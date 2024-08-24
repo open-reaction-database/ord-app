@@ -24,7 +24,7 @@ on:
 
 
 jobs:
-  test_ord_app:
+  test_python:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-14"]
