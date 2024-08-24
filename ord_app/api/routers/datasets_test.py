@@ -18,6 +18,7 @@ import gzip
 from base64 import b64decode
 
 import pytest
+from httpx import HTTPStatusError
 from ord_schema.proto.dataset_pb2 import Dataset
 
 from ord_app.api import load_dataset
@@ -41,18 +42,9 @@ def test_fetch_dataset(test_client):
 
 def test_fetch_unknown_dataset(test_client):
     response = test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "UNKNOWN"})
-    response.raise_for_status()
-    assert False
-
-
-def test_fetch_empty_dataset(test_client):
-    dataset_name = "TEST"
-    response = test_client.get("/editor/create_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
-    response.raise_for_status()
-    test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
-    response.raise_for_status()
-    dataset = Dataset.FromString(b64decode(response.json()))
-    assert len(dataset.reactions) == 0
+    with pytest.raises(HTTPStatusError):
+        response.raise_for_status()
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize("kind", ("binpb", "json", "txtpb"))
@@ -71,9 +63,23 @@ def test_upload_dataset(test_client, kind):
     pass
 
 
-def test_create_dataset():
-    pass
+def test_create_dataset(test_client):
+    dataset_name = "TEST"
+    response = test_client.get("/editor/create_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
+    response.raise_for_status()
+    response = test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
+    response.raise_for_status()
+    dataset = Dataset.FromString(b64decode(response.json()))
+    assert len(dataset.reactions) == 0
 
 
-def test_delete_dataset():
-    pass
+def test_delete_dataset(test_client):
+    dataset_name = "Deoxyfluorination screen"
+    response = test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
+    response.raise_for_status()
+    response = test_client.get("/editor/delete_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
+    response.raise_for_status()
+    response = test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})
+    with pytest.raises(HTTPStatusError):
+        response.raise_for_status()
+    assert response.status_code == 404

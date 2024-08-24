@@ -42,7 +42,10 @@ async def fetch_dataset(user_id: str, dataset_name: str):
     """Returns a base64-encoded dataset proto."""
     with get_cursor() as cursor:
         cursor.execute("SELECT binpb FROM datasets WHERE user_id = %s AND dataset_name = %s", (user_id, dataset_name))
-        return b64encode(cursor.fetchone()["binpb"]).decode()
+        row = cursor.fetchone()
+    if row is None:
+        return Response(status_code=404)
+    return b64encode(row["binpb"]).decode()
 
 
 @router.get("/download_dataset")
