@@ -2,6 +2,42 @@
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name="ord-app"
+description="App for the Open Reaction Database"
+url="https://github.com/Open-Reaction-Database/ord-app"
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+python_requires=">=3.10"
+dependencies=[
+    "fastapi[standard]",
+    "gunicorn",
+    "jinja2",
+    "numpy",
+    "ord-schema==0.3.89",
+    "pandas",
+    "protobuf==4.22.3",
+    "psycopg[binary,pool]>=3",
+    "rdkit",
+    "uvicorn[standard]",
+]
+
+[project.optional-dependencies]
+"tests"= [
+    "black>=22.3.0",
+    "coverage>=5.2.1",
+    "httpx",
+    "pylint>=2.13.9",
+    "pytest>=6.2.5",
+    "pytest-cov>=3.0.0",
+    "pytype>=2022.5.19",
+    "tenacity",
+    "testing-postgresql",
+]
+
 [tool.black]
 line-length = 120
 
