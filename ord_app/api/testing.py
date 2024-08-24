@@ -17,8 +17,8 @@ import os
 from glob import glob
 
 import psycopg
-from ord_schema.message_helpers import load_message
-from ord_schema.proto import dataset_pb2
+from google.protobuf import text_format
+from ord_schema.proto.dataset_pb2 import Dataset
 
 from ord_app.api.database import add_dataset, add_user, prepare_database
 
@@ -27,10 +27,10 @@ TEST_USER_ID = "680b0d9fe649417cb092d790907bd5a5"
 
 def setup_test_postgres(url: str) -> None:
     """Adds test data to a postgres database."""
-    datasets = [
-        load_message(filename, dataset_pb2.Dataset)
-        for filename in glob(os.path.join(os.path.dirname(__file__), "testdata", "*.pbtxt"))
-    ]
+    datasets = []
+    for filename in glob(os.path.join(os.path.dirname(__file__), "testdata", "*.txtpb")):
+        with open(filename) as f:
+            datasets.append(text_format.Parse(f.read(), Dataset()))
     assert datasets
     with psycopg.connect(url) as connection, connection.cursor() as cursor:  # pylint: disable=not-context-manager
         prepare_database(cursor)

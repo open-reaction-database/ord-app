@@ -18,6 +18,7 @@ import gzip
 from base64 import b64encode
 
 from fastapi import APIRouter, Response, UploadFile
+from ord_schema.proto.dataset_pb2 import Dataset
 
 from ord_app.api import download_message, load_dataset
 from ord_app.api.database import add_dataset, get_cursor, get_dataset
@@ -81,7 +82,8 @@ async def create_dataset(user_id: str, dataset_name: str):
     with get_cursor() as cursor:
         if get_dataset(user_id, dataset_name, cursor) is not None:
             return Response(status_code=409)
-        cursor.execute("INSERT INTO datasets (user_id, dataset_name) VALUES (%s, %s)", (user_id, dataset_name))
+        dataset = Dataset(name=dataset_name)
+        add_dataset(user_id, dataset, cursor)
 
 
 @router.get("/delete_dataset")

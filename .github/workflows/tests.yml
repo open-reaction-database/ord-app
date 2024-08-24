@@ -43,6 +43,6 @@ jobs:
       - name: Run tests
         run: |
           coverage erase
-          pytest -vv --cov=ord_app --durations=20
+          pytest -vv --cov=ord_app --durations=10
           coverage xml
       - uses: codecov/codecov-action@v4

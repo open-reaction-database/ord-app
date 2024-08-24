@@ -677,19 +677,19 @@ def _product_measurement_value(message) -> str:
     return ""
 
 
-def _pbtxt(reaction: reaction_pb2.Reaction) -> str:
+def _txtpb(reaction: reaction_pb2.Reaction) -> str:
     """Converts a message to text format."""
     message = text_format.MessageToString(reaction)
     # Preserve indentation.
     return re.sub(r"\s", "&nbsp;", message.strip().replace("\n", "<br>"))
 
 
-def _product_pbtxt(product: reaction_pb2.ProductCompound) -> str:
+def _product_txtpb(product: reaction_pb2.ProductCompound) -> str:
     """Converts a ProductCompound to text format without measurements."""
     trimmed = reaction_pb2.ProductCompound()
     trimmed.CopyFrom(product)
     del trimmed.measurements[:]
-    return _pbtxt(trimmed)
+    return _txtpb(trimmed)
 
 
 def _oneof(message, name="kind"):
@@ -763,8 +763,8 @@ TEMPLATE_FILTERS = {
     "count_addition_order": _count_addition_order,
     "sort_addition_order": _sort_addition_order,
     "get_input_borders": _get_input_borders,
-    "pbtxt": _pbtxt,
-    "product_pbtxt": _product_pbtxt,
+    "txtpb": _txtpb,
+    "product_txtpb": _product_txtpb,
     "oneof": _oneof,
     "defined": _defined,
     "type": _type,
