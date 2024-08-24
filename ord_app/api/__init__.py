@@ -16,7 +16,7 @@ import gzip
 from base64 import b64encode
 
 from fastapi import Response
-from google.protobuf import json_format, text_format  # pytype: disable=import-error
+from google.protobuf import json_format, text_format
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
