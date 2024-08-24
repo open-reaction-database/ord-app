@@ -43,7 +43,4 @@ jobs:
           python -m pip install .[tests]
       - name: Run tests
         run: |
-          coverage erase
           pytest -vv --cov=ord_app --durations=10
-          coverage xml
-      - uses: codecov/codecov-action@v4
