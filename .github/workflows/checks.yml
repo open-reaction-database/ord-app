@@ -14,7 +14,13 @@
 
 name: Checks
 
-on: [ pull_request, push ]
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
 
 jobs:
   check_license_headers:
