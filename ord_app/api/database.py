@@ -100,6 +100,15 @@ def add_user(user_id: str, user_name: str, cursor: Cursor) -> None:
     )
 
 
+def remove_user(user_id: str, cursor: Cursor) -> None:
+    """Deletes a user from the database."""
+    # NOTE(skearnes): We are deliberately not cascading deletion to avoid accidents.
+    try:
+        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+    except ForeignKeyViolation as error:
+        raise ValueError(f"All associated datasets must be deleted before deleting user: {user_id}") from error
+
+
 def add_dataset(user_id: str, dataset: Dataset, cursor: Cursor) -> None:
     """Adds a dataset to the database."""
     binpb = dataset.SerializeToString()
