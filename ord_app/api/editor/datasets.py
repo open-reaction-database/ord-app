@@ -20,7 +20,7 @@ from base64 import b64encode
 from fastapi import APIRouter, Response, UploadFile
 from ord_schema.proto.dataset_pb2 import Dataset
 
-from ord_app.api import download_message, load_dataset
+from ord_app.api import load_dataset, write_message
 from ord_app.api.database import add_dataset, get_cursor, get_dataset
 
 router = APIRouter(tags=["datasets"])
@@ -57,10 +57,15 @@ async def download_dataset(user_id: str, dataset_name: str, kind: str):
         dataset = get_dataset(user_id, dataset_name, cursor)
     if dataset is None:
         return Response(status_code=404)
-    return download_message(dataset, dataset_name, kind=kind)
+    data = write_message(dataset, kind=kind)
+    return Response(
+        gzip.compress(data),
+        headers={"Content-Disposition": f'attachment; filename="{dataset_name}.{kind}.gz"'},
+        media_type="application/gzip",
+    )
 
 
-@router.post("/upload_dataset")
+@router.post("/upload_dataset/{user_id}")
 async def upload_dataset(user_id: str, file: UploadFile):
     """Uploads a dataset."""
     data = await file.read()
@@ -86,7 +91,10 @@ async def create_dataset(user_id: str, dataset_name: str):
         if get_dataset(user_id, dataset_name, cursor) is not None:
             return Response(status_code=409)
         dataset = Dataset(name=dataset_name)
-        add_dataset(user_id, dataset, cursor)
+        try:
+            add_dataset(user_id, dataset, cursor)
+        except ValueError as error:
+            return Response(str(error), status_code=400)
 
 
 @router.get("/delete_dataset")

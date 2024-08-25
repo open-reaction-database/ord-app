@@ -17,10 +17,10 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from testing.postgresql import Postgresql
 
-from ord_app.api.routers import datasets, reactions, users, utilities, visualizations
+from ord_app.api.editor import datasets, reactions, users, utilities, visualizations
 from ord_app.api.testing import setup_test_postgres
 
 
@@ -28,21 +28,25 @@ from ord_app.api.testing import setup_test_postgres
 async def lifespan(*args, **kwargs):
     """FastAPI lifespan setup; see https://fastapi.tiangolo.com/advanced/events/#lifespan."""
     del args, kwargs  # Unused.
-    if os.getenv("ORD_EDITOR_TESTING", "FALSE") == "TRUE":
+    if os.getenv("ORD_APP_TESTING", "FALSE") == "TRUE":
         with Postgresql() as postgres:
             setup_test_postgres(postgres.url())
-            os.environ["ORD_EDITOR_POSTGRES"] = postgres.url()
+            os.environ["ORD_APP_POSTGRES"] = postgres.url()
             yield
     else:
         yield
 
 
-app = FastAPI(lifespan=lifespan, root_path="/editor")
-app.include_router(datasets.router)
-app.include_router(reactions.router)
-app.include_router(users.router)
-app.include_router(utilities.router)
-app.include_router(visualizations.router)
+app = FastAPI(lifespan=lifespan, root_path="/api")
+
+editor = APIRouter(prefix="/editor")
+editor.include_router(datasets.router)
+editor.include_router(reactions.router)
+editor.include_router(users.router)
+editor.include_router(utilities.router)
+editor.include_router(visualizations.router)
+
+app.include_router(editor)
 
 
 @app.get("/healthcheck")
