@@ -1,3 +1,4 @@
+name: "empty"
 reactions {
   reaction_id: "test"
 }
