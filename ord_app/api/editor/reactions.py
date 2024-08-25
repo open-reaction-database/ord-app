@@ -65,6 +65,7 @@ def clone_reaction(user_id: str, dataset_name: str, index: int):
             return Response(status_code=404)
         dataset.reactions.add().CopyFrom(dataset.reactions[index])
         add_dataset(user_id, dataset, cursor)
+    return Response(status_code=200)
 
 
 @router.get("/delete_reaction")
@@ -76,3 +77,4 @@ def delete_reaction(user_id: str, dataset_name: str, index: int):
             return Response(status_code=404)
         del dataset.reactions[index]
         add_dataset(user_id, dataset, cursor)
+    return Response(status_code=200)
