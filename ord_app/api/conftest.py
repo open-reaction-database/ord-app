@@ -51,9 +51,9 @@ def test_cursor(test_postgres) -> Iterator[Cursor]:
 @pytest.fixture
 def test_client(test_postgres) -> Iterator[TestClient]:
     with TestClient(app) as client, ExitStack() as stack:
-        # NOTE(skearnes): Set ORD_EDITOR_POSTGRES to use that database instead of a testing.postgresql instance.
-        # To force the use of testing.postgresl, set ORD_EDITOR_TESTING=TRUE.
-        if os.environ.get("ORD_EDITOR_TESTING", "FALSE") == "FALSE" and not os.environ.get("ORD_EDITOR_POSTGRES"):
-            stack.enter_context(patch.dict(os.environ, {"ORD_EDITOR_POSTGRES": test_postgres.url()}))
-        logger.debug(f"ORD_EDITOR_POSTGRES={os.environ['ORD_EDITOR_POSTGRES']}")
+        # NOTE(skearnes): Set ORD_APP_POSTGRES to use that database instead of a testing.postgresql instance.
+        # To force the use of testing.postgresl, set ORD_APP_TESTING=TRUE.
+        if os.environ.get("ORD_APP_TESTING", "FALSE") == "FALSE" and not os.environ.get("ORD_APP_POSTGRES"):
+            stack.enter_context(patch.dict(os.environ, {"ORD_APP_POSTGRES": test_postgres.url()}))
+        logger.debug(f"ORD_APP_POSTGRES={os.environ['ORD_APP_POSTGRES']}")
         yield client

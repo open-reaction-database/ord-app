@@ -12,14 +12,14 @@
     ```shell
     git clone git@github.com:open-reaction-database/ord-app.git
     cd ord-app
-    pip install -e ".[tests]"
+    pythom -m pip install -e ".[tests]"
     ```
 
 3. Run the FastAPI server
 
     ```shell
-    cd ord_app/editor/api
-    ORD_EDITOR_TESTING=TRUE fastapi dev main.py
+    cd ord_app/api
+    ORD_APP_TESTING=TRUE fastapi dev main.py
     ```
     
     This creates a test PostgreSQL database and starts the server at http://localhost:8000. Navigate to

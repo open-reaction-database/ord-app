@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for ord_app.api.routers.reactions."""
+"""Tests for ord_app.api.editor.utilities."""

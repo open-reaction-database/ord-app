@@ -30,7 +30,7 @@ POSTGRES_DATABASE = "editor"
 @contextmanager
 def get_cursor() -> Iterator[Cursor]:
     """Returns a psycopg cursor."""
-    dsn = os.getenv("ORD_EDITOR_POSTGRES")
+    dsn = os.getenv("ORD_APP_POSTGRES")
     if dsn is None:
         dsn = get_connection_string(
             database=POSTGRES_DATABASE,
