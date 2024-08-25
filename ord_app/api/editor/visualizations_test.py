@@ -13,3 +13,11 @@
 # limitations under the License.
 
 """Tests for ord_app.api.editor.visualizations."""
+
+
+def test_render_reaction():
+    pass
+
+
+def test_render_compound():
+    pass

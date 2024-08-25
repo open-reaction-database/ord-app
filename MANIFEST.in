@@ -1,3 +1,2 @@
-include ord_app/api/testdata/*.txtpb
-include ord_app/visualization/testdata/*.html
-include ord_app/visualization/testdata/*.txt
+graft ord_app/api/testdata
+graft ord_app/visualization/testdata

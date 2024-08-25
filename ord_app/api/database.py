@@ -93,7 +93,8 @@ def add_user(user_id: str, user_name: str, cursor: Cursor) -> None:
     """Adds a user to the database."""
     cursor.execute(
         """
-        INSERT INTO users (user_id, user_name) VALUES (%s, %s)
+        INSERT INTO users (user_id, user_name)
+            VALUES (%s, %s)
             ON CONFLICT (user_id) DO UPDATE SET user_name = %s
         """,
         (user_id, user_name, user_name),
@@ -110,12 +111,13 @@ def remove_user(user_id: str, cursor: Cursor) -> None:
 
 
 def add_dataset(user_id: str, dataset: Dataset, cursor: Cursor) -> None:
-    """Adds a dataset to the database."""
+    """Adds a dataset to the database (or updates an existing dataset)."""
     binpb = dataset.SerializeToString()
     try:
         cursor.execute(
             """
-            INSERT INTO datasets (user_id, dataset_name, binpb) VALUES (%s, %s, %s) 
+            INSERT INTO datasets (user_id, dataset_name, binpb)
+                VALUES (%s, %s, %s)
                 ON CONFLICT (user_id, dataset_name) DO UPDATE SET binpb = %s
             """,
             (user_id, dataset.name, binpb, binpb),
