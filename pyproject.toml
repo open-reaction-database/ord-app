@@ -16,7 +16,7 @@ dependencies = [
     "gunicorn",
     "jinja2",
     "numpy",
-    "ord-schema==0.3.89",
+    "ord-schema==0.3.91",
     "pandas",
     "protobuf==4.22.3",
     "psycopg[binary,pool]>=3",
