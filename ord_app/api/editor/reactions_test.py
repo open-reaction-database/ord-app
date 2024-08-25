@@ -53,15 +53,34 @@ def test_download_reaction(test_client, kind):
     assert reaction.reaction_id == "test_reaction-0"
 
 
+def test_create_reaction(test_client):
+    response = test_client.get(
+        "/api/editor/create_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "reaction_id": "test"},
+    )
+    response.raise_for_status()
+    index = response.json()
+    assert index == 80
+    response = test_client.get(
+        "/api/editor/fetch_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": index},
+    )
+    response.raise_for_status()
+    reaction = Reaction.FromString(b64decode(response.json()))
+    assert reaction.reaction_id == "test"
+
+
 def test_clone_reaction(test_client):
     response = test_client.get(
         "/api/editor/clone_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
     )
     response.raise_for_status()
+    index = response.json()
+    assert index == 80
     response = test_client.get(
         "/api/editor/fetch_reaction",
-        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 80},
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": index},
     )
     response.raise_for_status()
     reaction = Reaction.FromString(b64decode(response.json()))
