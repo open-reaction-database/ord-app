@@ -23,7 +23,7 @@ import pytest
 from httpx import HTTPStatusError
 from ord_schema.proto.dataset_pb2 import Dataset
 
-from ord_app.api import load_dataset, write_message
+from ord_app.api import load_message, write_message
 from ord_app.api.testing import TEST_USER_ID
 
 
@@ -56,7 +56,7 @@ def test_download_dataset(test_client, kind):
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "kind": kind},
     )
     response.raise_for_status()
-    dataset = load_dataset(gzip.decompress(response.read()), kind=kind)
+    dataset = load_message(gzip.decompress(response.read()), Dataset, kind=kind)
     assert len(dataset.reactions) == 80
 
 

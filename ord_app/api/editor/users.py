@@ -16,9 +16,9 @@
 
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 
-from ord_app.api.database import get_cursor
+from ord_app.api.database import add_user, get_cursor, remove_user
 
 router = APIRouter(tags=["users"])
 
@@ -28,7 +28,7 @@ async def create_user(user_name: str):
     """Creates a new user and returns the associated user ID."""
     user_id = uuid4().hex
     with get_cursor() as cursor:
-        cursor.execute("INSERT INTO users (user_id, user_name) VALUES (%s, %s)", (user_id, user_name))
+        add_user(user_id, user_name, cursor)
     return user_id
 
 
@@ -36,4 +36,7 @@ async def create_user(user_name: str):
 async def delete_user(user_id: str):
     """Deletes a user."""
     with get_cursor() as cursor:
-        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+        try:
+            remove_user(user_id, cursor)
+        except ValueError as error:
+            return Response(str(error), status_code=400)

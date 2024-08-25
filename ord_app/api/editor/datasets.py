@@ -20,7 +20,7 @@ from base64 import b64encode
 from fastapi import APIRouter, Response, UploadFile
 from ord_schema.proto.dataset_pb2 import Dataset
 
-from ord_app.api import load_dataset, write_message
+from ord_app.api import load_message, write_message
 from ord_app.api.database import add_dataset, get_cursor, get_dataset
 
 router = APIRouter(tags=["datasets"])
@@ -79,7 +79,7 @@ async def upload_dataset(user_id: str, file: UploadFile):
         kind = "txtpb"
     else:
         raise ValueError(file.filename)
-    dataset = load_dataset(data, kind)
+    dataset = load_message(data, Dataset, kind)
     with get_cursor() as cursor:
         add_dataset(user_id, dataset, cursor)
 
