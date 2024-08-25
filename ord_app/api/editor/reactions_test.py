@@ -17,6 +17,7 @@ import gzip
 from base64 import b64decode
 
 import pytest
+from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.api import load_message
@@ -50,3 +51,32 @@ def test_download_reaction(test_client, kind):
     response.raise_for_status()
     reaction = load_message(gzip.decompress(response.read()), Reaction, kind=kind)
     assert reaction.reaction_id == "test_reaction-0"
+
+
+def test_clone_reaction(test_client):
+    response = test_client.get(
+        "/api/editor/clone_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
+    )
+    response.raise_for_status()
+    response = test_client.get(
+        "/api/editor/fetch_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 80},
+    )
+    response.raise_for_status()
+    reaction = Reaction.FromString(b64decode(response.json()))
+    assert reaction.reaction_id == "test_reaction-0"
+
+
+def test_delete_reaction(test_client):
+    response = test_client.get(
+        "/api/editor/delete_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
+    )
+    response.raise_for_status()
+    response = test_client.get(
+        "/api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
+    )
+    response.raise_for_status()
+    dataset = Dataset.FromString(b64decode(response.json()))
+    assert len(dataset.reactions) == 79

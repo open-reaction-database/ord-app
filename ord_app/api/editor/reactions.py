@@ -18,7 +18,7 @@ import gzip
 from fastapi import APIRouter, Response
 
 from ord_app.api import send_message, write_message
-from ord_app.api.database import get_cursor, get_dataset
+from ord_app.api.database import add_dataset, get_cursor, get_dataset
 
 router = APIRouter(tags=["reactions"])
 
@@ -54,3 +54,25 @@ async def download_reaction(user_id: str, dataset_name: str, index: int, kind: s
         headers={"Content-Disposition": f'attachment; filename="{dataset_name}-{index}.{kind}.gz"'},
         media_type="application/gzip",
     )
+
+
+@router.get("/clone_reaction")
+def clone_reaction(user_id: str, dataset_name: str, index: int):
+    """Creates a copy of an existing reaction in the same dataset."""
+    with get_cursor() as cursor:
+        dataset = get_dataset(user_id, dataset_name, cursor)
+        if dataset is None:
+            return Response(status_code=404)
+        dataset.reactions.add().CopyFrom(dataset.reactions[index])
+        add_dataset(user_id, dataset, cursor)
+
+
+@router.get("/delete_reaction")
+def delete_reaction(user_id: str, dataset_name: str, index: int):
+    """Removes a reaction from the dataset."""
+    with get_cursor() as cursor:
+        dataset = get_dataset(user_id, dataset_name, cursor)
+        if dataset is None:
+            return Response(status_code=404)
+        del dataset.reactions[index]
+        add_dataset(user_id, dataset, cursor)
