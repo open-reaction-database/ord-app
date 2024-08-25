@@ -13,11 +13,32 @@
 # limitations under the License.
 
 """Tests for ord_app.api.editor.visualizations."""
+from base64 import b64decode
+
+from ord_schema.proto.reaction_pb2 import Reaction
+
+from ord_app.api.testing import TEST_USER_ID
 
 
-def test_render_reaction():
-    pass
+def test_render_reaction(test_client):
+    response = test_client.get(
+        "/api/editor/fetch_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
+    )
+    response.raise_for_status()
+    reaction = Reaction.FromString(b64decode(response.json()))
+    response = test_client.post("/api/editor/render_reaction", data=reaction.SerializeToString())
+    response.raise_for_status()
 
 
-def test_render_compound():
-    pass
+def test_render_compound(test_client):
+    response = test_client.get(
+        "/api/editor/fetch_reaction",
+        params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
+    )
+    response.raise_for_status()
+    reaction = Reaction.FromString(b64decode(response.json()))
+    response = test_client.post(
+        "/api/editor/render_compound", data=reaction.inputs["sulfonyl fluoride"].components[0].SerializeToString()
+    )
+    response.raise_for_status()

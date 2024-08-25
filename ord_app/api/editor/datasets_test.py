@@ -13,9 +13,9 @@
 # limitations under the License.
 
 """Tests for ord_app.api.editor.datasets."""
-
 import gzip
 import itertools
+import os
 from base64 import b64decode
 from io import BytesIO
 
@@ -113,3 +113,22 @@ def test_delete_dataset(test_client):
     with pytest.raises(HTTPStatusError):
         response.raise_for_status()
     assert response.status_code == 404
+
+
+def test_enumerate_dataset(test_client):
+    root = os.path.join(os.path.dirname(__file__), "testdata", "enumeration")
+    template = os.path.join(root, "nielsen_fig1_template.txtpb")
+    spreadsheet = os.path.join(root, "nielsen_fig1.csv")
+    response = test_client.post(
+        f"/api/editor/enumerate_dataset/{TEST_USER_ID}",
+        files={"template": (template, open(template, "rb")), "spreadsheet": (spreadsheet, open(spreadsheet, "rb"))},
+    )
+    response.raise_for_status()
+    dataset_name = response.json()
+    assert dataset_name == "nielsen_fig1"
+    response = test_client.get(
+        "/api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
+    )
+    response.raise_for_status()
+    dataset = Dataset.FromString(b64decode(response.json()))
+    assert len(dataset.reactions) == 80

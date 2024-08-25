@@ -28,7 +28,7 @@ TEST_USER_ID = "680b0d9fe649417cb092d790907bd5a5"
 def setup_test_postgres(url: str) -> None:
     """Adds test data to a postgres database."""
     datasets = []
-    for filename in glob(os.path.join(os.path.dirname(__file__), "testdata", "*.txtpb")):
+    for filename in glob(os.path.join(os.path.dirname(__file__), "editor", "testdata", "*.txtpb")):
         with open(filename) as f:
             datasets.append(text_format.Parse(f.read(), Dataset()))
     assert datasets

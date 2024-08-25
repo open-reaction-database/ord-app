@@ -13,12 +13,14 @@
 # limitations under the License.
 
 """Dataset API endpoints."""
-
 import gzip
+import os
 from base64 import b64encode
+from io import BytesIO
 
 from fastapi import APIRouter, Response, UploadFile
 from ord_schema.proto.dataset_pb2 import Dataset
+from ord_schema.templating import generate_dataset, read_spreadsheet
 
 from ord_app.api import load_message, write_message
 from ord_app.api.database import add_dataset, get_cursor, get_dataset
@@ -102,3 +104,23 @@ async def delete_dataset(user_id: str, dataset_name: str):
     """Deletes a dataset."""
     with get_cursor() as cursor:
         cursor.execute("DELETE FROM datasets WHERE user_id = %s AND dataset_name = %s", (user_id, dataset_name))
+
+
+@router.post("/enumerate_dataset/{user_id}")
+async def enumerate_dataset(user_id: str, template: UploadFile, spreadsheet: UploadFile):
+    """Creates a new dataset based on a template reaction and a spreadsheet."""
+    try:
+        basename, suffix = os.path.splitext(os.path.basename(spreadsheet.filename))
+        dataframe = read_spreadsheet(BytesIO(await spreadsheet.read()), suffix=suffix)
+        dataset = generate_dataset(
+            name=basename,
+            description="Enumerated by the ORD editor.",
+            template_string=(await template.read()).decode(),
+            df=dataframe,
+            validate=False,
+        )
+        with get_cursor() as cursor:
+            add_dataset(user_id, dataset, cursor)
+        return basename
+    except Exception as error:  # pylint: disable=broad-except
+        return Response(str(error), status_code=400)
