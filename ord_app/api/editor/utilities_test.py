@@ -13,14 +13,11 @@
 # limitations under the License.
 
 """Tests for ord_app.api.editor.utilities."""
-import os
 from base64 import b64decode
 
 import pytest
-from ord_schema.proto.dataset_pb2 import Dataset
-from ord_schema.proto.reaction_pb2 import Percentage, ReactionInput
-
-from ord_app.api.testing import TEST_USER_ID
+from ord_schema.proto.reaction_pb2 import Compound, Percentage, ReactionInput
+from rdkit import Chem
 
 
 @pytest.mark.parametrize(
@@ -60,20 +57,10 @@ def test_canonicalize_smiles(test_client, smiles, expected):
     assert response.json() == expected
 
 
-def test_enumerate_dataset(test_client):
-    root = os.path.join(os.path.dirname(__file__), "testdata", "enumeration")
-    template = os.path.join(root, "nielsen_fig1_template.txtpb")
-    spreadsheet = os.path.join(root, "nielsen_fig1.csv")
-    response = test_client.post(
-        f"/api/editor/enumerate_dataset/{TEST_USER_ID}",
-        files={"template": (template, open(template, "rb")), "spreadsheet": (spreadsheet, open(spreadsheet, "rb"))},
-    )
+def test_get_molblock(test_client):
+    smiles = "c1ccccc1"
+    compound = Compound()
+    compound.identifiers.add(value=smiles, type="SMILES")
+    response = test_client.post(f"/api/editor/get_molblock", data=compound.SerializeToString())
     response.raise_for_status()
-    dataset_name = response.json()
-    assert dataset_name == "nielsen_fig1"
-    response = test_client.get(
-        "/api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
-    )
-    response.raise_for_status()
-    dataset = Dataset.FromString(b64decode(response.json()))
-    assert len(dataset.reactions) == 80
+    assert response.json() == Chem.MolToMolBlock(Chem.MolFromSmiles(smiles))

@@ -13,20 +13,14 @@
 # limitations under the License.
 
 """Utility API endpoints."""
-
-import os
-from base64 import b64decode
-from io import BytesIO
-
-from fastapi import APIRouter, Request, Response, UploadFile
+from fastapi import APIRouter, Request, Response
 from ord_schema import resolvers
-from ord_schema.message_helpers import create_message
-from ord_schema.templating import generate_dataset, read_spreadsheet
+from ord_schema.message_helpers import create_message, molblock_from_compound
+from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
 from pydantic import BaseModel
 
 from ord_app.api import send_message
-from ord_app.api.database import add_dataset, get_cursor
 
 router = APIRouter(tags=["utilities"])
 
@@ -90,21 +84,11 @@ async def canonicalize_smiles(smiles: str):
         return Response(str(error), status_code=400)
 
 
-@router.post("/enumerate_dataset/{user_id}")
-async def enumerate_dataset(user_id: str, template: UploadFile, spreadsheet: UploadFile):
-    """Creates a new dataset based on a template reaction and a spreadsheet."""
+@router.post("/get_molblock")
+async def get_molblock(request: Request):
+    """Returns a MolBlock for the given Compound message."""
+    compound = Compound.FromString(await request.body())
     try:
-        basename, suffix = os.path.splitext(os.path.basename(spreadsheet.filename))
-        dataframe = read_spreadsheet(BytesIO(await spreadsheet.read()), suffix=suffix)
-        dataset = generate_dataset(
-            name=basename,
-            description="Enumerated by the ORD editor.",
-            template_string=(await template.read()).decode(),
-            df=dataframe,
-            validate=False,
-        )
-        with get_cursor() as cursor:
-            add_dataset(user_id, dataset, cursor)
-        return basename
-    except Exception as error:  # pylint: disable=broad-except
+        return molblock_from_compound(compound)
+    except ValueError as error:
         return Response(str(error), status_code=400)
