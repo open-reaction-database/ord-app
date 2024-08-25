@@ -21,6 +21,7 @@ import psycopg
 from ord_schema.orm.database import get_connection_string
 from ord_schema.proto.dataset_pb2 import Dataset
 from psycopg import Cursor
+from psycopg.errors import ForeignKeyViolation
 from psycopg.rows import dict_row
 
 POSTGRES_DATABASE = "editor"
@@ -102,13 +103,16 @@ def add_user(user_id: str, user_name: str, cursor: Cursor) -> None:
 def add_dataset(user_id: str, dataset: Dataset, cursor: Cursor) -> None:
     """Adds a dataset to the database."""
     binpb = dataset.SerializeToString()
-    cursor.execute(
-        """
-        INSERT INTO datasets (user_id, dataset_name, binpb) VALUES (%s, %s, %s) 
-            ON CONFLICT (user_id, dataset_name) DO UPDATE SET binpb = %s
-        """,
-        (user_id, dataset.name, binpb, binpb),
-    )
+    try:
+        cursor.execute(
+            """
+            INSERT INTO datasets (user_id, dataset_name, binpb) VALUES (%s, %s, %s) 
+                ON CONFLICT (user_id, dataset_name) DO UPDATE SET binpb = %s
+            """,
+            (user_id, dataset.name, binpb, binpb),
+        )
+    except ForeignKeyViolation as error:
+        raise ValueError(f"Unknown user: {user_id}") from error
 
 
 def get_dataset(user_id: str, dataset_name: str, cursor: Cursor) -> Dataset | None:

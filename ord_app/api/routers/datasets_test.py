@@ -85,6 +85,12 @@ def test_create_dataset(test_client):
     response.raise_for_status()
 
 
+def test_create_dataset_unknown_user(test_client):
+    response = test_client.get("/editor/create_dataset", params={"user_id": "test", "dataset_name": "test"})
+    with pytest.raises(HTTPStatusError):
+        response.raise_for_status()
+
+
 def test_delete_dataset(test_client):
     dataset_name = "Deoxyfluorination screen"
     response = test_client.get("/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name})

@@ -91,7 +91,10 @@ async def create_dataset(user_id: str, dataset_name: str):
         if get_dataset(user_id, dataset_name, cursor) is not None:
             return Response(status_code=409)
         dataset = Dataset(name=dataset_name)
-        add_dataset(user_id, dataset, cursor)
+        try:
+            add_dataset(user_id, dataset, cursor)
+        except ValueError as error:
+            return Response(str(error), status_code=400)
 
 
 @router.get("/delete_dataset")
