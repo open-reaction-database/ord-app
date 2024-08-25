@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """Reaction API endpoints."""
+import gzip
 
 from fastapi import APIRouter, Response
 
-from ord_app.api import download_message, send_message
+from ord_app.api import send_message, write_message
 from ord_app.api.database import get_cursor, get_dataset
 
 router = APIRouter(tags=["reactions"])
@@ -47,4 +48,9 @@ async def download_reaction(user_id: str, dataset_name: str, index: int, kind: s
         dataset = get_dataset(user_id, dataset_name, cursor)
     if dataset is None:
         return Response(status_code=404)
-    return download_message(dataset.reactions[index], f"{dataset_name}-{index}", kind=kind)
+    data = write_message(dataset.reactions[index], kind=kind)
+    return Response(
+        gzip.compress(data),
+        headers={"Content-Disposition": f'attachment; filename="{dataset_name}-{index}.{kind}.gz"'},
+        media_type="application/gzip",
+    )

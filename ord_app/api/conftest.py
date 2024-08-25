@@ -32,7 +32,7 @@ from ord_app.api.testing import setup_test_postgres
 logger = get_logger(__name__)
 
 
-@pytest.fixture(name="test_postgres", scope="session")
+@pytest.fixture(name="test_postgres")
 def test_postgres_fixture() -> Iterator[Postgresql]:
     with Postgresql() as postgres:
         setup_test_postgres(postgres.url())
@@ -48,7 +48,7 @@ def test_cursor(test_postgres) -> Iterator[Cursor]:
         yield cursor
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_client(test_postgres) -> Iterator[TestClient]:
     with TestClient(app) as client, ExitStack() as stack:
         # NOTE(skearnes): Set ORD_EDITOR_POSTGRES to use that database instead of a testing.postgresql instance.

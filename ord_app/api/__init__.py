@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Editor API helper functions."""
-import gzip
 from base64 import b64encode
 
-from fastapi import Response
 from google.protobuf import json_format, text_format
+from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
@@ -24,26 +23,38 @@ from ord_app.api.database import add_dataset, get_cursor, get_dataset
 from ord_app.api.testing import setup_test_postgres
 
 
-def download_message(message: Dataset | Reaction, prefix: str, kind: str):
-    """Downloads a dataset or reaction as a gzipped file."""
+def write_message(message: Dataset | Reaction, kind: str) -> bytes:
+    """Serializes a dataset or reaction.
+
+    Args:
+        message: Dataset or reaction proto.
+        kind: Serialization kind.
+
+    Returns:
+        Serialized proto.
+    """
     match kind:
         case "binpb":
             data = message.SerializeToString()
-            filename = f"{prefix}.binpb"
         case "json":
             data = json_format.MessageToJson(message).encode()
-            filename = f"{prefix}.json"
         case "txtpb":
             data = text_format.MessageToBytes(message)
-            filename = f"{prefix}.txtpb"
         case _:
             raise ValueError(kind)
-    headers = {"Content-Disposition": f'attachment; filename="{filename}.gz"'}
-    return Response(gzip.compress(data), headers=headers, media_type="application/gzip")
+    return data
 
 
-def load_dataset(data: bytes, kind: str):
-    """Loads a serialized dataset."""
+def load_dataset(data: bytes, kind: str) -> Dataset:
+    """Loads a serialized dataset.
+
+    Args:
+        data: Serialized dataset proto.
+        kind: Serialization kind.
+
+    Returns:
+        Dataset proto.
+    """
     match kind:
         case "binpb":
             dataset = Dataset.FromString(data)
@@ -56,6 +67,6 @@ def load_dataset(data: bytes, kind: str):
     return dataset
 
 
-def send_message(message) -> str:
+def send_message(message: Message) -> str:
     """Converts a protocol buffer message to a base64-encoded string."""
     return b64encode(message.SerializeToString()).decode()
