@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ord-app"
+description = "App for the Open Reaction Database"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]",
+    "gunicorn",
+    "jinja2",
+    "numpy",
+    "ord-schema==0.3.91",
+    "pandas",
+    "protobuf==4.22.3",
+    "psycopg[binary,pool]>=3",
+    "rdkit",
+    "setuptools",  # TODO(skearnes): Move to ord-schema.
+    "uvicorn[standard]",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+"tests" = [
+    "black",
+    "coverage",
+    "httpx",
+    "pylint",
+    "pytest",
+    "pytest-cov",
+    "pytype",
+    "tenacity",
+    "testing-postgresql",
+]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+skip_glob = ["**/*_pb2.py*"]
+line_length = 120
+profile = "black"
+known_third_party = ["ord_schema"]
+
+[tool.pytype]
+inputs = ["ord_app"]
+exclude = ["**/*_test.py", "**/test_*.py", "build/", "dist/"]
+keep_going = true
+disable = ["module-attr", "pyi-error"]
+jobs = 0
