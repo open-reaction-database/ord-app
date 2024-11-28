@@ -37,6 +37,9 @@ jobs:
 
   check_python:
     runs-on: ubuntu-latest
+    defaults:
+      run: 
+        working-directory: ./ord-app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -62,6 +65,9 @@ jobs:
 
   check_javascript:
     runs-on: ubuntu-latest
+    defaults:
+      run: 
+        working-directory: ./ord-app
     steps:
       - uses: actions/checkout@v4
       - name: clang-format
