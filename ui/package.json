@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src",
     "preview": "vite preview",
-    "prepare": "cd .. && husky ./ui/.husky"
+    "prepare": "cd .. && husky ./ui/.husky",
+    "add-license": "license-check-and-add add"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
