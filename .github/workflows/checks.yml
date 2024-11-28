@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run: 
-        working-directory: ./ord-app
+        working-directory: ord-app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run: 
-        working-directory: ./ord-app
+        working-directory: ord-app
     steps:
       - uses: actions/checkout@v4
       - name: clang-format
