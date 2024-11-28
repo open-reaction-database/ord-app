@@ -1,1 +1,1 @@
-npx lint-staged
+npx lint-staged --cwd ui --concurrent false
