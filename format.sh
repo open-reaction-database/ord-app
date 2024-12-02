@@ -25,6 +25,7 @@ if command -v go &> /dev/null; then
     -l apache "${ROOT_DIR}"
 else
   echo "Please install Go; see https://golang.org/doc/install"
+  exit 1
 fi
 # Format python.
 black "${ROOT_DIR}"
@@ -38,4 +39,5 @@ else
   echo "Please install clang-format:"
   echo "  Linux: apt install clang-format-10"
   echo "  MacOS: brew install clang-format"
+  exit 1
 fi
