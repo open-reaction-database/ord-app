@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for ord_app.api.database."""
-from ord_app.api.database import get_dataset
-from ord_app.api.testing import TEST_USER_ID
+"""Tests for ord_app.service_api.database."""
+from ord_app.service_api.database import get_dataset
+from ord_app.service_api.testing import TEST_USER_ID
 
 
 def test_get_dataset(test_cursor):

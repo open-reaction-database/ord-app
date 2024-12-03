@@ -26,8 +26,8 @@ from psycopg import Cursor
 from psycopg.rows import dict_row
 from testing.postgresql import Postgresql
 
-from ord_app.api.main import app
-from ord_app.api.testing import setup_test_postgres
+from ord_app.service_api.main import app
+from ord_app.service_api.testing import setup_test_postgres
 
 logger = get_logger(__name__)
 
