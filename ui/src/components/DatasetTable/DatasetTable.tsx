@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import { useEffect, useMemo, useState } from 'react';
-import datasetsMock from '../../common/mocks/datasetsMock';
 import { MRT_ColumnDef } from 'mantine-react-table';
-import Pagination from '../../common/components/Pagination/Pagination';
-import DataTable from '../../common/components/DataTable/DataTable';
+import { DataTable } from '../../common/components/DataTable/DataTable';
+import { Pagination } from '../../common/components/Pagination/Pagination';
 import classes from './DatasetTable.module.scss';
+import datasetsMock from '../../common/mocks/datasetsMock';
 
 interface DatasetTableRow {
   datasetName: string;
@@ -32,7 +32,7 @@ interface DatasetTableRow {
 
 const mockData: DatasetTableRow[] = datasetsMock;
 
-const DatasetTable: React.FC = () => {
+export function DatasetTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,6 +138,4 @@ const DatasetTable: React.FC = () => {
       />
     </div>
   );
-};
-
-export default DatasetTable;
+}

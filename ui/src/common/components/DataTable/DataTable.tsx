@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { MantineReactTable, MRT_RowData, MRT_TableOptions, useMantineReactTable } from 'mantine-react-table';
-import classes from './DataTable.module.scss';
 import { IconChevronDown, IconChevronUp, IconSelector } from '@tabler/icons-react';
+import classes from './DataTable.module.scss';
 
-const DataTable = <T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableOptions<T>) => {
+export function DataTable<T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableOptions<T>) {
   const table = useMantineReactTable<T>({
     columns,
     data: data,
@@ -61,6 +61,4 @@ const DataTable = <T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableO
   });
 
   return <MantineReactTable table={table} />;
-};
-
-export default DataTable;
+}

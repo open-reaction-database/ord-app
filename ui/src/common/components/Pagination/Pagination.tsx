@@ -27,13 +27,13 @@ interface PaginationProps {
 
 const ROW_PER_PAGE_OPTIONS = ['10', '20', '50', '100'];
 
-const Pagination: React.FC<PaginationProps> = ({
+export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
   rowsPerPage,
   onRowsPerPageChange,
-}) => {
+}: PaginationProps) {
   return (
     <Group align="center">
       <Button
@@ -76,6 +76,4 @@ const Pagination: React.FC<PaginationProps> = ({
       </Button>
     </Group>
   );
-};
-
-export default Pagination;
+}
