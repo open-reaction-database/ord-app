@@ -54,3 +54,6 @@ exclude = ["**/*_test.py", "**/test_*.py", "build/", "dist/"]
 keep_going = true
 disable = ["module-attr", "pyi-error"]
 jobs = 0
+
+[tool.setuptools]
+packages = ["ord_app"]
