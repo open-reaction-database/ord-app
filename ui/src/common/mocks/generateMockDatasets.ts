@@ -15,20 +15,24 @@
  */
 import { faker } from '@faker-js/faker';
 import { DatasetTableRow } from '../../components/DatasetTable/DatasetTable';
+import { DATASET_STATUS } from '../model/datasetStatus';
 
 /**
  * Generates an array of mock datasets
+ *
  * @param count - The number of datasets to generate
  * @returns
  */
 export function generateMockDatasets(count: number): DatasetTableRow[] {
+  const statusValues = Object.values(DATASET_STATUS);
+
   return Array.from({ length: count }, () => ({
-    datasetName: `${faker.number.int({ min: 100, max: 999 })} ${faker.company.name()} dataset`,
+    datasetName: `${faker.number.int({ min: 100, max: 999 })} ${faker.company.name()} dataset`.slice(0, 20),
     size: faker.number.int({ min: 10, max: 10000 }),
-    status: faker.helpers.arrayElement(['In Progress', 'Under Review', 'Need Revision', 'Approved', 'Published']),
+    status: faker.helpers.arrayElement(statusValues),
     group: `Group ${faker.number.int({ min: 1, max: 5 })}`,
-    owner: `${faker.person.firstName()} ${faker.person.lastName()}`,
+    owner: `${faker.person.firstName().slice(0, 5)} ${faker.person.lastName().slice(0, 5)}`,
     lastModified: faker.date.recent().getTime(),
-    description: faker.lorem.sentence(),
+    description: faker.lorem.sentence().slice(0, 20),
   }));
 }

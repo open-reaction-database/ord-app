@@ -13,29 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tableContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
-
-.table {
-  tr:hover {
-    .buttons {
-      display: block;
-    }
-
-    td {
-      color: #090a0b;
-    }
-
-    td:first-child {
-      font-weight: 600;
-    }
-  }
-}
-
-.buttons {
-  display: none;
+// TODO: Update when BE format is defined
+export enum DATASET_STATUS {
+  IN_PROGRESS = 'In Progress',
+  UNDER_REVIEW = 'Under Review',
+  NEED_REVISION = 'Need Revision',
+  APPROVED = 'Approved',
+  PUBLISHED = 'Published',
 }

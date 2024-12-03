@@ -13,29 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tableContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
+import { format } from 'date-fns';
 
-.table {
-  tr:hover {
-    .buttons {
-      display: block;
-    }
-
-    td {
-      color: #090a0b;
-    }
-
-    td:first-child {
-      font-weight: 600;
-    }
-  }
-}
-
-.buttons {
-  display: none;
+/**
+ * Formats a timestamp into a human-readable date string using date-fns library
+ *
+ * @param timestamp - Timestamp in milliseconds
+ * @returns
+ */
+export function formatDate(timestamp: number) {
+  return format(timestamp, 'dd.MM.yyyy hh:mmaaa');
 }

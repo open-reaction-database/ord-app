@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 import { useEffect, useMemo, useState } from 'react';
+import { Avatar, Group } from '@mantine/core';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { DataTable } from '../../common/components/DataTable/DataTable';
 import { Pagination } from '../../common/components/Pagination/Pagination';
-import classes from './DatasetTable.module.scss';
+import { StatusChip } from '../../common/components/StatusChip/StatusChip';
 import { generateMockDatasets } from '../../common/mocks/generateMockDatasets';
+import { DATASET_STATUS } from '../../common/model/datasetStatus';
+import { formatDate } from '../../common/utils';
+import classes from './DatasetTable.module.scss';
 
 export interface DatasetTableRow {
   datasetName: string;
   size: number;
-  status: string;
+  status: DATASET_STATUS;
   group: string;
   owner: string;
   lastModified: number;
@@ -81,6 +85,9 @@ export function DatasetTable() {
         id: 'status',
         accessorKey: 'status',
         header: 'Status',
+        Cell: ({ row }) => {
+          return <StatusChip status={row.original.status} />;
+        },
         size: 110,
       },
       {
@@ -93,12 +100,27 @@ export function DatasetTable() {
         id: 'owner',
         accessorKey: 'owner',
         header: 'Owner',
+        Cell: ({ row }) => {
+          // TODO: Update avatar src and consider the behaviour for long names
+          return (
+            <Group gap="4px">
+              <Avatar
+                src={null}
+                size="sm"
+              />
+              {row.original.owner}
+            </Group>
+          );
+        },
         size: 145,
       },
       {
         id: 'lastModified',
         accessorKey: 'lastModified',
         header: 'Last Modified',
+        Cell: ({ row }) => {
+          return <>{formatDate(row.original.lastModified)}</>;
+        },
         size: 145,
       },
       {

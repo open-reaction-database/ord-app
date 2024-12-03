@@ -13,29 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tableContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
+.chip {
+  padding: 4px 6px;
 }
 
-.table {
-  tr:hover {
-    .buttons {
-      display: block;
-    }
-
-    td {
-      color: #090a0b;
-    }
-
-    td:first-child {
-      font-weight: 600;
-    }
-  }
-}
-
-.buttons {
+.iconWrapper {
   display: none;
 }
