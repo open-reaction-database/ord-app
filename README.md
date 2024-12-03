@@ -18,7 +18,7 @@
 3. Run the FastAPI server
 
     ```shell
-    cd ord_app/api
+    cd ord_app/service_api
     ORD_APP_TESTING=TRUE fastapi dev main.py
     ```
     

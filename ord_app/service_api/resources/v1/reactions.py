@@ -18,8 +18,8 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Response
 
-from ord_app.api import send_message, write_message
-from ord_app.api.database import add_dataset, get_cursor, get_dataset
+from ord_app.service_api import send_message, write_message
+from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 
 router = APIRouter(tags=["reactions"])
 

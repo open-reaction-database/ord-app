@@ -20,8 +20,8 @@ from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
-from ord_app.api.database import add_dataset, get_cursor, get_dataset
-from ord_app.api.testing import setup_test_postgres
+from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
+from ord_app.service_api.testing import setup_test_postgres
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:

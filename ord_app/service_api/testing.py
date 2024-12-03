@@ -20,7 +20,7 @@ import psycopg
 from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
 
-from ord_app.api.database import add_dataset, add_user, prepare_database
+from ord_app.service_api.database import add_dataset, add_user, prepare_database
 
 TEST_USER_ID = "680b0d9fe649417cb092d790907bd5a5"
 

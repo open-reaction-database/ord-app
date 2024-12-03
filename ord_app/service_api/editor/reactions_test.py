@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for ord_app.api.editor.reactions."""
+"""Tests for ord_app.service_api.editor.reactions."""
 import gzip
 from base64 import b64decode
 
@@ -20,13 +20,13 @@ import pytest
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
-from ord_app.api import load_message
-from ord_app.api.testing import TEST_USER_ID
+from ord_app.service_api import load_message
+from ord_app.service_api.testing import TEST_USER_ID
 
 
 def test_list_reactions(test_client):
     response = test_client.get(
-        "/api/editor/list_reactions", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
+        "/service_api/editor/list_reactions", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
     )
     response.raise_for_status()
     assert len(response.json()) == 80
@@ -34,7 +34,7 @@ def test_list_reactions(test_client):
 
 def test_fetch_reaction(test_client):
     response = test_client.get(
-        "/api/editor/fetch_reaction",
+        "/service_api/editor/fetch_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
     )
     response.raise_for_status()
@@ -45,7 +45,7 @@ def test_fetch_reaction(test_client):
 @pytest.mark.parametrize("kind", ("binpb", "json", "txtpb"))
 def test_download_reaction(test_client, kind):
     response = test_client.get(
-        "/api/editor/download_reaction",
+        "/service_api/editor/download_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0, "kind": kind},
     )
     response.raise_for_status()
@@ -55,14 +55,14 @@ def test_download_reaction(test_client, kind):
 
 def test_create_reaction(test_client):
     response = test_client.get(
-        "/api/editor/create_reaction",
+        "/service_api/editor/create_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "reaction_id": "test"},
     )
     response.raise_for_status()
     index = response.json()
     assert index == 80
     response = test_client.get(
-        "/api/editor/fetch_reaction",
+        "/service_api/editor/fetch_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": index},
     )
     response.raise_for_status()
@@ -72,14 +72,14 @@ def test_create_reaction(test_client):
 
 def test_clone_reaction(test_client):
     response = test_client.get(
-        "/api/editor/clone_reaction",
+        "/service_api/editor/clone_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
     )
     response.raise_for_status()
     index = response.json()
     assert index == 80
     response = test_client.get(
-        "/api/editor/fetch_reaction",
+        "/service_api/editor/fetch_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": index},
     )
     response.raise_for_status()
@@ -89,12 +89,12 @@ def test_clone_reaction(test_client):
 
 def test_delete_reaction(test_client):
     response = test_client.get(
-        "/api/editor/delete_reaction",
+        "/service_api/editor/delete_reaction",
         params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen", "index": 0},
     )
     response.raise_for_status()
     response = test_client.get(
-        "/api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
+        "/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
     )
     response.raise_for_status()
     dataset = Dataset.FromString(b64decode(response.json()))
