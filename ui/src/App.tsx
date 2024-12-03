@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { createTheme, MantineProvider } from '@mantine/core';
+import DatasetTable from './components/DatasetTable/DatasetTable';
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -21,5 +22,9 @@ const theme = createTheme({
 });
 
 export function App() {
-  return <MantineProvider theme={theme}></MantineProvider>;
+  return (
+    <MantineProvider theme={theme}>
+      <DatasetTable />
+    </MantineProvider>
+  );
 }
