@@ -18,19 +18,19 @@ import { MRT_ColumnDef } from 'mantine-react-table';
 import { DataTable } from '../../common/components/DataTable/DataTable';
 import { Pagination } from '../../common/components/Pagination/Pagination';
 import classes from './DatasetTable.module.scss';
-import datasetsMock from '../../common/mocks/datasetsMock';
+import { generateMockDatasets } from '../../common/mocks/generateMockDatasets';
 
-interface DatasetTableRow {
+export interface DatasetTableRow {
   datasetName: string;
   size: number;
   status: string;
   group: string;
   owner: string;
-  lastModified: string;
+  lastModified: number;
   description: string;
 }
 
-const mockData: DatasetTableRow[] = datasetsMock;
+const mockData = generateMockDatasets(200);
 
 export function DatasetTable() {
   const [currentPage, setCurrentPage] = useState(1);
