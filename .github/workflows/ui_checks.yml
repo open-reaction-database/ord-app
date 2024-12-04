@@ -1,0 +1,36 @@
+on:
+  pull_request:
+    paths:
+      - 'ui/**'
+    branches:
+      - '*'
+  push:
+    paths:
+      - 'ui/**'
+    branches:
+      - 'main'
+
+defaults:
+  run:
+    working-directory: ./ui
+
+jobs:
+  lint_ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run lint:check
+
+  test_ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run test
