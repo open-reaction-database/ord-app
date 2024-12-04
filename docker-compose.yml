@@ -14,6 +14,7 @@
 
 services:
   api:
+    image: ord-api
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,6 +37,17 @@ services:
       - db:/bitnami/postgresql
     ports:
       - "5400:5432"
+
+  migrate:
+    image: ord-api
+    depends_on:
+      - db
+    environment:
+      PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
+    volumes:
+      - .:/app
+    entrypoint: >
+      sh -c "alembic upgrade head"
 
 volumes:
   db:

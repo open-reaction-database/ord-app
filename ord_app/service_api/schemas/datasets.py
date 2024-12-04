@@ -12,14 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from base64 import b64encode
+from datetime import datetime
+from typing import Literal
 
-from ord_app.service_api.settings import RuntimeSettings
+from pydantic import field_validator
 
-pg_engine = create_async_engine(RuntimeSettings.pg_dsn)
-db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
+from ord_app.service_api.schemas.base import BaseSchema
+
+DownloadFileFormats = Literal["binpb", "json", "txtpb"]
+
+class DatasetSchema(BaseSchema):
+    name: str
+    created_at: datetime
+    modified_at: datetime
+    binpb: str
+
+    @field_validator("binpb", mode="before")
+    @classmethod
+    def _binpb(cls, raw):
+        return b64encode(raw).decode()
 
 
-async def get_db_session():
-    async with db_session_maker() as session:
-        yield session
+class DatasetCreateSchema(BaseSchema):
+    name: str

@@ -20,7 +20,7 @@ from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
 from pydantic import BaseModel
 
-from ord_app.service_api import send_message
+from ord_app.service_api.domain.datasets import send_message
 
 router = APIRouter(tags=["utilities"])
 

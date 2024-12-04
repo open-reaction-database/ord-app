@@ -13,52 +13,35 @@
 # limitations under the License.
 
 import datetime
+import re
 
-from sqlalchemy import String, func, LargeBinary
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import func, LargeBinary, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, declared_attr
 
 
 class BaseModel(DeclarativeBase):
-    pass
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    @declared_attr
+    def __tablename__(cls):
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__.removesuffix("Model")).lower()
 
 
 class UserModel(BaseModel):
-    __tablename__ = 'users'
-
-    user_id: Mapped[str] = mapped_column(String(32), primary_key=True)
     user_name: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
 
-    @hybrid_property
-    def created(self):
-        return int(round(self.created_at.timestamp()))
-
 
 class DatasetModel(BaseModel):
-    __tablename__ = 'datasets'
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    user: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
-    user_id: Mapped[str] = mapped_column(String(32), primary_key=True)
-    dataset_name: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
 
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     modified_at: Mapped[datetime.datetime] = mapped_column(
-        server_default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
+        server_default=func.now(),
+        onupdate=func.now(),
         nullable=False
     )
-
-    @hybrid_property
-    def created(self):
-        return int(round(self.created_at.timestamp()))
-
-    @hybrid_property
-    def modified(self):
-        return int(round(self.modified_at.timestamp()))
-
-
-    # __table_args__ = (
-    #     {'extend_existing': True},
-    #     {'primary_key': ['user_id', 'dataset_name']}
-    # )

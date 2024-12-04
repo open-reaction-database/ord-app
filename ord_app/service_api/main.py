@@ -40,10 +40,10 @@ from ord_app.service_api.services.populate_data_sets import populate_testing_dat
 
 app = FastAPI(root_path="/service_api")
 
-editor = APIRouter(prefix="/editor")
+editor = APIRouter(prefix="/api/v1")
+editor.include_router(users.router)
 editor.include_router(datasets.router)
 editor.include_router(reactions.router)
-editor.include_router(users.router)
 editor.include_router(utilities.router)
 editor.include_router(visualizations.router)
 

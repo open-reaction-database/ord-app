@@ -23,7 +23,7 @@ import pytest
 from httpx import HTTPStatusError
 from ord_schema.proto.dataset_pb2 import Dataset
 
-from ord_app.service_api import load_message, write_message
+from ord_app.service_api.domain.datasets import write_message, load_message
 from ord_app.service_api.testing import TEST_USER_ID
 
 

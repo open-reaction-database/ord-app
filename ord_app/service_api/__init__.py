@@ -12,63 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Editor API helper functions."""
-from base64 import b64encode
-from typing import Type
-
-from google.protobuf import json_format, text_format
-from google.protobuf.message import Message
-from ord_schema.proto.dataset_pb2 import Dataset
-from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 from ord_app.service_api.testing import setup_test_postgres
-
-
-def write_message(message: Dataset | Reaction, kind: str) -> bytes:
-    """Serializes a dataset or reaction.
-
-    Args:
-        message: Dataset or Reaction proto.
-        kind: Serialization kind.
-
-    Returns:
-        Serialized proto.
-    """
-    match kind:
-        case "binpb":
-            data = message.SerializeToString()
-        case "json":
-            data = json_format.MessageToJson(message).encode()
-        case "txtpb":
-            data = text_format.MessageToBytes(message)
-        case _:
-            raise ValueError(kind)
-    return data
-
-
-def load_message(data: bytes, message_type: Type[Dataset | Reaction], kind: str) -> Dataset | Reaction:
-    """Loads a serialized dataset.
-
-    Args:
-        data: Serialized dataset proto.
-        message_type: Message type.
-        kind: Serialization kind.
-
-    Returns:
-        Dataset or Reaction proto.
-    """
-    match kind:
-        case "binpb":
-            dataset = message_type.FromString(data)
-        case "json":
-            dataset = json_format.Parse(data, message_type())
-        case "txtpb":
-            dataset = text_format.Parse(data.decode(), message_type())
-        case _:
-            raise ValueError(kind)
-    return dataset
-
-
-def send_message(message: Message) -> str:
-    """Converts a protocol buffer message to a base64-encoded string."""
-    return b64encode(message.SerializeToString()).decode()

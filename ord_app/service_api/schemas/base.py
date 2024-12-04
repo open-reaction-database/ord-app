@@ -12,14 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-
-from ord_app.service_api.settings import RuntimeSettings
-
-pg_engine = create_async_engine(RuntimeSettings.pg_dsn)
-db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
+from pydantic import BaseModel
 
 
-async def get_db_session():
-    async with db_session_maker() as session:
-        yield session
+class BaseSchema(BaseModel):
+    pass
