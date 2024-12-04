@@ -13,11 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
+.controlButton {
+  color: #090a0b;
 
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
+  &:disabled {
+    background-color: transparent;
+    color: #a6a6a6;
+  }
+}
+
+.paginationRoot {
+  --pagination-active-bg: #e8ebed;
+  --pagination-control-radius: 4px;
+
+  button {
+    font-size: 14px;
+    border: none;
+    color: #090a0b;
+  }
+}
+
+.select {
+  width: 70px;
+}
+
+.selectInput {
   border-radius: 10px;
 }

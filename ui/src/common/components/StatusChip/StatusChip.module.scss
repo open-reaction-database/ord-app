@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
+.chip {
+  padding: 4px 6px;
+}
 
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+.iconWrapper {
+  display: none;
 }

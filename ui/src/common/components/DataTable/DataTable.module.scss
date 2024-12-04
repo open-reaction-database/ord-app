@@ -13,11 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
+.paper {
+  box-shadow: none;
+  border-right: none;
+  border-left: none;
+  border-top: none;
+}
 
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+.tableContainer {
+  max-height: 600px;
+}
+
+.table {
+  --mrt-row-hover-background-color: #f8f8f8;
+}
+
+.headerCell {
+  padding: 16px 6px;
+  font-weight: 600;
+  line-height: 16.8px;
+  color: #40474f;
+}
+
+.bodyCell {
+  padding: 16px 6px;
+  color: #637d92;
 }

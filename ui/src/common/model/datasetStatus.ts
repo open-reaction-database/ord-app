@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
-
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+// TODO: Update when BE format is defined
+export enum DATASET_STATUS {
+  IN_PROGRESS = 'In Progress',
+  UNDER_REVIEW = 'Under Review',
+  NEED_REVISION = 'Need Revision',
+  APPROVED = 'Approved',
+  PUBLISHED = 'Published',
 }

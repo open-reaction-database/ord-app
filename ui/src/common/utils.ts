@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
+import { format } from 'date-fns';
 
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+/**
+ * Formats a timestamp into a human-readable date string using date-fns library
+ *
+ * @param timestamp - Timestamp in milliseconds
+ * @returns
+ */
+export function formatDate(timestamp: number) {
+  return format(timestamp, 'dd.MM.yyyy hh:mmaaa');
 }
