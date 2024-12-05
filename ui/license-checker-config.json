@@ -2,7 +2,7 @@
   "ignore": [".idea", ".husky", "README.md", ".gitignore", "**/*.svg", "FILE_LICENSE"],
   "license": "FILE_LICENSE",
   "licenseFormats": {
-    "js|ts|tsx|scss|cjs": {
+    "js|ts|tsx|scss|cjs|mjs": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {
