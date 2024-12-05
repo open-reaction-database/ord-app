@@ -26,6 +26,7 @@ services:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
     volumes:
       - .:/app
+      - /app/.venv
 
   db:
     image: bitnami/postgresql:17

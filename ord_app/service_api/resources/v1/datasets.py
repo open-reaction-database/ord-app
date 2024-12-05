@@ -22,73 +22,76 @@ from fastapi.params import Depends
 from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.datasets import get_user_datasets, create_dataset_uc, delete_user_dataset, \
-    upload_user_dataset, get_user_dataset, download_user_dataset
-from ord_app.service_api.models import DatasetModel
-from ord_app.service_api.schemas.datasets import DatasetSchema, DatasetCreateSchema, DownloadFileFormats
+from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.datasets import (
+    create_dataset_uc,
+    delete_user_dataset,
+    download_user_dataset,
+    get_user_dataset,
+    get_user_datasets,
+    upload_user_dataset,
+)
+from ord_app.service_api.models import DatasetModel, UserModel
+from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DatasetSchema, DownloadFileFormats
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["datasets"], prefix="/datasets")
 
 
-@router.post(
-    "/",
-    response_model=DatasetSchema,
-    status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=DatasetSchema, status_code=status.HTTP_201_CREATED)
 async def create_dataset(
-    user_id: int,
     payload: DatasetCreateSchema,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await create_dataset_uc(db_session, payload, user_id)
+    return await create_dataset_uc(db_session, user, payload)
 
 
 @router.get("/", response_model=list[DatasetSchema])
 async def list_datasets(
-    user_id: int,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_user_datasets(db_session, user_id)
+    return await get_user_datasets(db_session, user)
 
 
 @router.delete("/{dataset_id}")
 async def delete_dataset(
-    user_id: int,
     dataset_id: int,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    await delete_user_dataset(db_session, user_id, dataset_id)
+    await delete_user_dataset(db_session, user, dataset_id)
 
 
 @router.post("/upload")
 async def upload_dataset(
-    user_id: int,
     file: UploadFile,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    await upload_user_dataset(db_session, user_id, file)
+    await upload_user_dataset(db_session, user, file)
 
 
 @router.get("/{dataset_id}", response_model=DatasetSchema)
 async def fetch_dataset(
-    user_id: int,
     dataset_id: int,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_user_dataset(db_session, user_id, dataset_id)
+    return await get_user_dataset(db_session, user, dataset_id)
 
 
 @router.get("/{dataset_id}/download")
 async def download_dataset(
-    user_id: int,
     dataset_id: int,
     file_format: DownloadFileFormats,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
-    dataset, data = await download_user_dataset(db_session, user_id, dataset_id, file_format)
+    dataset, data = await download_user_dataset(db_session, user, dataset_id, file_format)
     return Response(
         gzip.compress(data),
         headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},
@@ -98,9 +101,9 @@ async def download_dataset(
 
 @router.post("/enumerate_dataset/{user_id}")
 async def enumerate_dataset(
-    user_id: str,
     template: UploadFile,
     spreadsheet: UploadFile,
+    user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     """TODO: (It is unclear what this endpoint does) Creates a new dataset based on a template reaction and a spreadsheet."""
@@ -114,15 +117,9 @@ async def enumerate_dataset(
             df=dataframe,
             validate=False,
         )
-        ds = DatasetModel(
-            user_id=user_id,
-            dataset_name=dataset.name,
-            binpb=dataset.SerializeToString()
-        )
+        ds = DatasetModel(user=user, name=dataset.name, binpb=dataset.SerializeToString())
         db_session.add(ds)
         await db_session.commit()
-        # with get_cursor() as cursor:
-        #     add_dataset(user_id, dataset, cursor)
         return basename
     except Exception as error:  # pylint: disable=broad-except
         return Response(str(error), status_code=400)

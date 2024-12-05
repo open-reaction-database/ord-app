@@ -14,14 +14,17 @@
 
 from datetime import datetime
 
+from pydantic import EmailStr
+
 from ord_app.service_api.schemas.base import BaseSchema
 
 
 class CreateUserSchema(BaseSchema):
-    user_name: str
+    email: EmailStr
+    password: str
 
 
-class ResponseUserSchema(BaseSchema):
+class UserSchema(BaseSchema):
     id: int
-    user_name: str
+    email: EmailStr
     created_at: datetime

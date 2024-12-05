@@ -20,50 +20,49 @@ from google.protobuf import json_format, text_format
 from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.models import DatasetModel
+from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 
-async def get_user_datasets(db_session: AsyncSession, user_id: int) -> Sequence[DatasetModel]:
-    stmt = select(DatasetModel).where(DatasetModel.user_id == user_id)
+async def get_user_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[DatasetModel]:
+    stmt = select(DatasetModel).where(DatasetModel.user == user)
     datasets = await db_session.scalars(stmt)
     return datasets.all()
 
 
-async def get_user_dataset(db_session: AsyncSession, user_id: int, dataset_id: int) -> DatasetModel:
-    stmt = select(DatasetModel).where(DatasetModel.user_id == user_id, DatasetModel.id == dataset_id).limit(1)
+async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int) -> DatasetModel:
+    stmt = select(DatasetModel).where(DatasetModel.user == user, DatasetModel.id == dataset_id).limit(1)
     dataset = await db_session.scalar(stmt)
     return dataset
 
 
-async def create_dataset_uc(db_session: AsyncSession, payload: DatasetCreateSchema, user_id: int) -> DatasetModel:
+async def create_dataset_uc(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
     dataset_proto = Dataset(name=payload.name)
-    dataset = DatasetModel(user_id=user_id, name=payload.name, binpb=dataset_proto.SerializeToString())
+    dataset = DatasetModel(user=user, name=payload.name, binpb=dataset_proto.SerializeToString())
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)
     return dataset
 
 
-async def delete_user_dataset(db_session: AsyncSession, user_id: int, dataset_id: int):
-    await db_session.execute(delete(DatasetModel).where(user_id=user_id, id=dataset_id))
+async def delete_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int):
+    stmt = delete(DatasetModel).where(DatasetModel.user == user, DatasetModel.id == dataset_id)
+    await db_session.execute(stmt)
+    await db_session.commit()
 
 
 async def download_user_dataset(
-    db_session: AsyncSession,
-    user_id: int,
-    dataset_id: int,
-    file_format: DownloadFileFormats
+    db_session: AsyncSession, user: UserModel, dataset_id: int, file_format: DownloadFileFormats
 ) -> tuple[DatasetModel, bytes]:
-    dataset = await get_user_dataset(db_session, user_id, dataset_id)
+    dataset = await get_user_dataset(db_session, user, dataset_id)
     data = write_message(Dataset.FromString(dataset.binpb), kind=file_format)
     return dataset, data
 
 
-async def upload_user_dataset(db_session: AsyncSession, user_id: int, file: UploadFile):
+async def upload_user_dataset(db_session: AsyncSession, user: UserModel, file: UploadFile):
     data = await file.read()
 
     if file.filename.endswith(".gz"):
@@ -79,11 +78,7 @@ async def upload_user_dataset(db_session: AsyncSession, user_id: int, file: Uplo
         raise ValueError(file.filename)
 
     dataset_proto = load_message(data, Dataset, kind)
-    dataset = DatasetModel(
-        user_id=user_id,
-        name=dataset_proto.name,
-        binpb=dataset_proto.SerializeToString()
-    )
+    dataset = DatasetModel(user=user, name=dataset_proto.name, binpb=dataset_proto.SerializeToString())
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)

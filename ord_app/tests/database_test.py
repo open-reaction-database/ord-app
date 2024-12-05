@@ -12,29 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from base64 import b64encode
-from datetime import datetime
-from typing import Literal
-
-from pydantic import field_validator
-
-from ord_app.service_api.schemas.base import BaseSchema
-
-DownloadFileFormats = Literal["binpb", "json", "txtpb"]
-
-
-class DatasetSchema(BaseSchema):
-    id: int
-    name: str
-    created_at: datetime
-    modified_at: datetime
-    binpb: str
-
-    @field_validator("binpb", mode="before")
-    @classmethod
-    def _binpb(cls, raw):
-        return b64encode(raw).decode()
-
-
-class DatasetCreateSchema(BaseSchema):
-    name: str
+"""Tests for ord_app.service_api.database."""
+# from ord_app.service_api.database import get_dataset
+# from ord_app.service_api.testing import TEST_USER_ID
+#
+#
+# def test_get_dataset(test_cursor):
+#     dataset = get_dataset(TEST_USER_ID, "Deoxyfluorination screen", test_cursor)
+#     assert len(dataset.reactions) == 80
+#
+#
+# def test_get_unknown_dataset(test_cursor):
+#     dataset = get_dataset(TEST_USER_ID, "UNKNOWN", test_cursor)
+#     assert dataset is None

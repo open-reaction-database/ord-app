@@ -15,8 +15,9 @@
 import datetime
 import re
 
-from sqlalchemy import func, LargeBinary, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, declared_attr
+from sqlalchemy import ForeignKey, LargeBinary, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
+from sqlalchemy_utils import EmailType, PasswordType
 
 
 class BaseModel(DeclarativeBase):
@@ -28,20 +29,27 @@ class BaseModel(DeclarativeBase):
 
 
 class UserModel(BaseModel):
-    user_name: Mapped[str] = mapped_column(nullable=True)
+    email: Mapped[str] = mapped_column(EmailType(), unique=True)
+    password: Mapped[str] = mapped_column(
+        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"])
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+    def __repr__(self):
+        return f"<User(id={self.id}, email={self.email})>"
 
 
 class DatasetModel(BaseModel):
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
-    user: Mapped[UserModel] = relationship(UserModel, backref="datasets")
-
-    name: Mapped[str] = mapped_column()
+    name: Mapped[str]
 
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     modified_at: Mapped[datetime.datetime] = mapped_column(
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
+        server_default=func.now(), onupdate=func.now(), nullable=False
     )
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    user: Mapped[UserModel] = relationship(UserModel, backref="datasets")
+
+    def __repr__(self):
+        return f"<Dataset(id={self.id}, name={self.name}, user_id={self.user_id})>"
