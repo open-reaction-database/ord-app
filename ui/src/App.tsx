@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createTheme, MantineProvider } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { DatasetTable } from './components/DatasetTable/DatasetTable';
-
-const theme = createTheme({
-  /** Put your mantine theme override here */
-  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-});
+import { theme } from './common/styling/theme';
 
 export function App() {
   return (
