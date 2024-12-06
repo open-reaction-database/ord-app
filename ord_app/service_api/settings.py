@@ -28,6 +28,12 @@ class Settings(BaseSettings):
 
     # databases
     pg_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"
+    pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
+
+    # Encryption
+    JWT_SECRET_KEY: str = "b8384c27736300be5ac9e92b9554191f681fa36d8555759243000ac3228568f3"
+    JWT_ACCESS_TOKEN_EXPIRE: int = 60 * 24 * 7
+    JWT_ALGORITHM: str = "HS256"
 
 
 RuntimeSettings = Settings()

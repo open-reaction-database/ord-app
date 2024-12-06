@@ -1,0 +1,10 @@
+.idea/
+
+__pychace__/
+.venv/
+.github/
+ui/
+
+.coverage
+.dockerignore
+.gitignore

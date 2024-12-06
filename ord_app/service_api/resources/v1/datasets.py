@@ -15,148 +15,98 @@
 """Dataset API endpoints."""
 import gzip
 import os
-from base64 import b64encode
-from datetime import datetime
 from io import BytesIO
 
-from pydantic import BaseModel, field_validator
-from sqlalchemy import select, text, delete
-
-from fastapi import APIRouter, Response, UploadFile
+from fastapi import APIRouter, Response, UploadFile, status
 from fastapi.params import Depends
-from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api import load_message, write_message
-from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.models import DatasetModel
-from ord_app.service_api.services.postgresql import db_session
+from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.datasets import (
+    create_dataset_uc,
+    delete_user_dataset,
+    download_user_dataset,
+    get_user_dataset,
+    get_user_datasets,
+    upload_user_dataset,
+)
+from ord_app.service_api.models import DatasetModel, UserModel
+from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DatasetSchema, DownloadFileFormats
+from ord_app.service_api.services.postgresql import get_db_session
 
-router = APIRouter(tags=["datasets"])
-
-
-class DatasetResponseSchema(BaseModel):
-    dataset_name: str
-    created_at: datetime
-    modified_at: datetime
-    binpb: str
-
-    @field_validator("binpb", mode="before")
-    @classmethod
-    def _binpb(cls, raw):
-        return b64encode(raw).decode()
+router = APIRouter(tags=["datasets"], prefix="/datasets")
 
 
-@router.get("/list_datasets")
-async def list_datasets(
-    user_id: str,
-    db_session: AsyncSession = Depends(db_session),
+@router.post("/", response_model=DatasetSchema, status_code=status.HTTP_201_CREATED)
+async def create_dataset(
+    payload: DatasetCreateSchema,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
-    """Returns a list of all datasets associated with the given user."""
-    stmt = select(DatasetModel.dataset_name).where(DatasetModel.user_id == user_id)
-    datasets = await db_session.scalars(stmt)
-    return datasets.all()
+    return await create_dataset_uc(db_session, user, payload)
 
 
-@router.get("/fetch_dataset", response_model=DatasetResponseSchema)
-async def fetch_dataset(user_id: str, dataset_name: str, db_session: AsyncSession = Depends(db_session)):
-    """Returns a base64-encoded dataset proto."""
-    stmt = select(DatasetModel).where(
-        DatasetModel.user_id == user_id,
-        DatasetModel.dataset_name == dataset_name
-    ).limit(1)
-    return await db_session.scalar(stmt)
-    # with get_cursor() as cursor:
-    #     cursor.execute("SELECT binpb FROM datasets WHERE user_id = %s AND dataset_name = %s", (user_id, dataset_name))
-    #     row = cursor.fetchone()
-    # if row is None:
-    #     return Response(status_code=404)
-    # return b64encode(row["binpb"]).decode()
+@router.get("/", response_model=list[DatasetSchema])
+async def list_datasets(
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    return await get_user_datasets(db_session, user)
 
 
-@router.get("/download_dataset")
-async def download_dataset(user_id: str, dataset_name: str, kind: str):
-    """Downloads a dataset."""
+@router.delete("/{dataset_id}")
+async def delete_dataset(
+    dataset_id: int,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    await delete_user_dataset(db_session, user, dataset_id)
+
+
+@router.post("/upload")
+async def upload_dataset(
+    file: UploadFile,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    await upload_user_dataset(db_session, user, file)
+
+
+@router.get("/{dataset_id}", response_model=DatasetSchema)
+async def fetch_dataset(
+    dataset_id: int,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    return await get_user_dataset(db_session, user, dataset_id)
+
+
+@router.get("/{dataset_id}/download")
+async def download_dataset(
+    dataset_id: int,
+    file_format: DownloadFileFormats,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-    if dataset is None:
-        return Response(status_code=404)
-    data = write_message(dataset, kind=kind)
+    dataset, data = await download_user_dataset(db_session, user, dataset_id, file_format)
     return Response(
         gzip.compress(data),
-        headers={"Content-Disposition": f'attachment; filename="{dataset_name}.{kind}.gz"'},
+        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},
         media_type="application/gzip",
     )
 
 
-@router.post("/upload_dataset/{user_id}")
-async def upload_dataset(user_id: str, file: UploadFile, db_session: AsyncSession = Depends(db_session)):
-    """Uploads a dataset."""
-    data = await file.read()
-    if file.filename.endswith(".gz"):
-        data = gzip.decompress(data)
-    if ".json" in file.filename:
-        kind = "json"
-    elif ".binpb" in file.filename:
-        kind = "binpb"
-    elif ".txtpb" in file.filename:
-        kind = "txtpb"
-    else:
-        raise ValueError(file.filename)
-    dataset = load_message(data, Dataset, kind)
-    ds = DatasetModel(
-        user_id=user_id,
-        dataset_name=dataset.name,
-        binpb=dataset.SerializeToString()
-    )
-    db_session.add(ds)
-    await db_session.commit()
-    #with get_cursor() as cursor:
-    #    add_dataset(user_id, dataset, cursor)
-
-
-@router.get("/create_dataset")
-async def create_dataset(user_id: str, dataset_name: str, db_session: AsyncSession = Depends(db_session)):
-    """Creates a new dataset."""
-    with get_cursor() as cursor:
-        if get_dataset(user_id, dataset_name, cursor) is not None:
-            return Response(status_code=409)
-        dataset = Dataset(name=dataset_name)
-        ds = DatasetModel(
-            user_id=user_id,
-            dataset_name=dataset.name,
-            binpb=dataset.SerializeToString()
-        )
-        db_session.add(ds)
-        await db_session.commit()
-        # try:
-        #     add_dataset(user_id, dataset, cursor)
-        # except ValueError as error:
-        #     return Response(str(error), status_code=400)
-
-
-@router.get("/delete_dataset")
-async def delete_dataset(user_id: str, dataset_name: str, db_session: AsyncSession = Depends(db_session)):
-    """Deletes a dataset."""
-    stmt = delete(DatasetModel).where(
-        DatasetModel.user_id == user_id, DatasetModel.dataset_name == dataset_name
-    )
-    await db_session.execute(stmt)
-    #with get_cursor() as cursor:
-    #    cursor.execute("DELETE FROM datasets WHERE user_id = %s AND dataset_name = %s", (user_id, dataset_name))
-
-
 @router.post("/enumerate_dataset/{user_id}")
 async def enumerate_dataset(
-    user_id: str,
     template: UploadFile,
     spreadsheet: UploadFile,
-    db_session: AsyncSession = Depends(db_session),
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
-    """Creates a new dataset based on a template reaction and a spreadsheet."""
+    """TODO: (It is unclear what this endpoint does) Creates a new dataset based on a template reaction and a spreadsheet."""
     try:
         basename, suffix = os.path.splitext(os.path.basename(spreadsheet.filename))
         dataframe = read_spreadsheet(BytesIO(await spreadsheet.read()), suffix=suffix)
@@ -167,15 +117,9 @@ async def enumerate_dataset(
             df=dataframe,
             validate=False,
         )
-        ds = DatasetModel(
-            user_id=user_id,
-            dataset_name=dataset.name,
-            binpb=dataset.SerializeToString()
-        )
+        ds = DatasetModel(user=user, name=dataset.name, binpb=dataset.SerializeToString())
         db_session.add(ds)
         await db_session.commit()
-        # with get_cursor() as cursor:
-        #     add_dataset(user_id, dataset, cursor)
         return basename
     except Exception as error:  # pylint: disable=broad-except
         return Response(str(error), status_code=400)

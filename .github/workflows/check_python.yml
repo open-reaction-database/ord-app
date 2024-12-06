@@ -1,0 +1,88 @@
+# Copyright 2020 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test_python:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.12"]
+    runs-on: ${{ matrix.os }}
+
+    env:
+      PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+      PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: ord
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+
+      - name: Install dependencies
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry config virtualenvs.create false
+          poetry install --with dev --no-interaction --no-ansi
+
+      - name: Run alembic migrations
+        run: alembic upgrade head
+
+      - name: Tests
+        run: pytest -vv --cov=ord_app --durations=10
+
+      - name: Black
+        run: black --check .
+
+      - name: isort
+        run: isort --check .
+
+      - name: pylint
+        run: pylint ord_app *.py --fail-under=5.0
+
+      - name: pytype
+        run: pytype -j auto

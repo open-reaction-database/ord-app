@@ -17,35 +17,21 @@ from glob import glob
 from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.models import UserModel, DatasetModel
+from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
 
-TEST_USER_ID = "680b0d9fe649417cb092d790907bd5a5"
+async def populate_testing_data(db_session: AsyncSession, user: UserModel):
+    datasets = []
 
-async def populate_testing_data():
+    for filename in glob(str(RuntimeSettings.base_dir.parent / "tests" / "testdata" / "*.txtpb")):
+        with open(filename, "r") as f:
+            dataset_proto = text_format.Parse(f.read(), Dataset())
 
-    user_values = {"user_id": TEST_USER_ID, "user_name": "test"}
-    user_stmt = insert(UserModel).values(user_values).on_conflict_do_nothing()
+            datasets.append(DatasetModel(name=dataset_proto.name, binpb=dataset_proto.SerializeToString(), user=user))
 
-    async with db_session_maker() as session:
-        for filename in glob(str(RuntimeSettings.base_dir/"editor"/"testdata"/"*.txtpb")):
-            with open(filename, "r") as f:
-                dataset = text_format.Parse(f.read(), Dataset())
-
-                values = {
-                    "user_id": TEST_USER_ID,
-                    "dataset_name": dataset.name,
-                    "binpb": dataset.SerializeToString()
-                }
-
-                stmt = insert(DatasetModel).values(values).on_conflict_do_update(
-                    index_elements=['user_id', 'dataset_name'],
-                    set_={"binpb": values["binpb"]},
-                )
-                await session.execute(stmt)
-
-        await session.execute(user_stmt)
-        await session.commit()
+    db_session.add_all(datasets)
+    await db_session.commit()

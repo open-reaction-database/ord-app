@@ -13,52 +13,43 @@
 # limitations under the License.
 
 import datetime
+import re
 
-from sqlalchemy import String, func, LargeBinary
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import ForeignKey, LargeBinary, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
+from sqlalchemy_utils import EmailType, PasswordType
 
 
 class BaseModel(DeclarativeBase):
-    pass
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    @declared_attr
+    def __tablename__(cls):
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__.removesuffix("Model")).lower()
 
 
 class UserModel(BaseModel):
-    __tablename__ = 'users'
-
-    user_id: Mapped[str] = mapped_column(String(32), primary_key=True)
-    user_name: Mapped[str] = mapped_column(nullable=True)
+    email: Mapped[str] = mapped_column(EmailType(), unique=True)
+    password: Mapped[str] = mapped_column(
+        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"])
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
 
-    @hybrid_property
-    def created(self):
-        return int(round(self.created_at.timestamp()))
+    def __repr__(self):
+        return f"<User(id={self.id}, email={self.email})>"
 
 
 class DatasetModel(BaseModel):
-    __tablename__ = 'datasets'
-
-    user_id: Mapped[str] = mapped_column(String(32), primary_key=True)
-    dataset_name: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str]
 
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     modified_at: Mapped[datetime.datetime] = mapped_column(
-        server_default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
-        nullable=False
+        server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    @hybrid_property
-    def created(self):
-        return int(round(self.created_at.timestamp()))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    user: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
-    @hybrid_property
-    def modified(self):
-        return int(round(self.modified_at.timestamp()))
-
-
-    # __table_args__ = (
-    #     {'extend_existing': True},
-    #     {'primary_key': ['user_id', 'dataset_name']}
-    # )
+    def __repr__(self):
+        return f"<Dataset(id={self.id}, name={self.name}, user_id={self.user_id})>"

@@ -38,12 +38,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install --no-cache-dir poetry
 
-
-COPY . .
+COPY migrations/ ./migrations/
+COPY alembic.ini .
+COPY poetry.lock .
+COPY pyproject.toml .
+COPY tox.ini .
+COPY ord_app/ ./ord_app
 
 RUN pip install --no-cache-dir poetry &&  \
     poetry config virtualenvs.create false &&  \
-    poetry install --no-dev --no-interaction --no-ansi
+    poetry install --with dev --no-interaction --no-ansi
 
 EXPOSE 8000
 

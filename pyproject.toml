@@ -7,33 +7,37 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.12"
-fastapi = { extras = ["standard"], version = "==0.115.5" }
+fastapi = "0.115.6"
 gunicorn = "==23.0.0"
 jinja2 = "==3.1.4"
 numpy = "==2.1.3"
 ord-schema = "==0.3.91"
 pandas = "==2.2.3"
 protobuf = "==4.22.3"
-psycopg = { extras = ["binary", "pool"], version = ">=3" }
+psycopg = "3.2.3"
 rdkit = "2024.3.6"
-uvicorn = { extras = ["standard"], version = "^0.22.0" }
+uvicorn = "0.32.1"
 setuptools = "^75.6.0"
-python-multipart = "^0.0.19"
-alembic = "^1.14.0"
-sqlalchemy = "^2.0.36"
-pydantic-settings = "^2.6.1"
-greenlet = "^3.1.1"
+python-multipart = "0.0.19"
+alembic = "1.14.0"
+sqlalchemy = "2.0.36"
+pydantic-settings = "2.6.1"
+greenlet = "3.1.1"
+sqlalchemy-utils = "0.41.2"
+passlib = "1.7.4"
+pydantic = {version = "2.10.3", extras = ["email"]}
 
 [tool.poetry.group.dev.dependencies]
-black = "*"
-coverage = "*"
-httpx = "*"
-pylint = "*"
-pytest = "*"
-pytest-cov = "*"
-pytype = "*"
-tenacity = "*"
-testing-postgresql = "*"
+black = "24.10.0"
+coverage = "7.6.8"
+httpx = "0.28.0"
+pylint = "3.3.2"
+pytest-cov = "6.0.0"
+pytype = "2024.10.11"
+tenacity = "9.0.0"
+testing-postgresql = "1.3.0"
+pytest = "8.3.4"
+pytest-asyncio = "0.24.0"
 
 [tool.black]
 line-length = 120

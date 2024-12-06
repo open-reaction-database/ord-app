@@ -14,36 +14,18 @@
 
 """Open Reaction Database API."""
 
-# import os
-# from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
-# from testing.postgresql import Postgresql
 
-from ord_app.service_api.resources.v1 import datasets, reactions, users, utilities, visualizations
-from ord_app.service_api.services.populate_data_sets import populate_testing_data
-# from ord_app.service_api.testing import setup_test_postgres
+from ord_app.service_api.resources.v1 import auth, datasets, reactions, users, utilities, visualizations
 
+app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True})
 
-# @asynccontextmanager
-# async def lifespan(*args, **kwargs):
-#     """FastAPI lifespan setup; see https://fastapi.tiangolo.com/advanced/events/#lifespan."""
-#     del args, kwargs  # Unused.
-#     if os.getenv("ORD_APP_TESTING", "FALSE") == "TRUE":
-#         with Postgresql() as postgres:
-#             setup_test_postgres(postgres.url())
-#             os.environ["ORD_APP_POSTGRES"] = postgres.url()
-#             yield
-#     else:
-#         yield
-
-
-app = FastAPI(root_path="/service_api")
-
-editor = APIRouter(prefix="/editor")
+editor = APIRouter(prefix="/api/v1")
+editor.include_router(auth.router)
+editor.include_router(users.router)
 editor.include_router(datasets.router)
 editor.include_router(reactions.router)
-editor.include_router(users.router)
 editor.include_router(utilities.router)
 editor.include_router(visualizations.router)
 
@@ -53,10 +35,3 @@ app.include_router(editor)
 @app.get("/healthcheck")
 async def health_check():
     return True
-
-
-@app.post("/populate-testing-data")
-async def testing_data():
-    # TODO: Move this to a more appropriate place; for now, let it stay like this
-    await populate_testing_data()
-    return {"status": "success"}

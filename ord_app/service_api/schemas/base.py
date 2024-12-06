@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Editor API helper functions."""
 
-from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.testing import setup_test_postgres
+from pydantic import BaseModel
+
+
+class BaseSchema(BaseModel):
+    pass

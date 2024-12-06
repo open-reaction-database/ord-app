@@ -11,7 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Editor API helper functions."""
 
-from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.testing import setup_test_postgres
+from datetime import datetime
+
+from pydantic import EmailStr
+
+from ord_app.service_api.schemas.base import BaseSchema
+
+
+class CreateUserSchema(BaseSchema):
+    email: EmailStr
+    password: str
+
+
+class UserSchema(BaseSchema):
+    id: int
+    email: EmailStr
+    created_at: datetime
