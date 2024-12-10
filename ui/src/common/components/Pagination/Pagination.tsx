@@ -33,7 +33,7 @@ export function Pagination({
   onPageChange,
   rowsPerPage,
   onRowsPerPageChange,
-}: PaginationProps) {
+}: Readonly<PaginationProps>) {
   return (
     <Group align="center">
       <Button

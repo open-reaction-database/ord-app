@@ -26,7 +26,7 @@ interface BreadcrumbsProps {
   items: Breadcrumb[];
 }
 
-export function Breadcrumbs({ items }: BreadcrumbsProps) {
+export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
   return (
     <div className={classes.container}>
       <ThemeIcon

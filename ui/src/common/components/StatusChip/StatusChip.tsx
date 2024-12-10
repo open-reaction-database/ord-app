@@ -30,7 +30,7 @@ const statusToColorMapping = new Map<DATASET_STATUS, string>([
   [DATASET_STATUS.PUBLISHED, '#637D92'],
 ]);
 
-export function StatusChip({ status }: StatusChipProps) {
+export function StatusChip({ status }: Readonly<StatusChipProps>) {
   const chipColor = statusToColorMapping.get(status);
 
   return (
