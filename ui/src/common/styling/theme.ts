@@ -17,6 +17,33 @@ import { colorsTuple, createTheme } from '@mantine/core';
 
 export const theme = createTheme({
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  fontSizes: {
+    sm: '0.875rem',
+    md: '0.875rem',
+  },
+  lineHeights: {
+    md: '1.5',
+  },
+  headings: {
+    sizes: {
+      h1: {
+        fontSize: '2rem',
+        lineHeight: '1.25',
+      },
+      h2: {
+        fontSize: '1.5rem',
+        lineHeight: '1.34',
+      },
+      h3: {
+        fontSize: '0.875',
+        lineHeight: '1.5',
+      },
+      h4: {
+        fontSize: '0.75rem',
+        lineHeight: '1.34',
+      },
+    },
+  },
   colors: {
     primary: colorsTuple('#3C78D8'),
   },

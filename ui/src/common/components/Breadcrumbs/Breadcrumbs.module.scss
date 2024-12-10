@@ -22,6 +22,7 @@
 }
 
 .active {
+  pointer-events: none;
   font-size: 13px;
   font-weight: 500;
   line-height: 24px;
@@ -32,9 +33,13 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 24px;
-  color: #64707d;
+  color: var(--mantine-color-primary-0);
 
   &:hover {
     text-decoration: none;
   }
+}
+
+.separator {
+  color: var(--color-text-secondary-1);
 }

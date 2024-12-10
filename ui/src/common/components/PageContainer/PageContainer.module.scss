@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 .header {
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,20 +23,24 @@
 }
 
 .main {
+  padding-top: 40px;
+  padding-bottom: 48px;
   min-width: 1280px;
 }
 
 .footer {
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  line-height: 20px;
   color: var(--color-text-secondary-2);
+}
+
+.logo {
+  width: 54px;
+  height: 24px;
 }
 
 .userDetails {
   color: var(--color-text-primary);
-  font-size: 14px;
-  line-height: 20px;
 }

@@ -22,8 +22,6 @@ import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 export function PageContainer({ children }: PropsWithChildren) {
   return (
     <AppShell
-      header={{ height: 40 }}
-      footer={{ height: 48 }}
       classNames={{
         header: classes.header,
         main: classes.main,
@@ -33,8 +31,7 @@ export function PageContainer({ children }: PropsWithChildren) {
       <AppShell.Header>
         <img
           src={ORDLogo}
-          width="54"
-          height="24"
+          className={classes.logo}
           alt="Open Reaction Database logo"
         />
 

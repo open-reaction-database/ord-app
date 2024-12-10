@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Anchor, Breadcrumbs as MantineBreadcrumbs, ThemeIcon } from '@mantine/core';
-import { IconChevronRight, IconHome } from '@tabler/icons-react';
+import { IconHome } from '@tabler/icons-react';
 import classes from './Breadcrumbs.module.scss';
 
 interface Breadcrumb {
@@ -36,22 +36,20 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
         <IconHome />
       </ThemeIcon>
       <MantineBreadcrumbs
-        separator={<IconChevronRight size={18} />}
-        separatorMargin={4}
+        separator="/"
+        separatorMargin={6}
+        classNames={{
+          separator: classes.separator,
+        }}
       >
         {items.map((item, index) => {
-          return index === items.length - 1 ? (
-            <div
-              className={classes.active}
-              id={item.path}
-            >
-              {item.title}
-            </div>
-          ) : (
+          const isActive = index === items.length - 1;
+          return (
             <Anchor
-              className={classes.link}
+              className={isActive ? classes.active : classes.link}
               href={item.path}
               id={item.path}
+              key={item.path}
             >
               {item.title}
             </Anchor>
