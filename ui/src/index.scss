@@ -16,6 +16,20 @@
 @import '@mantine/core/styles.css';
 @import 'mantine-react-table/styles.css';
 
+:root {
+  --color-primary: #3c78d8;
+  --color-background-main: #f8f8f8;
+  --color-background-gray: #e8ebed;
+  --color-background-white: #ffffff;
+  --color-text-primary: #090a0b;
+  --color-text-hover: #ff0000;
+  --color-text-secondary-1: #aab9c5;
+  --color-text-secondary-2: #637d92;
+  --color-text-secondary-3: #4a5e6d;
+  --color-border-1: #e8ebed;
+  --color-border-2: #d2d6db;
+}
+
 .textInputOverride {
   background-color: #f8f8f8;
   border: 1px solid #ededed;
