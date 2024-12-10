@@ -46,7 +46,7 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/prop-types': 'off',
       'react/prefer-read-only-props': 'error',
-      'complexity': ['error', 10],
+      complexity: ['error', 10],
     },
     settings: {
       react: {
