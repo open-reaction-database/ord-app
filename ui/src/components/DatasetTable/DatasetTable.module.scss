@@ -20,6 +20,10 @@
   align-items: center;
 }
 
+.buttons {
+  display: none;
+}
+
 .table {
   tr:hover {
     .buttons {
@@ -34,8 +38,4 @@
       font-weight: 600;
     }
   }
-}
-
-.buttons {
-  display: none;
 }
