@@ -35,7 +35,7 @@ export const theme = createTheme({
         lineHeight: '1.34',
       },
       h3: {
-        fontSize: '0.875',
+        fontSize: '0.875rem',
         lineHeight: '1.5',
       },
       h4: {
