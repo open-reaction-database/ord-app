@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint src/** *.ts *.cjs *.mjs --no-warn-ignored",
-    "lint:css": "stylelint 'src/*.css' 'src/*.scss'",
+    "lint": "eslint src *.ts *.cjs *.mjs",
+    "lint:css": "stylelint '**/*.[s]css'",
     "lint:check": "prettier --check . && npm run lint && npm run lint:css",
     "preview": "vite preview",
     "prepare": "cd .. && husky ./ui/.husky",
@@ -15,9 +15,12 @@
     "test": "vitest"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "(*.ts|*.tsx|*.cjs|*.mjs)": [
       "prettier --write",
       "eslint --fix"
+    ],
+    "*.[s]css": [
+      "stylelint --fix"
     ],
     "*": [
       "license-check-and-add add"

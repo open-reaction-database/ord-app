@@ -20,6 +20,10 @@
   align-items: center;
 }
 
+.buttons {
+  display: none;
+}
+
 .table {
   tr:hover {
     .buttons {
@@ -27,15 +31,11 @@
     }
 
     td {
-      color: #090a0b;
+      color: var(--color-text-primary);
     }
 
     td:first-child {
       font-weight: 600;
     }
   }
-}
-
-.buttons {
-  display: none;
 }

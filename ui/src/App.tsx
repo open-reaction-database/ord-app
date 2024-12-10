@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 import { MantineProvider } from '@mantine/core';
-import { DatasetTable } from './components/DatasetTable/DatasetTable';
 import { theme } from './common/styling/theme';
+import { DatasetTable } from './components/DatasetTable/DatasetTable';
+import { PageContainer } from './common/components/PageContainer/PageContainer';
 
 export function App() {
   return (
     <MantineProvider theme={theme}>
-      <DatasetTable />
+      <PageContainer>
+        <DatasetTable />
+      </PageContainer>
     </MantineProvider>
   );
 }

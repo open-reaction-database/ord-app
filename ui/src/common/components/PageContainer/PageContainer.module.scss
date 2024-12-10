@@ -13,30 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.controlButton {
+.header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-color: var(--color-background-gray);
+}
+
+.main {
+  padding-top: 40px;
+  padding-bottom: 48px;
+  min-width: 1280px;
+}
+
+.footer {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary-2);
+}
+
+.logo {
+  width: 54px;
+  height: 24px;
+}
+
+.userDetails {
   color: var(--color-text-primary);
-
-  &:disabled {
-    background-color: transparent;
-    color: #a6a6a6;
-  }
-}
-
-.paginationRoot {
-  --pagination-active-bg: var(--color-background-gray);
-  --pagination-control-radius: 4px;
-
-  button {
-    font-size: 14px;
-    border: none;
-    color: var(--color-text-primary);
-  }
-}
-
-.select {
-  width: 70px;
-}
-
-.selectInput {
-  border-radius: 10px;
 }

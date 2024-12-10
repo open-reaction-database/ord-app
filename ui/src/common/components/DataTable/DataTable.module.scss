@@ -25,17 +25,17 @@
 }
 
 .table {
-  --mrt-row-hover-background-color: #f8f8f8;
+  --mrt-row-hover-background-color: var(--color-background-main);
 }
 
 .headerCell {
   padding: 16px 6px;
   font-weight: 600;
   line-height: 16.8px;
-  color: #40474f;
+  color: var(--color-text-secondary-2);
 }
 
 .bodyCell {
   padding: 16px 6px;
-  color: #637d92;
+  color: var(--color-text-secondary-2);
 }
