@@ -113,5 +113,5 @@ class ReactionRequest(BaseModel):
 def summarize_reaction(request: ReactionRequest):
     """Returns summary information for the reaction card view."""
     # TODO(skearnes): Implement something useful here.
-    assert request.reaction.reaction_id == "test_reaction-0"
+    del request  # Unused.
     return {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}}
