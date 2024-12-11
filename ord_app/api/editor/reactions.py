@@ -101,6 +101,6 @@ def delete_reaction(user_id: str, dataset_name: str, index: int):
 async def summarize_reaction(request: Request):
     """Returns summary information for the reaction card view."""
     # TODO(skearnes): Implement something useful here.
-    del request  # Unused.
-    # reaction = Reaction.FromString(await request.body())
+    reaction = Reaction.FromString(await request.body())
+    del reaction  # Unused.
     return {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}}
