@@ -42,9 +42,9 @@ async def test_list_datasets(api_client, test_user, test_db_session):
     response.raise_for_status()
     response_data = response.json()
 
-    assert len(response_data) == 1
-    assert response_data[0]["id"] == db_dataset.id
-    assert response_data[0]["name"] == db_dataset.name
+    assert len(response_data["items"]) == 1
+    assert response_data["items"][0]["id"] == db_dataset.id
+    assert response_data["items"][0]["name"] == db_dataset.name
 
 
 async def test_delete_dataset(api_client, test_user, test_db_session):

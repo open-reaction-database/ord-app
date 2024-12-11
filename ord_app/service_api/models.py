@@ -32,6 +32,8 @@ class BaseModel(DeclarativeBase):
 
 class UserModel(BaseModel):
     email: Mapped[str] = mapped_column(EmailType(), unique=True)
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
     password: Mapped[str] = mapped_column(
         PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"])
     )

@@ -17,6 +17,7 @@ from io import BytesIO
 
 from fastapi import APIRouter, Response, UploadFile, status
 from fastapi.params import Depends
+from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,8 +26,8 @@ from ord_app.service_api.domain.datasets import (
     create_dataset,
     delete_dataset,
     download_user_dataset,
-    get_datasets,
     get_user_dataset,
+    paginate_datasets,
     upload_user_dataset,
 )
 from ord_app.service_api.models import DatasetModel, UserModel
@@ -45,12 +46,12 @@ async def _create_dataset(
     return await create_dataset(db_session, user, payload)
 
 
-@router.get("/", response_model=list[DatasetSchema])
+@router.get("/", response_model=Page[DatasetSchema])
 async def list_datasets(
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_datasets(db_session, user)
+    return await paginate_datasets(db_session, user)
 
 
 @router.delete("/{dataset_id}")

@@ -599,6 +599,38 @@ all = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>
 standard = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>=0.23.0)", "jinja2 (>=2.11.2)", "python-multipart (>=0.0.7)", "uvicorn[standard] (>=0.12.0)"]
 
 [[package]]
+name = "fastapi-pagination"
+version = "0.12.32"
+description = "FastAPI pagination"
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "fastapi_pagination-0.12.32-py3-none-any.whl", hash = "sha256:38e7e72abf252cbebbc1beff9081e4929762756c04959c471b2a5866bb7f0aaf"},
+    {file = "fastapi_pagination-0.12.32.tar.gz", hash = "sha256:b808b5b8af493c51d96ae0091b60532b25688cbca1350f39cb72f10d4d69a6ab"},
+]
+
+[package.dependencies]
+pydantic = ">=1.9.1"
+typing-extensions = ">=4.8.0,<5.0.0"
+
+[package.extras]
+all = ["SQLAlchemy (>=1.3.20)", "asyncpg (>=0.24.0)", "beanie (>=1.25.0)", "bunnet (>=1.1.0,<2.0.0)", "databases (>=0.6.0)", "django (<5.0.0)", "mongoengine (>=0.23.1,<0.30.0)", "motor (>=2.5.1,<4.0.0)", "orm (>=0.3.1)", "ormar (>=0.11.2)", "piccolo (>=0.89,<0.122)", "pony (>=0.7.16,<0.8.0)", "scylla-driver (>=3.25.6,<4.0.0)", "sqlakeyset (>=2.0.1680321678,<3.0.0)", "sqlmodel (>=0.0.8,<0.0.15)", "tortoise-orm (>=0.16.18,!=0.21.0,<0.22.0)"]
+asyncpg = ["SQLAlchemy (>=1.3.20)", "asyncpg (>=0.24.0)"]
+beanie = ["beanie (>=1.25.0)"]
+bunnet = ["bunnet (>=1.1.0,<2.0.0)"]
+databases = ["databases (>=0.6.0)"]
+django = ["databases (>=0.6.0)", "django (<5.0.0)"]
+mongoengine = ["mongoengine (>=0.23.1,<0.30.0)"]
+motor = ["motor (>=2.5.1,<4.0.0)"]
+orm = ["databases (>=0.6.0)", "orm (>=0.3.1)"]
+ormar = ["ormar (>=0.11.2)"]
+piccolo = ["piccolo (>=0.89,<0.122)"]
+scylla-driver = ["scylla-driver (>=3.25.6,<4.0.0)"]
+sqlalchemy = ["SQLAlchemy (>=1.3.20)", "sqlakeyset (>=2.0.1680321678,<3.0.0)"]
+sqlmodel = ["sqlakeyset (>=2.0.1680321678,<3.0.0)", "sqlmodel (>=0.0.8,<0.0.15)"]
+tortoise = ["tortoise-orm (>=0.16.18,!=0.21.0,<0.22.0)"]
+
+[[package]]
 name = "greenlet"
 version = "3.1.1"
 description = "Lightweight in-process concurrent programming"
@@ -2722,4 +2754,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "aebc0fefe0c8346644d6a28dc6fef622032ed7f6d6c1fee1c4a7f31902170a0c"
+content-hash = "3ea93fd55abf007fba5829b6d45dac1877da78358048e4a568ff91a5772418e9"
