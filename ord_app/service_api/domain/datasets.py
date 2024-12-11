@@ -27,29 +27,28 @@ from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 
-async def get_user_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[DatasetModel]:
-    stmt = select(DatasetModel).where(DatasetModel.user == user)
+async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[DatasetModel]:
+    stmt = select(DatasetModel).where(DatasetModel.owner == user)
     datasets = await db_session.scalars(stmt)
     return datasets.all()
 
 
 async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int) -> DatasetModel:
-    stmt = select(DatasetModel).where(DatasetModel.user == user, DatasetModel.id == dataset_id).limit(1)
+    stmt = select(DatasetModel).where(DatasetModel.owner == user, DatasetModel.id == dataset_id).limit(1)
     dataset = await db_session.scalar(stmt)
     return dataset
 
 
-async def create_dataset_uc(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
-    dataset_proto = Dataset(name=payload.name)
-    dataset = DatasetModel(user=user, name=payload.name, binpb=dataset_proto.SerializeToString())
+async def create_dataset(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
+    dataset = DatasetModel(owner=user, name=payload.name)
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)
     return dataset
 
 
-async def delete_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int):
-    stmt = delete(DatasetModel).where(DatasetModel.user == user, DatasetModel.id == dataset_id)
+async def delete_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int):
+    stmt = delete(DatasetModel).where(DatasetModel.owner == user, DatasetModel.id == dataset_id)
     await db_session.execute(stmt)
     await db_session.commit()
 

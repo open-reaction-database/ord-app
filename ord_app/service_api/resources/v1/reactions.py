@@ -12,39 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Reaction API endpoints."""
 import gzip
 from uuid import uuid4
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.domain.datasets import send_message, write_message
+from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.datasets import write_message
+from ord_app.service_api.domain.reactions import create_reaction, get_reaction, get_reactions
+from ord_app.service_api.models import UserModel
+from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
+from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["reactions"])
 
 
-@router.get("/list_reactions")
-async def list_reactions(user_id: str, dataset_name: str):
-    """Fetches a list of reactions in a dataset."""
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-    if dataset is None:
-        return Response(status_code=404)
-    return [reaction.reaction_id for reaction in dataset.reactions]
+@router.get("/datasets/{dataset_id}/reactions", response_model=list[ReactionSchema])
+async def reactions(
+    dataset_id: int,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    r = await get_reactions(db_session, user, dataset_id)
+    return r
 
 
-@router.get("/fetch_reaction")
-async def fetch_reaction(user_id: str, dataset_name: str, index: int):
-    """Returns a base64-encoded reaction proto."""
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-    return send_message(dataset.reactions[index])
+@router.get("/datasets/{dataset_id}/reactions/{reaction_id}", response_model=ReactionSchema)
+async def reaction(
+    dataset_id: int,
+    reaction_id: int,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    return await get_reaction(db_session, user, dataset_id, reaction_id)
 
 
 @router.get("/download_reaction")
 async def download_reaction(user_id: str, dataset_name: str, index: int, kind: str):
-    """Downloads a reaction."""
+    """WIP"""
     with get_cursor() as cursor:
         dataset = get_dataset(user_id, dataset_name, cursor)
     if dataset is None:
@@ -57,24 +64,19 @@ async def download_reaction(user_id: str, dataset_name: str, index: int, kind: s
     )
 
 
-@router.get("/create_reaction")
-def create_reaction(user_id: str, dataset_name: str, reaction_id: str | None = None):
-    """Adds a new reaction to the dataset."""
-    if reaction_id is None:
-        reaction_id = f"ord-{uuid4().hex}"
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-        if dataset is None:
-            return Response(status_code=404)
-        reaction = dataset.reactions.add()
-        reaction.reaction_id = reaction_id
-        add_dataset(user_id, dataset, cursor)
-    return len(dataset.reactions) - 1  # Index of the new reaction.
+@router.post("/datasets/{dataset_id}/reactions", response_model=ReactionSchema)
+async def _create_reaction(
+    dataset_id: int,
+    payload: ReactionCreateSchema,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    return await create_reaction(db_session, user, dataset_id, payload)
 
 
 @router.get("/clone_reaction")
 def clone_reaction(user_id: str, dataset_name: str, index: int):
-    """Creates a copy of an existing reaction in the same dataset."""
+    """WIP"""
     with get_cursor() as cursor:
         dataset = get_dataset(user_id, dataset_name, cursor)
         if dataset is None:
@@ -86,7 +88,7 @@ def clone_reaction(user_id: str, dataset_name: str, index: int):
 
 @router.get("/delete_reaction")
 def delete_reaction(user_id: str, dataset_name: str, index: int):
-    """Removes a reaction from the dataset."""
+    """WIP"""
     with get_cursor() as cursor:
         dataset = get_dataset(user_id, dataset_name, cursor)
         if dataset is None:

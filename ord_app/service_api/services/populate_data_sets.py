@@ -11,27 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from glob import glob
 
 from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.models import DatasetModel, UserModel
-from ord_app.service_api.services.postgresql import db_session_maker
+from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
 from ord_app.service_api.settings import RuntimeSettings
 
 
 async def populate_testing_data(db_session: AsyncSession, user: UserModel):
-    datasets = []
+    insert_data = []
 
     for filename in glob(str(RuntimeSettings.base_dir.parent / "tests" / "testdata" / "*.txtpb")):
         with open(filename, "r") as f:
-            dataset_proto = text_format.Parse(f.read(), Dataset())
+            dataset_pb = text_format.Parse(f.read(), Dataset())
 
-            datasets.append(DatasetModel(name=dataset_proto.name, binpb=dataset_proto.SerializeToString(), user=user))
+            dataset = DatasetModel(name=dataset_pb.name, owner=user)
+            insert_data.append(dataset)
 
-    db_session.add_all(datasets)
+            for reaction in dataset_pb.reactions:
+                insert_data.append(
+                    ReactionModel(
+                        name=reaction.reaction_id, binpb=reaction.SerializeToString(), dataset=dataset, owner=user
+                    )
+                )
+
+    db_session.add_all(insert_data)
     await db_session.commit()

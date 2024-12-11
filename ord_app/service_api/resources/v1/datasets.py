@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Dataset API endpoints."""
 import gzip
 import os
 from io import BytesIO
@@ -24,11 +22,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import get_current_user
 from ord_app.service_api.domain.datasets import (
-    create_dataset_uc,
-    delete_user_dataset,
+    create_dataset,
+    delete_dataset,
     download_user_dataset,
+    get_datasets,
     get_user_dataset,
-    get_user_datasets,
     upload_user_dataset,
 )
 from ord_app.service_api.models import DatasetModel, UserModel
@@ -39,12 +37,12 @@ router = APIRouter(tags=["datasets"], prefix="/datasets")
 
 
 @router.post("/", response_model=DatasetSchema, status_code=status.HTTP_201_CREATED)
-async def create_dataset(
+async def _create_dataset(
     payload: DatasetCreateSchema,
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await create_dataset_uc(db_session, user, payload)
+    return await create_dataset(db_session, user, payload)
 
 
 @router.get("/", response_model=list[DatasetSchema])
@@ -52,16 +50,16 @@ async def list_datasets(
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_user_datasets(db_session, user)
+    return await get_datasets(db_session, user)
 
 
 @router.delete("/{dataset_id}")
-async def delete_dataset(
+async def _delete_dataset(
     dataset_id: int,
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    await delete_user_dataset(db_session, user, dataset_id)
+    await delete_dataset(db_session, user, dataset_id)
 
 
 @router.post("/upload")
