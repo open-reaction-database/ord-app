@@ -25,3 +25,5 @@ class CreateUserSchema(BaseSchema):
 class UserSchema(BaseSchema):
     id: int
     email: EmailStr
+    first_name: str | None
+    last_name: str | None

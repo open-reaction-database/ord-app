@@ -16,6 +16,7 @@
 
 
 from fastapi import APIRouter, FastAPI
+from fastapi_pagination import add_pagination
 
 from ord_app.service_api.resources.v1 import auth, datasets, reactions, users, utilities, visualizations
 
@@ -30,6 +31,8 @@ editor.include_router(utilities.router)
 editor.include_router(visualizations.router)
 
 app.include_router(editor)
+
+add_pagination(app)
 
 
 @app.get("/healthcheck")

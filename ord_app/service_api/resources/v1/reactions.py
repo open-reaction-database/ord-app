@@ -16,12 +16,13 @@ import gzip
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Response
+from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 from ord_app.service_api.domain.auth import get_current_user
 from ord_app.service_api.domain.datasets import write_message
-from ord_app.service_api.domain.reactions import create_reaction, get_reaction, get_reactions
+from ord_app.service_api.domain.reactions import create_reaction, get_reaction, get_reactions, paginate_reactions
 from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
 from ord_app.service_api.services.postgresql import get_db_session
@@ -29,14 +30,13 @@ from ord_app.service_api.services.postgresql import get_db_session
 router = APIRouter(tags=["reactions"])
 
 
-@router.get("/datasets/{dataset_id}/reactions", response_model=list[ReactionSchema])
+@router.get("/datasets/{dataset_id}/reactions", response_model=Page[ReactionSchema])
 async def reactions(
     dataset_id: int,
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    r = await get_reactions(db_session, user, dataset_id)
-    return r
+    return await paginate_reactions(db_session, user, dataset_id)
 
 
 @router.get("/datasets/{dataset_id}/reactions/{reaction_id}", response_model=ReactionSchema)
