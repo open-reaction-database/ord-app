@@ -11,10 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Tests for ord_app.service_api.editor.datasets."""
-
-from ord_app.service_api.domain.datasets import create_dataset_uc, get_user_dataset
+from ord_app.service_api.domain.datasets import create_dataset, get_user_dataset
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema
 
 
@@ -39,7 +36,7 @@ async def test_create_dataset(api_client, test_user, test_db_session):
 async def test_list_datasets(api_client, test_user, test_db_session):
     test_user, access_token = test_user
     payload = DatasetCreateSchema(name="test")
-    db_dataset = await create_dataset_uc(test_db_session, test_user, payload)
+    db_dataset = await create_dataset(test_db_session, test_user, payload)
 
     response = api_client.get("/api/v1/datasets", headers={"Authorization": access_token})
     response.raise_for_status()
@@ -54,7 +51,7 @@ async def test_delete_dataset(api_client, test_user, test_db_session):
     test_user, access_token = test_user
 
     payload = DatasetCreateSchema(name="test")
-    db_dataset = await create_dataset_uc(test_db_session, test_user, payload)
+    db_dataset = await create_dataset(test_db_session, test_user, payload)
 
     response = api_client.delete(f"/api/v1/datasets/{db_dataset.id}", headers={"Authorization": access_token})
     response.raise_for_status()

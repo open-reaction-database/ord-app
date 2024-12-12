@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
-
 from pydantic import EmailStr
 
 from ord_app.service_api.schemas.base import BaseSchema
@@ -27,4 +25,3 @@ class CreateUserSchema(BaseSchema):
 class UserSchema(BaseSchema):
     id: int
     email: EmailStr
-    created_at: datetime
