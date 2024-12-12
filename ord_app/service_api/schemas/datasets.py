@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
 from typing import Literal
 
 from ord_app.service_api.schemas.base import BaseSchema
@@ -22,7 +23,11 @@ DownloadFileFormats = Literal["binpb", "json", "txtpb"]
 class DatasetSchema(BaseSchema):
     id: int
     name: str
+    created_at: datetime
+    modified_at: datetime
     owner: UserSchema
+    group: str = "mocked group"
+    description: str = "mocked description"
 
 
 class DatasetCreateSchema(BaseSchema):
