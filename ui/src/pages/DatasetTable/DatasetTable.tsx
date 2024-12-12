@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Avatar, Group } from '@mantine/core';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { DataTable } from '../../common/components/DataTable/DataTable';
 import { Pagination } from '../../common/components/Pagination/Pagination';
 import { StatusChip } from '../../common/components/StatusChip/StatusChip';
+import { UserField } from '../../common/components/UserField/UserField';
 import { generateMockDatasets } from '../../common/mocks/generateMockDatasets';
 import { DATASET_STATUS } from '../../common/model/datasetStatus';
 import { formatDate } from '../../common/utils';
@@ -102,15 +102,7 @@ export function DatasetTable() {
         header: 'Owner',
         Cell: ({ row }) => {
           // TODO: Update avatar src and consider the behaviour for long names
-          return (
-            <Group gap="4px">
-              <Avatar
-                src={null}
-                size="sm"
-              />
-              {row.original.owner}
-            </Group>
-          );
+          return <UserField username={row.original.owner} />;
         },
         size: 145,
       },

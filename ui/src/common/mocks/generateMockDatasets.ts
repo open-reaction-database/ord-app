@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { faker } from '@faker-js/faker';
-import { DatasetTableRow } from '../../components/DatasetTable/DatasetTable';
+import { DatasetTableRow } from '../../pages/DatasetTable/DatasetTable';
 import { DATASET_STATUS } from '../model/datasetStatus';
 
 /**

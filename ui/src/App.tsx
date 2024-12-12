@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 import { MantineProvider } from '@mantine/core';
+import { Link, Route, Switch } from 'wouter';
 import { theme } from './common/styling/theme';
-import { DatasetTable } from './components/DatasetTable/DatasetTable';
+import { DatasetTable } from './pages/DatasetTable/DatasetTable';
 import { PageContainer } from './common/components/PageContainer/PageContainer';
+import { DatasetPage } from './pages/dataset/DatasetPage/DatasetPage';
 
 export function App() {
   return (
     <MantineProvider theme={theme}>
       <PageContainer>
-        <DatasetTable />
+        <Switch>
+          <Route path="/">
+            <DatasetTable />
+            <Link to="/dataset/1">Test dataset link</Link>
+          </Route>
+
+          <Route
+            path="/dataset/:datasetId"
+            component={DatasetPage}
+          />
+        </Switch>
       </PageContainer>
     </MantineProvider>
   );

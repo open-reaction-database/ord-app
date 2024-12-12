@@ -59,7 +59,7 @@ export const theme = createTheme({
     xs: '0.375rem',
     sm: '0.75rem',
     md: '1rem',
-    lg: '2rem',
-    xl: '3rem',
+    lg: '1.5rem',
+    xl: '2rem',
   },
 });

@@ -14,33 +14,15 @@
  * limitations under the License.
  */
 .container {
-  height: 40px;
   display: flex;
-  gap: 6px;
-  align-items: center;
+  flex-direction: column;
 }
 
-.active {
-  pointer-events: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--color-text-primary);
-  text-decoration: none;
+.label {
+  color: var(--color-text-secondary-2);
+  margin-bottom: 4px;
 }
 
-.link {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--mantine-color-primary-0);
-  text-decoration: none;
-}
-
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.homeIcon {
-  background-color: var(--color-background-main);
+.content {
+  line-height: 2;
 }

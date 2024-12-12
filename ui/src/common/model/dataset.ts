@@ -13,34 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  height: 40px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
+import { User } from './user';
 
-.active {
-  pointer-events: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-
-.link {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--mantine-color-primary-0);
-  text-decoration: none;
-}
-
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.homeIcon {
-  background-color: var(--color-background-main);
+export interface Dataset {
+  id: number;
+  name: string;
+  owner: User;
+  created_at: string;
+  modified_at: string;
+  group: string;
+  description: string;
 }

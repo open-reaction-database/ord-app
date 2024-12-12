@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  height: 40px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
+import { Avatar, Group } from '@mantine/core';
+
+interface UserFieldProps {
+  username: string;
 }
 
-.active {
-  pointer-events: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-
-.link {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  color: var(--mantine-color-primary-0);
-  text-decoration: none;
-}
-
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.homeIcon {
-  background-color: var(--color-background-main);
+export function UserField({ username }: Readonly<UserFieldProps>) {
+  return (
+    // TODO: Update avatar src and consider the behaviour for long names
+    <Group gap="4px">
+      <Avatar
+        src={null}
+        size="28"
+      />
+      <span>{username}</span>
+    </Group>
+  );
 }
