@@ -17,13 +17,22 @@ import { MantineProvider } from '@mantine/core';
 import { theme } from './common/styling/theme';
 import { DatasetTable } from './components/DatasetTable/DatasetTable';
 import { PageContainer } from './common/components/PageContainer/PageContainer';
+import { useMemo } from 'react';
+import { configureAppStore } from './store/configureAppStore.ts';
+import { Provider } from 'react-redux';
 
 export function App() {
+  const store = useMemo(() => {
+    return configureAppStore();
+  }, []);
+
   return (
-    <MantineProvider theme={theme}>
-      <PageContainer>
-        <DatasetTable />
-      </PageContainer>
-    </MantineProvider>
+    <Provider store={store}>
+      <MantineProvider theme={theme}>
+        <PageContainer>
+          <DatasetTable />
+        </PageContainer>
+      </MantineProvider>
+    </Provider>
   );
 }

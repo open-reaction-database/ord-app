@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
-import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import type { AppThunk } from '../../common/types/store/thunk.ts';
+import { getDatasetActions } from './datasets.actions.ts';
+import type { Dataset } from './datasets.types.ts';
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), svgr(), tsconfigPaths()],
-  test: {
-    globals: true,
-  },
-});
+export const getDataset: AppThunk<typeof getDatasetActions> = async () => {
+  try {
+    // fetch dataset
+    const dataset = null as unknown as Dataset;
+    return getDatasetActions.success(dataset);
+  } catch (e) {
+    console.error(e);
+    return getDatasetActions.failure(new Error('error'));
+  }
+};

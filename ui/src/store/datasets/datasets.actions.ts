@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
-import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { createActionFactory } from '../../common/store/actions.ts';
+import type { Dataset } from './datasets.types.ts';
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), svgr(), tsconfigPaths()],
-  test: {
-    globals: true,
-  },
-});
+const { createAsyncAction } = createActionFactory('datasets');
+
+export const getDatasetActions = createAsyncAction<number, Dataset>('get');
+
+export const getDatasetListActions = createAsyncAction<void, Array<Dataset>>('list');
