@@ -15,12 +15,12 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Group } from '@mantine/core';
-import { MRT_ColumnDef } from 'mantine-react-table';
+import type { MRT_ColumnDef } from 'mantine-react-table';
 import { DataTable } from '../../common/components/DataTable/DataTable';
 import { Pagination } from '../../common/components/Pagination/Pagination';
 import { StatusChip } from '../../common/components/StatusChip/StatusChip';
 import { generateMockDatasets } from '../../common/mocks/generateMockDatasets';
-import { DATASET_STATUS } from '../../common/model/datasetStatus';
+import type { DATASET_STATUS } from '../../common/model/datasetStatus';
 import { formatDate } from '../../common/utils';
 import classes from './DatasetTable.module.scss';
 

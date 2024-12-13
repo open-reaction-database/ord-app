@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MantineReactTable, MRT_RowData, MRT_TableOptions, useMantineReactTable } from 'mantine-react-table';
+import type { MRT_RowData, MRT_TableOptions } from 'mantine-react-table';
+import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 import { IconChevronDown, IconChevronUp, IconSelector } from '@tabler/icons-react';
 import classes from './DataTable.module.scss';
 
