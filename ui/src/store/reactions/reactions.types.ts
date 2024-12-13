@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createActionFactory } from 'common/store';
-import type { Dataset } from './datasets.types.ts';
+import type OrdSchema from 'ord-schema';
 
-const { createAsyncAction } = createActionFactory('datasets');
-
-export const getDatasetActions = createAsyncAction<number, Dataset>('get');
-
-export const getDatasetListActions = createAsyncAction<void, Array<Dataset>>('list');
+export type Reaction = ReturnType<ReturnType<typeof OrdSchema.Reaction.deserializeBinary>['toObject']>;
