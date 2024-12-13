@@ -13,13 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDatasetActions } from './datasets.actions.ts';
-import type { Dataset } from './datasets.types.ts';
-import { createThunk } from '../../common/store';
-
-export const getDataset = createThunk(getDatasetActions, (dispatch, getState, datasetId) => {
-  console.info(dispatch, getState, datasetId);
-  // fetch dataset
-  const dataset = null as unknown as Dataset;
-  return getDatasetActions.success(dataset);
-});
+export * from './actions';
+export * from './thunks.ts';

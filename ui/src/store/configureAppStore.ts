@@ -23,3 +23,5 @@ export function configureAppStore() {
     devTools: isDev,
   });
 }
+
+export type AppState = ReturnType<ReturnType<typeof configureAppStore>['getState']>;

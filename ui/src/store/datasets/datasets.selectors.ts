@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppState } from '../rootReducer.ts';
+
+import type { AppState } from '../configureAppStore.ts';
 
 const selectRootState = (state: AppState) => state.datasets;
 

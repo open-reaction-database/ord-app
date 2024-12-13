@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers } from '@reduxjs/toolkit';
 import { datasetsReducer } from './datasets/datasets.reducer.ts';
 
-export const rootReducer = combineReducers({
+export const rootReducer = {
   datasets: datasetsReducer,
-});
-
-export type AppState = ReturnType<typeof rootReducer>;
+};

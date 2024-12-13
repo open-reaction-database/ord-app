@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppState } from 'store/rootReducer.ts';
-import type { ThunkAction } from '@reduxjs/toolkit';
+import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import type { AnyAsyncAction } from './actions.ts';
+import type { AppState } from '../../../store/configureAppStore.ts';
 
 export type AppThunk<T extends AnyAsyncAction> = ThunkAction<
   ReturnType<T['success']> | ReturnType<T['failure']>,
   AppState,
   Parameters<T['request']>[0],
-  never
+  Action
 >;
+
+export type ThunkWrapper<T extends AnyAsyncAction> = ThunkAction<void, AppState, Parameters<T['request']>[0], Action>;

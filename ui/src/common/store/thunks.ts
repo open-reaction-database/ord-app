@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDatasetActions } from './datasets.actions.ts';
-import type { Dataset } from './datasets.types.ts';
-import { createThunk } from '../../common/store';
+import type { AnyAsyncAction } from '../types';
+import type { ThunkWrapper, AppThunk } from '../types/store/thunk.ts';
 
-export const getDataset = createThunk(getDatasetActions, (dispatch, getState, datasetId) => {
-  console.info(dispatch, getState, datasetId);
-  // fetch dataset
-  const dataset = null as unknown as Dataset;
-  return getDatasetActions.success(dataset);
-});
+export function createThunk<AsyncAction extends AnyAsyncAction>(
+  asyncActionCreator: AsyncAction,
+  appThunk: AppThunk<AsyncAction>,
+): ThunkWrapper<AsyncAction> {
+  return async (dispatch, getState, extraArgument) => {
+    dispatch(asyncActionCreator.request(extraArgument));
+    try {
+      const result = appThunk(dispatch, getState, extraArgument);
+      dispatch(result);
+    } catch (e) {
+      console.error(e);
+      dispatch(asyncActionCreator.failure(e));
+    }
+  };
+}
