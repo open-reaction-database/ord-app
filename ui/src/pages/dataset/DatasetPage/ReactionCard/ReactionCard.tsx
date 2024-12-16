@@ -41,7 +41,7 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
               className={classes.link}
               to={'/dataset/123/reaction/123'}
             >
-              {name || id}
+              {name ?? id}
             </Link>
           </div>
 
