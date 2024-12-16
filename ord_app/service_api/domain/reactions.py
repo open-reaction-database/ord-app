@@ -15,10 +15,13 @@ from typing import Sequence
 
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
+from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ord_app.service_api.domain.datasets import write_message
 from ord_app.service_api.models import ReactionModel, UserModel
+from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema
 
 
@@ -57,3 +60,21 @@ async def create_reaction(db_session: AsyncSession, user: UserModel, dataset_id:
     await db_session.commit()
     await db_session.refresh(reaction)
     return reaction
+
+
+async def download_reaction(
+    db_session: AsyncSession, user: UserModel, dataset_id: int, reaction_id: int, file_format: DownloadFileFormats
+) -> tuple[ReactionModel, bytes]:
+    stmt = (
+        select(ReactionModel)
+        .where(
+            ReactionModel.dataset_id == dataset_id,
+            ReactionModel.id == reaction_id,
+            ReactionModel.owner == user,
+        )
+        .limit(1)
+    )
+
+    reaction = await db_session.scalar(stmt)
+    data = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
+    return reaction, data
