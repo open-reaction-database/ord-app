@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { AppShell, Avatar, Group } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from '../../../assets/ORD_logo.png';

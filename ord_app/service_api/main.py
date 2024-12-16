@@ -16,10 +16,22 @@
 
 
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 
 from ord_app.service_api.resources.v1 import auth, datasets, reactions, users, utilities, visualizations
+from ord_app.service_api.settings import RuntimeSettings
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True})
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=RuntimeSettings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 editor = APIRouter(prefix="/api/v1")
 editor.include_router(auth.router)
@@ -30,6 +42,8 @@ editor.include_router(utilities.router)
 editor.include_router(visualizations.router)
 
 app.include_router(editor)
+
+add_pagination(app)
 
 
 @app.get("/healthcheck")

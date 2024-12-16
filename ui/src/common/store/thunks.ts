@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
-import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import type { AnyAsyncAction } from '../types';
+import type { ThunkWrapper, AppThunk } from '../types/store/thunk.ts';
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), svgr(), tsconfigPaths()],
-  test: {
-    globals: true,
-  },
-});
+export function createThunk<AsyncAction extends AnyAsyncAction>(
+  asyncActionCreator: AsyncAction,
+  appThunk: AppThunk<AsyncAction>,
+): ThunkWrapper<AsyncAction> {
+  return async (dispatch, getState, extraArgument) => {
+    dispatch(asyncActionCreator.request(extraArgument));
+    try {
+      const result = appThunk(dispatch, getState, extraArgument);
+      dispatch(result);
+    } catch (e) {
+      console.error(e);
+      dispatch(asyncActionCreator.failure(e));
+    }
+  };
+}

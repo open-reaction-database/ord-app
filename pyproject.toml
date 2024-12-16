@@ -27,6 +27,7 @@ sqlalchemy-utils = "0.41.2"
 passlib = "1.7.4"
 pydantic = {version = "2.10.3", extras = ["email"]}
 orjson = "^3.10.12"
+fastapi-pagination = "0.12.32"
 
 [tool.poetry.group.dev.dependencies]
 black = "24.10.0"

@@ -13,6 +13,8 @@
 # limitations under the License.
 from typing import Sequence
 
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +28,14 @@ async def get_reactions(db_session: AsyncSession, user: UserModel, dataset_id: i
         ReactionModel.owner == user,
     )
     return (await db_session.scalars(stmt)).all()
+
+
+async def paginate_reactions(db_session: AsyncSession, user: UserModel, dataset_id: int) -> Page[ReactionModel]:
+    stmt = select(ReactionModel).where(
+        ReactionModel.dataset_id == dataset_id,
+        ReactionModel.owner == user,
+    )
+    return await paginate(db_session, stmt)
 
 
 async def get_reaction(db_session: AsyncSession, user: UserModel, dataset_id: int, reaction_id: int):

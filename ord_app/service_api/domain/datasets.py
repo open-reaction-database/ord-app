@@ -16,12 +16,15 @@ from base64 import b64encode
 from typing import Sequence, Type
 
 from fastapi import UploadFile
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from google.protobuf import json_format, text_format
 from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
@@ -31,6 +34,11 @@ async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[Da
     stmt = select(DatasetModel).where(DatasetModel.owner == user)
     datasets = await db_session.scalars(stmt)
     return datasets.all()
+
+
+async def paginate_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
+    stmt = select(DatasetModel).where(DatasetModel.owner == user).options(joinedload(DatasetModel.owner))
+    return await paginate(db_session, stmt)
 
 
 async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int) -> DatasetModel:

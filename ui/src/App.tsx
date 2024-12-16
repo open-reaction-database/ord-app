@@ -14,28 +14,34 @@
  * limitations under the License.
  */
 import { MantineProvider } from '@mantine/core';
+import { Provider } from 'react-redux';
 import { Link, Route, Switch } from 'wouter';
+import { configureAppStore } from './store/configureAppStore.ts';
 import { theme } from './common/styling/theme';
 import { DatasetTable } from './pages/DatasetTable/DatasetTable';
 import { PageContainer } from './common/components/PageContainer/PageContainer';
 import { DatasetPage } from './pages/dataset/DatasetPage/DatasetPage';
 
+const store = configureAppStore();
+
 export function App() {
   return (
-    <MantineProvider theme={theme}>
-      <PageContainer>
-        <Switch>
-          <Route path="/">
-            <DatasetTable />
-            <Link to="/dataset/1">Test dataset link</Link>
-          </Route>
+    <Provider store={store}>
+      <MantineProvider theme={theme}>
+        <PageContainer>
+          <Switch>
+            <Route path="/">
+              <DatasetTable />
+              <Link to="/dataset/1">Test dataset link</Link>
+            </Route>
 
-          <Route
-            path="/dataset/:datasetId"
-            component={DatasetPage}
-          />
-        </Switch>
-      </PageContainer>
-    </MantineProvider>
+            <Route
+              path="/dataset/:datasetId"
+              component={DatasetPage}
+            />
+          </Switch>
+        </PageContainer>
+      </MantineProvider>
+    </Provider>
   );
 }
