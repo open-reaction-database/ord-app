@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MantineProvider } from '@mantine/core';
-import { theme } from './common/styling/theme';
-import { DatasetTable } from './components/DatasetTable/DatasetTable';
-import { PageContainer } from './common/components/PageContainer/PageContainer';
-import { configureAppStore } from './store/configureAppStore.ts';
-import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import { rootReducer } from './rootReducer.ts';
+import { isDev } from '../constants.ts';
 
-const store = configureAppStore();
-
-export function App() {
-  return (
-    <Provider store={store}>
-      <MantineProvider theme={theme}>
-        <PageContainer>
-          <DatasetTable />
-        </PageContainer>
-      </MantineProvider>
-    </Provider>
-  );
+export function configureAppStore() {
+  return configureStore({
+    reducer: rootReducer,
+    devTools: isDev,
+  });
 }
+
+export type AppState = ReturnType<ReturnType<typeof configureAppStore>['getState']>;

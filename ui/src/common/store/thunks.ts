@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MantineProvider } from '@mantine/core';
-import { theme } from './common/styling/theme';
-import { DatasetTable } from './components/DatasetTable/DatasetTable';
-import { PageContainer } from './common/components/PageContainer/PageContainer';
-import { configureAppStore } from './store/configureAppStore.ts';
-import { Provider } from 'react-redux';
+import type { AnyAsyncAction } from '../types';
+import type { ThunkWrapper, AppThunk } from '../types/store/thunk.ts';
 
-const store = configureAppStore();
-
-export function App() {
-  return (
-    <Provider store={store}>
-      <MantineProvider theme={theme}>
-        <PageContainer>
-          <DatasetTable />
-        </PageContainer>
-      </MantineProvider>
-    </Provider>
-  );
+export function createThunk<AsyncAction extends AnyAsyncAction>(
+  asyncActionCreator: AsyncAction,
+  appThunk: AppThunk<AsyncAction>,
+): ThunkWrapper<AsyncAction> {
+  return async (dispatch, getState, extraArgument) => {
+    dispatch(asyncActionCreator.request(extraArgument));
+    try {
+      const result = appThunk(dispatch, getState, extraArgument);
+      dispatch(result);
+    } catch (e) {
+      console.error(e);
+      dispatch(asyncActionCreator.failure(e));
+    }
+  };
 }

@@ -13,23 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MantineProvider } from '@mantine/core';
-import { theme } from './common/styling/theme';
-import { DatasetTable } from './components/DatasetTable/DatasetTable';
-import { PageContainer } from './common/components/PageContainer/PageContainer';
-import { configureAppStore } from './store/configureAppStore.ts';
-import { Provider } from 'react-redux';
 
-const store = configureAppStore();
+import type { AppState } from '../configureAppStore.ts';
 
-export function App() {
-  return (
-    <Provider store={store}>
-      <MantineProvider theme={theme}>
-        <PageContainer>
-          <DatasetTable />
-        </PageContainer>
-      </MantineProvider>
-    </Provider>
-  );
-}
+const selectRootState = (state: AppState) => state.datasets;
+
+export const selectDatasetById = (id: string) => (state: AppState) => selectRootState(state).datasetsById[id];
