@@ -27,8 +27,9 @@ class DatasetSchema(BaseSchema):
     modified_at: datetime
     owner: UserSchema
     group: str = "mocked group"
-    description: str = "mocked description"
+    description: str | None
 
 
 class DatasetCreateSchema(BaseSchema):
     name: str
+    description: str | None = None

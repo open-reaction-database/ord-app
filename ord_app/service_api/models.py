@@ -44,6 +44,7 @@ class UserModel(BaseModel):
 
 class DatasetModel(BaseModel):
     name: Mapped[str] = mapped_column(nullable=True)
+    description: Mapped[str] = mapped_column(nullable=True)
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
