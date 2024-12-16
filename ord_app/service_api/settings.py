@@ -23,8 +23,10 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+    # app
     app_env: str = AppEns.localhost
     base_dir: PosixPath = PosixPath(__file__).parent
+    cors_origins: list[str] = ["http://localhost:5173"]
 
     # databases
     pg_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"
