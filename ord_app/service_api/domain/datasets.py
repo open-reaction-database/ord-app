@@ -49,7 +49,7 @@ async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id
 
 
 async def create_dataset(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
-    dataset = DatasetModel(owner=user, name=payload.name)
+    dataset = DatasetModel(owner=user, **payload.model_dump(exclude_unset=True))
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)
