@@ -25,7 +25,7 @@ from ord_app.service_api.domain.auth import get_current_user
 from ord_app.service_api.domain.datasets import (
     create_dataset,
     delete_dataset,
-    download_user_dataset,
+    download_dataset,
     get_user_dataset,
     paginate_datasets,
     upload_user_dataset,
@@ -82,7 +82,7 @@ async def fetch_dataset(
 
 
 @router.get("/{dataset_id}/download")
-async def download_dataset(
+async def _download_dataset(
     dataset_id: int,
     file_format: DownloadFileFormats,
     user: UserModel = Depends(get_current_user),
@@ -90,7 +90,7 @@ async def download_dataset(
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
-    dataset, data = await download_user_dataset(db_session, user, dataset_id, file_format)
+    dataset, data = await download_dataset(db_session, user, dataset_id, file_format)
     return Response(
         gzip.compress(data),
         headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},
