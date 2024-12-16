@@ -20,14 +20,16 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
   appThunk: AppThunk<AsyncAction>,
 ): ThunkWrapper<AsyncAction> {
-  return async (dispatch, getState, extraArgument) => {
-    dispatch(asyncActionCreator.request(extraArgument));
-    try {
-      const result = appThunk(dispatch, getState, extraArgument);
-      dispatch(result);
-    } catch (e) {
-      console.error(e);
-      dispatch(asyncActionCreator.failure(e));
-    }
+  return extraArgument => {
+    return async (dispatch, getState) => {
+      dispatch(asyncActionCreator.request(extraArgument));
+      try {
+        const result = appThunk(dispatch, getState, extraArgument);
+        dispatch(result);
+      } catch (e) {
+        console.error(e);
+        dispatch(asyncActionCreator.failure(e));
+      }
+    };
   };
 }

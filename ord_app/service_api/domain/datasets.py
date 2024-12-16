@@ -15,6 +15,7 @@ import gzip
 from base64 import b64encode
 from typing import Sequence, Type
 
+import orjson
 from fastapi import UploadFile
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -48,7 +49,7 @@ async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id
 
 
 async def create_dataset(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
-    dataset = DatasetModel(owner=user, name=payload.name)
+    dataset = DatasetModel(owner=user, **payload.model_dump(exclude_unset=True))
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)
@@ -61,11 +62,21 @@ async def delete_dataset(db_session: AsyncSession, user: UserModel, dataset_id: 
     await db_session.commit()
 
 
-async def download_user_dataset(
+async def download_dataset(
     db_session: AsyncSession, user: UserModel, dataset_id: int, file_format: DownloadFileFormats
 ) -> tuple[DatasetModel, bytes]:
-    dataset = await get_user_dataset(db_session, user, dataset_id)
-    data = write_message(Dataset.FromString(dataset.binpb), kind=file_format)
+    stmt = (
+        select(DatasetModel)
+        .where(DatasetModel.owner == user, DatasetModel.id == dataset_id)
+        .options(joinedload(DatasetModel.reactions))
+    )
+    dataset = await db_session.scalar(stmt)
+
+    dataset_pb = load_message(orjson.dumps({"name": dataset.name}), Dataset, "json")
+
+    dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
+
+    data = write_message(dataset_pb, kind=file_format)
     return dataset, data
 
 

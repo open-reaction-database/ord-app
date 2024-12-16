@@ -21,9 +21,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 from ord_app.service_api.domain.auth import get_current_user
-from ord_app.service_api.domain.datasets import write_message
-from ord_app.service_api.domain.reactions import create_reaction, get_reaction, get_reactions, paginate_reactions
+from ord_app.service_api.domain.reactions import create_reaction, download_reaction, get_reaction, paginate_reactions
 from ord_app.service_api.models import UserModel
+from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -49,17 +49,18 @@ async def reaction(
     return await get_reaction(db_session, user, dataset_id, reaction_id)
 
 
-@router.get("/download_reaction")
-async def download_reaction(user_id: str, dataset_name: str, index: int, kind: str):
-    """WIP"""
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-    if dataset is None:
-        return Response(status_code=404)
-    data = write_message(dataset.reactions[index], kind=kind)
+@router.get("/datasets/{dataset_id}/reactions/{reaction_id}/download")
+async def _download_reaction(
+    dataset_id: int,
+    reaction_id: int,
+    file_format: DownloadFileFormats,
+    user: UserModel = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    reaction, data = await download_reaction(db_session, user, dataset_id, reaction_id, file_format)
     return Response(
         gzip.compress(data),
-        headers={"Content-Disposition": f'attachment; filename="{dataset_name}-{index}.{kind}.gz"'},
+        headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}.gz"'},
         media_type="application/gzip",
     )
 
