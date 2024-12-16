@@ -16,6 +16,8 @@
 import { Chip } from '@mantine/core';
 import { DATASET_STATUS } from '../../model/datasetStatus';
 import classes from './StatusChip.module.scss';
+import { getDataset } from '../../../store/datasets/datasets.thunks.ts';
+import { useAppDispatch } from '../../../store/useAppDispatch.ts';
 
 interface StatusChipProps {
   status: DATASET_STATUS;
@@ -31,7 +33,9 @@ const statusToColorMapping = new Map<DATASET_STATUS, string>([
 ]);
 
 export function StatusChip({ status }: Readonly<StatusChipProps>) {
+  const dispatch = useAppDispatch();
   const chipColor = statusToColorMapping.get(status);
+  dispatch(getDataset(2));
 
   return (
     <Chip
