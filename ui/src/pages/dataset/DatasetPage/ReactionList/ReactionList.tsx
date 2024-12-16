@@ -16,7 +16,7 @@
 import { useState } from 'react';
 import { Pagination } from '../../../../common/components/Pagination/Pagination';
 import { ReactionCard } from '../ReactionCard/ReactionCard';
-import { Reaction } from '../../../../common/model/reaction';
+import type { Reaction } from '../../../../common/model/reaction';
 
 interface ReactionListProps {
   reactions: Reaction[];

@@ -16,8 +16,8 @@
 import { Button, Paper } from '@mantine/core';
 import classes from './ReactionCard.module.scss';
 import { Link } from 'wouter';
-import { IconChecklist, IconChevronDown, IconDots, IconDownload } from '@tabler/icons-react';
-import { Reaction } from '../../../../common/model/reaction';
+import type { Reaction } from '../../../../common/model/reaction';
+import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
 
 interface ReactionCardProps {
   reaction: Reaction;
@@ -53,22 +53,22 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
 
         <div className={classes.buttonContainer}>
           <Button
-            leftSection={<IconChecklist size={20} />}
+            leftSection={<CheckListIcon />}
             variant="white"
           >
             Save as a Template
           </Button>
 
           <Button
-            leftSection={<IconDownload size={20} />}
-            rightSection={<IconChevronDown size={20} />}
+            leftSection={<DownloadIcon />}
+            rightSection={<ChevronDownIcon />}
             variant="white"
           >
             Download Reaction
           </Button>
 
           <Button
-            leftSection={<IconDots size={20} />}
+            leftSection={<DotsIcon />}
             variant="white"
           >
             More

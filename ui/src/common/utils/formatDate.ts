@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 /**
- * Formats a timestamp into a human-readable date string using date-fns library
+ * Formats a string in ISO format into a human-readable date string using date-fns library
  *
- * @param timestamp - Timestamp in milliseconds
+ * @param inputDate - String in ISO format
  * @returns
  */
-export function formatDate(timestamp: number) {
-  return format(timestamp, 'dd.MM.yyyy hh:mm a');
+export function formatDate(inputDate: string) {
+  const date = parseISO(inputDate);
+
+  return format(date, 'dd.MM.yyyy hh:mm a');
 }

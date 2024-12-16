@@ -18,7 +18,7 @@ import type { AnyAsyncAction } from './actions.ts';
 import type { AppState } from '../../../store/configureAppStore.ts';
 
 export type AppThunk<T extends AnyAsyncAction> = ThunkAction<
-  ReturnType<T['success']> | ReturnType<T['failure']>,
+  Promise<ReturnType<T['success']>> | Promise<ReturnType<T['failure']>>,
   AppState,
   Parameters<T['request']>[0],
   Action

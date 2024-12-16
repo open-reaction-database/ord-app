@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { Breadcrumbs as MantineBreadcrumbs, ThemeIcon } from '@mantine/core';
-import { IconHome } from '@tabler/icons-react';
 import { Link } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
+import { HomeIcon } from 'common/icons';
 
 interface Breadcrumb {
   title: string;
@@ -35,7 +35,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
         variant="white"
         color="primary"
       >
-        <IconHome />
+        <HomeIcon />
       </ThemeIcon>
       <MantineBreadcrumbs
         separator="/"

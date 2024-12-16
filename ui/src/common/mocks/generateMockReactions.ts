@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { faker } from '@faker-js/faker';
-import { Reaction } from '../model/reaction';
+import type { Reaction } from '../model/reaction';
 
 /**
  * Generates an array of mock reactions

@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { User } from './user';
+import CheckListIcon from './CheckListIcon.svg?react';
+import ChevronDownIcon from './ChevronDownIcon.svg?react';
+import CopyIcon from './CopyIcon.svg?react';
+import DotsIcon from './DotsIcon.svg?react';
+import DownloadIcon from './DownloadIcon.svg?react';
+import HomeIcon from './HomeIcon.svg?react';
 
-export interface Dataset {
-  id: number;
-  name: string;
-  owner: User;
-  created_at: string;
-  modified_at: string;
-  group: string;
-  description: string;
-}
+export { CheckListIcon, ChevronDownIcon, CopyIcon, DotsIcon, DownloadIcon, HomeIcon };

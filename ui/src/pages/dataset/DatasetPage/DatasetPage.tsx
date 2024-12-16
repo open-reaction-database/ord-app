@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Paper, Title } from '@mantine/core';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams } from 'wouter';
+import { Flex, Loader, Paper, Title } from '@mantine/core';
+import { selectDatasetById } from 'store/datasets/datasets.selectors';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { getDataset } from 'store/datasets/datasets.thunks';
 import { ReactionList } from './ReactionList/ReactionList';
 import { DataField } from '../../../common/components/DataField/DataField';
 import { UserField } from '../../../common/components/UserField/UserField';
@@ -24,6 +30,27 @@ import classes from './DatasetPage.module.scss';
 const mockData = generateMockReactions(200);
 
 export function DatasetPage() {
+  const dispatch = useAppDispatch();
+  const { datasetId } = useParams();
+  const dataset = useSelector(selectDatasetById(datasetId as string));
+
+  useEffect(() => {
+    dispatch(getDataset(Number(datasetId)));
+  }, [dispatch, datasetId]);
+
+  if (!dataset) {
+    return (
+      <Flex
+        justify="center"
+        align="center"
+      >
+        <Loader size="xl" />
+      </Flex>
+    );
+  }
+
+  const { id, group, owner, name, description, modified_at } = dataset;
+
   return (
     <div className={classes.container}>
       <Paper
@@ -31,25 +58,22 @@ export function DatasetPage() {
         p="lg"
       >
         <div className={classes.datasetInfo}>
-          <DataField label="Group">Group 1</DataField>
+          <DataField label="Group">{group}</DataField>
           <DataField label="Dataset Owner">
-            <UserField username="John Doe" />
+            <UserField
+              username={owner.first_name && owner.last_name ? `${owner.first_name} ${owner.last_name}` : owner.email}
+            />
           </DataField>
-          <DataField label="Dataset ID">123</DataField>
-          <DataField label="Last Modified">{formatDate(1122334455)}</DataField>
+          <DataField label="Dataset ID">{id}</DataField>
+          <DataField label="Last Modified">{formatDate(modified_at)}</DataField>
         </div>
         <Title
           className={classes.title}
           order={1}
         >
-          750 AstraZeneca ELN Dataset Lorem ipsum dolor sit amet, consectetur
+          {name}
         </Title>
-        <div>
-          This dataset includes 750 Buchwald-Hartwig reactions generated from AstraZeneca. CML filenames:
-          pftaps19950606_wk23.xml,pftaps19950613_wk24.xml,pftaps199506. Long Text Description for clear example how it
-          could be. This dataset includes 750 Buchwald-Hartwig reactions generated from AstraZeneca. Long Text
-          Description for clear example how it could be.
-        </div>
+        <div>{description}</div>
       </Paper>
 
       <Paper

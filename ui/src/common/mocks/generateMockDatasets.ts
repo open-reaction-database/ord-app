@@ -32,7 +32,7 @@ export function generateMockDatasets(count: number): DatasetTableRow[] {
     status: faker.helpers.arrayElement(statusValues),
     group: `Group ${faker.number.int({ min: 1, max: 5 })}`,
     owner: `${faker.person.firstName().slice(0, 5)} ${faker.person.lastName().slice(0, 5)}`,
-    lastModified: faker.date.recent().getTime(),
+    lastModified: faker.date.recent().toISOString(),
     description: faker.lorem.sentence().slice(0, 20),
   }));
 }

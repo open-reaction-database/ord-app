@@ -30,7 +30,7 @@ export interface DatasetTableRow {
   status: DATASET_STATUS;
   group: string;
   owner: string;
-  lastModified: number;
+  lastModified: string;
   description: string;
 }
 

@@ -16,10 +16,11 @@
 import { getDatasetActions } from './datasets.actions.ts';
 import type { Dataset } from './datasets.types.ts';
 import { createThunk } from '../../common/store';
+import axios from 'axios';
 
-export const getDataset = createThunk(getDatasetActions, (dispatch, getState, datasetId) => {
+export const getDataset = createThunk(getDatasetActions, async (dispatch, getState, datasetId) => {
   console.info(dispatch, getState, datasetId);
-  // fetch dataset
-  const dataset = null as unknown as Dataset;
+  const response = await axios.get(`/datasets/${datasetId}`);
+  const dataset = response.data as Dataset;
   return getDatasetActions.success(dataset);
 });
