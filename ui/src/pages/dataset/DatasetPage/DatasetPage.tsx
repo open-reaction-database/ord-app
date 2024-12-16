@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 import { Paper, Title } from '@mantine/core';
+import { ReactionList } from './ReactionList/ReactionList';
 import { DataField } from '../../../common/components/DataField/DataField';
 import { UserField } from '../../../common/components/UserField/UserField';
 import { formatDate } from '../../../common/utils';
+import { generateMockReactions } from '../../../common/mocks/generateMockReactions';
 import classes from './DatasetPage.module.scss';
+
+const mockData = generateMockReactions(200);
 
 export function DatasetPage() {
   return (
     <div className={classes.container}>
       <Paper
-        className={classes.paper}
         radius="sm"
         p="lg"
       >
         <div className={classes.datasetInfo}>
-          <DataField label="Owner">
+          <DataField label="Group">Group 1</DataField>
+          <DataField label="Dataset Owner">
             <UserField username="John Doe" />
           </DataField>
           <DataField label="Dataset ID">123</DataField>
-          <DataField label="Group">Group 1</DataField>
           <DataField label="Last Modified">{formatDate(1122334455)}</DataField>
         </div>
         <Title
@@ -50,12 +53,15 @@ export function DatasetPage() {
       </Paper>
 
       <Paper
-        className={classes.paper}
+        className={classes.titleContainer}
         radius="sm"
         p="lg"
       >
         <Title order={2}>Dataset Reactions</Title>
+        <span className={classes.counter}>{mockData.length}</span>
       </Paper>
+
+      <ReactionList reactions={mockData} />
     </div>
   );
 }

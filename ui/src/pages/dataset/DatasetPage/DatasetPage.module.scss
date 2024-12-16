@@ -19,16 +19,26 @@
   gap: 8px;
 }
 
-.paper {
-  border: 1px solid var(--color-border-1);
-}
-
 .datasetInfo {
   display: flex;
   gap: 40px;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .title {
   margin-top: 16px;
   margin-bottom: 8px;
+}
+
+.counter {
+  padding: 2px 8px;
+  background-color: var(--color-background-gray);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  border-radius: var(--mantine-spacing-xl);
 }

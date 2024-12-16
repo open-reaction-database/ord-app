@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { format } from 'date-fns';
+import { faker } from '@faker-js/faker';
+import { Reaction } from '../model/reaction';
 
 /**
- * Formats a timestamp into a human-readable date string using date-fns library
+ * Generates an array of mock reactions
  *
- * @param timestamp - Timestamp in milliseconds
+ * @param count - The number of reactions to generate
  * @returns
  */
-export function formatDate(timestamp: number) {
-  return format(timestamp, 'dd.MM.yyyy hh:mm a');
+export function generateMockReactions(count: number): Reaction[] {
+  const generateName = () => (Math.random() > 0.5 ? faker.science.chemicalElement().name + ' reaction' : undefined);
+
+  return Array.from({ length: count }, () => ({
+    id: faker.string.uuid(),
+    name: generateName(),
+    summary: faker.lorem.sentence().slice(0, 30),
+    conditions: faker.lorem.sentence().slice(0, 30),
+    analysis: faker.lorem.sentence().slice(0, 30),
+  }));
 }
