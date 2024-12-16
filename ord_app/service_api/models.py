@@ -48,6 +48,8 @@ class DatasetModel(BaseModel):
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
+    reactions: Mapped[list["ReactionModel"]] = relationship("ReactionModel", back_populates="dataset")
+
     def __repr__(self):
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
 
@@ -57,7 +59,7 @@ class ReactionModel(BaseModel):
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
 
     dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"))
-    dataset: Mapped[DatasetModel] = relationship(DatasetModel, backref="reactions")
+    dataset: Mapped[DatasetModel] = relationship(DatasetModel, back_populates="reactions")
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
     owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
