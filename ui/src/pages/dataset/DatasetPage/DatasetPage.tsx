@@ -38,42 +38,40 @@ export function DatasetPage() {
     dispatch(getDataset(Number(datasetId)));
   }, [dispatch, datasetId]);
 
-  if (!dataset) {
-    return (
-      <Flex
-        justify="center"
-        align="center"
-      >
-        <Loader size="xl" />
-      </Flex>
-    );
-  }
-
-  const { id, group, owner, name, description, modified_at } = dataset;
-
-  return (
+  return !dataset ? (
+    <Flex
+      justify="center"
+      align="center"
+    >
+      <Loader size="xl" />
+    </Flex>
+  ) : (
     <div className={classes.container}>
       <Paper
         radius="sm"
         p="lg"
       >
         <div className={classes.datasetInfo}>
-          <DataField label="Group">{group}</DataField>
+          <DataField label="Group">{dataset.group}</DataField>
           <DataField label="Dataset Owner">
             <UserField
-              username={owner.first_name && owner.last_name ? `${owner.first_name} ${owner.last_name}` : owner.email}
+              username={
+                dataset.owner.first_name && dataset.owner.last_name
+                  ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
+                  : dataset.owner.email
+              }
             />
           </DataField>
-          <DataField label="Dataset ID">{id}</DataField>
-          <DataField label="Last Modified">{formatDate(modified_at)}</DataField>
+          <DataField label="Dataset ID">{dataset.id}</DataField>
+          <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
         </div>
         <Title
           className={classes.title}
           order={1}
         >
-          {name}
+          {dataset.name}
         </Title>
-        <div>{description}</div>
+        <div>{dataset.description}</div>
       </Paper>
 
       <Paper

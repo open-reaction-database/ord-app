@@ -36,6 +36,7 @@ export function ReactionList({ reactions }: Readonly<ReactionListProps>) {
   };
 
   const currentReactions = reactions.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  const totalPages = Math.ceil(reactions.length / rowsPerPage);
 
   return (
     <>
@@ -51,7 +52,7 @@ export function ReactionList({ reactions }: Readonly<ReactionListProps>) {
         onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleRowsPerPageChange}
-        totalPages={Math.ceil(reactions.length / rowsPerPage)}
+        totalPages={totalPages}
       />
     </>
   );

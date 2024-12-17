@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import CheckListIcon from './CheckListIcon.svg?react';
-import ChevronDownIcon from './ChevronDownIcon.svg?react';
-import CopyIcon from './CopyIcon.svg?react';
-import DotsIcon from './DotsIcon.svg?react';
-import DownloadIcon from './DownloadIcon.svg?react';
-import HomeIcon from './HomeIcon.svg?react';
-
-export { CheckListIcon, ChevronDownIcon, CopyIcon, DotsIcon, DownloadIcon, HomeIcon };
+export { default as CheckListIcon } from './CheckListIcon.svg?react';
+export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
+export { default as CopyIcon } from './CopyIcon.svg?react';
+export { default as DotsIcon } from './DotsIcon.svg?react';
+export { default as DownloadIcon } from './DownloadIcon.svg?react';
+export { default as HomeIcon } from './HomeIcon.svg?react';

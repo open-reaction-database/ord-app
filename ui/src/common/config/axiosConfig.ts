@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDatasetActions } from './datasets.actions.ts';
-import type { Dataset } from './datasets.types.ts';
-import { createThunk } from '../../common/store';
-import axiosInstance from 'common/config/axiosConfig.ts';
+import axios from 'axios';
 
-export const getDataset = createThunk(getDatasetActions, async (dispatch, getState, datasetId) => {
-  console.info(dispatch, getState, datasetId);
-  const dataset = (await axiosInstance.get<Dataset>(`/datasets/${datasetId}`)).data;
-  return getDatasetActions.success(dataset);
+const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_ENDPOINT,
+  headers: {
+    Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
+  },
 });
+
+export default axiosInstance;

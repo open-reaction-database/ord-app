@@ -130,6 +130,8 @@ export function DatasetTable() {
     setCurrentPage(1);
   };
 
+  const totalPages = Math.ceil(mockData.length / rowsPerPage);
+
   return (
     <div className={classes.tableContainer}>
       <DataTable
@@ -145,7 +147,7 @@ export function DatasetTable() {
         onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleRowsPerPageChange}
-        totalPages={Math.ceil(mockData.length / rowsPerPage)}
+        totalPages={totalPages}
       />
     </div>
   );

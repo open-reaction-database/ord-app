@@ -21,10 +21,6 @@ import { theme } from './common/styling/theme';
 import { DatasetTable } from './pages/DatasetTable/DatasetTable';
 import { PageContainer } from './common/components/PageContainer/PageContainer';
 import { DatasetPage } from './pages/dataset/DatasetPage/DatasetPage';
-import axios from 'axios';
-
-axios.defaults.baseURL = import.meta.env.VITE_API_ENDPOINT;
-axios.defaults.headers.common['Authorization'] = import.meta.env.VITE_AUTH_TOKEN;
 
 const store = configureAppStore();
 
