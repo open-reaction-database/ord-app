@@ -14,25 +14,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import get_current_user
-from ord_app.service_api.domain.users import create_user_uc, delete_user_uc, get_user_uc
+from ord_app.service_api.domain.auth import authenticate
+from ord_app.service_api.domain.users import delete_user_uc, get_user_uc
 from ord_app.service_api.models import UserModel
-from ord_app.service_api.schemas.users import CreateUserSchema, UserSchema
+from ord_app.service_api.schemas.users import UserSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["users"], prefix="/users")
 
 
-@router.post("/", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
-async def create_user(
-    payload: CreateUserSchema,
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    return await create_user_uc(db_session, payload)
-
-
 @router.get("/me", response_model=UserSchema)
-async def read_users_me(current_user: UserModel = Depends(get_current_user)):
+async def read_users_me(current_user: UserModel = Depends(authenticate)):
     return current_user
 
 

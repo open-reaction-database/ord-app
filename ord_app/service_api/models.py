@@ -13,10 +13,17 @@
 # limitations under the License.
 import datetime
 import re
+from enum import Enum
 
 from sqlalchemy import ForeignKey, LargeBinary, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
-from sqlalchemy_utils import EmailType, PasswordType
+from sqlalchemy_utils import ChoiceType, EmailType, PasswordType
+
+
+class AuthProviders(str, Enum):
+    platform: str = "platform"
+    github: str = "github"
+    orcid: str = "orcid"
 
 
 class BaseModel(DeclarativeBase):
@@ -31,12 +38,10 @@ class BaseModel(DeclarativeBase):
 
 
 class UserModel(BaseModel):
-    email: Mapped[str] = mapped_column(EmailType(), unique=True)
-    first_name: Mapped[str] = mapped_column(nullable=True)
-    last_name: Mapped[str] = mapped_column(nullable=True)
-    password: Mapped[str] = mapped_column(
-        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"])
-    )
+    auth0_id: Mapped[str] = mapped_column(nullable=True, index=True)
+    email: Mapped[str] = mapped_column(EmailType(), unique=True, nullable=True)
+    name: Mapped[str] = mapped_column(nullable=True)
+    avatar_url: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"

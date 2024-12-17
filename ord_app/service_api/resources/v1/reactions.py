@@ -20,7 +20,7 @@ from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.reactions import create_reaction, download_reaction, get_reaction, paginate_reactions
 from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
@@ -33,7 +33,7 @@ router = APIRouter(tags=["reactions"])
 @router.get("/datasets/{dataset_id}/reactions", response_model=Page[ReactionSchema])
 async def reactions(
     dataset_id: int,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await paginate_reactions(db_session, user, dataset_id)
@@ -43,7 +43,7 @@ async def reactions(
 async def reaction(
     dataset_id: int,
     reaction_id: int,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await get_reaction(db_session, user, dataset_id, reaction_id)
@@ -54,7 +54,7 @@ async def _download_reaction(
     dataset_id: int,
     reaction_id: int,
     file_format: DownloadFileFormats,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     reaction, data = await download_reaction(db_session, user, dataset_id, reaction_id, file_format)
@@ -69,7 +69,7 @@ async def _download_reaction(
 async def _create_reaction(
     dataset_id: int,
     payload: ReactionCreateSchema,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await create_reaction(db_session, user, dataset_id, payload)

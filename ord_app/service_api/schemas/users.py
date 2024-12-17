@@ -17,13 +17,8 @@ from pydantic import EmailStr
 from ord_app.service_api.schemas.base import BaseSchema
 
 
-class CreateUserSchema(BaseSchema):
-    email: EmailStr
-    password: str
-
-
 class UserSchema(BaseSchema):
     id: int
-    email: EmailStr
-    first_name: str | None
-    last_name: str | None
+    email: EmailStr | None = None
+    name: str | None = None
+    auth0_id: str | None = None
