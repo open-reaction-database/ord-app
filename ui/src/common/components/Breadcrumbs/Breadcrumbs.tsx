@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Anchor, Breadcrumbs as MantineBreadcrumbs, ThemeIcon } from '@mantine/core';
-import { IconHome } from '@tabler/icons-react';
+import { Breadcrumbs as MantineBreadcrumbs, ThemeIcon } from '@mantine/core';
+import { Link } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
+import { HomeIcon } from 'common/icons';
 
 interface Breadcrumb {
   title: string;
@@ -30,10 +31,11 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
   return (
     <div className={classes.container}>
       <ThemeIcon
+        className={classes.homeIcon}
         variant="white"
         color="primary"
       >
-        <IconHome />
+        <HomeIcon />
       </ThemeIcon>
       <MantineBreadcrumbs
         separator="/"
@@ -45,14 +47,14 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
         {items.map((item, index) => {
           const isActive = index === items.length - 1;
           return (
-            <Anchor
+            <Link
               className={isActive ? classes.active : classes.link}
-              href={item.path}
+              to={item.path}
               id={item.path}
               key={item.path}
             >
               {item.title}
-            </Anchor>
+            </Link>
           );
         })}
       </MantineBreadcrumbs>

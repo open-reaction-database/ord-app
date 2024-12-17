@@ -24,7 +24,7 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
     return async (dispatch, getState) => {
       dispatch(asyncActionCreator.request(extraArgument));
       try {
-        const result = appThunk(dispatch, getState, extraArgument);
+        const result = await appThunk(dispatch, getState, extraArgument);
         dispatch(result);
       } catch (e) {
         console.error(e);

@@ -13,27 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import '@mantine/core/styles.css';
-@import 'mantine-react-table/styles.css';
-
-:root {
-  --color-primary: #3c78d8;
-  --color-background-main: #f8f8f8;
-  --color-background-gray: #e8ebed;
-  --color-background-white: #fff;
-  --color-text-primary: #090a0b;
-  --color-text-hover: #f00;
-  --color-text-secondary-1: #aab9c5;
-  --color-text-secondary-2: #637d92;
-  --color-text-secondary-3: #4a5e6d;
-  --color-border-1: #e8ebed;
-  --color-border-2: #d2d6db;
-  --font-size-sm: 12px;
-  --font-size-lg: 16px;
-}
-
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+export interface User {
+  id: number;
+  email: string;
+  first_name?: string;
+  last_name?: string;
 }

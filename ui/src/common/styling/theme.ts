@@ -56,10 +56,19 @@ export const theme = createTheme({
     xl: '36px',
   },
   spacing: {
-    xs: '0.375rem',
+    xs: '0.25rem',
     sm: '0.75rem',
     md: '1rem',
-    lg: '2rem',
-    xl: '3rem',
+    lg: '1.5rem',
+    xl: '2rem',
+  },
+  components: {
+    Paper: {
+      styles: {
+        root: {
+          border: '1px solid var(--color-border-1)',
+        },
+      },
+    },
   },
 });

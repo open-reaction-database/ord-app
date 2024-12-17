@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { format, parseISO } from 'date-fns';
+import { faker } from '@faker-js/faker';
+import type { Reaction } from '../model/reaction';
 
 /**
- * Formats a string in ISO format into a human-readable date string using date-fns library
+ * Generates an array of mock reactions
  *
- * @param inputDate - String in ISO format
+ * @param count - The number of reactions to generate
  * @returns
  */
-export function formatDate(inputDate: string) {
-  const date = parseISO(inputDate);
+export function generateMockReactions(count: number): Reaction[] {
+  const generateName = () => (Math.random() > 0.5 ? faker.science.chemicalElement().name + ' reaction' : undefined);
 
-  return format(date, 'dd.MM.yyyy hh:mm a');
+  return Array.from({ length: count }, () => ({
+    id: faker.string.uuid(),
+    name: generateName(),
+    summary: faker.lorem.sentence().slice(0, 30),
+    conditions: faker.lorem.sentence().slice(0, 30),
+    analysis: faker.lorem.sentence().slice(0, 30),
+  }));
 }

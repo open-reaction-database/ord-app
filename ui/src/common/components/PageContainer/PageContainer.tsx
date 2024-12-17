@@ -51,8 +51,8 @@ export function PageContainer({ children }: PropsWithChildren) {
       <AppShell.Main>
         <Breadcrumbs
           items={[
-            { title: 'Contribute', path: '/contribute' },
-            { title: 'Enumerate', path: '/contribure/enumerate' },
+            { title: 'Contribute', path: '/' },
+            { title: 'Dataset 123', path: '/dataset/123' },
           ]}
         />
         {children}

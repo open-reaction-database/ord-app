@@ -13,7 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { User } from 'common/model/user';
+
 export interface Dataset {
   id: number;
   name: string;
+  owner: User;
+  created_at: string;
+  modified_at: string;
+  group: string;
+  description: string;
 }

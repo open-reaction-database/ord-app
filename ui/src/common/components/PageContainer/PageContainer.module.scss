@@ -23,9 +23,9 @@
 }
 
 .main {
-  padding-top: 40px;
-  padding-bottom: 48px;
+  padding: 40px 20px 48px;
   min-width: 1280px;
+  background-color: var(--color-background-main);
 }
 
 .footer {
@@ -34,6 +34,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text-secondary-2);
+  background-color: var(--color-background-main);
 }
 
 .logo {
