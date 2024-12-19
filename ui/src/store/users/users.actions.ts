@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const isDev = !import.meta.env.PROD;
+import { createActionFactory } from '../../common/store';
+import type { Self } from './users.types.ts';
 
-export const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
-export const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
+const { createAction } = createActionFactory('users');
 
-export const domain = window.location.origin;
+export const setActiveUser = createAction<Self>('set_active');

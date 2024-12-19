@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 import axios from 'axios';
+import type { GetAccessToken } from '../types/auth.ts';
+
+export let getAccessToken: GetAccessToken;
+
+export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
+  getAccessToken = getAccessTokenParam;
+}
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
   headers: {
     Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
   },
+});
+
+axiosInstance.interceptors.request.use(async config => {
+  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
+  return config;
 });
 
 export default axiosInstance;

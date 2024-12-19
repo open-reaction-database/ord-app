@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 import { datasetsReducer } from './datasets/datasets.reducer.ts';
+import { usersReducer } from './users/users.reducer.ts';
 
 export const rootReducer = {
   datasets: datasetsReducer,
+  users: usersReducer,
 };

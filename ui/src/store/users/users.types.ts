@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const isDev = !import.meta.env.PROD;
-
-export const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
-export const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
-
-export const domain = window.location.origin;
+export interface Self {
+  picture?: string | undefined;
+  name: string;
+}
