@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ord-app"
 version = "0.1.0"
-description = "AppContent for the Open Reaction Database"
+description = "App for the Open Reaction Database"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 
