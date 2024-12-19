@@ -19,6 +19,11 @@
   gap: 8px;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .datasetInfo {
   display: flex;
   gap: 40px;
@@ -38,6 +43,21 @@
 .title {
   margin-top: 16px;
   margin-bottom: 8px;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  min-width: 20%;
+
+  button {
+    border-radius: 8px;
+    font-weight: 400;
+  }
+
+  path {
+    fill: var(--mantine-color-white);
+  }
 }
 
 .counter {

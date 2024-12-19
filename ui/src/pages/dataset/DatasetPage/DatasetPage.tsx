@@ -22,6 +22,7 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import { getDataset } from 'store/datasets/datasets.thunks';
 import { ReactionList } from './ReactionList/ReactionList';
 import { DataField } from '../../../common/components/DataField/DataField';
+import { DownloadMenu } from './DownloadMenu/DownloadMenu';
 import { UserField } from '../../../common/components/UserField/UserField';
 import { formatDate } from '../../../common/utils';
 import { generateMockReactions } from '../../../common/mocks/generateMockReactions';
@@ -49,6 +50,11 @@ export function DatasetPage() {
 
   const hasReactions = reactions.length > 0;
 
+  const username =
+    dataset?.owner.first_name && dataset?.owner.last_name
+      ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
+      : dataset?.owner.email;
+
   return !dataset ? (
     <Flex
       justify="center"
@@ -59,38 +65,39 @@ export function DatasetPage() {
   ) : (
     <div className={classes.container}>
       <Paper
+        className={classes.header}
         radius="sm"
         p="lg"
       >
-        <div className={classes.datasetInfo}>
-          <DataField label="Group">{dataset.group}</DataField>
-          <DataField label="Dataset Owner">
-            <UserField
-              username={
-                dataset.owner.first_name && dataset.owner.last_name
-                  ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
-                  : dataset.owner.email
-              }
-            />
-          </DataField>
-          <DataField label="Dataset ID">
-            <Flex
-              align="center"
-              gap="4"
-            >
-              {dataset.id}
-              <CopyButton options={copyToClipboardOptions} />
-            </Flex>
-          </DataField>
-          <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
+        <div>
+          <div className={classes.datasetInfo}>
+            <DataField label="Group">{dataset.group}</DataField>
+            <DataField label="Dataset Owner">
+              <UserField username={username} />
+            </DataField>
+            <DataField label="Dataset ID">
+              <Flex
+                align="center"
+                gap="4"
+              >
+                {dataset.id}
+                <CopyButton options={copyToClipboardOptions} />
+              </Flex>
+            </DataField>
+            <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
+          </div>
+          <Title
+            className={classes.title}
+            order={1}
+          >
+            {dataset.name}
+          </Title>
+          <div>{dataset.description}</div>
         </div>
-        <Title
-          className={classes.title}
-          order={1}
-        >
-          {dataset.name}
-        </Title>
-        <div>{dataset.description}</div>
+
+        <div className={classes.buttonContainer}>
+          <DownloadMenu datasetId={Number(datasetId)} />
+        </div>
       </Paper>
 
       <Paper

@@ -13,6 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './downloadFile.ts';
-export * from './formatDate.ts';
-export * from './itemsById.ts';
+.dropdown {
+  width: 140px;
+  border: none;
+  box-shadow: 0 4px 24px 0 #00000014;
+}
+
+.menuItem {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.menuItemSection {
+  padding-right: 8px;
+
+  path {
+    fill: var(--color-text-secondary-2);
+  }
+}
+
+.target {
+  &:active {
+    transform: none;
+  }
+
+  &[data-expanded='true'] {
+    outline: 3px solid #3c78d899;
+  }
+}
