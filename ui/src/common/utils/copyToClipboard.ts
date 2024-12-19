@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 export function copyToClipboard(text: string) {
-  try {
-    navigator.clipboard.writeText(text);
-  } catch (e) {
-    console.error(e);
-  }
+  navigator.clipboard.writeText(text).catch(e => console.error(e));
 }
