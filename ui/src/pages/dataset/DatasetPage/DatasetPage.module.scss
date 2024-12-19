@@ -24,6 +24,11 @@
   gap: 40px;
 }
 
+.titleSection {
+  display: flex;
+  justify-content: space-between;
+}
+
 .titleContainer {
   display: flex;
   align-items: center;
@@ -41,4 +46,16 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   border-radius: var(--mantine-spacing-xl);
+}
+
+.button {
+  font-weight: 400;
+}
+
+.buttonSection {
+  margin-right: 10px;
+}
+
+.emptyText {
+  color: var(--color-text-secondary-1);
 }

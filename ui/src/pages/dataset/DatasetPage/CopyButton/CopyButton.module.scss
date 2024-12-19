@@ -13,11 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
-export { default as CheckListIcon } from './CheckListIcon.svg?react';
-export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
-export { default as CopyIcon } from './CopyIcon.svg?react';
-export { default as DotsIcon } from './DotsIcon.svg?react';
-export { default as DownloadIcon } from './DownloadIcon.svg?react';
-export { default as EmptyIcon } from './EmptyIcon.svg?react';
-export { default as HomeIcon } from './HomeIcon.svg?react';
+.dropdown {
+  border: none;
+  box-shadow: 0 4px 24px 0 #00000014;
+}
+
+.menuItem {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.target {
+  cursor: pointer;
+
+  &[data-expanded='true'] {
+    path {
+      fill: var(--color-text-hover);
+    }
+  }
+}

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Paper } from '@mantine/core';
-import classes from './ReactionCard.module.scss';
+import { Button, Flex, Paper } from '@mantine/core';
 import { Link } from 'wouter';
-import type { Reaction } from '../../../../common/model/reaction';
+import { CopyButton, type CopyButtonOptions } from '../CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
+import type { Reaction } from '../../../../common/model/reaction';
+import classes from './ReactionCard.module.scss';
 
 interface ReactionCardProps {
   reaction: Reaction;
@@ -27,6 +28,11 @@ interface ReactionCardProps {
 export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
   const { id, name, summary, conditions, analysis } = reaction;
 
+  const copyToClipboardOptions: CopyButtonOptions[] = [
+    { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
+    { label: 'Copy Reaction ID', value: id },
+  ];
+
   return (
     <Paper
       className={classes.container}
@@ -35,7 +41,10 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
     >
       <div className={classes.topContainer}>
         <div className={classes.titleContainer}>
-          <div>
+          <Flex
+            align="center"
+            gap="4"
+          >
             <span className={classes.index}>{index}.</span>
             <Link
               className={classes.link}
@@ -43,7 +52,9 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
             >
               {name ?? id}
             </Link>
-          </div>
+
+            <CopyButton options={copyToClipboardOptions} />
+          </Flex>
 
           <div>
             <span className={classes.summaryTitle}>Provenance Summary: </span>
