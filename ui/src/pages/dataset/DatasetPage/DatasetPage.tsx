@@ -39,6 +39,11 @@ export function DatasetPage() {
     dispatch(getDataset(Number(datasetId)));
   }, [dispatch, datasetId]);
 
+  const username =
+    dataset?.owner.first_name && dataset?.owner.last_name
+      ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
+      : dataset?.owner.email;
+
   return !dataset ? (
     <Flex
       justify="center"
@@ -57,13 +62,7 @@ export function DatasetPage() {
           <div className={classes.datasetInfo}>
             <DataField label="Group">{dataset.group}</DataField>
             <DataField label="Dataset Owner">
-              <UserField
-                username={
-                  dataset.owner.first_name && dataset.owner.last_name
-                    ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
-                    : dataset.owner.email
-                }
-              />
+              <UserField username={username} />
             </DataField>
             <DataField label="Dataset ID">{dataset.id}</DataField>
             <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
