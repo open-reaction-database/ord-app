@@ -24,7 +24,7 @@
 
 .paginationRoot {
   --pagination-active-bg: var(--color-background-gray);
-  --pagination-control-radius: 4px;
+  --pagination-control-radius: 8px;
 
   button {
     font-size: 14px;
@@ -38,5 +38,5 @@
 }
 
 .selectInput {
-  border-radius: 10px;
+  border-radius: 8px;
 }

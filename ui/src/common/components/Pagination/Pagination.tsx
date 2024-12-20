@@ -35,26 +35,38 @@ export function Pagination({
   onRowsPerPageChange,
 }: Readonly<PaginationProps>) {
   return (
-    <Group align="center">
-      <Button
-        className={classes.controlButton}
-        leftSection={<IconChevronLeft size={16} />}
-        variant="transparent"
-        disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
-      >
-        Previous
-      </Button>
+    <Group justify="space-between">
+      <Group align="center">
+        <Button
+          className={classes.controlButton}
+          leftSection={<IconChevronLeft size={16} />}
+          variant="transparent"
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          Previous
+        </Button>
 
-      <MantinePagination
-        className={classes.paginationRoot}
-        total={totalPages}
-        value={currentPage}
-        onChange={onPageChange}
-        size="lg"
-        withControls={false}
-        siblings={0}
-      />
+        <MantinePagination
+          className={classes.paginationRoot}
+          total={totalPages}
+          value={currentPage}
+          onChange={onPageChange}
+          size="lg"
+          withControls={false}
+          siblings={0}
+        />
+
+        <Button
+          className={classes.controlButton}
+          rightSection={<IconChevronRight size={16} />}
+          variant="transparent"
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          Next
+        </Button>
+      </Group>
 
       <Select
         classNames={{ root: classes.select, input: classes.selectInput }}
@@ -64,16 +76,6 @@ export function Pagination({
         data={ROW_PER_PAGE_OPTIONS}
         rightSectionWidth={30}
       />
-
-      <Button
-        className={classes.controlButton}
-        rightSection={<IconChevronRight size={16} />}
-        variant="transparent"
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
-      >
-        Next
-      </Button>
     </Group>
   );
 }

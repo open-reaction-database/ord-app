@@ -16,7 +16,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'wouter';
-import { Flex, Loader, Paper, Title } from '@mantine/core';
+import { Button, Flex, Loader, Paper, Title } from '@mantine/core';
 import { selectDatasetById } from 'store/datasets/datasets.selectors';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { getDataset } from 'store/datasets/datasets.thunks';
@@ -27,6 +27,8 @@ import { UserField } from '../../../common/components/UserField/UserField';
 import { formatDate } from '../../../common/utils';
 import { generateMockReactions } from '../../../common/mocks/generateMockReactions';
 import classes from './DatasetPage.module.scss';
+import { CopyButton, type CopyButtonOptions } from './CopyButton/CopyButton';
+import { AddCircleIcon, EmptyIcon } from 'common/icons';
 
 const mockData = generateMockReactions(200);
 
@@ -38,6 +40,15 @@ export function DatasetPage() {
   useEffect(() => {
     dispatch(getDataset(Number(datasetId)));
   }, [dispatch, datasetId]);
+
+  const copyToClipboardOptions: CopyButtonOptions[] = [
+    { label: 'Copy Dataset Link', value: window.location.href },
+    { label: 'Copy Dataset ID', value: datasetId as string },
+  ];
+
+  const reactions = mockData;
+
+  const hasReactions = reactions.length > 0;
 
   const username =
     dataset?.owner.first_name && dataset?.owner.last_name
@@ -64,7 +75,15 @@ export function DatasetPage() {
             <DataField label="Dataset Owner">
               <UserField username={username} />
             </DataField>
-            <DataField label="Dataset ID">{dataset.id}</DataField>
+            <DataField label="Dataset ID">
+              <Flex
+                align="center"
+                gap="4"
+              >
+                {dataset.id}
+                <CopyButton options={copyToClipboardOptions} />
+              </Flex>
+            </DataField>
             <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
           </div>
           <Title
@@ -82,15 +101,41 @@ export function DatasetPage() {
       </Paper>
 
       <Paper
-        className={classes.titleContainer}
         radius="sm"
         p="lg"
       >
-        <Title order={2}>Dataset Reactions</Title>
-        <span className={classes.counter}>{mockData.length}</span>
+        <div className={classes.titleSection}>
+          <div className={classes.titleContainer}>
+            <Title order={2}>Dataset Reactions</Title>
+            <span className={classes.counter}>{reactions.length}</span>
+          </div>
+
+          <Button
+            classNames={{ root: classes.button, section: classes.buttonSection }}
+            leftSection={<AddCircleIcon />}
+          >
+            Reaction
+          </Button>
+        </div>
+
+        {!hasReactions && (
+          <Flex
+            align="center"
+            justify="center"
+          >
+            <Flex
+              direction="column"
+              align="center"
+              gap="8"
+            >
+              <EmptyIcon />
+              <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
+            </Flex>
+          </Flex>
+        )}
       </Paper>
 
-      <ReactionList reactions={mockData} />
+      <ReactionList reactions={reactions} />
     </div>
   );
 }

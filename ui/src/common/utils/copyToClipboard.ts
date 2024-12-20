@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
-export { default as CheckListIcon } from './CheckListIcon.svg?react';
-export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
-export { default as CopyIcon } from './CopyIcon.svg?react';
-export { default as DotsIcon } from './DotsIcon.svg?react';
-export { default as DownloadIcon } from './DownloadIcon.svg?react';
-export { default as EmptyIcon } from './EmptyIcon.svg?react';
-export { default as HomeIcon } from './HomeIcon.svg?react';
+export function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).catch(e => console.error(e));
+}

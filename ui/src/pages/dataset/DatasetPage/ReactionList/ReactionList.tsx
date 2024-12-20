@@ -40,20 +40,24 @@ export function ReactionList({ reactions }: Readonly<ReactionListProps>) {
 
   return (
     <>
-      {currentReactions.map((reaction, index) => (
-        <ReactionCard
-          key={reaction.id}
-          reaction={reaction}
-          index={(currentPage - 1) * rowsPerPage + index + 1}
-        />
-      ))}
-      <Pagination
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        totalPages={totalPages}
-      />
+      {reactions.length > 0 && (
+        <>
+          {currentReactions.map((reaction, index) => (
+            <ReactionCard
+              key={reaction.id}
+              reaction={reaction}
+              index={(currentPage - 1) * rowsPerPage + index + 1}
+            />
+          ))}
+          <Pagination
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            totalPages={totalPages}
+          />
+        </>
+      )}
     </>
   );
 }
