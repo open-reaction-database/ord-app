@@ -22,15 +22,21 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import { getDataset } from 'store/datasets/datasets.thunks';
 import { ReactionList } from './ReactionList/ReactionList';
 import { DataField } from '../../../common/components/DataField/DataField';
-import { DownloadMenu } from './DownloadMenu/DownloadMenu';
+import { DownloadMenu, type DownloadMenuOptions } from './DownloadMenu/DownloadMenu';
 import { UserField } from '../../../common/components/UserField/UserField';
-import { formatDate } from '../../../common/utils';
+import { downloadFile, formatDate } from '../../../common/utils';
 import { generateMockReactions } from '../../../common/mocks/generateMockReactions';
-import classes from './DatasetPage.module.scss';
 import { CopyButton, type CopyButtonOptions } from './CopyButton/CopyButton';
-import { AddCircleIcon, EmptyIcon } from 'common/icons';
+import { AddCircleIcon, ChevronDownIcon, EmptyIcon } from 'common/icons';
+import classes from './DatasetPage.module.scss';
 
 const mockData = generateMockReactions(200);
+
+const datasetDownloadOptions: DownloadMenuOptions[] = [
+  { label: '.pb', format: 'binpb' },
+  { label: '.pbtxt', format: 'txtpb' },
+  { label: '.json', format: 'json' },
+];
 
 export function DatasetPage() {
   const dispatch = useAppDispatch();
@@ -40,6 +46,11 @@ export function DatasetPage() {
   useEffect(() => {
     dispatch(getDataset(Number(datasetId)));
   }, [dispatch, datasetId]);
+
+  const handleDatasetDownload = (format: string) => {
+    const url = `/datasets/${datasetId}/download?file_format=${format}`;
+    downloadFile(url, `Dataset_${datasetId}`);
+  };
 
   const copyToClipboardOptions: CopyButtonOptions[] = [
     { label: 'Copy Dataset Link', value: window.location.href },
@@ -96,7 +107,19 @@ export function DatasetPage() {
         </div>
 
         <div className={classes.buttonContainer}>
-          <DownloadMenu datasetId={Number(datasetId)} />
+          <DownloadMenu
+            options={datasetDownloadOptions}
+            onClick={handleDatasetDownload}
+            target={
+              <Button
+                className={classes.target}
+                rightSection={<ChevronDownIcon />}
+                title="Download dataset"
+              >
+                Download as
+              </Button>
+            }
+          />
         </div>
       </Paper>
 
