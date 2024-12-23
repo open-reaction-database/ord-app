@@ -27,7 +27,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ord_app.service_api.models import DatasetModel, UserModel, ReactionModel
+from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 

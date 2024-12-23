@@ -14,7 +14,7 @@
 from base64 import b64decode, b64encode
 
 from ord_schema.proto.reaction_pb2 import Reaction
-from pydantic import field_validator
+from pydantic import Field, field_validator
 
 from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import BaseSchema
@@ -24,6 +24,7 @@ class ReactionSchema(BaseSchema):
     id: int
     name: str | None
     binpb: str
+    summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
 
     @field_validator("binpb", mode="before")
     @classmethod

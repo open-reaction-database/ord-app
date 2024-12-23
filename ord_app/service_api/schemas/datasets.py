@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Literal, Any
+from typing import Any, Literal
 
-from pydantic import field_validator, model_validator, Field
+from pydantic import Field, field_validator, model_validator
 
 from ord_app.service_api.schemas.base import BaseSchema
 from ord_app.service_api.schemas.users import UserSchema
