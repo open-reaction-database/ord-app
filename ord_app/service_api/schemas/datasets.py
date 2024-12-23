@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Any
+
+from pydantic import field_validator, model_validator, Field
 
 from ord_app.service_api.schemas.base import BaseSchema
 from ord_app.service_api.schemas.users import UserSchema
@@ -28,6 +30,17 @@ class DatasetSchema(BaseSchema):
     owner: UserSchema
     group: str = "mocked group"
     description: str | None
+
+
+class DatasetWithReactionCountSchema(DatasetSchema):
+    reaction_count: int = Field(default=0)
+
+    @model_validator(mode="before")
+    @classmethod
+    def calculate_reaction_count(cls, data: Any):
+        if hasattr(data, "reactions"):
+            data.reaction_count = len(data.reactions)
+        return data
 
 
 class DatasetCreateSchema(BaseSchema):

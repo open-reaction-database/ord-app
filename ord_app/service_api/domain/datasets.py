@@ -27,7 +27,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ord_app.service_api.models import DatasetModel, UserModel
+from ord_app.service_api.models import DatasetModel, UserModel, ReactionModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 
@@ -38,8 +38,17 @@ async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[Da
 
 
 async def paginate_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
-    stmt = select(DatasetModel).where(DatasetModel.owner == user).options(joinedload(DatasetModel.owner))
-    return await paginate(db_session, stmt)
+    # todo: It is necessary to optimize the query: instead of retrieving all reactions, we need to get only their count.
+    #  However, there are difficulties with pagination and Pydantic models.
+    query = (
+        select(DatasetModel)
+        .where(DatasetModel.owner == user)
+        .options(
+            joinedload(DatasetModel.owner),
+            joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
+        )
+    )
+    return await paginate(db_session, query)
 
 
 async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int) -> DatasetModel:

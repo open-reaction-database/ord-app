@@ -31,7 +31,8 @@ from ord_app.service_api.domain.datasets import (
     upload_user_dataset,
 )
 from ord_app.service_api.models import DatasetModel, UserModel
-from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DatasetSchema, DownloadFileFormats
+from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DatasetSchema, DownloadFileFormats, \
+    DatasetWithReactionCountSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["datasets"], prefix="/datasets")
@@ -46,7 +47,7 @@ async def _create_dataset(
     return await create_dataset(db_session, user, payload)
 
 
-@router.get("/", response_model=Page[DatasetSchema])
+@router.get("/", response_model=Page[DatasetWithReactionCountSchema])
 async def list_datasets(
     user: UserModel = Depends(get_current_user),
     db_session: AsyncSession = Depends(get_db_session),
