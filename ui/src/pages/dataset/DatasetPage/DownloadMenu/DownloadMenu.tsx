@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Menu } from '@mantine/core';
-import { downloadFile } from 'common/utils';
-import { ChevronDownIcon, DownloadIcon } from 'common/icons';
+import { Menu } from '@mantine/core';
+import { DownloadIcon } from 'common/icons';
 import classes from './DownloadMenu.module.scss';
 
-interface DownloadMenuProps {
-  datasetId: number;
+export interface DownloadMenuOptions {
+  label: string;
+  format: string;
 }
 
-const downloadOptions = [
-  { label: '.pb', format: 'binpb' },
-  { label: '.pbtxt', format: 'txtpb' },
-  { label: '.json', format: 'json' },
-];
+interface DownloadMenuProps {
+  options: DownloadMenuOptions[];
+  target: JSX.Element;
+  onClick: (format: string) => void;
+}
 
-export function DownloadMenu({ datasetId }: Readonly<DownloadMenuProps>) {
-  const handleDownload = (format: string) => {
-    const url = `/datasets/${datasetId}/download?file_format=${format}`;
-    downloadFile(url, `Dataset_${datasetId}`);
-  };
-
+export function DownloadMenu({ options, target, onClick }: Readonly<DownloadMenuProps>) {
   return (
     <Menu
       classNames={{
@@ -43,22 +38,14 @@ export function DownloadMenu({ datasetId }: Readonly<DownloadMenuProps>) {
       }}
       width={140}
     >
-      <Menu.Target>
-        <Button
-          className={classes.target}
-          rightSection={<ChevronDownIcon />}
-          title="Download dataset"
-        >
-          Download as
-        </Button>
-      </Menu.Target>
+      <Menu.Target>{target}</Menu.Target>
 
       <Menu.Dropdown>
-        {downloadOptions.map(option => (
+        {options.map(option => (
           <Menu.Item
             key={option.format}
             leftSection={<DownloadIcon />}
-            onClick={() => handleDownload(option.format)}
+            onClick={() => onClick(option.format)}
           >
             {option.label}
           </Menu.Item>

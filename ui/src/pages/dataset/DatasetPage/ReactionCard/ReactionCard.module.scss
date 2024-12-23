@@ -54,3 +54,9 @@
 .infoTitle {
   font-weight: 700;
 }
+
+.target {
+  &:active {
+    transform: none;
+  }
+}

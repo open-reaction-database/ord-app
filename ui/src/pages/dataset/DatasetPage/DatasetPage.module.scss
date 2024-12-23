@@ -79,3 +79,13 @@
 .emptyText {
   color: var(--color-text-secondary-1);
 }
+
+.target {
+  &:active {
+    transform: none;
+  }
+
+  &[data-expanded='true'] {
+    outline: 3px solid #3c78d899;
+  }
+}

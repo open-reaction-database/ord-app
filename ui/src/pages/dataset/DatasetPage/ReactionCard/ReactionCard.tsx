@@ -14,19 +14,33 @@
  * limitations under the License.
  */
 import { Button, Flex, Paper } from '@mantine/core';
-import { Link } from 'wouter';
+import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from '../CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
 import type { Reaction } from '../../../../common/model/reaction';
+import { DownloadMenu, type DownloadMenuOptions } from '../DownloadMenu/DownloadMenu';
 import classes from './ReactionCard.module.scss';
+import { downloadFile } from 'common/utils';
 
 interface ReactionCardProps {
   reaction: Reaction;
   index: number;
 }
 
+const reactionDownloadOptions: DownloadMenuOptions[] = [
+  { label: '.pb', format: 'binpb' },
+  { label: '.pbtxt', format: 'txtpb' },
+];
+
 export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
+  const { datasetId } = useParams();
   const { id, name, summary, conditions, analysis } = reaction;
+
+  const handleReactionDownload = (format: string) => {
+    // TODO: Replace index with reaction id when reaction information is pulled from BE
+    const url = `/datasets/${datasetId}/reactions/${index}/download?file_format=${format}`;
+    downloadFile(url, `Dataset_${datasetId}_Reaction_${id}`);
+  };
 
   const copyToClipboardOptions: CopyButtonOptions[] = [
     { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
@@ -70,13 +84,20 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
             Save as a Template
           </Button>
 
-          <Button
-            leftSection={<DownloadIcon />}
-            rightSection={<ChevronDownIcon />}
-            variant="white"
-          >
-            Download Reaction
-          </Button>
+          <DownloadMenu
+            options={reactionDownloadOptions}
+            onClick={handleReactionDownload}
+            target={
+              <Button
+                className={classes.target}
+                leftSection={<DownloadIcon />}
+                rightSection={<ChevronDownIcon />}
+                variant="white"
+              >
+                Download Reaction
+              </Button>
+            }
+          />
 
           <Button
             leftSection={<DotsIcon />}
