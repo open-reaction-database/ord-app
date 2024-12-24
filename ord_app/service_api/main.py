@@ -14,7 +14,6 @@
 
 """Open Reaction Database API."""
 
-
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
@@ -23,7 +22,6 @@ from ord_app.service_api.resources.v1 import auth, datasets, reactions, users, u
 from ord_app.service_api.settings import RuntimeSettings
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True})
-
 
 app.add_middleware(
     CORSMiddleware,

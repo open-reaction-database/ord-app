@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from pathlib import PosixPath
 
 from pydantic_settings import BaseSettings
@@ -32,10 +31,14 @@ class Settings(BaseSettings):
     pg_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
-    # Encryption
-    JWT_SECRET_KEY: str = "b8384c27736300be5ac9e92b9554191f681fa36d8555759243000ac3228568f3"
-    JWT_ACCESS_TOKEN_EXPIRE: int = 60 * 24 * 7
-    JWT_ALGORITHM: str = "HS256"
+    # Encryption and auth
+    auth0_domain: str | None = None
+    auth0_algorithms: str | None = None
+    auth0_api_audience: str | None = None
+    auth0_issuer: str | None = None
+    auth0_client_id: str | None = None
+    auth0_client_secret: str | None = None
+    auth0_scope: str | None = None
 
 
 RuntimeSettings = Settings()

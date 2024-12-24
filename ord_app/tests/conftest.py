@@ -21,9 +21,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-from ord_app.service_api.domain.auth import create_access_token
 from ord_app.service_api.main import app
-from ord_app.service_api.models import BaseModel, UserModel
+from ord_app.service_api.models import AuthProviders, BaseModel, UserModel
+from ord_app.service_api.schemas.auth import OAuthJWTSchema
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -83,9 +83,11 @@ def clear_database():
     yield
 
 
-@pytest.fixture
-async def test_user(test_db_session) -> tuple[UserModel, str]:
-    user = UserModel(email="test@unit.com", password="password")
-    test_db_session.add(user)
-    await test_db_session.commit()
-    return user, f"Bearer {create_access_token(data={"sub": user.email})}"
+# @pytest.fixture
+# async def test_user(test_db_session) -> tuple[UserModel, str]:
+#     user = UserModel(email="test@unit.com", password="password")
+#     test_db_session.add(user)
+#     await test_db_session.commit()
+#     data = OAuthJWTSchema(sub=user.email or user.name, provider=AuthProviders.platform)
+#     access_token = create_access_token(data=data)
+#     return user, f"Bearer {access_token}"

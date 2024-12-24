@@ -11,18 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.testing.suite.test_reflection import users
 
 from ord_app.service_api.models import UserModel
-from ord_app.service_api.schemas.users import CreateUserSchema
 
 
-async def authenticate_user(db_session, email: str, password: str):
-    if (user := await get_user_by_email(db_session, email)) and user.password == password:
-        return user
-    return False
+async def get_user_by_auth0_id(db_session: AsyncSession, auth0_id: str) -> UserModel:
+    stmt = select(UserModel).where(UserModel.auth0_id == auth0_id).limit(1)
+    return await db_session.scalar(stmt)
 
 
 async def get_user_by_email(db_session: AsyncSession, email: str):
@@ -33,14 +31,6 @@ async def get_user_by_email(db_session: AsyncSession, email: str):
 async def get_user_uc(db_session: AsyncSession, user_id: int) -> UserModel:
     stmt = select(UserModel).where(UserModel.id == user_id)
     user = await db_session.scalar(stmt)
-    return user
-
-
-async def create_user_uc(db_session: AsyncSession, payload: CreateUserSchema) -> UserModel:
-    user = UserModel(**payload.model_dump())
-    db_session.add(user)
-    await db_session.commit()
-    await db_session.refresh(user)
     return user
 
 

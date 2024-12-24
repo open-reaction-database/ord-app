@@ -21,7 +21,7 @@ from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import (
     create_dataset,
     delete_dataset,
@@ -40,7 +40,7 @@ router = APIRouter(tags=["datasets"], prefix="/datasets")
 @router.post("/", response_model=DatasetSchema, status_code=status.HTTP_201_CREATED)
 async def _create_dataset(
     payload: DatasetCreateSchema,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await create_dataset(db_session, user, payload)
@@ -48,7 +48,7 @@ async def _create_dataset(
 
 @router.get("/", response_model=Page[DatasetSchema])
 async def list_datasets(
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await paginate_datasets(db_session, user)
@@ -57,7 +57,7 @@ async def list_datasets(
 @router.delete("/{dataset_id}")
 async def _delete_dataset(
     dataset_id: int,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     await delete_dataset(db_session, user, dataset_id)
@@ -66,7 +66,7 @@ async def _delete_dataset(
 @router.post("/upload")
 async def upload_dataset(
     file: UploadFile,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     await upload_user_dataset(db_session, user, file)
@@ -75,7 +75,7 @@ async def upload_dataset(
 @router.get("/{dataset_id}", response_model=DatasetSchema)
 async def fetch_dataset(
     dataset_id: int,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await get_user_dataset(db_session, user, dataset_id)
@@ -85,7 +85,7 @@ async def fetch_dataset(
 async def _download_dataset(
     dataset_id: int,
     file_format: DownloadFileFormats,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
@@ -102,7 +102,7 @@ async def _download_dataset(
 async def enumerate_dataset(
     template: UploadFile,
     spreadsheet: UploadFile,
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     """TODO: (It is unclear what this endpoint does) Creates a new dataset based on a template reaction and a spreadsheet."""

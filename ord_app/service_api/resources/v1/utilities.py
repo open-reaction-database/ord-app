@@ -21,7 +21,7 @@ from ord_schema.validations import ValidationOptions, validate_message
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import get_current_user
+from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import send_message
 from ord_app.service_api.models import UserModel
 from ord_app.service_api.services.populate_data_sets import populate_testing_data
@@ -32,7 +32,7 @@ router = APIRouter(tags=["utilities"])
 
 @router.post("/init-testing-data")
 async def testing_data(
-    user: UserModel = Depends(get_current_user),
+    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await populate_testing_data(db_session, user)
