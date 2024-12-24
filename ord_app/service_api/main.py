@@ -11,14 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Open Reaction Database API."""
-
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 
-from ord_app.service_api.resources.v1 import auth, datasets, reactions, users, utilities, visualizations
+from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, users, utilities, visualizations
 from ord_app.service_api.settings import RuntimeSettings
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True})
@@ -36,6 +33,7 @@ editor.include_router(auth.router)
 editor.include_router(users.router)
 editor.include_router(datasets.router)
 editor.include_router(reactions.router)
+editor.include_router(group.router)
 editor.include_router(utilities.router)
 editor.include_router(visualizations.router)
 
