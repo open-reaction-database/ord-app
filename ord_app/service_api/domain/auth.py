@@ -64,7 +64,7 @@ async def _create_new_user(db_session: AsyncSession, id_token: str):
     auth0_decoded_id_token = verify_id_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=id_token))
 
     user = UserModel(
-        email=auth0_decoded_id_token["email"],
+        email=auth0_decoded_id_token.get("email"),
         name=auth0_decoded_id_token["name"],
         avatar_url=auth0_decoded_id_token["picture"],
         auth0_id=auth0_decoded_id_token["sub"],
