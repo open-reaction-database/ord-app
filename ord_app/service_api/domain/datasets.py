@@ -27,6 +27,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from ord_app.service_api.domain.exceptions import EntityDoesNotExist
 from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
@@ -80,6 +81,9 @@ async def download_dataset(
         .options(joinedload(DatasetModel.reactions))
     )
     dataset = await db_session.scalar(stmt)
+
+    if not dataset:
+        raise EntityDoesNotExist("Dataset not found")
 
     dataset_pb = load_message(orjson.dumps({"name": dataset.name}), Dataset, "json")
 

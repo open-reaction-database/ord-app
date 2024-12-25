@@ -72,8 +72,8 @@ jobs:
       - name: Run alembic migrations
         run: alembic upgrade head
 
-#      - name: Tests
-#        run: pytest -vv --cov=ord_app --durations=10
+      - name: Tests
+        run: pytest -vv --cov=ord_app --durations=10
 
       - name: Black
         run: black --check .
