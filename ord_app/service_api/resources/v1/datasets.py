@@ -15,7 +15,7 @@ import gzip
 import os
 from io import BytesIO
 
-from fastapi import APIRouter, Response, UploadFile, status
+from fastapi import APIRouter, HTTPException, Response, UploadFile, status
 from fastapi.params import Depends
 from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
@@ -30,6 +30,7 @@ from ord_app.service_api.domain.datasets import (
     paginate_datasets,
     upload_user_dataset,
 )
+from ord_app.service_api.domain.exceptions import EntityDoesNotExist
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
@@ -66,6 +67,7 @@ async def _delete_dataset(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     await delete_dataset(db_session, user, dataset_id)
+    return Response("Object successfully deleted (or already absent)")
 
 
 @router.post("/upload")
@@ -83,7 +85,9 @@ async def fetch_dataset(
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_user_dataset(db_session, user, dataset_id)
+    if dataset := await get_user_dataset(db_session, user, dataset_id):
+        return dataset
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
 
 @router.get("/{dataset_id}/download")
@@ -95,7 +99,11 @@ async def _download_dataset(
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
-    dataset, data = await download_dataset(db_session, user, dataset_id, file_format)
+    try:
+        dataset, data = await download_dataset(db_session, user, dataset_id, file_format)
+    except EntityDoesNotExist as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
     return Response(
         gzip.compress(data),
         headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},

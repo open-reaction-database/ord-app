@@ -11,71 +11,76 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from fastapi import status
+
 from ord_app.service_api.domain.datasets import create_dataset, get_user_dataset
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema
 
 
-async def test_create_dataset(api_client, test_user, test_db_session):
-    test_user, access_token = test_user
+async def test_create_dataset(api_client, mock_authenticated_user, test_db_session):
+    user, set_mock_user = mock_authenticated_user
 
     payload = {"name": "test creation"}
-    response = api_client.post(
-        "/api/v1/datasets",
-        headers={"Authorization": access_token},
-        json=payload,
-    )
-    response.raise_for_status()
-    response_data = response.json()
+    response_data = api_client.post("/api/v1/datasets", json=payload).json()
 
-    db_dataset = await get_user_dataset(test_db_session, test_user, response_data["id"])
+    db_dataset = await get_user_dataset(test_db_session, user, response_data["id"])
 
     assert response_data["id"] == db_dataset.id
     assert response_data["name"] == db_dataset.name == payload["name"]
 
 
-async def test_list_datasets(api_client, test_user, test_db_session):
-    test_user, access_token = test_user
-    payload = DatasetCreateSchema(name="test")
-    db_dataset = await create_dataset(test_db_session, test_user, payload)
+async def test_list_datasets(api_client, mock_authenticated_user, test_db_session):
+    user, set_mock_user = mock_authenticated_user
 
-    response = api_client.get("/api/v1/datasets", headers={"Authorization": access_token})
-    response.raise_for_status()
-    response_data = response.json()
+    payload = DatasetCreateSchema(name="test")
+    db_dataset = await create_dataset(test_db_session, user, payload)
+
+    response_data = api_client.get("/api/v1/datasets").json()
 
     assert len(response_data["items"]) == 1
     assert response_data["items"][0]["id"] == db_dataset.id
     assert response_data["items"][0]["name"] == db_dataset.name
 
 
-async def test_delete_dataset(api_client, test_user, test_db_session):
-    test_user, access_token = test_user
+async def test_delete_dataset(api_client, mock_authenticated_user, test_db_session):
+    user, set_mock_user = mock_authenticated_user
 
     payload = DatasetCreateSchema(name="test")
-    db_dataset = await create_dataset(test_db_session, test_user, payload)
+    db_dataset = await create_dataset(test_db_session, user, payload)
 
-    response = api_client.delete(f"/api/v1/datasets/{db_dataset.id}", headers={"Authorization": access_token})
-    response.raise_for_status()
+    api_client.delete(f"/api/v1/datasets/{db_dataset.id}")
 
-    db_dataset = await get_user_dataset(test_db_session, test_user, db_dataset.id)
+    db_dataset = await get_user_dataset(test_db_session, user, db_dataset.id)
     assert db_dataset is None
 
 
-# def test_fetch_dataset(test_client):
-#     response = test_client.get(
-#         "/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "Deoxyfluorination screen"}
-#     )
-#     response.raise_for_status()
-#     dataset = Dataset.FromString(b64decode(response.json()))
-#     assert len(dataset.reactions) == 80
-#
-#
-# def test_fetch_unknown_dataset(test_client):
-#     response = test_client.get("/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": "UNKNOWN"})
-#     with pytest.raises(HTTPStatusError):
-#         response.raise_for_status()
-#     assert response.status_code == 404
-#
-#
+async def test_fetch_datasets(api_client, mock_authenticated_user, test_db_session):
+    user, set_mock_user = mock_authenticated_user
+
+    payload = DatasetCreateSchema(name="test")
+    db_dataset = await create_dataset(test_db_session, user, payload)
+
+    response_data = api_client.get(f"/api/v1/datasets/{db_dataset.id}").json()
+
+    assert response_data["id"] == db_dataset.id
+    assert response_data["name"] == db_dataset.name
+
+
+async def test_fetch_non_existent_datasets(api_client, mock_authenticated_user):
+    response = api_client.get(f"/api/v1/datasets/1000000")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+async def test_delete_non_existent_dataset(api_client, mock_authenticated_user):
+    response = api_client.delete(f"/api/v1/datasets/1000000")
+    response.raise_for_status()
+
+
+async def test_download_non_existent_datasets(api_client, mock_authenticated_user):
+    response = api_client.get(f"/api/v1/datasets/1000000/download?file_format=json")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
 # @pytest.mark.parametrize("kind", ("binpb", "json", "txtpb"))
 # def test_download_dataset(test_client, kind):
 #     response = test_client.get(
@@ -104,34 +109,6 @@ async def test_delete_dataset(api_client, test_user, test_db_session):
 #         "/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
 #     )
 #     response.raise_for_status()
-#
-#
-
-#
-#
-# def test_create_dataset_unknown_user(test_client):
-#     response = test_client.get("/service_api/editor/create_dataset", params={"user_id": "test", "dataset_name": "test"})
-#     with pytest.raises(HTTPStatusError):
-#         response.raise_for_status()
-#
-#
-# def test_delete_dataset(test_client):
-#     dataset_name = "Deoxyfluorination screen"
-#     response = test_client.get(
-#         "/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
-#     )
-#     response.raise_for_status()
-#     response = test_client.get(
-#         "/service_api/editor/delete_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
-#     )
-#     response.raise_for_status()
-#     response = test_client.get(
-#         "/service_api/editor/fetch_dataset", params={"user_id": TEST_USER_ID, "dataset_name": dataset_name}
-#     )
-#     with pytest.raises(HTTPStatusError):
-#         response.raise_for_status()
-#     assert response.status_code == 404
-#
 #
 # def test_enumerate_dataset(test_client):
 #     root = os.path.join(os.path.dirname(__file__), "testdata", "enumeration")
