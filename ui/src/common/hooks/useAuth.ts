@@ -15,7 +15,7 @@
  */
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import { setAccessTokenGetter } from '../config/axiosConfig.ts';
+import axiosInstance, { setAccessTokenGetter } from '../config/axiosConfig.ts';
 import { useAppDispatch } from '../../store/useAppDispatch.ts';
 import { setActiveUser } from '../../store/users/users.actions.ts';
 import type { Self } from '../../store/users/users.types.ts';
@@ -23,7 +23,7 @@ import type { Self } from '../../store/users/users.types.ts';
 export function useAuth() {
   const auth0 = useAuth0();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently } = auth0;
+  const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -38,10 +38,19 @@ export function useAuth() {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
+    const provisionUser = async () => {
+      const idToken = (await getIdTokenClaims())?.__raw;
+      const accessToken = await getAccessTokenSilently();
+
+      axiosInstance.post('/auth/jit-provisioning', { access_token: accessToken, id_token: idToken });
+    };
+
     if (user) {
       dispatch(setActiveUser(user as Self));
+
+      provisionUser();
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
 
   return isLoading;
 }

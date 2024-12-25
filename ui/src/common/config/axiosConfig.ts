@@ -24,9 +24,6 @@ export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
-  headers: {
-    Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
-  },
 });
 
 axiosInstance.interceptors.request.use(async config => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Auth0Provider } from '@auth0/auth0-react';
-import { auth0ClientId, auth0Domain, domain } from '../constants.ts';
+import { auth0Audience, auth0ClientId, auth0Domain, auth0Issuer, auth0Scope, domain } from '../constants.ts';
 import { Provider } from 'react-redux';
 import { MantineProvider } from '@mantine/core';
 import { theme } from '../common/styling/theme.ts';
@@ -28,10 +28,11 @@ export function AppRoot() {
     <Auth0Provider
       domain={auth0Domain}
       clientId={auth0ClientId}
+      issuer={auth0Issuer}
       authorizationParams={{
         redirect_uri: domain,
-        // TODO fill in after BE completes https://developer.auth0.com/resources/guides/spa/react/basic-authentication#integrate-react-with-an-api-server
-        // audience: 'http://localhost:8000/api/v1',
+        audience: auth0Audience,
+        scope: auth0Scope,
       }}
     >
       <Provider store={store}>
