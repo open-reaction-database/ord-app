@@ -22,7 +22,7 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from ord_app.service_api.main import app
 from ord_app.service_api.models import BaseModel, UserModel
-from ord_app.service_api.services.auth0 import verify_token
+from ord_app.service_api.services.auth0 import verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -84,7 +84,7 @@ def clear_database():
 
 @pytest.fixture
 async def mock_authenticated_user(test_db_session):
-    user = UserModel(email="test@unit.com", auth0_id="test_auth0_id")
+    user = UserModel(email="test@unit.com", external_id="test_auth0_id")
     test_db_session.add(user)
     await test_db_session.commit()
     await test_db_session.refresh(user)
@@ -92,10 +92,10 @@ async def mock_authenticated_user(test_db_session):
     def set_mock_user(new_user):
         nonlocal user
         user = new_user
-        app.dependency_overrides[verify_token] = lambda: {"sub": user.auth0_id}
+        app.dependency_overrides[verify_access_token] = lambda: {"sub": user.external_id}
 
-    app.dependency_overrides[verify_token] = lambda: {"sub": user.auth0_id}
+    app.dependency_overrides[verify_access_token] = lambda: {"sub": user.external_id}
 
     yield user, set_mock_user
 
-    app.dependency_overrides.pop(verify_token, None)
+    app.dependency_overrides.pop(verify_access_token, None)

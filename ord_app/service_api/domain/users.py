@@ -16,10 +16,11 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import UserModel
+from ord_app.service_api.schemas.users import UserCreateSchema
 
 
-async def get_user_by_auth0_id(db_session: AsyncSession, auth0_id: str) -> UserModel:
-    stmt = select(UserModel).where(UserModel.auth0_id == auth0_id).limit(1)
+async def get_user_by_external_id(db_session: AsyncSession, external_id: str) -> UserModel:
+    stmt = select(UserModel).where(UserModel.external_id == external_id).limit(1)
     return await db_session.scalar(stmt)
 
 
@@ -39,3 +40,11 @@ async def delete_user_uc(db_session: AsyncSession, user_id: int) -> int:
     result = await db_session.execute(stmt)
     await db_session.commit()
     return result.rowcount
+
+
+async def create_user(db_session: AsyncSession, payload: UserCreateSchema) -> UserModel:
+    user = UserModel(**payload.model_dump(exclude_unset=True))
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user

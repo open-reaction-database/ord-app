@@ -11,46 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import UTC, datetime, timedelta
-
-from pydantic import EmailStr, Field
-
-from ord_app.service_api.models import AuthProviders
 from ord_app.service_api.schemas.base import BaseSchema
-from ord_app.service_api.settings import RuntimeSettings
 
 
-class GitHubUserSchema(BaseSchema):
-    login: str
-    id: int
-    avatar_url: str
-    name: str | None = None
-    email: EmailStr | None = None
-
-
-class OAuthJWTSchema(BaseSchema):
-    sub: EmailStr
-    provider: AuthProviders
-    provider_access_token: str | None = None
-    exp: int = Field(
-        default_factory=lambda: round(
-            (datetime.now(UTC) + timedelta(minutes=RuntimeSettings.JWT_ACCESS_TOKEN_EXPIRE)).timestamp()
-        )
-    )
-
-
-class JWTAccessTokenSchema(BaseSchema):
+class Auth0CreateSchema(BaseSchema):
     access_token: str
-    token_type: str
-    expires_in: int
-
-
-class Auth0Schema(BaseSchema):
-    access_token: str
-    refresh_token: str
-    expires_in: int
-    token_type: str
-
-
-class Auth0RefreshTokenSchema(BaseSchema):
-    refresh_token: str
+    id_token: str

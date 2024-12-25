@@ -31,7 +31,7 @@ class UnauthenticatedException(HTTPException):
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="Requires authentication")
 
 
-def verify_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
+def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
     return _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,
@@ -40,7 +40,7 @@ def verify_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
     )
 
 
-def verify_id_token(token: HTTPAuthorizationCredentials):
+def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
     return _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,
@@ -49,7 +49,7 @@ def verify_id_token(token: HTTPAuthorizationCredentials):
     )
 
 
-def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str):
+def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
     if token is None:
         raise UnauthenticatedException
 
