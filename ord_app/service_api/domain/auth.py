@@ -15,10 +15,10 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.users import get_user_by_external_id, create_user
+from ord_app.service_api.domain.users import create_user, get_user_by_external_id
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema
-from ord_app.service_api.services.auth0 import UnauthorizedException, verify_id_token, verify_access_token
+from ord_app.service_api.services.auth0 import UnauthorizedException, verify_access_token, verify_id_token
 from ord_app.service_api.services.postgresql import get_db_session
 
 
