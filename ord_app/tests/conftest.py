@@ -84,7 +84,7 @@ def clear_database():
 
 @pytest.fixture
 async def mock_authenticated_user(test_db_session):
-    user = UserModel(email="test@unit.com", auth0_id="test_auth0_id")
+    user = UserModel(email="test@unit.com", external_id="test_auth0_id")
     test_db_session.add(user)
     await test_db_session.commit()
     await test_db_session.refresh(user)
