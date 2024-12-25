@@ -20,6 +20,6 @@ from ord_app.service_api.schemas.users import UserSchema
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserSchema)
+@router.post("/jit-provisioning", status_code=status.HTTP_201_CREATED, response_model=UserSchema)
 async def _jit_provisioning(payload: Auth0CreateSchema):
     return await jit_provisioning(payload)
