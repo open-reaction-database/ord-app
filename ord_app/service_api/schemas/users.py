@@ -21,4 +21,12 @@ class UserSchema(BaseSchema):
     id: int
     email: EmailStr | None = None
     name: str | None = None
-    auth0_id: str | None = None
+    external_id: str | None = None
+    avatar_url: str | None = None
+
+
+class UserCreateSchema(BaseSchema):
+    email: EmailStr | None = None
+    name: str | None = None
+    external_id: str | None = None
+    avatar_url: str | None = None

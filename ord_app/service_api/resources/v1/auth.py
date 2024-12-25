@@ -13,17 +13,13 @@
 # limitations under the License.
 from fastapi import APIRouter, status
 
-from ord_app.service_api.domain.auth import jit_provisioning, refresh_auth0_token
-from ord_app.service_api.schemas.auth import Auth0RefreshTokenSchema, Auth0Schema
+from ord_app.service_api.domain.auth import jit_provisioning
+from ord_app.service_api.schemas.auth import Auth0CreateSchema
+from ord_app.service_api.schemas.users import UserSchema
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 
-@router.get("/token", status_code=status.HTTP_201_CREATED, response_model=Auth0Schema)
-async def get_token(code: str, redirect_uri: str):
-    return await jit_provisioning(code, redirect_uri)
-
-
-@router.post("/token/refresh", response_model=Auth0Schema)
-async def refresh_token(payload: Auth0RefreshTokenSchema):
-    return await refresh_auth0_token(payload.refresh_token)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserSchema)
+async def _jit_provisioning(payload: Auth0CreateSchema):
+    return await jit_provisioning(payload)

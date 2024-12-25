@@ -38,7 +38,7 @@ class BaseModel(DeclarativeBase):
 
 
 class UserModel(BaseModel):
-    auth0_id: Mapped[str] = mapped_column(nullable=True, index=True)
+    external_id: Mapped[str] = mapped_column(nullable=True, index=True)
     email: Mapped[str] = mapped_column(EmailType(), unique=True, nullable=True)
     name: Mapped[str] = mapped_column(nullable=True)
     avatar_url: Mapped[str] = mapped_column(nullable=True)
