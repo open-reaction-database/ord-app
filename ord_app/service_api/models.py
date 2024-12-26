@@ -72,3 +72,12 @@ class ReactionModel(BaseModel):
 
     def __repr__(self):
         return f"<Reaction(id={self.id}, name={self.name}, user_id={self.owner_id})>"
+
+
+class GroupModel(BaseModel):
+    name: Mapped[str]
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    owner: Mapped[UserModel] = relationship(UserModel, backref="groups")
+
+    def __repr__(self):
+        return f"<Group(id={self.id}, name={self.name})>"
