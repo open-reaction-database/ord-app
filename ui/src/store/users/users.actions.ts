@@ -13,22 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import axios from 'axios';
-import type { GetAccessToken } from '../types/auth.ts';
+import { createActionFactory } from '../../common/store';
+import type { Self } from './users.types.ts';
 
-export let getAccessToken: GetAccessToken;
+const { createAction } = createActionFactory('users');
 
-export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
-  getAccessToken = getAccessTokenParam;
-}
-
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-});
-
-axiosInstance.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
-  return config;
-});
-
-export default axiosInstance;
+export const setActiveUser = createAction<Self>('set_active');

@@ -13,22 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import axios from 'axios';
-import type { GetAccessToken } from '../types/auth.ts';
+import type { useAuth0 } from '@auth0/auth0-react';
 
-export let getAccessToken: GetAccessToken;
-
-export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
-  getAccessToken = getAccessTokenParam;
-}
-
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-});
-
-axiosInstance.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
-  return config;
-});
-
-export default axiosInstance;
+export type GetAccessToken = ReturnType<typeof useAuth0>['getAccessTokenSilently'];

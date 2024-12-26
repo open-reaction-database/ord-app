@@ -13,22 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import axios from 'axios';
-import type { GetAccessToken } from '../types/auth.ts';
+import type { AppState } from '../configureAppStore.ts';
 
-export let getAccessToken: GetAccessToken;
+const selectRoot = (state: AppState) => state.users;
 
-export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
-  getAccessToken = getAccessTokenParam;
-}
-
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-});
-
-axiosInstance.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
-  return config;
-});
-
-export default axiosInstance;
+export const selectSelf = (state: AppState) => selectRoot(state).self;

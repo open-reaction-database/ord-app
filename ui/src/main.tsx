@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.scss';
-import { App } from './App.tsx';
+import { AppRoot } from './core/AppRoot.tsx';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+createRoot(document.getElementById('root')!).render(<AppRoot />);

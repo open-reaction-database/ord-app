@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import axios from 'axios';
-import type { GetAccessToken } from '../types/auth.ts';
+import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import type { Self } from './users.types.ts';
+import { setActiveUser } from './users.actions.ts';
 
-export let getAccessToken: GetAccessToken;
-
-export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
-  getAccessToken = getAccessTokenParam;
-}
-
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
+const self = createReducer<null | Self>(null, builder => {
+  builder.addCase(setActiveUser, (_, action) => action.payload);
 });
 
-axiosInstance.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
-  return config;
+export const usersReducer = combineReducers({
+  self,
 });
-
-export default axiosInstance;
