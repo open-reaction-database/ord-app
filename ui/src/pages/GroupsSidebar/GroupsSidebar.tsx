@@ -13,29 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type MouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
+import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, Paper, ScrollArea, Title } from '@mantine/core';
 import { AddCircleIcon, EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
 import classes from './GroupsSidebar.module.scss';
 import { GroupsDrawer } from 'pages/GroupsDrawer/GroupsDrawer';
+import { selectGroupsList } from 'store/groups/groups.selectors';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { getGroupList } from 'store/groups/groups.thunks';
+import { type Group } from 'store/groups/groups.types';
+import axiosInstance from 'common/config/axiosConfig';
 
 const GROUP_BUTTON_HEIGHT = 36;
 
 export function GroupsSidebar() {
+  const dispatch = useAppDispatch();
+  const groups = useSelector(selectGroupsList);
+
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group>();
 
-  const groups = [1, 2, 3];
+  useEffect(() => {
+    dispatch(getGroupList());
+  }, [dispatch]);
 
   const handleGroupAddition = async (value: string) => {
-    // Send request
-    console.log(value);
+    await axiosInstance.post('/groups', { name: value });
+    dispatch(getGroupList());
   };
 
-  const handleGroupsDrawerOpen = (e: MouseEvent) => {
+  const handleGroupsDrawerOpen = (e: MouseEvent, group: Group) => {
     e.stopPropagation();
+    setSelectedGroup(group);
     openDrawer();
   };
 
@@ -91,7 +104,7 @@ export function GroupsSidebar() {
                       root: classes.groupButton,
                       label: classes.buttonLabel,
                     }}
-                    key={group}
+                    key={group.id}
                     variant="white"
                     justify="flex-start"
                   >
@@ -100,11 +113,11 @@ export function GroupsSidebar() {
                       gap="8"
                     >
                       <GroupArrowIcon />
-                      Group {group}
+                      {group.name}
                     </Flex>
 
                     <ActionIcon
-                      onClick={handleGroupsDrawerOpen}
+                      onClick={e => handleGroupsDrawerOpen(e, group)}
                       variant="white"
                       title="Edit group"
                     >
@@ -137,11 +150,13 @@ export function GroupsSidebar() {
         inputLabel="Group name"
       />
 
-      <GroupsDrawer
-        opened={openedDrawer}
-        onClose={closeDrawer}
-        group="New Group"
-      />
+      {selectedGroup && (
+        <GroupsDrawer
+          opened={openedDrawer}
+          onClose={closeDrawer}
+          groupId={selectedGroup.id}
+        />
+      )}
     </>
   );
 }

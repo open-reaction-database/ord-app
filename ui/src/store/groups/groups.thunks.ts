@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
+import axiosInstance from 'common/config/axiosConfig';
+import type { Group } from './groups.types';
+import { getGroupActions, getGroupListActions } from './groups.actions';
+import { createThunk } from 'common/store';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-};
+export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
+  const groups = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
+  return getGroupActions.success(groups);
+});
+
+export const getGroupList = createThunk(getGroupListActions, async () => {
+  const groups = (await axiosInstance.get<Group[]>(`/groups`)).data;
+  return getGroupListActions.success(groups);
+});

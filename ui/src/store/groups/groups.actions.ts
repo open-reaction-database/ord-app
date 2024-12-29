@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
+import { createActionFactory } from 'common/store';
+import type { Group } from './groups.types';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-};
+const { createAsyncAction } = createActionFactory('groups');
+
+export const getGroupActions = createAsyncAction<number, Group>('get');
+
+export const getGroupListActions = createAsyncAction<void, Array<Group>>('list');

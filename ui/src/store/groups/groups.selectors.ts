@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
+import type { AppState } from '../configureAppStore.ts';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-};
+const selectRootState = (state: AppState) => state.groups;
+
+export const selectGroupById = (id: string) => (state: AppState) => selectRootState(state).groupsById[id];
+
+export const selectGroupsList = (state: AppState) => Object.values(selectRootState(state).groupsById);

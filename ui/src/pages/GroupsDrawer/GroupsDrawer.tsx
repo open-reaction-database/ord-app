@@ -19,19 +19,26 @@ import classes from './GroupsDrawer.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
 import { RoleSelector } from 'pages/RoleSelector/RoleSelector';
+import axiosInstance from 'common/config/axiosConfig';
+import { getGroupList } from 'store/groups/groups.thunks';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { useSelector } from 'react-redux';
+import { selectGroupById } from 'store/groups/groups.selectors';
 
 interface GroupsDrawerProps {
   opened: boolean;
   onClose: () => void;
-  group: string;
+  groupId: number;
 }
 
-export function GroupsDrawer({ opened, onClose, group }: Readonly<GroupsDrawerProps>) {
+export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawerProps>) {
+  const dispatch = useAppDispatch();
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const group = useSelector(selectGroupById(String(groupId)));
 
   const handleGroupRename = async (value: string) => {
-    // Send request
-    console.log(value);
+    await axiosInstance.patch(`/groups/${group.id}`, { name: value });
+    dispatch(getGroupList());
   };
 
   return (
@@ -54,7 +61,7 @@ export function GroupsDrawer({ opened, onClose, group }: Readonly<GroupsDrawerPr
                 align="center"
                 gap="4"
               >
-                <Drawer.Title className={classes.title}>{group}</Drawer.Title>
+                <Drawer.Title className={classes.title}>{group.name}</Drawer.Title>
                 <ActionIcon
                   variant="transparent"
                   onClick={openModal}
@@ -121,7 +128,7 @@ export function GroupsDrawer({ opened, onClose, group }: Readonly<GroupsDrawerPr
         onSubmit={handleGroupRename}
         title="Rename Group"
         inputLabel="Group name"
-        initialValue={group}
+        initialValue={group.name}
       />
     </>
   );
