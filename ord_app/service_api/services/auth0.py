@@ -27,8 +27,8 @@ class UnauthorizedException(HTTPException):
 
 
 class UnauthenticatedException(HTTPException):
-    def __init__(self):
-        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="Requires authentication")
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
 
 
 def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:

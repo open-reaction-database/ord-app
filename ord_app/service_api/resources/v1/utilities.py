@@ -30,12 +30,13 @@ from ord_app.service_api.services.postgresql import get_db_session
 router = APIRouter(tags=["utilities"])
 
 
-@router.post("/init-testing-data")
+@router.post("/group/{group_id}/init-testing-data")
 async def testing_data(
+    group_id: int,
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await populate_testing_data(db_session, user)
+    return await populate_testing_data(db_session, user, group_id)
 
 
 def adjust_error(error: str) -> str:

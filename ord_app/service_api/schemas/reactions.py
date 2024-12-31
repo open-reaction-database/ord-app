@@ -34,9 +34,9 @@ class ReactionSchema(BaseSchema):
 
 class ReactionCreateSchema(BaseSchema):
     name: str | None
-    binpb: bytes
+    binpb: bytes | None
 
     @field_validator("binpb", mode="after")
     @classmethod
     def binpb_validation(cls, raw):
-        return load_message(b64decode(raw), Reaction, "binpb").SerializeToString()
+        return None if raw is None else load_message(b64decode(raw), Reaction, "binpb").SerializeToString()

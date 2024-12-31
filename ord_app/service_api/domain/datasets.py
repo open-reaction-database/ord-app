@@ -28,7 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
+from ord_app.service_api.models import DatasetModel, GroupModel, ReactionModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 
@@ -38,46 +38,78 @@ async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[Da
     return datasets.all()
 
 
-async def paginate_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
-    # todo: It is necessary to optimize the query: instead of retrieving all reactions, we need to get only their count.
-    #  However, there are difficulties with pagination and Pydantic models.
-    query = (
+async def paginate_group_datasets(db_session: AsyncSession, group_id: int) -> Page[DatasetModel]:
+    stmt = (
         select(DatasetModel)
-        .where(DatasetModel.owner == user)
+        .where(DatasetModel.group_id == group_id)
         .options(
             joinedload(DatasetModel.owner),
             joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
         )
     )
-    return await paginate(db_session, query)
+    return await paginate(db_session, stmt)
 
 
-async def get_user_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int) -> DatasetModel:
-    stmt = select(DatasetModel).where(DatasetModel.owner == user, DatasetModel.id == dataset_id).limit(1)
+async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
+    stmt = (
+        select(DatasetModel)
+        .join(GroupModel, GroupModel.id == DatasetModel.group_id)
+        .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
+        .where(
+            UserGroupsMembershipModel.user == user,
+        )
+        .options(
+            joinedload(DatasetModel.owner),
+            joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
+        )
+    )
+    return await paginate(db_session, stmt)
+
+
+async def get_user_dataset(db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel) -> DatasetModel:
+    stmt = (
+        select(DatasetModel)
+        .where(
+            DatasetModel.owner == user,
+            DatasetModel.id == dataset_id,
+            DatasetModel.group_id == group_id,
+        )
+        .limit(1)
+    )
     dataset = await db_session.scalar(stmt)
     return dataset
 
 
-async def create_dataset(db_session: AsyncSession, user: UserModel, payload: DatasetCreateSchema) -> DatasetModel:
-    dataset = DatasetModel(owner=user, **payload.model_dump(exclude_unset=True))
+async def create_dataset(
+    db_session: AsyncSession, group_id: int, user: UserModel, payload: DatasetCreateSchema
+) -> DatasetModel:
+    dataset = DatasetModel(owner=user, group_id=group_id, **payload.model_dump(exclude_unset=True))
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)
     return dataset
 
 
-async def delete_dataset(db_session: AsyncSession, user: UserModel, dataset_id: int):
-    stmt = delete(DatasetModel).where(DatasetModel.owner == user, DatasetModel.id == dataset_id)
+async def delete_dataset(db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel):
+    stmt = delete(DatasetModel).where(
+        DatasetModel.owner == user,
+        DatasetModel.id == dataset_id,
+        DatasetModel.group_id == group_id,
+    )
     await db_session.execute(stmt)
     await db_session.commit()
 
 
 async def download_dataset(
-    db_session: AsyncSession, user: UserModel, dataset_id: int, file_format: DownloadFileFormats
+    db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel, file_format: DownloadFileFormats
 ) -> tuple[DatasetModel, bytes]:
     stmt = (
         select(DatasetModel)
-        .where(DatasetModel.owner == user, DatasetModel.id == dataset_id)
+        .where(
+            DatasetModel.owner == user,
+            DatasetModel.id == dataset_id,
+            DatasetModel.group_id == group_id,
+        )
         .options(joinedload(DatasetModel.reactions))
     )
     dataset = await db_session.scalar(stmt)
@@ -93,7 +125,7 @@ async def download_dataset(
     return dataset, data
 
 
-async def upload_user_dataset(db_session: AsyncSession, user: UserModel, file: UploadFile):
+async def upload_user_dataset(db_session: AsyncSession, group_id: int, user: UserModel, file: UploadFile):
     data = await file.read()
 
     if file.filename.endswith(".gz"):
@@ -109,7 +141,12 @@ async def upload_user_dataset(db_session: AsyncSession, user: UserModel, file: U
         raise ValueError(file.filename)
 
     dataset_proto = load_message(data, Dataset, kind)
-    dataset = DatasetModel(user=user, name=dataset_proto.name, binpb=dataset_proto.SerializeToString())
+    dataset = DatasetModel(
+        owner=user,
+        name=dataset_proto.name,
+        group_id=group_id,
+        binpb=dataset_proto.SerializeToString(),  # TODO: create reactions
+    )
     db_session.add(dataset)
     await db_session.commit()
     await db_session.refresh(dataset)

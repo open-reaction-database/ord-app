@@ -13,6 +13,7 @@
 # limitations under the License.
 from datetime import datetime
 
+from ord_app.service_api.models import UserRoles
 from ord_app.service_api.schemas.base import BaseSchema
 
 
@@ -25,3 +26,12 @@ class GroupSchema(BaseSchema):
 
 class GroupCreateSchema(BaseSchema):
     name: str | None
+
+
+class GroupMemberSchema(BaseSchema):
+    user_id: int
+    role: UserRoles
+
+
+class GroupMemberCreateSchema(BaseSchema):
+    members: list[GroupMemberSchema]
