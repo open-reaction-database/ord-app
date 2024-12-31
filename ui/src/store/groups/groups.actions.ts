@@ -21,3 +21,7 @@ const { createAsyncAction } = createActionFactory('groups');
 export const getGroupActions = createAsyncAction<number, Group>('get');
 
 export const getGroupListActions = createAsyncAction<void, Array<Group>>('list');
+
+export const createGroupActions = createAsyncAction<string, Group>('create');
+
+export const updateGroupActions = createAsyncAction<Partial<Group>, Group>('update');

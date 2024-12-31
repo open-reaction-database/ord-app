@@ -17,16 +17,18 @@ import { combineReducers, createReducer } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
 import { itemsById } from 'common/utils';
 import type { Group } from './groups.types.ts';
-import { getGroupActions, getGroupListActions } from './groups.actions.ts';
+import { createGroupActions, getGroupActions, getGroupListActions, updateGroupActions } from './groups.actions.ts';
 
 const getGroupId = (group: Group) => group.id;
 
 const groupsById = createReducer<ItemsById<Group>>({}, builder => {
-  builder.addCase(getGroupActions.success, (state, action) => ({
-    ...state,
-    [getGroupId(action.payload)]: action.payload,
-  }));
   builder.addCase(getGroupListActions.success, (_, action) => itemsById(action.payload, getGroupId));
+  [getGroupActions.success, createGroupActions.success, updateGroupActions.success].forEach(action =>
+    builder.addCase(action, (state, action) => ({
+      ...state,
+      [getGroupId(action.payload)]: action.payload,
+    })),
+  );
 });
 
 export const groupsReducer = combineReducers({

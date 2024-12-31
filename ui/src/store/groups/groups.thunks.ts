@@ -15,15 +15,25 @@
  */
 import axiosInstance from 'common/config/axiosConfig';
 import type { Group } from './groups.types';
-import { getGroupActions, getGroupListActions } from './groups.actions';
+import { createGroupActions, getGroupActions, getGroupListActions, updateGroupActions } from './groups.actions';
 import { createThunk } from 'common/store';
 
 export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
-  const groups = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
-  return getGroupActions.success(groups);
+  const group = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
+  return getGroupActions.success(group);
 });
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
   const groups = (await axiosInstance.get<Group[]>(`/groups`)).data;
   return getGroupListActions.success(groups);
+});
+
+export const createGroup = createThunk(createGroupActions, async (_d, _g, name) => {
+  const group = (await axiosInstance.post('/groups', { name })).data;
+  return createGroupActions.success(group);
+});
+
+export const updateGroup = createThunk(updateGroupActions, async (_d, _g, updatedGroup) => {
+  const group = (await axiosInstance.patch(`/groups/${updatedGroup.id}`, updatedGroup)).data;
+  return updateGroupActions.success(group);
 });

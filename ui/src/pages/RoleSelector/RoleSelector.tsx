@@ -16,15 +16,16 @@
 import { Menu, Button } from '@mantine/core';
 import { CheckIcon, ChevronDownIcon, RemoveIcon } from 'common/icons';
 import classes from './RoleSelector.module.scss';
+import { USER_ROLES } from 'common/types/roles';
 
 interface RoleSelectorProps {
-  value: string;
+  value: USER_ROLES;
   onChange: (value: string) => void;
   onRemove: () => void;
 }
 
 export function RoleSelector({ value, onChange, onRemove }: Readonly<RoleSelectorProps>) {
-  const roles = ['Admin', 'Editor', 'Viewer'];
+  const roles = Object.values(USER_ROLES);
 
   return (
     <Menu

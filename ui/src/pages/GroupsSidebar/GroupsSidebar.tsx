@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 import { useEffect, useState, type MouseEvent } from 'react';
-import { useSelector } from 'react-redux';
-import { ActionIcon, Button, Flex, Input, Paper, ScrollArea, Title } from '@mantine/core';
-import { AddCircleIcon, EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
+import { Button, Flex, Paper, Title } from '@mantine/core';
+import { AddCircleIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
-import classes from './GroupsSidebar.module.scss';
 import { GroupsDrawer } from 'pages/GroupsDrawer/GroupsDrawer';
-import { selectGroupsList } from 'store/groups/groups.selectors';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { getGroupList } from 'store/groups/groups.thunks';
+import { createGroup, getGroupList } from 'store/groups/groups.thunks';
 import { type Group } from 'store/groups/groups.types';
-import axiosInstance from 'common/config/axiosConfig';
-
-const GROUP_BUTTON_HEIGHT = 36;
+import { GroupsList } from 'pages/GroupsList/GroupsList';
+import classes from './GroupsSidebar.module.scss';
 
 export function GroupsSidebar() {
   const dispatch = useAppDispatch();
-  const groups = useSelector(selectGroupsList);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
@@ -42,8 +37,7 @@ export function GroupsSidebar() {
   }, [dispatch]);
 
   const handleGroupAddition = async (value: string) => {
-    await axiosInstance.post('/groups', { name: value });
-    dispatch(getGroupList());
+    dispatch(createGroup(value));
   };
 
   const handleGroupsDrawerOpen = (e: MouseEvent, group: Group) => {
@@ -51,8 +45,6 @@ export function GroupsSidebar() {
     setSelectedGroup(group);
     openDrawer();
   };
-
-  const scrollAreaHeight = groups.length > 4 ? GROUP_BUTTON_HEIGHT * 4 : GROUP_BUTTON_HEIGHT * groups.length;
 
   return (
     <>
@@ -76,70 +68,7 @@ export function GroupsSidebar() {
           </Button>
         </Flex>
 
-        {groups.length ? (
-          <>
-            <Input
-              classNames={{ input: classes.searchInput }}
-              rightSection={<SearchIcon />}
-              placeholder="Search by group"
-            />
-            <Flex direction="column">
-              <Button
-                classNames={{ root: classes.groupButton, section: classes.buttonSection }}
-                variant="white"
-                leftSection={<GridViewIcon />}
-                justify="flex-start"
-              >
-                All Groups
-              </Button>
-
-              <ScrollArea
-                h={scrollAreaHeight}
-                scrollbarSize={4}
-                scrollHideDelay={500}
-              >
-                {groups.map(group => (
-                  <Button
-                    classNames={{
-                      root: classes.groupButton,
-                      label: classes.buttonLabel,
-                    }}
-                    key={group.id}
-                    variant="white"
-                    justify="flex-start"
-                  >
-                    <Flex
-                      align="center"
-                      gap="8"
-                    >
-                      <GroupArrowIcon />
-                      {group.name}
-                    </Flex>
-
-                    <ActionIcon
-                      onClick={e => handleGroupsDrawerOpen(e, group)}
-                      variant="white"
-                      title="Edit group"
-                    >
-                      <SettingsIcon />
-                    </ActionIcon>
-                  </Button>
-                ))}
-              </ScrollArea>
-            </Flex>
-          </>
-        ) : (
-          <div className={classes.emptyContainer}>
-            <Flex
-              direction="column"
-              align="center"
-              gap="8"
-            >
-              <EmptyIcon />
-              <div className={classes.emptyText}>There are no groups yet</div>
-            </Flex>
-          </div>
-        )}
+        <GroupsList onEdit={handleGroupsDrawerOpen} />
       </Paper>
 
       <InputModal

@@ -19,11 +19,11 @@ import classes from './GroupsDrawer.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
 import { RoleSelector } from 'pages/RoleSelector/RoleSelector';
-import axiosInstance from 'common/config/axiosConfig';
-import { getGroupList } from 'store/groups/groups.thunks';
+import { updateGroup } from 'store/groups/groups.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';
 import { selectGroupById } from 'store/groups/groups.selectors';
+import { USER_ROLES } from 'common/types/roles';
 
 interface GroupsDrawerProps {
   opened: boolean;
@@ -37,8 +37,7 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
   const group = useSelector(selectGroupById(String(groupId)));
 
   const handleGroupRename = async (value: string) => {
-    await axiosInstance.patch(`/groups/${group.id}`, { name: value });
-    dispatch(getGroupList());
+    dispatch(updateGroup({ id: group.id, name: value }));
   };
 
   return (
@@ -112,7 +111,7 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
                 </Flex>
 
                 <RoleSelector
-                  value="Admin"
+                  value={USER_ROLES.ADMIN}
                   onChange={role => console.log(role)}
                   onRemove={() => console.log('Removed')}
                 />
