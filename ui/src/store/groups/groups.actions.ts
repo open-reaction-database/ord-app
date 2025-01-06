@@ -16,7 +16,7 @@
 import { createActionFactory } from 'common/store';
 import type { Group } from './groups.types';
 
-const { createAsyncAction } = createActionFactory('groups');
+const { createAsyncAction, createAction } = createActionFactory('groups');
 
 export const getGroupActions = createAsyncAction<number, Group>('get');
 
@@ -25,3 +25,5 @@ export const getGroupListActions = createAsyncAction<void, Array<Group>>('list')
 export const createGroupActions = createAsyncAction<string, Group>('create');
 
 export const updateGroupActions = createAsyncAction<Partial<Group>, Group>('update');
+
+export const setGroupSearchAction = createAction<string>('setSearch');

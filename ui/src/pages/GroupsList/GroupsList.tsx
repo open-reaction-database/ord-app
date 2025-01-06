@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useState, type MouseEvent } from 'react';
+import type { ChangeEvent } from 'react';
+import { type MouseEvent, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
-import { selectGroupsList } from 'store/groups/groups.selectors';
+import { selectGroupSearch, selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
 import { type Group } from 'store/groups/groups.types';
 import classes from './GroupsList.module.scss';
+import { setGroupSearchAction } from '../../store/groups/groups.actions.ts';
+import { useAppDispatch } from '../../store/useAppDispatch.ts';
 
 const GROUP_BUTTON_HEIGHT = 36;
 
@@ -28,9 +31,22 @@ interface GroupsListProps {
 }
 
 export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
-  const groups = useSelector(selectGroupsList);
+  const appDispatch = useAppDispatch();
+  const groups = useSelector(selectOrderedGroupsList);
+  const groupSearch = useSelector(selectGroupSearch);
 
-  const [filterValue, setFilterValue] = useState('');
+  const onSearchChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      appDispatch(setGroupSearchAction(e.target.value));
+    },
+    [appDispatch],
+  );
+
+  useEffect(() => {
+    return () => {
+      appDispatch(setGroupSearchAction(''));
+    };
+  }, [appDispatch]);
 
   const scrollAreaHeight = groups.length > 4 ? GROUP_BUTTON_HEIGHT * 4 : GROUP_BUTTON_HEIGHT * groups.length;
 
@@ -38,8 +54,8 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
     <>
       <Input
         classNames={{ input: classes.searchInput }}
-        value={filterValue}
-        onChange={e => setFilterValue(e.target.value)}
+        value={groupSearch}
+        onChange={onSearchChange}
         rightSection={<SearchIcon />}
         placeholder="Search by group"
       />
@@ -60,32 +76,30 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
           scrollHideDelay={500}
           type="auto"
         >
-          {groups
-            .filter(group => group.name.includes(filterValue))
-            .map(group => (
-              <Button
-                classNames={{
-                  root: classes.groupButton,
-                  label: classes.buttonLabel,
-                }}
-                key={group.id}
-                variant="white"
-                justify="flex-start"
-              >
-                <div className={classes.buttonName}>
-                  <GroupArrowIcon />
-                  <div title={group.name}>{group.name}</div>
-                </div>
+          {groups.map(group => (
+            <Button
+              classNames={{
+                root: classes.groupButton,
+                label: classes.buttonLabel,
+              }}
+              key={group.id}
+              variant="white"
+              justify="flex-start"
+            >
+              <div className={classes.buttonName}>
+                <GroupArrowIcon />
+                <div title={group.name}>{group.name}</div>
+              </div>
 
-                <ActionIcon
-                  onClick={e => onEdit(e, group)}
-                  variant="white"
-                  title="Edit group"
-                >
-                  <SettingsIcon />
-                </ActionIcon>
-              </Button>
-            ))}
+              <ActionIcon
+                onClick={e => onEdit(e, group)}
+                variant="white"
+                title="Edit group"
+              >
+                <SettingsIcon />
+              </ActionIcon>
+            </Button>
+          ))}
         </ScrollArea>
       </Flex>
     </>

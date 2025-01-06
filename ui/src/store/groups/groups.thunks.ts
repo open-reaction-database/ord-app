@@ -29,11 +29,11 @@ export const getGroupList = createThunk(getGroupListActions, async () => {
 });
 
 export const createGroup = createThunk(createGroupActions, async (_d, _g, name) => {
-  const group = (await axiosInstance.post('/groups', { name })).data;
+  const group = (await axiosInstance.post<Group>('/groups', { name })).data;
   return createGroupActions.success(group);
 });
 
 export const updateGroup = createThunk(updateGroupActions, async (_d, _g, updatedGroup) => {
-  const group = (await axiosInstance.patch(`/groups/${updatedGroup.id}`, updatedGroup)).data;
+  const group = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
   return updateGroupActions.success(group);
 });
