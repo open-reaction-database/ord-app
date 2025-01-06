@@ -48,6 +48,7 @@ export default tseslint.config(
       'react/prefer-read-only-props': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       complexity: ['error', 10],
+      'no-duplicate-imports': 'error',
     },
     settings: {
       react: {

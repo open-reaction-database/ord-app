@@ -46,9 +46,9 @@ export function useAuth() {
     };
 
     if (user) {
-      dispatch(setActiveUser(user as Self));
-
       provisionUser();
+
+      dispatch(setActiveUser(user as Self));
     }
   }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
 

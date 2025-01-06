@@ -1,0 +1,85 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.header {
+  padding: 20px 24px;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--color-border-1);
+}
+
+.title {
+  font-size: var(--mantine-h2-font-size);
+  line-height: var(--mantine-h2-line-height);
+  font-weight: 600;
+}
+
+.subtitle {
+  color: var(--color-text-secondary-2);
+}
+
+.body {
+  padding: 16px 24px;
+}
+
+.inputContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-1);
+
+  div {
+    flex: 1;
+  }
+}
+
+.button {
+  padding: 8px 16px;
+  font-weight: 400;
+  border-radius: 8px;
+}
+
+.membersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
+}
+
+.membersTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.counter {
+  padding: 2px 8px;
+  background-color: var(--color-background-gray);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  border-radius: var(--mantine-spacing-xl);
+}
+
+.userInfoContainer {
+  display: flex;
+  padding: 8px 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.category {
+  color: var(--color-text-secondary-2);
+  margin-right: 4px;
+}

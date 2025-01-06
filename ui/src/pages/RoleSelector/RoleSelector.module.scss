@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
+.dropdown {
+  border: none;
+  box-shadow: 0 4px 24px 0 #00000014;
+}
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-};
+.menuItem {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.menuItemSection {
+  padding-right: 8px;
+}
+
+.selectedOption {
+  background-color: var(--color-background-gray);
+}
+
+.iconPlaceholder {
+  min-width: 20px;
+}

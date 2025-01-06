@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Link, Route, Switch } from 'wouter';
-import { DatasetTable } from '../pages/DatasetTable/DatasetTable.tsx';
+import { Route, Switch } from 'wouter';
 import { PageContainer } from '../common/components/PageContainer/PageContainer.tsx';
 import { DatasetPage } from '../pages/dataset/DatasetPage/DatasetPage.tsx';
 import { useAuth } from '../common/hooks/useAuth.ts';
 import { Loader } from '@mantine/core';
+import { ContributePage } from 'pages/ContriburePage.tsx';
 
 export function AppContent() {
   const isLoading = useAuth();
@@ -28,10 +28,10 @@ export function AppContent() {
   ) : (
     <PageContainer>
       <Switch>
-        <Route path="/">
-          <DatasetTable />
-          <Link to="/dataset/1">Test dataset link</Link>
-        </Route>
+        <Route
+          path="/"
+          component={ContributePage}
+        ></Route>
 
         <Route
           path="/dataset/:datasetId"

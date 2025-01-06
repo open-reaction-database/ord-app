@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
+export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';
 export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
 export { default as CopyIcon } from './CopyIcon.svg?react';
 export { default as DotsIcon } from './DotsIcon.svg?react';
 export { default as DownloadIcon } from './DownloadIcon.svg?react';
+export { default as EditIcon } from './EditIcon.svg?react';
 export { default as EmptyIcon } from './EmptyIcon.svg?react';
+export { default as GridViewIcon } from './GridViewIcon.svg?react';
+export { default as GroupArrowIcon } from './GroupArrowIcon.svg?react';
 export { default as HomeIcon } from './HomeIcon.svg?react';
+export { default as RemoveIcon } from './RemoveIcon.svg?react';
+export { default as SearchIcon } from './SearchIcon.svg?react';
+export { default as SettingsIcon } from './SettingsIcon.svg?react';

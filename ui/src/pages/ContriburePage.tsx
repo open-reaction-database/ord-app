@@ -13,12 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
+import { Flex } from '@mantine/core';
+import { GroupsSidebar } from './GroupsSidebar/GroupsSidebar';
+import { DatasetTable } from './DatasetTable/DatasetTable';
+import { Link } from 'wouter';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-};
+export function ContributePage() {
+  return (
+    <>
+      <Flex
+        gap="sm"
+        align="flex-start"
+      >
+        <GroupsSidebar />
+        <DatasetTable />
+      </Flex>
+
+      <Link to="/dataset/1">Test dataset link</Link>
+    </>
+  );
+}
