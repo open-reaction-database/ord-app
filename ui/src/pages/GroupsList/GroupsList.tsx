@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ChangeEvent } from 'react';
-import { type MouseEvent, useEffect, useCallback } from 'react';
+import { useEffect, useCallback, type ChangeEvent, type MouseEvent } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
 import { selectGroupSearch, selectOrderedGroupsList } from 'store/groups/groups.selectors';
