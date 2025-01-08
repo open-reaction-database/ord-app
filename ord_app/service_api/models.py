@@ -13,22 +13,15 @@
 # limitations under the License.
 import datetime
 import re
-from enum import Enum
+from typing import Literal, get_args
 
-from sqlalchemy import ForeignKey, LargeBinary, func
+from sqlalchemy import Enum, ForeignKey, LargeBinary, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
-from sqlalchemy_utils import ChoiceType, EmailType, PasswordType
 
-
-class AuthProviders(str, Enum):
-    platform: str = "platform"
-    github: str = "github"
-    orcid: str = "orcid"
+UserRoles = Literal["admin", "editor", "viewer", "anonymous"]
 
 
 class BaseModel(DeclarativeBase):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     modified_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
@@ -38,8 +31,9 @@ class BaseModel(DeclarativeBase):
 
 
 class UserModel(BaseModel):
+    id: Mapped[int] = mapped_column(primary_key=True)
     external_id: Mapped[str] = mapped_column(nullable=True, index=True)
-    email: Mapped[str] = mapped_column(EmailType(), unique=True, nullable=True)
+    email: Mapped[str] = mapped_column(unique=True, nullable=True)
     name: Mapped[str] = mapped_column(nullable=True)
     avatar_url: Mapped[str] = mapped_column(nullable=True)
 
@@ -47,37 +41,66 @@ class UserModel(BaseModel):
         return f"<User(id={self.id}, email={self.email})>"
 
 
+class GroupModel(BaseModel):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
+    owner: Mapped[UserModel] = relationship(UserModel, backref="groups")
+
+    def __repr__(self):
+        return f"<Group(id={self.id}, name={self.name})>"
+
+
+class UserGroupsMembershipModel(BaseModel):
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
+    user: Mapped[UserModel] = relationship(UserModel, backref="groups_member")
+
+    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member")
+
+    role: Mapped[UserRoles] = mapped_column(
+        Enum(
+            *get_args(UserRoles),
+            name="user_group_role_enum",
+            create_constraint=True,
+            validate_strings=True,
+        )
+    )
+
+    def __repr__(self):
+        return f"<UserGroup(user_id={self.user_id}, group_id={self.group_id}, role={self.role})>"
+
+
 class DatasetModel(BaseModel):
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     description: Mapped[str] = mapped_column(nullable=True)
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), index=True)
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
     reactions: Mapped[list["ReactionModel"]] = relationship("ReactionModel", back_populates="dataset")
+
+    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), index=True)
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="datasets")
 
     def __repr__(self):
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
 
 
 class ReactionModel(BaseModel):
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
 
-    dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"))
+    dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"), index=True)
     dataset: Mapped[DatasetModel] = relationship(DatasetModel, back_populates="reactions")
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), index=True)
     owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
+
+    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), index=True)
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="reactions")
 
     def __repr__(self):
         return f"<Reaction(id={self.id}, name={self.name}, user_id={self.owner_id})>"
-
-
-class GroupModel(BaseModel):
-    name: Mapped[str]
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
-    owner: Mapped[UserModel] = relationship(UserModel, backref="groups")
-
-    def __repr__(self):
-        return f"<Group(id={self.id}, name={self.name})>"

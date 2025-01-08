@@ -21,20 +21,24 @@ from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
 from ord_app.service_api.settings import RuntimeSettings
 
 
-async def populate_testing_data(db_session: AsyncSession, user: UserModel):
+async def populate_testing_data(db_session: AsyncSession, user: UserModel, group_id: int):
     insert_data = []
 
     for filename in glob(str(RuntimeSettings.base_dir.parent / "tests" / "testdata" / "*.txtpb")):
         with open(filename, "r") as f:
             dataset_pb = text_format.Parse(f.read(), Dataset())
 
-            dataset = DatasetModel(name=dataset_pb.name, owner=user)
+            dataset = DatasetModel(name=dataset_pb.name, owner=user, group_id=group_id)
             insert_data.append(dataset)
 
             for reaction in dataset_pb.reactions:
                 insert_data.append(
                     ReactionModel(
-                        name=reaction.reaction_id, binpb=reaction.SerializeToString(), dataset=dataset, owner=user
+                        name=reaction.reaction_id,
+                        binpb=reaction.SerializeToString(),
+                        dataset=dataset,
+                        owner=user,
+                        group_id=group_id,
                     )
                 )
 

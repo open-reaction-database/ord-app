@@ -26,7 +26,7 @@ class UserSchema(BaseSchema):
 
 
 class UserCreateSchema(BaseSchema):
-    email: EmailStr | None = None
-    name: str | None = None
-    external_id: str | None = None
-    avatar_url: str | None = None
+    email: EmailStr | None
+    name: str | None
+    external_id: str | None
+    avatar_url: str | None
