@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate, authorize
 from ord_app.service_api.domain.groups import (
-    add_group_member,
+    add_group_members,
     create_group,
     delete_group,
     get_group,
@@ -30,7 +30,11 @@ from ord_app.service_api.services.postgresql import get_db_session
 router = APIRouter(tags=["group"])
 
 
-@router.post("/groups", response_model=GroupSchema, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/groups",
+    response_model=GroupSchema,
+    status_code=status.HTTP_201_CREATED
+)
 async def _create_group(
     payload: GroupCreateSchema,
     user: UserModel = Depends(authenticate),
@@ -39,7 +43,10 @@ async def _create_group(
     return await create_group(db_session, user, payload)
 
 
-@router.get("/groups", response_model=list[GroupSchema])
+@router.get(
+    "/groups",
+    response_model=list[GroupSchema]
+)
 async def _list_groups(
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
@@ -47,19 +54,24 @@ async def _list_groups(
     return await list_groups(db_session, user)
 
 
-@router.post("/groups/{group_id}/members", dependencies=[Depends(authorize(("admin", "editor", "viewer")))])
-async def _add_group_member(
+@router.post(
+    "/groups/{group_id}/members",
+    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+    status_code=status.HTTP_201_CREATED
+)
+async def _add_group_members(
     payload: GroupMemberCreateSchema,
     group_id: int,
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    # TODO: add response and status code
-    await add_group_member(db_session, user, group_id, payload)
+    await add_group_members(db_session, user, group_id, payload)
 
 
 @router.get(
-    "/groups/{group_id}", response_model=GroupSchema, dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
+    "/groups/{group_id}",
+    response_model=GroupSchema,
+    dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
 )
 async def _get_group(
     group_id: int,

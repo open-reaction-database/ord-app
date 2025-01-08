@@ -40,7 +40,7 @@ router = APIRouter(
 )
 
 
-@router.post("/reactions", response_model=ReactionSchema)
+@router.post("", response_model=ReactionSchema)
 async def _create_reaction(
     group_id: int,
     dataset_id: int,
@@ -51,7 +51,7 @@ async def _create_reaction(
     return await create_reaction(db_session, group_id, dataset_id, user, payload)
 
 
-@router.get("/", response_model=Page[ReactionSchema])
+@router.get("", response_model=Page[ReactionSchema])
 async def reactions(
     group_id: int,
     dataset_id: int,

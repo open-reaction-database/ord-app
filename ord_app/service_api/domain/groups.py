@@ -29,10 +29,9 @@ async def create_group(db_session: AsyncSession, user: UserModel, payload: Group
     return stmt
 
 
-async def add_group_member(
+async def add_group_members(
     db_session: AsyncSession, user: UserModel, group_id: int, payload: GroupMemberCreateSchema
 ) -> None:
-    # TODO: validate current user role here?
     group_members = []
     for member in payload.members:
         group_members.append(UserGroupsMembershipModel(user_id=member.user_id, group_id=group_id, role=member.role))
