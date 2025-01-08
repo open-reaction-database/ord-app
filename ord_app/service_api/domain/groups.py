@@ -20,7 +20,7 @@ from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, Us
 from ord_app.service_api.schemas.groups import GroupCreateSchema, GroupMemberCreateSchema, GroupMemberRemoveSchema
 
 
-async def create_group(db_session: AsyncSession, user: UserModel, payload: GroupCreateSchema) -> GroupModel:
+async def create_group(db_session: AsyncSession, user: UserModel, payload: GroupCreateSchema):
     # TODO: add response
     stmt = GroupModel(owner=user, **payload.model_dump(exclude_unset=True))
     user_group_member = UserGroupsMembershipModel(user=user, group=stmt, role="admin")

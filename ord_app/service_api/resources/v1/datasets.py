@@ -92,11 +92,24 @@ async def _delete_dataset(
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
+    # TODO: soft deletion needs to be implemented
     await delete_dataset(db_session, group_id, dataset_id, user)
     return Response("Object successfully deleted (or already absent)")
 
 
-@router.post("/groups/{group_id}/datasets/upload", dependencies=[Depends(authorize(("admin", "editor", "viewer")))])
+@router.post(
+    "/groups/{group_id}/datasets/upload",
+    dependencies=[
+        Depends(
+            authorize(
+                (
+                    "admin",
+                    "editor",
+                )
+            )
+        )
+    ],
+)
 async def upload_dataset(
     group_id: int,
     file: UploadFile,
