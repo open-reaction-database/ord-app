@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Sequence
 
-from sqlalchemy import delete, select, update, case
+from sqlalchemy import case, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel

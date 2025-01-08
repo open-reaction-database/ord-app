@@ -21,16 +21,16 @@ from ord_app.service_api.domain.groups import (
     delete_group,
     get_group,
     list_groups,
-    update_group,
     remove_group_members,
+    update_group,
     update_group_members,
 )
 from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.groups import (
     GroupCreateSchema,
     GroupMemberCreateSchema,
-    GroupSchema,
     GroupMemberRemoveSchema,
+    GroupSchema,
 )
 from ord_app.service_api.services.postgresql import get_db_session
 

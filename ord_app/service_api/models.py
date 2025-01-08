@@ -19,7 +19,6 @@ from typing import Literal, get_args
 from sqlalchemy import Enum, ForeignKey, LargeBinary, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
-
 UserRolesList = Literal["admin", "editor", "viewer"]
 
 

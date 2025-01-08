@@ -48,7 +48,7 @@ router = APIRouter(tags=["datasets"])
     "/groups/{group_id}/datasets",
     response_model=DatasetSchema,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+    dependencies=[Depends(authorize(("admin", "editor")))],
 )
 async def _create_dataset(
     group_id: int,
@@ -62,6 +62,7 @@ async def _create_dataset(
 @router.get(
     "/groups/datasets",
     response_model=Page[DatasetWithReactionCountSchema],
+    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
 )
 async def user_datasets(
     user: UserModel = Depends(authenticate),
@@ -84,9 +85,7 @@ async def group_datasets(
     return await paginate_group_datasets(db_session, group_id)
 
 
-@router.delete(
-    "/groups/{group_id}/datasets/{dataset_id}", dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
-)
+@router.delete("/groups/{group_id}/datasets/{dataset_id}", dependencies=[Depends(authorize(("admin",)))])
 async def _delete_dataset(
     group_id: int,
     dataset_id: int,
