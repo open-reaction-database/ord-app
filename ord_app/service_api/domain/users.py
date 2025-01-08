@@ -23,8 +23,8 @@ from ord_app.service_api.services.auth0 import verify_id_token
 
 async def get_user_by_external_pks(
     db_session: AsyncSession,
-    external_id: str = None,
-    external_email: str = None,
+    external_id: str | None = None,
+    external_email: str | None = None,
 ) -> UserModel:
     stmt = (
         select(UserModel)
