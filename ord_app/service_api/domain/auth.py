@@ -17,7 +17,7 @@ from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.users import get_user_by_external_pks
-from ord_app.service_api.models import UserGroupsMembershipModel, UserModel, UserRoles
+from ord_app.service_api.models import UserGroupsMembershipModel, UserModel, UserRolesList
 from ord_app.service_api.services.auth0 import UnauthenticatedException, UnauthorizedException, verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -28,7 +28,7 @@ async def authenticate(db_session: AsyncSession = Depends(get_db_session), token
     raise UnauthenticatedException(detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
 
-def authorize(roles: tuple[UserRoles, ...]):
+def authorize(roles: tuple[UserRolesList, ...]):
     async def _authorize(
         group_id: int | None,
         user: UserModel = Depends(authenticate),

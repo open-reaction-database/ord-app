@@ -13,12 +13,14 @@
 # limitations under the License.
 import datetime
 import re
+from dataclasses import dataclass
 from typing import Literal, get_args
 
 from sqlalchemy import Enum, ForeignKey, LargeBinary, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
-UserRoles = Literal["admin", "editor", "viewer", "anonymous"]
+
+UserRolesList = Literal["admin", "editor", "viewer"]
 
 
 class BaseModel(DeclarativeBase):
@@ -58,9 +60,9 @@ class UserGroupsMembershipModel(BaseModel):
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
     group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member")
 
-    role: Mapped[UserRoles] = mapped_column(
+    role: Mapped[UserRolesList] = mapped_column(
         Enum(
-            *get_args(UserRoles),
+            *get_args(UserRolesList),
             name="user_group_role_enum",
             create_constraint=True,
             validate_strings=True,

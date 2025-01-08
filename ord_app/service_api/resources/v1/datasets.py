@@ -85,9 +85,7 @@ async def group_datasets(
 
 
 @router.delete(
-    "/groups/{group_id}/datasets/{dataset_id}",
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))
-                  ]
+    "/groups/{group_id}/datasets/{dataset_id}", dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
 )
 async def _delete_dataset(
     group_id: int,
@@ -99,10 +97,7 @@ async def _delete_dataset(
     return Response("Object successfully deleted (or already absent)")
 
 
-@router.post(
-    "/groups/{group_id}/datasets/upload",
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
-)
+@router.post("/groups/{group_id}/datasets/upload", dependencies=[Depends(authorize(("admin", "editor", "viewer")))])
 async def upload_dataset(
     group_id: int,
     file: UploadFile,
