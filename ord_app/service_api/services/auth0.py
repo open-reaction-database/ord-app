@@ -50,14 +50,18 @@ def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
 
 
 def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
+    print(f"token: {token.credentials}")
     if token is None:
         raise UnauthenticatedException
 
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token.credentials).key
+        print("checked get_signing_key_from_jwt")
     except jwt.exceptions.PyJWKClientError as error:
+        print(f"PyJWKClientError: {error}")
         raise UnauthorizedException(str(error))
     except jwt.exceptions.DecodeError as error:
+        print(f"DecodeError: {error}")
         raise UnauthorizedException(str(error))
 
     try:
@@ -69,6 +73,7 @@ def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience
             issuer=issuer,
         )
     except Exception as error:
+        print(f"jwt.decode: {error}")
         raise UnauthorizedException(str(error))
 
     return payload
