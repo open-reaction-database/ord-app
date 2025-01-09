@@ -13,18 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  width: 205px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.addGroupButton {
-  padding: 0;
-  height: 20px;
-
-  path {
-    fill: var(--color-primary);
-  }
-}
+export { Routes as default } from './Routes';

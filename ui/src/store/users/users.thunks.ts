@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
-import type { Self } from './users.types';
-import { createUserActions, setActiveUser } from './users.actions';
+import { createThunk } from 'common/store';
+import { createUserActions } from './users.actions';
+import axiosInstance from 'common/config/axiosConfig';
 
-const isSelfCreated = createReducer<boolean>(false, builder => {
-  builder.addCase(createUserActions.success, () => true);
-});
-
-const self = createReducer<null | Self>(null, builder => {
-  builder.addCase(setActiveUser, (_, action) => action.payload);
-});
-
-export const usersReducer = combineReducers({
-  self,
-  isSelfCreated,
+export const createUser = createThunk(createUserActions, async (_d, _s, tokens) => {
+  await axiosInstance.post('/auth/jit-provisioning', tokens);
+  return createUserActions.success();
 });

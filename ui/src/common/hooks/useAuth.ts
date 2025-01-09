@@ -15,15 +15,21 @@
  */
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import axiosInstance, { setAccessTokenGetter } from '../config/axiosConfig.ts';
-import { useAppDispatch } from '../../store/useAppDispatch.ts';
-import { setActiveUser } from '../../store/users/users.actions.ts';
-import type { Self } from '../../store/users/users.types.ts';
+import { setAccessTokenGetter } from '../config/axiosConfig';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { setActiveUser } from 'store/users/users.actions';
+import type { Self } from 'store/users/users.types';
+import { selectIsUserCreated } from 'store/users/users.selectors';
+import { useSelector } from 'react-redux';
+import { createUser } from 'store/users/users.thunks';
 
 export function useAuth() {
   const auth0 = useAuth0();
   const dispatch = useAppDispatch();
   const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
+  const isUserCreated = useSelector(selectIsUserCreated);
+
+  const isAppLoading = isLoading || !isAuthenticated || !isUserCreated;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -38,11 +44,15 @@ export function useAuth() {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
-    const provisionUser = async () => {
-      const idToken = (await getIdTokenClaims())?.__raw;
-      const accessToken = await getAccessTokenSilently();
+    if (user) {
+      dispatch(setActiveUser(user as Self));
+    }
+  }, [dispatch, user]);
 
-      axiosInstance.post('/auth/jit-provisioning', { access_token: accessToken, id_token: idToken });
+  useEffect(() => {
+    const provisionUser = async () => {
+      const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);
+      dispatch(createUser({ access_token: accessToken, id_token: idToken?.__raw as string }));
     };
 
     if (user) {
@@ -52,5 +62,5 @@ export function useAuth() {
     }
   }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
 
-  return isLoading;
+  return isAppLoading;
 }

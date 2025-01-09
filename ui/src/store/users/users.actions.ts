@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { createActionFactory } from '../../common/store';
-import type { Self } from './users.types.ts';
+import type { Self, SelfCreate } from './users.types';
 
-const { createAction } = createActionFactory('users');
+const { createAction, createAsyncAction } = createActionFactory('users');
 
 export const setActiveUser = createAction<Self>('set_active');
+
+export const createUserActions = createAsyncAction<SelfCreate, void>('create');

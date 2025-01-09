@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-import type { AppState } from '../configureAppStore.ts';
+import type { AppState } from '../configureAppStore';
+import { createSelector } from '@reduxjs/toolkit';
 
 const selectRootState = (state: AppState) => state.datasets;
 
+const selectDatasets = (state: AppState) => selectRootState(state).datasetsById;
+
+const selectDatasetsOrder = (state: AppState) => selectRootState(state).datasetsOrder;
+
+export const selectAreDatasetsLoading = (state: AppState) => selectRootState(state).areDatasetsLoading;
+
 export const selectDatasetById = (id: string) => (state: AppState) => selectRootState(state).datasetsById[id];
+
+export const selectDatasetsPagination = (state: AppState) => selectRootState(state).pagination;
+
+export const selectOrderedDatasets = createSelector([selectDatasetsOrder, selectDatasets], (order, datasetsById) =>
+  order.map(id => datasetsById[id]),
+);

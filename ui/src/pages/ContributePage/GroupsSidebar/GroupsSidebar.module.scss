@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
-import type { Self } from './users.types';
-import { createUserActions, setActiveUser } from './users.actions';
+.container {
+  flex: 0 0 205px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-const isSelfCreated = createReducer<boolean>(false, builder => {
-  builder.addCase(createUserActions.success, () => true);
-});
+.addGroupButton {
+  padding: 0;
+  height: 20px;
 
-const self = createReducer<null | Self>(null, builder => {
-  builder.addCase(setActiveUser, (_, action) => action.payload);
-});
-
-export const usersReducer = combineReducers({
-  self,
-  isSelfCreated,
-});
+  path {
+    fill: var(--color-primary);
+  }
+}

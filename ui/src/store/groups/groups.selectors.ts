@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppState } from '../configureAppStore.ts';
+import type { AppState } from '../configureAppStore';
 import { createSelector } from '@reduxjs/toolkit';
 
 const selectRootState = (state: AppState) => state.groups;
@@ -23,6 +23,8 @@ export const selectGroupSearch = (state: AppState) => selectRootState(state).gro
 export const selectGroupById = (id: string) => (state: AppState) => selectRootState(state).groupsById[id];
 
 export const selectGroups = (state: AppState) => Object.values(selectRootState(state).groupsById);
+
+export const selectActiveGroupId = (state: AppState) => selectRootState(state).activeGroupId;
 
 export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroups], (search, groups) => {
   const lowerCaseSearch = search.toLowerCase();

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "prettier": "prettier --write .",
     "lint": "eslint src *.ts *.cjs *.mjs",
     "lint:css": "stylelint '**/*.[s]css'",
     "lint:check": "prettier --check . && npm run lint && npm run lint:css",
@@ -20,6 +21,7 @@
       "eslint --fix"
     ],
     "*.[s]css": [
+      "prettier --write",
       "stylelint --fix"
     ],
     "*": [

@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { PageContainer } from '../common/components/PageContainer/PageContainer.tsx';
-import { DatasetPage } from '../pages/dataset/DatasetPage/DatasetPage.tsx';
-import { useAuth } from '../common/hooks/useAuth.ts';
-import { Loader } from '@mantine/core';
-import { ContributePage } from 'pages/ContriburePage.tsx';
+import { useAuth } from 'common/hooks/useAuth';
+import { lazy, Suspense } from 'react';
+import { PageLoader } from '../common/components/PageLoader/PageLoader';
+
+const Routes = lazy(() => import('pages'));
 
 export function AppContent() {
   const isLoading = useAuth();
 
   return isLoading ? (
-    <Loader />
+    <PageLoader />
   ) : (
-    <PageContainer>
-      <Switch>
-        <Route
-          path="/"
-          component={ContributePage}
-        ></Route>
-
-        <Route
-          path="/dataset/:datasetId"
-          component={DatasetPage}
-        />
-      </Switch>
-    </PageContainer>
+    <Suspense fallback={<PageLoader />}>
+      <Routes />
+    </Suspense>
   );
 }

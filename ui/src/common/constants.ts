@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { Pagination } from './types';
+
 export const isDev = !import.meta.env.PROD;
 
 export const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
@@ -22,3 +24,5 @@ export const auth0Issuer = import.meta.env.VITE_AUTH0_ISSUER as string;
 export const auth0Scope = import.meta.env.VITE_AUTH0_SCOPE as string;
 
 export const domain = window.location.origin;
+
+export const emptyPagination: Pagination = { page: 1, size: 10, total: 0, pages: 0 };

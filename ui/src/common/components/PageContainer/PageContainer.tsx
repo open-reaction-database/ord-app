@@ -16,10 +16,10 @@
 import type { PropsWithChildren } from 'react';
 import { AppShell, Avatar, Group } from '@mantine/core';
 import classes from './PageContainer.module.scss';
-import ORDLogo from '../../../assets/ORD_logo.png';
+import ORDLogo from 'assets/ORD_logo.png';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { useSelector } from 'react-redux';
-import { selectSelf } from '../../../store/users/users.selectors.ts';
+import { selectSelf } from 'store/users/users.selectors';
 
 export function PageContainer({ children }: PropsWithChildren) {
   const user = useSelector(selectSelf);

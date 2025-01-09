@@ -13,12 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDatasetActions } from './datasets.actions.ts';
-import type { Dataset } from './datasets.types.ts';
+import { getDatasetActions, getDatasetPageActions, getGroupsInitialDatasetListActions } from './datasets.actions';
+import type { Dataset } from './datasets.types';
 import { createThunk } from '../../common/store';
-import axiosInstance from 'common/config/axiosConfig.ts';
+import axiosInstance from 'common/config/axiosConfig';
+import type { Pages } from '../../common/types';
+import { selectActiveGroupId } from '../groups/groups.selectors';
+import { selectDatasetsPagination } from './datasets.selectors';
 
 export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetId) => {
   const dataset = (await axiosInstance.get<Dataset>(`/datasets/${datasetId}`)).data;
   return getDatasetActions.success(dataset);
+});
+
+export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {
+  const url = groupId ? `/groups/${groupId}/datasets/` : '/groups/datasets/';
+  const params = { page: 1, size: 10 };
+
+  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
+  return getGroupsInitialDatasetListActions.success(datasetsPages);
+});
+
+export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, getState) => {
+  const state = getState();
+  const activeGroupId = selectActiveGroupId(state);
+  const currentPage = selectDatasetsPagination(state);
+
+  const url = activeGroupId ? `/groups/${activeGroupId}/datasets/` : '/groups/datasets/';
+  const params = { page: currentPage.page, size: currentPage.size };
+
+  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
+  return getDatasetPageActions.success(datasetsPages);
 });

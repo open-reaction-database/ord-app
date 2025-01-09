@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { configureStore } from '@reduxjs/toolkit';
-import { rootReducer } from './rootReducer.ts';
-import { isDev } from '../constants.ts';
+import { rootReducer } from './rootReducer';
+import { isDev } from 'common/constants';
 
 export function configureAppStore() {
   return configureStore({
