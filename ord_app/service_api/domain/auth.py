@@ -17,7 +17,14 @@ from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.users import get_user_by_external_pks
-from ord_app.service_api.models import UserGroupsMembershipModel, UserModel, UserRoles
+from ord_app.service_api.models import (
+    DatasetGroupAssociationModel,
+    DatasetModel,
+    GroupModel,
+    UserGroupsMembershipModel,
+    UserModel,
+    UserRolesList,
+)
 from ord_app.service_api.services.auth0 import UnauthenticatedException, UnauthorizedException, verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -28,7 +35,7 @@ async def authenticate(db_session: AsyncSession = Depends(get_db_session), token
     raise UnauthenticatedException(detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
 
-def authorize(roles: tuple[UserRoles, ...]):
+def group_authorization(allowed_roles: tuple[UserRolesList, ...]):
     async def _authorize(
         group_id: int | None,
         user: UserModel = Depends(authenticate),
@@ -36,9 +43,30 @@ def authorize(roles: tuple[UserRoles, ...]):
     ):
         stmt = select(
             exists().where(
-                (UserGroupsMembershipModel.user_id == user.id),
-                (UserGroupsMembershipModel.group_id == group_id),
-                (UserGroupsMembershipModel.role.in_(roles)),
+                UserGroupsMembershipModel.user_id == user.id,
+                UserGroupsMembershipModel.group_id == group_id,
+                UserGroupsMembershipModel.role.in_(allowed_roles),
+            )
+        )
+        if not await db_session.scalar(stmt):
+            raise UnauthorizedException(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
+
+    return _authorize
+
+
+def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]):
+    async def _authorize(
+        dataset_id: int | None,
+        user: UserModel = Depends(authenticate),
+        db_session: AsyncSession = Depends(get_db_session),
+    ):
+        stmt = select(
+            exists().where(
+                DatasetGroupAssociationModel.dataset_id == dataset_id,
+                DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
+                UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
+                UserGroupsMembershipModel.user_id == user.id,
+                UserGroupsMembershipModel.role.in_(allowed_roles),
             )
         )
         if not await db_session.scalar(stmt):

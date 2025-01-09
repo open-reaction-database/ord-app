@@ -13,14 +13,13 @@
 # limitations under the License.
 
 import gzip
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Response
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.domain.auth import authenticate, authorize
+from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
 from ord_app.service_api.domain.reactions import (
     create_reaction,
     download_reaction,
@@ -33,14 +32,14 @@ from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
-router = APIRouter(
-    prefix="/groups/{group_id}/datasets/{dataset_id}/reactions",
-    tags=["reactions"],
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+router = APIRouter(tags=["reactions"])
+
+
+@router.post(
+    "/groups/{group_id}/datasets/{dataset_id}/reactions",
+    dependencies=[Depends(group_authorization(("admin", "editor")))],
+    response_model=ReactionSchema,
 )
-
-
-@router.post("/reactions", response_model=ReactionSchema)
 async def _create_reaction(
     group_id: int,
     dataset_id: int,
@@ -51,49 +50,53 @@ async def _create_reaction(
     return await create_reaction(db_session, group_id, dataset_id, user, payload)
 
 
-@router.get("/", response_model=Page[ReactionSchema])
+@router.get(
+    "/datasets/{dataset_id}/reactions",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    response_model=Page[ReactionSchema],
+)
 async def reactions(
-    group_id: int,
     dataset_id: int,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await paginate_reactions(db_session, group_id, dataset_id, user)
+    return await paginate_reactions(db_session, dataset_id)
 
 
-@router.get("/{reaction_id}", response_model=ReactionSchema)
+@router.get(
+    "/datasets/{dataset_id}/reactions/{reaction_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    response_model=ReactionSchema,
+)
 async def reaction(
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await get_reaction(db_session, group_id, dataset_id, reaction_id, user)
+    return await get_reaction(db_session, reaction_id)
 
 
-@router.patch("/{reaction_id}", response_model=ReactionSchema)
+@router.patch(
+    "/datasets/{dataset_id}/reactions/{reaction_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor"))), Depends(authenticate)],
+    response_model=ReactionSchema,
+)
 async def _update_reaction(
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
     payload: ReactionCreateSchema,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await update_reactions(db_session, group_id, dataset_id, reaction_id, user, payload)
+    return await update_reactions(db_session, reaction_id, payload)
 
 
-@router.get("/{reaction_id}/download")
+@router.get(
+    "/datasets/{dataset_id}/reactions/{reaction_id}/download",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+)
 async def _download_reaction(
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
     file_format: DownloadFileFormats,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    reaction, data = await download_reaction(db_session, group_id, dataset_id, reaction_id, user, file_format)
+    reaction, data = await download_reaction(db_session, reaction_id, file_format)
     return Response(
         gzip.compress(data),
         headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}.gz"'},
@@ -101,7 +104,7 @@ async def _download_reaction(
     )
 
 
-@router.get("/clone_reaction")
+@router.get("/clone_reaction", dependencies=[Depends(group_authorization(("admin", "editor")))])
 def clone_reaction(user_id: str, dataset_name: str, index: int):
     """WIP"""
     with get_cursor() as cursor:
@@ -113,7 +116,7 @@ def clone_reaction(user_id: str, dataset_name: str, index: int):
     return len(dataset.reactions) - 1  # Index of the new reaction.
 
 
-@router.get("/delete_reaction")
+@router.get("/delete_reaction", dependencies=[Depends(group_authorization(("admin",)))])
 def delete_reaction(user_id: str, dataset_name: str, index: int):
     """WIP"""
     with get_cursor() as cursor:

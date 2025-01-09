@@ -13,7 +13,7 @@
 # limitations under the License.
 from fastapi import status
 
-from ord_app.service_api.domain.datasets import create_dataset, get_user_dataset
+from ord_app.service_api.domain.datasets import create_dataset, get_dataset
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema
 
 
@@ -23,7 +23,7 @@ async def test_create_dataset(api_client, mock_authenticated_user, test_db_sessi
     payload = {"name": "test creation"}
     response_data = api_client.post("/api/v1/datasets", json=payload).json()
 
-    db_dataset = await get_user_dataset(test_db_session, user, response_data["id"])
+    db_dataset = await get_dataset(test_db_session, response_data["id"])
 
     assert response_data["id"] == db_dataset.id
     assert response_data["name"] == db_dataset.name == payload["name"]
@@ -50,7 +50,7 @@ async def test_delete_dataset(api_client, mock_authenticated_user, test_db_sessi
 
     api_client.delete(f"/api/v1/datasets/{db_dataset.id}")
 
-    db_dataset = await get_user_dataset(test_db_session, user, db_dataset.id)
+    db_dataset = await get_dataset(test_db_session, db_dataset.id)
     assert db_dataset is None
 
 

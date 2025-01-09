@@ -13,30 +13,63 @@
 # limitations under the License.
 from typing import Sequence
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import case, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
-from ord_app.service_api.schemas.groups import GroupCreateSchema, GroupMemberCreateSchema
+from ord_app.service_api.schemas.groups import GroupCreateSchema, GroupMemberCreateSchema, GroupMemberRemoveSchema
 
 
-async def create_group(db_session: AsyncSession, user: UserModel, payload: GroupCreateSchema) -> GroupModel:
+async def create_group(db_session: AsyncSession, user: UserModel, payload: GroupCreateSchema):
+    # TODO: add response
     stmt = GroupModel(owner=user, **payload.model_dump(exclude_unset=True))
     user_group_member = UserGroupsMembershipModel(user=user, group=stmt, role="admin")
     db_session.add_all([stmt, user_group_member])
     await db_session.commit()
-    await db_session.refresh(stmt)
-    return stmt
+    # await db_session.refresh(stmt)
 
 
-async def add_group_member(
+async def add_group_members(
     db_session: AsyncSession, user: UserModel, group_id: int, payload: GroupMemberCreateSchema
 ) -> None:
-    # TODO: validate current user role here?
     group_members = []
     for member in payload.members:
         group_members.append(UserGroupsMembershipModel(user_id=member.user_id, group_id=group_id, role=member.role))
     db_session.add_all(group_members)
+    await db_session.commit()
+
+
+async def remove_group_members(
+    db_session: AsyncSession, user: UserModel, group_id: int, payload: GroupMemberRemoveSchema
+) -> None:
+
+    stmt = delete(UserGroupsMembershipModel).where(
+        UserGroupsMembershipModel.user_id.in_(payload.user_ids),
+        UserGroupsMembershipModel.group_id == group_id,
+    )
+    await db_session.execute(stmt)
+    await db_session.commit()
+
+
+async def update_group_members(
+    db_session: AsyncSession, user: UserModel, group_id: int, payload: GroupMemberCreateSchema
+) -> None:
+    # TODO: check if it will work
+    role_mapping = case(
+        {item["user_id"]: item["role"] for item in payload.members},
+        else_=None,
+    )
+
+    stmt = (
+        update(UserGroupsMembershipModel)
+        .where(
+            UserGroupsMembershipModel.group_id == group_id,
+            UserGroupsMembershipModel.user_id.in_([item["user_id"] for item in payload.members]),
+        )
+        .values(role=role_mapping)
+    )
+
+    await db_session.execute(stmt)
     await db_session.commit()
 
 
@@ -73,6 +106,6 @@ async def update_group(
 
 
 async def delete_group(db_session: AsyncSession, user: UserModel, group_id: int):
-    query = delete(GroupModel).where(GroupModel.owner == user, GroupModel.id == group_id)
+    query = delete(GroupModel).where(GroupModel.id == group_id)
     await db_session.execute(query)
     await db_session.commit()

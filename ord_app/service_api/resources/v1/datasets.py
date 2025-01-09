@@ -21,12 +21,12 @@ from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import authenticate, authorize
+from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import (
     create_dataset,
     delete_dataset,
     download_dataset,
-    get_user_dataset,
+    get_dataset,
     paginate_group_datasets,
     paginate_user_datasets,
     upload_user_dataset,
@@ -45,10 +45,10 @@ router = APIRouter(tags=["datasets"])
 
 
 @router.post(
-    "/groups/{group_id}/datasets/",
+    "/group/{group_id}/datasets",
     response_model=DatasetSchema,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+    dependencies=[Depends(group_authorization(("admin", "editor")))],
 )
 async def _create_dataset(
     group_id: int,
@@ -60,84 +60,73 @@ async def _create_dataset(
 
 
 @router.get(
-    "/groups/datasets/",
+    "/groups/{group_id}/datasets",
     response_model=Page[DatasetWithReactionCountSchema],
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
 )
-async def user_datasets(
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    # Authorization checked inside the query in the database
-    return await paginate_user_datasets(db_session, user)
-
-
-@router.get(
-    "/groups/{group_id}/datasets/",
-    response_model=Page[DatasetWithReactionCountSchema],
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
-)
-async def group_datasets(
+async def get_group_datasets(
     group_id: int,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await paginate_group_datasets(db_session, group_id)
 
 
-@router.delete(
-    "/groups/{group_id}/datasets/{dataset_id}", dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
-)
-async def _delete_dataset(
-    group_id: int,
-    dataset_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    await delete_dataset(db_session, group_id, dataset_id, user)
-    return Response("Object successfully deleted (or already absent)")
-
-
-@router.post("/groups/{group_id}/datasets/upload", dependencies=[Depends(authorize(("admin", "editor", "viewer")))])
+@router.post("/groups/{group_id}/datasets/upload", dependencies=[Depends(group_authorization(("admin", "editor")))])
 async def upload_dataset(
     group_id: int,
     file: UploadFile,
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
+    """WIP"""
     await upload_user_dataset(db_session, group_id, user, file)
 
 
-@router.get(
-    "/groups/{group_id}/datasets/{dataset_id}",
-    response_model=DatasetSchema,
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
-)
-async def fetch_dataset(
-    group_id: int,
-    dataset_id: int,
+@router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])
+async def get_user_datasets(
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    if dataset := await get_user_dataset(db_session, group_id, dataset_id, user):
+    return await paginate_user_datasets(db_session, user)
+
+
+@router.delete("/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",))), Depends(authenticate)])
+async def _delete_dataset(
+    dataset_id: int,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    # TODO: soft deletion needs to be implemented
+    await delete_dataset(db_session, dataset_id)
+    return Response("Object successfully deleted (or already absent)")
+
+
+@router.get(
+    "/datasets/{dataset_id}",
+    response_model=DatasetSchema,
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+)
+async def _get_dataset(
+    dataset_id: int,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    if dataset := await get_dataset(db_session, dataset_id):
         return dataset
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
 
 @router.get(
-    "/groups/{group_id}/datasets/{dataset_id}/download",
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+    "/{dataset_id}/download",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
 )
 async def _download_dataset(
-    group_id: int,
     dataset_id: int,
     file_format: DownloadFileFormats,
-    user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
     try:
-        dataset, data = await download_dataset(db_session, group_id, dataset_id, user, file_format)
+        dataset, data = await download_dataset(db_session, dataset_id, file_format)
     except EntityDoesNotExist as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -149,11 +138,10 @@ async def _download_dataset(
 
 
 @router.post(
-    "/groups/{group_id}/datasets/enumerate_dataset/{user_id}",
-    dependencies=[Depends(authorize(("admin", "editor", "viewer")))],
+    "/enumerate_dataset/{user_id}",
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def enumerate_dataset(
-    group_id: int,
     template: UploadFile,
     spreadsheet: UploadFile,
     user: UserModel = Depends(authenticate),
@@ -170,7 +158,8 @@ async def enumerate_dataset(
             df=dataframe,
             validate=False,
         )
-        ds = DatasetModel(owner=user, group_id=group_id, name=dataset.name, binpb=dataset.SerializeToString())
+        # ds = DatasetModel(owner=user, group_id=group_id, name=dataset.name, binpb=dataset.SerializeToString())
+        ds = DatasetModel(owner=user, name=dataset.name)
         db_session.add(ds)
         await db_session.commit()
         return basename

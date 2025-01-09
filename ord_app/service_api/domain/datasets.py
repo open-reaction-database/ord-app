@@ -28,7 +28,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import DatasetModel, GroupModel, ReactionModel, UserGroupsMembershipModel, UserModel
+from ord_app.service_api.models import (
+    DatasetGroupAssociationModel,
+    DatasetModel,
+    GroupModel,
+    ReactionModel,
+    UserGroupsMembershipModel,
+    UserModel,
+)
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
 
 
@@ -41,7 +48,8 @@ async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[Da
 async def paginate_group_datasets(db_session: AsyncSession, group_id: int) -> Page[DatasetModel]:
     stmt = (
         select(DatasetModel)
-        .where(DatasetModel.group_id == group_id)
+        .join(DatasetGroupAssociationModel, DatasetGroupAssociationModel.dataset_id == DatasetModel.id)
+        .where(DatasetGroupAssociationModel.group_id == group_id)
         .options(
             joinedload(DatasetModel.owner),
             joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
@@ -53,11 +61,11 @@ async def paginate_group_datasets(db_session: AsyncSession, group_id: int) -> Pa
 async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
     stmt = (
         select(DatasetModel)
-        .join(GroupModel, GroupModel.id == DatasetModel.group_id)
+        .distinct()
+        .join(DatasetModel.groups)
+        .join(GroupModel.members)
         .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
-        .where(
-            UserGroupsMembershipModel.user == user,
-        )
+        .where(UserGroupsMembershipModel.user_id == user.id)
         .options(
             joinedload(DatasetModel.owner),
             joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
@@ -66,16 +74,8 @@ async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> P
     return await paginate(db_session, stmt)
 
 
-async def get_user_dataset(db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel) -> DatasetModel:
-    stmt = (
-        select(DatasetModel)
-        .where(
-            DatasetModel.owner == user,
-            DatasetModel.id == dataset_id,
-            DatasetModel.group_id == group_id,
-        )
-        .limit(1)
-    )
+async def get_dataset(db_session: AsyncSession, dataset_id: int) -> DatasetModel:
+    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).limit(1)
     dataset = await db_session.scalar(stmt)
     return dataset
 
@@ -83,35 +83,28 @@ async def get_user_dataset(db_session: AsyncSession, group_id: int, dataset_id: 
 async def create_dataset(
     db_session: AsyncSession, group_id: int, user: UserModel, payload: DatasetCreateSchema
 ) -> DatasetModel:
-    dataset = DatasetModel(owner=user, group_id=group_id, **payload.model_dump(exclude_unset=True))
+    dataset = DatasetModel(owner=user, **payload.model_dump(exclude_unset=True))
     db_session.add(dataset)
+    await db_session.flush()
+
+    dataset_group_association = DatasetGroupAssociationModel(dataset_id=dataset.id, group_id=group_id)
+    db_session.add(dataset_group_association)
+
     await db_session.commit()
     await db_session.refresh(dataset)
     return dataset
 
 
-async def delete_dataset(db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel):
-    stmt = delete(DatasetModel).where(
-        DatasetModel.owner == user,
-        DatasetModel.id == dataset_id,
-        DatasetModel.group_id == group_id,
-    )
+async def delete_dataset(db_session: AsyncSession, dataset_id: int):
+    stmt = delete(DatasetModel).where(DatasetModel.id == dataset_id)
     await db_session.execute(stmt)
     await db_session.commit()
 
 
 async def download_dataset(
-    db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel, file_format: DownloadFileFormats
+    db_session: AsyncSession, dataset_id: int, file_format: DownloadFileFormats
 ) -> tuple[DatasetModel, bytes]:
-    stmt = (
-        select(DatasetModel)
-        .where(
-            DatasetModel.owner == user,
-            DatasetModel.id == dataset_id,
-            DatasetModel.group_id == group_id,
-        )
-        .options(joinedload(DatasetModel.reactions))
-    )
+    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(joinedload(DatasetModel.reactions))
     dataset = await db_session.scalar(stmt)
 
     if not dataset:

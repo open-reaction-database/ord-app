@@ -18,7 +18,7 @@ from typing import Literal, get_args
 from sqlalchemy import Enum, ForeignKey, LargeBinary, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
-UserRoles = Literal["admin", "editor", "viewer", "anonymous"]
+UserRolesList = Literal["admin", "editor", "viewer"]
 
 
 class BaseModel(DeclarativeBase):
@@ -37,6 +37,8 @@ class UserModel(BaseModel):
     name: Mapped[str] = mapped_column(nullable=True)
     avatar_url: Mapped[str] = mapped_column(nullable=True)
 
+    groups: Mapped[list["GroupModel"]] = relationship(secondary="user_groups_membership", back_populates="members")
+
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"
 
@@ -45,7 +47,13 @@ class GroupModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
-    owner: Mapped[UserModel] = relationship(UserModel, backref="groups")
+    owner: Mapped[UserModel] = relationship(UserModel, backref="owner_groups")
+
+    datasets: Mapped[list["DatasetModel"]] = relationship(
+        secondary="dataset_group_association", back_populates="groups"
+    )
+
+    members: Mapped[list[UserModel]] = relationship(secondary="user_groups_membership", back_populates="groups")
 
     def __repr__(self):
         return f"<Group(id={self.id}, name={self.name})>"
@@ -53,14 +61,14 @@ class GroupModel(BaseModel):
 
 class UserGroupsMembershipModel(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    user: Mapped[UserModel] = relationship(UserModel, backref="groups_member")
+    # user: Mapped[UserModel] = relationship(UserModel, backref="groups_member")
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
-    group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member")
+    # group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member")
 
-    role: Mapped[UserRoles] = mapped_column(
+    role: Mapped[UserRolesList] = mapped_column(
         Enum(
-            *get_args(UserRoles),
+            *get_args(UserRolesList),
             name="user_group_role_enum",
             create_constraint=True,
             validate_strings=True,
@@ -81,11 +89,15 @@ class DatasetModel(BaseModel):
 
     reactions: Mapped[list["ReactionModel"]] = relationship("ReactionModel", back_populates="dataset")
 
-    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), index=True)
-    group: Mapped[GroupModel] = relationship(GroupModel, backref="datasets")
+    groups: Mapped[list[GroupModel]] = relationship(secondary="dataset_group_association", back_populates="datasets")
 
     def __repr__(self):
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
+
+
+class DatasetGroupAssociationModel(BaseModel):
+    dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id"), primary_key=True)
+    group_id: Mapped[int] = mapped_column(ForeignKey("group.id"), primary_key=True)
 
 
 class ReactionModel(BaseModel):

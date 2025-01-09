@@ -17,7 +17,7 @@ from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.models import DatasetModel, ReactionModel, UserModel
+from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, ReactionModel, UserModel
 from ord_app.service_api.settings import RuntimeSettings
 
 
@@ -28,8 +28,11 @@ async def populate_testing_data(db_session: AsyncSession, user: UserModel, group
         with open(filename, "r") as f:
             dataset_pb = text_format.Parse(f.read(), Dataset())
 
-            dataset = DatasetModel(name=dataset_pb.name, owner=user, group_id=group_id)
-            insert_data.append(dataset)
+            dataset = DatasetModel(name=dataset_pb.name, owner=user)
+            db_session.add(dataset)
+            await db_session.flush()
+            dataset_group_association = DatasetGroupAssociationModel(dataset_id=dataset.id, group_id=group_id)
+            insert_data.append(dataset_group_association)
 
             for reaction in dataset_pb.reactions:
                 insert_data.append(

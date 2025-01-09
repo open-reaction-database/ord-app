@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
-from ord_app.service_api.domain.users import delete_user_uc, get_user_uc
+from ord_app.service_api.domain.users import get_user_uc
 from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.users import UserSchema
 from ord_app.service_api.services.postgresql import get_db_session
@@ -38,11 +38,11 @@ async def get_user(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(
-    user_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    if await delete_user_uc(db_session, user_id):
-        return "User was deleted", status.HTTP_204_NO_CONTENT
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+# @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+# async def delete_user(
+#     user_id: int,
+#     db_session: AsyncSession = Depends(get_db_session),
+# ):
+#     if await delete_user_uc(db_session, user_id):
+#         return "User was deleted", status.HTTP_204_NO_CONTENT
+#     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
