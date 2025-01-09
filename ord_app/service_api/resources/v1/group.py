@@ -14,7 +14,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import authenticate, authorize
+from ord_app.service_api.domain.auth import authenticate, group_authorization
 from ord_app.service_api.domain.groups import (
     add_group_members,
     create_group,
@@ -59,7 +59,9 @@ async def _list_groups(
 
 
 @router.post(
-    "/groups/{group_id}/members", dependencies=[Depends(authorize(("admin",)))], status_code=status.HTTP_201_CREATED
+    "/groups/{group_id}/members",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    status_code=status.HTTP_201_CREATED,
 )
 async def _add_group_members(
     payload: GroupMemberCreateSchema,
@@ -72,7 +74,7 @@ async def _add_group_members(
 
 @router.post(
     "/groups/{group_id}/members/remove",
-    dependencies=[Depends(authorize(("admin",)))],
+    dependencies=[Depends(group_authorization(("admin",)))],
     status_code=status.HTTP_201_CREATED,
 )
 async def _remove_group_members(
@@ -85,7 +87,9 @@ async def _remove_group_members(
 
 
 @router.patch(
-    "/groups/{group_id}/members", dependencies=[Depends(authorize(("admin",)))], status_code=status.HTTP_201_CREATED
+    "/groups/{group_id}/members",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    status_code=status.HTTP_201_CREATED,
 )
 async def _update_group_members(
     payload: GroupMemberCreateSchema,
@@ -97,7 +101,9 @@ async def _update_group_members(
 
 
 @router.get(
-    "/groups/{group_id}", response_model=GroupSchema, dependencies=[Depends(authorize(("admin", "editor", "viewer")))]
+    "/groups/{group_id}",
+    response_model=GroupSchema,
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def _get_group(
     group_id: int,
@@ -111,7 +117,7 @@ async def _get_group(
     "/groups/{group_id}",
     status_code=status.HTTP_201_CREATED,
     response_model=GroupSchema,
-    dependencies=[Depends(authorize(("admin",)))],
+    dependencies=[Depends(group_authorization(("admin",)))],
 )
 async def _update_group(
     group_id: int,
@@ -125,7 +131,7 @@ async def _update_group(
 @router.delete(
     "/groups/{group_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(authorize(("admin",)))],
+    dependencies=[Depends(group_authorization(("admin",)))],
 )
 async def _delete_group(
     group_id: int,

@@ -35,20 +35,12 @@ async def get_reactions(db_session: AsyncSession, user: UserModel, dataset_id: i
 
 async def update_reactions(
     db_session: AsyncSession,
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
-    user: UserModel,
     payload: ReactionCreateSchema,
 ) -> ReactionModel:
     stmt = (
         update(ReactionModel)
-        .where(
-            ReactionModel.group_id == group_id,
-            ReactionModel.dataset_id == dataset_id,
-            ReactionModel.id == reaction_id,
-            ReactionModel.owner == user,
-        )
+        .where(ReactionModel.id == reaction_id)
         .values(**payload.model_dump(exclude_unset=True))
         .returning(ReactionModel)
     )
@@ -57,34 +49,16 @@ async def update_reactions(
     return result
 
 
-async def paginate_reactions(
-    db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel
-) -> Page[ReactionModel]:
-    stmt = select(ReactionModel).where(
-        ReactionModel.group_id == group_id,
-        ReactionModel.dataset_id == dataset_id,
-        ReactionModel.owner == user,
-    )
+async def paginate_reactions(db_session: AsyncSession, dataset_id: int) -> Page[ReactionModel]:
+    stmt = select(ReactionModel).where(ReactionModel.dataset_id == dataset_id)
     return await paginate(db_session, stmt)
 
 
 async def get_reaction(
     db_session: AsyncSession,
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
-    user: UserModel,
 ):
-    stmt = (
-        select(ReactionModel)
-        .where(
-            ReactionModel.group_id == group_id,
-            ReactionModel.dataset_id == dataset_id,
-            ReactionModel.id == reaction_id,
-            ReactionModel.owner == user,
-        )
-        .limit(1)
-    )
+    stmt = select(ReactionModel).where(ReactionModel.id == reaction_id).limit(1)
     return await db_session.scalar(stmt)
 
 
@@ -105,23 +79,9 @@ async def create_reaction(
 
 async def download_reaction(
     db_session: AsyncSession,
-    group_id: int,
-    dataset_id: int,
     reaction_id: int,
-    user: UserModel,
     file_format: DownloadFileFormats,
 ) -> tuple[ReactionModel, bytes]:
-    stmt = (
-        select(ReactionModel)
-        .where(
-            ReactionModel.group_id == group_id,
-            ReactionModel.dataset_id == dataset_id,
-            ReactionModel.id == reaction_id,
-            ReactionModel.owner == user,
-        )
-        .limit(1)
-    )
-
-    reaction = await db_session.scalar(stmt)
+    reaction = await get_reaction(db_session, reaction_id)
     data = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
     return reaction, data

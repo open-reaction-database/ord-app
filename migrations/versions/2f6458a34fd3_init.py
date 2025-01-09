@@ -1,21 +1,8 @@
-# Copyright 2024 Open Reaction Database Project Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """init
 
-Revision ID: a9b875b0013a
+Revision ID: 2f6458a34fd3
 Revises: 
-Create Date: 2024-12-31 17:24:12.964972
+Create Date: 2025-01-08 22:47:17.453109
 
 """
 
@@ -25,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "a9b875b0013a"
+revision: str = "2f6458a34fd3"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,6 +34,18 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_user_external_id"), "user", ["external_id"], unique=False)
     op.create_table(
+        "dataset",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("name", sa.String(), nullable=True),
+        sa.Column("description", sa.String(), nullable=True),
+        sa.Column("owner_id", sa.Integer(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.Column("modified_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(["owner_id"], ["user.id"], ondelete="SET NULL"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_dataset_owner_id"), "dataset", ["owner_id"], unique=False)
+    op.create_table(
         "group",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(), nullable=True),
@@ -57,34 +56,20 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
-        "dataset",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=True),
-        sa.Column("description", sa.String(), nullable=True),
-        sa.Column("owner_id", sa.Integer(), nullable=False),
+        "dataset_group_association",
+        sa.Column("dataset_id", sa.Integer(), nullable=False),
         sa.Column("group_id", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
         sa.Column("modified_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["group_id"], ["group.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["owner_id"], ["user.id"], ondelete="SET NULL"),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_index(op.f("ix_dataset_group_id"), "dataset", ["group_id"], unique=False)
-    op.create_index(op.f("ix_dataset_owner_id"), "dataset", ["owner_id"], unique=False)
-    op.create_table(
-        "user_groups_membership",
-        sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("group_id", sa.Integer(), nullable=False),
-        sa.Column(
-            "role",
-            sa.Enum("admin", "editor", "viewer", "anonymous", name="user_group_role_enum", create_constraint=True),
-            nullable=False,
+        sa.ForeignKeyConstraint(
+            ["dataset_id"],
+            ["dataset.id"],
         ),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.Column("modified_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["group_id"], ["group.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("user_id", "group_id"),
+        sa.ForeignKeyConstraint(
+            ["group_id"],
+            ["group.id"],
+        ),
+        sa.PrimaryKeyConstraint("dataset_id", "group_id"),
     )
     op.create_table(
         "reaction",
@@ -104,20 +89,35 @@ def upgrade() -> None:
     op.create_index(op.f("ix_reaction_dataset_id"), "reaction", ["dataset_id"], unique=False)
     op.create_index(op.f("ix_reaction_group_id"), "reaction", ["group_id"], unique=False)
     op.create_index(op.f("ix_reaction_owner_id"), "reaction", ["owner_id"], unique=False)
+    op.create_table(
+        "user_groups_membership",
+        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("group_id", sa.Integer(), nullable=False),
+        sa.Column(
+            "role",
+            sa.Enum("admin", "editor", "viewer", name="user_group_role_enum", create_constraint=True),
+            nullable=False,
+        ),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.Column("modified_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(["group_id"], ["group.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("user_id", "group_id"),
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table("user_groups_membership")
     op.drop_index(op.f("ix_reaction_owner_id"), table_name="reaction")
     op.drop_index(op.f("ix_reaction_group_id"), table_name="reaction")
     op.drop_index(op.f("ix_reaction_dataset_id"), table_name="reaction")
     op.drop_table("reaction")
-    op.drop_table("user_groups_membership")
-    op.drop_index(op.f("ix_dataset_owner_id"), table_name="dataset")
-    op.drop_index(op.f("ix_dataset_group_id"), table_name="dataset")
-    op.drop_table("dataset")
+    op.drop_table("dataset_group_association")
     op.drop_table("group")
+    op.drop_index(op.f("ix_dataset_owner_id"), table_name="dataset")
+    op.drop_table("dataset")
     op.drop_index(op.f("ix_user_external_id"), table_name="user")
     op.drop_table("user")
     # ### end Alembic commands ###
