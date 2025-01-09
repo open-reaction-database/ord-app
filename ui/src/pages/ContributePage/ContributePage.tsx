@@ -31,14 +31,12 @@ export function ContributePage() {
   }, [activeGroupId, appDispatch]);
 
   return (
-    <>
-      <Flex
-        gap="sm"
-        align="flex-start"
-      >
-        <GroupsSidebar />
-        <DatasetTable />
-      </Flex>
-    </>
+    <Flex
+      gap="sm"
+      align="flex-start"
+    >
+      <GroupsSidebar />
+      <DatasetTable />
+    </Flex>
   );
 }
