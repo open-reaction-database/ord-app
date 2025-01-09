@@ -17,7 +17,7 @@ import { Button, Flex, Paper } from '@mantine/core';
 import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from '../CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
-import type { Reaction } from '../../../../common/model/reaction';
+import type { Reaction } from 'common/model/reaction';
 import { DownloadMenu, type DownloadMenuOptions } from '../DownloadMenu/DownloadMenu';
 import classes from './ReactionCard.module.scss';
 import { downloadFile } from 'common/utils';
@@ -62,7 +62,7 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
             <span className={classes.index}>{index}.</span>
             <Link
               className={classes.link}
-              to={'/dataset/123/reaction/123'}
+              to={'/Dataset/123/reaction/123'}
             >
               {name ?? id}
             </Link>

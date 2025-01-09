@@ -13,22 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
-import type { ItemsById } from 'common/types';
-import type { Dataset } from './datasets.types.ts';
-import { getDatasetActions, getDatasetListActions } from './datasets.actions.ts';
+import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
+import type { ItemsById, Pagination } from 'common/types';
+import type { Dataset } from './datasets.types';
+import { getDatasetActions, getDatasetPageActions, getGroupsInitialDatasetListActions } from './datasets.actions';
 import { itemsById } from 'common/utils';
+import { emptyPagination } from 'common/constants';
+import { setActiveGroupIdAction } from '../groups/groups.actions';
 
 const getDatasetId = (dataset: Dataset) => dataset.id;
+
+const areDatasetsLoading = createReducer<boolean>(false, builder => {
+  builder.addCase(setActiveGroupIdAction, () => true);
+  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(
+      getGroupsInitialDatasetListActions.success,
+      getGroupsInitialDatasetListActions.failure,
+      getDatasetPageActions.success,
+      getDatasetPageActions.failure,
+    ),
+    () => false,
+  );
+});
 
 const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
   builder.addCase(getDatasetActions.success, (state, action) => ({
     ...state,
     [getDatasetId(action.payload)]: action.payload,
   }));
-  builder.addCase(getDatasetListActions.success, (_, action) => itemsById(action.payload, getDatasetId));
+  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
+    itemsById(action.payload.items, getDatasetId),
+  );
+});
+
+const datasetsOrder = createReducer<number[]>([], builder => {
+  builder.addCase(setActiveGroupIdAction, () => []);
+  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
+    action.payload.items.map(item => item.id),
+  );
+});
+
+const pagination = createReducer<Pagination>(emptyPagination, builder => {
+  builder.addCase(setActiveGroupIdAction, () => emptyPagination);
+  builder.addCase(getDatasetPageActions.request, (state, action) => ({ ...state, ...action.payload }));
+  builder.addMatcher(
+    isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success),
+    (state, action) => ({
+      ...state,
+      total: action.payload.total,
+      pages: action.payload.pages,
+    }),
+  );
 });
 
 export const datasetsReducer = combineReducers({
   datasetsById,
+  datasetsOrder,
+  pagination,
+  areDatasetsLoading,
 });

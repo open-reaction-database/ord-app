@@ -20,8 +20,8 @@ import { selectGroupSearch, selectOrderedGroupsList } from 'store/groups/groups.
 import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
 import { type Group } from 'store/groups/groups.types';
 import classes from './GroupsList.module.scss';
-import { setGroupSearchAction } from '../../store/groups/groups.actions.ts';
-import { useAppDispatch } from '../../store/useAppDispatch.ts';
+import { setActiveGroupIdAction, setGroupSearchAction } from 'store/groups/groups.actions';
+import { useAppDispatch } from 'store/useAppDispatch';
 
 const GROUP_BUTTON_HEIGHT = 36;
 
@@ -33,6 +33,13 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
   const appDispatch = useAppDispatch();
   const groups = useSelector(selectOrderedGroupsList);
   const groupSearch = useSelector(selectGroupSearch);
+
+  const selectGroup = useCallback(
+    (groupId: number | null) => {
+      appDispatch(setActiveGroupIdAction(groupId));
+    },
+    [appDispatch],
+  );
 
   const onSearchChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +70,7 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
           classNames={{ root: classes.groupButton, section: classes.buttonSection }}
           variant="white"
           leftSection={<GridViewIcon />}
+          onClick={() => selectGroup(null)}
           justify="flex-start"
         >
           All Groups
@@ -84,6 +92,7 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
               key={group.id}
               variant="white"
               justify="flex-start"
+              onClick={() => selectGroup(group.id)}
             >
               <div className={classes.buttonName}>
                 <GroupArrowIcon />

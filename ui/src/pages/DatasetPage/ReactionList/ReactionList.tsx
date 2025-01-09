@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { useState } from 'react';
-import { Pagination } from '../../../../common/components/Pagination/Pagination';
+import { Pagination } from 'common/components/Pagination/Pagination';
 import { ReactionCard } from '../ReactionCard/ReactionCard';
-import type { Reaction } from '../../../../common/model/reaction';
+import type { Reaction } from 'common/model/reaction';
 
 interface ReactionListProps {
   reactions: Reaction[];

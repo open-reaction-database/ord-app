@@ -18,7 +18,7 @@ import { EditIcon } from 'common/icons';
 import classes from './GroupsDrawer.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
-import { RoleSelector } from 'pages/RoleSelector/RoleSelector';
+import { RoleSelector } from 'pages/ContributePage/GroupsSidebar/GroupsDrawer/RoleSelector/RoleSelector';
 import { updateGroup } from 'store/groups/groups.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';

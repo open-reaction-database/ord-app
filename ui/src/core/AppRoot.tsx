@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Auth0Provider } from '@auth0/auth0-react';
-import { auth0Audience, auth0ClientId, auth0Domain, auth0Issuer, auth0Scope, domain } from '../constants.ts';
+import { auth0Audience, auth0ClientId, auth0Domain, auth0Issuer, auth0Scope, domain } from 'common/constants';
 import { Provider } from 'react-redux';
 import { MantineProvider } from '@mantine/core';
 import { theme } from '../common/styling/theme.ts';

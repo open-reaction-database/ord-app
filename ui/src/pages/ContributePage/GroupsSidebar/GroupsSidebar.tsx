@@ -18,11 +18,11 @@ import { Button, Flex, Paper, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal';
-import { GroupsDrawer } from 'pages/GroupsDrawer/GroupsDrawer';
+import { GroupsDrawer } from 'pages/ContributePage/GroupsSidebar/GroupsDrawer/GroupsDrawer';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { createGroup, getGroupList } from 'store/groups/groups.thunks';
 import { type Group } from 'store/groups/groups.types';
-import { GroupsList } from 'pages/GroupsList/GroupsList';
+import { GroupsList } from 'pages/ContributePage/GroupsSidebar/GroupsList/GroupsList';
 import classes from './GroupsSidebar.module.scss';
 
 export function GroupsSidebar() {

@@ -27,3 +27,5 @@ export const createGroupActions = createAsyncAction<string, Group>('create');
 export const updateGroupActions = createAsyncAction<Partial<Group>, Group>('update');
 
 export const setGroupSearchAction = createAction<string>('setSearch');
+
+export const setActiveGroupIdAction = createAction<number | null>('setActiveGroupId');

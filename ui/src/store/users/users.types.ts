@@ -17,3 +17,8 @@ export interface Self {
   picture?: string | undefined;
   name: string;
 }
+
+export interface SelfCreate {
+  access_token: string;
+  id_token: string;
+}

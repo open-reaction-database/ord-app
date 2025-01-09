@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Flex } from '@mantine/core';
-import { GroupsSidebar } from './GroupsSidebar/GroupsSidebar';
-import { DatasetTable } from './DatasetTable/DatasetTable';
-import { Link } from 'wouter';
+export interface CurrentPage {
+  page: number;
+  size: number;
+}
 
-export function ContributePage() {
-  return (
-    <>
-      <Flex
-        gap="sm"
-        align="flex-start"
-      >
-        <GroupsSidebar />
-        <DatasetTable />
-      </Flex>
+export interface AllPages {
+  total: number;
+  pages: number;
+}
 
-      <Link to="/dataset/1">Test dataset link</Link>
-    </>
-  );
+export type Pagination = CurrentPage & AllPages;
+
+export interface Pages<T> extends Pagination {
+  items: T[];
 }

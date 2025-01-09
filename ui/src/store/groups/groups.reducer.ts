@@ -16,16 +16,21 @@
 import { combineReducers, createReducer } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
 import { itemsById } from 'common/utils';
-import type { Group } from './groups.types.ts';
+import type { Group } from './groups.types';
 import {
   createGroupActions,
   getGroupActions,
   getGroupListActions,
+  setActiveGroupIdAction,
   setGroupSearchAction,
   updateGroupActions,
-} from './groups.actions.ts';
+} from './groups.actions';
 
 const getGroupId = (group: Group) => group.id;
+
+const activeGroupId = createReducer<number | null>(null, builder => {
+  builder.addCase(setActiveGroupIdAction, (_, action) => action.payload);
+});
 
 const groupNameSearch = createReducer('', builder => {
   builder.addCase(setGroupSearchAction, (_, action) => action.payload);
@@ -44,4 +49,5 @@ const groupsById = createReducer<ItemsById<Group>>({}, builder => {
 export const groupsReducer = combineReducers({
   groupsById,
   groupNameSearch,
+  activeGroupId,
 });

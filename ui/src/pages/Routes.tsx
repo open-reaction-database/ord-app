@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
-import type { Self } from './users.types';
-import { createUserActions, setActiveUser } from './users.actions';
+import { Route, Switch } from 'wouter';
+import { DatasetPage } from './DatasetPage/DatasetPage';
+import { PageContainer } from 'common/components/PageContainer/PageContainer';
+import { ContributePage } from './ContributePage/ContributePage';
 
-const isSelfCreated = createReducer<boolean>(false, builder => {
-  builder.addCase(createUserActions.success, () => true);
-});
+export function Routes() {
+  return (
+    <PageContainer>
+      <Switch>
+        <Route
+          path="/"
+          component={ContributePage}
+        ></Route>
 
-const self = createReducer<null | Self>(null, builder => {
-  builder.addCase(setActiveUser, (_, action) => action.payload);
-});
-
-export const usersReducer = combineReducers({
-  self,
-  isSelfCreated,
-});
+        <Route
+          path="/dataset/:datasetId"
+          component={DatasetPage}
+        />
+      </Switch>
+    </PageContainer>
+  );
+}

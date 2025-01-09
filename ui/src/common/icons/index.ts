@@ -25,6 +25,7 @@ export { default as EmptyIcon } from './EmptyIcon.svg?react';
 export { default as GridViewIcon } from './GridViewIcon.svg?react';
 export { default as GroupArrowIcon } from './GroupArrowIcon.svg?react';
 export { default as HomeIcon } from './HomeIcon.svg?react';
+export { default as LogoIcon } from './Logo.svg?react';
 export { default as RemoveIcon } from './RemoveIcon.svg?react';
 export { default as SearchIcon } from './SearchIcon.svg?react';
 export { default as SettingsIcon } from './SettingsIcon.svg?react';

@@ -1,0 +1,85 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type { MRT_ColumnDef } from 'mantine-react-table';
+import { StatusChip } from 'common/components/StatusChip/StatusChip';
+import { UserField } from 'common/components/UserField/UserField';
+import { formatDate } from 'common/utils';
+import classes from './DatasetTable.module.scss';
+import type { Dataset } from 'store/datasets/datasets.types';
+import { DATASET_STATUS } from 'common/model/datasetStatus';
+
+export const columns: MRT_ColumnDef<Dataset>[] = [
+  {
+    id: 'datasetName',
+    accessorKey: 'datasetName',
+    header: 'Dataset Name',
+    size: 230,
+  },
+  {
+    id: 'size',
+    accessorKey: 'size',
+    header: 'Size',
+    size: 80,
+  },
+  {
+    id: 'status',
+    accessorKey: 'status',
+    header: 'Status',
+    Cell: () => {
+      return <StatusChip status={DATASET_STATUS.IN_PROGRESS} />;
+    },
+    size: 110,
+  },
+  {
+    id: 'group',
+    accessorKey: 'group',
+    header: 'Group',
+    size: 145,
+  },
+  {
+    id: 'owner',
+    accessorKey: 'owner',
+    header: 'Owner',
+    Cell: () => {
+      // TODO: Update avatar src and consider the behaviour for long names
+      return <UserField username="John Doe" />;
+    },
+    size: 145,
+  },
+  {
+    id: 'lastModified',
+    accessorKey: 'lastModified',
+    header: 'Last Modified',
+    Cell: ({ row }) => {
+      return <>{formatDate(row.original.modified_at)}</>;
+    },
+    size: 145,
+  },
+  {
+    id: 'description',
+    accessorKey: 'description',
+    header: 'Description',
+  },
+  {
+    id: 'buttons',
+    header: '',
+    enableSorting: false,
+    // TODO: Replace with button elements
+    Cell: () => {
+      return <div className={classes.buttons}>Click</div>;
+    },
+  },
+];
