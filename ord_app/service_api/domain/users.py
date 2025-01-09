@@ -82,6 +82,10 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     )
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)
+
+    db_session.add_all([user, group])
+    await db_session.flush()
+
     group_member = UserGroupsMembershipModel(user_id=user.id, group_id=group.id, role="admin")
 
     db_session.add_all([user, group, group_member])
