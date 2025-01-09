@@ -158,7 +158,8 @@ async def enumerate_dataset(
             df=dataframe,
             validate=False,
         )
-        ds = DatasetModel(owner=user, group_id=group_id, name=dataset.name, binpb=dataset.SerializeToString())
+        # ds = DatasetModel(owner=user, group_id=group_id, name=dataset.name, binpb=dataset.SerializeToString())
+        ds = DatasetModel(owner=user, name=dataset.name)
         db_session.add(ds)
         await db_session.commit()
         return basename
