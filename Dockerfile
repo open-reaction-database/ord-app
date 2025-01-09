@@ -47,8 +47,8 @@ COPY ord_app/ ./ord_app
 
 RUN pip install --no-cache-dir poetry &&  \
     poetry config virtualenvs.create false &&  \
-    poetry install --with dev --no-interaction --no-ansi
+    poetry install --with dev --no-root --no-interaction --no-ansi
 
 EXPOSE 8000
 
-CMD ["poetry", "run", "uvicorn", "ord_app.service_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "ord_app.service_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
