@@ -13,18 +13,17 @@
 # limitations under the License.
 from pathlib import PosixPath
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ord_app.service_api.constants import AppEns
 
 
 class Settings(BaseSettings):
-    class Config:
-        env_file = ".env"
+    base_dir: PosixPath = PosixPath(__file__).parent
+    model_config = SettingsConfigDict(env_file=str(base_dir.parent / ".env"))
 
     # app
     app_env: str = AppEns.localhost
-    base_dir: PosixPath = PosixPath(__file__).parent
     cors_origins: list[str] = ["http://localhost:5173"]
 
     # databases
@@ -32,13 +31,11 @@ class Settings(BaseSettings):
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
     # Encryption and auth
-    auth0_domain: str | None = None
-    auth0_algorithms: str | None = None
-    auth0_api_audience: str | None = None
-    auth0_issuer: str | None = None
-    auth0_client_id: str | None = None
-    auth0_client_secret: str | None = None
-    auth0_scope: str | None = None
+    auth0_domain: str
+    auth0_algorithms: str
+    auth0_audience: str
+    auth0_issuer: str
+    auth0_client_id: str
 
 
 RuntimeSettings = Settings()
