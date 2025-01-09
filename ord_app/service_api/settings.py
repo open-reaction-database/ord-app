@@ -31,11 +31,11 @@ class Settings(BaseSettings):
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
     # Encryption and auth
-    auth0_domain: str
-    auth0_algorithms: str
-    auth0_audience: str
-    auth0_issuer: str
-    auth0_client_id: str
+    auth0_domain: str = ""
+    auth0_algorithms: str = ""
+    auth0_audience: str = ""
+    auth0_issuer: str = ""
+    auth0_client_id: str = ""
 
 
 RuntimeSettings = Settings()
