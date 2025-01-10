@@ -20,6 +20,7 @@ type MutableMantineColorsTuple = { -readonly [K in keyof MantineColorsTuple]: Ma
 
 const primaryColors = colorsTuple('#3C78D8') as MutableMantineColorsTuple;
 primaryColors[9] = '#001926';
+const secondaryColors = colorsTuple(['#aab9c5', '#637d92', '#4a5e6d']);
 
 export const theme = createTheme({
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -52,6 +53,7 @@ export const theme = createTheme({
   },
   colors: {
     primary: primaryColors as MantineColorsTuple,
+    secondary: secondaryColors,
   },
   primaryColor: 'primary',
   radius: {
@@ -76,5 +78,22 @@ export const theme = createTheme({
         },
       },
     },
+    Modal: {
+      styles: {
+        title: {
+          fontSize: '24px',
+          lineHeight: '32px',
+          fontWeight: 600,
+        }
+      }
+    },
+    InputWrapper: {
+      styles: {
+        label: {
+          color: 'var(--color-text-secondary-2)',
+          paddingBottom: '8px',
+        }
+      }
+    }
   },
 });

@@ -24,13 +24,13 @@ import { DATASET_STATUS } from 'common/model/datasetStatus';
 export const columns: MRT_ColumnDef<Dataset>[] = [
   {
     id: 'datasetName',
-    accessorKey: 'datasetName',
+    accessorKey: 'name',
     header: 'Dataset Name',
     size: 230,
   },
   {
     id: 'size',
-    accessorKey: 'size',
+    accessorKey: 'reaction_count',
     header: 'Size',
     size: 80,
   },
@@ -53,9 +53,8 @@ export const columns: MRT_ColumnDef<Dataset>[] = [
     id: 'owner',
     accessorKey: 'owner',
     header: 'Owner',
-    Cell: () => {
-      // TODO: Update avatar src and consider the behaviour for long names
-      return <UserField username="John Doe" />;
+    Cell: ({ row }) => {
+      return <UserField username={row.original.owner.name} />;
     },
     size: 145,
   },

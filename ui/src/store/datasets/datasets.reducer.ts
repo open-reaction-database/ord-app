@@ -16,7 +16,12 @@
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById, Pagination } from 'common/types';
 import type { Dataset } from './datasets.types';
-import { getDatasetActions, getDatasetPageActions, getGroupsInitialDatasetListActions } from './datasets.actions';
+import {
+  createEmptyDatasetActions,
+  getDatasetActions,
+  getDatasetPageActions,
+  getGroupsInitialDatasetListActions,
+} from './datasets.actions';
 import { itemsById } from 'common/utils';
 import { emptyPagination } from 'common/constants';
 import { setActiveGroupIdAction } from '../groups/groups.actions';
@@ -37,8 +42,17 @@ const areDatasetsLoading = createReducer<boolean>(false, builder => {
   );
 });
 
+const isDatasetCreating = createReducer<boolean>(false, builder => {
+  builder.addMatcher(isAnyOf(createEmptyDatasetActions.request), () => true);
+  builder.addMatcher(isAnyOf(createEmptyDatasetActions.success, createEmptyDatasetActions.failure), () => false);
+})
+
 const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
   builder.addCase(getDatasetActions.success, (state, action) => ({
+    ...state,
+    [getDatasetId(action.payload)]: action.payload,
+  }));
+  builder.addMatcher(isAnyOf(createEmptyDatasetActions.success), (state, action) => ({
     ...state,
     [getDatasetId(action.payload)]: action.payload,
   }));
@@ -72,4 +86,5 @@ export const datasetsReducer = combineReducers({
   datasetsOrder,
   pagination,
   areDatasetsLoading,
+  isDatasetCreating,
 });

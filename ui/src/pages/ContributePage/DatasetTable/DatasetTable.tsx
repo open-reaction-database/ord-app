@@ -26,12 +26,14 @@ import { columns } from './datasetTable.columns';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useCallback } from 'react';
 import { getDatasetsPage } from 'store/datasets/datasets.thunks';
+import { useLocation } from 'wouter';
 
 export function DatasetTable() {
   const dispatch = useAppDispatch();
   const pagination = useSelector(selectDatasetsPagination);
   const datasets = useSelector(selectOrderedDatasets);
   const isLoading = useSelector(selectAreDatasetsLoading);
+  const [, navigate] = useLocation();
 
   const onPageChange = useCallback(
     (page: number) => {
@@ -42,7 +44,7 @@ export function DatasetTable() {
 
   const onPageSizeChange = useCallback(
     (pageSize: number) => {
-      dispatch(getDatasetsPage({ page: 0, size: pageSize }));
+      dispatch(getDatasetsPage({ page: 1, size: pageSize }));
     },
     [dispatch],
   );
@@ -56,13 +58,17 @@ export function DatasetTable() {
         mantineTableProps={{
           className: classes.table,
         }}
+        mantineTableBodyRowProps={({ row }) => ({
+            onClick: () => navigate(`/dataset/${row.original.id}`)
+          })
+        }
       />
       <Pagination
         currentPage={pagination.page}
         onPageChange={onPageChange}
         rowsPerPage={pagination.size}
         onRowsPerPageChange={onPageSizeChange}
-        totalPages={pagination.total}
+        totalPages={pagination.pages}
       />
     </div>
   );

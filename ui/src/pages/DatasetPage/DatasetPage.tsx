@@ -61,10 +61,7 @@ export function DatasetPage() {
 
   const hasReactions = reactions.length > 0;
 
-  const username =
-    dataset?.owner.first_name && dataset?.owner.last_name
-      ? `${dataset.owner.first_name} ${dataset.owner.last_name}`
-      : dataset?.owner.email;
+  const username = dataset?.owner.name;
 
   return !dataset ? (
     <Flex

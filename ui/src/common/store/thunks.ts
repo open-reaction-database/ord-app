@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { AnyAsyncAction } from '../types';
-import type { ThunkWrapper, AppThunk } from '../types/store/thunk.ts';
+import type { ThunkWrapper, AppThunk, AppVoidThunk } from '../types/store/thunk.ts';
 
 export function createThunk<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
@@ -26,6 +26,23 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
       try {
         const result = await appThunk(dispatch, getState, extraArgument);
         dispatch(result);
+      } catch (e) {
+        console.error(e);
+        dispatch(asyncActionCreator.failure(e));
+      }
+    };
+  };
+}
+
+export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction>(
+  asyncActionCreator: AsyncAction,
+  appThunk: AppVoidThunk<AsyncAction>,
+): ThunkWrapper<AsyncAction> {
+  return extraArgument => {
+    return async (dispatch, getState) => {
+      dispatch(asyncActionCreator.request(extraArgument));
+      try {
+        await appThunk(dispatch, getState, extraArgument);
       } catch (e) {
         console.error(e);
         dispatch(asyncActionCreator.failure(e));

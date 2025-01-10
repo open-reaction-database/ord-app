@@ -13,8 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface User {
-  id: number;
-  email: string;
-  name: string;
+.root {
+  width: 100%;
+  height: 80px;
+  padding: var(--mantine-spacing-md);
+  padding-left: 24px;
+}
+
+.inner {
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary-2);
+  font-weight: 500;
+}
+
+.section {
+  width: 32px;
+  height: 32px;
 }
