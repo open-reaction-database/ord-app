@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { getInitialDatasetsList } from 'store/datasets/datasets.thunks';
+import { DatasetTopActions } from './DatasetTopActions/DatasetTopActions';
 
 export function ContributePage() {
   const appDispatch = useAppDispatch();
@@ -31,12 +32,16 @@ export function ContributePage() {
   }, [activeGroupId, appDispatch]);
 
   return (
-    <Flex
-      gap="sm"
-      align="flex-start"
-    >
-      <GroupsSidebar />
-      <DatasetTable />
+    <Flex direction="column" gap="sm">
+      <DatasetTopActions/>
+      <Flex
+        gap="sm"
+        align="flex-start"
+      >
+        <GroupsSidebar />
+        <DatasetTable />
+      </Flex>
     </Flex>
+
   );
 }

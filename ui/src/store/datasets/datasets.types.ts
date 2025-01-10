@@ -24,3 +24,9 @@ export interface Dataset {
   group: string;
   description: string;
 }
+
+export interface CreateEmptyDataset {
+  groupId: number;
+  name: string;
+  description: string;
+}

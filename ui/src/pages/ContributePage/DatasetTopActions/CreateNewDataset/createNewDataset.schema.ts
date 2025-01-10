@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface User {
-  id: number;
-  email: string;
-  name: string;
-}
+import * as yup from 'yup';
+
+export const createNewDatasetSchema = yup.object({
+  name: yup.string().required(),
+  groupId: yup.string().required(),
+  description: yup.string().required(),
+});
+
+export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;

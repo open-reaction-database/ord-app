@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDatasetActions, getDatasetPageActions, getGroupsInitialDatasetListActions } from './datasets.actions';
+import {
+  createEmptyDatasetActions,
+  getDatasetActions,
+  getDatasetPageActions,
+  getGroupsInitialDatasetListActions,
+} from './datasets.actions';
 import type { Dataset } from './datasets.types';
-import { createThunk } from '../../common/store';
+import { createThunk, createThunkWithExplicitResult } from '../../common/store';
 import axiosInstance from 'common/config/axiosConfig';
 import type { Pages } from '../../common/types';
 import { selectActiveGroupId } from '../groups/groups.selectors';
 import { selectDatasetsPagination } from './datasets.selectors';
+import { navigate } from 'wouter/use-browser-location';
 
 export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetId) => {
   const dataset = (await axiosInstance.get<Dataset>(`/datasets/${datasetId}`)).data;
@@ -27,7 +33,7 @@ export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetI
 });
 
 export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {
-  const url = groupId ? `/groups/${groupId}/datasets/` : '/groups/datasets/';
+  const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
   const params = { page: 1, size: 10 };
 
   const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
@@ -39,9 +45,15 @@ export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, get
   const activeGroupId = selectActiveGroupId(state);
   const currentPage = selectDatasetsPagination(state);
 
-  const url = activeGroupId ? `/groups/${activeGroupId}/datasets/` : '/groups/datasets/';
+  const url = activeGroupId ? `/groups/${activeGroupId}/datasets` : '/datasets';
   const params = { page: currentPage.page, size: currentPage.size };
 
   const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
   return getDatasetPageActions.success(datasetsPages);
+});
+
+export const createEmptyDataset = createThunkWithExplicitResult(createEmptyDatasetActions, async (dispatch, _g, { groupId, ...payload }) => {
+  const dataset = (await axiosInstance.post<Dataset>(`/group/${groupId}/datasets`, payload)).data;
+  dispatch(createEmptyDatasetActions.success(dataset));
+  navigate(`/dataset/${dataset.id}`);
 });

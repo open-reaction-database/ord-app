@@ -32,3 +32,5 @@ export const selectDatasetsPagination = (state: AppState) => selectRootState(sta
 export const selectOrderedDatasets = createSelector([selectDatasetsOrder, selectDatasets], (order, datasetsById) =>
   order.map(id => datasetsById[id]),
 );
+
+export const selectIsDatasetCreating = (state: AppState) => selectRootState(state).isDatasetCreating;

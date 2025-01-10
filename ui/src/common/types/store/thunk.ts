@@ -24,6 +24,13 @@ export type AppThunk<T extends AnyAsyncAction> = ThunkAction<
   Action
 >;
 
+export type AppVoidThunk<T extends AnyAsyncAction> = ThunkAction<
+  Promise<void>,
+  AppState,
+  Parameters<T['request']>[0],
+  Action
+>;
+
 export type ThunkWrapper<T extends AnyAsyncAction> = (
   extraParameter: Parameters<T['request']>[0],
 ) => ThunkAction<void, AppState, never, Action>;
