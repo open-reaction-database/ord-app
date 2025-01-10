@@ -35,7 +35,7 @@ def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer
     return _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,
-        audience=RuntimeSettings.auth0_api_audience,
+        audience=RuntimeSettings.auth0_audience,
         issuer=RuntimeSettings.auth0_issuer,
     )
 

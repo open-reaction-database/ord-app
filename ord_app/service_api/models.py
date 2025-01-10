@@ -37,7 +37,9 @@ class UserModel(BaseModel):
     name: Mapped[str] = mapped_column(nullable=True)
     avatar_url: Mapped[str] = mapped_column(nullable=True)
 
-    groups: Mapped[list["GroupModel"]] = relationship(secondary="user_groups_membership", back_populates="members")
+    groups: Mapped[list["GroupModel"]] = relationship(
+        secondary="user_groups_membership", back_populates="members", overlaps="groups_member"
+    )
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"
@@ -53,7 +55,9 @@ class GroupModel(BaseModel):
         secondary="dataset_group_association", back_populates="groups"
     )
 
-    members: Mapped[list[UserModel]] = relationship(secondary="user_groups_membership", back_populates="groups")
+    members: Mapped[list[UserModel]] = relationship(
+        secondary="user_groups_membership", back_populates="groups", overlaps="groups_member"
+    )
 
     def __repr__(self):
         return f"<Group(id={self.id}, name={self.name})>"
@@ -61,10 +65,10 @@ class GroupModel(BaseModel):
 
 class UserGroupsMembershipModel(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    # user: Mapped[UserModel] = relationship(UserModel, backref="groups_member")
+    user: Mapped[UserModel] = relationship(UserModel, backref="groups_member", overlaps="groups,members")
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
-    # group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member")
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member", overlaps="groups,members")
 
     role: Mapped[UserRolesList] = mapped_column(
         Enum(

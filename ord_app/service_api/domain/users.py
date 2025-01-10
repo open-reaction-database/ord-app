@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import httpx
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema
-from ord_app.service_api.services.auth0 import verify_id_token
+from ord_app.service_api.services.auth0 import verify_access_token, verify_id_token
 
 
 async def get_user_by_external_pks(
@@ -66,19 +67,21 @@ async def create_user(db_session: AsyncSession, payload: UserCreateSchema) -> Us
 
 
 async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
-    decoded_id_token = verify_id_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=payload.id_token))
+    decoded_token = verify_access_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=payload.access_token))
+    user_info_api = next(filter(lambda i: "userinfo" in i, decoded_token["aud"]), None)
 
-    # TODO: change `decoded_id_token["sub"]` to ORCID / username
-    if user := await get_user_by_external_pks(
-        db_session, decoded_id_token.get("nickname"), decoded_id_token.get("email")
-    ):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(user_info_api, headers={"Authorization": f"Bearer {payload.access_token}"})
+        user_info = response.raise_for_status().json()
+
+    if user := await get_user_by_external_pks(db_session, user_info["sub"], user_info["email"]):
         return user
 
     user_payload = UserCreateSchema(
-        email=decoded_id_token.get("email"),
-        name=decoded_id_token["name"],
-        avatar_url=decoded_id_token["picture"],
-        external_id=decoded_id_token["sub"],  # TODO: change `decoded_id_token["sub"]` to ORCID / username
+        email=user_info["email"] or None,
+        name=user_info["name"],
+        avatar_url=user_info["picture"],
+        external_id=user_info["sub"],
     )
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)
