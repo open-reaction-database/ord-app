@@ -41,7 +41,6 @@ async def populate_testing_data(db_session: AsyncSession, user: UserModel, group
                         binpb=reaction.SerializeToString(),
                         dataset=dataset,
                         owner=user,
-                        group_id=group_id,
                     )
                 )
 

@@ -63,11 +63,12 @@ async def get_reaction(
 
 
 async def create_reaction(
-    db_session: AsyncSession, group_id: int, dataset_id: int, user: UserModel, payload: ReactionCreateSchema
+    db_session: AsyncSession, dataset_id: int, user: UserModel, payload: ReactionCreateSchema
 ) -> ReactionModel:
-    reaction = ReactionModel(owner=user, group_id=group_id, dataset_id=dataset_id, **payload.model_dump())
+    reaction = ReactionModel(owner=user, dataset_id=dataset_id, **payload.model_dump())
     db_session.add(reaction)
 
+    # set default id for Reaction BF
     if reaction.binpb is None:
         await db_session.flush()
         reaction.binpb = Reaction(reaction_id=str(reaction.id)).SerializeToString()

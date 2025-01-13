@@ -14,7 +14,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 
 from ord_app.service_api.schemas.base import BaseSchema
 from ord_app.service_api.schemas.users import UserSchema
@@ -24,11 +24,11 @@ DownloadFileFormats = Literal["binpb", "json", "txtpb"]
 
 class DatasetSchema(BaseSchema):
     id: int
-    name: str
+    name: str | None = ""
+    description: str | None = ""
     created_at: datetime
     modified_at: datetime
     owner: UserSchema
-    description: str | None
 
 
 class DatasetWithReactionCountSchema(DatasetSchema):
@@ -36,7 +36,7 @@ class DatasetWithReactionCountSchema(DatasetSchema):
 
     @model_validator(mode="before")
     @classmethod
-    def calculate_reaction_count(cls, data: Any):
+    def reaction_count(cls, data: Any):
         if hasattr(data, "reactions"):
             data.reaction_count = len(data.reactions)
         return data
@@ -44,4 +44,4 @@ class DatasetWithReactionCountSchema(DatasetSchema):
 
 class DatasetCreateSchema(BaseSchema):
     name: str
-    description: str | None = None
+    description: str

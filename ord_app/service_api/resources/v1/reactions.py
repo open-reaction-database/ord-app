@@ -32,27 +32,26 @@ from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
-router = APIRouter(tags=["reactions"])
+router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
 
 
 @router.post(
-    "/groups/{group_id}/datasets/{dataset_id}/reactions",
-    dependencies=[Depends(group_authorization(("admin", "editor")))],
+    "",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     response_model=ReactionSchema,
 )
 async def _create_reaction(
-    group_id: int,
     dataset_id: int,
     payload: ReactionCreateSchema,
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await create_reaction(db_session, group_id, dataset_id, user, payload)
+    return await create_reaction(db_session, dataset_id, user, payload)
 
 
 @router.get(
-    "/datasets/{dataset_id}/reactions",
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    "",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
     response_model=Page[ReactionSchema],
 )
 async def reactions(
@@ -63,8 +62,8 @@ async def reactions(
 
 
 @router.get(
-    "/datasets/{dataset_id}/reactions/{reaction_id}",
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    "/{reaction_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
     response_model=ReactionSchema,
 )
 async def reaction(
@@ -75,8 +74,8 @@ async def reaction(
 
 
 @router.patch(
-    "/datasets/{dataset_id}/reactions/{reaction_id}",
-    dependencies=[Depends(dataset_authorization(("admin", "editor"))), Depends(authenticate)],
+    "/{reaction_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     response_model=ReactionSchema,
 )
 async def _update_reaction(
@@ -88,8 +87,8 @@ async def _update_reaction(
 
 
 @router.get(
-    "/datasets/{dataset_id}/reactions/{reaction_id}/download",
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    "/{reaction_id}/download",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def _download_reaction(
     reaction_id: int,

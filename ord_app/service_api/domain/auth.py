@@ -20,7 +20,6 @@ from ord_app.service_api.domain.users import get_user_by_external_pks
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
     DatasetModel,
-    GroupModel,
     UserGroupsMembershipModel,
     UserModel,
     UserRolesList,
