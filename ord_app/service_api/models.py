@@ -115,8 +115,5 @@ class ReactionModel(BaseModel):
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), index=True)
     owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
 
-    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), index=True)
-    group: Mapped[GroupModel] = relationship(GroupModel, backref="reactions")
-
     def __repr__(self):
         return f"<Reaction(id={self.id}, name={self.name}, user_id={self.owner_id})>"

@@ -75,7 +75,7 @@ async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> P
 
 
 async def get_dataset(db_session: AsyncSession, dataset_id: int) -> DatasetModel:
-    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).limit(1)
+    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(joinedload(DatasetModel.owner)).limit(1)
     dataset = await db_session.scalar(stmt)
     return dataset
 
@@ -119,10 +119,10 @@ async def download_dataset(
 
 
 async def upload_user_dataset(db_session: AsyncSession, group_id: int, user: UserModel, file: UploadFile):
-    data = await file.read()
+    file_data = await file.read()
 
     if file.filename.endswith(".gz"):
-        data = gzip.decompress(data)
+        file_data = gzip.decompress(file_data)
 
     if ".json" in file.filename:
         kind = "json"
@@ -133,17 +133,30 @@ async def upload_user_dataset(db_session: AsyncSession, group_id: int, user: Use
     else:
         raise ValueError(file.filename)
 
-    dataset_proto = load_message(data, Dataset, kind)
-    dataset = DatasetModel(
-        owner=user,
-        name=dataset_proto.name,
-        group_id=group_id,
-        binpb=dataset_proto.SerializeToString(),  # TODO: create reactions
-    )
+    dataset_pb = load_message(file_data, Dataset, kind)
+
+    dataset = DatasetModel(owner=user, name=dataset_pb.name)
     db_session.add(dataset)
+    await db_session.flush()
+
+    dataset_group_association = DatasetGroupAssociationModel(dataset_id=dataset.id, group_id=group_id)
+    db_session.add(dataset_group_association)
+
+    reactions = []
+    for reaction in dataset_pb.reactions:
+        reactions.append(
+            ReactionModel(
+                name=reaction.reaction_id,
+                binpb=reaction.SerializeToString(),
+                dataset=dataset,
+                owner=user,
+            )
+        )
+
+    db_session.add_all(reactions)
     await db_session.commit()
-    await db_session.refresh(dataset)
-    return dataset
+
+    return await get_dataset(db_session, dataset.id)
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:

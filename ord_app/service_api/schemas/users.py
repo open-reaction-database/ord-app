@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import EmailStr
+from pydantic import EmailStr, field_validator
 
 from ord_app.service_api.schemas.base import BaseSchema
 
@@ -23,6 +23,11 @@ class UserSchema(BaseSchema):
     name: str | None = None
     external_id: str | None = None
     avatar_url: str | None = None
+
+    @field_validator("external_id", mode="after")
+    @classmethod
+    def _external_id(cls, raw):
+        return raw.split("|")[-1] if raw else None  # split auth0 id
 
 
 class UserCreateSchema(BaseSchema):

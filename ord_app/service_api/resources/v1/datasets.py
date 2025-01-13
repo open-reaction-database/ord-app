@@ -62,7 +62,7 @@ async def _create_dataset(
 @router.get(
     "/groups/{group_id}/datasets",
     response_model=Page[DatasetWithReactionCountSchema],
-    dependencies=[Depends(group_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def get_group_datasets(
     group_id: int,
@@ -71,15 +71,18 @@ async def get_group_datasets(
     return await paginate_group_datasets(db_session, group_id)
 
 
-@router.post("/groups/{group_id}/datasets/upload", dependencies=[Depends(group_authorization(("admin", "editor")))])
+@router.post(
+    "/groups/{group_id}/datasets/upload",
+    response_model=DatasetSchema,
+    dependencies=[Depends(group_authorization(("admin", "editor")))],
+)
 async def upload_dataset(
     group_id: int,
     file: UploadFile,
     user: UserModel = Depends(authenticate),
     db_session: AsyncSession = Depends(get_db_session),
 ):
-    """WIP"""
-    await upload_user_dataset(db_session, group_id, user, file)
+    return await upload_user_dataset(db_session, group_id, user, file)
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])
@@ -90,7 +93,7 @@ async def get_user_datasets(
     return await paginate_user_datasets(db_session, user)
 
 
-@router.delete("/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",))), Depends(authenticate)])
+@router.delete("/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))])
 async def _delete_dataset(
     dataset_id: int,
     db_session: AsyncSession = Depends(get_db_session),
@@ -103,7 +106,7 @@ async def _delete_dataset(
 @router.get(
     "/datasets/{dataset_id}",
     response_model=DatasetSchema,
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def _get_dataset(
     dataset_id: int,
@@ -115,8 +118,8 @@ async def _get_dataset(
 
 
 @router.get(
-    "/{dataset_id}/download",
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer"))), Depends(authenticate)],
+    "/datasets/{dataset_id}/download",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def _download_dataset(
     dataset_id: int,
@@ -138,7 +141,7 @@ async def _download_dataset(
 
 
 @router.post(
-    "/enumerate_dataset/{user_id}",
+    "/datasets/enumerate_dataset/{user_id}",
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def enumerate_dataset(
