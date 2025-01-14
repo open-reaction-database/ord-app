@@ -30,6 +30,7 @@ orjson = "^3.10.12"
 fastapi-pagination = "0.12.32"
 loguru = "^0.7.3"
 ruff = "^0.9.1"
+pytest = "^8.3.4"
 
 [tool.poetry.group.dev.dependencies]
 black = "24.10.0"
