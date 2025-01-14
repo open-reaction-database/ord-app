@@ -13,25 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { User } from 'common/model/user';
+import { createActionFactory } from '../../common/store';
+import type { ReactionWrapper } from './reactions.types';
+import type { CurrentPage, Pages } from '../../common/types';
 
-export interface Dataset {
-  id: number;
-  name: string;
-  owner: User;
-  created_at: string;
-  modified_at: string;
-  group: string;
-  description: string;
-}
+const { createAsyncAction } = createActionFactory('reactions');
 
-export interface CreateNewDatasetPayload {
-  groupId: number;
-  name: string;
-  description: string;
-}
+export const getReactionsListActions = createAsyncAction<number, Pages<ReactionWrapper>>('get_list');
 
-export interface CreateDatasetFromFilePayload {
-  groupId: number;
-  file: File;
-}
+export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<ReactionWrapper>>('get_page');

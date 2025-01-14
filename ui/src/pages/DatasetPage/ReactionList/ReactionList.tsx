@@ -13,48 +13,92 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { Pagination } from 'common/components/Pagination/Pagination';
-import { ReactionCard } from '../ReactionCard/ReactionCard';
-import type { Reaction } from 'common/model/reaction';
+import { ReactionCard } from './ReactionCard/ReactionCard';
+import { Button, Flex, Paper, Title } from '@mantine/core';
+import classes from './reactionsList.module.scss';
+import { AddCircleIcon, EmptyIcon } from 'common/icons';
+import { useSelector } from 'react-redux';
+import { selectReactionsOrder, selectReactionsPagination } from 'store/reactions/reactions.selectors';
+import { getReactionsPage } from '../../../store/reactions/reactions.thunks';
+import { useAppDispatch } from '../../../store/useAppDispatch';
 
-interface ReactionListProps {
-  reactions: Reaction[];
-}
+export function ReactionList() {
+  const dispatch = useAppDispatch();
+  const reactionsIds = useSelector(selectReactionsOrder);
+  const pagination = useSelector(selectReactionsPagination);
 
-export function ReactionList({ reactions }: Readonly<ReactionListProps>) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const hasReactions = reactionsIds.length > 0;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      dispatch(getReactionsPage({ page }));
+    },
+    [dispatch],
+  );
 
-  const handleRowsPerPageChange = (rows: number) => {
-    setRowsPerPage(rows);
-    setCurrentPage(1);
-  };
-
-  const currentReactions = reactions.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-  const totalPages = Math.ceil(reactions.length / rowsPerPage);
+  const handleRowsPerPageChange = useCallback(
+    (size: number) => {
+      dispatch(getReactionsPage({ page: 1, size }));
+    },
+    [dispatch],
+  );
 
   return (
     <>
-      {reactions.length > 0 && (
+      <Paper
+        radius="sm"
+        p="lg"
+      >
+        <Flex justify="space-between">
+          <Flex
+            align="center"
+            gap="sm"
+          >
+            <Title order={2}>Dataset Reactions</Title>
+            <span className={classes.counter}>{reactionsIds.length}</span>
+          </Flex>
+
+          <Button
+            classNames={{ root: classes.button, section: classes.buttonSection }}
+            leftSection={<AddCircleIcon />}
+          >
+            Reaction
+          </Button>
+        </Flex>
+
+        {!hasReactions && (
+          <Flex
+            align="center"
+            justify="center"
+          >
+            <Flex
+              direction="column"
+              align="center"
+              gap="8"
+            >
+              <EmptyIcon />
+              <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
+            </Flex>
+          </Flex>
+        )}
+      </Paper>
+      {hasReactions && (
         <>
-          {currentReactions.map((reaction, index) => (
+          {reactionsIds.map((id, index) => (
             <ReactionCard
-              key={reaction.id}
-              reaction={reaction}
-              index={(currentPage - 1) * rowsPerPage + index + 1}
+              key={id}
+              id={id}
+              index={(pagination.page - 1) * pagination.size + index + 1}
             />
           ))}
           <Pagination
-            currentPage={currentPage}
+            currentPage={pagination.page}
             onPageChange={handlePageChange}
-            rowsPerPage={rowsPerPage}
+            rowsPerPage={pagination.size}
             onRowsPerPageChange={handleRowsPerPageChange}
-            totalPages={totalPages}
+            totalPages={pagination.pages}
           />
         </>
       )}

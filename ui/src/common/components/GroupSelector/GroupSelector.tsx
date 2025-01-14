@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { User } from 'common/model/user';
+import { Select } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import { selectOrderedGroupsList } from '../../../store/groups/groups.selectors';
+import { useMemo } from 'react';
 
-export interface Dataset {
-  id: number;
-  name: string;
-  owner: User;
-  created_at: string;
-  modified_at: string;
-  group: string;
-  description: string;
-}
-
-export interface CreateNewDatasetPayload {
-  groupId: number;
-  name: string;
-  description: string;
-}
-
-export interface CreateDatasetFromFilePayload {
-  groupId: number;
-  file: File;
+export function GroupSelector() {
+  const groupsList = useSelector(selectOrderedGroupsList);
+  const data = useMemo(() => {
+    return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
+  }, [groupsList]);
+  return (
+    <Select
+      data={data}
+      label="Group"
+      searchable
+      required
+    />
+  );
 }

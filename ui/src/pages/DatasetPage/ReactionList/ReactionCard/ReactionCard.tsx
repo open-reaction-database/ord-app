@@ -15,15 +15,16 @@
  */
 import { Button, Flex, Paper } from '@mantine/core';
 import { Link, useParams } from 'wouter';
-import { CopyButton, type CopyButtonOptions } from '../CopyButton/CopyButton';
+import { CopyButton, type CopyButtonOptions } from '../../DatasetHeader/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
-import type { Reaction } from 'common/model/reaction';
-import { DownloadMenu, type DownloadMenuOptions } from '../DownloadMenu/DownloadMenu';
+import { DownloadMenu, type DownloadMenuOptions } from '../../DatasetHeader/DownloadMenu/DownloadMenu';
 import classes from './ReactionCard.module.scss';
 import { downloadFile } from 'common/utils';
+import { useSelector } from 'react-redux';
+import { selectReactionById } from '../../../../store/reactions/reactions.selectors';
 
 interface ReactionCardProps {
-  reaction: Reaction;
+  id: number;
   index: number;
 }
 
@@ -32,19 +33,18 @@ const reactionDownloadOptions: DownloadMenuOptions[] = [
   { label: '.pbtxt', format: 'txtpb' },
 ];
 
-export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
+export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
-  const { id, name, summary, conditions, analysis } = reaction;
+  const reaction = useSelector(selectReactionById(id));
 
   const handleReactionDownload = (format: string) => {
-    // TODO: Replace index with reaction id when reaction information is pulled from BE
-    const url = `/datasets/${datasetId}/reactions/${index}/download?file_format=${format}`;
+    const url = `/datasets/${datasetId}/reactions/${id}/download?file_format=${format}`;
     downloadFile(url, `Dataset_${datasetId}_Reaction_${id}`);
   };
 
   const copyToClipboardOptions: CopyButtonOptions[] = [
     { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
-    { label: 'Copy Reaction ID', value: id },
+    { label: 'Copy Reaction ID', value: id.toString() },
   ];
 
   return (
@@ -64,7 +64,7 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
               className={classes.link}
               to={'/Dataset/123/reaction/123'}
             >
-              {name ?? id}
+              {reaction.name || reaction.id}
             </Link>
 
             <CopyButton options={copyToClipboardOptions} />
@@ -72,7 +72,7 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
 
           <div>
             <span className={classes.summaryTitle}>Provenance Summary: </span>
-            <span className={classes.summary}>{summary}</span>
+            <span className={classes.summary}>{reaction.data?.notes?.procedureDetails || 'Generated summary'}</span>
           </div>
         </div>
 
@@ -109,12 +109,11 @@ export function ReactionCard({ reaction, index }: Readonly<ReactionCardProps>) {
       </div>
 
       <div>Reaction Field</div>
-
       <div>
         <span className={classes.infoTitle}>Conditions: </span>
-        {conditions} &middot;
+        Conidtions &middot;
         <span className={classes.infoTitle}> Analysis: </span>
-        {analysis}
+        Analysis
       </div>
     </Paper>
   );

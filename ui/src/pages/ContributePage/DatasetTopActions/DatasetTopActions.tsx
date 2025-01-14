@@ -18,32 +18,55 @@ import { NewDatasetIcon, UploadFileIcon } from 'common/icons';
 import classes from './datasetTopActions.module.scss';
 import { CreateNewDataset } from './CreateNewDataset/CreateNewDataset';
 import { useDisclosure } from '@mantine/hooks';
+import { CreateDatasetFromFile } from './CreateDatasetFromFile/CreateDatasetFromFile';
 
 export function DatasetTopActions() {
-  const [createNewOpened, { open: openCreateNew, close: closeCreateNew } ] = useDisclosure();
+  const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
+  const [createFromFileOpened, { open: openCreateFromFile, close: closeCreateFromFile }] = useDisclosure();
 
   return (
     <>
-      {createNewOpened && <CreateNewDataset onClose={closeCreateNew}/>}
-    <Grid align="center"  justify="space-between" className="">
-      <Grid.Col span={4}>
-        <Button onClick={openCreateNew} leftSection={(
-          <NewDatasetIcon/>
-        )} variant="default" classNames={{  root: classes.root, inner: classes.inner, label: classes.label, section: classes.section }}>
-          <span>New Dataset</span>
-          <span className={classes.subtitle}>Create dataset from scratch</span>
-        </Button>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        <Button leftSection={(
-          <UploadFileIcon/>
-        )} variant="default" classNames={{  root: classes.root, inner: classes.inner, label: classes.label, section: classes.section }}>
-          <span>From a File</span>
-          <span className={classes.subtitle}>Upload Dataset from a file</span>
-        </Button>
-      </Grid.Col>
-      <Grid.Col span={4}/>
-    </Grid>
+      {createNewOpened && <CreateNewDataset onClose={closeCreateNew} />}
+      {createFromFileOpened && <CreateDatasetFromFile onClose={closeCreateFromFile} />}
+      <Grid
+        align="center"
+        justify="space-between"
+        className=""
+      >
+        <Grid.Col span={4}>
+          <Button
+            onClick={openCreateNew}
+            leftSection={<NewDatasetIcon />}
+            variant="default"
+            classNames={{
+              root: classes.root,
+              inner: classes.inner,
+              label: classes.label,
+              section: classes.section,
+            }}
+          >
+            <span>New Dataset</span>
+            <span className={classes.subtitle}>Create dataset from scratch</span>
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Button
+            onClick={openCreateFromFile}
+            leftSection={<UploadFileIcon />}
+            variant="default"
+            classNames={{
+              root: classes.root,
+              inner: classes.inner,
+              label: classes.label,
+              section: classes.section,
+            }}
+          >
+            <span>From a File</span>
+            <span className={classes.subtitle}>Upload Dataset from a file</span>
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={4} />
+      </Grid>
     </>
   );
 }

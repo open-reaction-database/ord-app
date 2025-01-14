@@ -1,5 +1,14 @@
 {
-  "ignore": [".idea", ".husky", "README.md", ".gitignore", ".stylelintignore", "**/*.svg", "FILE_LICENSE"],
+  "ignore": [
+    ".idea",
+    ".husky",
+    "README.md",
+    ".gitignore",
+    ".stylelintignore",
+    ".prettierignore",
+    "**/*.svg",
+    "FILE_LICENSE"
+  ],
   "license": "FILE_LICENSE",
   "licenseFormats": {
     "js|ts|tsx|scss|cjs|mjs": {

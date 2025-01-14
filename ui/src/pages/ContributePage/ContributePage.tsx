@@ -32,8 +32,11 @@ export function ContributePage() {
   }, [activeGroupId, appDispatch]);
 
   return (
-    <Flex direction="column" gap="sm">
-      <DatasetTopActions/>
+    <Flex
+      direction="column"
+      gap="sm"
+    >
+      <DatasetTopActions />
       <Flex
         gap="sm"
         align="flex-start"
@@ -42,6 +45,5 @@ export function ContributePage() {
         <DatasetTable />
       </Flex>
     </Flex>
-
   );
 }

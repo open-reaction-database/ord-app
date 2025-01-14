@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Modal, Select, Textarea, TextInput } from '@mantine/core';
+import { Select, Textarea, TextInput } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectActiveGroupId, selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { useCallback, useMemo } from 'react';
 import { useForm, yupResolver } from '@mantine/form';
 import { type CreateNewDatasetFormValues, createNewDatasetSchema } from './createNewDataset.schema';
-import type { CreateEmptyDataset } from 'store/datasets/datasets.types';
+import type { CreateNewDatasetPayload } from 'store/datasets/datasets.types';
 import { createEmptyDataset } from 'store/datasets/datasets.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { selectIsDatasetCreating } from 'store/datasets/datasets.selectors';
+import { CreateDatasetLayout } from '../CreateDatasetLayout/CreateDatasetLayout';
 
 interface CreateNewDatasetProps {
   onClose: () => void;
@@ -34,7 +35,7 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
   const activeGroupId = useSelector(selectActiveGroupId);
   const isLoading = useSelector(selectIsDatasetCreating);
 
-  const form = useForm<CreateNewDatasetFormValues, (values: CreateNewDatasetFormValues) => CreateEmptyDataset>({
+  const form = useForm<CreateNewDatasetFormValues, (values: CreateNewDatasetFormValues) => CreateNewDatasetPayload>({
     mode: 'controlled',
     initialValues: {
       groupId: activeGroupId ? activeGroupId.toString() : '',
@@ -43,35 +44,48 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
     },
     validateInputOnChange: true,
     validate: yupResolver(createNewDatasetSchema),
-    transformValues: (values: CreateNewDatasetFormValues): CreateEmptyDataset => ({
+    transformValues: (values: CreateNewDatasetFormValues): CreateNewDatasetPayload => ({
       groupId: parseInt(values.groupId),
       name: values.name,
       description: values.description,
-    })
+    }),
   });
 
   const data = useMemo(() => {
-    return groupsList.map(group => ({ value: group.id.toString(), label: group.name }))
+    return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
   }, [groupsList]);
 
-  const onSubmit = useCallback((values: CreateEmptyDataset) => {
-    dispatch(createEmptyDataset(values));
-  }, [dispatch]);
+  const onSubmit = useCallback(
+    (values: CreateNewDatasetPayload) => {
+      dispatch(createEmptyDataset(values));
+    },
+    [dispatch],
+  );
 
   return (
-    <Modal opened onClose={onClose} centered title="Create Dataset from Scratch">
-      <form onSubmit={form.onSubmit(onSubmit)}>
-      <Flex direction="column" gap="sm">
-       <Select data={data} label="Group" searchable disabled={isLoading} {...form.getInputProps('groupId')} required />
-        <TextInput label="Dataset Name" disabled={isLoading} {...form.getInputProps('name')} />
-        <Textarea label="Description" disabled={isLoading} {...form.getInputProps('description')} />
-        <Flex justify="flex-end" align="center" gap="md">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button type="submit" loading={isLoading} >Create Dataset</Button>
-        </Flex>
-      </Flex>
-      </form>
-    </Modal>
-  )
-
+    <CreateDatasetLayout
+      onClose={onClose}
+      onSubmit={form.onSubmit(onSubmit)}
+      title="Create Dataset from Scratch"
+    >
+      <Select
+        data={data}
+        label="Group"
+        searchable
+        disabled={isLoading}
+        {...form.getInputProps('groupId')}
+        required
+      />
+      <TextInput
+        label="Dataset Name"
+        disabled={isLoading}
+        {...form.getInputProps('name')}
+      />
+      <Textarea
+        label="Description"
+        disabled={isLoading}
+        {...form.getInputProps('description')}
+      />
+    </CreateDatasetLayout>
+  );
 }

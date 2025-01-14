@@ -25,7 +25,7 @@ const selectDatasetsOrder = (state: AppState) => selectRootState(state).datasets
 
 export const selectAreDatasetsLoading = (state: AppState) => selectRootState(state).areDatasetsLoading;
 
-export const selectDatasetById = (id: string) => (state: AppState) => selectRootState(state).datasetsById[id];
+export const selectDatasetById = (id: number) => (state: AppState) => selectRootState(state).datasetsById[id];
 
 export const selectDatasetsPagination = (state: AppState) => selectRootState(state).pagination;
 
@@ -34,3 +34,5 @@ export const selectOrderedDatasets = createSelector([selectDatasetsOrder, select
 );
 
 export const selectIsDatasetCreating = (state: AppState) => selectRootState(state).isDatasetCreating;
+
+export const selectIsDatasetOpened = (state: AppState) => selectRootState(state).isDatasetEditOpened;

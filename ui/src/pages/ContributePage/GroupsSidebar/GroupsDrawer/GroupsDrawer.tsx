@@ -65,7 +65,7 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
                   variant="transparent"
                   onClick={openModal}
                 >
-                  <EditIcon />
+                  <EditIcon className={classes.editIcon} />
                 </ActionIcon>
               </Flex>
             </Flex>

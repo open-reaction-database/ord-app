@@ -16,9 +16,11 @@
 import { datasetsReducer } from './datasets/datasets.reducer.ts';
 import { groupsReducer } from './groups/groups.reducer.ts';
 import { usersReducer } from './users/users.reducer.ts';
+import { reactionsReducer } from './reactions/reactions.reducer';
 
 export const rootReducer = {
   datasets: datasetsReducer,
   users: usersReducer,
   groups: groupsReducer,
+  reactions: reactionsReducer,
 };

@@ -55,13 +55,13 @@ export function DatasetTable() {
         columns={columns}
         data={datasets}
         state={{ isLoading }}
+        enableSorting={false}
         mantineTableProps={{
           className: classes.table,
         }}
         mantineTableBodyRowProps={({ row }) => ({
-            onClick: () => navigate(`/dataset/${row.original.id}`)
-          })
-        }
+          onClick: () => navigate(`/dataset/${row.original.id}`),
+        })}
       />
       <Pagination
         currentPage={pagination.page}
