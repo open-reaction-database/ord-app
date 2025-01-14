@@ -62,7 +62,7 @@ async def update_dataset(db_session: AsyncSession, dataset_id: int, payload: Dat
     stmt = (
         update(DatasetModel)
         .where(DatasetModel.id == dataset_id)
-        .values(payload=payload.model_dump())
+        .values(**payload.model_dump())
         .returning(DatasetModel)
     )
     result = await db_session.scalar(stmt)
