@@ -97,7 +97,7 @@ async def get_user_datasets(
 @router.patch(
     "/datasets/{dataset_id}",
     response_model=Page[DatasetWithReactionCountSchema],
-    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def _update_dataset(
     dataset_id: int,
