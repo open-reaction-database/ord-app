@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Utility API endpoints."""
+
 from fastapi import APIRouter, Depends, Request, Response
 from ord_schema import resolvers
 from ord_schema.message_helpers import create_message, molblock_from_compound

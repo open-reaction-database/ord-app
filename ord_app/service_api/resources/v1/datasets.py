@@ -29,6 +29,7 @@ from ord_app.service_api.domain.datasets import (
     get_dataset,
     paginate_group_datasets,
     paginate_user_datasets,
+    update_dataset,
     upload_user_dataset,
 )
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
@@ -45,7 +46,7 @@ router = APIRouter(tags=["datasets"])
 
 
 @router.post(
-    "/group/{group_id}/datasets",
+    "/groups/{group_id}/datasets",
     response_model=DatasetSchema,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(group_authorization(("admin", "editor")))],
@@ -93,6 +94,19 @@ async def get_user_datasets(
     return await paginate_user_datasets(db_session, user)
 
 
+@router.patch(
+    "/datasets/{dataset_id}",
+    response_model=Page[DatasetWithReactionCountSchema],
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
+)
+async def _update_dataset(
+    dataset_id: int,
+    payload: DatasetCreateSchema,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    return await update_dataset(db_session, dataset_id, payload)
+
+
 @router.delete("/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))])
 async def _delete_dataset(
     dataset_id: int,
@@ -131,7 +145,7 @@ async def _download_dataset(
     try:
         dataset, data = await download_dataset(db_session, dataset_id, file_format)
     except EntityDoesNotExist as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
     return Response(
         gzip.compress(data),

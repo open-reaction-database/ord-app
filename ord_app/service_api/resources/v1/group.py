@@ -11,131 +11,98 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
 
-from ord_app.service_api.domain.auth import authenticate, group_authorization
+from fastapi import APIRouter, Depends, status
+
+from ord_app.service_api.domain.auth import group_authorization
 from ord_app.service_api.domain.groups import (
-    add_group_members,
-    create_group,
-    delete_group,
-    get_group,
-    list_groups,
-    remove_group_members,
-    update_group,
-    update_group_members,
+    GroupMembersUseCases,
+    GroupUseCases,
+    get_group_members_use_case,
+    get_group_use_case,
 )
-from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.groups import (
     GroupCreateSchema,
-    GroupMemberCreateSchema,
-    GroupMemberRemoveSchema,
+    GroupMemberEditSchema,
+    GroupMemberSchema,
     GroupSchema,
 )
-from ord_app.service_api.services.postgresql import get_db_session
 
-router = APIRouter(tags=["group"])
-
-
-@router.post(
-    "/groups",
-    # response_model=GroupSchema,
-    status_code=status.HTTP_201_CREATED,
-)
-async def _create_group(
-    payload: GroupCreateSchema,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    return await create_group(db_session, user, payload)
+router = APIRouter(tags=["group"], prefix="/groups")
 
 
-@router.get("/groups", response_model=list[GroupSchema])
-async def _list_groups(
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    return await list_groups(db_session, user)
+@router.post("", response_model=GroupSchema, status_code=status.HTTP_201_CREATED)
+async def create_group(payload: GroupCreateSchema, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
+    return await use_case.create(payload)
 
 
-@router.post(
-    "/groups/{group_id}/members",
-    dependencies=[Depends(group_authorization(("admin",)))],
-    status_code=status.HTTP_201_CREATED,
-)
-async def _add_group_members(
-    payload: GroupMemberCreateSchema,
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    await add_group_members(db_session, user, group_id, payload)
-
-
-@router.post(
-    "/groups/{group_id}/members/remove",
-    dependencies=[Depends(group_authorization(("admin",)))],
-    status_code=status.HTTP_201_CREATED,
-)
-async def _remove_group_members(
-    payload: GroupMemberRemoveSchema,
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    await remove_group_members(db_session, user, group_id, payload)
-
-
-@router.patch(
-    "/groups/{group_id}/members",
-    dependencies=[Depends(group_authorization(("admin",)))],
-    status_code=status.HTTP_201_CREATED,
-)
-async def _update_group_members(
-    payload: GroupMemberCreateSchema,
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    await update_group_members(db_session, user, group_id, payload)
+@router.get("", response_model=list[GroupSchema])
+async def list_current_user_groups(use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
+    return await use_case.user_groups()
 
 
 @router.get(
-    "/groups/{group_id}",
+    "/{group_id}",
     response_model=GroupSchema,
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
-async def _get_group(
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    return await get_group(db_session, user, group_id)
+async def get_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
+    return await use_case.get(group_id)
 
 
 @router.patch(
-    "/groups/{group_id}",
+    "/{group_id}",
     status_code=status.HTTP_201_CREATED,
     response_model=GroupSchema,
     dependencies=[Depends(group_authorization(("admin",)))],
 )
-async def _update_group(
-    group_id: int,
-    payload: GroupCreateSchema,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
+async def update_group(
+    group_id: int, payload: GroupCreateSchema, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]
 ):
-    return await update_group(db_session, user, group_id, payload)
+    return await use_case.update(group_id, payload)
 
 
 @router.delete(
-    "/groups/{group_id}",
+    "/{group_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(group_authorization(("admin",)))],
 )
-async def _delete_group(
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
+async def delete_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
+    await use_case.delete(group_id)
+
+
+@router.get(
+    "/{group_id}/members",
+    dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
+    response_model=list[GroupMemberSchema],
+)
+async def get_group_members(
+    group_id: int, use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)]
 ):
-    await delete_group(db_session, user, group_id)
+    return await use_case.all(group_id)
+
+
+@router.put(
+    "/{group_id}/members",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    response_model=list[GroupMemberSchema],
+    status_code=status.HTTP_201_CREATED,
+)
+async def upsert_members(
+    group_id: int,
+    payload: list[GroupMemberEditSchema],
+    use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)],
+):
+    await use_case.upsert(group_id, payload)
+
+
+@router.post(
+    "/{group_id}/members/remove",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    status_code=status.HTTP_200_OK,
+)
+async def remove_group_members(
+    group_id: int, payload: list[int], use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)]
+):
+    await use_case.remove_members(group_id, payload)

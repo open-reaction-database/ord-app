@@ -13,13 +13,14 @@
 # limitations under the License.
 import httpx
 from fastapi.security import HTTPAuthorizationCredentials
+from loguru import logger
 from sqlalchemy import delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema
-from ord_app.service_api.services.auth0 import verify_access_token, verify_id_token
+from ord_app.service_api.services.auth0 import verify_access_token
 
 
 async def get_user_by_external_pks(
@@ -67,14 +68,19 @@ async def create_user(db_session: AsyncSession, payload: UserCreateSchema) -> Us
 
 
 async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
+    # Decode token
     decoded_token = verify_access_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=payload.access_token))
-    user_info_api = next(filter(lambda i: "userinfo" in i, decoded_token["aud"]), None)
 
+    # getting information about the user from the found 'userinfo' link in decoded_token["aud"]
+    user_info_api = next(filter(lambda i: "userinfo" in i, decoded_token["aud"]), None)
     async with httpx.AsyncClient() as client:
         response = await client.get(user_info_api, headers={"Authorization": f"Bearer {payload.access_token}"})
         user_info = response.raise_for_status().json()
 
+    logger.debug(f"user_info: {user_info}")
+
     if user := await get_user_by_external_pks(db_session, user_info["sub"], user_info["email"]):
+        logger.info(f"<User(id={user.id})> already exists")
         return user
 
     user_payload = UserCreateSchema(
@@ -90,4 +96,7 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     db_session.add_all([user, group, group_member])
     await db_session.commit()
     await db_session.refresh(user)
+
+    logger.info(f"New <User(id={user.id})>, with <Group(id={group.id})> created")
+
     return user

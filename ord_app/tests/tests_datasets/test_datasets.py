@@ -67,17 +67,17 @@ async def test_fetch_datasets(api_client, mock_authenticated_user, test_db_sessi
 
 
 async def test_fetch_non_existent_datasets(api_client, mock_authenticated_user):
-    response = api_client.get(f"/api/v1/datasets/1000000")
+    response = api_client.get("/api/v1/datasets/1000000")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test_delete_non_existent_dataset(api_client, mock_authenticated_user):
-    response = api_client.delete(f"/api/v1/datasets/1000000")
+    response = api_client.delete("/api/v1/datasets/1000000")
     response.raise_for_status()
 
 
 async def test_download_non_existent_datasets(api_client, mock_authenticated_user):
-    response = api_client.get(f"/api/v1/datasets/1000000/download?file_format=json")
+    response = api_client.get("/api/v1/datasets/1000000/download?file_format=json")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 

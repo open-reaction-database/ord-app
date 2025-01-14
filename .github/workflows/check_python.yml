@@ -75,14 +75,8 @@ jobs:
 #      - name: Tests
 #        run: pytest -vv --cov=ord_app --durations=10
 
-      - name: Black
-        run: black --check .
-
-      - name: isort
-        run: isort --check .
-
-      - name: pylint
-        run: pylint ord_app *.py --fail-under=5.0
+      - name: ruff
+        run: ruff check ord_app/
 
       - name: pytype
         run: pytype -j auto
