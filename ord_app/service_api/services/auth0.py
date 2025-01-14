@@ -14,6 +14,7 @@
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from loguru import logger
 from starlette import status
 
 from ord_app.service_api.settings import RuntimeSettings
@@ -51,14 +52,17 @@ def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
 
 def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
     if token is None:
+        logger.error("token is missing")
         raise UnauthenticatedException
 
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token.credentials).key
     except jwt.exceptions.PyJWKClientError as error:
-        raise UnauthorizedException(str(error))
+        logger.error(error)
+        raise UnauthorizedException(str(error)) from error
     except jwt.exceptions.DecodeError as error:
-        raise UnauthorizedException(str(error))
+        logger.error(error)
+        raise UnauthorizedException(str(error)) from error
 
     try:
         payload = jwt.decode(
@@ -69,6 +73,9 @@ def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience
             issuer=issuer,
         )
     except Exception as error:
-        raise UnauthorizedException(str(error))
+        logger.error(error)
+        raise UnauthorizedException(str(error)) from error
+
+    logger.debug(f"Token verified: {payload}")
 
     return payload

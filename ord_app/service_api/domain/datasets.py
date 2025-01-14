@@ -23,7 +23,7 @@ from google.protobuf import json_format, text_format
 from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -56,6 +56,18 @@ async def paginate_group_datasets(db_session: AsyncSession, group_id: int) -> Pa
         )
     )
     return await paginate(db_session, stmt)
+
+
+async def update_dataset(db_session: AsyncSession, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
+    stmt = (
+        update(DatasetModel)
+        .where(DatasetModel.id == dataset_id)
+        .values(payload=payload.model_dump())
+        .returning(DatasetModel)
+    )
+    result = await db_session.scalar(stmt)
+    await db_session.commit()
+    return result
 
 
 async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:

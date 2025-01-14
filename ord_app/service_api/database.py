@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Editor database."""
+
 import os
 from contextlib import contextmanager
 from typing import Iterator

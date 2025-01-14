@@ -28,14 +28,11 @@ class GroupCreateSchema(BaseSchema):
     name: str | None
 
 
-class GroupMemberSchema(BaseSchema):
+class GroupMemberEditSchema(BaseSchema):
     user_id: int
     role: UserRolesList
 
 
-class GroupMemberCreateSchema(BaseSchema):
-    members: list[GroupMemberSchema]
-
-
-class GroupMemberRemoveSchema(BaseSchema):
-    user_ids: list[int]
+class GroupMemberSchema(BaseSchema):
+    user_id: int
+    role: UserRolesList

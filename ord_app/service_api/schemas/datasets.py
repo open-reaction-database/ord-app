@@ -36,12 +36,12 @@ class DatasetWithReactionCountSchema(DatasetSchema):
 
     @model_validator(mode="before")
     @classmethod
-    def reaction_count(cls, data: Any):
+    def reaction_count(cls, data: Any):  # noqa: F811
         if hasattr(data, "reactions"):
             data.reaction_count = len(data.reactions)
         return data
 
 
 class DatasetCreateSchema(BaseSchema):
-    name: str
-    description: str
+    name: str | None = ""
+    description: str | None = ""
