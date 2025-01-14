@@ -13,25 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { User } from 'common/model/user';
+import * as yup from 'yup';
+export const editDatasetSchema = yup.object({
+  name: yup.string().required(),
+  description: yup.string().required(),
+});
 
-export interface Dataset {
-  id: number;
-  name: string;
-  owner: User;
-  created_at: string;
-  modified_at: string;
-  group: string;
-  description: string;
-}
-
-export interface CreateNewDatasetPayload {
-  groupId: number;
-  name: string;
-  description: string;
-}
-
-export interface CreateDatasetFromFilePayload {
-  groupId: number;
-  file: File;
-}
+export type EditDatasetFormValues = yup.InferType<typeof editDatasetSchema>;

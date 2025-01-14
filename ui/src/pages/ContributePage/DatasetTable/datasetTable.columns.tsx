@@ -17,7 +17,6 @@ import type { MRT_ColumnDef } from 'mantine-react-table';
 import { StatusChip } from 'common/components/StatusChip/StatusChip';
 import { UserField } from 'common/components/UserField/UserField';
 import { formatDate } from 'common/utils';
-import classes from './DatasetTable.module.scss';
 import type { Dataset } from 'store/datasets/datasets.types';
 import { DATASET_STATUS } from 'common/model/datasetStatus';
 
@@ -71,14 +70,5 @@ export const columns: MRT_ColumnDef<Dataset>[] = [
     id: 'description',
     accessorKey: 'description',
     header: 'Description',
-  },
-  {
-    id: 'buttons',
-    header: '',
-    enableSorting: false,
-    // TODO: Replace with button elements
-    Cell: () => {
-      return <div className={classes.buttons}>Click</div>;
-    },
   },
 ];

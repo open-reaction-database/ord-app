@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { User } from 'common/model/user';
-
-export interface Dataset {
-  id: number;
-  name: string;
-  owner: User;
-  created_at: string;
-  modified_at: string;
-  group: string;
-  description: string;
+.counter {
+  padding: 2px 8px;
+  background-color: var(--color-background-gray);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  border-radius: var(--mantine-spacing-xl);
 }
 
-export interface CreateNewDatasetPayload {
-  groupId: number;
-  name: string;
-  description: string;
+.label {
+  font-weight: 400;
 }
 
-export interface CreateDatasetFromFilePayload {
-  groupId: number;
-  file: File;
+.buttonSection {
+  margin-right: 10px;
+}
+
+.emptyText {
+  color: var(--color-text-secondary-1);
 }

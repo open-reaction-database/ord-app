@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -29,20 +23,15 @@
   gap: 40px;
 }
 
-.titleSection {
-  display: flex;
-  justify-content: space-between;
-}
-
-.titleContainer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .title {
   margin-top: 16px;
   margin-bottom: 8px;
+}
+
+.editIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--mantine-color-primary);
 }
 
 .buttonContainer {
@@ -58,26 +47,6 @@
   path {
     fill: var(--mantine-color-white);
   }
-}
-
-.counter {
-  padding: 2px 8px;
-  background-color: var(--color-background-gray);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  border-radius: var(--mantine-spacing-xl);
-}
-
-.label {
-  font-weight: 400;
-}
-
-.buttonSection {
-  margin-right: 10px;
-}
-
-.emptyText {
-  color: var(--color-text-secondary-1);
 }
 
 .target {

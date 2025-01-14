@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import {
-  createEmptyDatasetActions,
+  createDatasetFromFileActions,
+  createNewDatasetActions,
   getDatasetActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
@@ -52,8 +53,23 @@ export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, get
   return getDatasetPageActions.success(datasetsPages);
 });
 
-export const createEmptyDataset = createThunkWithExplicitResult(createEmptyDatasetActions, async (dispatch, _g, { groupId, ...payload }) => {
-  const dataset = (await axiosInstance.post<Dataset>(`/group/${groupId}/datasets`, payload)).data;
-  dispatch(createEmptyDatasetActions.success(dataset));
-  navigate(`/dataset/${dataset.id}`);
-});
+export const createEmptyDataset = createThunkWithExplicitResult(
+  createNewDatasetActions,
+  async (dispatch, _g, { groupId, ...payload }) => {
+    const dataset = (await axiosInstance.post<Dataset>(`/group/${groupId}/datasets`, payload)).data;
+    dispatch(createNewDatasetActions.success(dataset));
+    navigate(`/dataset/${dataset.id}`);
+  },
+);
+
+export const createDatasetFromFile = createThunkWithExplicitResult(
+  createDatasetFromFileActions,
+  async (dispatch, _g, { groupId, file }) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets/upload`, formData)).data;
+    dispatch(createDatasetFromFileActions.success(dataset));
+    navigate(`/dataset/${dataset.id}`);
+  },
+);

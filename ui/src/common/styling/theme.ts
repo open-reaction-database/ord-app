@@ -84,16 +84,16 @@ export const theme = createTheme({
           fontSize: '24px',
           lineHeight: '32px',
           fontWeight: 600,
-        }
-      }
+        },
+      },
     },
     InputWrapper: {
       styles: {
         label: {
           color: 'var(--color-text-secondary-2)',
           paddingBottom: '8px',
-        }
-      }
-    }
+        },
+      },
+    },
   },
 });

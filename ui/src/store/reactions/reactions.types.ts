@@ -15,4 +15,15 @@
  */
 import type OrdSchema from 'ord-schema';
 
+export interface ReactionResponse {
+  id: number;
+  name: string;
+  summary: unknown;
+  binpb: string;
+}
+
 export type Reaction = ReturnType<ReturnType<typeof OrdSchema.Reaction.deserializeBinary>['toObject']>;
+
+export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {
+  data: Reaction;
+}

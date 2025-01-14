@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'common/store';
-import type { CreateEmptyDataset, Dataset } from './datasets.types.ts';
+import type { CreateDatasetFromFilePayload, CreateNewDatasetPayload, Dataset } from './datasets.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 
 const { createAsyncAction } = createActionFactory('datasets');
@@ -25,4 +25,8 @@ export const getGroupsInitialDatasetListActions = createAsyncAction<number | nul
 
 export const getDatasetPageActions = createAsyncAction<Partial<CurrentPage>, Pages<Dataset>>('page');
 
-export const createEmptyDatasetActions = createAsyncAction<CreateEmptyDataset, Dataset>('create_empty');
+export const createNewDatasetActions = createAsyncAction<CreateNewDatasetPayload, Dataset>('create_empty');
+
+export const createDatasetFromFileActions = createAsyncAction<CreateDatasetFromFilePayload, Dataset>(
+  'create_from_file',
+);
