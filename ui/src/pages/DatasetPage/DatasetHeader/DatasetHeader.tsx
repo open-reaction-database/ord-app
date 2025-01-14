@@ -24,8 +24,11 @@ import { ChevronDownIcon, EditIcon } from 'common/icons';
 import type { Dataset } from 'store/datasets/datasets.types';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { useDisclosure } from '@mantine/hooks';
 import { EditDataset } from './EditDataset/EditDataset';
+import { useSelector } from 'react-redux';
+import { selectIsDatasetOpened } from '../../../store/datasets/datasets.selectors';
+import { setDatasetEditOpenedAction } from '../../../store/datasets/datasets.actions';
+import { useAppDispatch } from '../../../store/useAppDispatch';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -39,7 +42,16 @@ const datasetDownloadOptions: DownloadMenuOptions[] = [
 
 export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const [location] = useLocation();
-  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure();
+  const dispatch = useAppDispatch();
+  const isEditOpened = useSelector(selectIsDatasetOpened);
+
+  const openEdit = useCallback(() => {
+    dispatch(setDatasetEditOpenedAction(true));
+  }, [dispatch]);
+
+  const closeEdit = useCallback(() => {
+    dispatch(setDatasetEditOpenedAction(false));
+  }, [dispatch]);
 
   const copyToClipboardOptions: CopyButtonOptions[] = useMemo(
     () => [
@@ -116,7 +128,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
           }
         />
       </div>
-      {editOpened && (
+      {isEditOpened && (
         <EditDataset
           datasetId={dataset.id}
           onClose={closeEdit}

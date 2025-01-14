@@ -34,3 +34,5 @@ export const selectOrderedDatasets = createSelector([selectDatasetsOrder, select
 );
 
 export const selectIsDatasetCreating = (state: AppState) => selectRootState(state).isDatasetCreating;
+
+export const selectIsDatasetOpened = (state: AppState) => selectRootState(state).isDatasetEditOpened;

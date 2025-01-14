@@ -20,6 +20,7 @@ import { selectDatasetById } from '../../../../store/datasets/datasets.selectors
 import { type EditDatasetFormValues, editDatasetSchema } from './editDataset.schema';
 import { useCallback } from 'react';
 import { useAppDispatch } from '../../../../store/useAppDispatch';
+import { updateDataset } from '../../../../store/datasets/datasets.thunks';
 
 interface EditDatasetProps {
   datasetId: number;
@@ -41,7 +42,7 @@ export function EditDataset({ datasetId, onClose }: Readonly<EditDatasetProps>) 
 
   const onSubmit = useCallback(
     (values: EditDatasetFormValues) => {
-      console.info(values);
+      dispatch(updateDataset({ id: datasetId, ...values }));
     },
     [dispatch, datasetId],
   );

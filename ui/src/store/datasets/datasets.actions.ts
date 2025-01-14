@@ -17,7 +17,7 @@ import { createActionFactory } from 'common/store';
 import type { CreateDatasetFromFilePayload, CreateNewDatasetPayload, Dataset } from './datasets.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 
-const { createAsyncAction } = createActionFactory('datasets');
+const { createAsyncAction, createAction } = createActionFactory('datasets');
 
 export const getDatasetActions = createAsyncAction<number, Dataset>('get');
 
@@ -30,3 +30,7 @@ export const createNewDatasetActions = createAsyncAction<CreateNewDatasetPayload
 export const createDatasetFromFileActions = createAsyncAction<CreateDatasetFromFilePayload, Dataset>(
   'create_from_file',
 );
+
+export const setDatasetEditOpenedAction = createAction<boolean>('set_edit_opened');
+
+export const updateDatasetActions = createAsyncAction<Pick<Dataset, 'id' | 'name' | 'description'>, Dataset>('update');

@@ -22,6 +22,8 @@ import {
   getDatasetActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
+  setDatasetEditOpenedAction,
+  updateDatasetActions,
 } from './datasets.actions';
 import { itemsById } from 'common/utils';
 import { emptyPagination } from 'common/constants';
@@ -61,6 +63,10 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
     ...state,
     [getDatasetId(action.payload)]: action.payload,
   }));
+  builder.addCase(updateDatasetActions.success, (state, action) => ({
+    ...state,
+    [action.payload.id]: action.payload,
+  }));
   builder.addMatcher(
     isAnyOf(createNewDatasetActions.success, createDatasetFromFileActions.success),
     (state, action) => ({
@@ -93,10 +99,16 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
   );
 });
 
+const isDatasetEditOpened = createReducer<boolean>(false, builder => {
+  builder.addCase(setDatasetEditOpenedAction, (_, action) => action.payload);
+  builder.addCase(updateDatasetActions.success, () => false);
+});
+
 export const datasetsReducer = combineReducers({
   datasetsById,
   datasetsOrder,
   pagination,
   areDatasetsLoading,
   isDatasetCreating,
+  isDatasetEditOpened,
 });

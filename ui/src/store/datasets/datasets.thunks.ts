@@ -19,6 +19,7 @@ import {
   getDatasetActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
+  updateDatasetActions,
 } from './datasets.actions';
 import type { Dataset } from './datasets.types';
 import { createThunk, createThunkWithExplicitResult } from '../../common/store';
@@ -73,3 +74,8 @@ export const createDatasetFromFile = createThunkWithExplicitResult(
     navigate(`/dataset/${dataset.id}`);
   },
 );
+
+export const updateDataset = createThunk(updateDatasetActions, async (_d, _g, { id, ...payload }) => {
+  const updatedDataset = (await axiosInstance.patch<Dataset>(`datasets/${id}`, payload)).data;
+  return updateDatasetActions.success(updatedDataset);
+});
