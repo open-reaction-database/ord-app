@@ -122,7 +122,11 @@ async def download_dataset(
     if not dataset:
         raise EntityDoesNotExist("Dataset not found")
 
-    dataset_pb = load_message(orjson.dumps({"name": dataset.name}), Dataset, "json")
+    dataset_pb = load_message(
+        orjson.dumps({"name": dataset.name, "description": dataset.description}),
+        Dataset,
+        "json"
+    )
 
     dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
 
