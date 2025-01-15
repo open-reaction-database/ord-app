@@ -16,6 +16,7 @@
 export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
 export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';
+export { default as ChevronDownFilledIcon } from './ChevronDownFilledIcon.svg?react';
 export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
 export { default as CopyIcon } from './CopyIcon.svg?react';
 export { default as DotsIcon } from './DotsIcon.svg?react';
@@ -30,4 +31,5 @@ export { default as NewDatasetIcon } from './NewDatasetIcon.svg?react';
 export { default as RemoveIcon } from './RemoveIcon.svg?react';
 export { default as SearchIcon } from './SearchIcon.svg?react';
 export { default as SettingsIcon } from './SettingsIcon.svg?react';
+export { default as SignOutIcon } from './SignOutIcon.svg?react';
 export { default as UploadFileIcon } from './UploadFileIcon.svg?react';

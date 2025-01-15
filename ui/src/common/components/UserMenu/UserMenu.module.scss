@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  border-color: var(--color-background-gray);
+.dropdown {
+  border: none;
+  box-shadow: 0 4px 24px 0 #00000014;
 }
 
-.main {
-  padding: 40px 20px 48px;
-  min-width: 1280px;
-  background-color: var(--color-background-main);
+.menuItem {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
 }
 
-.footer {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-secondary-2);
-  background-color: var(--color-background-main);
+.menuItemSection {
+  margin-right: 8px;
+  color: var(--color-icons-default);
 }
 
-.logo {
-  width: 54px;
-  height: 24px;
+.target {
+  height: 100%;
+  padding: 0 8px;
+  color: var(--color-text-primary);
+
+  &:hover {
+    background-color: var(--color-background-main);
+  }
 }
