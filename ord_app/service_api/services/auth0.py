@@ -71,6 +71,7 @@ def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience
             algorithms=algorithms,
             audience=audience,
             issuer=issuer,
+            leeway=10
         )
     except Exception as error:
         logger.error(error)
