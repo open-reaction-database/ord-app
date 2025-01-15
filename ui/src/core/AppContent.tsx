@@ -20,9 +20,9 @@ import { PageLoader } from '../common/components/PageLoader/PageLoader';
 const Routes = lazy(() => import('pages'));
 
 export function AppContent() {
-  const { isAppLoading } = useAuth();
+  const isLoading = useAuth();
 
-  return isAppLoading ? (
+  return isLoading ? (
     <PageLoader />
   ) : (
     <Suspense fallback={<PageLoader />}>

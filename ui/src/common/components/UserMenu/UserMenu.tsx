@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Menu, Avatar, Group, Text, Flex, UnstyledButton } from '@mantine/core';
 import { domain } from 'common/constants';
-import { useAuth } from 'common/hooks/useAuth';
-import { useSelector } from 'react-redux';
 import { selectSelf } from 'store/users/users.selectors';
-import classes from './UserMenu.module.scss';
 import { ChevronDownFilledIcon, SignOutIcon } from 'common/icons';
+import classes from './UserMenu.module.scss';
 
 export default function UserMenu() {
-  const { logout } = useAuth();
+  const { logout } = useAuth0();
   const user = useSelector(selectSelf);
+
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: domain,
+      },
+    });
+  };
 
   return user ? (
     <Menu
@@ -55,13 +63,7 @@ export default function UserMenu() {
       <Menu.Dropdown>
         <Menu.Item
           leftSection={<SignOutIcon />}
-          onClick={() =>
-            logout({
-              logoutParams: {
-                returnTo: domain,
-              },
-            })
-          }
+          onClick={handleLogout}
         >
           Sign out
         </Menu.Item>
