@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useAuth } from 'common/hooks/useAuth';
-import { lazy, Suspense } from 'react';
-import { PageLoader } from '../common/components/PageLoader/PageLoader';
+.dropdown {
+  border: none;
+  box-shadow: 0 4px 24px 0 #00000014;
+}
 
-const Routes = lazy(() => import('pages'));
+.menuItem {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+}
 
-export function AppContent() {
-  const { isAppLoading } = useAuth();
+.menuItemSection {
+  margin-right: 8px;
+  color: var(--color-icons-default);
+}
 
-  return isAppLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-    </Suspense>
-  );
+.target {
+  height: 100%;
+  padding: 0 8px;
+  color: var(--color-text-primary);
+
+  &:hover {
+    background-color: var(--color-background-main);
+  }
 }

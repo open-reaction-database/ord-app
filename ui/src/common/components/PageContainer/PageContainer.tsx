@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 import type { PropsWithChildren } from 'react';
-import { AppShell, Avatar, Group } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from 'assets/ORD_logo.png';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
-import { useSelector } from 'react-redux';
-import { selectSelf } from 'store/users/users.selectors';
+import UserMenu from '../UserMenu/UserMenu';
 
 export function PageContainer({ children }: PropsWithChildren) {
-  const user = useSelector(selectSelf);
   return (
     <AppShell
       classNames={{
@@ -38,17 +36,7 @@ export function PageContainer({ children }: PropsWithChildren) {
           alt="Open Reaction Database logo"
         />
 
-        {/* TODO: Replace with user details component */}
-        <Group
-          gap="4px"
-          className={classes.userDetails}
-        >
-          <Avatar
-            src={null}
-            size="sm"
-          />
-          {user?.name}
-        </Group>
+        <UserMenu />
       </AppShell.Header>
 
       <AppShell.Main>

@@ -26,7 +26,8 @@ import { createUser } from 'store/users/users.thunks';
 export function useAuth() {
   const auth0 = useAuth0();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
+  const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims, logout } =
+    auth0;
   const isUserCreated = useSelector(selectIsUserCreated);
 
   const isAppLoading = isLoading || !isAuthenticated || !isUserCreated;
@@ -62,5 +63,5 @@ export function useAuth() {
     }
   }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
 
-  return isAppLoading;
+  return { isAppLoading, logout };
 }
