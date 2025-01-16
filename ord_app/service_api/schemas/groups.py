@@ -29,7 +29,7 @@ class GroupCreateSchema(BaseSchema):
 
 
 class GroupMemberEditSchema(BaseSchema):
-    user_id: int
+    identity: int | str
     role: UserRolesList
 
 

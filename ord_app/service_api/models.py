@@ -38,7 +38,9 @@ class UserModel(BaseModel):
     avatar_url: Mapped[str] = mapped_column(nullable=True)
 
     groups: Mapped[list["GroupModel"]] = relationship(
-        secondary="user_groups_membership", back_populates="members", overlaps="groups_member"
+        secondary="user_groups_membership",
+        back_populates="members",
+        overlaps="groups_member"
     )
 
     def __repr__(self):
@@ -52,11 +54,15 @@ class GroupModel(BaseModel):
     owner: Mapped[UserModel] = relationship(UserModel, backref="owner_groups")
 
     datasets: Mapped[list["DatasetModel"]] = relationship(
-        secondary="dataset_group_association", back_populates="groups"
+        secondary="dataset_group_association",
+        back_populates="groups",
+        overlaps="dataset_group_associations"
     )
 
     members: Mapped[list[UserModel]] = relationship(
-        secondary="user_groups_membership", back_populates="groups", overlaps="groups_member"
+        secondary="user_groups_membership",
+        back_populates="groups",
+        overlaps="groups_member"
     )
 
     def __repr__(self):
@@ -93,7 +99,11 @@ class DatasetModel(BaseModel):
 
     reactions: Mapped[list["ReactionModel"]] = relationship("ReactionModel", back_populates="dataset")
 
-    groups: Mapped[list[GroupModel]] = relationship(secondary="dataset_group_association", back_populates="datasets")
+    groups: Mapped[list[GroupModel]] = relationship(
+        secondary="dataset_group_association",
+        back_populates="datasets",
+        overlaps="dataset_group_associations"
+    )
 
     def __repr__(self):
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
@@ -101,10 +111,18 @@ class DatasetModel(BaseModel):
 
 class DatasetGroupAssociationModel(BaseModel):
     dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"), primary_key=True)
-    dataset: Mapped[DatasetModel] = relationship(DatasetModel, backref="dataset_group_associations")
+    dataset: Mapped[DatasetModel] = relationship(
+        DatasetModel,
+        backref="dataset_group_associations",
+        overlaps="groups,datasets"
+    )
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
-    group: Mapped[GroupModel] = relationship(GroupModel, backref="dataset_group_associations")
+    group: Mapped[GroupModel] = relationship(
+        GroupModel,
+        backref="dataset_group_associations",
+        overlaps="groups,datasets"
+    )
 
 
 class ReactionModel(BaseModel):

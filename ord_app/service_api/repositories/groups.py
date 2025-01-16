@@ -73,21 +73,30 @@ class GroupMembersRepository:
         self.db = db
         self.autocommit = autocommit
 
+    async def get(self, user_id: int, group_id: int) -> UserGroupsMembershipModel:
+        stmt = select(UserGroupsMembershipModel).where(
+            UserGroupsMembershipModel.user_id == user_id,
+            UserGroupsMembershipModel.group_id == group_id,
+        ).limit(1)
+        result = await self.db.scalar(stmt)
+        return result
+
     async def all(self, group_id: int) -> Sequence[UserGroupsMembershipModel]:
         stmt = select(UserGroupsMembershipModel).where(UserGroupsMembershipModel.group_id == group_id)
         return (await self.db.scalars(stmt)).all()
 
-    async def upsert(self, insert_values: list[dict]):
-        stmt = insert(UserGroupsMembershipModel).values(insert_values)
+    async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+        value = {"user_id": user_id, "group_id": group_id, "role": role}
+        stmt = insert(UserGroupsMembershipModel).values(value)
         stmt = stmt.on_conflict_do_update(
             index_elements=[UserGroupsMembershipModel.user_id, UserGroupsMembershipModel.group_id],
             set_={"role": stmt.excluded.role},
         )
 
-        if self.autocommit:
+        if autocommit:
             await self.db.execute(stmt)
             await self.db.commit()
-            logger.debug(f"Members upsert: {insert_values}")
+            logger.debug(f"Members upsert: {value}")
 
     async def remove_members(self, group_id, members_ids: list[int]):
         stmt = delete(UserGroupsMembershipModel).where(
