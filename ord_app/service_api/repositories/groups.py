@@ -90,7 +90,13 @@ class GroupMembersRepository:
         return result
 
     async def all(self, group_id: int) -> Sequence[UserGroupsMembershipModel]:
-        stmt = select(UserGroupsMembershipModel).where(UserGroupsMembershipModel.group_id == group_id)
+        stmt = (
+            select(UserGroupsMembershipModel)
+            .where(UserGroupsMembershipModel.group_id == group_id)
+            .options(
+                joinedload(UserGroupsMembershipModel.user)
+            )
+        )
         return (await self.db.scalars(stmt)).all()
 
     async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
