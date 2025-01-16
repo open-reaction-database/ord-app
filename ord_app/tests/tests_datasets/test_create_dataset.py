@@ -30,7 +30,7 @@ async def test_create_dataset(api_client, mock_authenticated_user):
 
 
 async def test_create_empty_dataset(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={}).raise_for_status().json()
 

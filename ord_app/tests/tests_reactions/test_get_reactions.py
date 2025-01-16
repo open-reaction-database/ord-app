@@ -56,7 +56,7 @@ async def test_get_reaction(api_client, mock_authenticated_user, test_db_session
 
     response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}").raise_for_status().json()
 
-    assert response_data["id"] == response_data["id"]
+    assert response_data["id"] == reaction_id
 
 
 async def test_download_reaction(api_client, mock_authenticated_user, test_db_session):

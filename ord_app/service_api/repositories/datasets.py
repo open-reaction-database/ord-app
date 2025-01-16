@@ -101,9 +101,10 @@ class DatasetsRepository:
                 )
             )
 
-        self.db.add_all(reactions)
-        await self.db.commit()
-        await self.db.refresh(dataset)
+        if autocommit:
+            self.db.add_all(reactions)
+            await self.db.commit()
+            await self.db.refresh(dataset)
         return dataset
 
     async def update(self, dataset_id: int, payload: dict, autocommit: bool = True):
