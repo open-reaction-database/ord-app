@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fastapi import Depends
+import gzip
+
+from fastapi import Depends, UploadFile
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
-from ord_app.service_api.domain.datasets import write_message
+from ord_app.service_api.domain.datasets import load_message, write_message
 from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
@@ -46,6 +48,29 @@ class ReactionsUseCase:
         await self.db.commit()
         await self.db.refresh(reaction)
         return reaction
+
+    async def upload(self, dataset_id: int, file: UploadFile):
+        file_data = await file.read()
+
+        if file.filename.endswith(".gz"):
+            file_data = gzip.decompress(file_data)
+
+        if ".json" in file.filename:
+            kind = "json"
+        elif ".binpb" in file.filename:
+            kind = "binpb"
+        elif ".txtpb" in file.filename:
+            kind = "txtpb"
+        else:
+            raise ValueError(file.filename)
+
+        reaction_pb = load_message(file_data, Reaction, kind)
+        reaction_payload = {"name": reaction_pb.reaction_id, "binpb": reaction_pb.SerializeToString()}
+        reaction = await self.reaction_repository.create(
+            dataset_id, self.current_user.id, reaction_payload
+        )
+        return reaction
+
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
         stmt = self.reaction_repository.all_reactions_stmt(dataset_id)

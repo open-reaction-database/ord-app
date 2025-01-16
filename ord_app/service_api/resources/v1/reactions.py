@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, UploadFile
 from fastapi_pagination import Page
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
@@ -36,6 +36,19 @@ async def create_reaction(
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
     return await use_case.create(dataset_id, payload)
+
+
+@router.post(
+    "/upload",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
+    response_model=ReactionSchema,
+)
+async def upload_reaction(
+    dataset_id: int,
+    file: UploadFile,
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
+):
+    return await use_case.upload(dataset_id, file)
 
 
 @router.get(
