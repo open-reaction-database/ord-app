@@ -79,5 +79,5 @@ async def test_download_reaction(api_client, mock_authenticated_user, test_db_se
         f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}/download?file_format=json"
     ).raise_for_status()
 
-    decompressed_data = json.loads(gzip.decompress(response_data.content))
+    decompressed_data = json.loads(response_data.content)
     assert decompressed_data["reactionId"] == str(reaction_id)

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import gzip
 import os
 from io import BytesIO
 from typing import Annotated
@@ -137,9 +136,8 @@ async def download_dataset(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
     return Response(
-        gzip.compress(data),
-        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},
-        media_type="application/gzip",
+        data,
+        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'}
     )
 
 

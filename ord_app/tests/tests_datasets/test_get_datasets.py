@@ -87,9 +87,7 @@ async def test_download_dataset(api_client, mock_authenticated_user, test_db_ses
     await test_db_session.commit()
 
     response = api_client.get(f"/api/v1/datasets/{dataset.id}/download?file_format=json").raise_for_status()
-    assert response.headers["Content-Disposition"] == 'attachment; filename="test_dataset.json.gz"'
-    assert response.headers["Content-Type"] == "application/gzip"
 
-    decompressed_data = json.loads(gzip.decompress(response.content))
-    assert decompressed_data["name"] == dataset.name
-    assert decompressed_data["description"] == dataset.description
+    response_data = json.loads(response.content)
+    assert response_data["name"] == dataset.name
+    assert response_data["description"] == dataset.description

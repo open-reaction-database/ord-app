@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import gzip
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response
@@ -87,9 +86,8 @@ async def _download_reaction(
 ):
     reaction, data = await use_case.download(reaction_id, file_format)
     return Response(
-        gzip.compress(data),
-        headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}.gz"'},
-        media_type="application/gzip",
+        data,
+        headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}"'},
     )
 
 
