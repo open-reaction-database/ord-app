@@ -34,9 +34,6 @@ class ReactionsRepository:
     def all_reactions_stmt(self, dataset_id: int):
         return select(ReactionModel).where(ReactionModel.dataset_id == dataset_id)
 
-    async def paginate(self):
-        pass
-
     async def get(self, reaction_id):
         stmt = select(ReactionModel).where(ReactionModel.id == reaction_id).limit(1)
         return await self.db.scalar(stmt)
@@ -52,9 +49,6 @@ class ReactionsRepository:
             result = await self.db.scalar(stmt)
             await self.db.commit()
             return result
-
-    async def download(self):
-        pass
 
     async def bulk_create(self, payload: list[dict], autocommit: bool = True) -> list[ReactionModel]:
         reactions = [ReactionModel(**reaction) for reaction in payload]
