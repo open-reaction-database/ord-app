@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +29,7 @@ class ReactionsRepository:
             self.db.add(reaction)
             await self.db.commit()
             await self.db.refresh(reaction)
+            logger.debug(f"{reaction} created with payload: {payload}")
 
         return reaction
 
@@ -46,9 +48,10 @@ class ReactionsRepository:
             .returning(ReactionModel)
         )
         if autocommit:
-            result = await self.db.scalar(stmt)
+            reaction = await self.db.scalar(stmt)
             await self.db.commit()
-            return result
+            logger.debug(f"{reaction} updated with payload: {payload}")
+            return reaction
 
     async def bulk_create(self, payload: list[dict], autocommit: bool = True) -> list[ReactionModel]:
         reactions = [ReactionModel(**reaction) for reaction in payload]
@@ -56,5 +59,6 @@ class ReactionsRepository:
 
         if autocommit:
             await self.db.commit()
+            logger.debug("Bulk reaction created with payload")
 
         return reactions

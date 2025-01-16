@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from loguru import logger
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -40,6 +41,7 @@ class DatasetsRepository:
         self.db.add_all([dataset, dataset_group_association])
 
         if autocommit:
+            logger.debug(f"{dataset} created with payload {payload}")
             await self.db.commit()
             await self.db.refresh(dataset)
 
@@ -85,28 +87,6 @@ class DatasetsRepository:
         )
         return stmt
 
-    async def create_from_pb(self, group_id, owner_id, dataset_pb, autocommit=True):
-        dataset = DatasetModel(owner_id=owner_id, name=dataset_pb.name)
-        dataset_group_association = DatasetGroupAssociationModel(dataset=dataset, group_id=group_id)
-        self.db.add(dataset_group_association)
-
-        reactions = []
-        for reaction in dataset_pb.reactions:
-            reactions.append(
-                ReactionModel(
-                    name=reaction.reaction_id,
-                    binpb=reaction.SerializeToString(),
-                    dataset=dataset,
-                    owner_id=owner_id,
-                )
-            )
-
-        if autocommit:
-            self.db.add_all(reactions)
-            await self.db.commit()
-            await self.db.refresh(dataset)
-        return dataset
-
     async def update(self, dataset_id: int, payload: dict, autocommit: bool = True):
         stmt = (
             update(DatasetModel)
@@ -116,11 +96,13 @@ class DatasetsRepository:
         )
 
         if autocommit:
-            result = await self.db.scalar(stmt)
+            dataset = await self.db.scalar(stmt)
             await self.db.commit()
-            return result
+            logger.debug(f"{dataset} updated with payload: {payload}")
+            return dataset
 
     async def delete(self, dataset_id: int):
         stmt = delete(DatasetModel).where(DatasetModel.id == dataset_id)
         await self.db.execute(stmt)
         await self.db.commit()
+        logger.debug(f"<Dataset(id={dataset_id})> deleted")
