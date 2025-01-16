@@ -21,12 +21,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from ord_app.service_api.main import app
-from ord_app.service_api.models import BaseModel, UserModel
+from ord_app.service_api.models import BaseModel, GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.services.auth0 import verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
 
-test_fast_app = TestClient(app)
 pg_engine = create_async_engine(RuntimeSettings.pg_test_dsn)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
 
@@ -34,9 +33,6 @@ db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocom
 async def _test_db_session():
     async with db_session_maker() as session:
         yield session
-
-
-app.dependency_overrides[get_db_session] = _test_db_session
 
 
 @pytest.fixture
@@ -47,7 +43,9 @@ async def test_db_session():
 
 @pytest.fixture
 def api_client():
-    return test_fast_app
+    app.dependency_overrides[get_db_session] = _test_db_session
+    yield TestClient(app)
+    app.dependency_overrides = {}
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -84,8 +82,11 @@ def clear_database():
 
 @pytest.fixture
 async def mock_authenticated_user(test_db_session):
-    user = UserModel(email="test@unit.com", external_id="test_auth0_id")
-    test_db_session.add(user)
+    user = UserModel(email="utest@unit.com", external_id="utest_external_id")
+    group = GroupModel(name="utest", owner_id=user.id)
+    group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
+    test_db_session.add_all([user, group, group_member])
+
     await test_db_session.commit()
     await test_db_session.refresh(user)
 
@@ -96,6 +97,6 @@ async def mock_authenticated_user(test_db_session):
 
     app.dependency_overrides[verify_access_token] = lambda: {"sub": user.external_id}
 
-    yield user, set_mock_user
+    yield user, set_mock_user, group
 
     app.dependency_overrides.pop(verify_access_token, None)

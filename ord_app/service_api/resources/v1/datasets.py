@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import gzip
 import os
 from io import BytesIO
+from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Response, UploadFile, status
 from fastapi.params import Depends
@@ -22,16 +22,7 @@ from ord_schema.templating import generate_dataset, read_spreadsheet
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
-from ord_app.service_api.domain.datasets import (
-    create_dataset,
-    delete_dataset,
-    download_dataset,
-    get_dataset,
-    paginate_group_datasets,
-    paginate_user_datasets,
-    update_dataset,
-    upload_user_dataset,
-)
+from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import (
@@ -51,13 +42,12 @@ router = APIRouter(tags=["datasets"])
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(group_authorization(("admin", "editor")))],
 )
-async def _create_dataset(
+async def create_dataset(
     group_id: int,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
     payload: DatasetCreateSchema,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
 ):
-    return await create_dataset(db_session, group_id, user, payload)
+    return await use_case.create(group_id, payload)
 
 
 @router.get(
@@ -67,9 +57,9 @@ async def _create_dataset(
 )
 async def get_group_datasets(
     group_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await paginate_group_datasets(db_session, group_id)
+    return await use_case.paginate_group_datasets(group_id)
 
 
 @router.post(
@@ -80,18 +70,16 @@ async def get_group_datasets(
 async def upload_dataset(
     group_id: int,
     file: UploadFile,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await upload_user_dataset(db_session, group_id, user, file)
+    return await use_case.upload(group_id, file)
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])
 async def get_user_datasets(
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await paginate_user_datasets(db_session, user)
+    return await use_case.paginate_user_datasets()
 
 
 @router.patch(
@@ -99,22 +87,22 @@ async def get_user_datasets(
     response_model=DatasetSchema,
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
-async def _update_dataset(
+async def update_dataset(
     dataset_id: int,
     payload: DatasetCreateSchema,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await update_dataset(db_session, dataset_id, payload)
+    return await use_case.update(dataset_id, payload)
 
 
 @router.delete("/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))])
-async def _delete_dataset(
+async def delete_dataset(
     dataset_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
     # TODO: soft deletion needs to be implemented
-    await delete_dataset(db_session, dataset_id)
-    return Response("Object successfully deleted (or already absent)")
+    await use_case.delete(dataset_id)
+    return "Object successfully deleted (or already absent)"
 
 
 @router.get(
@@ -122,11 +110,11 @@ async def _delete_dataset(
     response_model=DatasetSchema,
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
-async def _get_dataset(
+async def get_dataset(
     dataset_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    if dataset := await get_dataset(db_session, dataset_id):
+    if dataset := await use_case.get(dataset_id):
         return dataset
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
@@ -135,22 +123,21 @@ async def _get_dataset(
     "/datasets/{dataset_id}/download",
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
-async def _download_dataset(
+async def download_dataset(
     dataset_id: int,
     file_format: DownloadFileFormats,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
     try:
-        dataset, data = await download_dataset(db_session, dataset_id, file_format)
+        dataset, data = await use_case.download(dataset_id, file_format)
     except EntityDoesNotExist as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
     return Response(
-        gzip.compress(data),
-        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}.gz"'},
-        media_type="application/gzip",
+        data,
+        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'}
     )
 
 

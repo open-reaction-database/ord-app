@@ -13,166 +13,110 @@
 # limitations under the License.
 import gzip
 from base64 import b64encode
-from typing import Sequence, Type
+from typing import Type
 
 import orjson
-from fastapi import UploadFile
+from fastapi import Depends, UploadFile
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from google.protobuf import json_format, text_format
 from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
+from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import (
-    DatasetGroupAssociationModel,
-    DatasetModel,
-    GroupModel,
-    ReactionModel,
-    UserGroupsMembershipModel,
-    UserModel,
-)
+from ord_app.service_api.models import DatasetModel, UserModel
+from ord_app.service_api.repositories.datasets import DatasetsRepository
+from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
+from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def get_datasets(db_session: AsyncSession, user: UserModel) -> Sequence[DatasetModel]:
-    stmt = select(DatasetModel).where(DatasetModel.owner == user)
-    datasets = await db_session.scalars(stmt)
-    return datasets.all()
+class DatasetUseCases:
+    def __init__(self, db: AsyncSession, current_user: UserModel):
+        self.db = db
+        self.current_user = current_user
+        self.dataset_repository = DatasetsRepository(db)
+        self.reaction_repository = ReactionsRepository(db)
 
+    async def create(
+        self, group_id: int, payload: DatasetCreateSchema
+    ) -> DatasetModel:
+        dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
+        return await self.dataset_repository.get(dataset.id)
 
-async def paginate_group_datasets(db_session: AsyncSession, group_id: int) -> Page[DatasetModel]:
-    stmt = (
-        select(DatasetModel)
-        .join(DatasetGroupAssociationModel, DatasetGroupAssociationModel.dataset_id == DatasetModel.id)
-        .where(DatasetGroupAssociationModel.group_id == group_id)
-        .options(
-            joinedload(DatasetModel.owner),
-            joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
-        )
-    )
-    return await paginate(db_session, stmt)
+    async def get(self, dataset_id: int) -> DatasetModel:
+        return await self.dataset_repository.get(dataset_id)
 
+    async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
+        stmt = self.dataset_repository.group_dataset_stmt(group_id)
+        return await paginate(self.db, stmt)
 
-async def update_dataset(db_session: AsyncSession, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
-    stmt = (
-        update(DatasetModel)
-        .where(DatasetModel.id == dataset_id)
-        .values(**payload.model_dump())
-        .returning(DatasetModel)
-    )
-    result = await db_session.scalar(stmt)
-    await db_session.commit()
-    return result
+    async def upload(self, group_id: int, file: UploadFile):
+        file_data = await file.read()
 
+        if file.filename.endswith(".gz"):
+            file_data = gzip.decompress(file_data)
 
-async def paginate_user_datasets(db_session: AsyncSession, user: UserModel) -> Page[DatasetModel]:
-    stmt = (
-        select(DatasetModel)
-        .distinct()
-        .join(DatasetModel.groups)
-        .join(GroupModel.members)
-        .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
-        .where(UserGroupsMembershipModel.user_id == user.id)
-        .options(
-            joinedload(DatasetModel.owner),
-            joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
-        )
-    )
-    return await paginate(db_session, stmt)
+        if ".json" in file.filename:
+            kind = "json"
+        elif ".binpb" in file.filename:
+            kind = "binpb"
+        elif ".txtpb" in file.filename:
+            kind = "txtpb"
+        else:
+            raise ValueError(file.filename)
 
+        dataset_pb = load_message(file_data, Dataset, kind)
 
-async def get_dataset(db_session: AsyncSession, dataset_id: int) -> DatasetModel:
-    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(joinedload(DatasetModel.owner)).limit(1)
-    dataset = await db_session.scalar(stmt)
-    return dataset
-
-
-async def create_dataset(
-    db_session: AsyncSession, group_id: int, user: UserModel, payload: DatasetCreateSchema
-) -> DatasetModel:
-    dataset = DatasetModel(owner=user, **payload.model_dump(exclude_unset=True))
-    db_session.add(dataset)
-    await db_session.flush()
-
-    dataset_group_association = DatasetGroupAssociationModel(dataset_id=dataset.id, group_id=group_id)
-    db_session.add(dataset_group_association)
-
-    await db_session.commit()
-    await db_session.refresh(dataset)
-    return dataset
-
-
-async def delete_dataset(db_session: AsyncSession, dataset_id: int):
-    stmt = delete(DatasetModel).where(DatasetModel.id == dataset_id)
-    await db_session.execute(stmt)
-    await db_session.commit()
-
-
-async def download_dataset(
-    db_session: AsyncSession, dataset_id: int, file_format: DownloadFileFormats
-) -> tuple[DatasetModel, bytes]:
-    stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(joinedload(DatasetModel.reactions))
-    dataset = await db_session.scalar(stmt)
-
-    if not dataset:
-        raise EntityDoesNotExist("Dataset not found")
-
-    dataset_pb = load_message(
-        orjson.dumps({"name": dataset.name, "description": dataset.description}),
-        Dataset,
-        "json"
-    )
-
-    dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
-
-    data = write_message(dataset_pb, kind=file_format)
-    return dataset, data
-
-
-async def upload_user_dataset(db_session: AsyncSession, group_id: int, user: UserModel, file: UploadFile):
-    file_data = await file.read()
-
-    if file.filename.endswith(".gz"):
-        file_data = gzip.decompress(file_data)
-
-    if ".json" in file.filename:
-        kind = "json"
-    elif ".binpb" in file.filename:
-        kind = "binpb"
-    elif ".txtpb" in file.filename:
-        kind = "txtpb"
-    else:
-        raise ValueError(file.filename)
-
-    dataset_pb = load_message(file_data, Dataset, kind)
-
-    dataset = DatasetModel(owner=user, name=dataset_pb.name)
-    db_session.add(dataset)
-    await db_session.flush()
-
-    dataset_group_association = DatasetGroupAssociationModel(dataset_id=dataset.id, group_id=group_id)
-    db_session.add(dataset_group_association)
-
-    reactions = []
-    for reaction in dataset_pb.reactions:
-        reactions.append(
-            ReactionModel(
-                name=reaction.reaction_id,
-                binpb=reaction.SerializeToString(),
-                dataset=dataset,
-                owner=user,
-            )
+        dataset_payload = DatasetCreateSchema(name=dataset_pb.name, description=dataset_pb.description)
+        dataset = await self.dataset_repository.create(
+            group_id, self.current_user.id, payload=dataset_payload.model_dump(), autocommit=False
         )
 
-    db_session.add_all(reactions)
-    await db_session.commit()
+        reactions_payload = [
+            {
+                "name": reaction.reaction_id,
+                "binpb": reaction.SerializeToString(),
+                "dataset": dataset,
+                "owner_id": self.current_user.id,
+            }
+            for reaction in dataset_pb.reactions
+        ]
+        await self.reaction_repository.bulk_create(reactions_payload, autocommit=False)
+        await self.db.commit()
+        await self.db.refresh(dataset)
 
-    return await get_dataset(db_session, dataset.id)
+        return await self.dataset_repository.get(dataset.id)
+
+    async def paginate_user_datasets(self):
+        stmt = self.dataset_repository.user_datasets_stmt(self.current_user.id)
+        return await paginate(self.db, stmt)
+
+    async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
+        return await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
+
+    async def delete(self, dataset_id: int):
+        return await self.dataset_repository.delete(dataset_id)
+
+    async def download(self, dataset_id: int, file_format: DownloadFileFormats) -> tuple[DatasetModel, bytes]:
+        dataset = await self.dataset_repository.get_with_reactions(dataset_id)
+
+        if not dataset:
+            raise EntityDoesNotExist("Dataset not found")
+
+        dataset_pb = load_message(
+            orjson.dumps({"name": dataset.name, "description": dataset.description}),
+            Dataset,
+            "json"
+        )
+
+        dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
+
+        data = write_message(dataset_pb, kind=file_format)
+        return dataset, data
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:
@@ -223,3 +167,14 @@ def load_message(data: bytes, message_type: Type[Dataset | Reaction], kind: str)
 def send_message(message: Message) -> str:
     """Converts a protocol buffer message to a base64-encoded string."""
     return b64encode(message.SerializeToString()).decode()
+
+
+def get_dataset_use_case(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: UserModel = Depends(authenticate),
+) -> DatasetUseCases:
+    """
+    A factory function that retrieves `db` and `current_user` via Depends,
+    and then returns a fully initialized UseCase without any mention of Depends inside the UseCase itself.
+    """
+    return DatasetUseCases(db=db, current_user=current_user)
