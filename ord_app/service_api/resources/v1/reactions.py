@@ -11,26 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import gzip
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response
 from fastapi_pagination import Page
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
-from ord_app.service_api.domain.reactions import (
-    create_reaction,
-    download_reaction,
-    get_reaction,
-    paginate_reactions,
-    update_reactions,
-)
-from ord_app.service_api.models import UserModel
+from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
+from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
-from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
 
@@ -40,13 +31,12 @@ router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions"
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     response_model=ReactionSchema,
 )
-async def _create_reaction(
+async def create_reaction(
     dataset_id: int,
     payload: ReactionCreateSchema,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await create_reaction(db_session, dataset_id, user, payload)
+    return await use_case.create(dataset_id, payload)
 
 
 @router.get(
@@ -56,9 +46,9 @@ async def _create_reaction(
 )
 async def reactions(
     dataset_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await paginate_reactions(db_session, dataset_id)
+    return await use_case.paginate(dataset_id)
 
 
 @router.get(
@@ -68,9 +58,9 @@ async def reactions(
 )
 async def reaction(
     reaction_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await get_reaction(db_session, reaction_id)
+    return await use_case.get(reaction_id)
 
 
 @router.patch(
@@ -81,9 +71,9 @@ async def reaction(
 async def _update_reaction(
     reaction_id: int,
     payload: ReactionCreateSchema,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await update_reactions(db_session, reaction_id, payload)
+    return await use_case.update(reaction_id, payload)
 
 
 @router.get(
@@ -93,9 +83,9 @@ async def _update_reaction(
 async def _download_reaction(
     reaction_id: int,
     file_format: DownloadFileFormats,
-    db_session: AsyncSession = Depends(get_db_session),
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    reaction, data = await download_reaction(db_session, reaction_id, file_format)
+    reaction, data = await use_case.download(reaction_id, file_format)
     return Response(
         gzip.compress(data),
         headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}.gz"'},

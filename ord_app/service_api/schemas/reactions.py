@@ -33,8 +33,8 @@ class ReactionSchema(BaseSchema):
 
 
 class ReactionCreateSchema(BaseSchema):
-    name: str | None
-    binpb: bytes | None
+    name: str | None = None
+    binpb: bytes | None = None
 
     @field_validator("binpb", mode="after")
     @classmethod

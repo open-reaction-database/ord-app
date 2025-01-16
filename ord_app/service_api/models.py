@@ -100,8 +100,11 @@ class DatasetModel(BaseModel):
 
 
 class DatasetGroupAssociationModel(BaseModel):
-    dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id"), primary_key=True)
-    group_id: Mapped[int] = mapped_column(ForeignKey("group.id"), primary_key=True)
+    dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"), primary_key=True)
+    dataset: Mapped[DatasetModel] = relationship(DatasetModel, backref="dataset_group_associations")
+
+    group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="dataset_group_associations")
 
 
 class ReactionModel(BaseModel):
