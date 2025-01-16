@@ -11,29 +11,5 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import datetime
-
-from ord_app.service_api.models import UserRolesList
-from ord_app.service_api.schemas.base import BaseSchema
-from ord_app.service_api.schemas.users import UserSchema
-
-
-class GroupSchema(BaseSchema):
-    id: int
-    name: str
-    created_at: datetime
-    modified_at: datetime
-
-
-class GroupCreateSchema(BaseSchema):
-    name: str | None
-
-
-class GroupMemberEditSchema(BaseSchema):
-    identity: int | str
-    role: UserRolesList
-
-
-class GroupMemberSchema(BaseSchema):
-    role: UserRolesList
-    user: UserSchema
+class EntityNotFoundError(Exception):
+    pass

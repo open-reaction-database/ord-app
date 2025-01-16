@@ -19,7 +19,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.repositories.groups import GroupMembersRepository, GroupRepository
+from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.groups import GroupCreateSchema, GroupMemberEditSchema
+from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -50,13 +52,16 @@ class GroupMembersUseCases:
         self.db = db
         self.current_user = current_user
         self.group_members_repository = GroupMembersRepository(db)
+        self.user_repository = UserRepository(db)
 
     async def all(self, group_id: int) -> Sequence[UserGroupsMembershipModel]:
         return await self.group_members_repository.all(group_id)
 
-    async def upsert(self, group_id: int, payload: list[GroupMemberEditSchema]):
-        insert_values = [{"user_id": member.user_id, "group_id": group_id, "role": member.role} for member in payload]
-        await self.group_members_repository.upsert(insert_values)
+    async def upsert(self, group_id: int, payload: GroupMemberEditSchema):
+        if user := await self.user_repository.search_user_by_identity(payload.identity):
+            await self.group_members_repository.upsert(user.id, group_id, payload.role)
+            return await self.group_members_repository.get(user.id, group_id)
+        raise EntityNotFoundError(f"<User(identity={payload.identity})> not found")
 
     async def remove_members(self, group_id: int, members_ids: list[int]):
         await self.group_members_repository.remove_members(group_id, members_ids)
