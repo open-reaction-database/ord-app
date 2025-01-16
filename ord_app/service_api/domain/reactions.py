@@ -63,69 +63,6 @@ class ReactionsUseCase:
         return reaction, reaction_pb
 
 
-# async def get_reactions(db_session: AsyncSession, user: UserModel, dataset_id: int) -> Sequence[ReactionModel]:
-#     stmt = select(ReactionModel).where(
-#         ReactionModel.dataset_id == dataset_id,
-#         ReactionModel.owner == user,
-#     )
-#     return (await db_session.scalars(stmt)).all()
-#
-#
-# async def update_reactions(
-#     db_session: AsyncSession,
-#     reaction_id: int,
-#     payload: ReactionCreateSchema,
-# ) -> ReactionModel:
-#     stmt = (
-#         update(ReactionModel)
-#         .where(ReactionModel.id == reaction_id)
-#         .values(**payload.model_dump(exclude_unset=True))
-#         .returning(ReactionModel)
-#     )
-#     result = await db_session.scalar(stmt)
-#     await db_session.commit()
-#     return result
-#
-#
-# async def paginate_reactions(db_session: AsyncSession, dataset_id: int) -> Page[ReactionModel]:
-#     stmt = select(ReactionModel).where(ReactionModel.dataset_id == dataset_id)
-#     return await paginate(db_session, stmt)
-#
-#
-# async def get_reaction(
-#     db_session: AsyncSession,
-#     reaction_id: int,
-# ):
-#     stmt = select(ReactionModel).where(ReactionModel.id == reaction_id).limit(1)
-#     return await db_session.scalar(stmt)
-#
-#
-# async def create_reaction(
-#     db_session: AsyncSession, dataset_id: int, user: UserModel, payload: ReactionCreateSchema
-# ) -> ReactionModel:
-#     reaction = ReactionModel(owner=user, dataset_id=dataset_id, **payload.model_dump())
-#     db_session.add(reaction)
-#
-#     # set default id for Reaction BF
-#     if reaction.binpb is None:
-#         await db_session.flush()
-#         reaction.binpb = Reaction(reaction_id=str(reaction.id)).SerializeToString()
-#
-#     await db_session.commit()
-#     await db_session.refresh(reaction)
-#     return reaction
-#
-#
-# async def download_reaction(
-#     db_session: AsyncSession,
-#     reaction_id: int,
-#     file_format: DownloadFileFormats,
-# ) -> tuple[ReactionModel, bytes]:
-#     reaction = await get_reaction(db_session, reaction_id)
-#     data = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
-#     return reaction, data
-#
-
 def get_reaction_use_case(
     db: AsyncSession = Depends(get_db_session),
     current_user: UserModel = Depends(authenticate),
