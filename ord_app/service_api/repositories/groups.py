@@ -17,6 +17,7 @@ from loguru import logger
 from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel
 
@@ -74,10 +75,17 @@ class GroupMembersRepository:
         self.autocommit = autocommit
 
     async def get(self, user_id: int, group_id: int) -> UserGroupsMembershipModel:
-        stmt = select(UserGroupsMembershipModel).where(
-            UserGroupsMembershipModel.user_id == user_id,
-            UserGroupsMembershipModel.group_id == group_id,
-        ).limit(1)
+        stmt = (
+            select(UserGroupsMembershipModel)
+            .where(
+                UserGroupsMembershipModel.user_id == user_id,
+                UserGroupsMembershipModel.group_id == group_id,
+            )
+            .options(
+                joinedload(UserGroupsMembershipModel.user)
+            )
+            .limit(1)
+        )
         result = await self.db.scalar(stmt)
         return result
 
