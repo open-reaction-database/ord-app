@@ -13,38 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Avatar, Button, Drawer, Flex, Input, Text } from '@mantine/core';
-import { EditIcon } from 'common/icons';
-import classes from './GroupsDrawer.module.scss';
+import { useSelector } from 'react-redux';
 import { useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Drawer, Flex, Text } from '@mantine/core';
+import { EditIcon } from 'common/icons';
 import { InputModal } from 'common/components/InputModal/InputModal';
-import { RoleSelector } from 'pages/ContributePage/GroupsSidebar/GroupsDrawer/RoleSelector/RoleSelector';
 import { updateGroup } from 'store/groups/groups.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { useSelector } from 'react-redux';
-import { selectGroupById } from 'store/groups/groups.selectors';
-import { USER_ROLES } from 'common/types/roles';
+import {
+  selectEditingGroupId,
+  selectGroupById,
+  selectIsGroupUpdating,
+  selectMemberRoles,
+} from 'store/groups/groups.selectors';
+import { GroupMembersList } from './GroupMembersList/GroupMembersList';
+import {
+  resetAddMemberErrorAction,
+  setAddMemberInputValueAction,
+  setEditingGroupIdAction,
+} from 'store/groups/groups.actions';
+import { AddMemberInput } from './AddMemberInput/AddMemberInput';
+import classes from './GroupsDrawer.module.scss';
 
-interface GroupsDrawerProps {
-  opened: boolean;
-  onClose: () => void;
-  groupId: number;
-}
-
-export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawerProps>) {
+export function GroupsDrawer() {
   const dispatch = useAppDispatch();
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
+
+  const groupId = useSelector(selectEditingGroupId);
   const group = useSelector(selectGroupById(String(groupId)));
+
+  const isGroupUpdating = useSelector(selectIsGroupUpdating);
+  const { isAdmin } = useSelector(selectMemberRoles);
 
   const handleGroupRename = async (value: string) => {
     dispatch(updateGroup({ id: group.id, name: value }));
   };
 
+  const handleClose = () => {
+    dispatch(setAddMemberInputValueAction(''));
+    dispatch(resetAddMemberErrorAction());
+    dispatch(setEditingGroupIdAction(null));
+  };
+
   return (
     <>
       <Drawer.Root
-        opened={opened}
-        onClose={onClose}
+        opened={!!groupId}
+        onClose={handleClose}
         position="right"
         size="65%"
       >
@@ -60,10 +75,11 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
                 align="center"
                 gap="4"
               >
-                <Drawer.Title className={classes.title}>{group.name}</Drawer.Title>
+                <Drawer.Title className={classes.title}>{group?.name}</Drawer.Title>
                 <ActionIcon
                   variant="transparent"
                   onClick={openModal}
+                  disabled={!isAdmin || isGroupUpdating}
                 >
                   <EditIcon className={classes.editIcon} />
                 </ActionIcon>
@@ -72,51 +88,9 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
             <Drawer.CloseButton />
           </Drawer.Header>
           <Drawer.Body className={classes.body}>
-            <div className={classes.inputContainer}>
-              <Input placeholder="Add user by e-mail or ORCID number" />
-              <Button className={classes.button}>Add User</Button>
-            </div>
+            <AddMemberInput />
 
-            <div className={classes.membersContainer}>
-              <Flex
-                align="center"
-                gap="8"
-              >
-                <div className={classes.membersTitle}>Members</div>
-                <div className={classes.counter}>3</div>
-              </Flex>
-
-              <div className={classes.userInfoContainer}>
-                <Flex
-                  align="center"
-                  gap="12"
-                >
-                  <Avatar radius="xl">JD</Avatar>
-                  <Flex
-                    direction="column"
-                    gap="4"
-                  >
-                    <div>John Doe</div>
-                    <Flex gap="8">
-                      <div>
-                        <span className={classes.category}>ORCID:</span>
-                        <span>0000-0001-5727-2427</span>
-                      </div>
-                      <div>
-                        <span className={classes.category}>e-mail:</span>
-                        <span>john-doe@epam.com</span>
-                      </div>
-                    </Flex>
-                  </Flex>
-                </Flex>
-
-                <RoleSelector
-                  value={USER_ROLES.ADMIN}
-                  onChange={role => console.log(role)}
-                  onRemove={() => console.log('Removed')}
-                />
-              </div>
-            </div>
+            <GroupMembersList />
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>
@@ -127,7 +101,7 @@ export function GroupsDrawer({ opened, onClose, groupId }: Readonly<GroupsDrawer
         onSubmit={handleGroupRename}
         title="Rename Group"
         inputLabel="Group name"
-        initialValue={group.name}
+        initialValue={group?.name}
       />
     </>
   );

@@ -13,34 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  padding: 20px 24px;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--color-border-1);
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
 }
 
 .title {
-  font-size: var(--mantine-h2-font-size);
-  line-height: var(--mantine-h2-line-height);
+  font-size: 16px;
   font-weight: 600;
 }
 
-.editIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--mantine-color-primary-0);
+.counter {
+  padding: 2px 8px;
+  background-color: var(--color-background-gray);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  border-radius: var(--mantine-spacing-xl);
 }
 
-.subtitle {
+.userInfoContainer {
+  display: flex;
+  padding: 8px 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.category {
   color: var(--color-text-secondary-2);
+  margin-right: 4px;
 }
 
-.body {
-  padding: 16px 24px;
+.rolesButton {
+  color: var(--color-primary);
+  text-decoration: dotted;
+  cursor: pointer;
+
+  span {
+    border-bottom: 1px dotted var(--color-primary);
+  }
 }
 
-.label {
-  padding: 8px 16px;
-  font-weight: 400;
-  border-radius: 8px;
+.role {
+  text-transform: capitalize;
 }

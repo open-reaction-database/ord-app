@@ -1,3 +1,6 @@
+import type { USER_ROLES } from 'common/types';
+import type { User } from 'store/users/users.types';
+
 /*
  * Copyright 2024 Open Reaction Database Project Authors
  *
@@ -18,4 +21,10 @@ export interface Group {
   name: string;
   created_at: string;
   modified_at: string;
+  members?: GroupMember[];
+}
+
+export interface GroupMember {
+  role: USER_ROLES;
+  user: User;
 }

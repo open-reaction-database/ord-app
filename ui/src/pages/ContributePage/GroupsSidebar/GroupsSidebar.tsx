@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect } from 'react';
 import { Button, Flex, Paper, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
@@ -21,16 +21,12 @@ import { InputModal } from 'common/components/InputModal/InputModal';
 import { GroupsDrawer } from 'pages/ContributePage/GroupsSidebar/GroupsDrawer/GroupsDrawer';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { createGroup, getGroupList } from 'store/groups/groups.thunks';
-import { type Group } from 'store/groups/groups.types';
 import { GroupsList } from 'pages/ContributePage/GroupsSidebar/GroupsList/GroupsList';
 import classes from './GroupsSidebar.module.scss';
 
 export function GroupsSidebar() {
   const dispatch = useAppDispatch();
-
   const [opened, { open, close }] = useDisclosure(false);
-  const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
-  const [selectedGroup, setSelectedGroup] = useState<Group>();
 
   useEffect(() => {
     dispatch(getGroupList());
@@ -38,12 +34,6 @@ export function GroupsSidebar() {
 
   const handleGroupAddition = async (value: string) => {
     dispatch(createGroup(value));
-  };
-
-  const handleGroupsDrawerOpen = (e: MouseEvent, group: Group) => {
-    e.stopPropagation();
-    setSelectedGroup(group);
-    openDrawer();
   };
 
   return (
@@ -68,7 +58,7 @@ export function GroupsSidebar() {
           </Button>
         </Flex>
 
-        <GroupsList onEdit={handleGroupsDrawerOpen} />
+        <GroupsList />
       </Paper>
 
       <InputModal
@@ -79,13 +69,7 @@ export function GroupsSidebar() {
         inputLabel="Group name"
       />
 
-      {selectedGroup && (
-        <GroupsDrawer
-          opened={openedDrawer}
-          onClose={closeDrawer}
-          groupId={selectedGroup.id}
-        />
-      )}
+      <GroupsDrawer />
     </>
   );
 }

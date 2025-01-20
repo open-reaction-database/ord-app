@@ -16,9 +16,18 @@
 export interface Self {
   picture?: string | undefined;
   name: string;
+  email: string;
 }
 
 export interface SelfCreate {
   access_token: string;
   id_token: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  external_id: string;
+  avatar_url: string;
 }

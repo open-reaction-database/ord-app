@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 export enum USER_ROLES {
-  ADMIN = 'Admin',
-  EDITOR = 'Editor',
-  VIEWER = 'Viewer',
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  VIEWER = 'viewer',
 }

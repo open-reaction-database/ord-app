@@ -13,23 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
 import { itemsById } from 'common/utils';
-import type { Group } from './groups.types';
+import type { Group, GroupMember } from './groups.types';
 import {
+  addGroupMemberActions,
   createGroupActions,
   getGroupActions,
   getGroupListActions,
+  getGroupMembersActions,
+  removeGroupMembersActions,
+  resetAddMemberErrorAction,
   setActiveGroupIdAction,
+  setAddMemberInputValueAction,
+  setEditingGroupIdAction,
   setGroupSearchAction,
   updateGroupActions,
+  updateGroupMembersActions,
 } from './groups.actions';
 
 const getGroupId = (group: Group) => group.id;
 
 const activeGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(setActiveGroupIdAction, (_, action) => action.payload);
+});
+
+const editingGroupId = createReducer<number | null>(null, builder => {
+  builder.addCase(setEditingGroupIdAction, (_, action) => action.payload);
 });
 
 const groupNameSearch = createReducer('', builder => {
@@ -46,8 +57,90 @@ const groupsById = createReducer<ItemsById<Group>>({}, builder => {
   );
 });
 
+const groupsMembersByGroupId = createReducer<ItemsById<Array<GroupMember>>>({}, builder => {
+  builder.addCase(getGroupMembersActions.success, (state, action) => {
+    const { groupId, members } = action.payload;
+
+    return {
+      ...state,
+      [groupId]: members,
+    };
+  });
+  builder.addCase(updateGroupMembersActions.success, (state, action) => {
+    const { groupId, member: updatedMember } = action.payload;
+
+    const updatedMembers = state[groupId].map(member =>
+      member.user.id === updatedMember.user.id ? updatedMember : member,
+    );
+
+    return {
+      ...state,
+      [groupId]: updatedMembers,
+    };
+  });
+  builder.addCase(removeGroupMembersActions.success, (state, action) => {
+    const { groupId, membersId } = action.payload;
+
+    const updatedMembers = state[groupId].filter(member => !membersId.includes(member.user.id));
+
+    return {
+      ...state,
+      [groupId]: updatedMembers,
+    };
+  });
+  builder.addCase(addGroupMemberActions.success, (state, action) => {
+    const { groupId, member } = action.payload;
+
+    const updatedMembers = [...state[groupId], member];
+
+    return {
+      ...state,
+      [groupId]: updatedMembers,
+    };
+  });
+});
+
+const addMemberInputValue = createReducer('', builder => {
+  builder.addCase(setAddMemberInputValueAction, (_, action) => action.payload);
+});
+
+const addMemberError = createReducer<Error | null>(null, builder => {
+  builder.addCase(addGroupMemberActions.failure, (_, action) => action.payload);
+  builder.addCase(resetAddMemberErrorAction, () => null);
+});
+
+const isGroupUpdating = createReducer<boolean>(false, builder => {
+  builder.addMatcher(
+    isAnyOf(
+      updateGroupActions.request,
+      updateGroupMembersActions.request,
+      removeGroupMembersActions.request,
+      addGroupMemberActions.request,
+    ),
+    () => true,
+  );
+  builder.addMatcher(
+    isAnyOf(
+      updateGroupActions.success,
+      updateGroupMembersActions.success,
+      removeGroupMembersActions.success,
+      addGroupMemberActions.success,
+      updateGroupActions.failure,
+      updateGroupMembersActions.failure,
+      removeGroupMembersActions.failure,
+      addGroupMemberActions.failure,
+    ),
+    () => false,
+  );
+});
+
 export const groupsReducer = combineReducers({
   groupsById,
   groupNameSearch,
   activeGroupId,
+  editingGroupId,
+  groupsMembersByGroupId,
+  addMemberInputValue,
+  addMemberError,
+  isGroupUpdating,
 });

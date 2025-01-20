@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { selectSelf } from 'store/users/users.selectors';
 import type { AppState } from '../configureAppStore';
 import { createSelector } from '@reduxjs/toolkit';
+import { USER_ROLES } from 'common/types';
 
 const selectRootState = (state: AppState) => state.groups;
 
@@ -26,6 +28,8 @@ export const selectGroups = (state: AppState) => Object.values(selectRootState(s
 
 export const selectActiveGroupId = (state: AppState) => selectRootState(state).activeGroupId;
 
+export const selectEditingGroupId = (state: AppState) => selectRootState(state).editingGroupId;
+
 export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroups], (search, groups) => {
   const lowerCaseSearch = search.toLowerCase();
   const filteredList =
@@ -34,3 +38,23 @@ export const selectOrderedGroupsList = createSelector([selectGroupSearch, select
       : Object.values(groups);
   return filteredList.sort((a, b) => a.name.localeCompare(b.name));
 });
+
+export const selectGroupMembersByGroupId = (id: string) => (state: AppState) =>
+  selectRootState(state).groupsMembersByGroupId[id];
+
+export const selectAddMemberInputValue = (state: AppState) => selectRootState(state).addMemberInputValue;
+
+export const selectAddMemberError = (state: AppState) => selectRootState(state).addMemberError;
+
+export const selectIsGroupUpdating = (state: AppState) => selectRootState(state).isGroupUpdating;
+
+export const selectMemberRoles = createSelector(
+  [selectEditingGroupId, (state: AppState) => state, selectSelf],
+  (editingGroupId, state, currentUser) => {
+    const groupMembers = selectGroupMembersByGroupId(String(editingGroupId))(state);
+    const isAdmin = groupMembers?.find(member => member.user.email === currentUser?.email)?.role === USER_ROLES.ADMIN;
+    const hasTwoAdmins = groupMembers?.filter(member => member.role === USER_ROLES.ADMIN)?.length >= 2;
+
+    return { isAdmin, hasTwoAdmins };
+  },
+);

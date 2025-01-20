@@ -16,6 +16,7 @@
 import { useAuth } from 'common/hooks/useAuth';
 import { lazy, Suspense } from 'react';
 import { PageLoader } from '../common/components/PageLoader/PageLoader';
+import { Notifications } from '@mantine/notifications';
 
 const Routes = lazy(() => import('pages'));
 
@@ -27,6 +28,7 @@ export function AppContent() {
   ) : (
     <Suspense fallback={<PageLoader />}>
       <Routes />
+      <Notifications containerWidth={350} />
     </Suspense>
   );
 }

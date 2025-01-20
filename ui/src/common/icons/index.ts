@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
+export { default as AlertCircleIcon } from './AlertCircleIcon.svg?react';
+export { default as CheckCircleIcon } from './CheckCircleIcon.svg?react';
 export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';
 export { default as ChevronDownFilledIcon } from './ChevronDownFilledIcon.svg?react';
 export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
 export { default as CopyIcon } from './CopyIcon.svg?react';
+export { default as CrossCircleIcon } from './CrossCircleIcon.svg?react';
 export { default as DotsIcon } from './DotsIcon.svg?react';
 export { default as DownloadIcon } from './DownloadIcon.svg?react';
 export { default as EditIcon } from './EditIcon.svg?react';
@@ -26,6 +29,7 @@ export { default as EmptyIcon } from './EmptyIcon.svg?react';
 export { default as GridViewIcon } from './GridViewIcon.svg?react';
 export { default as GroupArrowIcon } from './GroupArrowIcon.svg?react';
 export { default as HomeIcon } from './HomeIcon.svg?react';
+export { default as InfoCircleIcon } from './InfoCircleIcon.svg?react';
 export { default as LogoIcon } from './LogoIcon.svg?react';
 export { default as NewDatasetIcon } from './NewDatasetIcon.svg?react';
 export { default as RemoveIcon } from './RemoveIcon.svg?react';
