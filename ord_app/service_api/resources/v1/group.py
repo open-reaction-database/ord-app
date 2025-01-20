@@ -23,10 +23,11 @@ from ord_app.service_api.domain.groups import (
     get_group_use_case,
 )
 from ord_app.service_api.schemas.groups import (
+    GroupAddMemberSchema,
     GroupCreateSchema,
-    GroupMemberEditSchema,
     GroupMemberSchema,
     GroupSchema,
+    GroupUpdateMemberSchema,
 )
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 
@@ -84,19 +85,36 @@ async def get_group_members(
     return await use_case.all(group_id)
 
 
-@router.put(
+@router.post(
     "/{group_id}/members",
     dependencies=[Depends(group_authorization(("admin",)))],
     response_model=GroupMemberSchema,
     status_code=status.HTTP_201_CREATED,
 )
-async def upsert_members(
+async def add_member(
     group_id: int,
-    payload: GroupMemberEditSchema,
+    payload: GroupAddMemberSchema,
     use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)],
 ):
     try:
-        return await use_case.upsert(group_id, payload)
+        return await use_case.add_member(group_id, payload)
+    except EntityNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
+
+@router.patch(
+    "/{group_id}/members",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    response_model=GroupMemberSchema,
+    status_code=status.HTTP_201_CREATED,
+)
+async def update_member(
+    group_id: int,
+    payload: GroupUpdateMemberSchema,
+    use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)],
+):
+    try:
+        return await use_case.update_member(group_id, payload)
     except EntityNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
