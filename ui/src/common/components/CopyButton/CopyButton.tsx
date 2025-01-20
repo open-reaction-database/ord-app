@@ -16,7 +16,7 @@
 import { Menu, ThemeIcon } from '@mantine/core';
 import { CopyIcon } from 'common/icons';
 import { copyToClipboard } from 'common/utils/copyToClipboard';
-import classes from './CopyButton.module.scss';
+import classes from './copyButton.module.scss';
 
 interface CopyButtonProps {
   options: CopyButtonOptions[];

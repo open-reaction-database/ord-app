@@ -33,7 +33,11 @@ export function useAuth() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      loginWithRedirect();
+      loginWithRedirect({
+        appState: {
+          returnTo: window.location.href,
+        },
+      });
     }
   }, [isAuthenticated, isLoading, loginWithRedirect]);
 

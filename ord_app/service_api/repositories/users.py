@@ -21,17 +21,19 @@ class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def search_user_by_identity(self, identity: int | str) -> UserModel:
-        stmt = select(UserModel).limit(1)
+    async def get(self, user_id: int) -> UserModel:
+        return await self.db.get(UserModel, user_id)
 
-        if isinstance(identity, int):
-            stmt = stmt.where(UserModel.id == identity)
-        else:
-            stmt = stmt.where(
+    async def search_user_by_identity(self, identity: int | str) -> UserModel:
+        stmt = (
+            select(UserModel)
+            .where(
                 or_(
                     UserModel.email == identity,
-                    UserModel.external_id.ilike(f"%{identity}%"),
+                    UserModel.external_id.ilike(f"%{identity}"),
                 )
             )
+            .limit(1)
+        )
 
         return await self.db.scalar(stmt)

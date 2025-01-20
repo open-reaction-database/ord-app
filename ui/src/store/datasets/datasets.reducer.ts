@@ -81,6 +81,7 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
 
 const datasetsOrder = createReducer<number[]>([], builder => {
   builder.addCase(setActiveGroupIdAction, () => []);
+  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
     action.payload.items.map(item => item.id),
   );

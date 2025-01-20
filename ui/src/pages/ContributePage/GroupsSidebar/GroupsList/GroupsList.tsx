@@ -16,7 +16,7 @@
 import { useEffect, useCallback, type ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
-import { selectGroupSearch, selectOrderedGroupsList } from 'store/groups/groups.selectors';
+import { selectGroupSearch, selectHaveAnyGroups, selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
 import classes from './GroupsList.module.scss';
 import { setActiveGroupIdAction, setEditingGroupIdAction, setGroupSearchAction } from 'store/groups/groups.actions';
@@ -28,6 +28,7 @@ export function GroupsList() {
   const appDispatch = useAppDispatch();
   const groups = useSelector(selectOrderedGroupsList);
   const groupSearch = useSelector(selectGroupSearch);
+  const haveAnyGroups = useSelector(selectHaveAnyGroups);
 
   const selectGroup = useCallback(
     (groupId: number | null) => {
@@ -59,7 +60,7 @@ export function GroupsList() {
 
   const scrollAreaHeight = groups.length > 4 ? GROUP_BUTTON_HEIGHT * 4 : GROUP_BUTTON_HEIGHT * groups.length;
 
-  return groups.length ? (
+  return haveAnyGroups ? (
     <>
       <Input
         classNames={{ input: classes.searchInput }}

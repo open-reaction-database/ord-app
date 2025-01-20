@@ -99,6 +99,27 @@ class GroupMembersRepository:
         )
         return (await self.db.scalars(stmt)).all()
 
+    async def add_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+        value = {"user_id": user_id, "group_id": group_id, "role": role}
+        stmt = insert(UserGroupsMembershipModel).values(value)
+        if autocommit:
+            await self.db.execute(stmt)
+            await self.db.commit()
+            logger.debug(f"Member {user_id} added to {group_id} with role: {role}")
+
+    async def update_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+        stmt = (
+            update(UserGroupsMembershipModel)
+            .where(
+                UserGroupsMembershipModel.user_id == user_id,
+                UserGroupsMembershipModel.group_id == group_id,
+            )
+            .values(role=role)
+        )
+        if self.autocommit:
+            await self.db.execute(stmt)
+            await self.db.commit()
+
     async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)

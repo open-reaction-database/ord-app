@@ -22,6 +22,25 @@ from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetMode
 from ord_app.service_api.settings import RuntimeSettings
 
 
+async def test_create_empty_reaction(api_client, mock_authenticated_user, test_db_session):
+    user, _, group = mock_authenticated_user
+
+    dataset = DatasetModel(owner=user, name="init", description="init")
+    test_db_session.add(dataset)
+    await test_db_session.flush()
+
+    test_db_session.add(
+        DatasetGroupAssociationModel(dataset=dataset, group=group)
+    )
+    await test_db_session.commit()
+    payload = {}
+    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+
+    assert response_data["name"] is None
+    reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
+    assert reaction_pb.reaction_id == str(response_data["id"])
+
+
 async def test_create_reaction(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
 

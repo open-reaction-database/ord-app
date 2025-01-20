@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Suspense } from 'react';
 import { useAuth } from 'common/hooks/useAuth';
-import { lazy, Suspense } from 'react';
+import { lazyWithPreload } from 'react-lazy-with-preload';
 import { PageLoader } from '../common/components/PageLoader/PageLoader';
 import { Notifications } from '@mantine/notifications';
 
-const Routes = lazy(() => import('pages'));
+const Routes = lazyWithPreload(() => import('pages'));
 
 export function AppContent() {
   const isLoading = useAuth();
