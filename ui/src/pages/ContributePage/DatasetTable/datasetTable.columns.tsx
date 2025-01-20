@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 import type { MRT_ColumnDef } from 'mantine-react-table';
-import { StatusChip } from 'common/components/StatusChip/StatusChip';
 import { UserField } from 'common/components/UserField/UserField';
 import { formatDate } from 'common/utils';
 import type { Dataset } from 'store/datasets/datasets.types';
-import { DATASET_STATUS } from 'common/model/datasetStatus';
 
 export const columns: MRT_ColumnDef<Dataset>[] = [
   {
@@ -32,15 +30,6 @@ export const columns: MRT_ColumnDef<Dataset>[] = [
     accessorKey: 'reaction_count',
     header: 'Size',
     size: 80,
-  },
-  {
-    id: 'status',
-    accessorKey: 'status',
-    header: 'Status',
-    Cell: () => {
-      return <StatusChip status={DATASET_STATUS.IN_PROGRESS} />;
-    },
-    size: 110,
   },
   {
     id: 'group',
@@ -70,5 +59,6 @@ export const columns: MRT_ColumnDef<Dataset>[] = [
     id: 'description',
     accessorKey: 'description',
     header: 'Description',
+    size: 280,
   },
 ];

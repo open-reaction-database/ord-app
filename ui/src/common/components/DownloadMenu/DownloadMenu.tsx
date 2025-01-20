@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { type JSX, useCallback } from 'react';
+import { downloadFile } from 'common/store/util.thunks';
+import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
 import { DownloadIcon } from 'common/icons';
 import classes from './DownloadMenu.module.scss';
@@ -24,11 +27,20 @@ export interface DownloadMenuOptions {
 
 interface DownloadMenuProps {
   options: DownloadMenuOptions[];
+  url: string;
   target: JSX.Element;
-  onClick: (format: string) => void;
 }
 
-export function DownloadMenu({ options, target, onClick }: Readonly<DownloadMenuProps>) {
+export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProps>) {
+  const dispatch = useAppDispatch();
+
+  const handleDatasetDownload = useCallback(
+    (format: string) => {
+      dispatch(downloadFile(`${url}?file_format=${format}`));
+    },
+    [dispatch, url],
+  );
+
   return (
     <Menu
       classNames={{
@@ -39,13 +51,12 @@ export function DownloadMenu({ options, target, onClick }: Readonly<DownloadMenu
       width={140}
     >
       <Menu.Target>{target}</Menu.Target>
-
       <Menu.Dropdown>
         {options.map(option => (
           <Menu.Item
             key={option.format}
             leftSection={<DownloadIcon />}
-            onClick={() => onClick(option.format)}
+            onClick={() => handleDatasetDownload(option.format)}
           >
             {option.label}
           </Menu.Item>

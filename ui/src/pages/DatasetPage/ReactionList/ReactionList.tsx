@@ -21,8 +21,8 @@ import classes from './reactionsList.module.scss';
 import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useSelector } from 'react-redux';
 import { selectReactionsOrder, selectReactionsPagination } from 'store/reactions/reactions.selectors';
-import { getReactionsPage } from '../../../store/reactions/reactions.thunks';
-import { useAppDispatch } from '../../../store/useAppDispatch';
+import { getReactionsPage } from 'store/reactions/reactions.thunks';
+import { useAppDispatch } from 'store/useAppDispatch';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ export function ReactionList() {
             gap="sm"
           >
             <Title order={2}>Dataset Reactions</Title>
-            <span className={classes.counter}>{reactionsIds.length}</span>
+            <span className={classes.counter}>{pagination.total}</span>
           </Flex>
 
           <Button
