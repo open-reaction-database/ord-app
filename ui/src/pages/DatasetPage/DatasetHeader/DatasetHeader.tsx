@@ -29,6 +29,7 @@ import { useSelector } from 'react-redux';
 import { selectIsDatasetOpened } from 'store/datasets/datasets.selectors';
 import { setDatasetEditOpenedAction } from 'store/datasets/datasets.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
+import { domain } from 'common/constants';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -55,7 +56,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
 
   const copyToClipboardOptions: CopyButtonOptions[] = useMemo(
     () => [
-      { label: 'Copy Dataset Link', value: `${window.location.origin}${location}` },
+      { label: 'Copy Dataset Link', value: `${domain}${location}` },
       { label: 'Copy Dataset ID', value: dataset.id.toString() },
     ],
     [dataset.id, location],

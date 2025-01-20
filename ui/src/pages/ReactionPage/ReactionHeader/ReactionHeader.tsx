@@ -16,11 +16,12 @@
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { useSelector } from 'react-redux';
-import { CopyButton } from '../../../common/components/CopyButton/CopyButton';
+import { CopyButton } from 'common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
 import { useMemo } from 'react';
 import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
 import { useLocation } from 'wouter';
+import { domain } from 'common/constants';
 
 const reactionDownloadOptions: DownloadMenuOptions[] = [
   { label: '.pb', format: 'binpb' },
@@ -38,7 +39,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
 
   const copyOptions = useMemo(
     () => [
-      { label: 'Copy Reaction Link', value: `${window.location.origin}${location}` },
+      { label: 'Copy Reaction Link', value: `${domain}${location}` },
       { label: 'Copy Reaction ID', value: reactionId.toString() },
     ],
     [reactionId, location],
