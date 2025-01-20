@@ -20,7 +20,7 @@ from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.repositories.groups import GroupMembersRepository, GroupRepository
 from ord_app.service_api.repositories.users import UserRepository
-from ord_app.service_api.schemas.groups import GroupCreateSchema, GroupMemberEditSchema
+from ord_app.service_api.schemas.groups import GroupAddMemberSchema, GroupCreateSchema, GroupUpdateMemberSchema
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -57,11 +57,17 @@ class GroupMembersUseCases:
     async def all(self, group_id: int) -> Sequence[UserGroupsMembershipModel]:
         return await self.group_members_repository.all(group_id)
 
-    async def upsert(self, group_id: int, payload: GroupMemberEditSchema):
+    async def add_member(self, group_id: int, payload: GroupAddMemberSchema):
         if user := await self.user_repository.search_user_by_identity(payload.identity):
-            await self.group_members_repository.upsert(user.id, group_id, payload.role)
+            await self.group_members_repository.add_member(user.id, group_id, payload.role)
             return await self.group_members_repository.get(user.id, group_id)
         raise EntityNotFoundError(f"<User(identity={payload.identity})> not found")
+
+    async def update_member(self, group_id: int, payload: GroupUpdateMemberSchema):
+        if user := await self.user_repository.get(payload.user_id):
+            await self.group_members_repository.update_member(user.id, group_id, payload.role)
+            return await self.group_members_repository.get(user.id, group_id)
+        raise EntityNotFoundError(f"<User(identity={payload.user_id})> not found")
 
     async def remove_members(self, group_id: int, members_ids: list[int]):
         await self.group_members_repository.remove_members(group_id, members_ids)
