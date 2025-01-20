@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createActionFactory } from '../../common/store';
-import type { ReactionWrapper } from './reactions.types';
-import type { CurrentPage, Pages } from '../../common/types';
+import classes from './requiredAsterisk.module.scss';
 
-const { createAsyncAction } = createActionFactory('reactions');
-
-export const getReactionsListActions = createAsyncAction<number, Pages<ReactionWrapper>>('get_list');
-
-export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<ReactionWrapper>>('get_page');
-
-export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, ReactionWrapper>('get');
+export function RequiredAsterisk() {
+  return <span className={classes.required}>*</span>;
+}

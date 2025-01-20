@@ -15,13 +15,12 @@
  */
 import { Button, Flex, Paper } from '@mantine/core';
 import { Link, useParams } from 'wouter';
-import { CopyButton, type CopyButtonOptions } from '../../DatasetHeader/CopyButton/CopyButton';
+import { CopyButton, type CopyButtonOptions } from '../../../../common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
-import { DownloadMenu, type DownloadMenuOptions } from '../../DatasetHeader/DownloadMenu/DownloadMenu';
+import { DownloadMenu, type DownloadMenuOptions } from '../../../../common/components/DownloadMenu/DownloadMenu';
 import classes from './ReactionCard.module.scss';
-import { downloadFile } from 'common/utils';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from '../../../../store/reactions/reactions.selectors';
+import { selectReactionById } from 'store/reactions/reactions.selectors';
 
 interface ReactionCardProps {
   id: number;
@@ -36,11 +35,6 @@ const reactionDownloadOptions: DownloadMenuOptions[] = [
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
   const reaction = useSelector(selectReactionById(id));
-
-  const handleReactionDownload = (format: string) => {
-    const url = `/datasets/${datasetId}/reactions/${id}/download?file_format=${format}`;
-    downloadFile(url, `Dataset_${datasetId}_Reaction_${id}`);
-  };
 
   const copyToClipboardOptions: CopyButtonOptions[] = [
     { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
@@ -62,7 +56,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
             <span className={classes.index}>{index}.</span>
             <Link
               className={classes.link}
-              to={'/Dataset/123/reaction/123'}
+              to={`/dataset/${datasetId}/reaction/${id}`}
             >
               {reaction.name || reaction.id}
             </Link>
@@ -76,7 +70,11 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           </div>
         </div>
 
-        <div className={classes.buttonContainer}>
+        <Flex
+          align="flex-start"
+          direction="column"
+          className={classes.buttonContainer}
+        >
           <Button
             leftSection={<CheckListIcon />}
             variant="white"
@@ -86,7 +84,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
 
           <DownloadMenu
             options={reactionDownloadOptions}
-            onClick={handleReactionDownload}
+            url={`/datasets/${datasetId}/reactions/${id}/download`}
             target={
               <Button
                 className={classes.target}
@@ -105,7 +103,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           >
             More
           </Button>
-        </div>
+        </Flex>
       </div>
 
       <div>Reaction Field</div>

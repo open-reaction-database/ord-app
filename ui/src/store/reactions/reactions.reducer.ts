@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
-import { getReactionPageActions, getReactionsListActions } from './reactions.actions';
-import { itemsById } from '../../common/utils';
+import { getReactionActions, getReactionPageActions, getReactionsListActions } from './reactions.actions';
+import { itemsById } from 'common/utils';
 import type { ReactionWrapper } from './reactions.types';
-import type { ItemsById, Pagination } from '../../common/types';
-import { emptyPagination } from '../../common/constants';
+import type { ItemsById, Pagination } from 'common/types';
+import { emptyPagination } from 'common/constants';
 
 const getReactionId = (reaction: ReactionWrapper) => reaction.id;
 
 const activeDatasetId = createReducer<number>(0, builder => {
+  builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
   builder.addCase(getReactionsListActions.request, (_, action) => action.payload);
 });
 
 const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
+  builder.addCase(getReactionActions.success, (state, action) => ({
+    ...state,
+    [getReactionId(action.payload)]: action.payload,
+  }));
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
     itemsById(action.payload.items, getReactionId),
   );
@@ -34,6 +39,7 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
 
 const reactionsOrder = createReducer<number[]>([], builder => {
   builder.addCase(getReactionsListActions.request, () => []);
+  builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
     action.payload.items.map(getReactionId),
   );

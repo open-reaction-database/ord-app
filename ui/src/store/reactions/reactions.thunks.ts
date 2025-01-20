@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 import { createThunk } from '../../common/store';
-import { getReactionPageActions, getReactionsListActions } from './reactions.actions';
+import { getReactionActions, getReactionPageActions, getReactionsListActions } from './reactions.actions';
 import axiosInstance from '../../common/config/axiosConfig';
 import type { Pages } from '../../common/types';
 import type { ReactionResponse, ReactionWrapper } from './reactions.types';
 import ordSchema from 'ord-schema';
 import { selectActiveDatasetId, selectReactionsPagination } from './reactions.selectors';
 
-const reactionResponseToWrapped = (pages: Pages<ReactionResponse>): Pages<ReactionWrapper> => {
+const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => ({
+  ...rest,
+  // TODO check whether we need to cast it
+  data: ordSchema.Reaction.deserializeBinary(binpb as unknown as Uint8Array).toObject(),
+});
+
+const parseReactionList = (pages: Pages<ReactionResponse>): Pages<ReactionWrapper> => {
   const { items, ...pagination } = pages;
-  const wrappedItems = items.map(
-    ({ binpb, ...rest }): ReactionWrapper => ({
-      ...rest,
-      data: ordSchema.Reaction.deserializeBinary(binpb as unknown as Uint8Array).toObject(),
-    }),
-  );
+  const wrappedItems = items.map(parseReaction);
   return { ...pagination, items: wrappedItems };
 };
 
@@ -36,7 +37,7 @@ export const getReactionsList = createThunk(getReactionsListActions, async (_d, 
   const currentPage = selectReactionsPagination(getState());
   const params = { page: currentPage.page, size: currentPage.size };
   const result = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
-  return getReactionsListActions.success(reactionResponseToWrapped(result.data));
+  return getReactionsListActions.success(parseReactionList(result.data));
 });
 
 export const getReactionsPage = createThunk(getReactionPageActions, async (_d, getState) => {
@@ -46,5 +47,12 @@ export const getReactionsPage = createThunk(getReactionPageActions, async (_d, g
   const params = { page: currentPage.page, size: currentPage.size };
 
   const result = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
-  return getReactionPageActions.success(reactionResponseToWrapped(result.data));
+  return getReactionPageActions.success(parseReactionList(result.data));
+});
+
+export const getReaction = createThunk(getReactionActions, async (_d, getState, { reactionId }) => {
+  const datasetId = selectActiveDatasetId(getState());
+
+  const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
+  return getReactionActions.success(parseReaction(result.data));
 });

@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 import classes from './datasetHeader.module.scss';
-import { DataField } from '../../../common/components/DataField/DataField';
-import { UserField } from '../../../common/components/UserField/UserField';
+import { DataField } from 'common/components/DataField/DataField';
+import { UserField } from 'common/components/UserField/UserField';
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
-import { CopyButton, type CopyButtonOptions } from './CopyButton/CopyButton';
-import { downloadFile, formatDate } from '../../../common/utils';
-import { DownloadMenu, type DownloadMenuOptions } from './DownloadMenu/DownloadMenu';
+import { CopyButton, type CopyButtonOptions } from 'common/components/CopyButton/CopyButton';
+import { formatDate } from 'common/utils';
+import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
 import { ChevronDownIcon, EditIcon } from 'common/icons';
 import type { Dataset } from 'store/datasets/datasets.types';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { EditDataset } from './EditDataset/EditDataset';
 import { useSelector } from 'react-redux';
-import { selectIsDatasetOpened } from '../../../store/datasets/datasets.selectors';
-import { setDatasetEditOpenedAction } from '../../../store/datasets/datasets.actions';
-import { useAppDispatch } from '../../../store/useAppDispatch';
+import { selectIsDatasetOpened } from 'store/datasets/datasets.selectors';
+import { setDatasetEditOpenedAction } from 'store/datasets/datasets.actions';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { domain } from 'common/constants';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -55,18 +56,10 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
 
   const copyToClipboardOptions: CopyButtonOptions[] = useMemo(
     () => [
-      { label: 'Copy Dataset Link', value: `${window.location.origin}${location}` },
+      { label: 'Copy Dataset Link', value: `${domain}${location}` },
       { label: 'Copy Dataset ID', value: dataset.id.toString() },
     ],
     [dataset.id, location],
-  );
-
-  const handleDatasetDownload = useCallback(
-    (format: string) => {
-      const url = `/datasets/${dataset.id}/download?file_format=${format}`;
-      downloadFile(url, `Dataset_${dataset.id}`);
-    },
-    [dataset.id],
   );
 
   return (
@@ -116,7 +109,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
       <div className={classes.buttonContainer}>
         <DownloadMenu
           options={datasetDownloadOptions}
-          onClick={handleDatasetDownload}
+          url={`/datasets/${dataset.id}/download`}
           target={
             <Button
               className={classes.target}

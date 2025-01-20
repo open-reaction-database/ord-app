@@ -20,13 +20,15 @@ const selectRootState = (state: AppState) => state.groups;
 
 export const selectGroupSearch = (state: AppState) => selectRootState(state).groupNameSearch;
 
-export const selectGroupById = (id: string) => (state: AppState) => selectRootState(state).groupsById[id];
+export const selectGroupsByIds = (state: AppState) => selectRootState(state).groupsById;
 
-export const selectGroups = (state: AppState) => Object.values(selectRootState(state).groupsById);
+export const selectGroupById = (id: string) => (state: AppState) => selectGroupsByIds(state)[id];
 
 export const selectActiveGroupId = (state: AppState) => selectRootState(state).activeGroupId;
 
-export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroups], (search, groups) => {
+export const selectHaveAnyGroups = createSelector([selectGroupsByIds], groups => Object.keys(groups).length > 0);
+
+export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroupsByIds], (search, groups) => {
   const lowerCaseSearch = search.toLowerCase();
   const filteredList =
     search !== ''
