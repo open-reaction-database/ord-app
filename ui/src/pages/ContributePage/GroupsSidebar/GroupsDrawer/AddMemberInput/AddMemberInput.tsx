@@ -38,7 +38,6 @@ export function AddMemberInput() {
 
   const handleAddMember = async () => {
     dispatch(addGroupMember(inputValue));
-    dispatch(setAddMemberInputValueAction(''));
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
