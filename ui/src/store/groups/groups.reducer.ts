@@ -102,6 +102,7 @@ const groupsMembersByGroupId = createReducer<ItemsById<Array<GroupMember>>>({}, 
 
 const addMemberInputValue = createReducer('', builder => {
   builder.addCase(setAddMemberInputValueAction, (_, action) => action.payload);
+  builder.addCase(addGroupMemberActions.success, () => '');
 });
 
 const addMemberError = createReducer<Error | null>(null, builder => {
