@@ -21,6 +21,7 @@
 .menuItem {
   padding: 10px 12px;
   border-radius: 8px;
+  text-transform: capitalize;
 }
 
 .menuItemSection {
@@ -33,4 +34,18 @@
 
 .iconPlaceholder {
   min-width: 20px;
+}
+
+.target {
+  text-transform: capitalize;
+  width: 140px;
+}
+
+.alertIcon {
+  color: #e4626f;
+}
+
+.popoverButton {
+  padding: 6px 12px;
+  font-weight: 400;
 }

@@ -13,34 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  padding: 20px 24px;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--color-border-1);
-}
+import { notifications, type NotificationData } from '@mantine/notifications';
+import { CheckCircleIcon } from 'common/icons';
 
-.title {
-  font-size: var(--mantine-h2-font-size);
-  line-height: var(--mantine-h2-line-height);
-  font-weight: 600;
-}
-
-.editIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--mantine-color-primary-0);
-}
-
-.subtitle {
-  color: var(--color-text-secondary-2);
-}
-
-.body {
-  padding: 16px 24px;
-}
-
-.label {
-  padding: 8px 16px;
-  font-weight: 400;
-  border-radius: 8px;
+export function showNotification(options: NotificationData) {
+  notifications.show({
+    position: 'top-right',
+    autoClose: 10000,
+    icon: <CheckCircleIcon />,
+    color: 'transparent',
+    radius: '8px',
+    withBorder: false,
+    ...options,
+  });
 }

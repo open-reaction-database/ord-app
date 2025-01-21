@@ -14,33 +14,45 @@
  * limitations under the License.
  */
 .header {
-  padding: 20px 24px;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--color-border-1);
+  padding-bottom: 0;
 }
 
-.title {
-  font-size: var(--mantine-h2-font-size);
-  line-height: var(--mantine-h2-line-height);
-  font-weight: 600;
+.tableBody {
+  td {
+    padding: 12px;
+    vertical-align: middle;
+  }
 }
 
-.editIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--mantine-color-primary-0);
-}
-
-.subtitle {
+.tableHeader {
+  height: 48px;
   color: var(--color-text-secondary-2);
+
+  tr {
+    border-bottom: none;
+  }
 }
 
-.body {
-  padding: 16px 24px;
+.featureCell {
+  width: 225px;
 }
 
-.label {
-  padding: 8px 16px;
-  font-weight: 400;
-  border-radius: 8px;
+.category {
+  border-bottom: none;
+
+  td {
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    font-weight: 700;
+    padding: 8px 12px;
+  }
+}
+
+.lastRow {
+  border-bottom: none;
+  height: 56px;
+
+  td {
+    vertical-align: top;
+  }
 }

@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useCallback, type ChangeEvent, type MouseEvent } from 'react';
+import { useEffect, useCallback, type ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
 import { selectGroupSearch, selectHaveAnyGroups, selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
-import { type Group } from 'store/groups/groups.types';
 import classes from './GroupsList.module.scss';
-import { setActiveGroupIdAction, setGroupSearchAction } from 'store/groups/groups.actions';
+import { setActiveGroupIdAction, setEditingGroupIdAction, setGroupSearchAction } from 'store/groups/groups.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 
 const GROUP_BUTTON_HEIGHT = 36;
 
-interface GroupsListProps {
-  onEdit: (e: MouseEvent, group: Group) => void;
-}
-
-export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
+export function GroupsList() {
   const appDispatch = useAppDispatch();
   const groups = useSelector(selectOrderedGroupsList);
   const groupSearch = useSelector(selectGroupSearch);
@@ -38,6 +33,14 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
   const selectGroup = useCallback(
     (groupId: number | null) => {
       appDispatch(setActiveGroupIdAction(groupId));
+    },
+    [appDispatch],
+  );
+
+  const openGroupInformation = useCallback(
+    (e: React.MouseEvent, groupId: number | null) => {
+      e.stopPropagation();
+      appDispatch(setEditingGroupIdAction(groupId));
     },
     [appDispatch],
   );
@@ -101,7 +104,7 @@ export function GroupsList({ onEdit }: Readonly<GroupsListProps>) {
               </div>
 
               <ActionIcon
-                onClick={e => onEdit(e, group)}
+                onClick={e => openGroupInformation(e, group.id)}
                 variant="white"
                 title="Edit group"
               >
