@@ -19,11 +19,7 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
 import { DownloadIcon } from 'common/icons';
 import classes from './DownloadMenu.module.scss';
-
-export interface DownloadMenuOptions {
-  label: string;
-  format: string;
-}
+import type { DownloadMenuOptions } from 'common/types/downloadMenuOptions';
 
 interface DownloadMenuProps {
   options: DownloadMenuOptions[];

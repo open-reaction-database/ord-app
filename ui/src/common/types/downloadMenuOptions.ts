@@ -13,30 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.paper {
-  box-shadow: none;
-  border-right: none;
-  border-left: none;
-  border-top: none;
-  align-self: stretch;
-}
-
-.tableContainer {
-  max-height: 800px;
-}
-
-.table {
-  --mrt-row-hover-background-color: var(--color-background-main);
-}
-
-.headerCell {
-  padding: 16px 6px;
-  font-weight: 600;
-  line-height: 16.8px;
-  color: var(--color-text-secondary-2);
-}
-
-.bodyCell {
-  padding: 16px 6px;
-  color: var(--color-text-secondary-2);
+export interface DownloadMenuOptions {
+  label: string;
+  format: string;
 }

@@ -24,4 +24,7 @@ export default defineConfig({
   test: {
     globals: true,
   },
+  preview: {
+    port: 5173,
+  },
 });
