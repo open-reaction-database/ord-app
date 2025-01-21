@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Input, Modal } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { Button, Flex, Modal, TextInput } from '@mantine/core';
+import { useForm, yupResolver } from '@mantine/form';
 import classes from './InputModal.module.scss';
 import { useEffect } from 'react';
+import * as yup from 'yup';
+import { textSchema } from 'common/utils/schema';
 
 interface InputModalProps {
   opened: boolean;
@@ -24,7 +26,7 @@ interface InputModalProps {
   onSubmit: (value: string) => Promise<void>;
   title: string;
   initialValue?: string;
-  inputLabel?: string;
+  inputLabel: string;
   inputPlaceholder?: string;
 }
 
@@ -46,14 +48,15 @@ export function InputModal({
     reset,
     getInputProps,
     setValues,
-    errors,
   } = useForm<InputModalForm>({
     initialValues: {
       value: initialValue,
     },
-    validate: {
-      value: (value: string) => (!value.trim() ? `${inputLabel} is required` : null),
-    },
+    validate: yupResolver(
+      yup.object({
+        value: textSchema.required().label(inputLabel),
+      }),
+    ),
   });
 
   useEffect(() => {
@@ -80,35 +83,23 @@ export function InputModal({
       centered
     >
       <form onSubmit={onFormSubmit(handleFormSubmit)}>
-        <Input.Wrapper
-          classNames={{ root: classes.inputWrapper, error: classes.inputError, label: classes.inputLabel }}
+        <TextInput
+          className={classes.inputWrapper}
           label={inputLabel}
-        >
-          <Input
-            {...getInputProps('value')}
-            placeholder={inputPlaceholder || `Enter ${inputLabel?.toLowerCase()}`}
-          />
-
-          <Input.Error>{errors.value}</Input.Error>
-        </Input.Wrapper>
-
+          placeholder={inputPlaceholder || `Enter ${inputLabel?.toLowerCase()}`}
+          {...getInputProps('value')}
+        />
         <Flex
           justify="flex-end"
           gap="16"
         >
           <Button
-            className={`${classes.button} ${classes.closeButton}`}
             variant="default"
             onClick={handleClose}
           >
             Close
           </Button>
-          <Button
-            className={classes.button}
-            type="submit"
-          >
-            Save
-          </Button>
+          <Button type="submit">Save</Button>
         </Flex>
       </form>
     </Modal>

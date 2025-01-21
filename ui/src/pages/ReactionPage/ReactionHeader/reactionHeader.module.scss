@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as yup from 'yup';
-import { descriptionSchema, textSchema } from 'common/utils/schema';
-export const editDatasetSchema = yup.object({
-  name: textSchema.required(),
-  description: descriptionSchema.required(),
-});
-
-export type EditDatasetFormValues = yup.InferType<typeof editDatasetSchema>;
+.title {
+  color: var(--color-text-secondary-1);
+}

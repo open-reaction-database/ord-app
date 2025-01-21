@@ -57,7 +57,7 @@ export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, get
 export const createEmptyDataset = createThunkWithExplicitResult(
   createNewDatasetActions,
   async (dispatch, _g, { groupId, ...payload }) => {
-    const dataset = (await axiosInstance.post<Dataset>(`/group/${groupId}/datasets`, payload)).data;
+    const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)).data;
     dispatch(createNewDatasetActions.success(dataset));
     navigate(`/dataset/${dataset.id}`);
   },

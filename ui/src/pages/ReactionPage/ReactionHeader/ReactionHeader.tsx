@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Paper, Title, Tooltip } from '@mantine/core';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/CopyButton/CopyButton';
@@ -22,6 +22,7 @@ import { useMemo } from 'react';
 import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
 import { useLocation } from 'wouter';
 import { domain } from 'common/constants';
+import classes from './reactionHeader.module.scss';
 
 const reactionDownloadOptions: DownloadMenuOptions[] = [
   { label: '.pb', format: 'binpb' },
@@ -59,7 +60,20 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             align="center"
             gap="sm"
           >
-            <Title order={2}>{reaction.name}</Title>
+            {!reaction.name && (
+              <Title
+                className={classes.title}
+                order={2}
+              >
+                Reaction
+              </Title>
+            )}
+            <Tooltip
+              label="Reaction Name (corresponds to ID when creating the reaction)"
+              position="bottom"
+            >
+              <Title order={2}>{reaction.name || reaction.id}</Title>
+            </Tooltip>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="white">
               <EditIcon />

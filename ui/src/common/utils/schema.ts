@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 import * as yup from 'yup';
-import { descriptionSchema, textSchema } from 'common/utils/schema';
-export const editDatasetSchema = yup.object({
-  name: textSchema.required(),
-  description: descriptionSchema.required(),
-});
 
-export type EditDatasetFormValues = yup.InferType<typeof editDatasetSchema>;
+const MAX_TEXT_LENGTH = 55;
+const MAX_DESCRIPTION_LENGTH = 255;
+
+export const textSchema = yup.string().max(MAX_TEXT_LENGTH);
+export const descriptionSchema = yup.string().max(MAX_DESCRIPTION_LENGTH);

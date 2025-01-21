@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { PropsWithChildren } from 'react';
-import { AppShell } from '@mantine/core';
+import { AppShell, Flex } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from 'assets/ORD_logo.png';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
@@ -40,13 +40,18 @@ export function PageContainer({ children }: PropsWithChildren) {
       </AppShell.Header>
 
       <AppShell.Main>
-        <Breadcrumbs
-          items={[
-            { title: 'Contribute', path: '/' },
-            { title: 'Dataset 123', path: '/dataset/123' },
-          ]}
-        />
-        {children}
+        <Flex
+          direction="column"
+          className={classes.content}
+        >
+          <Breadcrumbs
+            items={[
+              { title: 'Contribute', path: '/' },
+              { title: 'Dataset 123', path: '/dataset/123' },
+            ]}
+          />
+          {children}
+        </Flex>
       </AppShell.Main>
 
       <AppShell.Footer withBorder={false}>© Copyright 2024 Open Reaction Database</AppShell.Footer>
