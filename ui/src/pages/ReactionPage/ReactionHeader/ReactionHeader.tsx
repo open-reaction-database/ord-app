@@ -18,11 +18,15 @@ import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
 import { useLocation } from 'wouter';
 import { domain } from 'common/constants';
 import classes from './reactionHeader.module.scss';
+import { useDisclosure } from '@mantine/hooks';
+import { useAppDispatch } from 'store/useAppDispatch';
+import { InputModal } from '../../../common/components/InputModal/InputModal';
+import { renameReaction } from '../../../store/reactions/reactions.thunks';
 
 const reactionDownloadOptions: DownloadMenuOptions[] = [
   { label: '.pb', format: 'binpb' },
@@ -36,7 +40,16 @@ interface ReactionHeaderProps {
 
 export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
   const [location] = useLocation();
+  const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
+  const [opened, { open, close }] = useDisclosure();
+
+  const onReactionNameChange = useCallback(
+    async (name: string) => {
+      dispatch(renameReaction({ reactionId, name }));
+    },
+    [dispatch, reactionId],
+  );
 
   const copyOptions = useMemo(
     () => [
@@ -76,7 +89,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             </Tooltip>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="white">
-              <EditIcon />
+              <EditIcon onClick={open} />
             </ActionIcon>
           </Flex>
           <Flex
@@ -113,6 +126,14 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           </Flex>
         </Flex>
       </Flex>
+      <InputModal
+        opened={opened}
+        onClose={close}
+        onSubmit={onReactionNameChange}
+        title="Rename Reaction"
+        inputLabel="Reaction Name"
+        initialValue={reaction.name}
+      />
     </Paper>
   );
 }

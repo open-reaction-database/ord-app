@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
-import { getReactionActions, getReactionPageActions, getReactionsListActions } from './reactions.actions';
+import {
+  getReactionActions,
+  getReactionPageActions,
+  getReactionsListActions,
+  renameReactionActions,
+} from './reactions.actions';
 import { itemsById } from 'common/utils';
 import type { ReactionWrapper } from './reactions.types';
 import type { ItemsById, Pagination } from 'common/types';
@@ -28,7 +33,7 @@ const activeDatasetId = createReducer<number>(0, builder => {
 });
 
 const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
-  builder.addCase(getReactionActions.success, (state, action) => ({
+  builder.addMatcher(isAnyOf(getReactionActions.success, renameReactionActions.success), (state, action) => ({
     ...state,
     [getReactionId(action.payload)]: action.payload,
   }));

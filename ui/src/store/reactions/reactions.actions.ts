@@ -24,3 +24,5 @@ export const getReactionsListActions = createAsyncAction<number, Pages<ReactionW
 export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<ReactionWrapper>>('get_page');
 
 export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, ReactionWrapper>('get');
+
+export const renameReactionActions = createAsyncAction<{ reactionId: number; name: string }, ReactionWrapper>('rename');
