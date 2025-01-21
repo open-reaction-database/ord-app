@@ -23,9 +23,17 @@
 }
 
 .main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding: 40px 20px 48px;
   min-width: 1280px;
   background-color: var(--color-background-main);
+}
+
+.content {
+  flex: 0 1 1440px;
+  max-width: 1440px;
 }
 
 .footer {

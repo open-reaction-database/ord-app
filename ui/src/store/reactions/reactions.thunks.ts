@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { createThunk } from '../../common/store';
-import { getReactionActions, getReactionPageActions, getReactionsListActions } from './reactions.actions';
+import {
+  getReactionActions,
+  getReactionPageActions,
+  getReactionsListActions,
+  renameReactionActions,
+} from './reactions.actions';
 import axiosInstance from '../../common/config/axiosConfig';
 import type { Pages } from '../../common/types';
 import type { ReactionResponse, ReactionWrapper } from './reactions.types';
@@ -55,4 +60,12 @@ export const getReaction = createThunk(getReactionActions, async (_d, getState, 
 
   const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
   return getReactionActions.success(parseReaction(result.data));
+});
+
+export const renameReaction = createThunk(renameReactionActions, async (_d, getState, { reactionId, name }) => {
+  const datasetId = selectActiveDatasetId(getState());
+  const result = await axiosInstance.patch<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`, {
+    name,
+  });
+  return renameReactionActions.success(parseReaction(result.data));
 });

@@ -93,6 +93,9 @@ export const theme = createTheme({
           color: 'var(--color-text-secondary-2)',
           paddingBottom: '8px',
         },
+        error: {
+          marginTop: '4px',
+        },
       },
     },
   },

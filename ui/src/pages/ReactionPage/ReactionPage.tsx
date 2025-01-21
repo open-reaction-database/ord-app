@@ -15,10 +15,10 @@
  */
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { type FC, useEffect } from 'react';
+import { type FC, Fragment, useEffect } from 'react';
 import { getReaction } from 'store/reactions/reactions.thunks';
 import { ReactionHeader } from './ReactionHeader/ReactionHeader';
-import { Flex, Paper, Tabs } from '@mantine/core';
+import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from '../../store/reactions/reactions.selectors';
 import classes from './reactionPage.module.scss';
@@ -74,13 +74,18 @@ export function ReactionPage() {
         >
           <Tabs.List>
             {tabs.map(({ name, required }) => (
-              <Tabs.Tab
-                key={name}
-                value={name}
-              >
-                {name}
-                {required && <RequiredAsterisk />}
-              </Tabs.Tab>
+              <Fragment key={name}>
+                {required ? (
+                  <Tooltip label="Mandatory section">
+                    <Tabs.Tab value={name}>
+                      {name}
+                      <RequiredAsterisk />
+                    </Tabs.Tab>
+                  </Tooltip>
+                ) : (
+                  <Tabs.Tab value={name}>{name}</Tabs.Tab>
+                )}
+              </Fragment>
             ))}
           </Tabs.List>
           {tabs.map(({ name, Component }) => (
