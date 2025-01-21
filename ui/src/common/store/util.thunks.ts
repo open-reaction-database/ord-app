@@ -27,6 +27,8 @@ export const downloadFile =
       });
 
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const header = response.headers['content-disposition'];
+      const fileName = header.replace(/^.*filename="(.*)"/, '$1');
 
       const link = document.createElement('a');
       fileUrl = URL.createObjectURL(blob);
@@ -34,7 +36,7 @@ export const downloadFile =
       link.href = fileUrl;
       // We need content-disposition value to get filename from BE.
       // Waiting to be exposed by CORS
-      link.setAttribute('download', 'test.txt');
+      link.setAttribute('download', fileName);
 
       document.body.appendChild(link);
       link.click();

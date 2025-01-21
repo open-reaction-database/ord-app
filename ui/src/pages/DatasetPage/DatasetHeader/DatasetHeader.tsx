@@ -19,7 +19,7 @@ import { UserField } from 'common/components/UserField/UserField';
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { CopyButton, type CopyButtonOptions } from 'common/components/CopyButton/CopyButton';
 import { formatDate } from 'common/utils';
-import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
+import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu';
 import { ChevronDownIcon, EditIcon } from 'common/icons';
 import type { Dataset } from 'store/datasets/datasets.types';
 import { useCallback, useMemo } from 'react';
@@ -29,17 +29,11 @@ import { useSelector } from 'react-redux';
 import { selectIsDatasetOpened } from 'store/datasets/datasets.selectors';
 import { setDatasetEditOpenedAction } from 'store/datasets/datasets.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { domain } from 'common/constants';
+import { domain, fileDownloadOptions } from 'common/constants';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
 }
-
-const datasetDownloadOptions: DownloadMenuOptions[] = [
-  { label: '.pb', format: 'binpb' },
-  { label: '.pbtxt', format: 'txtpb' },
-  { label: '.json', format: 'json' },
-];
 
 export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const [location] = useLocation();
@@ -108,7 +102,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
 
       <div className={classes.buttonContainer}>
         <DownloadMenu
-          options={datasetDownloadOptions}
+          options={fileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}
           target={
             <Button

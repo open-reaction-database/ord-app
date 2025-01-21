@@ -19,19 +19,14 @@ import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
-import { DownloadMenu, type DownloadMenuOptions } from 'common/components/DownloadMenu/DownloadMenu';
+import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu';
 import { useLocation } from 'wouter';
-import { domain } from 'common/constants';
+import { domain, fileDownloadOptions } from 'common/constants';
 import classes from './reactionHeader.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { InputModal } from '../../../common/components/InputModal/InputModal';
 import { renameReaction } from '../../../store/reactions/reactions.thunks';
-
-const reactionDownloadOptions: DownloadMenuOptions[] = [
-  { label: '.pb', format: 'binpb' },
-  { label: '.pbtxt', format: 'txtpb' },
-];
 
 interface ReactionHeaderProps {
   datasetId: number;
@@ -110,7 +105,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
               Save as Template
             </Button>
             <DownloadMenu
-              options={reactionDownloadOptions}
+              options={fileDownloadOptions}
               url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
               target={
                 <Button

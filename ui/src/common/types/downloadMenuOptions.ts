@@ -13,18 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
-import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
-
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), svgr(), tsconfigPaths()],
-  test: {
-    globals: true,
-  },
-  preview: {
-    port: 5173,
-  },
-});
+export interface DownloadMenuOptions {
+  label: string;
+  format: string;
+}

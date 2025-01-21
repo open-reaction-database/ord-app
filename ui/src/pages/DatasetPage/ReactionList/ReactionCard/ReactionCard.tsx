@@ -15,22 +15,18 @@
  */
 import { Button, Flex, Paper } from '@mantine/core';
 import { Link, useParams } from 'wouter';
-import { CopyButton, type CopyButtonOptions } from '../../../../common/components/CopyButton/CopyButton';
+import { CopyButton, type CopyButtonOptions } from 'common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
-import { DownloadMenu, type DownloadMenuOptions } from '../../../../common/components/DownloadMenu/DownloadMenu';
+import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu';
 import classes from './ReactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
+import { fileDownloadOptions } from 'common/constants';
 
 interface ReactionCardProps {
   id: number;
   index: number;
 }
-
-const reactionDownloadOptions: DownloadMenuOptions[] = [
-  { label: '.pb', format: 'binpb' },
-  { label: '.pbtxt', format: 'txtpb' },
-];
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
@@ -83,7 +79,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           </Button>
 
           <DownloadMenu
-            options={reactionDownloadOptions}
+            options={fileDownloadOptions}
             url={`/datasets/${datasetId}/reactions/${id}/download`}
             target={
               <Button

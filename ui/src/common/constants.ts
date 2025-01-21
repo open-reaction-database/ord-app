@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import type { Pagination } from './types';
+import type { DownloadMenuOptions } from './types/downloadMenuOptions';
 
 export const isDev = !import.meta.env.PROD;
 
@@ -26,3 +27,9 @@ export const auth0Scope = import.meta.env.VITE_AUTH0_SCOPE as string;
 export const domain = window.location.origin;
 
 export const emptyPagination: Pagination = { page: 1, size: 10, total: 0, pages: 0 };
+
+export const fileDownloadOptions: DownloadMenuOptions[] = [
+  { label: '.binpb', format: 'binpb' },
+  { label: '.txtpb', format: 'txtpb' },
+  { label: '.json', format: 'json' },
+];
