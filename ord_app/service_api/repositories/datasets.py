@@ -57,7 +57,12 @@ class DatasetsRepository:
         return await self.db.scalar(stmt)
 
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel:
-        stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(joinedload(DatasetModel.reactions))
+        stmt = (
+            select(DatasetModel)
+            .where(DatasetModel.id == dataset_id)
+            .options(joinedload(DatasetModel.reactions))
+            .order_by(DatasetModel.modified_at.desc())
+        )
         return await self.db.scalar(stmt)
 
     def group_dataset_stmt(self, group_id: int):
@@ -69,6 +74,7 @@ class DatasetsRepository:
                 joinedload(DatasetModel.owner),
                 joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
             )
+            .order_by(DatasetModel.modified_at.desc())
         )
         return stmt
 
@@ -84,6 +90,7 @@ class DatasetsRepository:
                 joinedload(DatasetModel.owner),
                 joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
             )
+            .order_by(DatasetModel.modified_at.desc())
         )
         return stmt
 
