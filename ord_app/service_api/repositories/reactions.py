@@ -34,7 +34,12 @@ class ReactionsRepository:
         return reaction
 
     def all_reactions_stmt(self, dataset_id: int):
-        return select(ReactionModel).where(ReactionModel.dataset_id == dataset_id)
+        stmt = (
+            select(ReactionModel)
+            .where(ReactionModel.dataset_id == dataset_id)
+            .order_by(ReactionModel.modified_at.desc())
+        )
+        return stmt
 
     async def get(self, reaction_id):
         stmt = select(ReactionModel).where(ReactionModel.id == reaction_id).limit(1)
