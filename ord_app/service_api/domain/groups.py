@@ -37,7 +37,7 @@ class GroupUseCases:
     async def get(self, group_id: int) -> GroupModel:
         return await self.group_repository.get(group_id)
 
-    async def user_groups(self) -> Sequence[GroupModel]:
+    async def user_groups(self):
         return await self.group_repository.get_user_groups(self.current_user.id)
 
     async def update(self, group_id: int, payload: GroupCreateSchema) -> GroupModel:

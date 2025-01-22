@@ -22,6 +22,7 @@ class UserSchema(BaseSchema):
     email: EmailStr | None = None
     name: str | None = None
     external_id: str | None = None
+    orcid_id: str | None
     avatar_url: str | None = None
 
     @field_validator("external_id", mode="after")
@@ -34,4 +35,5 @@ class UserCreateSchema(BaseSchema):
     email: EmailStr | None
     name: str | None
     external_id: str | None
+    orcid_id: str | None
     avatar_url: str | None
