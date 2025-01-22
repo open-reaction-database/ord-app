@@ -83,11 +83,19 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         logger.info(f"<User(id={user.id})> already exists")
         return user
 
+    external_id = user_info["sub"]
+    orcid_id = None
+    if "orcid" in user_info["sub"]:
+        orcid_id = user_info["sub"].split("|")[-1] if "orcid" in user_info["sub"] else None
+    elif "github" in user_info["sub"]:
+        external_id = user_info["nickname"]
+
     user_payload = UserCreateSchema(
         email=user_info["email"] or None,
         name=user_info["name"],
         avatar_url=user_info["picture"],
-        external_id=user_info["sub"],
+        external_id=external_id,
+        orcid_id=orcid_id
     )
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)

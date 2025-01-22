@@ -33,6 +33,7 @@ class BaseModel(DeclarativeBase):
 class UserModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     external_id: Mapped[str] = mapped_column(nullable=True, index=True)
+    orcid_id: Mapped[str] = mapped_column(nullable=True, index=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=True)
     name: Mapped[str] = mapped_column(nullable=True)
     avatar_url: Mapped[str] = mapped_column(nullable=True)

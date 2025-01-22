@@ -43,13 +43,18 @@ class GroupRepository:
     async def get(self, pk: int) -> GroupModel:
         return await self.db.get(GroupModel, pk)
 
-    async def get_user_groups(self, user_id: int) -> Sequence[GroupModel]:
+    async def get_user_groups(self, user_id: int):
         stmt = (
-            select(GroupModel)
+            select(GroupModel, UserGroupsMembershipModel)
             .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
             .where(UserGroupsMembershipModel.user_id == user_id)
         )
-        return (await self.db.scalars(stmt)).all()
+        rows = (await self.db.execute(stmt)).all()
+        groups = [
+            dict(id=group.id, name=group.name, role=user_group.role)
+            for group, user_group in rows
+        ]
+        return groups
 
     async def update(self, group_id: int, payload: dict):
         stmt = update(GroupModel).where(GroupModel.id == group_id).values(payload).returning(GroupModel)
