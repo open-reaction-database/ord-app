@@ -30,6 +30,7 @@ import { USER_ROLES } from 'common/types';
 import { PermissionsModal } from '../PermissionModal/PermissionModal';
 import { InfoCircleIcon } from 'common/icons';
 import classes from './GroupMembersList.module.scss';
+import { UserDataField } from './UserDataField/UserDataField';
 
 export function GroupMembersList() {
   const dispatch = useAppDispatch();
@@ -77,7 +78,9 @@ export function GroupMembersList() {
       </Flex>
 
       {!groupMembers?.length ? (
-        <Loader />
+        <Flex justify="center">
+          <Loader />
+        </Flex>
       ) : (
         groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
           <div
@@ -99,14 +102,22 @@ export function GroupMembersList() {
               >
                 <div>{name}</div>
                 <Flex gap="8">
-                  <div>
-                    <span className={classes.category}>ORCID:</span>
-                    <span>{orcid_id || 'Unavailable'}</span>
-                  </div>
-                  <div>
-                    <span className={classes.category}>e-mail:</span>
-                    <span>{email || 'Unavailable'}</span>
-                  </div>
+                  {orcid_id ? (
+                    <UserDataField
+                      fieldName="ORCID"
+                      value={orcid_id}
+                    />
+                  ) : (
+                    <UserDataField
+                      fieldName="ID"
+                      value={external_id}
+                    />
+                  )}
+
+                  <UserDataField
+                    fieldName="e-mail"
+                    value={email}
+                  />
                 </Flex>
               </Flex>
             </Flex>
