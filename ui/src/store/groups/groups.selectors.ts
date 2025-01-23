@@ -53,7 +53,7 @@ export const selectIsGroupUpdating = (state: AppState) => selectRootState(state)
 export const selectMemberRoles = createSelector(
   [selectEditingGroupId, (state: AppState) => state, selectSelf],
   (editingGroupId, state, currentUser) => {
-    const groupMembers = editingGroupId !== null ? selectGroupMembersByGroupId(editingGroupId)(state) : [];
+    const groupMembers = selectGroupMembersByGroupId(Number(editingGroupId))(state) || [];
     const isAdmin = groupMembers.find(member => member.user.id === currentUser?.id)?.role === USER_ROLES.ADMIN;
     const hasTwoAdmins = groupMembers.filter(member => member.role === USER_ROLES.ADMIN).length >= 2;
 
