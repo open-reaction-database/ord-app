@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from io import BytesIO
+
 import pytest
+from fastapi import status
 
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -54,3 +57,21 @@ async def test_upload_dataset(kind, filename, expected_name, api_client, mock_au
         ).raise_for_status().json()
         response_data["name"] = expected_name
         response_data["owner"]["id"] = user.id
+
+
+async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
+    user, _, group = mock_authenticated_user
+
+    response_data = api_client.post(
+        f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("wrong.pdf", BytesIO(b"pdf"))}
+    )
+    assert response_data.status_code == status.HTTP_400_BAD_REQUEST
+
+
+async def test_upload_wrong_file(api_client, mock_authenticated_user):
+    user, _, group = mock_authenticated_user
+
+    response_data = api_client.post(
+        f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("wrongfile.pb", BytesIO(b"pdf"))}
+    )
+    assert response_data.status_code == status.HTTP_400_BAD_REQUEST

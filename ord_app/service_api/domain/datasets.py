@@ -11,16 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import gzip
 from base64 import b64encode
 from typing import Type
 
 import orjson
-from fastapi import Depends, UploadFile
+from fastapi import Depends
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from google.protobuf import json_format, text_format
-from google.protobuf.message import Message
+from google.protobuf.message import DecodeError, Message
+from loguru import logger
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,6 +31,7 @@ from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
+from ord_app.service_api.services.exceptions import ProtobufDecodeError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -54,22 +55,12 @@ class DatasetUseCases:
         stmt = self.dataset_repository.group_dataset_stmt(group_id)
         return await paginate(self.db, stmt)
 
-    async def upload(self, group_id: int, file: UploadFile):
-        file_data = await file.read()
-
-        if file.filename.endswith(".gz"):
-            file_data = gzip.decompress(file_data)
-
-        if ".json" in file.filename:
-            kind = "json"
-        elif ".binpb" in file.filename:
-            kind = "binpb"
-        elif ".txtpb" in file.filename:
-            kind = "txtpb"
-        else:
-            raise ValueError(file.filename)
-
-        dataset_pb = load_message(file_data, Dataset, kind)
+    async def upload(self, group_id: int, file_data, kind):
+        try:
+            dataset_pb = load_message(file_data, Dataset, kind)
+        except DecodeError as e:
+            logger.error(e)
+            raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
         dataset_payload = DatasetCreateSchema(name=dataset_pb.name, description=dataset_pb.description)
         dataset = await self.dataset_repository.create(

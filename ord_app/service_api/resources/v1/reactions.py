@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi_pagination import Page
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
@@ -21,6 +21,8 @@ from ord_app.service_api.domain.auth import dataset_authorization, group_authori
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
+from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
 
@@ -48,7 +50,12 @@ async def upload_reaction(
     file: UploadFile,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.upload(dataset_id, file)
+    file_data, kind = await validate_uploaded_pb_file(file)
+
+    try:
+        return await use_case.upload(dataset_id, file_data, kind)
+    except ProtobufDecodeError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e)) from e
 
 
 @router.get(

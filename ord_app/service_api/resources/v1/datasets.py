@@ -31,6 +31,10 @@ from ord_app.service_api.schemas.datasets import (
     DatasetWithReactionCountSchema,
     DownloadFileFormats,
 )
+from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.services.pb_utils import (
+    validate_uploaded_pb_file,
+)
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["datasets"])
@@ -72,7 +76,13 @@ async def upload_dataset(
     file: UploadFile,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await use_case.upload(group_id, file)
+    file_data, kind = await validate_uploaded_pb_file(file)
+
+    try:
+        return await use_case.upload(group_id, file_data, kind)
+    except ProtobufDecodeError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e)) from e
+
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])
