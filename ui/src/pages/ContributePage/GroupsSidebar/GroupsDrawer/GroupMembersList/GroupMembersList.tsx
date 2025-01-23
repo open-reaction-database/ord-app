@@ -102,17 +102,10 @@ export function GroupMembersList() {
               >
                 <div>{name}</div>
                 <Flex gap="8">
-                  {orcid_id ? (
-                    <UserDataField
-                      fieldName="ORCID"
-                      value={orcid_id}
-                    />
-                  ) : (
-                    <UserDataField
-                      fieldName="ID"
-                      value={external_id}
-                    />
-                  )}
+                  <UserDataField
+                    fieldName="ORCID"
+                    value={orcid_id}
+                  />
 
                   <UserDataField
                     fieldName="e-mail"

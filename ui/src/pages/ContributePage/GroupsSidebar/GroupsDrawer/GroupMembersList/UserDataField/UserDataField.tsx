@@ -24,7 +24,7 @@ export function UserDataField({ fieldName, value }: Readonly<UserDataFieldProps>
   return (
     <div>
       <span className={classes.category}>{fieldName}:</span>
-      <span>{value || 'Unavailable'}</span>
+      <span>{value ?? 'Unavailable'}</span>
     </div>
   );
 }
