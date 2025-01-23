@@ -18,7 +18,6 @@ import { useForm, yupResolver } from '@mantine/form';
 import classes from './InputModal.module.scss';
 import { useEffect } from 'react';
 import * as yup from 'yup';
-import { textSchema } from 'common/utils/schema';
 
 interface InputModalProps {
   opened: boolean;
@@ -54,7 +53,7 @@ export function InputModal({
     },
     validate: yupResolver(
       yup.object({
-        value: textSchema.required().label(inputLabel),
+        value: yup.string().required().label(inputLabel),
       }),
     ),
   });
