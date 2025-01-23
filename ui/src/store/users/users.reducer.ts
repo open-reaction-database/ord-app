@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer } from '@reduxjs/toolkit';
-import type { Self } from './users.types';
-import { createUserActions, setActiveUser } from './users.actions';
+import { createUserActions } from './users.actions';
+import type { User } from './users.types';
 
-const isSelfCreated = createReducer<boolean>(false, builder => {
-  builder.addCase(createUserActions.success, () => true);
-});
-
-const self = createReducer<null | Self>(null, builder => {
-  builder.addCase(setActiveUser, (_, action) => action.payload);
+const self = createReducer<null | User>(null, builder => {
+  builder.addCase(createUserActions.success, (_, action) => action.payload);
 });
 
 export const usersReducer = combineReducers({
   self,
-  isSelfCreated,
 });

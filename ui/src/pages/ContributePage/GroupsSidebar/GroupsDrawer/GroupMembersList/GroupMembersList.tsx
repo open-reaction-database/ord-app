@@ -35,7 +35,7 @@ export function GroupMembersList() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
   const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(selectGroupMembersByGroupId(String(groupId)));
+  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId)));
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
 
@@ -79,7 +79,7 @@ export function GroupMembersList() {
       {!groupMembers?.length ? (
         <Loader />
       ) : (
-        groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id } }) => (
+        groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
           <div
             key={external_id}
             className={classes.userInfoContainer}
@@ -101,12 +101,11 @@ export function GroupMembersList() {
                 <Flex gap="8">
                   <div>
                     <span className={classes.category}>ORCID:</span>
-                    {/* TODO: Replace when orcid nullable field is implemented on the BE */}
-                    <span>{external_id}</span>
+                    <span>{orcid_id || 'Unavailable'}</span>
                   </div>
                   <div>
                     <span className={classes.category}>e-mail:</span>
-                    <span>{email}</span>
+                    <span>{email || 'Unavailable'}</span>
                   </div>
                 </Flex>
               </Flex>

@@ -26,7 +26,7 @@ interface Permission {
   category: 'Group' | 'Dataset';
 }
 
-const data: Permission[] = [
+const permissionsList: Permission[] = [
   { feature: 'Read Group', admin: true, editor: true, viewer: true, category: 'Group' },
   { feature: 'Rename Group', admin: true, editor: false, viewer: false, category: 'Group' },
   { feature: 'Manage Users', admin: true, editor: false, viewer: false, category: 'Group' },
@@ -61,46 +61,45 @@ export function PermissionsModal({ opened, onClose }: Readonly<PermissionsModalP
       size="730px"
       padding="lg"
     >
-      <div>
-        <Table>
-          <Table.Thead className={classes.tableHeader}>
-            <Table.Tr>
-              <Table.Th />
-              <Table.Th>Admin</Table.Th>
-              <Table.Th>Editor</Table.Th>
-              <Table.Th>Viewer</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody className={classes.tableBody}>
-            {data.map((row, index) => {
-              const isRowWithHeader = index === 0 || (index > 0 && row.category !== data[index - 1].category);
-              const lastRowInCategory = data[index + 1] && row.category !== data[index + 1].category;
+      <Table>
+        <Table.Thead className={classes.tableHeader}>
+          <Table.Tr>
+            <Table.Th />
+            <Table.Th>Admin</Table.Th>
+            <Table.Th>Editor</Table.Th>
+            <Table.Th>Viewer</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody className={classes.tableBody}>
+          {permissionsList.map((row, index) => {
+            const isRowWithHeader = index === 0 || (index > 0 && row.category !== permissionsList[index - 1].category);
+            const lastRowInCategory =
+              permissionsList[index + 1] && row.category !== permissionsList[index + 1].category;
 
-              return (
-                <React.Fragment key={row.feature}>
-                  {isRowWithHeader && (
-                    <Table.Tr className={classes.category}>
-                      <Table.Td colSpan={4}>{row.category}</Table.Td>
-                    </Table.Tr>
-                  )}
-                  <Table.Tr className={lastRowInCategory ? classes.lastRow : ''}>
-                    <Table.Td className={classes.featureCell}>{row.feature}</Table.Td>
-                    <Table.Td>
-                      <FeatureIcon hasAccess={row.admin} />
-                    </Table.Td>
-                    <Table.Td>
-                      <FeatureIcon hasAccess={row.editor} />
-                    </Table.Td>
-                    <Table.Td>
-                      <FeatureIcon hasAccess={row.viewer} />
-                    </Table.Td>
+            return (
+              <React.Fragment key={row.feature}>
+                {isRowWithHeader && (
+                  <Table.Tr className={classes.category}>
+                    <Table.Td colSpan={4}>{row.category}</Table.Td>
                   </Table.Tr>
-                </React.Fragment>
-              );
-            })}
-          </Table.Tbody>
-        </Table>
-      </div>
+                )}
+                <Table.Tr className={lastRowInCategory ? classes.lastRow : ''}>
+                  <Table.Td className={classes.featureCell}>{row.feature}</Table.Td>
+                  <Table.Td>
+                    <FeatureIcon hasAccess={row.admin} />
+                  </Table.Td>
+                  <Table.Td>
+                    <FeatureIcon hasAccess={row.editor} />
+                  </Table.Td>
+                  <Table.Td>
+                    <FeatureIcon hasAccess={row.viewer} />
+                  </Table.Td>
+                </Table.Tr>
+              </React.Fragment>
+            );
+          })}
+        </Table.Tbody>
+      </Table>
     </Modal>
   );
 }

@@ -47,7 +47,7 @@ export default function UserMenu() {
         <UnstyledButton className={classes.target}>
           <Group gap="8px">
             <Avatar
-              src={user.picture}
+              src={user.avatar_url}
               radius="xl"
               size="28px"
             />

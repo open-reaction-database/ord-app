@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Self {
-  picture?: string | undefined;
-  name: string;
-  email: string;
-}
-
 export interface SelfCreate {
   access_token: string;
   id_token: string;
@@ -26,8 +20,9 @@ export interface SelfCreate {
 
 export interface User {
   id: number;
-  email: string;
+  email?: string;
   name: string;
+  orcid_id?: string;
   external_id: string;
   avatar_url: string;
 }

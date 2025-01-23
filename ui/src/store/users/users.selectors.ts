@@ -19,5 +19,3 @@ import type { AppState } from '../configureAppStore';
 const selectRoot = (state: AppState) => state.users;
 
 export const selectSelf = (state: AppState) => selectRoot(state).self;
-
-export const selectIsUserCreated = (state: AppState) => selectRoot(state).isSelfCreated;
