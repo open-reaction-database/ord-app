@@ -41,7 +41,7 @@ export const selectOrderedGroupsList = createSelector([selectGroupSearch, select
   return filteredList.sort((a, b) => a.name.localeCompare(b.name));
 });
 
-export const selectGroupMembersByGroupId = (id: string) => (state: AppState) =>
+export const selectGroupMembersByGroupId = (id: number) => (state: AppState) =>
   selectRootState(state).groupsMembersByGroupId[id];
 
 export const selectAddMemberInputValue = (state: AppState) => selectRootState(state).addMemberInputValue;
@@ -53,9 +53,9 @@ export const selectIsGroupUpdating = (state: AppState) => selectRootState(state)
 export const selectMemberRoles = createSelector(
   [selectEditingGroupId, (state: AppState) => state, selectSelf],
   (editingGroupId, state, currentUser) => {
-    const groupMembers = selectGroupMembersByGroupId(String(editingGroupId))(state);
-    const isAdmin = groupMembers?.find(member => member.user.email === currentUser?.email)?.role === USER_ROLES.ADMIN;
-    const hasTwoAdmins = groupMembers?.filter(member => member.role === USER_ROLES.ADMIN)?.length >= 2;
+    const groupMembers = editingGroupId !== null ? selectGroupMembersByGroupId(editingGroupId)(state) : [];
+    const isAdmin = groupMembers.find(member => member.user.id === currentUser?.id)?.role === USER_ROLES.ADMIN;
+    const hasTwoAdmins = groupMembers.filter(member => member.role === USER_ROLES.ADMIN).length >= 2;
 
     return { isAdmin, hasTwoAdmins };
   },

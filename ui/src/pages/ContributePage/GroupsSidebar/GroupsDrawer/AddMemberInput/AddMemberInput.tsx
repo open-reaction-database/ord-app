@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useSelector } from 'react-redux';
-import { Button, Group, Input } from '@mantine/core';
+import { Button, Group, TextInput } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch';
 import {
@@ -50,7 +50,11 @@ export function AddMemberInput() {
 
   return (
     <div className={classes.inputContainer}>
-      <Input.Wrapper
+      <TextInput
+        placeholder="Add user by email or ID (ORCID, etc.)"
+        value={inputValue}
+        onChange={handleSearchChange}
+        disabled={!isAdmin || isGroupUpdating}
         error={
           inputError && (
             <Group gap="4px">
@@ -59,15 +63,7 @@ export function AddMemberInput() {
             </Group>
           )
         }
-      >
-        <Input
-          placeholder="Add user by email or ID (ORCID, etc.)"
-          value={inputValue}
-          onChange={handleSearchChange}
-          disabled={!isAdmin || isGroupUpdating}
-          error={!!inputError}
-        />
-      </Input.Wrapper>
+      />
 
       <Button
         onClick={handleAddMember}

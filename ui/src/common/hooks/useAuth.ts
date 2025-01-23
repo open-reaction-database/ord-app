@@ -17,17 +17,15 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
 import { setAccessTokenGetter } from '../config/axiosConfig';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { setActiveUser } from 'store/users/users.actions';
-import type { Self } from 'store/users/users.types';
-import { selectIsUserCreated } from 'store/users/users.selectors';
 import { useSelector } from 'react-redux';
 import { createUser } from 'store/users/users.thunks';
+import { selectSelf } from 'store/users/users.selectors';
 
 export function useAuth() {
   const auth0 = useAuth0();
   const dispatch = useAppDispatch();
   const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
-  const isUserCreated = useSelector(selectIsUserCreated);
+  const isUserCreated = useSelector(selectSelf);
 
   const isAppLoading = isLoading || !isAuthenticated || !isUserCreated;
 
@@ -48,12 +46,6 @@ export function useAuth() {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
-    if (user) {
-      dispatch(setActiveUser(user as Self));
-    }
-  }, [dispatch, user]);
-
-  useEffect(() => {
     const provisionUser = async () => {
       const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);
       dispatch(createUser({ access_token: accessToken, id_token: idToken?.__raw as string }));
@@ -61,8 +53,6 @@ export function useAuth() {
 
     if (user) {
       provisionUser();
-
-      dispatch(setActiveUser(user as Self));
     }
   }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
 

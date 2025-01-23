@@ -34,6 +34,7 @@ export function AppRoot() {
         audience: auth0Audience,
         scope: auth0Scope,
       }}
+      cacheLocation="localstorage"
     >
       <Provider store={store}>
         <MantineProvider theme={theme}>

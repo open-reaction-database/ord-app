@@ -30,12 +30,13 @@ import { USER_ROLES } from 'common/types';
 import { PermissionsModal } from '../PermissionModal/PermissionModal';
 import { InfoCircleIcon } from 'common/icons';
 import classes from './GroupMembersList.module.scss';
+import { UserDataField } from './UserDataField/UserDataField';
 
 export function GroupMembersList() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
   const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(selectGroupMembersByGroupId(String(groupId)));
+  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId)));
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
 
@@ -77,9 +78,11 @@ export function GroupMembersList() {
       </Flex>
 
       {!groupMembers?.length ? (
-        <Loader />
+        <Flex justify="center">
+          <Loader />
+        </Flex>
       ) : (
-        groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id } }) => (
+        groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
           <div
             key={external_id}
             className={classes.userInfoContainer}
@@ -99,15 +102,15 @@ export function GroupMembersList() {
               >
                 <div>{name}</div>
                 <Flex gap="8">
-                  <div>
-                    <span className={classes.category}>ORCID:</span>
-                    {/* TODO: Replace when orcid nullable field is implemented on the BE */}
-                    <span>{external_id}</span>
-                  </div>
-                  <div>
-                    <span className={classes.category}>e-mail:</span>
-                    <span>{email}</span>
-                  </div>
+                  <UserDataField
+                    fieldName="ORCID"
+                    value={orcid_id}
+                  />
+
+                  <UserDataField
+                    fieldName="e-mail"
+                    value={email}
+                  />
                 </Flex>
               </Flex>
             </Flex>

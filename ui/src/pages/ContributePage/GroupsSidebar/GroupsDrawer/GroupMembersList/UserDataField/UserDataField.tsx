@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface SelfCreate {
-  access_token: string;
-  id_token: string;
+import classes from './UserDataField.module.scss';
+
+interface UserDataFieldProps {
+  fieldName: string;
+  value?: string;
 }
 
-export interface User {
-  id: number;
-  email?: string;
-  name: string;
-  orcid_id?: string;
-  external_id: string;
-  avatar_url: string;
+export function UserDataField({ fieldName, value }: Readonly<UserDataFieldProps>) {
+  return (
+    <div>
+      <span className={classes.category}>{fieldName}:</span>
+      <span>{value ?? 'Unavailable'}</span>
+    </div>
+  );
 }
