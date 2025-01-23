@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 import * as yup from 'yup';
-import { descriptionSchema, textSchema } from 'common/utils/schema';
 
 export const createNewDatasetSchema = yup.object({
-  name: textSchema.required(),
+  name: yup.string().required(),
   groupId: yup.string().required(),
-  description: descriptionSchema.required(),
+  description: yup.string().required(),
 });
 
 export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;

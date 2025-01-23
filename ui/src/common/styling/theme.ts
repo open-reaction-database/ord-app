@@ -88,6 +88,9 @@ export const theme = createTheme({
       },
     },
     InputWrapper: {
+      defaultProps: {
+        inputWrapperOrder: ['label', 'input', 'description', 'error'],
+      },
       styles: {
         label: {
           color: 'var(--color-text-secondary-2)',

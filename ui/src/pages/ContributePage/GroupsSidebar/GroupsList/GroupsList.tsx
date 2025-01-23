@@ -16,7 +16,12 @@
 import { useEffect, useCallback, type ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
-import { selectGroupSearch, selectHaveAnyGroups, selectOrderedGroupsList } from 'store/groups/groups.selectors';
+import {
+  selectActiveGroupId,
+  selectGroupSearch,
+  selectHaveAnyGroups,
+  selectOrderedGroupsList,
+} from 'store/groups/groups.selectors';
 import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
 import classes from './GroupsList.module.scss';
 import { setActiveGroupIdAction, setEditingGroupIdAction, setGroupSearchAction } from 'store/groups/groups.actions';
@@ -29,13 +34,13 @@ export function GroupsList() {
   const groups = useSelector(selectOrderedGroupsList);
   const groupSearch = useSelector(selectGroupSearch);
   const haveAnyGroups = useSelector(selectHaveAnyGroups);
+  const selectedGroupId = useSelector(selectActiveGroupId);
 
-  const selectGroup = useCallback(
-    (groupId: number | null) => {
+  const selectGroup = (groupId: number | null) => {
+    if (groupId !== selectedGroupId) {
       appDispatch(setActiveGroupIdAction(groupId));
-    },
-    [appDispatch],
-  );
+    }
+  };
 
   const openGroupInformation = useCallback(
     (e: React.MouseEvent, groupId: number | null) => {
