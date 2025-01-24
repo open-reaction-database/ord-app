@@ -34,12 +34,11 @@
   line-height: 24px;
   color: var(--mantine-color-primary-0);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .separator {
   color: var(--color-text-secondary-1);
-}
-
-.homeIcon {
-  background-color: var(--color-background-main);
 }

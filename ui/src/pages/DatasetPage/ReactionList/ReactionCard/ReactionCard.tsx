@@ -73,7 +73,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
         >
           <Button
             leftSection={<CheckListIcon />}
-            variant="white"
+            variant="transparent"
           >
             Save as a Template
           </Button>
@@ -86,7 +86,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
                 className={classes.target}
                 leftSection={<DownloadIcon />}
                 rightSection={<ChevronDownIcon />}
-                variant="white"
+                variant="transparent"
               >
                 Download Reaction
               </Button>
@@ -95,7 +95,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
 
           <Button
             leftSection={<DotsIcon />}
-            variant="white"
+            variant="transparent"
           >
             More
           </Button>

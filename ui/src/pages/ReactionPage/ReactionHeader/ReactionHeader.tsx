@@ -83,7 +83,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
               <Title order={2}>{reaction.name || reaction.id}</Title>
             </Tooltip>
             <CopyButton options={copyOptions} />
-            <ActionIcon variant="white">
+            <ActionIcon variant="transparent">
               <EditIcon onClick={open} />
             </ActionIcon>
           </Flex>
@@ -92,14 +92,14 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             gap="sm"
           >
             <Button
-              variant="white"
+              variant="transparent"
               color="red"
               leftSection={<TrashIcon />}
             >
               Remove
             </Button>
             <Button
-              variant="white"
+              variant="transparent"
               leftSection={<CheckListIcon />}
             >
               Save as Template
@@ -111,7 +111,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                 <Button
                   leftSection={<DownloadIcon />}
                   rightSection={<ChevronDownIcon />}
-                  variant="white"
+                  variant="transparent"
                 >
                   Download Reaction
                 </Button>

@@ -30,6 +30,10 @@
 
 .selectedOption {
   background-color: var(--color-background-gray);
+
+  svg {
+    color: var(--color-primary);
+  }
 }
 
 .iconPlaceholder {

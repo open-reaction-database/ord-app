@@ -30,6 +30,10 @@
   &:hover {
     color: var(--color-text-primary);
   }
+
+  svg {
+    color: var(--color-icons-default);
+  }
 }
 
 .buttonLabel {
@@ -70,6 +74,6 @@
   margin-top: 12px;
 }
 
-.emptyText {
+.placeholder {
   color: var(--color-text-secondary-1);
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Breadcrumbs as MantineBreadcrumbs, ThemeIcon } from '@mantine/core';
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
 import { Link } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
 import { HomeIcon } from 'common/icons';
@@ -30,13 +30,6 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
   return (
     <div className={classes.container}>
-      <ThemeIcon
-        className={classes.homeIcon}
-        variant="white"
-        color="primary"
-      >
-        <HomeIcon />
-      </ThemeIcon>
       <MantineBreadcrumbs
         separator="/"
         separatorMargin={6}
@@ -53,6 +46,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
               id={item.path}
               key={item.path}
             >
+              {index === 0 && <HomeIcon />}
               {item.title}
             </Link>
           );
