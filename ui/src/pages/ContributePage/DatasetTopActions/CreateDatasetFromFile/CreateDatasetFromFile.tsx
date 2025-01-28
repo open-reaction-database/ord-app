@@ -18,7 +18,7 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { useForm, yupResolver } from '@mantine/form';
-import { CreateDatasetLayout } from '../CreateDatasetLayout/CreateDatasetLayout';
+import { FormModal } from 'common/components/FormModal/FormModal';
 import { type CreateDatasetFromFileFormValues, createDatasetFromFileSchema } from './createDatasetFromFile.schema';
 import type { CreateDatasetFromFilePayload } from 'store/datasets/datasets.types';
 import { createDatasetFromFile } from 'store/datasets/datasets.thunks';
@@ -59,10 +59,11 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
   );
 
   return (
-    <CreateDatasetLayout
+    <FormModal
       onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
       title="Create Dataset from File"
+      submitTitle="Create Dataset"
     >
       <Select
         data={data}
@@ -76,6 +77,6 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
         description=".binpb, .txtpb, or .json"
         {...form.getInputProps('file')}
       />
-    </CreateDatasetLayout>
+    </FormModal>
   );
 }

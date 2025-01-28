@@ -32,3 +32,5 @@ export const selectReactionById = (id: number) => (state: AppState) => selectRoo
 export const selectReactionsPagination = (state: AppState) => selectRoot(state).pagination;
 
 export const selectActiveDatasetId = (state: AppState) => selectRoot(state).activeDatasetId;
+
+export const selectIsReactionUploadOpened = (state: AppState) => selectRoot(state).isReactionUploadOpened;

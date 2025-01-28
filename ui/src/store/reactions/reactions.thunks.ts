@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createThunk } from '../../common/store';
+import { createThunk, createThunkWithExplicitResult } from '../../common/store';
 import {
+  createEmptyReactionActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
+  importReactionFromFileActions,
   renameReactionActions,
 } from './reactions.actions';
 import axiosInstance from '../../common/config/axiosConfig';
@@ -25,6 +27,7 @@ import type { Pages } from '../../common/types';
 import type { ReactionResponse, ReactionWrapper } from './reactions.types';
 import ordSchema from 'ord-schema';
 import { selectActiveDatasetId, selectReactionsPagination } from './reactions.selectors';
+import { navigate } from 'wouter/use-browser-location';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => ({
   ...rest,
@@ -68,4 +71,27 @@ export const renameReaction = createThunk(renameReactionActions, async (_d, getS
     name,
   });
   return renameReactionActions.success(parseReaction(result.data));
+});
+
+export const createEmptyReaction = createThunkWithExplicitResult(
+  createEmptyReactionActions,
+  async (dispatch, getState) => {
+    const datasetId = selectActiveDatasetId(getState());
+
+    const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions`, {});
+    const reaction = parseReaction(result.data);
+    dispatch(createEmptyReactionActions.success(reaction));
+    navigate(`/dataset/${datasetId}/reaction/${reaction.id}`);
+  },
+);
+
+export const importReactionFromFile = createThunk(importReactionFromFileActions, async (_d, getState, { file }) => {
+  const datasetId = selectActiveDatasetId(getState());
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/upload`, formData);
+  const reaction = parseReaction(result.data);
+  return importReactionFromFileActions.success(reaction);
 });
