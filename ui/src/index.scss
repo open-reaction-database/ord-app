@@ -23,7 +23,7 @@
   --color-background-gray: #e8ebed;
   --color-background-white: #fff;
   --color-text-primary: #090a0b;
-  --color-text-hover: #f00;
+  --color-text-hover: #ff8d00;
   --color-text-secondary-1: #aab9c5;
   --color-text-secondary-2: #637d92;
   --color-text-secondary-3: #4a5e6d;
@@ -34,8 +34,15 @@
   --font-size-lg: 16px;
 }
 
-.textInputOverride {
-  background-color: #f8f8f8;
-  border: 1px solid #ededed;
-  border-radius: 10px;
+button {
+  &[data-variant='transparent'] {
+    --button-hover-color: var(--color-text-hover);
+    --ai-hover-color: var(--color-text-hover);
+  }
+}
+
+a {
+  &:hover {
+    color: var(--color-text-hover);
+  }
 }

@@ -68,7 +68,7 @@ export function GroupsList() {
   return haveAnyGroups ? (
     <>
       <Input
-        classNames={{ input: classes.searchInput }}
+        classNames={{ input: classes.searchInput, section: classes.placeholder }}
         value={groupSearch}
         onChange={onSearchChange}
         rightSection={<SearchIcon />}
@@ -128,7 +128,7 @@ export function GroupsList() {
         gap="8"
       >
         <EmptyIcon />
-        <div className={classes.emptyText}>There are no groups yet</div>
+        <div className={classes.placeholder}>There are no groups yet</div>
       </Flex>
     </div>
   );

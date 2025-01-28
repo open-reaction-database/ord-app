@@ -49,6 +49,14 @@
   span {
     border-bottom: 1px dotted var(--color-primary);
   }
+
+  &:hover {
+    color: var(--color-text-hover);
+
+    span {
+      border-color: var(--color-text-hover);
+    }
+  }
 }
 
 .role {
