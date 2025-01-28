@@ -35,13 +35,20 @@ class GroupRepository:
             self.db.add_all([group, user_group_member])
             await self.db.commit()
             await self.db.refresh(group)
+            await self.db.refresh(user_group_member)
             logger.debug(f"{group} created with payload: {payload}")
-            return group
+            return group, user_group_member
 
         return group, user_group_member
 
-    async def get(self, pk: int) -> GroupModel:
-        return await self.db.get(GroupModel, pk)
+    async def get(self, group_id: int):
+        stmt = (
+            select(GroupModel, UserGroupsMembershipModel)
+            .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
+            .where(GroupModel.id == group_id)
+        )
+        group, user_group = (await self.db.execute(stmt)).one()
+        return dict(id=group.id, name=group.name, role=user_group.role)
 
     async def get_user_groups(self, user_id: int):
         stmt = (
