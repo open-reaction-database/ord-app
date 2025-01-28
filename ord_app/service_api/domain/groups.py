@@ -32,9 +32,10 @@ class GroupUseCases:
         self.group_repository = GroupRepository(db)
 
     async def create(self, payload: GroupCreateSchema):
-        return await self.group_repository.create(self.current_user.id, payload.model_dump(exclude_unset=True))
+        group, _ = await self.group_repository.create(self.current_user.id, payload.model_dump(exclude_unset=True))
+        return await self.group_repository.get(group.id)
 
-    async def get(self, group_id: int) -> GroupModel:
+    async def get(self, group_id: int):
         return await self.group_repository.get(group_id)
 
     async def user_groups(self):
