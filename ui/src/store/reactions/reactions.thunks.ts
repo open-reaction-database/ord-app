@@ -85,13 +85,17 @@ export const createEmptyReaction = createThunkWithExplicitResult(
   },
 );
 
-export const importReactionFromFile = createThunk(importReactionFromFileActions, async (_d, getState, { file }) => {
-  const datasetId = selectActiveDatasetId(getState());
+export const importReactionFromFile = createThunkWithExplicitResult(
+  importReactionFromFileActions,
+  async (dispatch, getState, { file }) => {
+    const datasetId = selectActiveDatasetId(getState());
 
-  const formData = new FormData();
-  formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/upload`, formData);
-  const reaction = parseReaction(result.data);
-  return importReactionFromFileActions.success(reaction);
-});
+    const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/upload`, formData);
+    const reaction = parseReaction(result.data);
+    dispatch(importReactionFromFileActions.success(reaction));
+    navigate(`/dataset/${datasetId}/reaction/${reaction.id}`);
+  },
+);

@@ -22,9 +22,12 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import { type CreateReactionFromFileFormValues, createReactionFromFileSchema } from './createReactionFromFile.schema';
 import { type ImportReactionFromFilePayload } from 'store/reactions/reactions.types';
 import classes from './CreateReactionFromFile.module.scss';
-import { setReactionUploadOpenedAction } from 'store/reactions/reactions.actions';
 
-export function CreateReactionFromFile() {
+interface CreateReactionFromFileProps {
+  onClose: () => void;
+}
+
+export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromFileProps>) {
   const dispatch = useAppDispatch();
 
   const form = useForm<
@@ -45,11 +48,9 @@ export function CreateReactionFromFile() {
     [dispatch],
   );
 
-  const handleClose = useCallback(() => dispatch(setReactionUploadOpenedAction(false)), [dispatch]);
-
   return (
     <FormModal
-      onClose={handleClose}
+      onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
       title="Import Reaction from File"
       submitTitle="Save"

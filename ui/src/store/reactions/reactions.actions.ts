@@ -17,7 +17,7 @@ import { createActionFactory } from '../../common/store';
 import type { ImportReactionFromFilePayload, ReactionWrapper } from './reactions.types';
 import type { CurrentPage, Pages } from '../../common/types';
 
-const { createAsyncAction, createAction } = createActionFactory('reactions');
+const { createAsyncAction } = createActionFactory('reactions');
 
 export const getReactionsListActions = createAsyncAction<number, Pages<ReactionWrapper>>('get_list');
 
@@ -32,5 +32,3 @@ export const createEmptyReactionActions = createAsyncAction<void, ReactionWrappe
 export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, ReactionWrapper>(
   'import_from_file',
 );
-
-export const setReactionUploadOpenedAction = createAction<boolean>('set_reaction_upload_opened');

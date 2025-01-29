@@ -21,7 +21,6 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   renameReactionActions,
-  setReactionUploadOpenedAction,
 } from './reactions.actions';
 import { itemsById } from 'common/utils';
 import type { ReactionWrapper } from './reactions.types';
@@ -76,15 +75,9 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
   }));
 });
 
-const isReactionUploadOpened = createReducer<boolean>(false, builder => {
-  builder.addCase(setReactionUploadOpenedAction, (_, action) => action.payload);
-  builder.addCase(importReactionFromFileActions.success, () => false);
-});
-
 export const reactionsReducer = combineReducers({
   reactionsById,
   reactionsOrder,
   pagination,
   activeDatasetId,
-  isReactionUploadOpened,
 });

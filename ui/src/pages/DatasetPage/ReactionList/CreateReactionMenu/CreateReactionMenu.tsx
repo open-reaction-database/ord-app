@@ -15,22 +15,18 @@
  */
 import { useCallback } from 'react';
 import { Button, Menu } from '@mantine/core';
-import { useSelector } from 'react-redux';
+import { useDisclosure } from '@mantine/hooks';
 import { createEmptyReaction } from 'store/reactions/reactions.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { AddCircleIcon, ChevronDownIcon } from 'common/icons';
 import { CreateReactionFromFile } from './CreateReactionFromFile/CreateReactionFromFile';
-import { selectIsReactionUploadOpened } from 'store/reactions/reactions.selectors';
-import { setReactionUploadOpenedAction } from 'store/reactions/reactions.actions';
 import classes from './createReactionMenu.module.scss';
 
 export function CreateReactionMenu() {
   const dispatch = useAppDispatch();
-  const isReactionUploadOpened = useSelector(selectIsReactionUploadOpened);
+  const [importFromFileOpened, { open: openImportFromFile, close: closeImportFromFile }] = useDisclosure(false);
 
   const handleReactionCreate = useCallback(() => dispatch(createEmptyReaction()), [dispatch]);
-
-  const handleReactionUpload = useCallback(() => dispatch(setReactionUploadOpenedAction(true)), [dispatch]);
 
   return (
     <>
@@ -52,11 +48,11 @@ export function CreateReactionMenu() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item onClick={handleReactionCreate}>From Scratch</Menu.Item>
-          <Menu.Item onClick={handleReactionUpload}>Import from File</Menu.Item>
+          <Menu.Item onClick={openImportFromFile}>Import from File</Menu.Item>
         </Menu.Dropdown>
       </Menu>
 
-      {isReactionUploadOpened && <CreateReactionFromFile />}
+      {importFromFileOpened && <CreateReactionFromFile onClose={closeImportFromFile} />}
     </>
   );
 }
