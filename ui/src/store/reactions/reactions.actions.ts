@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { createActionFactory } from '../../common/store';
-import type { ReactionWrapper } from './reactions.types';
+import type { ImportReactionFromFilePayload, ReactionWrapper } from './reactions.types';
 import type { CurrentPage, Pages } from '../../common/types';
 
 const { createAsyncAction } = createActionFactory('reactions');
@@ -26,3 +26,9 @@ export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pa
 export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, ReactionWrapper>('get');
 
 export const renameReactionActions = createAsyncAction<{ reactionId: number; name: string }, ReactionWrapper>('rename');
+
+export const createEmptyReactionActions = createAsyncAction<void, ReactionWrapper>('create_empty');
+
+export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, ReactionWrapper>(
+  'import_from_file',
+);

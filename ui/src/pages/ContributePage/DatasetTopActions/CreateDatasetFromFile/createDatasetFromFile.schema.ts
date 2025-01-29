@@ -15,7 +15,7 @@
  */
 import * as yup from 'yup';
 
-const MAX_FILE_SIZE = 1024 * 1024 * 10;
+const MAX_FILE_SIZE = 1024 * 1024 * 100;
 
 const MAX_FILE_SIZE_MB = (MAX_FILE_SIZE / 1024 / 1024).toFixed(2);
 

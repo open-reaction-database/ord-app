@@ -23,7 +23,7 @@ import type { CreateNewDatasetPayload } from 'store/datasets/datasets.types';
 import { createEmptyDataset } from 'store/datasets/datasets.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { selectIsDatasetCreating } from 'store/datasets/datasets.selectors';
-import { CreateDatasetLayout } from '../CreateDatasetLayout/CreateDatasetLayout';
+import { FormModal } from 'common/components/FormModal/FormModal';
 
 interface CreateNewDatasetProps {
   onClose: () => void;
@@ -63,10 +63,11 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
   );
 
   return (
-    <CreateDatasetLayout
+    <FormModal
       onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
       title="Create Dataset from Scratch"
+      submitTitle="Create Dataset"
     >
       <Select
         data={data}
@@ -86,6 +87,6 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
         disabled={isLoading}
         {...form.getInputProps('description')}
       />
-    </CreateDatasetLayout>
+    </FormModal>
   );
 }

@@ -16,13 +16,14 @@
 import { useCallback } from 'react';
 import { Pagination } from 'common/components/Pagination/Pagination';
 import { ReactionCard } from './ReactionCard/ReactionCard';
-import { Button, Flex, Paper, Title } from '@mantine/core';
-import classes from './reactionsList.module.scss';
-import { AddCircleIcon, EmptyIcon } from 'common/icons';
+import { Flex, Paper, Title } from '@mantine/core';
+import { EmptyIcon } from 'common/icons';
 import { useSelector } from 'react-redux';
 import { selectReactionsOrder, selectReactionsPagination } from 'store/reactions/reactions.selectors';
 import { getReactionsPage } from 'store/reactions/reactions.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
+import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu';
+import classes from './reactionsList.module.scss';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -60,12 +61,7 @@ export function ReactionList() {
             <span className={classes.counter}>{pagination.total}</span>
           </Flex>
 
-          <Button
-            classNames={{ root: classes.button, section: classes.buttonSection }}
-            leftSection={<AddCircleIcon />}
-          >
-            Reaction
-          </Button>
+          <CreateReactionMenu />
         </Flex>
 
         {!hasReactions && (

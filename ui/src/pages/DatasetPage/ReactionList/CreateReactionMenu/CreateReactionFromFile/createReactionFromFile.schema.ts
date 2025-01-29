@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type OrdSchema from 'ord-schema';
+import * as yup from 'yup';
 
-export interface ReactionResponse {
-  id: number;
-  name: string;
-  summary: unknown;
-  binpb: string;
-}
+const MAX_FILE_SIZE = 1024 * 1024 * 15;
 
-export type Reaction = ReturnType<ReturnType<typeof OrdSchema.Reaction.deserializeBinary>['toObject']>;
+const MAX_FILE_SIZE_MB = (MAX_FILE_SIZE / 1024 / 1024).toFixed(2);
 
-export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {
-  data: Reaction;
-}
+export const createReactionFromFileSchema = yup.object({
+  file: yup
+    .mixed()
+    .required('Reaction file is required')
+    .label('File')
+    .test({
+      message: `Filesize cannot exceed ${MAX_FILE_SIZE_MB} MB`,
+      test: value => {
+        const file = value as File;
+        return file?.size < MAX_FILE_SIZE;
+      },
+    }),
+});
 
-export interface ImportReactionFromFilePayload {
-  file: File;
-}
+export type CreateReactionFromFileFormValues = yup.InferType<typeof createReactionFromFileSchema>;

@@ -15,9 +15,11 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import {
+  createEmptyReactionActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
+  importReactionFromFileActions,
   renameReactionActions,
 } from './reactions.actions';
 import { itemsById } from 'common/utils';
@@ -33,10 +35,18 @@ const activeDatasetId = createReducer<number>(0, builder => {
 });
 
 const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
-  builder.addMatcher(isAnyOf(getReactionActions.success, renameReactionActions.success), (state, action) => ({
-    ...state,
-    [getReactionId(action.payload)]: action.payload,
-  }));
+  builder.addMatcher(
+    isAnyOf(
+      getReactionActions.success,
+      renameReactionActions.success,
+      createEmptyReactionActions.success,
+      importReactionFromFileActions.success,
+    ),
+    (state, action) => ({
+      ...state,
+      [getReactionId(action.payload)]: action.payload,
+    }),
+  );
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
     itemsById(action.payload.items, getReactionId),
   );
@@ -57,6 +67,11 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
     ...state,
     total: action.payload.total,
     pages: action.payload.pages,
+  }));
+  builder.addMatcher(isAnyOf(createEmptyReactionActions.success, importReactionFromFileActions.success), state => ({
+    ...state,
+    total: state.total + 1,
+    pages: Math.ceil((state.total + 1) / state.size),
   }));
 });
 

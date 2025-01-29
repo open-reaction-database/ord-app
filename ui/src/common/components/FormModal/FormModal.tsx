@@ -16,14 +16,15 @@
 import type { ReactNode } from 'react';
 import { Button, Flex, Modal } from '@mantine/core';
 
-interface CreateDatasetLayoutProps {
+interface FormModalProps {
   onClose: () => void;
   onSubmit: () => void;
   title: string;
   children: ReactNode;
+  submitTitle?: string;
 }
 
-export function CreateDatasetLayout({ onClose, onSubmit, title, children }: Readonly<CreateDatasetLayoutProps>) {
+export function FormModal({ onClose, onSubmit, title, children, submitTitle }: Readonly<FormModalProps>) {
   return (
     <Modal
       opened
@@ -48,7 +49,7 @@ export function CreateDatasetLayout({ onClose, onSubmit, title, children }: Read
             >
               Cancel
             </Button>
-            <Button type="submit">Create Dataset</Button>
+            <Button type="submit">{submitTitle ?? 'Create'}</Button>
           </Flex>
         </Flex>
       </form>
