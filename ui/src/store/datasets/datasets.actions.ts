@@ -34,3 +34,5 @@ export const createDatasetFromFileActions = createAsyncAction<CreateDatasetFromF
 export const setDatasetEditOpenedAction = createAction<boolean>('set_edit_opened');
 
 export const updateDatasetActions = createAsyncAction<Pick<Dataset, 'id' | 'name' | 'description'>, Dataset>('update');
+
+export const removeDatasetActions = createAsyncAction<number>('remove_dataset');

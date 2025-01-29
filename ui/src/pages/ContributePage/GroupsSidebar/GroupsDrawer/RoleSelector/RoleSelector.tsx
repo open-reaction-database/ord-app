@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Menu, Button, Popover, Flex, Text } from '@mantine/core';
-import { AlertCircleIcon, CheckIcon, ChevronDownIcon, RemoveIcon } from 'common/icons';
-import classes from './RoleSelector.module.scss';
+import { Menu, Button } from '@mantine/core';
+import { CheckIcon, ChevronDownIcon, RemoveIcon } from 'common/icons';
 import { USER_ROLES } from 'common/types/roles';
 import { useDisclosure } from '@mantine/hooks';
+import ConfirmPopover from 'common/components/ConfirmPopover/ConfirmPopover';
+import classes from './RoleSelector.module.scss';
 
 interface RoleSelectorProps {
   value: USER_ROLES;
@@ -89,16 +90,14 @@ export function RoleSelector({ value, onChange, onRemove, disabled }: Readonly<R
 
         <Menu.Divider />
 
-        <Popover
+        <ConfirmPopover
           opened={openedConfirm}
-          classNames={{
-            dropdown: classes.dropdown,
-          }}
           position="right"
-          offset={16}
-          withArrow
-        >
-          <Popover.Target>
+          title="Remove user"
+          text="Are you sure to remove this user?"
+          onConfirm={handleConfirm}
+          onCancel={closeConfirm}
+          target={
             <Menu.Item
               color="red"
               leftSection={<RemoveIcon />}
@@ -106,51 +105,8 @@ export function RoleSelector({ value, onChange, onRemove, disabled }: Readonly<R
             >
               Remove
             </Menu.Item>
-          </Popover.Target>
-
-          <Popover.Dropdown>
-            <Flex
-              direction="column"
-              gap="16px"
-            >
-              <Flex
-                direction="column"
-                gap="4px"
-              >
-                <Flex
-                  align="center"
-                  gap="4px"
-                >
-                  <AlertCircleIcon className={classes.alertIcon} />
-                  <Text fw={700}>Remove user</Text>
-                </Flex>
-                <Text>Are you sure to remove this user?</Text>
-              </Flex>
-
-              <Flex
-                justify="flex-end"
-                align="center"
-                gap="8px"
-              >
-                <Button
-                  className={classes.popoverButton}
-                  variant="default"
-                  size="xs"
-                  onClick={closeConfirm}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className={classes.popoverButton}
-                  size="xs"
-                  onClick={handleConfirm}
-                >
-                  OK
-                </Button>
-              </Flex>
-            </Flex>
-          </Popover.Dropdown>
-        </Popover>
+          }
+        />
       </Menu.Dropdown>
     </Menu>
   );

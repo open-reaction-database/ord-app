@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import classes from './datasetHeader.module.scss';
 import { DataField } from 'common/components/DataField/DataField';
 import { UserField } from 'common/components/UserField/UserField';
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { CopyButton, type CopyButtonOptions } from 'common/components/CopyButton/CopyButton';
 import { formatDate } from 'common/utils';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu';
-import { ChevronDownIcon, EditIcon } from 'common/icons';
+import { ChevronDownIcon, EditIcon, TrashIcon } from 'common/icons';
 import type { Dataset } from 'store/datasets/datasets.types';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
@@ -30,6 +29,10 @@ import { selectIsDatasetOpened } from 'store/datasets/datasets.selectors';
 import { setDatasetEditOpenedAction } from 'store/datasets/datasets.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { domain, fileDownloadOptions } from 'common/constants';
+import ConfirmPopover from 'common/components/ConfirmPopover/ConfirmPopover';
+import { useDisclosure } from '@mantine/hooks';
+import { removeDataset } from 'store/datasets/datasets.thunks';
+import classes from './datasetHeader.module.scss';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -39,6 +42,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
   const isEditOpened = useSelector(selectIsDatasetOpened);
+  const [removeConfirmOpened, { open: openRemoveConfirm, close: closeRemoveConfirm }] = useDisclosure(false);
 
   const openEdit = useCallback(() => {
     dispatch(setDatasetEditOpenedAction(true));
@@ -55,6 +59,11 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
     ],
     [dataset.id, location],
   );
+
+  const handleDatasetRemove = useCallback(() => {
+    dispatch(removeDataset(dataset.id));
+    closeRemoveConfirm();
+  }, [dispatch, closeRemoveConfirm, dataset.id]);
 
   return (
     <Paper
@@ -101,6 +110,27 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
       </div>
 
       <div className={classes.buttonContainer}>
+        <ConfirmPopover
+          opened={removeConfirmOpened}
+          position="right"
+          offset={8}
+          title="Remove dataset"
+          text="Are you sure to remove this dataset?"
+          onConfirm={handleDatasetRemove}
+          onCancel={closeRemoveConfirm}
+          target={
+            <Button
+              classNames={{ section: classes.removeIcon }}
+              variant="transparent"
+              color="red"
+              leftSection={<TrashIcon />}
+              onClick={openRemoveConfirm}
+            >
+              Remove
+            </Button>
+          }
+        />
+
         <DownloadMenu
           options={fileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}
