@@ -19,6 +19,7 @@ import {
   getDatasetActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
+  removeDatasetActions,
   updateDatasetActions,
 } from './datasets.actions';
 import type { Dataset } from './datasets.types';
@@ -78,4 +79,10 @@ export const createDatasetFromFile = createThunkWithExplicitResult(
 export const updateDataset = createThunk(updateDatasetActions, async (_d, _g, { id, ...payload }) => {
   const updatedDataset = (await axiosInstance.patch<Dataset>(`datasets/${id}`, payload)).data;
   return updateDatasetActions.success(updatedDataset);
+});
+
+export const removeDataset = createThunkWithExplicitResult(removeDatasetActions, async (dispatch, _g, datasetId) => {
+  await axiosInstance.delete(`/datasets/${datasetId}`);
+  dispatch(removeDatasetActions.success());
+  navigate(`/`);
 });

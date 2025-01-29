@@ -18,29 +18,11 @@
   box-shadow: 0 4px 24px 0 #00000014;
 }
 
-.menuItem {
-  padding: 10px 12px;
-  border-radius: 8px;
-  text-transform: capitalize;
+.alertIcon {
+  color: #e4626f;
 }
 
-.menuItemSection {
-  padding-right: 8px;
-}
-
-.selectedOption {
-  background-color: var(--color-background-gray);
-
-  svg {
-    color: var(--color-primary);
-  }
-}
-
-.iconPlaceholder {
-  min-width: 20px;
-}
-
-.target {
-  text-transform: capitalize;
-  width: 140px;
+.popoverButton {
+  padding: 6px 12px;
+  font-weight: 400;
 }

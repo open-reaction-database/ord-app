@@ -36,17 +36,16 @@
 
 .buttonContainer {
   display: flex;
-  flex-direction: row-reverse;
-  min-width: 20%;
+  justify-content: space-between;
 
   button {
     border-radius: 8px;
     font-weight: 400;
   }
+}
 
-  path {
-    fill: var(--mantine-color-white);
-  }
+.removeIcon {
+  margin-inline-end: 6px;
 }
 
 .target {
