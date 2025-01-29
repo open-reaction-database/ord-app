@@ -22,7 +22,7 @@ import { AddCircleIcon, ChevronDownIcon } from 'common/icons';
 import { CreateReactionFromFile } from './CreateReactionFromFile/CreateReactionFromFile';
 import { selectIsReactionUploadOpened } from 'store/reactions/reactions.selectors';
 import { setReactionUploadOpenedAction } from 'store/reactions/reactions.actions';
-import classes from './CreateReaction.module.scss';
+import classes from './createReactionMenu.module.scss';
 
 export function CreateReactionMenu() {
   const dispatch = useAppDispatch();
