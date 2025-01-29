@@ -19,7 +19,9 @@ from fastapi import Depends
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from google.protobuf import json_format, text_format
+from google.protobuf.json_format import ParseError as JsonParseError
 from google.protobuf.message import DecodeError, Message
+from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
@@ -58,7 +60,7 @@ class DatasetUseCases:
     async def upload(self, group_id: int, file_data, kind):
         try:
             dataset_pb = load_message(file_data, Dataset, kind)
-        except DecodeError as e:
+        except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
