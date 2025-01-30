@@ -75,9 +75,23 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
   }));
 });
 
+const isReactionCreating = createReducer<boolean>(false, builder => {
+  builder.addMatcher(isAnyOf(createEmptyReactionActions.request, importReactionFromFileActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(
+      createEmptyReactionActions.success,
+      createEmptyReactionActions.failure,
+      importReactionFromFileActions.success,
+      importReactionFromFileActions.failure,
+    ),
+    () => false,
+  );
+});
+
 export const reactionsReducer = combineReducers({
   reactionsById,
   reactionsOrder,
   pagination,
   activeDatasetId,
+  isReactionCreating,
 });

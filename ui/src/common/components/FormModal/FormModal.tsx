@@ -22,9 +22,10 @@ interface FormModalProps {
   title: string;
   children: ReactNode;
   submitTitle?: string;
+  loading?: boolean;
 }
 
-export function FormModal({ onClose, onSubmit, title, children, submitTitle }: Readonly<FormModalProps>) {
+export function FormModal({ onClose, onSubmit, title, children, submitTitle, loading }: Readonly<FormModalProps>) {
   return (
     <Modal
       opened
@@ -49,7 +50,12 @@ export function FormModal({ onClose, onSubmit, title, children, submitTitle }: R
             >
               Cancel
             </Button>
-            <Button type="submit">{submitTitle ?? 'Create'}</Button>
+            <Button
+              type="submit"
+              loading={loading}
+            >
+              {submitTitle ?? 'Create'}
+            </Button>
           </Flex>
         </Flex>
       </form>

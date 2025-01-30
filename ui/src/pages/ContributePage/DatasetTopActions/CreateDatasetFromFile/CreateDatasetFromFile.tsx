@@ -23,6 +23,7 @@ import { type CreateDatasetFromFileFormValues, createDatasetFromFileSchema } fro
 import type { CreateDatasetFromFilePayload } from 'store/datasets/datasets.types';
 import { createDatasetFromFile } from 'store/datasets/datasets.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
+import { selectIsDatasetCreating } from 'store/datasets/datasets.selectors';
 
 interface CreateDatasetFromFileProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ interface CreateDatasetFromFileProps {
 export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFileProps>) {
   const dispatch = useAppDispatch();
   const groupsList = useSelector(selectOrderedGroupsList);
+  const isDatasetCreating = useSelector(selectIsDatasetCreating);
   const data = useMemo(() => {
     return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
   }, [groupsList]);
@@ -64,6 +66,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       onSubmit={form.onSubmit(onSubmit)}
       title="Create Dataset from File"
       submitTitle="Create Dataset"
+      loading={isDatasetCreating}
     >
       <Select
         data={data}
