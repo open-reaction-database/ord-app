@@ -23,6 +23,9 @@ export const columns: MRT_ColumnDef<Dataset>[] = [
     id: 'datasetName',
     accessorKey: 'name',
     header: 'Dataset Name',
+    Cell: ({ row }) => {
+      return <>{row.original.name || `Dataset ${row.original.id}`}</>;
+    },
     size: 230,
   },
   {

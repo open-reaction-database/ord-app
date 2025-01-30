@@ -89,15 +89,19 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
           <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
         </div>
         <Flex
+          className={classes.title}
           gap="sm"
           align="baseline"
         >
-          <Title
-            className={classes.title}
-            order={1}
-          >
-            {dataset.name}
-          </Title>
+          {!dataset.name && (
+            <Title
+              className={classes.titlePlaceholder}
+              order={1}
+            >
+              Dataset
+            </Title>
+          )}
+          <Title order={1}>{dataset.name || dataset.id}</Title>
           <ActionIcon
             variant="transparent"
             onClick={openEdit}
