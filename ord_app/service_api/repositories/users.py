@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from sqlalchemy import or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import UserModel
+from ord_app.service_api.repositories.base import BaseRepository
 
 
-class UserRepository:
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
-    async def get(self, user_id: int) -> UserModel:
-        return await self.db.get(UserModel, user_id)
+class UserRepository(BaseRepository[UserModel]):
+    model = UserModel
 
     async def search_user_by_identity(self, identity: int | str) -> UserModel:
         stmt = (
