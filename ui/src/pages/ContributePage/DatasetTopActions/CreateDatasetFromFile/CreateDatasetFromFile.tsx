@@ -16,7 +16,7 @@
 import { FileInput, Select } from '@mantine/core';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectOrderedGroupsList } from 'store/groups/groups.selectors';
+import { selectActiveGroupId, selectOrderedGroupsList } from 'store/groups/groups.selectors';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal';
 import { type CreateDatasetFromFileFormValues, createDatasetFromFileSchema } from './createDatasetFromFile.schema';
@@ -32,6 +32,7 @@ interface CreateDatasetFromFileProps {
 export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFileProps>) {
   const dispatch = useAppDispatch();
   const groupsList = useSelector(selectOrderedGroupsList);
+  const activeGroupId = useSelector(selectActiveGroupId);
   const isDatasetCreating = useSelector(selectIsDatasetCreating);
   const data = useMemo(() => {
     return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
@@ -43,7 +44,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
   >({
     mode: 'controlled',
     initialValues: {
-      groupId: '',
+      groupId: activeGroupId ? activeGroupId.toString() : '',
       file: '',
     },
     transformValues: values => ({
