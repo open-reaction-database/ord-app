@@ -65,7 +65,7 @@ class GroupMembersUseCases:
         raise EntityNotFoundError(f"<User(identity={payload.identity})> not found")
 
     async def update_member(self, group_id: int, payload: GroupUpdateMemberSchema):
-        if user := await self.user_repository.get(payload.user_id):
+        if user := await self.user_repository.get(id=payload.user_id):
             await self.group_members_repository.update_member(user.id, group_id, payload.role)
             return await self.group_members_repository.get(user.id, group_id)
         raise EntityNotFoundError(f"<User(identity={payload.user_id})> not found")

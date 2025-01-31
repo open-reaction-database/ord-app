@@ -41,6 +41,15 @@ async def get_user_by_external_pks(
     return await db_session.scalar(stmt)
 
 
+async def authenticate_auth0_user(db_session: AsyncSession, auth0_id: str) -> UserModel:
+    stmt = (
+        select(UserModel)
+        .where(UserModel.auth0_id == auth0_id)
+        .limit(1)
+    )
+    return await db_session.scalar(stmt)
+
+
 async def get_user_by_email(db_session: AsyncSession, email: str):
     stmt = select(UserModel).where(UserModel.email == email).limit(1)
     return await db_session.scalar(stmt)
@@ -95,7 +104,8 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         name=user_info["name"],
         avatar_url=user_info["picture"],
         external_id=external_id,
-        orcid_id=orcid_id
+        orcid_id=orcid_id,
+        auth0_id=user_info["sub"]
     )
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)

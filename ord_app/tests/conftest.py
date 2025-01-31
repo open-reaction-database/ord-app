@@ -81,8 +81,17 @@ def clear_database():
 
 
 @pytest.fixture
+async def test_user(test_db_session):
+    user = UserModel(email="utest@unit.com", external_id="utest_external_id", auth0_id="utest_auth0_id")
+    test_db_session.add(user)
+    await test_db_session.commit()
+    await test_db_session.refresh(user)
+    return user
+
+
+@pytest.fixture
 async def mock_authenticated_user(test_db_session):
-    user = UserModel(email="utest@unit.com", external_id="utest_external_id")
+    user = UserModel(email="utest@unit.com", external_id="utest_external_id", auth0_id="utest_auth0_id")
     group = GroupModel(name="utest", owner_id=user.id)
     group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
     test_db_session.add_all([user, group, group_member])
@@ -93,9 +102,9 @@ async def mock_authenticated_user(test_db_session):
     def set_mock_user(new_user):
         nonlocal user
         user = new_user
-        app.dependency_overrides[verify_access_token] = lambda: {"sub": user.external_id}
+        app.dependency_overrides[verify_access_token] = lambda: {"sub": user.auth0_id}
 
-    app.dependency_overrides[verify_access_token] = lambda: {"sub": user.external_id}
+    app.dependency_overrides[verify_access_token] = lambda: {"sub": user.auth0_id}
 
     yield user, set_mock_user, group
 

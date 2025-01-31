@@ -33,7 +33,9 @@ class UserSchema(BaseSchema):
 
 class UserCreateSchema(BaseSchema):
     email: EmailStr | None
+    auth0_id: str
     name: str | None
     external_id: str | None
     orcid_id: str | None
     avatar_url: str | None
+
