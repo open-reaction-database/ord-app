@@ -67,13 +67,15 @@ export function DatasetTable() {
             : {}
         }
       />
-      <Pagination
-        currentPage={pagination.page}
-        onPageChange={onPageChange}
-        rowsPerPage={pagination.size}
-        onRowsPerPageChange={onPageSizeChange}
-        totalPages={pagination.pages}
-      />
+      {datasets?.length > 0 && (
+        <Pagination
+          currentPage={pagination.page}
+          onPageChange={onPageChange}
+          rowsPerPage={pagination.size}
+          onRowsPerPageChange={onPageSizeChange}
+          totalPages={pagination.pages}
+        />
+      )}
     </div>
   );
 }
