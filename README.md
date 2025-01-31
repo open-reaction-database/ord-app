@@ -32,3 +32,8 @@ Python tests are written with `pytest`:
 ```shell
 pytest -vv
 ```
+
+## Dockerization
+```bash
+
+```

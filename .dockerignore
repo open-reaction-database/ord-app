@@ -1,10 +1,10 @@
 .idea/
+.github/
 
 __pychace__/
 .venv/
-.github/
-ui/
-
 .coverage
 .dockerignore
 .gitignore
+
+ui/node_modules/
