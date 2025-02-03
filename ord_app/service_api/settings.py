@@ -13,8 +13,8 @@
 # limitations under the License.
 from pathlib import PosixPath
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, AliasChoices
 
 from ord_app.service_api.constants import AppEns
 
