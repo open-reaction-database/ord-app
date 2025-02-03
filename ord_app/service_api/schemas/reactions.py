@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from base64 import b64decode, b64encode
+from collections import defaultdict
+from itertools import chain
+from typing import Any
 
+from ord_schema.message_helpers import molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Reaction
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import BaseSchema
@@ -25,11 +29,38 @@ class ReactionSchema(BaseSchema):
     name: str | None
     binpb: str
     summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
+    mulblocks: dict
 
     @field_validator("binpb", mode="before")
     @classmethod
     def _binpb(cls, raw):
         return b64encode(raw).decode()
+
+    @model_validator(mode="before")
+    @classmethod
+    def reaction_count(cls, data: Any):  # noqa: F811
+        pb = load_message(data.binpb, Reaction, "binpb")
+
+        products = []
+        for product in chain.from_iterable(outcome.products for outcome in pb.outcomes):
+            try:
+                products.append(molblock_from_compound(product))
+            except ValueError:
+                products.append(None)
+
+        inputs = defaultdict(list)
+        for input_key, input_value in pb.inputs.items():
+            for component in input_value.components:
+                try:
+                    inputs[input_key].append(molblock_from_compound(component))
+                except ValueError:
+                    inputs[input_key].append(None)
+
+        data.mulblocks = {"products": products, "inputs": inputs}
+
+        if hasattr(data, "reactions"):
+            data.reaction_count = len(data.reactions)
+        return data
 
 
 class ReactionCreateSchema(BaseSchema):

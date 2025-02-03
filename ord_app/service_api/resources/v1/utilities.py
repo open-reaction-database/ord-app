@@ -19,14 +19,15 @@ from ord_schema import resolvers
 from ord_schema.message_helpers import create_message, molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import send_message
 from ord_app.service_api.models import UserModel
+from ord_app.service_api.schemas.utilites import ResolveCompoundInputs, ResolveCompoundOutputs
 from ord_app.service_api.services.populate_data_sets import populate_testing_data
 from ord_app.service_api.services.postgresql import get_db_session
+from ord_app.service_api.services.resolvers import canonicalize_smiles_cached, name_resolve_cached
 
 router = APIRouter(tags=["utilities"])
 
@@ -73,24 +74,17 @@ async def resolve_input(input_string: str):
         return Response(str(error), status_code=400)
 
 
-class ResolveCompoundInputs(BaseModel):
-    """Inputs for resolve_compound."""
-
-    identifier_type: str
-    identifier: str
-
-
-@router.post("/resolve_compound")
+@router.post("/resolve-compound", response_model=ResolveCompoundOutputs)
 async def resolve_compound(inputs: ResolveCompoundInputs):
     """Resolves a compound identifier into a SMILES string."""
     try:
-        smiles, resolver = resolvers.name_resolve(inputs.identifier_type, inputs.identifier)
-        return {"smiles": resolvers.canonicalize_smiles(smiles), "resolver": resolver}
+        resolver, smiles = await name_resolve_cached(inputs.identifier_type, inputs.identifier)
+        return {"smiles": canonicalize_smiles_cached(smiles), "resolver": resolver}
     except ValueError as error:
         return Response(str(error), status_code=400)
 
 
-@router.get("/canonicalize_smiles")
+@router.get("/canonicalize-smiles")
 async def canonicalize_smiles(smiles: str):
     """Canonicalizes a SMILES string."""
     try:
