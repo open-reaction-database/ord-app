@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Button, Flex, Paper, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/CopyButton/CopyButton';
@@ -76,12 +76,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                 Reaction
               </Title>
             )}
-            <Tooltip
-              label="Reaction Name (corresponds to ID when creating the reaction)"
-              position="bottom"
-            >
-              <Title order={2}>{reaction.name || reaction.id}</Title>
-            </Tooltip>
+            <Title order={2}>{reaction.name || reaction.id}</Title>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="transparent">
               <EditIcon onClick={open} />
@@ -125,8 +120,9 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
         opened={opened}
         onClose={close}
         onSubmit={onReactionNameChange}
-        title="Rename Reaction"
-        inputLabel="Reaction Name"
+        title="Change Reaction ID"
+        inputLabel="Reaction ID"
+        inputPlaceholder="Enter reaction ID"
         initialValue={reaction.name}
       />
     </Paper>

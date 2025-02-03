@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { FileInput } from '@mantine/core';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal';
 import { importReactionFromFile } from 'store/reactions/reactions.thunks';
+import { selectIsReactionCreating } from 'store/reactions/reactions.selectors';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { type CreateReactionFromFileFormValues, createReactionFromFileSchema } from './createReactionFromFile.schema';
 import { type ImportReactionFromFilePayload } from 'store/reactions/reactions.types';
@@ -29,6 +31,7 @@ interface CreateReactionFromFileProps {
 
 export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromFileProps>) {
   const dispatch = useAppDispatch();
+  const isReactionCreating = useSelector(selectIsReactionCreating);
 
   const form = useForm<
     CreateReactionFromFileFormValues,
@@ -54,6 +57,7 @@ export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromF
       onSubmit={form.onSubmit(onSubmit)}
       title="Import Reaction from File"
       submitTitle="Save"
+      loading={isReactionCreating}
     >
       <FileInput
         className={classes.fileInput}
