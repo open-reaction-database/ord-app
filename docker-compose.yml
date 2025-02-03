@@ -27,6 +27,8 @@ services:
     volumes:
       - .:/app
       - /app/.venv
+    networks:
+      - ord_network
 
   db:
     image: bitnami/postgresql:17
@@ -38,6 +40,8 @@ services:
       - db:/bitnami/postgresql
     ports:
       - "5400:5432"
+    networks:
+      - ord_network
 
   migrate:
     image: ord-api
@@ -49,6 +53,12 @@ services:
       - .:/app
     entrypoint: >
       sh -c "alembic upgrade head"
+    networks:
+      - ord_network
+
+networks:
+  ord_network:
+    name: ord_network
 
 volumes:
   db:

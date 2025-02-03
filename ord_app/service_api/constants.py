@@ -15,6 +15,7 @@
 
 class AppEns:
     localhost = "localhost"
+    production = "production"
 
 
 ALLOWED_PB_EXTENSIONS = (".json", ".binpb", ".txtpb", ".pb", ".pbtxt")
