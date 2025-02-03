@@ -32,11 +32,11 @@ class Settings(BaseSettings):
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
     # Encryption and auth
-    auth0_domain: str = Field(validation_alias=AliasChoices("vite_auth0_domain", "auth0_domain"))
-    auth0_algorithms: str = Field(validation_alias=AliasChoices("vite_auth0_algorithms", "auth0_algorithms"))
-    auth0_audience: str = Field(validation_alias=AliasChoices("vite_auth0_audience", "auth0_audience"))
-    auth0_issuer: str = Field(validation_alias=AliasChoices("vite_auth0_issuer", "auth0_issuer"))
-    auth0_client_id: str = Field(validation_alias=AliasChoices("vite_auth0_client_id", "auth0_client_id"))
+    auth0_domain: str = Field("", validation_alias=AliasChoices("vite_auth0_domain", "auth0_domain"))
+    auth0_algorithms: str = Field("", validation_alias=AliasChoices("vite_auth0_algorithms", "auth0_algorithms"))
+    auth0_audience: str = Field("", validation_alias=AliasChoices("vite_auth0_audience", "auth0_audience"))
+    auth0_issuer: str = Field("", validation_alias=AliasChoices("vite_auth0_issuer", "auth0_issuer"))
+    auth0_client_id: str = Field("", validation_alias=AliasChoices("vite_auth0_client_id", "auth0_client_id"))
 
 
 RuntimeSettings = Settings()
