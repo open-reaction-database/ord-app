@@ -60,7 +60,7 @@ _Note: the database must be on the same network as docker or docker must connect
    -e VITE_AUTH0_CLIENT_ID="..." \
    -e VITE_AUTH0_AUDIENCE="..." \
    -e VITE_AUTH0_ISSUER="..." \
-   -e pg_dsn="postgresql+psycopg://ord@host.docker.internal:5400/ord"
+   -e PG_DSN="postgresql+psycopg://ord@db:5400/ord"
    --rm -p 5173:80 -p 8000:8000 ord
    ```
 
