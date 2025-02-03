@@ -15,7 +15,9 @@
 from fastapi import Depends
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
+from google.protobuf.json_format import ParseError as JsonParseError
 from google.protobuf.message import DecodeError
+from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,7 +56,7 @@ class ReactionsUseCase:
     async def upload(self, dataset_id: int, file_data, kind):
         try:
             reaction_pb = load_message(file_data, Reaction, kind)
-        except DecodeError as e:
+        except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
