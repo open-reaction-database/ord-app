@@ -27,6 +27,8 @@ services:
     volumes:
       - .:/app
       - /app/.venv
+    networks:
+      - ord_network
 
   db:
     image: bitnami/postgresql:17
@@ -38,17 +40,32 @@ services:
       - db:/bitnami/postgresql
     ports:
       - "5400:5432"
+    networks:
+      - ord_network
+    healthcheck:
+      test: pg_isready -U ord
+      interval: 5s
+      retries: 6
+      start_period: 1s
 
   migrate:
     image: ord-api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
     volumes:
       - .:/app
     entrypoint: >
       sh -c "alembic upgrade head"
+    networks:
+      - ord_network
+    restart: no
+
+networks:
+  ord_network:
+    name: ord_network
 
 volumes:
   db:
