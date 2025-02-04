@@ -35,9 +35,11 @@ At the same time, you need to run the Front-End separately.
 ```shell
 cd ui
 ```
+
 ```shell
-npm install
+npm ci
 ```
+
 ```shell
 npm run dev
 ```

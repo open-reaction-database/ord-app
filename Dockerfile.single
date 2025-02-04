@@ -17,14 +17,11 @@ FROM node:22.13-alpine AS react-build
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY ui/package.json ui/package-lock.json ./
+# Copy the rest of the React app
+COPY ui/ ./
 
 # Install dependencies
 RUN npm ci --ignore-scripts
-
-# Copy the rest of the React app
-COPY ui/ ./
 
 # Build the React app
 RUN npm run build
