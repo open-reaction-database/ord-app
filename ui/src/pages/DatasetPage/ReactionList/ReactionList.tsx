@@ -18,12 +18,13 @@ import { Pagination } from 'common/components/Pagination/Pagination';
 import { ReactionCard } from './ReactionCard/ReactionCard';
 import { Flex, Paper, Title } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
+import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionsOrder, selectReactionsPagination } from 'store/reactions/reactions.selectors';
 import { getReactionsPage } from 'store/reactions/reactions.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu';
-import classes from './reactionsList.module.scss';
+import { Counter } from 'common/components/Counter/Counter';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -58,7 +59,7 @@ export function ReactionList() {
             gap="sm"
           >
             <Title order={2}>Dataset Reactions</Title>
-            <span className={classes.counter}>{pagination.total}</span>
+            <Counter amount={pagination.total} />
           </Flex>
 
           <CreateReactionMenu />

@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import { ReactionFormNodeType, type ReactionFormNode } from 'common/types/reaction/reactionFields';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+export function wrapInputsWithGrid(...inputs: Array<ReactionFormNode>): ReactionFormNode {
+  const inputsAmount = inputs.length;
+  return {
+    type: ReactionFormNodeType.wrapper,
+    grid: inputsAmount,
+    fields: inputs,
+  };
+}

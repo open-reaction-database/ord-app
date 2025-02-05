@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import { createActionFactory } from 'common/store';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+const { createAction } = createActionFactory('reactionForm');
+
+export const setReactionPathComponentsList = createAction<Array<ReactionPathComponents>>('set_list');
+
+export const addReactionPathComponentToList = createAction<ReactionPathComponents>('add_to_list');
+
+export const popReactionPathComponents = createAction<void>('pop_from_list');
+
+export const clearReactionPathComponentsList = createAction<void>('clear_list');

@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import type { ReactionEntity } from 'common/model/reaction/reactionEntityToForm.models';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+interface ProtobufEntity {
+  toObject(): object;
+}
+
+interface ProtobufEntityConstructor {
+  new (): ProtobufEntity;
+}
+
+export interface SidebarFormConfiguration {
+  constructor: ProtobufEntityConstructor;
+  schemaPath: Array<string>;
+  entity: ReactionEntity;
+  name: string;
+}

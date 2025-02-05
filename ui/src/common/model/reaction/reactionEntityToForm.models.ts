@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import type { ReactionFormNode } from 'common/types/reaction/reactionFields';
+import { reactionInputs } from './reactionInputs.model';
+import { reactionNotes } from './reactionNotes.model';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
+export enum ReactionEntity {
+  Inputs = 'inputs',
+  Notes = 'notes',
+}
+
+export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
+  [ReactionEntity.Inputs]: reactionInputs,
+  [ReactionEntity.Notes]: reactionNotes,
 };

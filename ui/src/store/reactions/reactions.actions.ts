@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createActionFactory } from '../../common/store';
+import { createActionFactory } from 'common/store';
 import type { ImportReactionFromFilePayload, ReactionWrapper } from './reactions.types';
-import type { CurrentPage, Pages } from '../../common/types';
+import type { CurrentPage, Pages } from 'common/types';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
 const { createAsyncAction } = createActionFactory('reactions');
 
@@ -32,3 +33,8 @@ export const createEmptyReactionActions = createAsyncAction<void, ReactionWrappe
 export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, ReactionWrapper>(
   'import_from_file',
 );
+
+export const updateReactionActions = createAsyncAction<
+  { reactionId: number; pathComponents: ReactionPathComponents; newValue: object },
+  ReactionWrapper
+>('update');

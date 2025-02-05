@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import { ReactionFormNodeType, type ReactionFormSelect } from 'common/types/reaction/reactionFields';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+const booleanOptions = [
+  { label: 'UNSPECIFIED', value: undefined },
+  { label: 'TRUE', value: true },
+  { label: 'FALSE', value: false },
+];
+
+export function createBooleanInput(
+  name: string,
+  wrapperConfig: ReactionFormSelect['wrapperConfig'],
+): ReactionFormSelect {
+  return {
+    type: ReactionFormNodeType.select,
+    name,
+    selectType: 'segmented',
+    options: booleanOptions,
+    wrapperConfig,
+  };
+}

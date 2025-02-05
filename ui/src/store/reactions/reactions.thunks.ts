@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createThunk, createThunkWithExplicitResult } from '../../common/store';
+import { createThunk, createThunkWithExplicitResult } from 'common/store';
 import {
   createEmptyReactionActions,
   getReactionActions,
@@ -21,13 +21,15 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   renameReactionActions,
+  updateReactionActions,
 } from './reactions.actions';
-import axiosInstance from '../../common/config/axiosConfig';
-import type { Pages } from '../../common/types';
+import axiosInstance from 'common/config/axiosConfig';
+import type { Pages } from 'common/types';
 import type { ReactionResponse, ReactionWrapper } from './reactions.types';
 import ordSchema from 'ord-schema';
-import { selectActiveDatasetId, selectReactionsPagination } from './reactions.selectors';
+import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors';
 import { navigate } from 'wouter/use-browser-location';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => ({
   ...rest,
@@ -97,5 +99,29 @@ export const importReactionFromFile = createThunkWithExplicitResult(
     const reaction = parseReaction(result.data);
     dispatch(importReactionFromFileActions.success(reaction));
     navigate(`/dataset/${datasetId}/reaction/${reaction.id}`);
+  },
+);
+
+// Function is not typed - treat as deep merge
+// eslint-disable-next-line
+function mergeReactionParts(reactionPart: any, path: ReactionPathComponents, value: any) {
+  if (path.length === 0) {
+    return value;
+  }
+  const [key, ...rest] = path;
+  const nextPart = reactionPart[key];
+
+  const reactionPartCopy = Array.isArray(reactionPart) ? [...reactionPart] : { ...reactionPart };
+  reactionPartCopy[key] = mergeReactionParts(nextPart, rest, value);
+  return reactionPartCopy;
+}
+
+export const updateReaction = createThunk(
+  updateReactionActions,
+  async (_d, getState, { reactionId, pathComponents, newValue }) => {
+    const { data, ...reaction } = selectReactionById(reactionId)(getState());
+    const updatedReaction = mergeReactionParts(data, pathComponents, newValue);
+    const resultReaction: ReactionWrapper = { ...reaction, data: updatedReaction };
+    return updateReactionActions.success(resultReaction);
   },
 );

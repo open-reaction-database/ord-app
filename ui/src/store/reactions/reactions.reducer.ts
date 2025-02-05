@@ -21,6 +21,7 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   renameReactionActions,
+  updateReactionActions,
 } from './reactions.actions';
 import { itemsById } from 'common/utils';
 import type { ReactionWrapper } from './reactions.types';
@@ -41,6 +42,7 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
       renameReactionActions.success,
       createEmptyReactionActions.success,
       importReactionFromFileActions.success,
+      updateReactionActions.success,
     ),
     (state, action) => ({
       ...state,

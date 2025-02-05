@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import { ReactionEntity } from './reactionEntityToForm.models';
+import reactionSchema from 'ord-schema/proto/reaction_pb';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
+interface ReactionEntityClass {
+  toObject: () => object;
+}
+
+interface ReactionEntityConstructor {
+  new (): ReactionEntityClass;
+}
+
+export const reactionEntityToConstructor: Record<ReactionEntity, ReactionEntityConstructor> = {
+  [ReactionEntity.Inputs]: reactionSchema.ReactionInput,
+  [ReactionEntity.Notes]: reactionSchema.ReactionNotes,
 };
