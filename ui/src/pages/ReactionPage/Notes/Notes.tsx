@@ -57,29 +57,27 @@ export function Notes({ reactionId }: Readonly<ReactionSectionProps>) {
   };
 
   return (
-    <>
-      <Flex
-        direction="column"
-        gap="md"
-      >
-        <Flex justify="space-between">
-          <Title order={2}>Notes</Title>
-          <Button
-            onClick={onEdit}
-            leftSection={<AddCircleIcon />}
-          >
-            Edit
-          </Button>
-        </Flex>
-        <div className={classes.grid}>
-          {fields.map(([label, value]) => (
-            <Fragment key={label}>
-              <span className={typographyClasses.secondary2}>{label}</span>
-              <p>{value.toString()}</p>
-            </Fragment>
-          ))}
-        </div>
+    <Flex
+      direction="column"
+      gap="md"
+    >
+      <Flex justify="space-between">
+        <Title order={2}>Notes</Title>
+        <Button
+          onClick={onEdit}
+          leftSection={<AddCircleIcon />}
+        >
+          Edit
+        </Button>
       </Flex>
-    </>
+      <div className={classes.grid}>
+        {fields.map(([label, value]) => (
+          <Fragment key={label}>
+            <span className={typographyClasses.secondary2}>{label}</span>
+            <p>{value.toString()}</p>
+          </Fragment>
+        ))}
+      </div>
+    </Flex>
   );
 }

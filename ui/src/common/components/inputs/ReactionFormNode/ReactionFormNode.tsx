@@ -60,7 +60,7 @@ export function ReactionFormGroup({ node, getInputProps }: Readonly<ReactionForm
 
 export function ReactionFormWrapper({ node, getInputProps }: Readonly<ReactionFormNodeProps<ReactionFormWrapper>>) {
   return (
-    <Input.Wrapper {...(node.wrapperConfig || {})}>
+    <Input.Wrapper {...(node.wrapperConfig ?? {})}>
       <div
         className={classes.wrapper}
         style={{ gridTemplateColumns: `repeat(${node.grid}, 1fr)` }}
@@ -79,7 +79,7 @@ export function ReactionFormWrapper({ node, getInputProps }: Readonly<ReactionFo
 
 export function ReactionFormValue({ node, getInputProps }: Readonly<ReactionFormNodeProps<ReactionFormValue>>) {
   const wrapperProps = node.wrapperConfig || {};
-  const inputProps = Object.assign({ placeholder: 'Type' }, node.inputConfig || {});
+  const inputProps = { placeholder: 'Type', ...(node.inputConfig ?? {}) };
   const props = { name: node.name, ...wrapperProps, ...inputProps };
 
   switch (node.inputType) {

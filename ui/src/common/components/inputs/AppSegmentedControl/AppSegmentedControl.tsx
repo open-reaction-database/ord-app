@@ -33,8 +33,8 @@ export function AppSegmentedControl<T>({
   ...rest
 }: Readonly<AppSegmentedControlProps<T>>) {
   const stringOptions = useMemo(() => options.map(option => ({ label: option.label, value: option.label })), [options]);
-  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label || undefined;
-  const stringValue = options.find(option => option.value === value)?.label || undefined;
+  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label ?? undefined;
+  const stringValue = options.find(option => option.value === value)?.label ?? undefined;
   const handleChange = useCallback(
     (stringValue: string) => {
       const value = (options.find(option => option.label === stringValue) as SelectOption<T>).value;

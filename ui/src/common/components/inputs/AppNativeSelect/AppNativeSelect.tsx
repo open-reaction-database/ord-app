@@ -32,8 +32,8 @@ export function AppNativeSelect<T>({
   ...rest
 }: Readonly<AppNativeSelectProps<T>>) {
   const stringOptions = useMemo(() => options.map(option => option.label), [options]);
-  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label || undefined;
-  const stringValue = options.find(option => option.value === value)?.label || undefined;
+  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label ?? undefined;
+  const stringValue = options.find(option => option.value === value)?.label ?? undefined;
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {

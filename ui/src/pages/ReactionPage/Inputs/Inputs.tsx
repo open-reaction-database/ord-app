@@ -36,33 +36,31 @@ export function Inputs({ reactionId }: ReactionSectionProps) {
   }, [dispatch, inputs.length]);
 
   return (
-    <>
-      <Flex direction="column">
-        <Flex justify="space-between">
-          <Flex
-            align="center"
-            gap="sm"
-          >
-            <Title order={2}>Inputs</Title>
-            <Counter amount={inputs.length} />
-          </Flex>
-          <Button
-            onClick={onCreateNew}
-            leftSection={<AddCircleIcon />}
-          >
-            Input
-          </Button>
-        </Flex>
-        <span>Reaction inputs include every chemical added to the reaction vessel</span>
+    <Flex direction="column">
+      <Flex justify="space-between">
         <Flex
-          direction="column"
           align="center"
           gap="sm"
         >
-          <NoData className={classes.icon} />
-          <span className={typographyClasses.secondary1}>There are no Inputs yet</span>
+          <Title order={2}>Inputs</Title>
+          <Counter amount={inputs.length} />
         </Flex>
+        <Button
+          onClick={onCreateNew}
+          leftSection={<AddCircleIcon />}
+        >
+          Input
+        </Button>
       </Flex>
-    </>
+      <span>Reaction inputs include every chemical added to the reaction vessel</span>
+      <Flex
+        direction="column"
+        align="center"
+        gap="sm"
+      >
+        <NoData className={classes.icon} />
+        <span className={typographyClasses.secondary1}>There are no Inputs yet</span>
+      </Flex>
+    </Flex>
   );
 }
