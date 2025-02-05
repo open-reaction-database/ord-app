@@ -14,100 +14,26 @@
  * limitations under the License.
  */
 import { type ReactionFormNode, ReactionFormNodeType } from 'common/types/reaction/reactionFields';
-
-const booleanOptions = [
-  { label: 'UNSPECIFIED', value: undefined },
-  { label: 'TRUE', value: true },
-  { label: 'FALSE', value: false },
-];
+import { wrapInputsWithGrid } from '../../utils/reactionForm/wrapInputsWithGrid';
+import { createBooleanInput } from '../../utils/reactionForm/createBooleanInput';
 
 export const reactionNotes: Array<ReactionFormNode> = [
+  wrapInputsWithGrid(
+    createBooleanInput('isHeterogeneous', { label: 'Is heterogeneous' }),
+    createBooleanInput('formsPrecipitate', { label: 'Forms precipitate' }),
+  ),
+  wrapInputsWithGrid(
+    createBooleanInput('isExothermic', { label: 'Is exothermic' }),
+    createBooleanInput('offgasses', { label: 'Offgasses' }),
+  ),
+  wrapInputsWithGrid(
+    createBooleanInput('isSensitiveToOxygen', { label: 'Oxygen sensitive' }),
+    createBooleanInput('isSensitiveToMoisture', { label: 'Moisture sensitive' }),
+  ),
   {
     type: ReactionFormNodeType.wrapper,
     grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isHeterogeneous',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'In heterogeneous',
-        },
-      },
-      {
-        type: ReactionFormNodeType.select,
-        name: 'formsPrecipitate',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Forms precipitate',
-        },
-      },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isExothermic',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'In exothermic',
-        },
-      },
-      {
-        type: ReactionFormNodeType.select,
-        name: 'offgasses',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Offgasses',
-        },
-      },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isSensitiveToOxygen',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Oxygen sensitive',
-        },
-      },
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isSensitiveToMoisture',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Moisture sensitive',
-        },
-      },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isSensitiveToLight',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Light sensitive',
-        },
-      },
-    ],
+    fields: [createBooleanInput('isSensitiveToLight', { label: 'Light sensitive' })],
   },
   {
     type: ReactionFormNodeType.value,
