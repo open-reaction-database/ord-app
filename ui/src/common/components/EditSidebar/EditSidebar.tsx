@@ -15,7 +15,7 @@
  */
 import classes from './editSidebar.module.scss';
 import { Drawer } from '@mantine/core';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { SidebarForm } from './SidebarForm/SidebarForm';
 import { useSelector } from 'react-redux';
 import { selectReactionPathComponentsList } from 'store/reactionForm/reactionForm.selectors';
@@ -27,7 +27,7 @@ interface EditSidebarProps {
   reactionId: number;
 }
 
-export function EditSidebar({ reactionId }: Readonly<EditSidebarProps>) {
+function EditSidebarComponent({ reactionId }: Readonly<EditSidebarProps>) {
   const dispatch = useAppDispatch();
   const reactionPathComponentsList = useSelector(selectReactionPathComponentsList);
 
@@ -63,3 +63,5 @@ export function EditSidebar({ reactionId }: Readonly<EditSidebarProps>) {
     </Drawer>
   );
 }
+
+export const EditSidebar = memo(EditSidebarComponent);

@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
+    "@fastify/deepmerge": "^2.0.2",
     "@mantine/core": "^7.15.3",
     "@mantine/dates": "^7.15.3",
     "@mantine/form": "^7.15.3",
