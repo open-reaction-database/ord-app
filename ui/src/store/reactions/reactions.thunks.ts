@@ -25,11 +25,12 @@ import {
 } from './reactions.actions';
 import axiosInstance from 'common/config/axiosConfig';
 import type { Pages } from 'common/types';
-import type { ReactionResponse, ReactionWrapper } from './reactions.types';
+import type { Reaction, ReactionResponse, ReactionWrapper } from './reactions.types';
 import ordSchema from 'ord-schema';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors';
 import { navigate } from 'wouter/use-browser-location';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
+import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => ({
   ...rest,
@@ -102,25 +103,45 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-// Function is not typed - treat as deep merge
-// eslint-disable-next-line
-function mergeReactionParts(reactionPart: any, path: ReactionPathComponents, value: any) {
-  if (path.length === 0) {
+function mergeArray({ isMergeableObject, deepmerge, clone }: Parameters<Required<Options>['mergeArray']>[0]) {
+  return function (target: Array<unknown>, source: Array<unknown>) {
+    const targetClone = clone(target);
+    source.forEach((item, index) => {
+      if (item) {
+        const isMergeable = isMergeableObject(targetClone[index]) && isMergeableObject(item);
+        targetClone[index] = isMergeable ? deepmerge(targetClone[index], item) : item;
+      }
+    });
+    return targetClone;
+  };
+}
+
+const deepmerge = deepmergeFactory({ mergeArray });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function generateDeepPartialReactionByPath(pathComponents: ReactionPathComponents, value: any): any {
+  if (pathComponents.length === 0) {
     return value;
   }
-  const [key, ...rest] = path;
-  const nextPart = reactionPart[key];
-
-  const reactionPartCopy = Array.isArray(reactionPart) ? [...reactionPart] : { ...reactionPart };
-  reactionPartCopy[key] = mergeReactionParts(nextPart, rest, value);
-  return reactionPartCopy;
+  const [currentPathComponent, ...rest] = pathComponents;
+  if (typeof currentPathComponent === 'number') {
+    const array = [];
+    array[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
+    return array;
+  }
+  const object: Record<string, unknown> = {};
+  object[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
+  return object;
 }
 
 export const updateReaction = createThunk(
   updateReactionActions,
   async (_d, getState, { reactionId, pathComponents, newValue }) => {
     const { data, ...reaction } = selectReactionById(reactionId)(getState());
-    const updatedReaction = mergeReactionParts(data, pathComponents, newValue);
+    const updatedReaction: Reaction = deepmerge(
+      data,
+      generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as Reaction,
+    );
     const resultReaction: ReactionWrapper = { ...reaction, data: updatedReaction };
     return updateReactionActions.success(resultReaction);
   },

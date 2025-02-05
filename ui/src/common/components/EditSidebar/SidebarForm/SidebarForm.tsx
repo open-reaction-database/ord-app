@@ -45,7 +45,8 @@ export function SidebarForm({ reactionId, reactionPathComponents, isHidden, onFo
     (acc: object, key) => (acc !== null ? Reflect.get(acc, key) || null : null),
     reaction.data,
   );
-  const initialValues: object = value ? value : new constructor().toObject();
+  const initialValues: object = new constructor().toObject();
+  console.log(value, initialValues);
   const form = useForm({
     mode: 'controlled',
     initialValues: { ...initialValues },
