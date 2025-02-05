@@ -29,7 +29,7 @@ from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema
-from ord_app.service_api.services.exceptions import ProtobufDecodeError, psycopg_error_wrapper, EntityNotFoundError
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, psycopg_error_wrapper
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -89,7 +89,9 @@ class ReactionsUseCase:
         return await self.reaction_repo.get(id=reaction_id)
 
     async def update(self, reaction_id, payload: ReactionCreateSchema):
-        return await self.reaction_repo.update(payload.model_dump(exclude_unset=True), id=reaction_id)
+        if reaction := await self.reaction_repo.update(payload.model_dump(exclude_unset=True), id=reaction_id):
+            return reaction
+        raise EntityNotFoundError("Reaction not found")
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):

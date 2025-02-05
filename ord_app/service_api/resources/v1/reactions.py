@@ -21,7 +21,7 @@ from ord_app.service_api.domain.auth import dataset_authorization, group_authori
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
-from ord_app.service_api.services.exceptions import ProtobufDecodeError, UniqueViolation, EntityNotFoundError
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, UniqueViolation
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
@@ -94,7 +94,10 @@ async def _update_reaction(
     payload: ReactionCreateSchema,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.update(reaction_id, payload)
+    try:
+        return await use_case.update(reaction_id, payload)
+    except EntityNotFoundError as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
 
 
 @router.get(

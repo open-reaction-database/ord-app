@@ -13,6 +13,7 @@
 # limitations under the License.
 from base64 import b64decode, b64encode
 
+from fastapi import status
 from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.domain.datasets import load_message
@@ -49,6 +50,6 @@ async def test_update_reaction(api_client, mock_authenticated_user, test_db_sess
 async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    response_data = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+    response_data = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{100500}", json=payload)
 
-    print()
+    assert status.HTTP_404_NOT_FOUND == response_data.status_code
