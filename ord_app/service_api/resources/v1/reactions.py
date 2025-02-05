@@ -21,7 +21,7 @@ from ord_app.service_api.domain.auth import dataset_authorization, group_authori
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
-from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.services.exceptions import ProtobufDecodeError, UniqueViolation, EntityNotFoundError
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
@@ -37,8 +37,10 @@ async def create_reaction(
     payload: ReactionCreateSchema,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.create(dataset_id, payload)
-
+    try:
+        return await use_case.create(dataset_id, payload)
+    except UniqueViolation as err:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
 
 @router.post(
     "/upload",
@@ -54,8 +56,8 @@ async def upload_reaction(
 
     try:
         return await use_case.upload(dataset_id, file_data, kind)
-    except ProtobufDecodeError as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e)) from e
+    except ProtobufDecodeError as err:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
 
 
 @router.get(
@@ -104,10 +106,14 @@ async def _download_reaction(
     file_format: DownloadFileFormats,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    reaction, data = await use_case.download(reaction_id, file_format)
+    try:
+        reaction, data = await use_case.download(reaction_id, file_format)
+    except EntityNotFoundError as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
+    filename = f"{reaction.pb_reaction_id}-{reaction.id}.{file_format}"
     return Response(
         data,
-        headers={"Content-Disposition": f'attachment; filename="{reaction.name}-{reaction.id}.{file_format}"'},
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

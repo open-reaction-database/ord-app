@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from loguru import logger
-from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from ord_app.service_api.models import ReactionModel
+from ord_app.service_api.repositories.base import BaseRepository
 
 
-class ReactionsRepository:
-    def __init__(self, db: AsyncSession):
-        self.db = db
+class ReactionsRepository(BaseRepository[ReactionModel]):
+    model = ReactionModel
 
     async def create(self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True):
         reaction = ReactionModel(owner_id=user_id, dataset_id=dataset_id, **payload)
@@ -33,7 +32,8 @@ class ReactionsRepository:
 
         return reaction
 
-    def all_reactions_stmt(self, dataset_id: int):
+    @staticmethod
+    def all_reactions_stmt(dataset_id: int):
         stmt = (
             select(ReactionModel)
             .where(ReactionModel.dataset_id == dataset_id)
@@ -41,28 +41,10 @@ class ReactionsRepository:
         )
         return stmt
 
-    async def get(self, reaction_id):
-        stmt = select(ReactionModel).where(ReactionModel.id == reaction_id).limit(1)
-        return await self.db.scalar(stmt)
-
-    async def update(self, reaction_id: int, payload: dict, autocommit: bool = True):
-        stmt = (
-            update(ReactionModel)
-            .where(ReactionModel.id == reaction_id)
-            .values(**payload)
-            .returning(ReactionModel)
-        )
-        if autocommit:
-            reaction = await self.db.scalar(stmt)
-            await self.db.commit()
-            logger.debug(f"{reaction} updated with payload: {payload}")
-            return reaction
-
     async def bulk_create(self, payload: list[dict], autocommit: bool = True) -> list[ReactionModel]:
         reactions = [ReactionModel(**reaction) for reaction in payload]
-        self.db.add_all(reactions)
-
         if autocommit:
+            self.db.add_all(reactions)
             await self.db.commit()
             logger.debug("Bulk reaction created with payload")
 

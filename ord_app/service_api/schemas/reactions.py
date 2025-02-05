@@ -26,7 +26,7 @@ from ord_app.service_api.schemas.base import BaseSchema
 
 class ReactionSchema(BaseSchema):
     id: int
-    name: str | None
+    pb_reaction_id: str
     binpb: str
     summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
     mulblocks: dict
@@ -64,7 +64,6 @@ class ReactionSchema(BaseSchema):
 
 
 class ReactionCreateSchema(BaseSchema):
-    name: str | None = None
     binpb: bytes | None = None
 
     @field_validator("binpb", mode="after")

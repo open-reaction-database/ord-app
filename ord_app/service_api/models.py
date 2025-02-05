@@ -15,7 +15,7 @@ import datetime
 import re
 from typing import Literal, get_args
 
-from sqlalchemy import Enum, ForeignKey, LargeBinary, func
+from sqlalchemy import Enum, ForeignKey, LargeBinary, UniqueConstraint, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
 UserRolesList = Literal["admin", "editor", "viewer"]
@@ -129,7 +129,7 @@ class DatasetGroupAssociationModel(BaseModel):
 
 class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=True)
+    pb_reaction_id: Mapped[str]
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
 
     dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"), index=True)
@@ -138,5 +138,9 @@ class ReactionModel(BaseModel):
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), index=True)
     owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
 
+    __table_args__ = (
+        UniqueConstraint("pb_reaction_id", "dataset_id", name="uq_pb_reaction_id_dataset_id"),
+    )
+
     def __repr__(self):
-        return f"<Reaction(id={self.id}, name={self.name}, user_id={self.owner_id})>"
+        return f"<Reaction(id={self.id}, dataset_id={self.dataset_id}, name={self.pb_reaction_id})>"
