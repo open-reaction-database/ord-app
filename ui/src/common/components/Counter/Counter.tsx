@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import classes from './counter.module.scss';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+interface CounterProps {
+  amount: number;
+}
+
+export function Counter({ amount }: Readonly<CounterProps>) {
+  return <span className={classes.counter}>{amount}</span>;
+}

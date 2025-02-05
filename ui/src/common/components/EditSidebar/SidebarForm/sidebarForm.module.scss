@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+.actions {
+  border-top: 1px solid #e8ebed;
+  position: sticky;
+  margin: 0 calc(-1 * var(--mantine-spacing-md));
+  padding: var(--mantine-spacing-md);
+}

@@ -13,16 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import type { AppState } from '../configureAppStore';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+const selectRoot = (state: AppState) => state.reactionForm;
+
+export const selectReactionPathComponentsList = (state: AppState) => selectRoot(state).reactionPathComponentsList;

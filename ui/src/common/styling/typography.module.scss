@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+.secondary1 {
+  color: var(--color-text-secondary-1);
+}
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+.secondary2 {
+  color: var(--color-text-secondary-2);
+}
+
+.secondary3 {
+  color: var(--color-text-secondary-3);
+}

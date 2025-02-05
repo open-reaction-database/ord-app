@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer';
-import { reactionFormReducer } from './reactionForm/reactionForm.reducer';
+import classes from './inputGroup.module.scss';
+import { type GroupProps, Group } from '@mantine/core';
+import type { ReactNode } from 'react';
 
-export const rootReducer = {
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  reactionForm: reactionFormReducer,
-};
+interface InputGroupProps extends Omit<GroupProps, 'className'> {
+  children: ReactNode;
+}
+
+export function InputGroup({ children, ...props }: Readonly<InputGroupProps>) {
+  return (
+    <Group
+      className={classes.root}
+      gap={0}
+      {...props}
+    >
+      {children}
+    </Group>
+  );
+}

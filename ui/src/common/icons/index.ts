@@ -31,6 +31,7 @@ export { default as GroupArrowIcon } from './GroupArrowIcon.svg?react';
 export { default as HomeIcon } from './HomeIcon.svg?react';
 export { default as InfoCircleIcon } from './InfoCircleIcon.svg?react';
 export { default as LogoIcon } from './LogoIcon.svg?react';
+export { default as NoData } from './NoData.svg?react';
 export { default as NewDatasetIcon } from './NewDatasetIcon.svg?react';
 export { default as RemoveIcon } from './RemoveIcon.svg?react';
 export { default as SearchIcon } from './SearchIcon.svg?react';

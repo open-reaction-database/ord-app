@@ -101,5 +101,12 @@ export const theme = createTheme({
         },
       },
     },
+    Textarea: {
+      styles: {
+        input: {
+          minHeight: '92px',
+        },
+      },
+    },
   },
 });

@@ -23,22 +23,26 @@ import { useSelector } from 'react-redux';
 import { selectReactionById } from '../../store/reactions/reactions.selectors';
 import classes from './reactionPage.module.scss';
 import { RequiredAsterisk } from '../../common/components/RequiredAsterisk/RequiredAsterisk';
+import { Inputs } from './Inputs/Inputs';
+import type { ReactionSectionProps } from './reactionPage.types';
+import { EditSidebar } from '../../common/components/EditSidebar/EditSidebar';
+import { Notes } from './Notes/Notes';
 
 interface ReactionTab {
   name: string;
   required?: true;
-  Component: FC;
+  Component: FC<ReactionSectionProps>;
 }
 
 const createEmptyComponent = (name: string) => () => name;
 
 const tabs: Array<ReactionTab> = [
-  { name: 'inputs', required: true, Component: createEmptyComponent('inputs') },
+  { name: 'inputs', required: true, Component: Inputs },
   { name: 'outcomes', required: true, Component: createEmptyComponent('outcomes') },
   { name: 'conditions', Component: createEmptyComponent('conditions') },
   { name: 'identifiers', Component: createEmptyComponent('identifiers') },
   { name: 'setup', Component: createEmptyComponent('setup') },
-  { name: 'notes', Component: createEmptyComponent('notes') },
+  { name: 'notes', Component: Notes },
   { name: 'observations', Component: createEmptyComponent('observations') },
   { name: 'workups', Component: createEmptyComponent('workups') },
   { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
@@ -70,7 +74,7 @@ export function ReactionPage() {
       >
         <Tabs
           defaultValue={tabs[0].name}
-          classNames={{ tab: classes.tabTitle }}
+          classNames={{ tab: classes.tabTitle, panel: classes.panel }}
         >
           <Tabs.List>
             {tabs.map(({ name, required }) => (
@@ -93,11 +97,12 @@ export function ReactionPage() {
               key={name}
               value={name}
             >
-              <Component />
+              <Component reactionId={reactionId} />
             </Tabs.Panel>
           ))}
         </Tabs>
       </Paper>
+      <EditSidebar reactionId={reactionId} />
     </Flex>
   ) : null;
 }
