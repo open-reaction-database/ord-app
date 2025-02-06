@@ -21,11 +21,12 @@ import type { ReactionSectionProps } from '../reactionPage.types';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import type reactionSchema from 'ord-schema/proto/reaction_pb';
+import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo } from 'react';
 import classes from './notes.module.scss';
-import { typographyClasses } from '../../../common/styling';
+import { typographyClasses } from 'common/styling';
 
-const notesFields: Array<[keyof reactionSchema.ReactionNotes.AsObject, string]> = [
+const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
   ['safetyNotes', 'Safety notes'],
   ['isHeterogeneous', 'Is Heterogeneous'],
@@ -37,7 +38,10 @@ const notesFields: Array<[keyof reactionSchema.ReactionNotes.AsObject, string]> 
   ['isSensitiveToLight', 'Light sensitive'],
 ];
 
-const booleanToUppercase = (value: boolean | string): string =>
+type ValueType = ord.IReactionNotes[keyof ord.IReactionNotes];
+type NotEmptyValueType = Exclude<ValueType, null | undefined>;
+
+const booleanToUppercase = (value: NotEmptyValueType): string =>
   typeof value === 'boolean' ? value.toString().toUpperCase() : value;
 
 export function Notes({ reactionId }: Readonly<ReactionSectionProps>) {
@@ -47,9 +51,9 @@ export function Notes({ reactionId }: Readonly<ReactionSectionProps>) {
   const fields = useMemo((): Array<[string, string]> => {
     const notes = reaction.notes || ({} as reactionSchema.ReactionNotes.AsObject);
     return notesFields
-      .map(([key, label]): [string, string | boolean] => [label, notes[key]])
+      .map(([key, label]): [string, ValueType] => [label, notes[key]])
       .filter(([, value]) => typeof value !== 'undefined' && value !== null && value !== '')
-      .map(([label, value]) => [label, booleanToUppercase(value)]);
+      .map(([label, value]) => [label, booleanToUppercase(value as NotEmptyValueType)]);
   }, [reaction.notes]);
 
   const onEdit = () => {

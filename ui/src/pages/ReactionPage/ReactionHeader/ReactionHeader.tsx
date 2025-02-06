@@ -39,6 +39,8 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const reaction = useSelector(selectReactionById(reactionId));
   const [opened, { open, close }] = useDisclosure();
 
+  const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
+
   const onReactionNameChange = useCallback(
     async (name: string) => {
       dispatch(renameReaction({ reactionId, name }));
@@ -68,7 +70,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             align="center"
             gap="sm"
           >
-            {!reaction.name && (
+            {hasReactionDefaultId && (
               <Title
                 className={classes.title}
                 order={2}
@@ -76,7 +78,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                 Reaction
               </Title>
             )}
-            <Title order={2}>{reaction.name || reaction.id}</Title>
+            <Title order={2}>{reaction.pb_reaction_id}</Title>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="transparent">
               <EditIcon onClick={open} />
@@ -123,7 +125,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
         title="Change Reaction ID"
         inputLabel="Reaction ID"
         inputPlaceholder="Enter reaction ID"
-        initialValue={reaction.name}
+        initialValue={reaction.pb_reaction_id}
       />
     </Paper>
   );

@@ -19,8 +19,13 @@ import classes from './PageContainer.module.scss';
 import ORDLogo from 'assets/ORD_logo.png';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import UserMenu from '../UserMenu/UserMenu';
+import type { Breadcrumb } from 'common/types/breadcrumbs';
 
-export function PageContainer({ children }: PropsWithChildren) {
+interface PageContainerProps extends PropsWithChildren {
+  breadcrumbs: Array<Breadcrumb>;
+}
+
+export function PageContainer({ children, breadcrumbs }: Readonly<PageContainerProps>) {
   return (
     <AppShell
       classNames={{
@@ -44,12 +49,7 @@ export function PageContainer({ children }: PropsWithChildren) {
           direction="column"
           className={classes.content}
         >
-          <Breadcrumbs
-            items={[
-              { title: 'Contribute', path: '/' },
-              { title: 'Dataset 123', path: '/dataset/123' },
-            ]}
-          />
+          <Breadcrumbs items={breadcrumbs} />
           {children}
         </Flex>
       </AppShell.Main>

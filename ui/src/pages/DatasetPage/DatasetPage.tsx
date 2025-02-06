@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'wouter';
 import { Flex, Loader } from '@mantine/core';
@@ -23,7 +23,9 @@ import { getDataset } from 'store/datasets/datasets.thunks';
 import { ReactionList } from './ReactionList/ReactionList';
 import classes from './datasetPage.module.scss';
 import { DatasetHeader } from './DatasetHeader/DatasetHeader';
-import { getReactionsList } from '../../store/reactions/reactions.thunks';
+import { getReactionsList } from 'store/reactions/reactions.thunks';
+import type { Breadcrumbs } from 'common/types/breadcrumbs';
+import { PageContainer } from 'common/components/PageContainer/PageContainer';
 
 export function DatasetPage() {
   const dispatch = useAppDispatch();
@@ -31,22 +33,33 @@ export function DatasetPage() {
   const id = parseInt(datasetId as string);
   const dataset = useSelector(selectDatasetById(id));
 
+  const breadcrumbs = useMemo((): Breadcrumbs => {
+    return [
+      { title: 'Datasets', path: '/' },
+      { path: `/dataset/${id}`, title: dataset?.name ?? id },
+    ];
+  }, [dataset?.name, id]);
+
   useEffect(() => {
     dispatch(getDataset(id));
     dispatch(getReactionsList(id));
   }, [dispatch, id]);
 
-  return !dataset ? (
-    <Flex
-      justify="center"
-      align="center"
-    >
-      <Loader size="xl" />
-    </Flex>
-  ) : (
-    <div className={classes.container}>
-      <DatasetHeader dataset={dataset} />
-      <ReactionList />
-    </div>
+  return (
+    <PageContainer breadcrumbs={breadcrumbs}>
+      {!dataset ? (
+        <Flex
+          justify="center"
+          align="center"
+        >
+          <Loader size="xl" />
+        </Flex>
+      ) : (
+        <div className={classes.container}>
+          <DatasetHeader dataset={dataset} />
+          <ReactionList />
+        </div>
+      )}
+    </PageContainer>
   );
 }

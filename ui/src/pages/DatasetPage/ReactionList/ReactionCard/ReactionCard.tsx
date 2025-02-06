@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Paper } from '@mantine/core';
+import { Button, Flex, Paper, Title } from '@mantine/core';
 import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from 'common/components/CopyButton/CopyButton';
 import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
@@ -22,6 +22,40 @@ import classes from './ReactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { fileDownloadOptions } from 'common/constants';
+import { useMemo } from 'react';
+import { typographyClasses } from 'common/styling';
+
+interface DescriptorsListProps {
+  title: string;
+  items: Record<string, string | number>;
+}
+
+function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
+  const itemsArray = useMemo(() => Object.entries(items), [items]);
+
+  return (
+    <div>
+      <Title
+        className={typographyClasses.secondary2}
+        order={3}
+      >
+        {title}:
+      </Title>
+      <Flex gap="xs">
+        {itemsArray.map(([key, value], index) => (
+          <Flex
+            key={key}
+            gap="xs"
+          >
+            <span className={classes.infoTitle}>{key}: </span>
+            <span>{value}</span>
+            {index !== itemsArray.length - 1 && <span>&middot;</span>}
+          </Flex>
+        ))}
+      </Flex>
+    </div>
+  );
+}
 
 interface ReactionCardProps {
   id: number;
@@ -54,18 +88,21 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
               className={classes.link}
               to={`/dataset/${datasetId}/reaction/${id}`}
             >
-              {reaction.name || reaction.id}
+              {reaction.pb_reaction_id}
             </Link>
 
             <CopyButton options={copyToClipboardOptions} />
           </Flex>
 
-          <div>
-            <span className={classes.summaryTitle}>Provenance Summary: </span>
-            <span className={classes.summary}>{reaction.data?.notes?.procedureDetails || 'Generated summary'}</span>
-          </div>
+          <DescriptorsList
+            title="Provenance"
+            items={reaction.summary.provenance}
+          />
+          <DescriptorsList
+            title="Summary"
+            items={reaction.summary.summary}
+          />
         </div>
-
         <Flex
           align="flex-start"
           direction="column"
@@ -100,14 +137,6 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
             More
           </Button>
         </Flex>
-      </div>
-
-      <div>Reaction Field</div>
-      <div>
-        <span className={classes.infoTitle}>Conditions: </span>
-        Conidtions &middot;
-        <span className={classes.infoTitle}> Analysis: </span>
-        Analysis
       </div>
     </Paper>
   );

@@ -26,17 +26,24 @@ import {
 import axiosInstance from 'common/config/axiosConfig';
 import type { Pages } from 'common/types';
 import type { Reaction, ReactionResponse, ReactionWrapper } from './reactions.types';
-import ordSchema from 'ord-schema';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors';
 import { navigate } from 'wouter/use-browser-location';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
+import { selectDatasetById } from '../datasets/datasets.selectors';
+import { getDataset } from '../datasets/datasets.thunks';
+import { type Action, type ThunkDispatch } from '@reduxjs/toolkit';
+import type { AppState } from '../configureAppStore';
+import { ord } from 'ord-schema-protobufjs';
+import { Buffer } from 'buffer';
 
-const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => ({
-  ...rest,
-  // TODO check whether we need to cast it
-  data: ordSchema.Reaction.deserializeBinary(binpb as unknown as Uint8Array).toObject(),
-});
+const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => {
+  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
+  return {
+    ...rest,
+    data: ord.Reaction.toObject(parsedProtobuf),
+  };
+};
 
 const parseReactionList = (pages: Pages<ReactionResponse>): Pages<ReactionWrapper> => {
   const { items, ...pagination } = pages;
@@ -61,8 +68,13 @@ export const getReactionsPage = createThunk(getReactionPageActions, async (_d, g
   return getReactionPageActions.success(parseReactionList(result.data));
 });
 
-export const getReaction = createThunk(getReactionActions, async (_d, getState, { reactionId }) => {
+export const getReaction = createThunk(getReactionActions, async (dispatch, getState, { reactionId }) => {
   const datasetId = selectActiveDatasetId(getState());
+  const dataset = selectDatasetById(datasetId)(getState());
+
+  if (!dataset) {
+    (dispatch as ThunkDispatch<AppState, never, Action>)(getDataset(datasetId));
+  }
 
   const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
   return getReactionActions.success(parseReaction(result.data));
@@ -138,10 +150,15 @@ export const updateReaction = createThunk(
   updateReactionActions,
   async (_d, getState, { reactionId, pathComponents, newValue }) => {
     const { data, ...reaction } = selectReactionById(reactionId)(getState());
-    const updatedReaction: Reaction = deepmerge(
+    const datasetId = selectActiveDatasetId(getState());
+    const updatedReaction: ord.IReaction = deepmerge(
       data,
       generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as Reaction,
     );
+    const payload = Buffer.from(ord.Reaction.encode(updatedReaction).finish()).toString('base64');
+    await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
+      binpb: payload,
+    });
     const resultReaction: ReactionWrapper = { ...reaction, data: updatedReaction };
     return updateReactionActions.success(resultReaction);
   },

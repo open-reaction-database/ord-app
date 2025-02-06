@@ -20,8 +20,10 @@ import { MantineProvider } from '@mantine/core';
 import { theme } from 'common/styling/theme.ts';
 import { configureAppStore } from '../store/configureAppStore.ts';
 import { AppContent } from './AppContent.tsx';
+import { initIndigo } from 'common/utils/indigo';
 
 const store = configureAppStore();
+initIndigo();
 
 export function AppRoot() {
   return (
