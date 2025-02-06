@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from ord_app.service_api.main import app
-from ord_app.service_api.models import BaseModel, GroupModel, UserGroupsMembershipModel, UserModel
+from ord_app.service_api.models import BaseModel, DatasetModel, GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.services.auth0 import verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
@@ -109,3 +109,11 @@ async def mock_authenticated_user(test_db_session):
     yield user, set_mock_user, group
 
     app.dependency_overrides.pop(verify_access_token, None)
+
+
+async def create_test_dataset(db_session, mock_authenticated_user):
+    user, _, group = mock_authenticated_user
+    dataset = DatasetModel(owner=user, groups=[group])
+    db_session.add(dataset)
+    await db_session.commit()
+    return dataset

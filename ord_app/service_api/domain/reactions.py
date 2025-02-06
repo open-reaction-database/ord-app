@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from uuid import uuid4
 
 from fastapi import Depends
 from fastapi_pagination import Page
@@ -28,58 +29,75 @@ from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema
-from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, psycopg_error_wrapper
 from ord_app.service_api.services.postgresql import get_db_session
 
 
 class ReactionsUseCase:
+    model = ReactionModel
+
     def __init__(self, db: AsyncSession, current_user: UserModel):
         self.db = db
         self.current_user = current_user
-        self.reaction_repository = ReactionsRepository(db)
+        self.reaction_repo = ReactionsRepository(db)
 
-    async def create(self, dataset_id: int, payload: ReactionCreateSchema):
-        reaction = await self.reaction_repository.create(
-            dataset_id, self.current_user.id, payload.model_dump(exclude_unset=True), autocommit=False
+    @psycopg_error_wrapper
+    async def _create_reaction(self, dataset_id: int, insert_data: dict):
+        reaction = await self.reaction_repo.create(
+            dataset_id,
+            self.current_user.id,
+            insert_data,
+            autocommit=False
         )
-        self.db.add(reaction)
 
-        # set default id for Reaction BF
+        self.db.add(reaction)
+        await self.db.flush()
+
+        # Update pb_reaction_id and binpb based on whether binpb is already set
         if reaction.binpb is None:
-            await self.db.flush()
+            reaction.pb_reaction_id = reaction.id  # Use reaction.id as fallback
             reaction.binpb = Reaction(reaction_id=str(reaction.id)).SerializeToString()
+        else:
+            message = load_message(reaction.binpb, Reaction, "binpb")
+            # If the loaded message has a valid reaction_id, use it; otherwise, fallback to reaction.id
+            reaction.pb_reaction_id = message.reaction_id or reaction.id
 
         await self.db.commit()
         await self.db.refresh(reaction)
+        return reaction
+
+    async def create(self, dataset_id: int, payload: ReactionCreateSchema):
+        insert_data = payload.model_dump(exclude_unset=True) | {"pb_reaction_id": uuid4().hex}
+        reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
             reaction_pb = load_message(file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
-            logger.error(e)
+            logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
-        reaction_payload = {"name": reaction_pb.reaction_id, "binpb": reaction_pb.SerializeToString()}
-        reaction = await self.reaction_repository.create(
-            dataset_id, self.current_user.id, reaction_payload
-        )
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": reaction_pb.SerializeToString()}
+        reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
-        stmt = self.reaction_repository.all_reactions_stmt(dataset_id)
-        return await paginate(self.db, stmt)
+        return await paginate(self.db, self.reaction_repo.all_reactions_stmt(dataset_id))
 
-    async def get(self, dataset_id):
-        return await self.reaction_repository.get(dataset_id)
+    async def get(self, reaction_id):
+        return await self.reaction_repo.get(id=reaction_id)
 
     async def update(self, reaction_id, payload: ReactionCreateSchema):
-        return await self.reaction_repository.update(reaction_id, payload.model_dump(exclude_unset=True))
+        if reaction := await self.reaction_repo.update(payload.model_dump(exclude_unset=True), id=reaction_id):
+            return reaction
+        raise EntityNotFoundError("Reaction not found")
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
-        reaction = await self.reaction_repository.get(reaction_id)
-        reaction_pb = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
-        return reaction, reaction_pb
+        if reaction := await self.reaction_repo.get(id=reaction_id):
+            reaction_pb = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
+            return reaction, reaction_pb
+        raise EntityNotFoundError("Reaction not found")
 
 
 def get_reaction_use_case(

@@ -28,13 +28,11 @@ async def test_paginate_reactions(api_client, mock_authenticated_user, test_db_s
     )
     await test_db_session.commit()
 
-    payload = {"name": "test reaction name"}
-    api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status()
+    api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json={}).raise_for_status()
 
     response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
 
     assert response_data["total"] == 1
-    assert response_data["items"][0]["name"] == payload["name"]
 
 
 async def test_get_reaction(api_client, mock_authenticated_user, test_db_session):
@@ -70,8 +68,7 @@ async def test_download_reaction(api_client, mock_authenticated_user, test_db_se
     )
     await test_db_session.commit()
 
-    payload = {"name": "test reaction name"}
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json={}).raise_for_status().json()
     reaction_id = response_data["id"]
 
     response_data = api_client.get(

@@ -11,11 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from functools import wraps
+
+import psycopg.errors
+from sqlalchemy.exc import IntegrityError
 
 
-class EntityNotFoundError(Exception):
+class BaseError(Exception):
     pass
 
 
-class ProtobufDecodeError(Exception):
+class EntityNotFoundError(BaseError):
     pass
+
+
+class ProtobufDecodeError(BaseError):
+    pass
+
+
+class UniqueViolation(BaseError):
+    pass
+
+
+def psycopg_error_wrapper(coro):
+    @wraps(coro)
+    async def wrapper(*args, **kwargs):
+        try:
+            return await coro(*args, **kwargs)
+        except IntegrityError as err:
+            if isinstance(err.orig, psycopg.errors.UniqueViolation):
+                raise UniqueViolation("Unique constraint violation caught") from err
+            else:
+                raise
+    return wrapper

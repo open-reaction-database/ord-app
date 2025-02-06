@@ -66,20 +66,22 @@ class DatasetUseCases:
 
         dataset_payload = DatasetCreateSchema(name=dataset_pb.name, description=dataset_pb.description)
         dataset = await self.dataset_repository.create(
-            group_id, self.current_user.id, payload=dataset_payload.model_dump(), autocommit=False
+            group_id,
+            self.current_user.id,
+            payload=dataset_payload.model_dump(),
+            autocommit=False
         )
 
         reactions_payload = [
             {
-                "name": reaction.reaction_id,
+                "pb_reaction_id": reaction.reaction_id,
                 "binpb": reaction.SerializeToString(),
                 "dataset": dataset,
                 "owner_id": self.current_user.id,
             }
             for reaction in dataset_pb.reactions
         ]
-        await self.reaction_repository.bulk_create(reactions_payload, autocommit=False)
-        await self.db.commit()
+        await self.reaction_repository.bulk_create(reactions_payload)
         await self.db.refresh(dataset)
 
         return await self.dataset_repository.get(dataset.id)
