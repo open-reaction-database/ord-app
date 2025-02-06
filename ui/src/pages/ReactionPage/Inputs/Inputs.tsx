@@ -28,11 +28,11 @@ import { useAppDispatch } from 'store/useAppDispatch';
 export function Inputs({ reactionId }: ReactionSectionProps) {
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
-  const inputs = reaction.data.inputsMap || [];
+  const inputs = reaction.data.inputs ? Object.values(reaction.data.inputs) : [];
 
   const onCreateNew = useCallback(() => {
     const newIndex = inputs.length;
-    dispatch(setReactionPathComponentsList([['inputsMap', newIndex.toString(), '1']]));
+    dispatch(setReactionPathComponentsList([['inputs', newIndex.toString(), '1']]));
   }, [dispatch, inputs.length]);
 
   return (
