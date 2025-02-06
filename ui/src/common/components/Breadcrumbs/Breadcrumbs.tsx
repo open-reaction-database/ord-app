@@ -35,6 +35,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
         separatorMargin={6}
         classNames={{
           separator: classes.separator,
+          breadcrumb: classes.breadcrumb,
         }}
       >
         {items.map((item, index) => {
@@ -46,7 +47,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
               id={item.path}
               key={item.path}
             >
-              {index === 0 && <HomeIcon />}
+              {index === 0 && <HomeIcon className={classes.homeIcon} />}
               {item.title}
             </Link>
           );

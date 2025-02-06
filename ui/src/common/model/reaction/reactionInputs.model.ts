@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 import { type ReactionFormNode, ReactionFormNodeType } from 'common/types/reaction/reactionFields';
-import { createValuePrecisionUnitInputs } from '../../utils/reactionForm/createValuePrecisionUnitInputs';
+import { createValuePrecisionUnitInputs } from 'common/utils/reactionForm/createValuePrecisionUnitInputs';
 import reactionSchema from 'ord-schema/proto/reaction_pb';
-
-const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
-  Object.entries<number>(ordMap).map(([key, value]) => ({
-    label: key.toString(),
-    value: value.toString(),
-  }));
+import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject';
 
 const speedOptions = ordMapToKeyValueObject(reactionSchema.ReactionInput.AdditionSpeed.AdditionSpeedType);
 

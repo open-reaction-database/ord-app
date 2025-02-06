@@ -16,13 +16,16 @@
 import type { ReactionFormNode } from 'common/types/reaction/reactionFields';
 import { reactionInputs } from './reactionInputs.model';
 import { reactionNotes } from './reactionNotes.model';
+import { reactionIdentifiers } from './reactionIdentifiers';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
   Notes = 'notes',
+  Identifiers = 'identifiers',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
   [ReactionEntity.Inputs]: reactionInputs,
   [ReactionEntity.Notes]: reactionNotes,
+  [ReactionEntity.Identifiers]: reactionIdentifiers,
 };

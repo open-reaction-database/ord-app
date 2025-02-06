@@ -13,19 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from './reactionEntityToForm.models';
-import reactionSchema from 'ord-schema/proto/reaction_pb';
-
-interface ReactionEntityClass {
-  toObject: () => object;
+export interface Breadcrumb {
+  title: string;
+  path: string;
 }
 
-interface ReactionEntityConstructor {
-  new (): ReactionEntityClass;
-}
-
-export const reactionEntityToConstructor: Record<ReactionEntity, ReactionEntityConstructor> = {
-  [ReactionEntity.Inputs]: reactionSchema.ReactionInput,
-  [ReactionEntity.Notes]: reactionSchema.ReactionNotes,
-  [ReactionEntity.Identifiers]: reactionSchema.ReactionIdentifier,
-};
+export type Breadcrumbs = Array<Breadcrumb>;

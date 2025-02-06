@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 import type OrdSchema from 'ord-schema';
+import type { ord } from 'ord-schema-protobufjs';
+
+export interface ReactionSummary {
+  provenance: Record<string, string | number>;
+  summary: Record<string, string | number>;
+}
+
+export interface ReactionMolBlocks {
+  products: Array<string>;
+  inputs: Record<string, Array<string>>;
+}
 
 export interface ReactionResponse {
   id: number;
-  name: string;
-  summary: unknown;
+  pb_reaction_id: string;
+  summary: ReactionSummary;
   binpb: string;
+  mulblocks: ReactionMolBlocks;
 }
 
 export type Reaction = ReturnType<ReturnType<typeof OrdSchema.Reaction.deserializeBinary>['toObject']>;
 
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {
-  data: Reaction;
+  data: ord.IReaction;
 }
 
 export interface ImportReactionFromFilePayload {

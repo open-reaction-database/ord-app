@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from './reactionEntityToForm.models';
-import reactionSchema from 'ord-schema/proto/reaction_pb';
-
-interface ReactionEntityClass {
-  toObject: () => object;
-}
-
-interface ReactionEntityConstructor {
-  new (): ReactionEntityClass;
-}
-
-export const reactionEntityToConstructor: Record<ReactionEntity, ReactionEntityConstructor> = {
-  [ReactionEntity.Inputs]: reactionSchema.ReactionInput,
-  [ReactionEntity.Notes]: reactionSchema.ReactionNotes,
-  [ReactionEntity.Identifiers]: reactionSchema.ReactionIdentifier,
-};
+export const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
+  Object.entries<number>(ordMap).map(([key, value]) => ({
+    label: key.toString(),
+    value: value.toString(),
+  }));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ReactionEntity } from '../model/reaction/reactionEntityToForm.models';
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { Title } from '@mantine/core';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
@@ -26,7 +26,17 @@ export interface ReactionSidebarInfo {
 
 const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   { pathComponents: ['notes'], entityName: ReactionEntity.Notes, sidebarTitle: <Title order={2}>Notes</Title> },
-  { pathComponents: ['inputsMap'], entityName: ReactionEntity.Inputs, sidebarTitle: <Title order={2}>Input</Title> },
+  { pathComponents: ['inputs'], entityName: ReactionEntity.Inputs, sidebarTitle: <Title order={2}>Input</Title> },
+  {
+    pathComponents: ['identifiers'],
+    entityName: ReactionEntity.Identifiers,
+    sidebarTitle: (
+      <>
+        <Title order={2}>Identifier</Title>
+        <p>Reaction identifiers define descriptions of the overall reaction</p>
+      </>
+    ),
+  },
 ];
 
 function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {

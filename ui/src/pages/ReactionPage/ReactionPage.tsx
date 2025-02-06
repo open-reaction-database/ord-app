@@ -15,18 +15,22 @@
  */
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { type FC, Fragment, useEffect } from 'react';
+import { type FC, Fragment, useEffect, useMemo } from 'react';
 import { getReaction } from 'store/reactions/reactions.thunks';
 import { ReactionHeader } from './ReactionHeader/ReactionHeader';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from '../../store/reactions/reactions.selectors';
+import { selectReactionById } from 'store/reactions/reactions.selectors';
 import classes from './reactionPage.module.scss';
-import { RequiredAsterisk } from '../../common/components/RequiredAsterisk/RequiredAsterisk';
+import { RequiredAsterisk } from 'common/components/RequiredAsterisk/RequiredAsterisk';
 import { Inputs } from './Inputs/Inputs';
 import type { ReactionSectionProps } from './reactionPage.types';
-import { EditSidebar } from '../../common/components/EditSidebar/EditSidebar';
+import { EditSidebar } from 'common/components/EditSidebar/EditSidebar';
 import { Notes } from './Notes/Notes';
+import { PageContainer } from 'common/components/PageContainer/PageContainer';
+import type { Breadcrumbs } from '../../common/types/breadcrumbs';
+import { selectDatasetById } from '../../store/datasets/datasets.selectors';
+import { Identifiers } from './Identifiers/Identifiers';
 
 interface ReactionTab {
   name: string;
@@ -40,7 +44,7 @@ const tabs: Array<ReactionTab> = [
   { name: 'inputs', required: true, Component: Inputs },
   { name: 'outcomes', required: true, Component: createEmptyComponent('outcomes') },
   { name: 'conditions', Component: createEmptyComponent('conditions') },
-  { name: 'identifiers', Component: createEmptyComponent('identifiers') },
+  { name: 'identifiers', Component: Identifiers },
   { name: 'setup', Component: createEmptyComponent('setup') },
   { name: 'notes', Component: Notes },
   { name: 'observations', Component: createEmptyComponent('observations') },
@@ -54,55 +58,71 @@ export function ReactionPage() {
   const reactionId = parseInt(rawReactionId);
   const datasetId = parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(reactionId));
+  const dataset = useSelector(selectDatasetById(datasetId));
+
+  const breadcrumbs = useMemo((): Breadcrumbs => {
+    return [
+      { title: 'Datasets', path: '/' },
+      { path: `/dataset/${datasetId}`, title: dataset?.name ?? datasetId.toString() },
+      {
+        path: `/dataset/${datasetId}/reaction/${reactionId}`,
+        title: reaction?.pb_reaction_id ?? reactionId.toString(),
+      },
+    ];
+  }, [reactionId, datasetId, dataset?.name, reaction?.pb_reaction_id]);
 
   useEffect(() => {
     dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
-  return reaction ? (
-    <Flex
-      direction="column"
-      gap="sm"
-    >
-      <ReactionHeader
-        datasetId={datasetId}
-        reactionId={reactionId}
-      />
-      <Paper
-        radius="md"
-        p="lg"
-      >
-        <Tabs
-          defaultValue={tabs[0].name}
-          classNames={{ tab: classes.tabTitle, panel: classes.panel }}
+  return (
+    <PageContainer breadcrumbs={breadcrumbs}>
+      {reaction && (
+        <Flex
+          direction="column"
+          gap="sm"
         >
-          <Tabs.List>
-            {tabs.map(({ name, required }) => (
-              <Fragment key={name}>
-                {required ? (
-                  <Tooltip label="Mandatory section">
-                    <Tabs.Tab value={name}>
-                      {name}
-                      <RequiredAsterisk />
-                    </Tabs.Tab>
-                  </Tooltip>
-                ) : (
-                  <Tabs.Tab value={name}>{name}</Tabs.Tab>
-                )}
-              </Fragment>
-            ))}
-          </Tabs.List>
-          {tabs.map(({ name, Component }) => (
-            <Tabs.Panel
-              key={name}
-              value={name}
+          <ReactionHeader
+            datasetId={datasetId}
+            reactionId={reactionId}
+          />
+          <Paper
+            radius="md"
+            p="lg"
+          >
+            <Tabs
+              defaultValue={tabs[0].name}
+              classNames={{ tab: classes.tabTitle, panel: classes.panel }}
             >
-              <Component reactionId={reactionId} />
-            </Tabs.Panel>
-          ))}
-        </Tabs>
-      </Paper>
-      <EditSidebar reactionId={reactionId} />
-    </Flex>
-  ) : null;
+              <Tabs.List>
+                {tabs.map(({ name, required }) => (
+                  <Fragment key={name}>
+                    {required ? (
+                      <Tooltip label="Mandatory section">
+                        <Tabs.Tab value={name}>
+                          {name}
+                          <RequiredAsterisk />
+                        </Tabs.Tab>
+                      </Tooltip>
+                    ) : (
+                      <Tabs.Tab value={name}>{name}</Tabs.Tab>
+                    )}
+                  </Fragment>
+                ))}
+              </Tabs.List>
+              {tabs.map(({ name, Component }) => (
+                <Tabs.Panel
+                  key={name}
+                  value={name}
+                >
+                  <Component reactionId={reactionId} />
+                </Tabs.Panel>
+              ))}
+            </Tabs>
+          </Paper>
+          <EditSidebar reactionId={reactionId} />
+        </Flex>
+      )}
+    </PageContainer>
+  );
 }

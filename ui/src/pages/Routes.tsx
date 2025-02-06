@@ -15,27 +15,24 @@
  */
 import { Route, Switch } from 'wouter';
 import { DatasetPage } from './DatasetPage/DatasetPage';
-import { PageContainer } from 'common/components/PageContainer/PageContainer';
 import { ContributePage } from './ContributePage/ContributePage';
 import { ReactionPage } from './ReactionPage/ReactionPage';
 
 export function Routes() {
   return (
-    <PageContainer>
-      <Switch>
-        <Route
-          path="/"
-          component={ContributePage}
-        ></Route>
+    <Switch>
+      <Route
+        path="/"
+        component={ContributePage}
+      ></Route>
 
-        <Route
-          path="/dataset/:datasetId"
-          component={DatasetPage}
-        />
-        <Route path="/dataset/:datasetId/reaction/:reactionId">
-          <ReactionPage />
-        </Route>
-      </Switch>
-    </PageContainer>
+      <Route
+        path="/dataset/:datasetId"
+        component={DatasetPage}
+      />
+      <Route path="/dataset/:datasetId/reaction/:reactionId">
+        <ReactionPage />
+      </Route>
+    </Switch>
   );
 }

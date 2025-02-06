@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { getInitialDatasetsList } from 'store/datasets/datasets.thunks';
 import { DatasetTopActions } from './DatasetTopActions/DatasetTopActions';
+import { PageContainer } from 'common/components/PageContainer/PageContainer';
 
 export function ContributePage() {
   const appDispatch = useAppDispatch();
@@ -32,18 +33,20 @@ export function ContributePage() {
   }, [activeGroupId, appDispatch]);
 
   return (
-    <Flex
-      direction="column"
-      gap="sm"
-    >
-      <DatasetTopActions />
+    <PageContainer breadcrumbs={[{ title: 'Datasets', path: '/' }]}>
       <Flex
+        direction="column"
         gap="sm"
-        align="flex-start"
       >
-        <GroupsSidebar />
-        <DatasetTable />
+        <DatasetTopActions />
+        <Flex
+          gap="sm"
+          align="flex-start"
+        >
+          <GroupsSidebar />
+          <DatasetTable />
+        </Flex>
       </Flex>
-    </Flex>
+    </PageContainer>
   );
 }
