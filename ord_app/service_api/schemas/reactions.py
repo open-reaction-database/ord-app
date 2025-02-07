@@ -29,7 +29,7 @@ class ReactionSchema(BaseSchema):
     pb_reaction_id: str
     binpb: str
     summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
-    mulblocks: dict
+    molblocks: dict
 
     @field_validator("binpb", mode="before")
     @classmethod
@@ -38,7 +38,7 @@ class ReactionSchema(BaseSchema):
 
     @model_validator(mode="before")
     @classmethod
-    def reaction_count(cls, data: Any):  # noqa: F811
+    def _fill_molblocks(cls, data: Any):
         pb = load_message(data.binpb, Reaction, "binpb")
 
         products = []
@@ -56,8 +56,12 @@ class ReactionSchema(BaseSchema):
                 except ValueError:
                     inputs[input_key].append(None)
 
-        data.mulblocks = {"products": products, "inputs": inputs}
+        data.molblocks = {"products": products, "inputs": inputs}
+        return data
 
+    @model_validator(mode="before")
+    @classmethod
+    def reaction_count(cls, data: Any):  # noqa: F811
         if hasattr(data, "reactions"):
             data.reaction_count = len(data.reactions)
         return data
