@@ -133,7 +133,6 @@ async function updateReaction(reactionId: number, getState: () => AppState): Pro
   await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
     binpb: payload,
   });
-  return;
 }
 
 export const addUpdateReactionField = createThunk(
