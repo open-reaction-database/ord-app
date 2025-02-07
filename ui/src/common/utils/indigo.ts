@@ -31,5 +31,5 @@ export function renderSvg(component: string) {
   options.set('smart-layout', 'true');
   options.set('ignore-stereochemistry-errors', 'true');
   options.set('render-coloring', 'true');
-  return Buffer.from(indigoModule.render(component.trim(), options), 'base64').toString();
+  return Buffer.from(indigoModule.render(component, options), 'base64').toString();
 }

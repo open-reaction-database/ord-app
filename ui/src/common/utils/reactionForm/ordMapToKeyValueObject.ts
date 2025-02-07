@@ -16,5 +16,5 @@
 export const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
   Object.entries<number>(ordMap).map(([key, value]) => ({
     label: key.toString(),
-    value: value.toString(),
+    value: value,
   }));

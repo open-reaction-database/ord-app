@@ -20,6 +20,7 @@ import {
   type ReactionFormValue,
   type ReactionFormGroup,
   type ReactionFormWrapper,
+  type ReactionFormValuePrecisionUnit,
 } from 'common/types/reaction/reactionFields';
 import { Input, NumberInput, Textarea, TextInput } from '@mantine/core';
 import type { FC } from 'react';
@@ -28,6 +29,7 @@ import classes from './reactionFormNode.module.scss';
 import type { useForm } from '@mantine/form';
 import { AppNativeSelect } from '../AppNativeSelect/AppNativeSelect';
 import { AppSegmentedControl } from '../AppSegmentedControl/AppSegmentedControl';
+import { ValuePrecisionUnitControl } from '../ValuePrecisionUnitControl/ValuePrecisionUnitControl';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GetInputProps = ReturnType<typeof useForm<any>>['getInputProps'];
@@ -42,7 +44,22 @@ const nodeTypeToComponent = {
   [ReactionFormNodeType.select]: ReactionFormSelect,
   [ReactionFormNodeType.group]: ReactionFormGroup,
   [ReactionFormNodeType.wrapper]: ReactionFormWrapper,
+  [ReactionFormNodeType.vpu]: ReactionFormValuePrecisionUnit,
 };
+
+export function ReactionFormValuePrecisionUnit({
+  node,
+  getInputProps,
+}: Readonly<ReactionFormNodeProps<ReactionFormValuePrecisionUnit>>) {
+  return (
+    <ValuePrecisionUnitControl
+      options={node.options}
+      useNativeSelect={node.useNativeSelect}
+      {...node.wrapperConfig}
+      {...getInputProps(node.name)}
+    />
+  );
+}
 
 export function ReactionFormGroup({ node, getInputProps }: Readonly<ReactionFormNodeProps<ReactionFormGroup>>) {
   return (

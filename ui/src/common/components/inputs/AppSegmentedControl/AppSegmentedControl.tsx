@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SelectOption, SelectOptions } from 'common/types/selectOptions';
+import type { SelectOptions } from 'common/types/selectOptions';
 import { SegmentedControl, type SegmentedControlProps } from '@mantine/core';
-import { useCallback, useMemo } from 'react';
+import { useUncontrolledSelect } from 'common/hooks/useUncontrolledSelect';
 
 interface AppSegmentedControlProps<T>
   extends Omit<SegmentedControlProps, 'onChange' | 'data' | 'defaultValue' | 'value'> {
@@ -32,23 +32,10 @@ export function AppSegmentedControl<T>({
   options,
   ...rest
 }: Readonly<AppSegmentedControlProps<T>>) {
-  const stringOptions = useMemo(() => options.map(option => ({ label: option.label, value: option.label })), [options]);
-  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label ?? undefined;
-  const stringValue = options.find(option => option.value === value)?.label ?? undefined;
-  const handleChange = useCallback(
-    (stringValue: string) => {
-      const value = (options.find(option => option.label === stringValue) as SelectOption<T>).value;
-      onChange(value);
-    },
-    [onChange, options],
-  );
-
+  const inputProps = useUncontrolledSelect(false, options, value, defaultValue, onChange);
   return (
     <SegmentedControl
-      value={stringValue}
-      defaultValue={stringDefaultValue}
-      onChange={handleChange}
-      data={stringOptions}
+      {...inputProps}
       {...rest}
     />
   );

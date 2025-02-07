@@ -20,10 +20,9 @@ import { reactionEntityToForm } from 'common/model/reaction/reactionEntityToForm
 import { ReactionFormNode } from '../../inputs/ReactionFormNode/ReactionFormNode';
 import { Button, Flex } from '@mantine/core';
 import classes from './sidebarForm.module.scss';
-import { updateReaction } from 'store/reactions/reactions.thunks';
+import { addUpdateReactionField } from 'store/reactions/reactions.thunks';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSidebarInfo } from 'common/hooks/useSidebarInfo';
-import { reactionEntityToConstructor } from 'common/model/reaction/reactionEntityToConstructor';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
 interface SidebarFormProps {
@@ -38,23 +37,21 @@ export function SidebarForm({ reactionId, reactionPathComponents, isHidden, onFo
 
   const currentSidebarInfo = useSidebarInfo(reactionPathComponents);
   const formEntity = currentSidebarInfo.entityName;
-  const constructor = reactionEntityToConstructor[currentSidebarInfo.entityName];
 
   const reaction = useSelector(selectReactionById(reactionId));
-  const value = reactionPathComponents.reduce(
+  const initialValues = reactionPathComponents.reduce(
     (acc: object, key) => (acc !== null ? Reflect.get(acc, key) || null : null),
     reaction.data,
   );
-  const initialValues: object = value ?? new constructor().toObject();
   const form = useForm({
-    mode: 'controlled',
+    mode: 'uncontrolled',
     initialValues: { ...initialValues },
   });
 
   const formDefinition = reactionEntityToForm[formEntity];
 
   const onSubmit = (values: object) => {
-    dispatch(updateReaction({ reactionId, pathComponents: reactionPathComponents, newValue: values }));
+    dispatch(addUpdateReactionField({ reactionId, pathComponents: reactionPathComponents, newValue: values }));
   };
 
   return isHidden ? null : (

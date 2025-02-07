@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/Counter/Counter';
 import type { ReactionSectionProps } from '../reactionPage.types';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
 import { useSelector } from 'react-redux';
-import { AddCircleIcon } from 'common/icons';
+import { AddCircleIcon, EditIcon, RemoveIcon } from 'common/icons';
 import { ord } from 'ord-schema-protobufjs';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useCallback } from 'react';
 import { setReactionPathComponentsList } from 'store/reactionForm/reactionForm.actions';
+import { deleteReactionField, addUpdateReactionField } from '../../../store/reactions/reactions.thunks';
+import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents';
 
 const entries = Object.entries(ord.ReactionIdentifier.ReactionIdentifierType) as Array<[string, number]>;
 
 const reactionIdentifierKeyByValue: Record<number, string> = entries.reduce(
-  (acc, [key, value]: [string, number]) => {
+  (acc: Record<number, string>, [key, value]: [string, number]) => {
     return { ...acc, [value]: key };
   },
-  {} as Record<number, string>,
+  {},
 );
 
 const reactionIdentifierTypeValueToKey = (value?: number | null): string =>
@@ -42,8 +44,26 @@ export function Identifiers({ reactionId }: ReactionSectionProps) {
   const identifiers = reaction.data.identifiers || [];
 
   const onIdentifierCreate = useCallback(() => {
-    dispatch(setReactionPathComponentsList([['identifiers', identifiers.length]]));
-  }, [identifiers.length, dispatch]);
+    const newIdentifierPath: ReactionPathComponents = ['identifiers', identifiers.length];
+    const newIdentifier = ord.ReactionIdentifier.toObject(new ord.ReactionIdentifier());
+
+    dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newIdentifier }));
+    dispatch(setReactionPathComponentsList([newIdentifierPath]));
+  }, [reactionId, identifiers.length, dispatch]);
+
+  const onIdentifierEdit = useCallback(
+    (index: number) => {
+      dispatch(setReactionPathComponentsList([['identifiers', index]]));
+    },
+    [dispatch],
+  );
+
+  const deleteIdentifier = useCallback(
+    (index: number) => {
+      dispatch(deleteReactionField({ reactionId, pathComponents: ['identifiers', index] }));
+    },
+    [dispatch, reactionId],
+  );
 
   return (
     <Flex
@@ -70,13 +90,32 @@ export function Identifiers({ reactionId }: ReactionSectionProps) {
       </Flex>
       <span>Reaction identifiers define descriptions of the overall reaction</span>
 
-      {identifiers.map(identifier => (
-        <div key={identifier.value}>
-          <div>{reactionIdentifierTypeValueToKey(identifier.type)}</div>
-          <div>{identifier.details}</div>
-          <div>{identifier.value}</div>
-        </div>
-      ))}
+      <Flex
+        direction="column"
+        gap="sm"
+        key={identifiers.length}
+      >
+        {identifiers.map((identifier, index) => (
+          <div key={index}>
+            <ActionIcon
+              variant="white"
+              color="red"
+              onClick={() => deleteIdentifier(index)}
+            >
+              <RemoveIcon />
+            </ActionIcon>
+            <ActionIcon
+              variant="white"
+              onClick={() => onIdentifierEdit(index)}
+            >
+              <EditIcon />
+            </ActionIcon>
+            <div>{reactionIdentifierTypeValueToKey(identifier.type)}</div>
+            <div>{identifier.details}</div>
+            <div>{identifier.value}</div>
+          </div>
+        ))}
+      </Flex>
     </Flex>
   );
 }

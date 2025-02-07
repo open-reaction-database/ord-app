@@ -21,27 +21,33 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   renameReactionActions,
-  updateReactionActions,
+  addUpdateReactionFieldActions,
+  deleteReactionFieldActions,
 } from './reactions.actions';
 import axiosInstance from 'common/config/axiosConfig';
 import type { Pages } from 'common/types';
-import type { Reaction, ReactionResponse, ReactionWrapper } from './reactions.types';
+import type { ReactionResponse, ReactionWrapper } from './reactions.types';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors';
 import { navigate } from 'wouter/use-browser-location';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 import { selectDatasetById } from '../datasets/datasets.selectors';
 import { getDataset } from '../datasets/datasets.thunks';
 import { type Action, type ThunkDispatch } from '@reduxjs/toolkit';
 import type { AppState } from '../configureAppStore';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
+import { appInputsToOrdInputs, ordInputsToAppInputs } from '../../common/utils/reactionForm/reactionInputsConverter';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
+  const { inputs, ...persistentReactionData }: ord.IReaction = ord.Reaction.toObject(parsedProtobuf);
+  const appReaction = {
+    ...persistentReactionData,
+    inputs: ordInputsToAppInputs(inputs),
+  };
+
   return {
     ...rest,
-    data: ord.Reaction.toObject(parsedProtobuf),
+    data: appReaction,
   };
 };
 
@@ -115,51 +121,29 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-function mergeArray({ isMergeableObject, deepmerge, clone }: Parameters<Required<Options>['mergeArray']>[0]) {
-  return function (target: Array<unknown>, source: Array<unknown>) {
-    const targetClone = clone(target);
-    source.forEach((item, index) => {
-      if (item) {
-        const isMergeable = isMergeableObject(targetClone[index]) && isMergeableObject(item);
-        targetClone[index] = isMergeable ? deepmerge(targetClone[index], item) : item;
-      }
-    });
-    return targetClone;
+async function updateReaction(reactionId: number, getState: () => AppState): Promise<void> {
+  const datasetId = selectActiveDatasetId(getState());
+  const reaction = selectReactionById(reactionId)(getState());
+  const { inputs, ...persistentData } = reaction.data;
+  const ordReaction = {
+    ...persistentData,
+    inputs: appInputsToOrdInputs(inputs),
   };
+  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
+    binpb: payload,
+  });
 }
 
-const deepmerge = deepmergeFactory({ mergeArray });
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function generateDeepPartialReactionByPath(pathComponents: ReactionPathComponents, value: any): any {
-  if (pathComponents.length === 0) {
-    return value;
-  }
-  const [currentPathComponent, ...rest] = pathComponents;
-  if (typeof currentPathComponent === 'number') {
-    const array = [];
-    array[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
-    return array;
-  }
-  const object: Record<string, unknown> = {};
-  object[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
-  return object;
-}
-
-export const updateReaction = createThunk(
-  updateReactionActions,
-  async (_d, getState, { reactionId, pathComponents, newValue }) => {
-    const { data, ...reaction } = selectReactionById(reactionId)(getState());
-    const datasetId = selectActiveDatasetId(getState());
-    const updatedReaction: ord.IReaction = deepmerge(
-      data,
-      generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as Reaction,
-    );
-    const payload = Buffer.from(ord.Reaction.encode(updatedReaction).finish()).toString('base64');
-    await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
-      binpb: payload,
-    });
-    const resultReaction: ReactionWrapper = { ...reaction, data: updatedReaction };
-    return updateReactionActions.success(resultReaction);
+export const addUpdateReactionField = createThunk(
+  addUpdateReactionFieldActions,
+  async (_d, getState, { reactionId }) => {
+    await updateReaction(reactionId, getState);
+    return addUpdateReactionFieldActions.success();
   },
 );
+
+export const deleteReactionField = createThunk(deleteReactionFieldActions, async (_d, getState, { reactionId }) => {
+  await updateReaction(reactionId, getState);
+  return deleteReactionFieldActions.success();
+});

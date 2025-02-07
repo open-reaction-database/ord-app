@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ReactionEntity } from './reactionEntityToForm.models';
-import reactionSchema from 'ord-schema/proto/reaction_pb';
+import { ord } from 'ord-schema-protobufjs';
 
-interface ReactionEntityClass {
-  toObject: () => object;
+type ConversionOptions = Parameters<typeof ord.ReactionInput.toObject>[1];
+
+interface ReactionEntityConstructor<T> {
+  new (): T;
+  toObject: (instance: T, options?: ConversionOptions) => { [k: string]: any };
 }
 
-interface ReactionEntityConstructor {
-  new (): ReactionEntityClass;
-}
-
-export const reactionEntityToConstructor: Record<ReactionEntity, ReactionEntityConstructor> = {
-  [ReactionEntity.Inputs]: reactionSchema.ReactionInput,
-  [ReactionEntity.Notes]: reactionSchema.ReactionNotes,
-  [ReactionEntity.Identifiers]: reactionSchema.ReactionIdentifier,
+export const reactionEntityToConstructor: Record<ReactionEntity, ReactionEntityConstructor<any>> = {
+  [ReactionEntity.Inputs]: ord.ReactionInput,
+  [ReactionEntity.Notes]: ord.ReactionNotes,
+  [ReactionEntity.Identifiers]: ord.ReactionIdentifier,
 };

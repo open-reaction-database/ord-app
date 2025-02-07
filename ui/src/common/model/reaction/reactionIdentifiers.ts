@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ordSchema from 'ord-schema';
 import { ReactionFormNodeType, type ReactionFormNode } from 'common/types/reaction/reactionFields';
-import { ordMapToKeyValueObject } from '../../utils/reactionForm/ordMapToKeyValueObject';
+import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject';
+import { ord } from 'ord-schema-protobufjs';
 
-const reactionIdentifiersOptions = ordMapToKeyValueObject(ordSchema.ReactionIdentifier.ReactionIdentifierType);
+const reactionIdentifiersOptions = ordMapToKeyValueObject(ord.ReactionIdentifier.ReactionIdentifierType);
 
 export const reactionIdentifiers: Array<ReactionFormNode> = [
   {

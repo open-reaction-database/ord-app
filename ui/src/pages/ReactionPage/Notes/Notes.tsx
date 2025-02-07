@@ -20,7 +20,6 @@ import { setReactionPathComponentsList } from 'store/reactionForm/reactionForm.a
 import type { ReactionSectionProps } from '../reactionPage.types';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/reactions/reactions.selectors';
-import type reactionSchema from 'ord-schema/proto/reaction_pb';
 import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo } from 'react';
 import classes from './notes.module.scss';
@@ -40,6 +39,7 @@ const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
 
 type ValueType = ord.IReactionNotes[keyof ord.IReactionNotes];
 type NotEmptyValueType = Exclude<ValueType, null | undefined>;
+const defaultNotes: Partial<ord.IReactionNotes> = {};
 
 const booleanToUppercase = (value: NotEmptyValueType): string =>
   typeof value === 'boolean' ? value.toString().toUpperCase() : value;
@@ -49,7 +49,7 @@ export function Notes({ reactionId }: Readonly<ReactionSectionProps>) {
   const { data: reaction } = useSelector(selectReactionById(reactionId));
 
   const fields = useMemo((): Array<[string, string]> => {
-    const notes = reaction.notes || ({} as reactionSchema.ReactionNotes.AsObject);
+    const notes: Partial<ord.IReactionNotes> = reaction.notes ?? defaultNotes;
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
       .filter(([, value]) => typeof value !== 'undefined' && value !== null && value !== '')

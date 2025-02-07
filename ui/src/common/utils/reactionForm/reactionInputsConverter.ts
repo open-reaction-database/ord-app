@@ -13,29 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tableContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  flex-grow: 1;
-}
+import type { ord } from 'ord-schema-protobufjs';
+import type { AppReaction } from 'store/reactions/reactions.types';
 
-.buttons {
-  display: none;
-}
+export const ordInputsToAppInputs = (inputs: ord.IReaction['inputs']): AppReaction['inputs'] =>
+  !inputs
+    ? []
+    : Object.entries(inputs).map(([key, value]) => ({
+        ...value,
+        name: key,
+      }));
 
-.table {
-  tr:hover {
-    .buttons {
-      display: block;
-    }
-
-    td {
-      color: var(--color-text-primary);
-    }
-
-    td:first-child {
-      color: var(--color-text-hover);
-    }
-  }
-}
+export const appInputsToOrdInputs = (inputs: AppReaction['inputs']): ord.IReaction['inputs'] =>
+  inputs.reduce(
+    (acc, { name, ...item }) => ({
+      ...acc,
+      [name]: item,
+    }),
+    {},
+  );
