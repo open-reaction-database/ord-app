@@ -91,8 +91,9 @@ class ReactionsUseCase:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction.SerializeToString()}
         if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
-            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
+            pb_reaction.pb_reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction.SerializeToString()}
         reaction = await self._create_reaction(dataset_id, insert_data)
