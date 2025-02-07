@@ -14,19 +14,34 @@
  * limitations under the License.
  */
 import { type ReactionFormNode, ReactionFormNodeType } from 'common/types/reaction/reactionFields';
-import { createValuePrecisionUnitInputs } from 'common/utils/reactionForm/createValuePrecisionUnitInputs';
-import reactionSchema from 'ord-schema/proto/reaction_pb';
+import { ord } from 'ord-schema-protobufjs';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject';
 
-const speedOptions = ordMapToKeyValueObject(reactionSchema.ReactionInput.AdditionSpeed.AdditionSpeedType);
+const speedOptions = ordMapToKeyValueObject(ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
 
-const deviceOptions = ordMapToKeyValueObject(reactionSchema.ReactionInput.AdditionDevice.AdditionDeviceType);
+const deviceOptions = ordMapToKeyValueObject(ord.ReactionInput.AdditionDevice.AdditionDeviceType);
 
-const timeOptions = ordMapToKeyValueObject(reactionSchema.Time.TimeUnit);
+const timeOptions = ordMapToKeyValueObject(ord.Time.TimeUnit);
 
-const temperatureOptions = ordMapToKeyValueObject(reactionSchema.Temperature.TemperatureUnit);
+const temperatureOptions = ordMapToKeyValueObject(ord.Temperature.TemperatureUnit);
+
+const flowRateOptions = ordMapToKeyValueObject(ord.FlowRate.FlowRateUnit);
 
 export const reactionInputs: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    fields: [
+      {
+        type: ReactionFormNodeType.value,
+        name: 'name',
+        inputType: 'string',
+        wrapperConfig: {
+          label: 'Input name',
+        },
+      },
+    ],
+  },
   {
     type: ReactionFormNodeType.wrapper,
     grid: 2,
@@ -88,22 +103,40 @@ export const reactionInputs: Array<ReactionFormNode> = [
       },
     ],
   },
-  createValuePrecisionUnitInputs({
+  {
+    type: ReactionFormNodeType.vpu,
     name: 'additionTime',
-    label: 'Time',
-    unitOptions: timeOptions,
-    hint: 'Addition time is relative to when the first input was added',
-  }),
-  createValuePrecisionUnitInputs({
+    wrapperConfig: {
+      label: 'Time',
+      hint: 'Addition time is relative to when the first input was added',
+    },
+    options: timeOptions,
+  },
+  {
+    type: ReactionFormNodeType.vpu,
     name: 'additionDuration',
-    label: 'Duration',
-    unitOptions: timeOptions,
-    hint: 'Addition time is relative to when the first input was added',
-  }),
-  createValuePrecisionUnitInputs({
+    wrapperConfig: {
+      label: 'Duration',
+      hint: 'Addition time is relative to when the first input was added',
+    },
+    options: timeOptions,
+  },
+  {
+    type: ReactionFormNodeType.vpu,
     name: 'additionTemperature',
-    label: 'Temperature',
-    unitOptions: temperatureOptions,
-    hint: 'Addition time is relative to when the first input was added',
-  }),
+    wrapperConfig: {
+      label: 'Temperature',
+      hint: 'Addition time is relative to when the first input was added',
+    },
+    options: temperatureOptions,
+  },
+  {
+    type: ReactionFormNodeType.vpu,
+    name: 'flowRate',
+    wrapperConfig: {
+      label: 'Flow rate',
+    },
+    options: flowRateOptions,
+    useNativeSelect: true,
+  },
 ];

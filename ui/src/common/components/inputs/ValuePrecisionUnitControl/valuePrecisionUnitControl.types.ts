@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
-  Object.entries<number>(ordMap).map(([key, value]) => ({
-    label: key.toString(),
-    value: value,
-  }));
+export interface ValuePrecisionUnit {
+  value?: number;
+  precision?: number;
+  unit?: number;
+}

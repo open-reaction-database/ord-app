@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
-  Object.entries<number>(ordMap).map(([key, value]) => ({
-    label: key.toString(),
-    value: value,
-  }));
+import type { ord } from 'ord-schema-protobufjs';
+import type { AppReaction } from 'store/reactions/reactions.types';
+
+export const ordInputsToAppInputs = (inputs: ord.IReaction['inputs']): AppReaction['inputs'] =>
+  !inputs
+    ? []
+    : Object.entries(inputs).map(([key, value]) => ({
+        ...value,
+        name: key,
+      }));
+
+export const appInputsToOrdInputs = (inputs: AppReaction['inputs']): ord.IReaction['inputs'] =>
+  inputs.reduce(
+    (acc, { name, ...item }) => ({
+      ...acc,
+      [name]: item,
+    }),
+    {},
+  );

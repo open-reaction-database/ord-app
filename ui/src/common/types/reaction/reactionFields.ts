@@ -21,6 +21,7 @@ export enum ReactionFormNodeType {
   wrapper = 'wrapper',
   value = 'value',
   select = 'select',
+  vpu = 'vpu',
 }
 
 interface ReactionFormNodeBase {
@@ -61,4 +62,16 @@ export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeB
   selectType: 'segmented' | 'dropdown';
 }
 
-export type ReactionFormNode = ReactionFormGroup | ReactionFormWrapper | ReactionFormValue | ReactionFormSelect;
+export interface ReactionFormValuePrecisionUnit extends ReactionFormField, ReactionFormNodeBase, ReactionFormNodeBase {
+  type: ReactionFormNodeType.vpu;
+  name: string;
+  options: SelectOptions<number>;
+  useNativeSelect?: boolean;
+}
+
+export type ReactionFormNode =
+  | ReactionFormGroup
+  | ReactionFormWrapper
+  | ReactionFormValue
+  | ReactionFormSelect
+  | ReactionFormValuePrecisionUnit;

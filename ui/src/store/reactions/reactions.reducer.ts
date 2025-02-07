@@ -21,12 +21,14 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   renameReactionActions,
-  updateReactionActions,
+  addUpdateReactionFieldActions,
+  deleteReactionFieldActions,
 } from './reactions.actions';
 import { itemsById } from 'common/utils';
-import type { ReactionWrapper } from './reactions.types';
+import type { AppReaction, ReactionWrapper } from './reactions.types';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants';
+import { deepMergeWithArrayMerge, generateDeepPartialReactionByPath, removeDeepReactionPart } from './reactions.utils';
 
 const getReactionId = (reaction: ReactionWrapper) => reaction.id;
 
@@ -36,13 +38,40 @@ const activeDatasetId = createReducer<number>(0, builder => {
 });
 
 const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
+  builder.addCase(
+    addUpdateReactionFieldActions.request,
+    (state, { payload: { reactionId, pathComponents, newValue } }) => {
+      const reaction = state[reactionId];
+      const updatedReaction: AppReaction = deepMergeWithArrayMerge(
+        reaction.data,
+        generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
+      );
+      return {
+        ...state,
+        [reactionId]: {
+          ...reaction,
+          data: updatedReaction,
+        },
+      };
+    },
+  );
+  builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
+    const reaction = state[reactionId];
+    const updatedReaction: AppReaction = removeDeepReactionPart(reaction.data, pathComponents);
+    return {
+      ...state,
+      [reactionId]: {
+        ...reaction,
+        data: updatedReaction,
+      },
+    };
+  });
   builder.addMatcher(
     isAnyOf(
       getReactionActions.success,
       renameReactionActions.success,
       createEmptyReactionActions.success,
       importReactionFromFileActions.success,
-      updateReactionActions.success,
     ),
     (state, action) => ({
       ...state,

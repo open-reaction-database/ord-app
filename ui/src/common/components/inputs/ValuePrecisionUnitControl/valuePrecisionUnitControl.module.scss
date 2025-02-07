@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const ordMapToKeyValueObject = <T extends object, K extends keyof T>(ordMap: Record<K, number>) =>
-  Object.entries<number>(ordMap).map(([key, value]) => ({
-    label: key.toString(),
-    value: value,
-  }));
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

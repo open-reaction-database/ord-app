@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { NativeSelect, type NativeSelectProps } from '@mantine/core';
-import type { SelectOption, SelectOptions } from '../../../types/selectOptions';
-import { useCallback, useMemo, type ChangeEvent } from 'react';
+import type { SelectOptions } from 'common/types/selectOptions';
+import { useUncontrolledSelect } from 'common/hooks/useUncontrolledSelect';
 
 interface AppNativeSelectProps<T> extends Omit<NativeSelectProps, 'onChange' | 'data' | 'defaultValue' | 'value'> {
   options: SelectOptions<T>;
@@ -31,25 +31,10 @@ export function AppNativeSelect<T>({
   options,
   ...rest
 }: Readonly<AppNativeSelectProps<T>>) {
-  const stringOptions = useMemo(() => options.map(option => option.label), [options]);
-  const stringDefaultValue = options.find(option => option.value === defaultValue)?.label ?? undefined;
-  const stringValue = options.find(option => option.value === value)?.label ?? undefined;
-
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const stringValue = event.target.value;
-      const value = (options.find(option => option.label === stringValue) as SelectOption<T>).value;
-      onChange(value);
-    },
-    [onChange, options],
-  );
-
+  const inputProps = useUncontrolledSelect(true, options, value, defaultValue, onChange);
   return (
     <NativeSelect
-      value={stringValue}
-      defaultValue={stringDefaultValue}
-      onChange={handleChange}
-      data={stringOptions}
+      {...inputProps}
       {...rest}
     />
   );

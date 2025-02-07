@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type OrdSchema from 'ord-schema';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -26,6 +26,14 @@ export interface ReactionMolBlocks {
   inputs: Record<string, Array<string>>;
 }
 
+export interface AppReactionInput extends ord.IReactionInput {
+  name: string;
+}
+
+export interface AppReaction extends Omit<ord.IReaction, 'inputs'> {
+  inputs: Array<AppReactionInput>;
+}
+
 export interface ReactionResponse {
   id: number;
   pb_reaction_id: string;
@@ -34,12 +42,20 @@ export interface ReactionResponse {
   mulblocks: ReactionMolBlocks;
 }
 
-export type Reaction = ReturnType<ReturnType<typeof OrdSchema.Reaction.deserializeBinary>['toObject']>;
-
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {
-  data: ord.IReaction;
+  data: AppReaction;
 }
 
 export interface ImportReactionFromFilePayload {
   file: File;
+}
+
+export interface UpdateReactionPayload {
+  reactionId: number;
+  pathComponents: ReactionPathComponents;
+}
+
+export interface AddEditReactionFieldPayload extends UpdateReactionPayload {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  newValue: any;
 }
