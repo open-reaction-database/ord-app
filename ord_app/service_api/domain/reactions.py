@@ -73,12 +73,15 @@ class ReactionsUseCase:
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            reaction_pb = load_message(file_data, Reaction, kind)
+            pb_reaction = load_message(file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
-        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": reaction_pb.SerializeToString()}
+        if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+            pb_reaction.pb_reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
+
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction.SerializeToString()}
         reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
