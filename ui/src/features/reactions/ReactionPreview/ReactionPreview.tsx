@@ -28,7 +28,7 @@ function ReactionProduct({ svg }: Readonly<ReactionProductPreview>) {
   return (
     <div
       className={classes.molecule}
-      dangerouslySetInnerHTML={{ __html: svg || '' }}
+      dangerouslySetInnerHTML={{ __html: svg ?? '' }}
     />
   );
 }
@@ -42,7 +42,7 @@ function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
           <div
             key={index}
             className={classes.molecule}
-            dangerouslySetInnerHTML={{ __html: svg || '' }}
+            dangerouslySetInnerHTML={{ __html: svg ?? '' }}
           />
         ))}
       </div>
