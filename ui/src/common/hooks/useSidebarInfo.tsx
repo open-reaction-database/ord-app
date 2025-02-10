@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from '../model/reaction/reactionEntityToForm.models';
+import { ReactionEntity } from '../../features/reactions/ReactionDetailsSidebar/reactionEntities/reactionEntityToForm.models.ts';
 import { type ReactNode, useMemo } from 'react';
 import { Title } from '@mantine/core';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';

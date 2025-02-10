@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 import { useParams } from 'wouter';
-import { useAppDispatch } from 'store/useAppDispatch';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { type FC, Fragment, useEffect, useMemo } from 'react';
-import { getReaction } from 'store/reactions/reactions.thunks';
-import { ReactionHeader } from './ReactionHeader/ReactionHeader';
+import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
+import { ReactionHeader } from './ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/reactions/reactions.selectors';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import classes from './reactionPage.module.scss';
-import { RequiredAsterisk } from 'common/components/RequiredAsterisk/RequiredAsterisk';
-import { Inputs } from './Inputs/Inputs';
-import type { ReactionSectionProps } from './reactionPage.types';
-import { EditSidebar } from 'common/components/EditSidebar/EditSidebar';
-import { Notes } from './Notes/Notes';
-import { PageContainer } from 'common/components/PageContainer/PageContainer';
-import type { Breadcrumbs } from '../../common/types/breadcrumbs';
-import { selectDatasetById } from '../../store/datasets/datasets.selectors';
-import { Identifiers } from './Identifiers/Identifiers';
+import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
+import { Inputs } from './Inputs/Inputs.tsx';
+import type { ReactionSectionProps } from './reactionPage.types.ts';
+import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import { Notes } from './Notes/Notes.tsx';
+import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import type { Breadcrumbs } from '../../common/types/breadcrumbs.ts';
+import { selectDatasetById } from '../../store/entities/datasets/datasets.selectors.ts';
+import { Identifiers } from './Identifiers/Identifiers.tsx';
 
 interface ReactionTab {
   name: string;
@@ -62,10 +62,10 @@ export function ReactionPage() {
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
-      { title: 'Datasets', path: '/' },
-      { path: `/dataset/${datasetId}`, title: dataset?.name ?? datasetId.toString() },
+      { title: 'Datasets', path: '~/' },
+      { path: `~/datasets/${datasetId}`, title: dataset?.name ?? datasetId.toString() },
       {
-        path: `/dataset/${datasetId}/reaction/${reactionId}`,
+        path: `~/datasets/${datasetId}/reactions/${reactionId}`,
         title: reaction?.pb_reaction_id ?? reactionId.toString(),
       },
     ];
@@ -120,7 +120,7 @@ export function ReactionPage() {
               ))}
             </Tabs>
           </Paper>
-          <EditSidebar reactionId={reactionId} />
+          <ReactionDetailsSidebar reactionId={reactionId} />
         </Flex>
       )}
     </PageContainer>

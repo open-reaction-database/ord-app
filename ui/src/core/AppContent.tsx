@@ -16,10 +16,10 @@
 import { Suspense } from 'react';
 import { useAuth } from 'common/hooks/useAuth';
 import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/PageLoader/PageLoader';
+import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
 import { Notifications } from '@mantine/notifications';
 
-const Routes = lazyWithPreload(() => import('pages'));
+const Routes = lazyWithPreload(() => import('routes'));
 
 export function AppContent() {
   const isLoading = useAuth();

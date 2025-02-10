@@ -15,11 +15,11 @@
  */
 import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
-import { useAppDispatch } from 'store/useAppDispatch';
-import { setReactionPathComponentsList } from 'store/reactionForm/reactionForm.actions';
-import type { ReactionSectionProps } from '../reactionPage.types';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import type { ReactionSectionProps } from '../reactionPage.types.ts';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/reactions/reactions.selectors';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo } from 'react';
 import classes from './notes.module.scss';

@@ -1,0 +1,75 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents.ts';
+import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
+
+type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
+
+function mergeArray({ isMergeableObject, deepmerge, clone }: MergeArrayOptions) {
+  return function (target: Array<unknown>, source: Array<unknown>) {
+    const targetClone = clone(target);
+    source.forEach((item, index) => {
+      if (item) {
+        const isMergeable = isMergeableObject(targetClone[index]) && isMergeableObject(item);
+        targetClone[index] = isMergeable ? deepmerge(targetClone[index], item) : item;
+      }
+    });
+    return targetClone;
+  };
+}
+
+export const deepMergeWithArrayMerge = deepmergeFactory({ mergeArray });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function generateDeepPartialReactionByPath(pathComponents: ReactionPathComponents, value: any): any {
+  if (pathComponents.length === 0) {
+    return value;
+  }
+  const [currentPathComponent, ...rest] = pathComponents;
+  if (typeof currentPathComponent === 'number') {
+    const array = [];
+    array[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
+    return array;
+  }
+  const object: Record<string, unknown> = {};
+  object[currentPathComponent] = generateDeepPartialReactionByPath(rest, value);
+  return object;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function removeDeepReactionPart(reactionPart: any, pathComponents: ReactionPathComponents): any {
+  const [currentPathComponent, ...rest] = pathComponents;
+
+  if (rest.length === 0) {
+    if (typeof currentPathComponent === 'number') {
+      return reactionPart.slice(0, currentPathComponent).concat(reactionPart.slice(currentPathComponent + 1));
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [currentPathComponent]: _, ...value } = reactionPart;
+    return value;
+  } else {
+    if (typeof currentPathComponent === 'number') {
+      return reactionPart
+        .slice(0, currentPathComponent)
+        .concat(removeDeepReactionPart(reactionPart[currentPathComponent], rest))
+        .concat(reactionPart.slice(currentPathComponent + 1));
+    }
+    return {
+      ...reactionPart,
+      [currentPathComponent]: removeDeepReactionPart(reactionPart[currentPathComponent], rest),
+    };
+  }
+}

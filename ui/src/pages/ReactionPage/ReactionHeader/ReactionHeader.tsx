@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
-import { selectReactionById } from 'store/reactions/reactions.selectors';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
-import { CopyButton } from 'common/components/CopyButton/CopyButton';
+import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
-import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu';
+import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
-import { domain, fileDownloadOptions } from 'common/constants';
+import { domain, fileDownloadOptions } from 'common/constants.ts';
 import classes from './reactionHeader.module.scss';
 import { useDisclosure } from '@mantine/hooks';
-import { useAppDispatch } from 'store/useAppDispatch';
-import { InputModal } from '../../../common/components/InputModal/InputModal';
-import { renameReaction } from '../../../store/reactions/reactions.thunks';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { InputModal } from '../../../common/components/InputModal/InputModal.tsx';
+import { renameReaction } from '../../../store/entities/reactions/reactions.thunks.ts';
 
 interface ReactionHeaderProps {
   datasetId: number;

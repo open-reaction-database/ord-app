@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/Counter/Counter';
+import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { AddCircleIcon, EditIcon, NoData, RemoveIcon } from 'common/icons';
 import classes from './inputs.module.scss';
 import { typographyClasses } from 'common/styling';
-import type { ReactionSectionProps } from '../reactionPage.types';
-import { selectReactionById } from 'store/reactions/reactions.selectors';
+import type { ReactionSectionProps } from '../reactionPage.types.ts';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { useCallback } from 'react';
-import { setReactionPathComponentsList } from 'store/reactionForm/reactionForm.actions';
-import { useAppDispatch } from 'store/useAppDispatch';
-import type { AppReactionInput } from 'store/reactions/reactions.types';
+import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import type { AppReactionInput } from 'store/entities/reactions/reactions.types.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { addUpdateReactionField, deleteReactionField } from 'store/reactions/reactions.thunks';
+import { addUpdateReactionField, deleteReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 
 function findValidInputName(inputs: Array<AppReactionInput>): string {
   let counter = 1;

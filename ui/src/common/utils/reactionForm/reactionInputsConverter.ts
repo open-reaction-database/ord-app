@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppReaction } from 'store/reactions/reactions.types';
+import type { AppReaction } from 'store/entities/reactions/reactions.types';
 
 export const ordInputsToAppInputs = (inputs: ord.IReaction['inputs']): AppReaction['inputs'] =>
   !inputs
