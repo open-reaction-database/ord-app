@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { type JSX, useCallback } from 'react';
-import { downloadFile } from 'common/store/util.thunks';
+import { downloadFile } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
 import { DownloadIcon } from 'common/icons';

@@ -15,7 +15,7 @@
  */
 import { Select } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { selectOrderedGroupsList } from '../../../store/groups/groups.selectors';
+import { selectOrderedGroupsList } from '../../../store/entities/groups/groups.selectors';
 import { useMemo } from 'react';
 
 export function GroupSelector() {

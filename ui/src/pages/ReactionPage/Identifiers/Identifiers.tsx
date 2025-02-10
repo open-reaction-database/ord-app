@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/Counter/Counter';
-import type { ReactionSectionProps } from '../reactionPage.types';
-import { selectReactionById } from 'store/reactions/reactions.selectors';
+import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import type { ReactionSectionProps } from '../reactionPage.types.ts';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { AddCircleIcon, EditIcon, RemoveIcon } from 'common/icons';
 import { ord } from 'ord-schema-protobufjs';
-import { useAppDispatch } from 'store/useAppDispatch';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback } from 'react';
-import { setReactionPathComponentsList } from 'store/reactionForm/reactionForm.actions';
-import { deleteReactionField, addUpdateReactionField } from '../../../store/reactions/reactions.thunks';
-import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents';
+import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { deleteReactionField, addUpdateReactionField } from '../../../store/entities/reactions/reactions.thunks.ts';
+import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents.ts';
 
 const entries = Object.entries(ord.ReactionIdentifier.ReactionIdentifierType) as Array<[string, number]>;
 

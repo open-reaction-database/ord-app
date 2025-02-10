@@ -16,9 +16,9 @@
 import type { PropsWithChildren } from 'react';
 import { AppShell, Flex } from '@mantine/core';
 import classes from './PageContainer.module.scss';
-import ORDLogo from 'assets/ORD_logo.png';
-import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
-import UserMenu from '../UserMenu/UserMenu';
+import ORDLogo from './ORDLogo.png';
+import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
+import UserMenu from './UserMenu/UserMenu';
 import type { Breadcrumb } from 'common/types/breadcrumbs';
 
 interface PageContainerProps extends PropsWithChildren {
