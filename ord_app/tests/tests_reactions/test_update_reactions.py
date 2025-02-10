@@ -53,3 +53,18 @@ async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, 
     response_data = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{100500}", json=payload)
 
     assert status.HTTP_404_NOT_FOUND == response_data.status_code
+
+
+async def test_update_reaction_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+
+    payload1 = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
+    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload1).raise_for_status().json()
+    assert "test" == response_data["pb_reaction_id"]
+
+    payload2 = {"binpb": b64encode(Reaction(reaction_id="test2").SerializeToString()).decode()}
+    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload2).raise_for_status().json()
+    assert "test2" == response_data["pb_reaction_id"]
+
+    response = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{response_data['id']}", json=payload1)
+    assert status.HTTP_400_BAD_REQUEST == response.status_code

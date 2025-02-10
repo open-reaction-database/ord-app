@@ -13,6 +13,7 @@
 # limitations under the License.
 from base64 import b64encode
 from typing import Type
+from uuid import uuid4
 
 import orjson
 from fastapi import Depends
@@ -71,6 +72,18 @@ class DatasetUseCases:
             payload=dataset_payload.model_dump(),
             autocommit=False
         )
+
+        seen_ids = set()
+        reactions_ids = []
+        for reaction in dataset_pb.reactions:
+            if reaction.reaction_id in seen_ids:
+                reaction.reaction_id = f"duplicate-{reaction.reaction_id}-{uuid4().hex}"
+            seen_ids.add(reaction.reaction_id)
+            reactions_ids.append(reaction.reaction_id)
+
+        for item in await self.reaction_repository.filter(pb_reaction_id=reactions_ids):
+            pb_reaction_idx = reactions_ids.index(item.pb_reaction_id)
+            dataset_pb.reactions[pb_reaction_idx].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
 
         reactions_payload = [
             {

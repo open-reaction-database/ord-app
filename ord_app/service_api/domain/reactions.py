@@ -29,7 +29,12 @@ from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema
-from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, psycopg_error_wrapper
+from ord_app.service_api.services.exceptions import (
+    EntityNotFoundError,
+    ProtobufDecodeError,
+    UniqueViolation,
+    psycopg_error_wrapper,
+)
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -67,18 +72,29 @@ class ReactionsUseCase:
         return reaction
 
     async def create(self, dataset_id: int, payload: ReactionCreateSchema):
-        insert_data = payload.model_dump(exclude_unset=True) | {"pb_reaction_id": uuid4().hex}
+        insert_data = {"pb_reaction_id": uuid4().hex}
+
+        if payload.binpb is not None:
+            pb_reaction = load_message(payload.binpb, Reaction, "binpb")
+            if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+                pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
+
+            insert_data["binpb"] = pb_reaction.SerializeToString()
+
         reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            reaction_pb = load_message(file_data, Reaction, kind)
+            pb_reaction = load_message(file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
-        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": reaction_pb.SerializeToString()}
+        if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
+
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction.SerializeToString()}
         reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
@@ -89,8 +105,13 @@ class ReactionsUseCase:
         return await self.reaction_repo.get(id=reaction_id)
 
     async def update(self, reaction_id, payload: ReactionCreateSchema):
+        pb_reaction = load_message(payload.binpb, Reaction, "binpb")
+        if await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+            raise UniqueViolation(f"Reaction with pb_reaction_id={pb_reaction.reaction_id} already exists")
+
         if reaction := await self.reaction_repo.update(payload.model_dump(exclude_unset=True), id=reaction_id):
             return reaction
+
         raise EntityNotFoundError("Reaction not found")
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):

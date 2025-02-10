@@ -96,6 +96,8 @@ async def _update_reaction(
 ):
     try:
         return await use_case.update(reaction_id, payload)
+    except UniqueViolation as err:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
     except EntityNotFoundError as err:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
 

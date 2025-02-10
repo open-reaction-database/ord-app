@@ -45,7 +45,8 @@ async def test_create_empty_dataset(api_client, mock_authenticated_user):
     "kind,filename,expected_name",
     (
         ("txtpb", "empty.txtpb", "empty"),
-        ("txtpb", "full.txtpb", "full")
+        ("txtpb", "full.txtpb", "full"),
+        ("txtpb", "reaction_duplication.txtpb", "full")
     )
 )
 async def test_upload_dataset(kind, filename, expected_name, api_client, mock_authenticated_user):

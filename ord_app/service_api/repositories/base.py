@@ -23,12 +23,26 @@ from ord_app.service_api.models import UserModel
 T = TypeVar("T")
 
 
+filters_map = {
+    list: lambda field, values: field.in_(values),
+}
+
+
 def _get_filter_stmt(model: Any, **kwargs: Any) -> List[BinaryExpression]:
     filters: List[BinaryExpression] = []
     for field_name, field_value in kwargs.items():
         if field_name not in model.__table__.columns:
             raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
-        filters.append(getattr(model, field_name) == field_value)
+
+        attr = getattr(model, field_name)
+        ft = filters_map.get(
+            type(field_value),
+            lambda field, value: field == value
+        )(attr, field_value)
+
+        filters.append(
+            ft
+        )
     return filters
 
 
