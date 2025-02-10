@@ -24,6 +24,7 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { fileDownloadOptions } from 'common/constants.ts';
 import { useMemo } from 'react';
 import { typographyClasses } from 'common/styling';
+import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
 
 interface DescriptorsListProps {
   title: string;
@@ -98,10 +99,6 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
             title="Provenance"
             items={reaction.summary.provenance}
           />
-          <DescriptorsList
-            title="Summary"
-            items={reaction.summary.summary}
-          />
         </div>
         <Flex
           align="flex-start"
@@ -138,6 +135,11 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           </Button>
         </Flex>
       </div>
+      <ReactionPreview reaction={reaction} />
+      <DescriptorsList
+        title="Summary"
+        items={reaction.summary.summary}
+      />
     </Paper>
   );
 }

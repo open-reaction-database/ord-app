@@ -39,7 +39,7 @@ export interface ReactionResponse {
   pb_reaction_id: string;
   summary: ReactionSummary;
   binpb: string;
-  mulblocks: ReactionMolBlocks;
+  molblocks: ReactionMolBlocks;
 }
 
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {

@@ -25,11 +25,17 @@ export function initIndigo() {
   indigoModule = indigoInit().then((result: typeof indigoModule) => (indigoModule = result));
 }
 
-export function renderSvg(component: string) {
+export function renderSvg(component: string, size: number = 120) {
   const options = new indigoModule.MapStringString();
   options.set('render-output-format', 'svg');
   options.set('smart-layout', 'true');
+  options.set('render-image-width', size.toString());
   options.set('ignore-stereochemistry-errors', 'true');
   options.set('render-coloring', 'true');
-  return Buffer.from(indigoModule.render(component, options), 'base64').toString();
+  try {
+    return Buffer.from(indigoModule.render(component, options), 'base64').toString();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
