@@ -60,7 +60,7 @@ export const createEmptyDataset = createThunkWithExplicitResult(
   async (dispatch, _g, { groupId, ...payload }) => {
     const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)).data;
     dispatch(createNewDatasetActions.success(dataset));
-    navigate(`~/dataset/${dataset.id}`);
+    navigate(`/datasets/${dataset.id}`);
   },
 );
 
@@ -72,7 +72,7 @@ export const createDatasetFromFile = createThunkWithExplicitResult(
 
     const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets/upload`, formData)).data;
     dispatch(createDatasetFromFileActions.success(dataset));
-    navigate(`~/dataset/${dataset.id}`);
+    navigate(`/datasets/${dataset.id}`);
   },
 );
 
@@ -84,5 +84,5 @@ export const updateDataset = createThunk(updateDatasetActions, async (_d, _g, { 
 export const removeDataset = createThunkWithExplicitResult(removeDatasetActions, async (dispatch, _g, datasetId) => {
   await axiosInstance.delete(`/datasets/${datasetId}`);
   dispatch(removeDatasetActions.success());
-  navigate(`~/`);
+  navigate(`/`);
 });

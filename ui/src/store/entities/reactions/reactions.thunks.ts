@@ -105,7 +105,7 @@ export const createEmptyReaction = createThunkWithExplicitResult(
     const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions`, {});
     const reaction = parseReaction(result.data);
     dispatch(createEmptyReactionActions.success(reaction));
-    navigate(`~/datasets/${datasetId}/reactions/${reaction.id}`);
+    navigate(`/datasets/${datasetId}/reactions/${reaction.id}`);
   },
 );
 
@@ -120,7 +120,7 @@ export const importReactionFromFile = createThunkWithExplicitResult(
     const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/upload`, formData);
     const reaction = parseReaction(result.data);
     dispatch(importReactionFromFileActions.success(reaction));
-    navigate(`~/datasets/${datasetId}/reactions/${reaction.id}`);
+    navigate(`/datasets/${datasetId}/reactions/${reaction.id}`);
   },
 );
 
