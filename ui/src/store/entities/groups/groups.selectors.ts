@@ -18,6 +18,7 @@ import type { AppState } from '../../configureAppStore.ts';
 import { createSelector } from '@reduxjs/toolkit';
 import { USER_ROLES } from 'common/types';
 import { createSelectorFactory } from 'store/utils';
+import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.groups);
 
@@ -26,8 +27,6 @@ export const selectGroupSearch = buildSelector(state => state.groupNameSearch);
 export const selectGroupsByIds = buildSelector(state => state.groupsById);
 
 export const selectGroupById = (id: string) => (state: AppState) => selectGroupsByIds(state)[id];
-
-export const selectEditingGroupId = buildSelector(state => state.editingGroupId);
 
 export const selectHaveAnyGroups = createSelector([selectGroupsByIds], groups => Object.keys(groups).length > 0);
 
