@@ -15,7 +15,7 @@ import os
 from io import BytesIO
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Response, UploadFile, status
 from fastapi.params import Depends
 from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
+from ord_app.service_api.domain.reactions import validate_reactions_task
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
@@ -75,14 +76,19 @@ async def upload_dataset(
     group_id: int,
     file: UploadFile,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    background_tasks: BackgroundTasks
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
 
     try:
-        return await use_case.upload(group_id, file_data, kind)
+        response = await use_case.upload(group_id, file_data, kind)
     except ProtobufDecodeError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e)) from e
 
+    background_tasks.add_task(validate_reactions_task, db)
+
+    return response
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])

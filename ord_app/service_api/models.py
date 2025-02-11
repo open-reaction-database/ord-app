@@ -131,6 +131,7 @@ class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     pb_reaction_id: Mapped[str]
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
+    is_valid: Mapped[bool] = mapped_column(nullable=True)
 
     dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"), index=True)
     dataset: Mapped[DatasetModel] = relationship(DatasetModel, back_populates="reactions")

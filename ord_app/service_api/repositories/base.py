@@ -28,24 +28,6 @@ filters_map = {
 }
 
 
-def _get_filter_stmt(model: Any, **kwargs: Any) -> List[BinaryExpression]:
-    filters: List[BinaryExpression] = []
-    for field_name, field_value in kwargs.items():
-        if field_name not in model.__table__.columns:
-            raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
-
-        attr = getattr(model, field_name)
-        ft = filters_map.get(
-            type(field_value),
-            lambda field, value: field == value
-        )(attr, field_value)
-
-        filters.append(
-            ft
-        )
-    return filters
-
-
 class AbstractRepository(ABC, Generic[T]):
     model: Type[T]
 
@@ -58,20 +40,38 @@ class AbstractRepository(ABC, Generic[T]):
         pass
 
 class BaseRepository(AbstractRepository[T]):
+    @staticmethod
+    def _get_filter_stmt(model: Any, **kwargs: Any) -> List[BinaryExpression]:
+        filters: List[BinaryExpression] = []
+        for field_name, field_value in kwargs.items():
+            if field_name not in model.__table__.columns:
+                raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
+
+            attr = getattr(model, field_name)
+            ft = filters_map.get(
+                type(field_value),
+                lambda field, value: field == value
+            )(attr, field_value)
+
+            filters.append(
+                ft
+            )
+        return filters
+
     async def get(self, **kwargs) -> Optional[T]:
-        stmt = select(self.model).where(*_get_filter_stmt(self.model, **kwargs))
+        stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalar(stmt)
         return result
 
     async def filter(self, **kwargs) -> Sequence[T]:
-        stmt = select(self.model).where(*_get_filter_stmt(self.model, **kwargs))
+        stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalars(stmt)
         return result.all()
 
     async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> Optional[T] | None:
         stmt = (
             update(self.model)
-            .where(*_get_filter_stmt(self.model, **kwargs))
+            .where(*self._get_filter_stmt(self.model, **kwargs))
             .values(**payload)
             .returning(self.model)
         )
@@ -83,7 +83,7 @@ class BaseRepository(AbstractRepository[T]):
             return obj
 
     async def delete(self, **kwargs) -> None:
-        stmt = delete(self.model).where(*_get_filter_stmt(self.model, **kwargs))
+        stmt = delete(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         await self.db.execute(stmt)
         await self.db.commit()
         logger.debug(f"<{self.model.__name__.title()}({kwargs})> was deleted")

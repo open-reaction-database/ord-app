@@ -13,16 +13,18 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, UploadFile, status
 from fastapi_pagination import Page
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
-from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
+from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
 from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, UniqueViolation
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
+from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
 
@@ -51,11 +53,15 @@ async def upload_reaction(
     dataset_id: int,
     file: UploadFile,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    background_tasks: BackgroundTasks
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
 
     try:
-        return await use_case.upload(dataset_id, file_data, kind)
+        response =  await use_case.upload(dataset_id, file_data, kind)
+        background_tasks.add_task(validate_reactions_task, db)
+        return response
     except ProtobufDecodeError as err:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
 

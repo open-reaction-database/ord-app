@@ -35,7 +35,29 @@ from ord_app.service_api.services.exceptions import (
     UniqueViolation,
     psycopg_error_wrapper,
 )
+from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
+
+
+async def validate_reactions_task(db: AsyncSession):
+    reaction_repo = ReactionsRepository(db)
+    update_values = []
+
+    async for reactions_chunk in reaction_repo.stream_reactions():
+        for reaction in reactions_chunk:
+            pb_reaction = load_message(reaction.binpb, Reaction, "binpb")
+            try:
+                validation_result = validate_pb_reaction(pb_reaction)
+            except ValueError as err:
+                validation_result = [err], []
+
+            if any(validation_result):
+                update_values.append({"id": reaction.id, "is_valid": False})
+                logger.debug(f"Reaction validation failed: {validation_result}")
+            else:
+                update_values.append({"id": reaction.id, "is_valid": True})
+
+    await reaction_repo.bulk_update(update_values)
 
 
 class ReactionsUseCase:
@@ -48,12 +70,35 @@ class ReactionsUseCase:
 
     @psycopg_error_wrapper
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
+        if "binpb" in insert_data:
+            try:
+                validation_result = validate_pb_reaction(insert_data["binpb"])
+            except ValueError as err:
+                validation_result = [err], []
+
+            insert_data["binpb"] = insert_data["binpb"].SerializeToString()
+        else:
+            validation_result = [], []
+
         reaction = await self.reaction_repo.create(
             dataset_id,
             self.current_user.id,
             insert_data,
             autocommit=False
         )
+
+        # Validation
+        if any(validation_result):
+            errors, warnings = validation_result
+            # This field is written to the database
+            reaction.is_valid = False
+
+            # And this is not, it is only stored in the object
+            # There is no need to store these fields in the database yet
+            reaction.validation = {"errors": errors, "warnings": warnings}
+        else:
+            reaction.is_valid = True  # same
+            reaction.validation = {"errors": [], "warnings": []}  # same
 
         self.db.add(reaction)
         await self.db.flush()
@@ -69,6 +114,7 @@ class ReactionsUseCase:
 
         await self.db.commit()
         await self.db.refresh(reaction)
+
         return reaction
 
     async def create(self, dataset_id: int, payload: ReactionCreateSchema):
@@ -78,8 +124,7 @@ class ReactionsUseCase:
             pb_reaction = load_message(payload.binpb, Reaction, "binpb")
             if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
                 pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
-
-            insert_data["binpb"] = pb_reaction.SerializeToString()
+            insert_data["binpb"] = pb_reaction
 
         reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
@@ -94,7 +139,7 @@ class ReactionsUseCase:
         if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
 
-        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction.SerializeToString()}
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
         reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 

@@ -24,10 +24,17 @@ from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import BaseSchema
 
 
+class _ReactionValidation(BaseSchema):
+    errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class ReactionSchema(BaseSchema):
     id: int
     pb_reaction_id: str
     binpb: str
+    is_valid: bool | None
+    validation: _ReactionValidation | None = None
     summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
     molblocks: dict
 

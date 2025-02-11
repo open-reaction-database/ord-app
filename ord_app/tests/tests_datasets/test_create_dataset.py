@@ -15,7 +15,10 @@ from io import BytesIO
 
 import pytest
 from fastapi import status
+from sqlalchemy import select
 
+from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.settings import RuntimeSettings
 
 
@@ -59,6 +62,21 @@ async def test_upload_dataset(kind, filename, expected_name, api_client, mock_au
         response_data["name"] = expected_name
         response_data["owner"]["id"] = user.id
 
+
+async def test_upload_dataset_with_reaction_validation(api_client, mock_authenticated_user, test_db_session):
+    user, _, group = mock_authenticated_user
+
+    with open(RuntimeSettings.base_dir.parent / "tests" / "testdata" / "ord-nielsen-example.txtpb", "rb") as fd:
+        response_data = api_client.post(
+            f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("ord-nielsen-example.txtpb", fd.read())}
+        ).raise_for_status().json()
+
+        response_data["name"] = "Deoxyfluorination screen"
+        response_data["owner"]["id"] = user.id
+
+    stmt = select(ReactionModel.is_valid).where(ReactionModel.dataset_id == response_data["id"])
+    await validate_reactions_task(test_db_session)
+    assert {True,} == set((await test_db_session.scalars(stmt)).all())
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
