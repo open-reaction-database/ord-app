@@ -19,6 +19,7 @@ import { renderSvg } from 'common/utils/indigo.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionInputPreview, ReactionProductPreview } from './reactionPreview.types.ts';
 import classes from './reactionPreview.module.scss';
+import { Flex } from '@mantine/core';
 
 interface ReactionPreviewProps {
   reaction: ReactionWrapper;
@@ -37,7 +38,7 @@ function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
   return (
     <div className={classes.inputCard}>
       <span>{name}</span>
-      <div>
+      <Flex gap="sm">
         {components.map(({ svg }, index) => (
           <div
             key={index}
@@ -45,7 +46,7 @@ function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
             dangerouslySetInnerHTML={{ __html: svg ?? '' }}
           />
         ))}
-      </div>
+      </Flex>
     </div>
   );
 }
