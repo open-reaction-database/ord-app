@@ -81,3 +81,17 @@ class ReactionCreateSchema(BaseSchema):
     @classmethod
     def binpb_validation(cls, raw):
         return None if raw is None else load_message(b64decode(raw), Reaction, "binpb").SerializeToString()
+
+
+class ReactionUpdateSchema(BaseSchema):
+    binpb: bytes
+
+    @field_validator("binpb", mode="after")
+    @classmethod
+    def load_binpb(cls, raw):
+        return load_message(b64decode(raw), Reaction, "binpb")
+
+    def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
+        data = super().model_dump(*args, **kwargs)
+        data["binpb"] = data["binpb"].SerializeToString()
+        return data

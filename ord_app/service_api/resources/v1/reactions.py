@@ -21,7 +21,7 @@ from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
 from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
-from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema
+from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema, ReactionUpdateSchema
 from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, UniqueViolation
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 from ord_app.service_api.services.postgresql import get_db_session
@@ -96,12 +96,13 @@ async def reaction(
     response_model=ReactionSchema,
 )
 async def _update_reaction(
+    dataset_id: int,
     reaction_id: int,
-    payload: ReactionCreateSchema,
+    payload: ReactionUpdateSchema,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
     try:
-        return await use_case.update(reaction_id, payload)
+        return await use_case.update(dataset_id, reaction_id, payload)
     except UniqueViolation as err:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
     except EntityNotFoundError as err:
