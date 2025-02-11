@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from loguru import logger
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
@@ -20,6 +20,19 @@ from ord_app.service_api.repositories.base import BaseRepository
 
 class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
+
+    async def bulk_update(self, values):
+        await self.db.execute(update(ReactionModel), values)
+        await self.db.commit()
+
+    async def stream_reactions(self, chunk_size: int = 10, **filters):
+        stmt = select(ReactionModel).where(*self._get_filter_stmt(filters))
+        scalars = await self.db.stream_scalars(stmt)
+        while True:
+            chunk = await scalars.fetchmany(chunk_size)
+            if not chunk:
+                break
+            yield chunk
 
     async def create(self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True):
         reaction = ReactionModel(owner_id=user_id, dataset_id=dataset_id, **payload)

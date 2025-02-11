@@ -15,6 +15,8 @@ import gzip
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile, status
+from ord_schema.proto.reaction_pb2 import Reaction
+from ord_schema.validations import ValidationOptions, validate_message
 
 MAP_FILE_EXT_TO_PB_KIND = {
     ".json": "json",
@@ -48,3 +50,19 @@ async def validate_uploaded_pb_file(file: UploadFile):
         file_data = gzip.decompress(file_data)
 
     return file_data, kind
+
+
+def _adjust_error(error: str) -> str:
+    """Strips the message name from errors to make them more readable."""
+    fields = error.split(":")
+    location = ".".join(fields[0].strip().split(".")[1:])
+    message = ":".join(fields[1:])
+    if location:
+        return f"{location}: {message.strip()}"
+    return message.strip()
+
+
+def validate_pb_reaction(reaction: Reaction, raise_on_error=False, require_provenance=False):
+    options = ValidationOptions(require_provenance=require_provenance)
+    output = validate_message(reaction, raise_on_error=raise_on_error, options=options)
+    return list(map(_adjust_error, output.errors)), list(map(_adjust_error, output.warnings))
