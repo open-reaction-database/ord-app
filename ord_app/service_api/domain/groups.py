@@ -17,7 +17,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
-from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
+from ord_app.service_api.models import UserGroupsMembershipModel, UserModel
 from ord_app.service_api.repositories.groups import GroupMembersRepository, GroupRepository
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.groups import GroupAddMemberSchema, GroupCreateSchema, GroupUpdateMemberSchema
@@ -41,7 +41,7 @@ class GroupUseCases:
     async def user_groups(self):
         return await self.group_repository.get_user_groups(self.current_user.id)
 
-    async def update(self, group_id: int, payload: GroupCreateSchema) -> GroupModel:
+    async def update(self, group_id: int, payload: GroupCreateSchema):
         return await self.group_repository.update(group_id, payload.model_dump(exclude_unset=True))
 
     async def delete(self, group_id: int):

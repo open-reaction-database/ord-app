@@ -18,7 +18,6 @@ from uuid import uuid4
 import orjson
 from fastapi import Depends
 from fastapi_pagination import Page
-from fastapi_pagination.ext.sqlalchemy import paginate
 from google.protobuf import json_format, text_format
 from google.protobuf.json_format import ParseError as JsonParseError
 from google.protobuf.message import DecodeError, Message
@@ -55,8 +54,7 @@ class DatasetUseCases:
         return await self.dataset_repository.get(dataset_id)
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
-        stmt = self.dataset_repository.group_dataset_stmt(group_id)
-        return await paginate(self.db, stmt)
+        return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
 
     async def upload(self, group_id: int, file_data, kind):
         try:
@@ -100,8 +98,7 @@ class DatasetUseCases:
         return await self.dataset_repository.get(dataset.id)
 
     async def paginate_user_datasets(self):
-        stmt = self.dataset_repository.user_datasets_stmt(self.current_user.id)
-        return await paginate(self.db, stmt)
+        return await self.dataset_repository.user_datasets_stmt(self.current_user.id)
 
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         return await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
