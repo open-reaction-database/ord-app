@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 from pydantic import Field, model_validator
 
@@ -31,8 +31,15 @@ class DatasetSchema(BaseSchema):
     owner: UserSchema
 
 
+class DatasetUserGroupSchema(BaseSchema):
+    id: int
+    name: str
+    role: Optional[str] = Field(default=None, alias="role")
+
+
 class DatasetWithReactionCountSchema(DatasetSchema):
     reaction_count: int = Field(default=0)
+    groups: list[DatasetUserGroupSchema]
 
     @model_validator(mode="before")
     @classmethod

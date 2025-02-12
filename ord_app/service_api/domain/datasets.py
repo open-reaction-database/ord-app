@@ -55,8 +55,8 @@ class DatasetUseCases:
         return await self.dataset_repository.get(dataset_id)
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
-        stmt = self.dataset_repository.group_dataset_stmt(group_id)
-        return await paginate(self.db, stmt)
+        return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
+        # return await paginate(self.db, stmt)
 
     async def upload(self, group_id: int, file_data, kind):
         try:

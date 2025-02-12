@@ -21,8 +21,6 @@ class GroupSchema(BaseSchema):
     id: int
     name: str
     role: UserRolesList
-    # created_at: datetime
-    # modified_at: datetime
 
 
 class GroupCreateSchema(BaseSchema):

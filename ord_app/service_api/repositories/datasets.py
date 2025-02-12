@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,18 +66,44 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
-    def group_dataset_stmt(self, group_id: int):
+    async def group_dataset_stmt(self, group_id: int, user_id: int):
+        # Base query for datasets
         stmt = (
             select(DatasetModel)
             .join(DatasetGroupAssociationModel, DatasetGroupAssociationModel.dataset_id == DatasetModel.id)
             .where(DatasetGroupAssociationModel.group_id == group_id)
             .options(
                 joinedload(DatasetModel.owner),
+                joinedload(DatasetModel.groups),
                 joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
             )
             .order_by(DatasetModel.modified_at.desc())
         )
-        return stmt
+        paginated_datasets = await paginate(self.db, stmt)
+
+        # Collect all group IDs from the paginated datasets
+        group_ids = {group.id for dataset in paginated_datasets.items for group in dataset.groups}
+
+        # Query memberships for the specific user and the collected groups
+        membership_stmt = (
+            select(UserGroupsMembershipModel)
+            .where(
+                UserGroupsMembershipModel.group_id.in_(group_ids),
+                UserGroupsMembershipModel.user_id == user_id
+            )
+        )
+        memberships = await self.db.scalars(membership_stmt)
+        membership_by_group = {membership.group_id: membership for membership in memberships.all()}
+
+        # Annotate each group in the paginated datasets with the user role
+        for dataset in paginated_datasets.items:
+            for group in dataset.groups:
+                membership = membership_by_group.get(group.id)
+                group.role = membership.role if membership else None
+            # filter out groups that the user is not a member of
+            dataset.groups = [group for group in dataset.groups if group.role is not None]
+
+        return paginated_datasets
 
     def user_datasets_stmt(self, user_id):
         stmt = (

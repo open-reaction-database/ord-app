@@ -64,12 +64,12 @@ class GroupRepository:
         return groups
 
     async def update(self, group_id: int, payload: dict):
-        stmt = update(GroupModel).where(GroupModel.id == group_id).values(payload).returning(GroupModel)
+        stmt = update(GroupModel).where(GroupModel.id == group_id).values(payload)
 
         if self.autocommit:
-            result = await self.db.execute(stmt)
+            await self.db.execute(stmt)
             await self.db.commit()
-            group = result.scalar_one_or_none()
+            group = await self.get(group_id)
             logger.debug(f"{group} updated with payload: {payload}")
             return group
 
