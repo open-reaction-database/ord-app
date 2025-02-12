@@ -18,7 +18,7 @@ from typing import Any
 
 from ord_schema.message_helpers import molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Reaction
-from pydantic import Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import BaseSchema
@@ -84,7 +84,9 @@ class ReactionCreateSchema(BaseSchema):
 
 
 class ReactionUpdateSchema(BaseSchema):
-    binpb: bytes
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    binpb: bytes | Any
 
     @field_validator("binpb", mode="after")
     @classmethod
