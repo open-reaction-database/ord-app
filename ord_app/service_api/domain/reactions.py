@@ -28,11 +28,10 @@ from ord_app.service_api.domain.datasets import load_message, write_message
 from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
-from ord_app.service_api.schemas.reactions import ReactionCreateSchema
+from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionUpdateSchema
 from ord_app.service_api.services.exceptions import (
     EntityNotFoundError,
     ProtobufDecodeError,
-    UniqueViolation,
     psycopg_error_wrapper,
 )
 from ord_app.service_api.services.pb_utils import validate_pb_reaction
@@ -67,6 +66,21 @@ class ReactionsUseCase:
         self.db = db
         self.current_user = current_user
         self.reaction_repo = ReactionsRepository(db)
+
+    @staticmethod
+    def validate(binpb) -> tuple[bool, list[str], list[str] | list]:
+        is_valid = False
+
+        try:
+            errors, warnings = validate_pb_reaction(binpb)
+        except ValueError as err:
+            errors, warnings = [str(err)], []
+
+        if not any((errors, warnings)):
+            is_valid = True
+
+        return is_valid, errors, warnings
+
 
     @psycopg_error_wrapper
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
@@ -149,12 +163,10 @@ class ReactionsUseCase:
     async def get(self, reaction_id):
         return await self.reaction_repo.get(id=reaction_id)
 
-    async def update(self, reaction_id, payload: ReactionCreateSchema):
-        pb_reaction = load_message(payload.binpb, Reaction, "binpb")
-        if await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
-            raise UniqueViolation(f"Reaction with pb_reaction_id={pb_reaction.reaction_id} already exists")
+    async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
+        updating_data = payload.model_dump() | {"pb_reaction_id": payload.binpb.reaction_id}
 
-        if reaction := await self.reaction_repo.update(payload.model_dump(exclude_unset=True), id=reaction_id):
+        if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
             return reaction
 
         raise EntityNotFoundError("Reaction not found")

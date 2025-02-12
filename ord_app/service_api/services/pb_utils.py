@@ -62,7 +62,9 @@ def _adjust_error(error: str) -> str:
     return message.strip()
 
 
-def validate_pb_reaction(reaction: Reaction, raise_on_error=False, require_provenance=False):
+def validate_pb_reaction(
+    reaction: Reaction, raise_on_error=False, require_provenance=False
+) -> tuple[list[str], list[str]]:
     options = ValidationOptions(require_provenance=require_provenance)
     output = validate_message(reaction, raise_on_error=raise_on_error, options=options)
     return list(map(_adjust_error, output.errors)), list(map(_adjust_error, output.warnings))
