@@ -66,21 +66,8 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
-    async def group_dataset_stmt(self, group_id: int, user_id: int):
-        # Base query for datasets
-        stmt = (
-            select(DatasetModel)
-            .join(DatasetGroupAssociationModel, DatasetGroupAssociationModel.dataset_id == DatasetModel.id)
-            .where(DatasetGroupAssociationModel.group_id == group_id)
-            .options(
-                joinedload(DatasetModel.owner),
-                joinedload(DatasetModel.groups),
-                joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
-            )
-            .order_by(DatasetModel.modified_at.desc())
-        )
-        paginated_datasets = await paginate(self.db, stmt)
-
+    async def _modify_paginated_datasets(self, paginated_datasets, user_id):
+        # wip
         # Collect all group IDs from the paginated datasets
         group_ids = {group.id for dataset in paginated_datasets.items for group in dataset.groups}
 
@@ -105,7 +92,25 @@ class DatasetsRepository:
 
         return paginated_datasets
 
-    def user_datasets_stmt(self, user_id):
+    async def group_dataset_stmt(self, group_id: int, user_id: int):
+        # Base query for datasets
+        stmt = (
+            select(DatasetModel)
+            .join(DatasetGroupAssociationModel, DatasetGroupAssociationModel.dataset_id == DatasetModel.id)
+            .where(DatasetGroupAssociationModel.group_id == group_id)
+            .options(
+                joinedload(DatasetModel.owner),
+                joinedload(DatasetModel.groups),
+                joinedload(DatasetModel.reactions).load_only(ReactionModel.id),
+            )
+            .order_by(DatasetModel.modified_at.desc())
+        )
+        paginated_datasets = await paginate(self.db, stmt)
+        paginated_datasets = await self._modify_paginated_datasets(paginated_datasets, user_id)
+
+        return paginated_datasets
+
+    async def user_datasets_stmt(self, user_id):
         stmt = (
             select(DatasetModel)
             .distinct()
@@ -119,7 +124,10 @@ class DatasetsRepository:
             )
             .order_by(DatasetModel.modified_at.desc())
         )
-        return stmt
+        paginated_datasets = await paginate(self.db, stmt)
+        paginated_datasets = await self._modify_paginated_datasets(paginated_datasets, user_id)
+
+        return paginated_datasets
 
     async def update(self, dataset_id: int, payload: dict, autocommit: bool = True):
         stmt = (
