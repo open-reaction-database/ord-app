@@ -33,7 +33,7 @@ export const setActiveGroupIdAction = createAction<number | null>('set_active_gr
 
 export const setEditingGroupIdAction = createAction<number | null>('set_editing_group_id');
 
-export const getGroupMembersActions = createAsyncAction<number, { groupId: number; members: GroupMember[] }>(
+export const getGroupMembersActions = createAsyncAction<number, { groupId: number; members: Array<GroupMember> }>(
   'get_group_members',
 );
 

@@ -26,5 +26,5 @@ export interface AllPages {
 export type Pagination = CurrentPage & AllPages;
 
 export interface Pages<T> extends Pagination {
-  items: T[];
+  items: Array<T>;
 }

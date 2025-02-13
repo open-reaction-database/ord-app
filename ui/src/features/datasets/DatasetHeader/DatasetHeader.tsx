@@ -52,7 +52,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
     dispatch(setDatasetEditOpenedAction(false));
   }, [dispatch]);
 
-  const copyToClipboardOptions: CopyButtonOptions[] = useMemo(
+  const copyToClipboardOptions: Array<CopyButtonOptions> = useMemo(
     () => [
       { label: 'Copy Dataset Link', value: `${domain}${location}` },
       { label: 'Copy Dataset ID', value: dataset.id.toString() },

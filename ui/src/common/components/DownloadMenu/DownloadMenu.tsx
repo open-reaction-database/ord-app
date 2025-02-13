@@ -22,7 +22,7 @@ import classes from './DownloadMenu.module.scss';
 import type { DownloadMenuOptions } from 'common/types/downloadMenuOptions';
 
 interface DownloadMenuProps {
-  options: DownloadMenuOptions[];
+  options: Array<DownloadMenuOptions>;
   url: string;
   target: JSX.Element;
 }

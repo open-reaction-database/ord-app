@@ -26,7 +26,7 @@ interface Permission {
   category: 'Group' | 'Dataset';
 }
 
-const permissionsList: Permission[] = [
+const permissionsList: Array<Permission> = [
   { feature: 'Read Group', admin: true, editor: true, viewer: true, category: 'Group' },
   { feature: 'Rename Group', admin: true, editor: false, viewer: false, category: 'Group' },
   { feature: 'Manage Users', admin: true, editor: false, viewer: false, category: 'Group' },

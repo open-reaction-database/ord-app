@@ -87,7 +87,7 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
   );
 });
 
-const reactionsOrder = createReducer<number[]>([], builder => {
+const reactionsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(getReactionsListActions.request, () => []);
   builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>

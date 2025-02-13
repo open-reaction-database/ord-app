@@ -18,7 +18,7 @@ import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { formatDate } from 'common/utils';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 
-export const columns: MRT_ColumnDef<Dataset>[] = [
+export const columns: Array<MRT_ColumnDef<Dataset>> = [
   {
     id: 'datasetName',
     accessorKey: 'name',

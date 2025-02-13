@@ -79,7 +79,7 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
   );
 });
 
-const datasetsOrder = createReducer<number[]>([], builder => {
+const datasetsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(setActiveGroupIdAction, () => []);
   builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>

@@ -16,11 +16,11 @@
 import { Button, Flex, Modal, Textarea, TextInput } from '@mantine/core';
 import { useForm, yupResolver } from '@mantine/form';
 import { useSelector } from 'react-redux';
-import { selectDatasetById } from '../../../../store/entities/datasets/datasets.selectors.ts';
+import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { type EditDatasetFormValues, editDatasetSchema } from './editDataset.schema.ts';
 import { useCallback } from 'react';
-import { useAppDispatch } from '../../../../store/useAppDispatch.ts';
-import { updateDataset } from '../../../../store/entities/datasets/datasets.thunks.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { updateDataset } from 'store/entities/datasets/datasets.thunks.ts';
 
 interface EditDatasetProps {
   datasetId: number;

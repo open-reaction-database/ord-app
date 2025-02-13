@@ -59,6 +59,7 @@ export default tseslint.config(
         'error',
         { ignoreRestSiblings: true, varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
       ],
+      '@typescript-eslint/array-type': ['error', { default: 'generic' }],
     },
     settings: {
       'import/resolver': {
