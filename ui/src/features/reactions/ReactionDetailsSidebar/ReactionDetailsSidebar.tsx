@@ -106,7 +106,7 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
   }, [areSidebarFormsDirty, currentPath, onFormClose, openCloseConfirmation]);
 
   const onActualSidebarClose = useMemo(() => {
-    return Object.values(areSidebarFormsDirty).every(item => item) ? openCloseAllConfirmation : onSidebarClose;
+    return Object.values(areSidebarFormsDirty).some(item => item) ? openCloseAllConfirmation : onSidebarClose;
   }, [areSidebarFormsDirty, onSidebarClose, openCloseAllConfirmation]);
 
   const onSetFormDirty = useCallback(
