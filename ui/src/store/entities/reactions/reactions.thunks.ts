@@ -35,18 +35,11 @@ import { type Action, type ThunkDispatch } from '@reduxjs/toolkit';
 import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
-import {
-  appInputsToOrdInputs,
-  ordInputsToAppInputs,
-} from '../../../common/utils/reactionForm/reactionInputsConverter.ts';
+import { ordReactionToReaction, reactionToOrdReaction } from './reactions.converters.ts';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
-  const { inputs, ...persistentReactionData }: ord.IReaction = ord.Reaction.toObject(parsedProtobuf);
-  const appReaction = {
-    ...persistentReactionData,
-    inputs: ordInputsToAppInputs(inputs),
-  };
+  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
 
   return {
     ...rest,
@@ -127,11 +120,7 @@ export const importReactionFromFile = createThunkWithExplicitResult(
 async function updateReaction(reactionId: number, getState: () => AppState): Promise<void> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
-  const { inputs, ...persistentData } = reaction.data;
-  const ordReaction = {
-    ...persistentData,
-    inputs: appInputsToOrdInputs(inputs),
-  };
+  const ordReaction = reactionToOrdReaction(reaction.data);
   const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
   await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
     binpb: payload,

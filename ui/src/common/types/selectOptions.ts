@@ -18,4 +18,4 @@ export interface SelectOption<T> {
   value: T;
 }
 
-export type SelectOptions<T> = SelectOption<T>[];
+export type SelectOptions<T> = Array<SelectOption<T>>;

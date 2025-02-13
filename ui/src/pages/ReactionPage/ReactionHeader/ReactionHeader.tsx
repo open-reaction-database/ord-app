@@ -25,8 +25,9 @@ import { domain, fileDownloadOptions } from 'common/constants.ts';
 import classes from './reactionHeader.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { InputModal } from '../../../common/components/InputModal/InputModal.tsx';
-import { renameReaction } from '../../../store/entities/reactions/reactions.thunks.ts';
+import { InputModal } from 'common/components/InputModal/InputModal.tsx';
+import { renameReaction } from 'store/entities/reactions/reactions.thunks.ts';
+import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 
 interface ReactionHeaderProps {
   datasetId: number;
@@ -117,6 +118,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             <Button>Save</Button>
           </Flex>
         </Flex>
+        <ReactionPreview reaction={reaction} />
       </Flex>
       <InputModal
         opened={opened}

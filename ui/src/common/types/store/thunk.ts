@@ -15,7 +15,7 @@
  */
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import type { AnyAsyncAction } from './actions.ts';
-import type { AppState } from '../../../store/configureAppStore.ts';
+import type { AppState } from 'store/configureAppStore.ts';
 
 export type AppThunk<T extends AnyAsyncAction> = ThunkAction<
   Promise<ReturnType<T['success']>> | Promise<ReturnType<T['failure']>>,

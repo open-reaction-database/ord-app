@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormSelect } from 'common/types/reaction/reactionFields';
+import {
+  ReactionFormNodeType,
+  type ReactionFormSelect,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
 const booleanOptions = [
   { label: 'UNSPECIFIED', value: undefined },

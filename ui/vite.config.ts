@@ -21,10 +21,19 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), svgr(), tsconfigPaths()],
+  // Because ketcher needs asserts which requires super outdated package util
+  define: {
+    'process.env': {},
+  },
   test: {
     globals: true,
   },
   preview: {
     port: 5173,
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
   },
 });

@@ -36,7 +36,7 @@ export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => 
 });
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
-  const groups = (await axiosInstance.get<Group[]>(`/groups`)).data;
+  const groups = (await axiosInstance.get<Array<Group>>(`/groups`)).data;
   return getGroupListActions.success(groups);
 });
 
@@ -55,7 +55,7 @@ export const updateGroup = createThunk(updateGroupActions, async (_d, _g, update
 });
 
 export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g, groupId) => {
-  const members = (await axiosInstance.get<GroupMember[]>(`/groups/${groupId}/members`)).data;
+  const members = (await axiosInstance.get<Array<GroupMember>>(`/groups/${groupId}/members`)).data;
   return getGroupMembersActions.success({ groupId, members });
 });
 

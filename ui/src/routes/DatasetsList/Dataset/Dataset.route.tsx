@@ -16,10 +16,10 @@
 import { Route, Switch, useParams } from 'wouter';
 import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
 import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
-import { useAppDispatch } from '../../../store/useAppDispatch.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect } from 'react';
-import { getDataset } from '../../../store/entities/datasets/datasets.thunks.ts';
-import { getReactionsList } from '../../../store/entities/reactions/reactions.thunks.ts';
+import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
+import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 
 export function DatasetRoute() {
   const dispatch = useAppDispatch();

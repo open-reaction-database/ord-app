@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
@@ -57,7 +57,7 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
     if (typeof currentPathComponent === 'number') {
       return reactionPart.slice(0, currentPathComponent).concat(reactionPart.slice(currentPathComponent + 1));
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { [currentPathComponent]: _, ...value } = reactionPart;
     return value;
   } else {

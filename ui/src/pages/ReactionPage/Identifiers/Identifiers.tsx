@@ -23,8 +23,8 @@ import { ord } from 'ord-schema-protobufjs';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { deleteReactionField, addUpdateReactionField } from '../../../store/entities/reactions/reactions.thunks.ts';
-import type { ReactionPathComponents } from '../../../common/types/reaction/reactionPathComponents.ts';
+import { deleteReactionField, addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 const entries = Object.entries(ord.ReactionIdentifier.ReactionIdentifierType) as Array<[string, number]>;
 

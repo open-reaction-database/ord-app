@@ -47,7 +47,7 @@ export function GroupsSidebar() {
           align="center"
           justify="space-between"
         >
-          <Title order={3}>My Groups</Title>
+          <Title order={4}>My Groups</Title>
           <Button
             className={classes.addGroupButton}
             variant="transparent"

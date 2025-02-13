@@ -20,6 +20,7 @@ import classes from './DataTable.module.scss';
 export function DataTable<T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableOptions<T>) {
   const table = useMantineReactTable<T>({
     columns,
+    layoutMode: 'grid',
     data: data,
     enableColumnActions: false,
     enableTopToolbar: false,
@@ -28,6 +29,7 @@ export function DataTable<T extends MRT_RowData>({ columns, data, ...rest }: MRT
     enableStickyHeader: true,
     mantinePaperProps: {
       className: classes.paper,
+      withBorder: false,
       ...rest.mantinePaperProps,
     },
     mantineTableContainerProps: {

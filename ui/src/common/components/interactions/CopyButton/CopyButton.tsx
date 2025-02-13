@@ -19,7 +19,7 @@ import { copyToClipboard } from 'common/utils/copyToClipboard.ts';
 import classes from './copyButton.module.scss';
 
 interface CopyButtonProps {
-  options: CopyButtonOptions[];
+  options: Array<CopyButtonOptions>;
 }
 
 export interface CopyButtonOptions {

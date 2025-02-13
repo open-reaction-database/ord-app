@@ -25,3 +25,5 @@ export const addReactionPathComponentToList = createAction<ReactionPathComponent
 export const popReactionPathComponents = createAction<void>('pop_from_list');
 
 export const clearReactionPathComponentsList = createAction<void>('clear_list');
+
+export const sliceReactionPathComponentsList = createAction<number>('slice_list');

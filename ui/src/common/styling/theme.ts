@@ -42,10 +42,14 @@ export const theme = createTheme({
         lineHeight: '1.34',
       },
       h3: {
-        fontSize: '0.875rem',
+        fontSize: '1rem',
         lineHeight: '1.5',
       },
       h4: {
+        fontSize: '0.875rem',
+        lineHeight: '1.5',
+      },
+      h5: {
         fontSize: '0.75rem',
         lineHeight: '1.34',
       },
@@ -72,10 +76,8 @@ export const theme = createTheme({
   },
   components: {
     Paper: {
-      styles: {
-        root: {
-          border: '1px solid var(--color-border-1)',
-        },
+      defaultProps: {
+        withBorder: true,
       },
     },
     Modal: {
@@ -92,6 +94,7 @@ export const theme = createTheme({
         inputWrapperOrder: ['label', 'input', 'description', 'error'],
       },
       styles: {
+        root: {},
         label: {
           color: 'var(--color-text-secondary-2)',
           paddingBottom: '8px',
@@ -108,5 +111,23 @@ export const theme = createTheme({
         },
       },
     },
+    // Almost impossible to properly customize, need to rewrite from scratch
+    /*SegmentedControl: {
+      styles: {
+        root: {
+          backgroundColor: 'white',
+          border: '1px solid #D2D6DB',
+          borderRadius: 8,
+          padding: 0,
+        },
+        control: {
+          padding: 0,
+        },
+        indicator: {
+          backgroundColor: '#F8F8F8',
+          height: 32,
+        },
+      },
+    },*/
   },
 });

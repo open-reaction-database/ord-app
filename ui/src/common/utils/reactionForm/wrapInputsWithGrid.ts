@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from 'common/types/reaction/reactionFields';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
 export function wrapInputsWithGrid(...inputs: Array<ReactionFormNode>): ReactionFormNode {
   const inputsAmount = inputs.length;

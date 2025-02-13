@@ -15,7 +15,7 @@
  */
 import type { ItemsById } from 'common/types';
 
-export function itemsById<T>(items: T[], getId: (item: T) => string | number): ItemsById<T> {
+export function itemsById<T>(items: Array<T>, getId: (item: T) => string | number): ItemsById<T> {
   return items.reduce(
     (acc, item) => ({
       ...acc,

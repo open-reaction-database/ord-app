@@ -15,6 +15,7 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -26,12 +27,8 @@ export interface ReactionMolBlocks {
   inputs: Record<string, Array<string>>;
 }
 
-export interface AppReactionInput extends ord.IReactionInput {
-  name: string;
-}
-
 export interface AppReaction extends Omit<ord.IReaction, 'inputs'> {
-  inputs: Array<AppReactionInput>;
+  inputs: Record<string, AppReactionInput>;
 }
 
 export interface ReactionResponse {

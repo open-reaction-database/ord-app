@@ -28,7 +28,7 @@ export const domain = window.location.origin;
 
 export const emptyPagination: Pagination = { page: 1, size: 10, total: 0, pages: 0 };
 
-export const fileDownloadOptions: DownloadMenuOptions[] = [
+export const fileDownloadOptions: Array<DownloadMenuOptions> = [
   { label: '.binpb', format: 'binpb' },
   { label: '.txtpb', format: 'txtpb' },
   { label: '.json', format: 'json' },

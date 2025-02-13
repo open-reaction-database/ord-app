@@ -21,7 +21,7 @@ export interface Group {
   name: string;
   created_at: string;
   modified_at: string;
-  members?: GroupMember[];
+  members?: Array<GroupMember>;
 }
 
 export interface GroupMember {
