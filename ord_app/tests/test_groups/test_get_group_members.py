@@ -13,10 +13,21 @@
 # limitations under the License.
 
 
-async def test_get_group_members(api_client, mock_authenticated_user):
+async def test_list_current_user_groups(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
 
-    response_data = api_client.get(f"/api/v1/groups/{group.id}/members").raise_for_status().json()[0]
+    response_data = api_client.get("/api/v1/groups").raise_for_status().json()[0]
 
-    assert response_data["user"]["id"] == user.id
+    assert response_data["id"] == group.id
+    assert response_data["name"] == group.name
+    assert response_data["role"] == "admin"
+
+
+async def test_get_group(api_client, mock_authenticated_user):
+    user, _, group = mock_authenticated_user
+
+    response_data = api_client.get(f"/api/v1/groups/{group.id}").raise_for_status().json()
+
+    assert response_data["id"] == group.id
+    assert response_data["name"] == group.name
     assert response_data["role"] == "admin"

@@ -31,6 +31,10 @@ class DatasetSchema(BaseSchema):
     owner: UserSchema
 
 
+class DatasetSharableSchema(DatasetSchema):
+    is_sharable: bool
+
+
 class DatasetUserGroupSchema(BaseSchema):
     id: int
     name: str
@@ -52,3 +56,12 @@ class DatasetWithReactionCountSchema(DatasetSchema):
 class DatasetCreateSchema(BaseSchema):
     name: str | None = ""
     description: str | None = ""
+
+
+class DatasetShareSchema(BaseSchema):
+    group_id: int
+    dataset_id: int
+
+
+class DatasetShareCreateSchema(BaseSchema):
+    secondary_group_id: int

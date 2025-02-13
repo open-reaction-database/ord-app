@@ -126,6 +126,9 @@ class DatasetGroupAssociationModel(BaseModel):
         overlaps="groups,datasets"
     )
 
+    # This flag indicates that this is the main group and that related dataset can be shared with another group.
+    is_primary: Mapped[bool] = mapped_column(default=True)
+
 
 class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)

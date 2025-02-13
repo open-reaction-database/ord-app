@@ -13,9 +13,9 @@
 # limitations under the License.
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
-from sqlalchemy import delete, select, update
+from sqlalchemy import and_, delete, exists, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, with_loader_criteria
 
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
@@ -53,6 +53,64 @@ class DatasetsRepository:
             select(DatasetModel)
             .where(DatasetModel.id == dataset_id)
             .options(joinedload(DatasetModel.owner))
+            .limit(1)
+        )
+        return await self.db.scalar(stmt)
+
+    async def get_with_sharable_info(self, dataset_id: int, user_id: int) -> DatasetModel:
+        # Subquery to check that a group has a membership record with the specified user_id.
+        user_group_exists = exists(
+            select(1)
+            .where(
+                and_(
+                    UserGroupsMembershipModel.group_id == GroupModel.id,
+                    UserGroupsMembershipModel.user_id == user_id
+                )
+            )
+            .correlate(GroupModel)  # Explicitly correlate with GroupModel for correct scoping
+        )
+
+        # Subquery to check that there is an association for the given dataset in the group
+        # where the 'is_primary' flag is True.
+        dataset_assoc_exists = exists(
+            select(1)
+            .where(
+                and_(
+                    DatasetGroupAssociationModel.group_id == GroupModel.id,
+                    DatasetGroupAssociationModel.dataset_id == dataset_id,
+                    DatasetGroupAssociationModel.is_primary.is_(True)
+                )
+            )
+            .correlate(GroupModel)  # Correlate with GroupModel to ensure proper linkage
+        )
+
+        stmt = (
+            select(DatasetModel)
+            .where(DatasetModel.id == dataset_id)
+            .options(
+                # Eager-load related owner, associations, and groups.
+                joinedload(DatasetModel.owner),
+                joinedload(DatasetModel.dataset_group_associations),
+                joinedload(DatasetModel.groups),
+                # Apply loader criteria to filter associations: only include those with is_primary True.
+                with_loader_criteria(
+                    DatasetGroupAssociationModel,
+                    DatasetGroupAssociationModel.is_primary.is_(True),
+                    include_aliases=True
+                ),
+                # Apply loader criteria to filter groups:
+                # Only include groups where both conditions are met:
+                #   1. The group has a membership record with the specified user_id.
+                #   2. The group is associated with the dataset with is_primary True.
+                with_loader_criteria(
+                    GroupModel,
+                    and_(
+                        user_group_exists,
+                        dataset_assoc_exists
+                    ),
+                    include_aliases=True
+                )
+            )
             .limit(1)
         )
         return await self.db.scalar(stmt)
@@ -134,17 +192,45 @@ class DatasetsRepository:
             update(DatasetModel)
             .where(DatasetModel.id == dataset_id)
             .values(**payload)
-            .returning(DatasetModel)
         )
 
         if autocommit:
-            dataset = await self.db.scalar(stmt)
+            await self.db.execute(stmt)
             await self.db.commit()
-            logger.debug(f"{dataset} updated with payload: {payload}")
-            return dataset
+            logger.debug(f"{dataset_id} updated with payload: {payload}")
 
     async def delete(self, dataset_id: int):
         stmt = delete(DatasetModel).where(DatasetModel.id == dataset_id)
         await self.db.execute(stmt)
         await self.db.commit()
         logger.debug(f"<Dataset(id={dataset_id})> deleted")
+
+    async def get_dataset_group_association(self, group_id, dataset_id: int):
+        dataset_group_association_stmt = (
+            select(DatasetGroupAssociationModel)
+            .where(
+                DatasetGroupAssociationModel.group_id == group_id,
+                DatasetGroupAssociationModel.dataset_id == dataset_id,
+                DatasetGroupAssociationModel.is_primary.is_(True)
+            )
+        )
+        return await self.db.scalar(dataset_group_association_stmt)
+
+    async def share_dataset(self, primary_dataset_id: int, secondary_group_id: int):
+        dataset_group_association = DatasetGroupAssociationModel(
+            dataset_id=primary_dataset_id,
+            group_id=secondary_group_id,
+            is_primary=False
+        )
+        self.db.add(dataset_group_association)
+        await self.db.commit()
+        await self.db.refresh(dataset_group_association)
+        return dataset_group_association
+
+    async def unshare_dataset(self, primary_dataset_id: int, secondary_group_id: int):
+        stmt = delete(DatasetGroupAssociationModel).where(
+            DatasetGroupAssociationModel.dataset_id == primary_dataset_id,
+            DatasetGroupAssociationModel.group_id == secondary_group_id
+        )
+        await self.db.execute(stmt)
+        await self.db.commit()
