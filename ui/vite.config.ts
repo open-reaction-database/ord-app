@@ -31,4 +31,9 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 });
