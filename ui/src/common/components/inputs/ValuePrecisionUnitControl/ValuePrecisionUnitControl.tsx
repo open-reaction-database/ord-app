@@ -21,13 +21,14 @@ import { AppSegmentedControl } from '../AppSegmentedControl/AppSegmentedControl'
 import classes from './valuePrecisionUnitControl.module.scss';
 import { useUncontrolled } from '@mantine/hooks';
 import { AppNativeSelect } from '../AppNativeSelect/AppNativeSelect';
+import type { ReactNode } from 'react';
 
 interface ValuePrecisionUnitControlProps {
   value?: ValuePrecisionUnit;
   defaultValue?: ValuePrecisionUnit;
-  label?: string;
+  label?: ReactNode;
   onChange: (value: ValuePrecisionUnit) => void;
-  options: Array<SelectOption<number>>;
+  options: Array<SelectOption<number | string>>;
   useNativeSelect?: boolean;
 }
 
@@ -50,7 +51,7 @@ export function ValuePrecisionUnitControl({
     uncontrolledOnChange({ ...previousValue, [name]: newValue });
   };
 
-  const unitOnChange = handleChange.bind(null, 'unit');
+  const unitOnChange = handleChange.bind(null, 'units');
 
   return (
     <Input.Wrapper label={label}>
@@ -70,13 +71,13 @@ export function ValuePrecisionUnitControl({
         </InputGroup>
         {useNativeSelect ? (
           <AppNativeSelect
-            value={uncontrolledValue?.unit}
+            value={uncontrolledValue?.units}
             options={options}
             onChange={unitOnChange}
           />
         ) : (
           <AppSegmentedControl
-            value={uncontrolledValue?.unit}
+            value={uncontrolledValue?.units}
             options={options}
             onChange={unitOnChange}
             fullWidth

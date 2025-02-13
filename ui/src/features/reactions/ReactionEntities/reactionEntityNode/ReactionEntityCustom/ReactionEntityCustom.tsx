@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1;
-}
+import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
+import type { ReactionFormCustom } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-.actions {
-  border-top: 1px solid #e8ebed;
-  position: sticky;
-  margin: 0 calc(-1 * var(--mantine-spacing-md));
-  padding: var(--mantine-spacing-md);
+export function ReactionEntityCustom({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormCustom>>) {
+  const { Component } = node;
+  return (
+    <Component
+      name={node.name}
+      useSelectData={node.useSelectData}
+      formMethods={formMethods}
+    />
+  );
 }

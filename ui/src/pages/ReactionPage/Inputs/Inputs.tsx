@@ -19,14 +19,14 @@ import { AddCircleIcon, EditIcon, NoData, RemoveIcon } from 'common/icons';
 import classes from './inputs.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { ReactionSectionProps } from '../reactionPage.types.ts';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactions.types.ts';
-import { ord } from 'ord-schema-protobufjs';
 import { addUpdateReactionField, deleteReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
 
 function findValidInputName(inputs: Array<AppReactionInput>): string {
   let counter = 1;
@@ -42,28 +42,26 @@ function findValidInputName(inputs: Array<AppReactionInput>): string {
 
 export function Inputs({ reactionId }: ReactionSectionProps) {
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
-  const inputs = reaction.data.inputs || [];
+  const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
 
   const onCreateNew = useCallback(() => {
     const newInputName = findValidInputName(inputs);
-    const newOrdReaction = ord.ReactionInput.toObject(new ord.ReactionInput());
-    const appReaction = { ...newOrdReaction, name: newInputName };
-    const pathComponents = ['inputs', inputs.length];
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: pathComponents, newValue: appReaction }));
+    const appReactionInput = createEmptyReactionInput(newInputName);
+    const pathComponents = ['inputs', appReactionInput.id];
+    dispatch(addUpdateReactionField({ reactionId, pathComponents: pathComponents, newValue: appReactionInput }));
     dispatch(setReactionPathComponentsList([pathComponents]));
   }, [dispatch, reactionId, inputs]);
 
   const onDeleteInput = useCallback(
-    (index: number) => {
-      dispatch(deleteReactionField({ reactionId, pathComponents: ['inputs', index] }));
+    (id: string) => {
+      dispatch(deleteReactionField({ reactionId, pathComponents: ['inputs', id] }));
     },
     [dispatch, reactionId],
   );
 
   const onEditInput = useCallback(
-    (index: number) => {
-      dispatch(setReactionPathComponentsList([['inputs', index]]));
+    (id: string) => {
+      dispatch(setReactionPathComponentsList([['inputs', id]]));
     },
     [dispatch],
   );
@@ -88,19 +86,19 @@ export function Inputs({ reactionId }: ReactionSectionProps) {
       <span>Reaction inputs include every chemical added to the reaction vessel</span>
       {inputs.length > 0 ? (
         <div>
-          {inputs.map((input, index) => (
-            <div key={input.name}>
+          {inputs.map(input => (
+            <div key={input.id}>
               <span>{input.name}</span>
               <ActionIcon
                 variant="white"
-                onClick={() => onEditInput(index)}
+                onClick={() => onEditInput(input.id)}
               >
                 <EditIcon />
               </ActionIcon>
               <ActionIcon
                 variant="white"
                 color="red"
-                onClick={() => onDeleteInput(index)}
+                onClick={() => onDeleteInput(input.id)}
               >
                 <RemoveIcon />
               </ActionIcon>

@@ -20,6 +20,8 @@ import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionInputPreview, ReactionProductPreview } from './reactionPreview.types.ts';
 import classes from './reactionPreview.module.scss';
 import { Flex } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 
 interface ReactionPreviewProps {
   reaction: ReactionWrapper;
@@ -27,10 +29,12 @@ interface ReactionPreviewProps {
 
 function ReactionProduct({ svg }: Readonly<ReactionProductPreview>) {
   return (
-    <div
-      className={classes.molecule}
-      dangerouslySetInnerHTML={{ __html: svg ?? '' }}
-    />
+    svg && (
+      <img
+        src={`data:image/svg+xml;base64,${svg}`}
+        className={classes.molecule}
+      />
+    )
   );
 }
 
@@ -39,21 +43,25 @@ function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
     <div className={classes.inputCard}>
       <span>{name}</span>
       <Flex gap="sm">
-        {components.map(({ svg }, index) => (
-          <div
-            key={index}
-            className={classes.molecule}
-            dangerouslySetInnerHTML={{ __html: svg ?? '' }}
-          />
-        ))}
+        {components.map(({ svg }, index) =>
+          svg ? (
+            <img
+              src={`data:image/svg+xml;base64,${svg}`}
+              key={index}
+              className={classes.molecule}
+            />
+          ) : null,
+        )}
       </Flex>
     </div>
   );
 }
 
 export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
-  const inputs: Array<ReactionInputPreview> = useMemo(() => {
-    return reaction.data.inputs.map(
+  const inputs = useSelector(selectOrderedInputsWrapper(reaction.id));
+
+  const inputsPreview: Array<ReactionInputPreview> = useMemo(() => {
+    return inputs.map(
       (input): ReactionInputPreview => ({
         name: input.name,
         components: (input.components || []).map((component, index) => ({
@@ -62,7 +70,7 @@ export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
         })),
       }),
     );
-  }, [reaction.data.inputs, reaction.molblocks.inputs]);
+  }, [inputs, reaction.molblocks.inputs]);
 
   const products = useMemo(() => {
     return reaction.molblocks.products.map(
@@ -75,7 +83,7 @@ export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
 
   return (
     <div className={classes.wrapper}>
-      {inputs.map((molecule, index) => (
+      {inputsPreview.map((molecule, index) => (
         <Fragment key={molecule.name}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
           <ReactionInput

@@ -38,7 +38,7 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
     <div>
       <Title
         className={typographyClasses.secondary2}
-        order={3}
+        order={4}
       >
         {title}:
       </Title>

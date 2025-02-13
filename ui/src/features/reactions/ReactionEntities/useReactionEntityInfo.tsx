@@ -13,41 +13,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from '../../features/reactions/ReactionDetailsSidebar/reactionEntities/reactionEntityToForm.models.ts';
-import { type ReactNode, useMemo } from 'react';
-import { Title } from '@mantine/core';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
+import { ReactionEntity } from 'features/reactions/ReactionEntities/index.ts';
+import { type FC } from 'react';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionEntityTitleProps } from './ReactionEntityTitle/reactionEntityTitle.types.ts';
+import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/ReactionEntityTitle/ReactionEntityTitle.tsx';
 
 export interface ReactionSidebarInfo {
-  pathComponents: Array<string>;
+  pathComponents: ReactionPathComponents;
   entityName: ReactionEntity;
-  sidebarTitle: ReactNode;
+  label: string;
+  sidebarTitle: FC<ReactionEntityTitleProps>;
 }
 
 const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
-  { pathComponents: ['notes'], entityName: ReactionEntity.Notes, sidebarTitle: <Title order={2}>Notes</Title> },
-  { pathComponents: ['inputs'], entityName: ReactionEntity.Inputs, sidebarTitle: <Title order={2}>Input</Title> },
+  {
+    pathComponents: ['notes'],
+    entityName: ReactionEntity.Notes,
+    label: 'Notes',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Notes', hasDelete: false }),
+  },
+  {
+    pathComponents: ['inputs'],
+    entityName: ReactionEntity.Inputs,
+    label: 'Input',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Input',
+      hasDelete: true,
+      description: 'Reaction inputs include every chemical added to the reaction vessel',
+    }),
+  },
+  {
+    pathComponents: ['components'],
+    entityName: ReactionEntity.Components,
+    label: 'Component',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: false }),
+  },
   {
     pathComponents: ['identifiers'],
     entityName: ReactionEntity.Identifiers,
-    sidebarTitle: (
-      <>
-        <Title order={2}>Identifier</Title>
-        <p>Reaction identifiers define descriptions of the overall reaction</p>
-      </>
-    ),
+    label: 'Identifier',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Identifier',
+      hasDelete: false,
+      description: 'Reaction identifiers define descriptions of the overall reaction',
+    }),
   },
+];
+
+const allowedEntityNames: Array<string> = [
+  ReactionEntity.Notes,
+  ReactionEntity.Inputs,
+  ReactionEntity.Components,
+  ReactionEntity.Identifiers,
 ];
 
 function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {
   const [entity, ...rest] = pathComponents;
-  if (typeof entity === 'number') {
+  if (typeof entity === 'number' || !allowedEntityNames.includes(entity)) {
     return getEntityPathComponent(rest);
   }
   return [rest, entity];
 }
 
-function getSidebarInfo(
+export function getSidebarInfo(
   pathComponents: ReactionPathComponents,
   index: number = 0,
   sidebarInfoCandidates: Array<ReactionSidebarInfo> = reactionSidebarInfo,
@@ -62,16 +91,4 @@ function getSidebarInfo(
     throw new Error('Invalid path');
   }
   return getSidebarInfo(updatedPathComponents, index + 1, filteredSidebarInfoCandidates);
-}
-
-export function useSidebarInfo(pathComponents: undefined): null;
-export function useSidebarInfo(pathComponents: ReactionPathComponents): ReactionSidebarInfo;
-
-export function useSidebarInfo(pathComponents?: ReactionPathComponents): ReactionSidebarInfo | null {
-  return useMemo(() => {
-    if (!pathComponents) {
-      return null;
-    }
-    return getSidebarInfo(pathComponents);
-  }, [pathComponents]);
 }

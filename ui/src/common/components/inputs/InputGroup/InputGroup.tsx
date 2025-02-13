@@ -25,6 +25,7 @@ export function InputGroup({ children, ...props }: Readonly<InputGroupProps>) {
   return (
     <Group
       className={classes.root}
+      grow
       gap={0}
       {...props}
     >

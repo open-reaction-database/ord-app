@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
+import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
 export type RenderedSvg = string | null;
 
 export interface ReactionComponentPreview {
-  component: ord.ICompound;
+  component: AppReactionCompound;
   svg: RenderedSvg;
 }
 

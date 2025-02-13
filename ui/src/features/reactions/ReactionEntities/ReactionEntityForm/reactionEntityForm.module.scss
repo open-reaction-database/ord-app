@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionFormNode } from 'common/types/reaction/reactionFields.ts';
-import { reactionInputs } from './reactionInputs.model.ts';
-import { reactionNotes } from './reactionNotes.model.ts';
-import { reactionIdentifiers } from './reactionIdentifiers.ts';
-
-export enum ReactionEntity {
-  Inputs = 'inputs',
-  Notes = 'notes',
-  Identifiers = 'identifiers',
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
 }
 
-export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
-  [ReactionEntity.Inputs]: reactionInputs,
-  [ReactionEntity.Notes]: reactionNotes,
-  [ReactionEntity.Identifiers]: reactionIdentifiers,
-};
+.content {
+  padding: 0 var(--mantine-spacing-md);
+}
+
+.actions {
+  border-top: 1px solid #e8ebed;
+  position: sticky;
+  padding: var(--mantine-spacing-md);
+}

@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionEntity } from 'features/reactions/ReactionDetailsSidebar/reactionEntities/reactionEntityToForm.models.ts';
+import type {
+  ReactionFormMethods,
+  ReactionFormNode,
+  ReactionFormNodeType,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import type { FC } from 'react';
 
-interface ProtobufEntity {
-  toObject(): object;
+export interface ReactionEntityNodeProps<T extends ReactionFormNode = ReactionFormNode> {
+  node: T;
+  formMethods: ReactionFormMethods;
 }
 
-interface ProtobufEntityConstructor {
-  new (): ProtobufEntity;
-}
-
-export interface SidebarFormConfiguration {
-  constructor: ProtobufEntityConstructor;
-  schemaPath: Array<string>;
-  entity: ReactionEntity;
-  name: string;
-}
+export type ReactionNodeToComponent = Record<ReactionFormNodeType, FC<ReactionEntityNodeProps>>;

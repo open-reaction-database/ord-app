@@ -25,14 +25,7 @@ interface ConfirmPopoverProps extends PopoverProps {
   onCancel: () => void;
 }
 
-export default function ConfirmPopover({
-  target,
-  title,
-  text,
-  onConfirm,
-  onCancel,
-  ...rest
-}: Readonly<ConfirmPopoverProps>) {
+export function ConfirmPopover({ target, title, text, onConfirm, onCancel, ...rest }: Readonly<ConfirmPopoverProps>) {
   return (
     <Popover
       classNames={{

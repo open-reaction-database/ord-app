@@ -19,6 +19,7 @@ import {
   clearReactionPathComponentsList,
   popReactionPathComponents,
   setReactionPathComponentsList,
+  sliceReactionPathComponentsList,
 } from './reactionForm.actions.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
@@ -26,8 +27,9 @@ const defaultReactionPathComponentsList: Array<ReactionPathComponents> = [];
 
 const reactionPathComponentsList = createReducer(defaultReactionPathComponentsList, builder => {
   builder.addCase(setReactionPathComponentsList, (_, action) => action.payload);
-  builder.addCase(addReactionPathComponentToList, (state, action) => state.concat(action.payload));
+  builder.addCase(addReactionPathComponentToList, (state, action) => state.concat([action.payload]));
   builder.addCase(popReactionPathComponents, state => state.slice(0, state.length - 1));
+  builder.addCase(sliceReactionPathComponentsList, (state, action) => state.slice(0, action.payload + 1));
   builder.addCase(clearReactionPathComponentsList, () => defaultReactionPathComponentsList);
 });
 

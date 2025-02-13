@@ -28,8 +28,8 @@ import type { ReactionSectionProps } from './reactionPage.types.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { Notes } from './Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import type { Breadcrumbs } from '../../common/types/breadcrumbs.ts';
-import { selectDatasetById } from '../../store/entities/datasets/datasets.selectors.ts';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from './Identifiers/Identifiers.tsx';
 
 interface ReactionTab {

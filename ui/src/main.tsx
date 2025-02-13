@@ -17,4 +17,8 @@ import { createRoot } from 'react-dom/client';
 import './index.scss';
 import { AppRoot } from './core/AppRoot.tsx';
 
+// Because ketcher depends on draft-js which requires setImmediate package
+// https://github.com/yuzujs/setImmediate
+window.global ||= window;
+
 createRoot(document.getElementById('root')!).render(<AppRoot />);

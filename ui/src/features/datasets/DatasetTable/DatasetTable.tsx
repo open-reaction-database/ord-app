@@ -27,6 +27,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback } from 'react';
 import { getDatasetsPage } from 'store/entities/datasets/datasets.thunks.ts';
 import { useLocation } from 'wouter';
+import { Paper } from '@mantine/core';
 
 export function DatasetTable() {
   const dispatch = useAppDispatch();
@@ -50,7 +51,7 @@ export function DatasetTable() {
   );
 
   return (
-    <div className={classes.tableContainer}>
+    <Paper className={classes.tableContainer}>
       <DataTable
         columns={columns}
         data={datasets}
@@ -76,6 +77,6 @@ export function DatasetTable() {
           totalPages={pagination.pages}
         />
       )}
-    </div>
+    </Paper>
   );
 }

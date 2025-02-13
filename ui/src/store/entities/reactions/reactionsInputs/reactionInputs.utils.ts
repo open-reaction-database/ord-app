@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { AppReaction } from 'store/entities/reactions/reactions.types';
+import type { AppReactionInput } from './reactionInputs.types.ts';
+import { ord } from 'ord-schema-protobufjs';
+import { ordInputToReactionsInput } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 
-export const ordInputsToAppInputs = (inputs: ord.IReaction['inputs']): AppReaction['inputs'] =>
-  !inputs
-    ? []
-    : Object.entries(inputs).map(([key, value]) => ({
-        ...value,
-        name: key,
-      }));
-
-export const appInputsToOrdInputs = (inputs: AppReaction['inputs']): ord.IReaction['inputs'] =>
-  inputs.reduce(
-    (acc, { name, ...item }) => ({
-      ...acc,
-      [name]: item,
-    }),
-    {},
-  );
+export function createEmptyReactionInput(name: string): AppReactionInput {
+  return ordInputToReactionsInput(ord.ReactionInput.toObject(new ord.ReactionInput()), name);
+}

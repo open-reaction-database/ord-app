@@ -25,9 +25,7 @@ import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 export function DatasetsListRoute() {
   const dispatch = useAppDispatch();
   const activeGroupId = useSelector(selectActiveGroupId);
-  console.log('DatasetsListRoute', activeGroupId);
   useEffect(() => {
-    console.count('DatasetsListRoute');
     dispatch(getInitialDatasetsList(activeGroupId));
   }, [activeGroupId, dispatch]);
 

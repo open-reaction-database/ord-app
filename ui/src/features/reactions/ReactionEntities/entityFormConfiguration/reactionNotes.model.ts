@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type ReactionFormNode, ReactionFormNodeType } from 'common/types/reaction/reactionFields.ts';
-import { wrapInputsWithGrid } from '../../../../common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { createBooleanInput } from '../../../../common/utils/reactionForm/createBooleanInput.ts';
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import { createBooleanInput } from 'common/utils/reactionForm/createBooleanInput.ts';
+import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 
 export const reactionNotes: Array<ReactionFormNode> = [
   wrapInputsWithGrid(

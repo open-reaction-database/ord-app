@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from 'common/types/reaction/reactionFields.ts';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 import { ord } from 'ord-schema-protobufjs';
 

@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createSelector } from '@reduxjs/toolkit';
 import { createSelectorFactory } from 'store/utils';
+import { createSelector } from '@reduxjs/toolkit';
+import type { AppState } from 'store/configureAppStore.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 
 export const selectReactionsOrder = buildSelector(state => state.reactionsOrder);
 
-export const selectReactionsByIds = buildSelector(state => state.reactionsById);
-
-export const selectReactionsList = createSelector(
-  [selectReactionsByIds, selectReactionsOrder],
-  (reactionsByIds, reactionsOrder) => reactionsOrder.map(id => reactionsByIds[id]),
-);
+export const selectReactions = buildSelector(state => state.reactionsById);
 
 export const selectReactionById = (id: number) => buildSelector(state => state.reactionsById[id]);
 
@@ -34,3 +30,19 @@ export const selectReactionsPagination = buildSelector(state => state.pagination
 export const selectActiveDatasetId = buildSelector(state => state.activeDatasetId);
 
 export const selectIsReactionCreating = buildSelector(state => state.isReactionCreating);
+
+export const selectReactionComponents = (id: number, input: string) =>
+  buildSelector(state => state.reactionsById[id].data.inputs[input]?.components || []);
+
+export const selectReactionId = (_state: unknown, id: number) => id;
+
+export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
+  const inputsMap = reactions[id].data.inputs;
+  return Object.values(inputsMap).sort((a, b) => {
+    const aOrder = a.additionOrder ?? Infinity;
+    const bOrder = b.additionOrder ?? Infinity;
+    return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
+  });
+});
+
+export const selectOrderedInputsWrapper = (id: number) => (state: AppState) => selectOrderedInputs(state, id);

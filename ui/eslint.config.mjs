@@ -20,6 +20,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 
 export default tseslint.config(
   { ignores: ['dist'] },
@@ -40,6 +41,7 @@ export default tseslint.config(
       react: react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'no-relative-import-paths': noRelativeImportPaths,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -49,8 +51,21 @@ export default tseslint.config(
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       complexity: ['error', 10],
       'no-duplicate-imports': 'error',
+      'no-relative-import-paths/no-relative-import-paths': [
+        'error',
+        { allowSameFolder: true, rootDir: 'src', allowedDepth: 2 },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true, varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+      ],
     },
     settings: {
+      'import/resolver': {
+        node: {
+          moduleDirectory: ['node_modules', 'src/'],
+        },
+      },
       react: {
         version: 'detect',
       },
