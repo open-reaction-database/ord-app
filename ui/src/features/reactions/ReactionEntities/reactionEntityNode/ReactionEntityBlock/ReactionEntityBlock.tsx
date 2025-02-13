@@ -72,7 +72,7 @@ export function ReactionEntityBlockTitle({ leftSection, rightSection }: Readonly
   );
 }
 
-export function ReactionEntityBlockNode({ node, formMethods }: ReactionEntityNodeProps<ReactionFormBlock>) {
+export function ReactionEntityBlockNode({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormBlock>>) {
   const title = useReactionEntityLabel(node.title);
   return (
     <ReactionEntityBlock renderedTitle={<ReactionEntityBlockTitle leftSection={<Title order={3}>{title}</Title>} />}>

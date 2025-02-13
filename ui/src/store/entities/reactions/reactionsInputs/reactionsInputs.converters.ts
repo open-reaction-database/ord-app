@@ -32,19 +32,19 @@ import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 // eslint-disable-next-line complexity
 function ordAmountToReactionAmount(ordAmount?: ord.IAmount | null): AppReactionAmount {
   const { moles, mass, volume } = ordAmount || {};
-  if (moles && moles.units && molesUnitByValue[moles.units]) {
+  if (moles?.units && molesUnitByValue[moles.units]) {
     return {
       ...moles,
       units: molesUnitByValue[moles.units],
     };
   }
-  if (mass && mass.units && massUnitByValue[mass.units]) {
+  if (mass?.units && massUnitByValue[mass.units]) {
     return {
       ...mass,
       units: molesUnitByValue[mass.units],
     };
   }
-  if (volume && volume.units && volumeUnitByValue[volume.units || 0]) {
+  if (volume?.units && volumeUnitByValue[volume.units || 0]) {
     return {
       ...volume,
       units: molesUnitByValue[volume.units],

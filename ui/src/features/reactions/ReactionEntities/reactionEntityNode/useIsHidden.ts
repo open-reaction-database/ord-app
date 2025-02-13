@@ -23,9 +23,11 @@ export const useIsHidden = (
   condition: ReactionFormConditionalRendering['condition'],
   formMethods: ReactionFormMethods,
 ) => {
+  if (!condition) return false;
   const initialValue = condition ? condition.isHidden(formMethods.getValues()[condition.name]) : false;
+  // condition will always stay the same in the runtime due to it being readonly property
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isHidden, setIsHidden] = useState(initialValue);
-  if (!condition) return isHidden;
   formMethods.watch(condition.name, ({ value }) => {
     setIsHidden(condition.isHidden(value));
   });
