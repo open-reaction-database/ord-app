@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from faker import Faker
+
+faker = Faker()
 
 
-async def test_get_group_members(api_client, mock_authenticated_user):
+async def test_update_group(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
-
-    response_data = api_client.get(f"/api/v1/groups/{group.id}/members").raise_for_status().json()[0]
-
-    assert response_data["user"]["id"] == user.id
-    assert response_data["role"] == "admin"
+    payload = {"name": faker.company()}
+    response_data = api_client.patch(f"/api/v1/groups/{group.id}", json=payload).raise_for_status().json()
+    assert payload["name"] == response_data["name"]

@@ -33,6 +33,7 @@ ruff = "^0.9.1"
 pytest = "^8.3.4"
 freezegun = "^1.5.1"
 asyncpg = "^0.30.0"
+faker = "^36.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "24.10.0"

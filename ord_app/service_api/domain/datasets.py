@@ -32,8 +32,12 @@ from ord_app.service_api.domain.exceptions import EntityDoesNotExist
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
-from ord_app.service_api.schemas.datasets import DatasetCreateSchema, DownloadFileFormats
-from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.schemas.datasets import (
+    DatasetCreateSchema,
+    DatasetShareCreateSchema,
+    DownloadFileFormats,
+)
+from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -51,7 +55,13 @@ class DatasetUseCases:
         return await self.dataset_repository.get(dataset.id)
 
     async def get(self, dataset_id: int) -> DatasetModel:
-        return await self.dataset_repository.get(dataset_id)
+        dataset = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
+
+        dataset.is_sharable = False
+        if dataset.groups and dataset.dataset_group_associations:
+            dataset.is_sharable = True
+
+        return dataset
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
         return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
@@ -101,7 +111,8 @@ class DatasetUseCases:
         return await self.dataset_repository.user_datasets_stmt(self.current_user.id)
 
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
-        return await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
+        await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
+        return await self.dataset_repository.get(dataset_id)
 
     async def delete(self, dataset_id: int):
         return await self.dataset_repository.delete(dataset_id)
@@ -122,6 +133,24 @@ class DatasetUseCases:
 
         data = write_message(dataset_pb, kind=file_format)
         return dataset, data
+
+    async def share(self, master_group_id: int, master_dataset_id: int, payload: DatasetShareCreateSchema):
+        dataset_group_association = (
+            await self.dataset_repository.get_dataset_group_association(master_group_id, master_dataset_id)
+        )
+        if dataset_group_association:
+            return await self.dataset_repository.share_dataset(master_dataset_id, payload.slave_group_id)
+
+        raise ForbiddenError(f"Dataset {master_dataset_id} not owned by {master_group_id}")
+
+    async def unshare(self, master_group_id: int, master_dataset_id: int, payload: DatasetShareCreateSchema):
+        dataset_group_association = (
+            await self.dataset_repository.get_dataset_group_association(master_group_id, master_dataset_id)
+        )
+        if dataset_group_association:
+            return await self.dataset_repository.unshare_dataset(master_dataset_id, payload.slave_group_id)
+
+        raise ForbiddenError(f"Dataset {master_dataset_id} not owned by {master_group_id}")
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:
