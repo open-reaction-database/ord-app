@@ -29,10 +29,13 @@ from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
     DatasetSchema,
+    DatasetSharableSchema,
+    DatasetShareCreateSchema,
+    DatasetShareSchema,
     DatasetWithReactionCountSchema,
     DownloadFileFormats,
 )
-from ord_app.service_api.services.exceptions import ProtobufDecodeError
+from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
 from ord_app.service_api.services.pb_utils import (
     validate_uploaded_pb_file,
 )
@@ -123,7 +126,7 @@ async def delete_dataset(
 
 @router.get(
     "/datasets/{dataset_id}",
-    response_model=DatasetSchema,
+    response_model=DatasetSharableSchema,
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def get_dataset(
@@ -185,3 +188,37 @@ async def enumerate_dataset(
         return basename
     except Exception as error:  # pylint: disable=broad-except
         return Response(str(error), status_code=400)
+
+
+@router.post(
+    "/groups/{group_id}/datasets/{dataset_id}/share",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    response_model=DatasetShareSchema
+)
+async def share_dataset(
+    group_id: int,
+    dataset_id: int,
+    payload: DatasetShareCreateSchema,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+):
+    try:
+        return await use_case.share(group_id, dataset_id, payload)
+    except ForbiddenError as err:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err)) from err
+
+
+@router.post(
+    "/groups/{group_id}/datasets/{dataset_id}/unshare",
+    dependencies=[Depends(group_authorization(("admin",)))],
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def unshare_dataset(
+    group_id: int,
+    dataset_id: int,
+    payload: DatasetShareCreateSchema,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+):
+    try:
+        await use_case.unshare(group_id, dataset_id, payload)
+    except ForbiddenError as err:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err)) from err

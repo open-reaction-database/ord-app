@@ -33,6 +33,10 @@ class UniqueViolation(BaseError):
     pass
 
 
+class ForbiddenError(BaseError):
+    pass
+
+
 def psycopg_error_wrapper(coro):
     @wraps(coro)
     async def wrapper(*args, **kwargs):
