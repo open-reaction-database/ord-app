@@ -41,6 +41,14 @@ async def test_db_session():
         yield session
 
 
+@pytest.fixture(autouse=True)
+async def override_engine(monkeypatch):
+    monkeypatch.setattr("ord_app.service_api.services.postgresql.pg_engine", pg_engine)
+    test_session_maker = async_sessionmaker(
+        pg_engine, expire_on_commit=False, autoflush=False, autocommit=False
+    )
+    monkeypatch.setattr("ord_app.service_api.services.postgresql.db_session_maker", test_session_maker)
+
 @pytest.fixture
 def api_client():
     app.dependency_overrides[get_db_session] = _test_db_session

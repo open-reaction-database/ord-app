@@ -13,7 +13,7 @@
 # limitations under the License.
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
-from sqlalchemy import and_, delete, exists, select, update
+from sqlalchemy import and_, delete, exists, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, with_loader_criteria
 
@@ -29,6 +29,15 @@ from ord_app.service_api.models import (
 class DatasetsRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
+
+    async def update_modified_at(self, dataset_id: int):
+        stmt = (
+            update(DatasetModel)
+            .where(DatasetModel.id == dataset_id)
+            .values(modified_at=func.now())
+        )
+        await self.db.execute(stmt)
+        await self.db.commit()
 
     async def create(
         self,
