@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import load_message, write_message
 from ord_app.service_api.models import ReactionModel, UserModel
+from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionUpdateSchema
@@ -66,6 +67,7 @@ class ReactionsUseCase:
         self.db = db
         self.current_user = current_user
         self.reaction_repo = ReactionsRepository(db)
+        self.dataset_repo = DatasetsRepository(db)
 
     @staticmethod
     def validate(binpb) -> tuple[bool, list[str], list[str] | list]:
@@ -141,6 +143,7 @@ class ReactionsUseCase:
             insert_data["binpb"] = pb_reaction
 
         reaction = await self._create_reaction(dataset_id, insert_data)
+        await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
     async def upload(self, dataset_id: int, file_data, kind):
@@ -155,6 +158,7 @@ class ReactionsUseCase:
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
         reaction = await self._create_reaction(dataset_id, insert_data)
+        await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
@@ -167,6 +171,7 @@ class ReactionsUseCase:
         updating_data = payload.model_dump() | {"pb_reaction_id": payload.binpb.reaction_id}
 
         if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
+            await self.dataset_repo.update_modified_at(dataset_id)
             return reaction
 
         raise EntityNotFoundError("Reaction not found")
