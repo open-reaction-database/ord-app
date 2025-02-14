@@ -134,23 +134,23 @@ class DatasetUseCases:
         data = write_message(dataset_pb, kind=file_format)
         return dataset, data
 
-    async def share(self, master_group_id: int, master_dataset_id: int, payload: DatasetShareCreateSchema):
+    async def share(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
         dataset_group_association = (
-            await self.dataset_repository.get_dataset_group_association(master_group_id, master_dataset_id)
+            await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )
         if dataset_group_association:
-            return await self.dataset_repository.share_dataset(master_dataset_id, payload.slave_group_id)
+            return await self.dataset_repository.share_dataset(primary_dataset_id, payload.secondary_group_id)
 
-        raise ForbiddenError(f"Dataset {master_dataset_id} not owned by {master_group_id}")
+        raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
 
-    async def unshare(self, master_group_id: int, master_dataset_id: int, payload: DatasetShareCreateSchema):
+    async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
         dataset_group_association = (
-            await self.dataset_repository.get_dataset_group_association(master_group_id, master_dataset_id)
+            await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )
         if dataset_group_association:
-            return await self.dataset_repository.unshare_dataset(master_dataset_id, payload.slave_group_id)
+            return await self.dataset_repository.unshare_dataset(primary_dataset_id, payload.secondary_group_id)
 
-        raise ForbiddenError(f"Dataset {master_dataset_id} not owned by {master_group_id}")
+        raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:

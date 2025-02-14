@@ -35,76 +35,76 @@ async def _create_test_user_with_group(test_db_session):
 
 
 async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, test_db_session):
-    master_user, set_user_auth, master_group = mock_authenticated_user
-    master_dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    primary_user, set_user_auth, primary_group = mock_authenticated_user
+    primary_dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
-    # get the master dataset, there is should be one which is created above
-    master_group_datasets = api_client.get(f"/api/v1/groups/{master_group.id}/datasets").raise_for_status().json()
-    assert master_group_datasets["total"] == 1
-    assert master_group_datasets["items"][0]["id"] == master_dataset.id
+    # get the primary dataset, there is should be one which is created above
+    primary_group_datasets = api_client.get(f"/api/v1/groups/{primary_group.id}/datasets").raise_for_status().json()
+    assert primary_group_datasets["total"] == 1
+    assert primary_group_datasets["items"][0]["id"] == primary_dataset.id
 
     # can the current user share the dataset?
-    master_user_dataset = api_client.get(f"/api/v1/datasets/{master_dataset.id}").raise_for_status().json()
-    assert master_dataset.id == master_user_dataset["id"]
-    assert True is master_user_dataset["is_sharable"]
+    primary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
+    assert primary_dataset.id == primary_user_dataset["id"]
+    assert True is primary_user_dataset["is_sharable"]
 
-    # slave user should have 0 datasets
-    slave_user, slave_group = await _create_test_user_with_group(test_db_session)
-    set_user_auth(slave_user)
-    master_group_datasets = api_client.get(f"/api/v1/groups/{slave_group.id}/datasets").raise_for_status().json()
-    assert master_group_datasets["total"] == 0
+    # secondary user should have 0 datasets
+    secondary_user, secondary_group = await _create_test_user_with_group(test_db_session)
+    set_user_auth(secondary_user)
+    primary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    assert primary_group_datasets["total"] == 0
 
-    # share master dataset by master user to the slave user
-    set_user_auth(master_user)
+    # share primary dataset by primary user to the secondary user
+    set_user_auth(primary_user)
     share_response_data = api_client.post(
-        f"/api/v1/groups/{master_group.id}/datasets/{master_dataset.id}/share",
-        json={"slave_group_id": slave_group.id}
+        f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
+        json={"secondary_group_id": secondary_group.id}
     ).raise_for_status().json()
-    assert share_response_data == {"dataset_id": master_dataset.id, "group_id": slave_group.id}
+    assert share_response_data == {"dataset_id": primary_dataset.id, "group_id": secondary_group.id}
 
-    # now slave user should have 1 dataset with the master id
-    set_user_auth(slave_user)
-    slave_group_datasets = api_client.get(f"/api/v1/groups/{slave_group.id}/datasets").raise_for_status().json()
-    assert slave_group_datasets["total"] == 1
-    assert slave_group_datasets["items"][0]["id"] == master_dataset.id
+    # now secondary user should have 1 dataset with the primary id
+    set_user_auth(secondary_user)
+    secondary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    assert secondary_group_datasets["total"] == 1
+    assert secondary_group_datasets["items"][0]["id"] == primary_dataset.id
 
-    # And slave user cannot share that dataset
+    # And secondary user cannot share that dataset
     foreign_user, foreign_group = await _create_test_user_with_group(test_db_session)
-    slave_user_dataset = api_client.get(f"/api/v1/datasets/{master_dataset.id}").raise_for_status().json()
-    assert master_dataset.id == slave_user_dataset["id"]
-    assert False is slave_user_dataset["is_sharable"]
-    slave_share_response = api_client.post(
-        f"/api/v1/groups/{master_group.id}/datasets/{master_dataset.id}/share",
-        json={"slave_group_id": foreign_group.id}
+    secondary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
+    assert primary_dataset.id == secondary_user_dataset["id"]
+    assert False is secondary_user_dataset["is_sharable"]
+    secondary_share_response = api_client.post(
+        f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
+        json={"secondary_group_id": foreign_group.id}
     )
-    assert status.HTTP_403_FORBIDDEN == slave_share_response.status_code
-    slave_share_response = api_client.post(
-        f"/api/v1/groups/{slave_group.id}/datasets/{master_dataset.id}/share",
-        json={"slave_group_id": foreign_group.id}
+    assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
+    secondary_share_response = api_client.post(
+        f"/api/v1/groups/{secondary_group.id}/datasets/{primary_dataset.id}/share",
+        json={"secondary_group_id": foreign_group.id}
     )
-    assert status.HTTP_403_FORBIDDEN == slave_share_response.status_code
+    assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
 
-    # But he can update master dataset
+    # But he can update primary dataset
     payload = {"name": "updated name", "description": "updated description"}
-    response_data = api_client.patch(f"/api/v1/datasets/{master_dataset.id}", json=payload).raise_for_status().json()
+    response_data = api_client.patch(f"/api/v1/datasets/{primary_dataset.id}", json=payload).raise_for_status().json()
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
 
     # check if the dataset is not duplicated
-    set_user_auth(master_user)
-    master_group_datasets = api_client.get(f"/api/v1/groups/{master_group.id}/datasets").raise_for_status().json()
-    assert master_group_datasets["total"] == 1
-    assert master_group_datasets["items"][0]["id"] == master_dataset.id
+    set_user_auth(primary_user)
+    primary_group_datasets = api_client.get(f"/api/v1/groups/{primary_group.id}/datasets").raise_for_status().json()
+    assert primary_group_datasets["total"] == 1
+    assert primary_group_datasets["items"][0]["id"] == primary_dataset.id
 
-    # unshare dataset from the slave user
+    # unshare dataset from the secondary user
     api_client.post(
-        f"/api/v1/groups/{master_group.id}/datasets/{master_dataset.id}/unshare",
-        json={"slave_group_id": slave_group.id}
+        f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/unshare",
+        json={"secondary_group_id": secondary_group.id}
     ).raise_for_status()
 
-    # check how many datasets slave user has now
-    set_user_auth(slave_user)
-    slave_group_datasets = api_client.get(f"/api/v1/groups/{slave_group.id}/datasets").raise_for_status().json()
-    assert slave_group_datasets["total"] == 0
-    slave_user_response = api_client.get(f"/api/v1/datasets/{master_dataset.id}")
-    assert status.HTTP_403_FORBIDDEN == slave_user_response.status_code
+    # check how many datasets secondary user has now
+    set_user_auth(secondary_user)
+    secondary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    assert secondary_group_datasets["total"] == 0
+    secondary_user_response = api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
+    assert status.HTTP_403_FORBIDDEN == secondary_user_response.status_code

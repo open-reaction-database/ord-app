@@ -64,4 +64,4 @@ class DatasetShareSchema(BaseSchema):
 
 
 class DatasetShareCreateSchema(BaseSchema):
-    slave_group_id: int
+    secondary_group_id: int

@@ -225,10 +225,10 @@ class DatasetsRepository:
         )
         return await self.db.scalar(dataset_group_association_stmt)
 
-    async def share_dataset(self, master_dataset_id: int, slave_group_id: int):
+    async def share_dataset(self, primary_dataset_id: int, secondary_group_id: int):
         dataset_group_association = DatasetGroupAssociationModel(
-            dataset_id=master_dataset_id,
-            group_id=slave_group_id,
+            dataset_id=primary_dataset_id,
+            group_id=secondary_group_id,
             is_primary=False
         )
         self.db.add(dataset_group_association)
@@ -236,10 +236,10 @@ class DatasetsRepository:
         await self.db.refresh(dataset_group_association)
         return dataset_group_association
 
-    async def unshare_dataset(self, master_dataset_id: int, slave_group_id: int):
+    async def unshare_dataset(self, primary_dataset_id: int, secondary_group_id: int):
         stmt = delete(DatasetGroupAssociationModel).where(
-            DatasetGroupAssociationModel.dataset_id == master_dataset_id,
-            DatasetGroupAssociationModel.group_id == slave_group_id
+            DatasetGroupAssociationModel.dataset_id == primary_dataset_id,
+            DatasetGroupAssociationModel.group_id == secondary_group_id
         )
         await self.db.execute(stmt)
         await self.db.commit()
