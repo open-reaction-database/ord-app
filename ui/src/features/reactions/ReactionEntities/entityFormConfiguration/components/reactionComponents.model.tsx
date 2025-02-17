@@ -154,7 +154,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
       requiredFields: [
         {
           label: 'Type',
-          render: item => (item.type ? preparationNameByValue[item.type] : ''),
+          render: item => preparationNameByValue[item.type ?? 0],
         },
         {
           label: 'Details',
