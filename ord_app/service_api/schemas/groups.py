@@ -20,6 +20,11 @@ from ord_app.service_api.schemas.users import UserSchema
 class GroupSchema(BaseSchema):
     id: int
     name: str
+
+
+class GroupUserSchema(BaseSchema):
+    id: int
+    name: str
     role: UserRolesList
 
 

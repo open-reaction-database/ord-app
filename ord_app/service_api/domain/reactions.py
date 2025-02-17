@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import Depends
@@ -20,7 +21,7 @@ from google.protobuf.json_format import ParseError as JsonParseError
 from google.protobuf.message import DecodeError
 from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
-from ord_schema.proto.reaction_pb2 import Reaction
+from ord_schema.proto.reaction_pb2 import DateTime, Person, Reaction, ReactionProvenance, RecordEvent
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
@@ -83,6 +84,18 @@ class ReactionsUseCase:
 
         return is_valid, errors, warnings
 
+    def set_provenance(self, pb_reaction: Reaction):
+        person = Person(
+            username=self.current_user.external_id,
+            name=self.current_user.name,
+            orcid=self.current_user.orcid_id,
+            email=self.current_user.email,
+        )
+        pb_reaction.provenance.experimenter = person
+
+        dt = DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
+        pb_reaction.provenance.record_created = RecordEvent(time=dt, person=person)
+
 
     @psycopg_error_wrapper
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
@@ -124,9 +137,10 @@ class ReactionsUseCase:
             reaction.pb_reaction_id = reaction.id  # Use reaction.id as fallback
             reaction.binpb = Reaction(reaction_id=str(reaction.id)).SerializeToString()
         else:
-            message = load_message(reaction.binpb, Reaction, "binpb")
+            pb_reaction = load_message(reaction.binpb, Reaction, "binpb")
             # If the loaded message has a valid reaction_id, use it; otherwise, fallback to reaction.id
-            reaction.pb_reaction_id = message.reaction_id or reaction.id
+            reaction.pb_reaction_id = pb_reaction.reaction_id = str(pb_reaction.reaction_id or reaction.id)
+            reaction.binpb = pb_reaction.SerializeToString()
 
         await self.db.commit()
         await self.db.refresh(reaction)
@@ -144,6 +158,24 @@ class ReactionsUseCase:
 
         reaction = await self._create_reaction(dataset_id, insert_data)
         await self.dataset_repo.update_modified_at(dataset_id)
+        return reaction
+
+    async def create_from_scratch(self, dataset_id: int):
+        person = Person(
+            username=self.current_user.external_id,
+            name=self.current_user.name,
+            orcid=self.current_user.orcid_id,
+            email=self.current_user.email,
+        )
+        record_event = RecordEvent(
+            time=DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")),
+            person=person
+        )
+        provenance = ReactionProvenance(experimenter=person, record_created=record_event)
+        pb_reaction = Reaction(provenance=provenance)
+
+        insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
+        reaction = await self._create_reaction(dataset_id, insert_data)
         return reaction
 
     async def upload(self, dataset_id: int, file_data, kind):

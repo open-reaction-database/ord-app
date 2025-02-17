@@ -14,6 +14,7 @@
 import pytest
 from alembic import command
 from alembic.config import Config
+from faker import Faker
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -25,6 +26,8 @@ from ord_app.service_api.models import BaseModel, DatasetModel, GroupModel, User
 from ord_app.service_api.services.auth0 import verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
+
+fake = Faker()
 
 pg_engine = create_async_engine(RuntimeSettings.pg_test_dsn)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
@@ -99,7 +102,13 @@ async def test_user(test_db_session):
 
 @pytest.fixture
 async def mock_authenticated_user(test_db_session):
-    user = UserModel(email="utest@unit.com", external_id="utest_external_id", auth0_id="utest_auth0_id")
+    user = UserModel(
+        name=fake.name(),
+        email=fake.email(),
+        external_id=fake.uuid4(),
+        auth0_id=fake.uuid4(),
+        orcid_id=fake.uuid4(),
+    )
     group = GroupModel(name="utest", owner_id=user.id)
     group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
     test_db_session.add_all([user, group, group_member])
