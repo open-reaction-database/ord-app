@@ -29,7 +29,10 @@ export function AppContent() {
   ) : (
     <Suspense fallback={<PageLoader />}>
       <Routes />
-      <Notifications containerWidth={350} />
+      <Notifications
+        containerWidth={350}
+        position="bottom-right"
+      />
     </Suspense>
   );
 }
