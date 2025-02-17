@@ -39,6 +39,7 @@ export function ReactionEntityTitle({
             entityName={entityName}
             reactionId={reactionId}
             pathComponents={pathComponents}
+            shouldCloseSidebar
           />
         )}
       </Flex>

@@ -16,6 +16,7 @@
 import { createSelectorFactory } from 'store/utils';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 
@@ -33,6 +34,21 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 
 export const selectReactionComponents = (id: number, input: string) =>
   buildSelector(state => state.reactionsById[id].data.inputs[input]?.components || []);
+
+export const selectReactionPartByPath =
+  (reactionId: number, pathComponents: ReactionPathComponents) => (state: AppState) => {
+    const reaction = selectReactionById(reactionId)(state);
+    try {
+      // If the path is incorrect we will get an error
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return pathComponents.reduce((reactionPart: any, key) => {
+        return reactionPart[key];
+      }, reaction.data);
+    } catch (e) {
+      console.info(pathComponents, e);
+      return null;
+    }
+  };
 
 export const selectReactionId = (_state: unknown, id: number) => id;
 

@@ -27,8 +27,16 @@ import {
   volumeUnitNames,
 } from 'store/entities/reactions/reactionsInputs/reactionsInputs.models.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
+import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/buildUseCreate.ts';
+import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
+import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 
 const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
+
+const textureTypeOptions = ordMapToKeyValueObject(ord.Texture.TextureType);
+
+const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
 
 const booleanOptions = [
   { label: 'UNSPECIFIED', value: undefined },
@@ -47,6 +55,10 @@ const appReactionAmountOptions = appReactionAmountType.map(item => ({
   label: item,
   value: item,
 }));
+
+const emptyPreparation = () => {
+  return ord.CompoundPreparation.toObject(new ord.CompoundPreparation());
+};
 
 export const reactionComponents: Array<ReactionFormNode> = [
   {
@@ -125,6 +137,62 @@ export const reactionComponents: Array<ReactionFormNode> = [
               label: 'Lot number',
             },
             inputType: 'string',
+          },
+        ),
+      },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.list,
+    title: {
+      label: 'Preparations',
+    },
+    useSelectItems: buildUseSelectItems('preparations'),
+    ItemDisplay: createEntityListItemComponent<ord.CompoundPreparation>({
+      entityName: 'preparations',
+      title: 'Preparation',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => (item.type ? preparationNameByValue[item.type] : ''),
+        },
+        {
+          label: 'Details',
+          render: item => item.details,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Preparation',
+      useCreate: buildUseCreate('preparations', emptyPreparation),
+    },
+  },
+  {
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Isolated Product Characteristics',
+    },
+    fields: [
+      {
+        type: ReactionFormNodeType.objectInitializer,
+        name: 'texture',
+        field: wrapInputsWithGrid(
+          {
+            type: ReactionFormNodeType.select,
+            name: 'texture.type',
+            selectType: 'dropdown',
+            options: textureTypeOptions,
+            wrapperConfig: {
+              label: 'Texture',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'texture.details',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Texture details',
+            },
           },
         ),
       },

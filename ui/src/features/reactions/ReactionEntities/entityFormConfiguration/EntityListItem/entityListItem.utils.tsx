@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-type Primitive = string | number;
+import type { EntityListItemStaticProps, EntityListItemRuntimeProps } from './entityListItem.types.ts';
+import { EntityListItem } from './EntityListItem.tsx';
 
-export const reversePrimitiveRecord = <Key extends Primitive, Value extends Primitive>(
-  record: Record<Key, Value>,
-): Record<Value, Key> =>
-  (Object.entries(record) as Array<[Key, Value]>).reduce(
-    (acc: Record<Value, Key>, [key, value]): Record<Value, Key> => ({
-      ...acc,
-      [value]: key,
-    }),
-    {} as Record<Value, Key>,
-  );
+export function createEntityListItemComponent<T>(staticProps: EntityListItemStaticProps<T>) {
+  return function EntityListItemComponent(runtimeProps: EntityListItemRuntimeProps<T>) {
+    return (
+      <EntityListItem
+        {...staticProps}
+        {...runtimeProps}
+      />
+    );
+  };
+}

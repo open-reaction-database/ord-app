@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-type Primitive = string | number;
+import type { ReactNode } from 'react';
 
-export const reversePrimitiveRecord = <Key extends Primitive, Value extends Primitive>(
-  record: Record<Key, Value>,
-): Record<Value, Key> =>
-  (Object.entries(record) as Array<[Key, Value]>).reduce(
-    (acc: Record<Value, Key>, [key, value]): Record<Value, Key> => ({
-      ...acc,
-      [value]: key,
-    }),
-    {} as Record<Value, Key>,
-  );
+interface FieldConfiguration<T> {
+  label: string;
+  render: (entity: T) => ReactNode;
+}
+
+export interface EntityListItemRuntimeProps<T> {
+  entity: T;
+  index: number;
+}
+
+export interface EntityListItemStaticProps<T> {
+  entityName: string;
+  title: ((entity: T) => string) | string;
+  requiredFields: Array<FieldConfiguration<T>>;
+}
+
+export type EntityListItemProps<T> = EntityListItemStaticProps<T> & EntityListItemRuntimeProps<T>;

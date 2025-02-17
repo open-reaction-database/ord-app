@@ -59,14 +59,15 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       description: 'Reaction identifiers define descriptions of the overall reaction',
     }),
   },
+  {
+    pathComponents: ['preparations', 'components'],
+    entityName: ReactionEntity.ComponentPreparation,
+    label: 'Preparation',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Preparation', hasDelete: true }),
+  },
 ];
 
-const allowedEntityNames: Array<string> = [
-  ReactionEntity.Notes,
-  ReactionEntity.Inputs,
-  ReactionEntity.Components,
-  ReactionEntity.Identifiers,
-];
+const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity)];
 
 function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {
   const [entity, ...rest] = pathComponents;

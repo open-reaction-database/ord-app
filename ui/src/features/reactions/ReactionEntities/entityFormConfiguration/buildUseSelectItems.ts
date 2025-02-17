@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-type Primitive = string | number;
+import { useContext } from 'react';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { useSelector } from 'react-redux';
+import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 
-export const reversePrimitiveRecord = <Key extends Primitive, Value extends Primitive>(
-  record: Record<Key, Value>,
-): Record<Value, Key> =>
-  (Object.entries(record) as Array<[Key, Value]>).reduce(
-    (acc: Record<Value, Key>, [key, value]): Record<Value, Key> => ({
-      ...acc,
-      [value]: key,
-    }),
-    {} as Record<Value, Key>,
-  );
+export const buildUseSelectItems = (entityName: string) =>
+  function useSelectItems() {
+    const { reactionId, pathComponents } = useContext(reactionEntityContext);
+    return useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+  };

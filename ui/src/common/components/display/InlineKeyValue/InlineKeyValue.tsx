@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-type Primitive = string | number;
+import { Flex, Text } from '@mantine/core';
+import { typographyClasses } from 'common/styling';
+import type { ReactNode } from 'react';
 
-export const reversePrimitiveRecord = <Key extends Primitive, Value extends Primitive>(
-  record: Record<Key, Value>,
-): Record<Value, Key> =>
-  (Object.entries(record) as Array<[Key, Value]>).reduce(
-    (acc: Record<Value, Key>, [key, value]): Record<Value, Key> => ({
-      ...acc,
-      [value]: key,
-    }),
-    {} as Record<Value, Key>,
+interface InlineKeyValueProps {
+  label: string;
+  value: ReactNode;
+}
+
+export function InlineKeyValue({ label, value }: Readonly<InlineKeyValueProps>) {
+  return (
+    <Flex
+      gap="xs"
+      align="center"
+    >
+      <Text className={typographyClasses.secondary1}>{label}:</Text>
+      <Text>{value}</Text>
+    </Flex>
   );
+}
