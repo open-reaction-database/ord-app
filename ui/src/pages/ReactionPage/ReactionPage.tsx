@@ -17,7 +17,7 @@ import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { type FC, Fragment, useEffect, useMemo } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionHeader } from './ReactionHeader/ReactionHeader.tsx';
+import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';

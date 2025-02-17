@@ -60,7 +60,7 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     }),
   },
   {
-    pathComponents: ['preparations', 'components'],
+    pathComponents: ['preparations', 'components', 'inputs'],
     entityName: ReactionEntity.ComponentPreparation,
     label: 'Preparation',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Preparation', hasDelete: true }),
