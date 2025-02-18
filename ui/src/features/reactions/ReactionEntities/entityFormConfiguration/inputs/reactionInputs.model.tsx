@@ -20,10 +20,6 @@ import {
 import { ord } from 'ord-schema-protobufjs';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 import { InputsComponentList } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/InputsComponentsList/InputsComponentList.tsx';
-import { useContext } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionComponents } from 'store/entities/reactions/reactions.selectors.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 
 const speedOptions = ordMapToKeyValueObject(ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
@@ -54,11 +50,6 @@ export const reactionInputs: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.custom,
     name: 'components',
-    useSelectData: function () {
-      const { reactionId, pathComponents } = useContext(reactionEntityContext);
-      const inputId = pathComponents.at(-1) as string;
-      return useSelector(selectReactionComponents(reactionId, inputId));
-    },
     Component: InputsComponentList,
   },
   {

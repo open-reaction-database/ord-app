@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
@@ -22,4 +22,14 @@ export const buildUseSelectItems = (entityName: string) =>
   function useSelectItems() {
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
     return useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+  };
+
+export const buildUseSelectItemsListFromMap = <T>(entityName: string, compareFn: (a: T, b: T) => number) =>
+  function useSelectItems() {
+    const { reactionId, pathComponents } = useContext(reactionEntityContext);
+    const map = useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+
+    return useMemo(() => {
+      return (Object.values(map) as Array<T>).sort(compareFn);
+    }, [map]);
   };

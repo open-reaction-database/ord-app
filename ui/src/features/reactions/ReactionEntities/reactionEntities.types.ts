@@ -29,6 +29,7 @@ export enum ReactionFormNodeType {
   objectInitializer = 'objectInitializer',
   block = 'block',
   list = 'list',
+  data = 'data',
   custom = 'custom',
 }
 
@@ -101,13 +102,18 @@ export interface ReactionFormBlock extends ReactionFormNodeBase {
   fields: Array<ReactionFormNode>;
 }
 
+export interface ReactionFormData extends ReactionFormNodeBase {
+  type: ReactionFormNodeType.data;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ReactionFormList<T = any> extends ReactionFormNodeBase {
   type: ReactionFormNodeType.list;
   title: ReactionFormStandaloneField;
+  getKey: (item: T, index: number) => string | number;
   addItem?: {
     label: string;
-    useCreate: () => (index: number) => void;
+    useCreate: () => (index: number, list: Array<T>) => void;
   };
   useSelectItems: () => Array<T>;
   ItemDisplay: FC<EntityListItemRuntimeProps<T>>;
@@ -128,7 +134,6 @@ export interface ReactionFormCustomProps {
 export interface ReactionFormCustom extends ReactionFormNodeBase {
   type: ReactionFormNodeType.custom;
   name: string;
-  useSelectData: () => unknown;
   Component: FC<ReactionFormCustomProps>;
 }
 
@@ -141,6 +146,7 @@ export type ReactionFormNode =
   | ReactionFormValuePrecisionUnit
   | ReactionFormBlock
   | ReactionFormList
+  | ReactionFormData
   | ReactionFormCustom;
 
 export interface ReactionEntityContext {

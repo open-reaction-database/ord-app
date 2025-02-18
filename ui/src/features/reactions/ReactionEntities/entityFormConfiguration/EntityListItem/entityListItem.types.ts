@@ -22,7 +22,7 @@ interface FieldConfiguration<T> {
 
 export interface EntityListItemRuntimeProps<T> {
   entity: T;
-  index: number;
+  entityKey: string | number;
 }
 
 export interface EntityListItemStaticProps<T> {

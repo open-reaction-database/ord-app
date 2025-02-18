@@ -44,7 +44,7 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     }),
   },
   {
-    pathComponents: ['components'],
+    pathComponents: ['components', 'inputs'],
     entityName: ReactionEntity.Components,
     label: 'Component',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: false }),
@@ -64,6 +64,18 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     entityName: ReactionEntity.ComponentPreparations,
     label: 'Preparation',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Preparation', hasDelete: true }),
+  },
+  {
+    pathComponents: ['features', 'components', 'inputs'],
+    entityName: ReactionEntity.Features,
+    label: 'Features',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
+  },
+  {
+    pathComponents: ['identifiers', 'components', 'inputs'],
+    entityName: ReactionEntity.ComponentIdentifiers,
+    label: 'Identifiers',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
   },
 ];
 

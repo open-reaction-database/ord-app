@@ -27,16 +27,34 @@ import {
   volumeUnitNames,
 } from 'store/entities/reactions/reactionsInputs/reactionsInputs.models.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import {
+  buildUseSelectItems,
+  buildUseSelectItemsListFromMap,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/buildUseCreate.ts';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
+import { ordDataToReactionData } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
+import { useMemo } from 'react';
 
 const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
 const textureTypeOptions = ordMapToKeyValueObject(ord.Texture.TextureType);
 
 const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
+
+const compareFeatures = (a: AppData, b: AppData): number => a.name.localeCompare(b.name);
+
+const createEmptyFeature = (_: number, features: Array<unknown>): [string, AppData] => {
+  const uniqueName = findReactionEntityUniqueName(
+    'Feature',
+    (features as Array<AppData>).map(f => f.name),
+  );
+  const feature = ordDataToReactionData(ord.Data.toObject(new ord.Data()), uniqueName);
+  return [feature.id, feature];
+};
 
 const booleanOptions = [
   { label: 'UNSPECIFIED', value: undefined },
@@ -56,9 +74,13 @@ const appReactionAmountOptions = appReactionAmountType.map(item => ({
   value: item,
 }));
 
-const emptyPreparation = () => {
-  return ord.CompoundPreparation.toObject(new ord.CompoundPreparation());
+const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
+  return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
 };
+
+const useSelectIdentifiers = buildUseSelectItems('identifiers');
+
+const identifierKeyByValue = reversePrimitiveRecord(ord.CompoundIdentifier.CompoundIdentifierType);
 
 export const reactionComponents: Array<ReactionFormNode> = [
   {
@@ -101,8 +123,34 @@ export const reactionComponents: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.custom,
     name: 'ketcher',
-    useSelectData: () => {},
     Component: ComponentsKetcherEditor,
+  },
+  {
+    type: ReactionFormNodeType.list,
+    title: {
+      label: 'Identifiers',
+    },
+    getKey: (_, index) => index,
+    useSelectItems: function useSelectIdentifiersWrapper() {
+      const identifiers: Array<ord.CompoundIdentifier> = useSelectIdentifiers();
+      return useMemo(() => {
+        return (identifiers || []).filter(item => item.type !== ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK);
+      }, [identifiers]);
+    },
+    ItemDisplay: createEntityListItemComponent<ord.ICompoundIdentifier>({
+      entityName: 'identifiers',
+      title: 'Identifier',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => identifierKeyByValue[item.type ?? 0],
+        },
+        {
+          label: 'Value',
+          render: item => item.value,
+        },
+      ],
+    }),
   },
   {
     type: ReactionFormNodeType.block,
@@ -147,6 +195,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
     title: {
       label: 'Preparations',
     },
+    getKey: (_, index) => index,
     useSelectItems: buildUseSelectItems('preparations'),
     ItemDisplay: createEntityListItemComponent<ord.CompoundPreparation>({
       entityName: 'preparations',
@@ -165,6 +214,28 @@ export const reactionComponents: Array<ReactionFormNode> = [
     addItem: {
       label: 'Preparation',
       useCreate: buildUseCreate('preparations', emptyPreparation),
+    },
+  },
+  {
+    type: ReactionFormNodeType.list,
+    title: {
+      label: 'Features',
+    },
+    getKey: (item: AppData) => item.id,
+    useSelectItems: buildUseSelectItemsListFromMap('features', compareFeatures),
+    ItemDisplay: createEntityListItemComponent<AppData>({
+      entityName: 'features',
+      title: item => item.name,
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => item.data.type,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Feature',
+      useCreate: buildUseCreate('features', createEmptyFeature),
     },
   },
   {

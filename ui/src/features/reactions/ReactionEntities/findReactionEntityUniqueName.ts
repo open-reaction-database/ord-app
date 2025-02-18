@@ -13,44 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.homeIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-icons-default);
-}
-
-.active {
-  color: var(--color-text-primary);
-}
-
-.link {
-  color: var(--mantine-color-primary-0);
-}
-
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.breadcrumb {
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  display: flex;
-  align-items: center;
-  gap: var(--mantine-spacing-xs);
-  max-width: 150px;
-  overflow: hidden;
-}
-
-.text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+export function findReactionEntityUniqueName(entityName: string, names: Array<string>) {
+  let counter = 1;
+  let isValid = false;
+  let newUniqueName: string = `${entityName} ${counter}`;
+  while (!isValid) {
+    newUniqueName = `${entityName} ${counter}`;
+    isValid = names.every(existingName => existingName !== newUniqueName);
+    counter++;
+  }
+  return newUniqueName;
 }
