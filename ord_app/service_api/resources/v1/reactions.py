@@ -17,8 +17,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.database import add_dataset, get_cursor, get_dataset
-from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
+from ord_app.service_api.domain.auth import dataset_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema, ReactionUpdateSchema
@@ -138,27 +137,3 @@ async def _download_reaction(
         data,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
-
-
-@router.get("/clone_reaction", dependencies=[Depends(group_authorization(("admin", "editor")))])
-def clone_reaction(user_id: str, dataset_name: str, index: int):
-    """WIP"""
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-        if dataset is None:
-            return Response(status_code=404)
-        dataset.reactions.add().CopyFrom(dataset.reactions[index])
-        add_dataset(user_id, dataset, cursor)
-    return len(dataset.reactions) - 1  # Index of the new reaction.
-
-
-@router.get("/delete_reaction", dependencies=[Depends(group_authorization(("admin",)))])
-def delete_reaction(user_id: str, dataset_name: str, index: int):
-    """WIP"""
-    with get_cursor() as cursor:
-        dataset = get_dataset(user_id, dataset_name, cursor)
-        if dataset is None:
-            return Response(status_code=404)
-        del dataset.reactions[index]
-        add_dataset(user_id, dataset, cursor)
-    return Response(status_code=200)

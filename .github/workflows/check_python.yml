@@ -72,11 +72,11 @@ jobs:
       - name: Run alembic migrations
         run: alembic upgrade head
 
-      - name: Tests
-        run: pytest -vv --cov=ord_app --durations=10
-
       - name: ruff
         run: ruff check ord_app/
 
       - name: pytype
         run: pytype -j auto
+
+      - name: Tests
+        run: pytest -vv --cov=ord_app --durations=10

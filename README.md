@@ -58,26 +58,26 @@ _Note: the database must be on the same network as docker or docker must connect
    docker run \
    --network ord_network \
    -e VITE_API_ENDPOINT="http://localhost:8000/service_api/api/v1" \
-   -e VITE_AUTH0_DOMAIN="..." \
-   -e VITE_AUTH0_CLIENT_ID="..." \
-   -e VITE_AUTH0_AUDIENCE="..." \
-   -e VITE_AUTH0_ISSUER="..." \
+   -e VITE_AUTH0_DOMAIN="dev-z4acb31kcl4prqtw.us.auth0.com" \
+   -e VITE_AUTH0_CLIENT_ID="6iGbDSlSANtgqktlxmERNKUUM8zx89TR" \
+   -e VITE_AUTH0_AUDIENCE="https://dev-z4acb31kcl4prqtw.us.auth0.com/api/v2/" \
+   -e VITE_AUTH0_ISSUER="https://dev-z4acb31kcl4prqtw.us.auth0.com/" \
    -e PG_DSN="postgresql+psycopg://ord@db:5400/ord"
    --rm -p 5173:80 -p 8000:8000 ord
    ```
 
 Envs for backend:
 
-| Name                                          | Description                                        | Required | Default                                               |
-|-----------------------------------------------|----------------------------------------------------|----------|-------------------------------------------------------|
-| `pg_dsn`                                      | DSN for connecting to the database                 | false    | `postgresql+psycopg://ord@localhost:5400/ord`         |
-| `cors_origins`                                | Allowed origins                                    | false    | `["http://localhost:5173"]`                           |
-| `app_env`                                     | Manages the application context (debug parameters) | false    | `localhost` (available: `localhost`, `production`)    |
-| `auth0_domain` or `vite_auth0_domain`         | Auth0 config                                       | true     | -                                                     |
-| `auth0_algorithms` or `vite_auth0_algorithms` | Auth0 config                                       | true     | -                                                     |
-| `auth0_audience` or `vite_auth0_audience`     | Auth0 config                                       | true     | -                                                     |
-| `auth0_issuer` or `vite_auth0_issuer`         | Auth0 config                                       | true     | -                                                     |
-| `auth0_client_id` or `vite_auth0_client_id`   | Auth0 config                                       | true     | -                                                     |
+| Name                    | Description                                        | Required | Default                                                 |
+|-------------------------|----------------------------------------------------|----------|---------------------------------------------------------|
+| `pg_dsn`                | DSN for connecting to the database                 | false    | `postgresql+psycopg://ord@localhost:5400/ord`           |
+| `cors_origins`          | Allowed origins                                    | false    | `["http://localhost:5173"]`                             |
+| `app_env`               | Manages the application context (debug parameters) | false    | `production` (available: `localhost`, `production`)     |
+| `vite_auth0_domain`     | Auth0 config                                       | true     | -                                                       |
+| `vite_auth0_algorithms` | Auth0 config                                       | true     | -                                                       |
+| `vite_auth0_audience`   | Auth0 config                                       | true     | -                                                       |
+| `vite_auth0_issuer`     | Auth0 config                                       | true     | -                                                       |
+| `vite_auth0_client_id`  | Auth0 config                                       | true     | -                                                       |
 
 
 ## Testing
