@@ -45,6 +45,17 @@ async def create_reaction(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
 
 @router.post(
+    "/from-scratch",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
+    response_model=ReactionSchema
+)
+async def create_reaction_from_scratch(
+    dataset_id: int,
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)]
+):
+    return await use_case.create_from_scratch(dataset_id)
+
+@router.post(
     "/upload",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     response_model=ReactionSchema,

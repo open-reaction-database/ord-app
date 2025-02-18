@@ -30,4 +30,3 @@ async def test_get_group(api_client, mock_authenticated_user):
 
     assert response_data["id"] == group.id
     assert response_data["name"] == group.name
-    assert response_data["role"] == "admin"

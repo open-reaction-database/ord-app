@@ -20,35 +20,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel
+from ord_app.service_api.repositories.base import BaseRepository
 
 
-class GroupRepository:
-    def __init__(self, db: AsyncSession, autocommit: bool = True):
-        self.db = db
-        self.autocommit = autocommit
+class GroupRepository(BaseRepository[GroupModel]):
+    model = GroupModel
 
-    async def create(self, owner_id: int, payload: dict):
-        group = GroupModel(owner_id=owner_id, **payload)
-        user_group_member = UserGroupsMembershipModel(user_id=owner_id, group=group, role="admin")
+    async def create(self, owner_id: int, payload: dict, autocommit: bool = True) -> GroupModel:
+        group = GroupModel(
+            owner_id=owner_id,
+            groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")],
+            **payload
+        )
 
-        if self.autocommit:
-            self.db.add_all([group, user_group_member])
+        if autocommit:
+            self.db.add(group)
             await self.db.commit()
             await self.db.refresh(group)
-            await self.db.refresh(user_group_member)
             logger.debug(f"{group} created with payload: {payload}")
-            return group, user_group_member
 
-        return group, user_group_member
-
-    async def get(self, group_id: int):
-        stmt = (
-            select(GroupModel, UserGroupsMembershipModel)
-            .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
-            .where(GroupModel.id == group_id)
-        )
-        group, user_group = (await self.db.execute(stmt)).one()
-        return dict(id=group.id, name=group.name, role=user_group.role)
+        return group
 
     async def get_user_groups(self, user_id: int):
         stmt = (
@@ -62,23 +53,6 @@ class GroupRepository:
             for group, user_group in rows
         ]
         return groups
-
-    async def update(self, group_id: int, payload: dict):
-        stmt = update(GroupModel).where(GroupModel.id == group_id).values(payload)
-
-        if self.autocommit:
-            await self.db.execute(stmt)
-            await self.db.commit()
-            group = await self.get(group_id)
-            logger.debug(f"{group} updated with payload: {payload}")
-            return group
-
-    async def delete(self, group_id):
-        stmt = delete(GroupModel).where(GroupModel.id == group_id)
-        if self.autocommit:
-            await self.db.execute(stmt)
-            await self.db.commit()
-            logger.debug(f"<Group(id={group_id})> deleted")
 
 
 class GroupMembersRepository:

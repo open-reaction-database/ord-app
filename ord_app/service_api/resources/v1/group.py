@@ -28,6 +28,7 @@ from ord_app.service_api.schemas.groups import (
     GroupMemberSchema,
     GroupSchema,
     GroupUpdateMemberSchema,
+    GroupUserSchema,
 )
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 
@@ -39,9 +40,10 @@ async def create_group(payload: GroupCreateSchema, use_case: Annotated[GroupUseC
     return await use_case.create(payload)
 
 
-@router.get("", response_model=list[GroupSchema])
+@router.get("", response_model=list[GroupUserSchema])
 async def list_current_user_groups(use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
-    return await use_case.user_groups()
+    response = await use_case.user_groups()
+    return response
 
 
 @router.get(
