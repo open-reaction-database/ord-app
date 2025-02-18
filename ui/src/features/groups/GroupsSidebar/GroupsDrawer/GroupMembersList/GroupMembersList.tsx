@@ -34,10 +34,11 @@ import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts'
 export function GroupMembersList() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
-  const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId)));
-  const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
+  const groupId = useSelector(selectEditingGroupId);
+  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId))) || [];
+  const isGroupUpdating = useSelector(selectIsGroupUpdating);
+  const roleOrder = Object.values(USER_ROLES);
 
   const handleRoleChange = (user_id: number, role: USER_ROLES) => {
     dispatch(updateGroupMembers({ user_id, role }));
@@ -46,6 +47,15 @@ export function GroupMembersList() {
   const handleMemberRemove = (id: number) => {
     dispatch(removeGroupMembers([id]));
   };
+
+  const sortedGroupMembers = groupMembers.length
+    ? [...groupMembers].sort(
+        (a, b) =>
+          roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role) ||
+          a.user.name?.localeCompare(b.user.name, undefined, { sensitivity: 'base' }) ||
+          0,
+      )
+    : [];
 
   return (
     <div className={classes.container}>
@@ -75,7 +85,7 @@ export function GroupMembersList() {
           <Loader />
         </Flex>
       ) : (
-        groupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
+        sortedGroupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
           <div
             key={external_id}
             className={classes.userInfoContainer}
