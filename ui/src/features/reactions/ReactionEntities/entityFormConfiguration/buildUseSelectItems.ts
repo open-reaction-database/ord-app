@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+import { useContext } from 'react';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { useSelector } from 'react-redux';
+import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 
-const Routes = lazyWithPreload(() => import('routes'));
-
-export function AppContent() {
-  const isLoading = useAuth();
-
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="bottom-right"
-      />
-    </Suspense>
-  );
-}
+export const buildUseSelectItems = (entityName: string) =>
+  function useSelectItems() {
+    const { reactionId, pathComponents } = useContext(reactionEntityContext);
+    return useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+  };

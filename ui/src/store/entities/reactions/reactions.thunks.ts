@@ -117,21 +117,23 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-async function updateReaction(reactionId: number, getState: () => AppState): Promise<void> {
+async function updateReaction(reactionId: number, getState: () => AppState): Promise<ReactionResponse> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);
   const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
-  await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
-    binpb: payload,
-  });
+  return (
+    await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
+      binpb: payload,
+    })
+  ).data;
 }
 
 export const addUpdateReactionField = createThunk(
   addUpdateReactionFieldActions,
   async (_d, getState, { reactionId }) => {
-    await updateReaction(reactionId, getState);
-    return addUpdateReactionFieldActions.success();
+    const { binpb: _, ...reaction } = await updateReaction(reactionId, getState);
+    return addUpdateReactionFieldActions.success(reaction);
   },
 );
 

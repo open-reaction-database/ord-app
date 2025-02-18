@@ -28,17 +28,26 @@ interface ReactionEntityDeleteProps {
   reactionId: number;
   entityName: string;
   pathComponents: ReactionPathComponents;
+  shouldCloseSidebar?: true;
 }
 
-export function ReactionEntityDelete({ reactionId, entityName, pathComponents }: Readonly<ReactionEntityDeleteProps>) {
+export function ReactionEntityDelete({
+  reactionId,
+  entityName,
+  pathComponents,
+  shouldCloseSidebar,
+}: Readonly<ReactionEntityDeleteProps>) {
   const dispatch = useAppDispatch();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
   const onRemove = useCallback(() => {
-    dispatch(popReactionPathComponents());
+    if (shouldCloseSidebar) {
+      dispatch(popReactionPathComponents());
+    }
     dispatch(deleteReactionField({ reactionId, pathComponents }));
-  }, [dispatch, pathComponents, reactionId]);
+    closeConfirmation();
+  }, [closeConfirmation, dispatch, pathComponents, reactionId, shouldCloseSidebar]);
 
   return (
     <ConfirmPopover

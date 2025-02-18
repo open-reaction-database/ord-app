@@ -21,7 +21,7 @@ export const reversePrimitiveRecord = <Key extends Primitive, Value extends Prim
   (Object.entries(record) as Array<[Key, Value]>).reduce(
     (acc: Record<Value, Key>, [key, value]): Record<Value, Key> => ({
       ...acc,
-      [key]: value,
+      [value]: key,
     }),
     {} as Record<Value, Key>,
   );

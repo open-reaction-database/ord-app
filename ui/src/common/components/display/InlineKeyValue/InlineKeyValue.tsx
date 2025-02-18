@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+import { Flex, Text } from '@mantine/core';
+import { typographyClasses } from 'common/styling';
+import type { ReactNode } from 'react';
 
-const Routes = lazyWithPreload(() => import('routes'));
+interface InlineKeyValueProps {
+  label: string;
+  value: ReactNode;
+}
 
-export function AppContent() {
-  const isLoading = useAuth();
-
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="bottom-right"
-      />
-    </Suspense>
+export function InlineKeyValue({ label, value }: Readonly<InlineKeyValueProps>) {
+  return (
+    <Flex
+      gap="xs"
+      align="center"
+    >
+      <Text className={typographyClasses.secondary1}>{label}:</Text>
+      <Text>{value}</Text>
+    </Flex>
   );
 }

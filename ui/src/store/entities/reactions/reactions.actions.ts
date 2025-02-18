@@ -38,6 +38,9 @@ export const importReactionFromFileActions = createAsyncAction<ImportReactionFro
   'import_from_file',
 );
 
-export const addUpdateReactionFieldActions = createAsyncAction<AddEditReactionFieldPayload, void>('addUpdateField');
+export const addUpdateReactionFieldActions = createAsyncAction<
+  AddEditReactionFieldPayload,
+  Omit<ReactionWrapper, 'data'>
+>('addUpdateField');
 
 export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');

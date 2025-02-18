@@ -17,13 +17,15 @@ import type { ReactionFormNode } from 'features/reactions/ReactionEntities/react
 import { reactionInputs } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/reactionInputs.model.tsx';
 import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
-import { reactionComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponents.model.ts';
+import { reactionComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponents.model.tsx';
+import { reactionComponentsPreparations } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/preparations/reactionComponentsPreparations.model..ts';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
   Notes = 'notes',
   Identifiers = 'identifiers',
   Components = 'components',
+  ComponentPreparations = 'preparations',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -31,4 +33,5 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Notes]: reactionNotes,
   [ReactionEntity.Identifiers]: reactionIdentifiers,
   [ReactionEntity.Components]: reactionComponents,
+  [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
 };

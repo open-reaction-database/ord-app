@@ -18,6 +18,7 @@ import type { SelectOptions } from 'common/types/selectOptions.ts';
 import type { FC, ReactNode } from 'react';
 import type { useForm } from '@mantine/form';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { EntityListItemRuntimeProps } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.types.ts';
 
 export enum ReactionFormNodeType {
   group = 'group',
@@ -27,6 +28,7 @@ export enum ReactionFormNodeType {
   vpu = 'vpu',
   objectInitializer = 'objectInitializer',
   block = 'block',
+  list = 'list',
   custom = 'custom',
 }
 
@@ -99,6 +101,18 @@ export interface ReactionFormBlock extends ReactionFormNodeBase {
   fields: Array<ReactionFormNode>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ReactionFormList<T = any> extends ReactionFormNodeBase {
+  type: ReactionFormNodeType.list;
+  title: ReactionFormStandaloneField;
+  addItem?: {
+    label: string;
+    useCreate: () => (index: number) => void;
+  };
+  useSelectItems: () => Array<T>;
+  ItemDisplay: FC<EntityListItemRuntimeProps<T>>;
+}
+
 export type ReactionFormMethods = Pick<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReturnType<typeof useForm<any>>,
@@ -126,6 +140,7 @@ export type ReactionFormNode =
   | ReactionFormObjectInitializer
   | ReactionFormValuePrecisionUnit
   | ReactionFormBlock
+  | ReactionFormList
   | ReactionFormCustom;
 
 export interface ReactionEntityContext {

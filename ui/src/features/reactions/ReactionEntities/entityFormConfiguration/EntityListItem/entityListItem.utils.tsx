@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+import type { EntityListItemStaticProps, EntityListItemRuntimeProps } from './entityListItem.types.ts';
+import { EntityListItem } from './EntityListItem.tsx';
 
-const Routes = lazyWithPreload(() => import('routes'));
-
-export function AppContent() {
-  const isLoading = useAuth();
-
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="bottom-right"
+export function createEntityListItemComponent<T>(staticProps: EntityListItemStaticProps<T>) {
+  return function EntityListItemComponent(runtimeProps: EntityListItemRuntimeProps<T>) {
+    return (
+      <EntityListItem
+        {...staticProps}
+        {...runtimeProps}
       />
-    </Suspense>
-  );
+    );
+  };
 }
