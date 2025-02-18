@@ -38,6 +38,7 @@ import type { AppData } from 'store/entities/reactions/reactionData/reactionData
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { ordDataToReactionData } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import { useMemo } from 'react';
+import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 
 const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
@@ -230,6 +231,14 @@ export const reactionComponents: Array<ReactionFormNode> = [
         {
           label: 'Type',
           render: item => item.data.type,
+        },
+        {
+          label: 'Value',
+          render: item => <AppDataDisplay appData={item} />,
+        },
+        {
+          label: 'Description',
+          render: item => item.description,
         },
       ],
     }),

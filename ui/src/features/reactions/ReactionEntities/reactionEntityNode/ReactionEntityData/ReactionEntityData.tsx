@@ -20,11 +20,12 @@ import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyVal
 import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import mime from 'mime/lite';
 import { useUncontrolled } from '@mantine/hooks';
-import { type ChangeEvent, useCallback, useMemo } from 'react';
+import { type ChangeEvent, useCallback } from 'react';
 import { ActionIcon, FileInput, Flex, Input, NumberInput, TextInput } from '@mantine/core';
 import { Buffer } from 'buffer';
 import { RemoveIcon } from 'common/icons';
 import { inputWrapperClasses } from 'common/components/display/InputWrapper';
+import { useFileNameHref } from 'features/reactions/ReactionEntities/useFileNameHref.ts';
 
 const options = ordMapToKeyValueObject(AppDataType as Record<string, AppDataType>);
 
@@ -39,17 +40,7 @@ interface ReactionEntityValueProps {
 }
 
 function ReactionEntityDataFile({ value, name, onChange }: ReactionEntityValueProps) {
-  const format = value.format || '';
-  const stringValue = value.value;
-
-  const fileName = useMemo(() => {
-    // In case there are incorrect saved format files
-    return [name, format.replace('.', '')].join('.');
-  }, [format, name]);
-
-  const href = useMemo(() => {
-    return `data:application/octet-stream;base64,${stringValue}`;
-  }, [stringValue]);
+  const { fileName, href } = useFileNameHref(name, value);
 
   const handleChange = useCallback(
     (file: File | null) => {
