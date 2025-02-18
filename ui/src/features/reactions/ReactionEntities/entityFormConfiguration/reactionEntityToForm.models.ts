@@ -25,7 +25,7 @@ export enum ReactionEntity {
   Notes = 'notes',
   Identifiers = 'identifiers',
   Components = 'components',
-  ComponentPreparation = 'preparations',
+  ComponentPreparations = 'preparations',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -33,5 +33,5 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Notes]: reactionNotes,
   [ReactionEntity.Identifiers]: reactionIdentifiers,
   [ReactionEntity.Components]: reactionComponents,
-  [ReactionEntity.ComponentPreparation]: reactionComponentsPreparations,
+  [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
 };
