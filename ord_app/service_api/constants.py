@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-class AppEns:
+class AppEnvs:
     localhost = "localhost"
     production = "production"
 

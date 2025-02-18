@@ -14,31 +14,18 @@
 
 """Utility API endpoints."""
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Request, Response
 from ord_schema import resolvers
 from ord_schema.message_helpers import create_message, molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import send_message
-from ord_app.service_api.models import UserModel
 from ord_app.service_api.schemas.utilites import ResolveCompoundInputs, ResolveCompoundOutputs
-from ord_app.service_api.services.populate_data_sets import populate_testing_data
-from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.services.resolvers import canonicalize_smiles_cached, name_resolve_cached
 
 router = APIRouter(tags=["utilities"])
 
-
-@router.post("/group/{group_id}/init-testing-data")
-async def testing_data(
-    group_id: int,
-    user: UserModel = Depends(authenticate),
-    db_session: AsyncSession = Depends(get_db_session),
-):
-    return await populate_testing_data(db_session, user, group_id)
 
 
 def adjust_error(error: str) -> str:

@@ -13,10 +13,10 @@
 # limitations under the License.
 from pathlib import PosixPath
 
-from pydantic import AliasChoices, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from ord_app.service_api.constants import AppEns
+from ord_app.service_api.constants import AppEnvs
 
 
 class Settings(BaseSettings):
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=str(base_dir.parent / ".env"), case_sensitive=False)
 
     # app
-    app_env: str = AppEns.localhost
+    app_env: str = AppEnvs.production
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # databases
@@ -32,11 +32,11 @@ class Settings(BaseSettings):
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
     # Encryption and auth
-    auth0_domain: str = Field("", validation_alias=AliasChoices("vite_auth0_domain", "auth0_domain"))
-    auth0_algorithms: str = Field("", validation_alias=AliasChoices("vite_auth0_algorithms", "auth0_algorithms"))
-    auth0_audience: str = Field("", validation_alias=AliasChoices("vite_auth0_audience", "auth0_audience"))
-    auth0_issuer: str = Field("", validation_alias=AliasChoices("vite_auth0_issuer", "auth0_issuer"))
-    auth0_client_id: str = Field("", validation_alias=AliasChoices("vite_auth0_client_id", "auth0_client_id"))
+    auth0_domain: str = Field("", validation_alias="vite_auth0_domain")
+    auth0_algorithms: str = Field("RS256", validation_alias="vite_auth0_algorithms")
+    auth0_audience: str = Field("", validation_alias="vite_auth0_audience")
+    auth0_issuer: str = Field("", validation_alias="vite_auth0_issuer")
+    auth0_client_id: str = Field("", validation_alias="vite_auth0_client_id")
 
 
 RuntimeSettings = Settings()

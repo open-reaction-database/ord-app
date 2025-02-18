@@ -1,10 +1,25 @@
 .idea/
 .github/
 
+.dockerignore
+.gitignore
+.env
+
 __pychace__/
 .venv/
 .coverage
-.dockerignore
-.gitignore
+.pylintrc
+.pytype/
+ord_app/tests/
+migrations/
+alembic.ini
+docker-compose.yml
+Dockerfile
+Dockerfile.single
+format.sh
+Makefile
+MANIFEST.in
+ruff.toml
+tox.ini
 
 ui/node_modules/

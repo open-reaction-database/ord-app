@@ -24,6 +24,11 @@ services:
       - db
     environment:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
+      APP_ENV: "localhost"
+      VITE_AUTH0_DOMAIN: "dev-z4acb31kcl4prqtw.us.auth0.com"
+      VITE_AUTH0_AUDIENCE: "https://dev-z4acb31kcl4prqtw.us.auth0.com/api/v2/"
+      VITE_AUTH0_ISSUER: "https://dev-z4acb31kcl4prqtw.us.auth0.com/"
+      VITE_AUTH0_CLIENT_ID: "6iGbDSlSANtgqktlxmERNKUUM8zx89TR"
     volumes:
       - .:/app
       - /app/.venv
@@ -61,7 +66,7 @@ services:
       sh -c "alembic upgrade head"
     networks:
       - ord_network
-    restart: no
+    restart: "no"
 
 networks:
   ord_network:
