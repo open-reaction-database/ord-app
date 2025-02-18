@@ -20,7 +20,7 @@ import classes from './DataTable.module.scss';
 export function DataTable<T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableOptions<T>) {
   const table = useMantineReactTable<T>({
     columns,
-    layoutMode: 'grid',
+    layoutMode: data.length > 0 ? 'grid' : 'semantic',
     data: data,
     enableColumnActions: false,
     enableTopToolbar: false,
