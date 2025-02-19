@@ -14,27 +14,23 @@
 import httpx
 from fastapi.security import HTTPAuthorizationCredentials
 from loguru import logger
-from sqlalchemy import delete, or_, select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema
-from ord_app.service_api.services.auth0 import verify_access_token
+from ord_app.service_api.services.auth0 import UnauthorizedException, verify_access_token
 
 
-async def get_user_by_external_pks(
+async def get_user_by_external_id(
     db_session: AsyncSession,
-    external_id: str | None = None,
-    external_email: str | None = None,
+    external_id: str,
 ) -> UserModel:
     stmt = (
         select(UserModel)
         .where(
-            or_(
-                UserModel.external_id == external_id,
-                UserModel.email == external_email,
-            )
+            UserModel.external_id == external_id,
         )
         .limit(1)
     )
@@ -87,8 +83,10 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         user_info = response.raise_for_status().json()
 
     logger.debug(f"user_info: {user_info}")
+    if "sub" not in user_info:
+        raise UnauthorizedException("sub is not provided")
 
-    if user := await get_user_by_external_pks(db_session, user_info["sub"], user_info["email"]):
+    if user := await get_user_by_external_id(db_session, user_info["sub"]):
         logger.info(f"<User(id={user.id})> already exists")
         return user
 
@@ -100,9 +98,9 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         external_id = user_info["nickname"]
 
     user_payload = UserCreateSchema(
-        email=user_info["email"] or None,
-        name=user_info["name"],
-        avatar_url=user_info["picture"],
+        email=user_info.get("email") or None,
+        name=user_info.get("name") or None,
+        avatar_url=user_info.get("picture") or None,
         external_id=external_id,
         orcid_id=orcid_id,
         auth0_id=user_info["sub"]

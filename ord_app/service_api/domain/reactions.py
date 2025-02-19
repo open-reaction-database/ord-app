@@ -197,7 +197,9 @@ class ReactionsUseCase:
         return await paginate(self.db, self.reaction_repo.all_reactions_stmt(dataset_id))
 
     async def get(self, reaction_id):
-        return await self.reaction_repo.get(id=reaction_id)
+        if reaction := await self.reaction_repo.get(id=reaction_id):
+            return reaction
+        raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         updating_data = payload.model_dump() | {"pb_reaction_id": payload.binpb.reaction_id}
@@ -207,6 +209,9 @@ class ReactionsUseCase:
             return reaction
 
         raise EntityNotFoundError("Reaction not found")
+
+    async def delete(self, dataset_id: int, reaction_id: int):
+        await self.reaction_repo.delete(dataset_id=dataset_id, id=reaction_id)
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):

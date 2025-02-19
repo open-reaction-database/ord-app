@@ -14,24 +14,9 @@
 from faker import Faker
 from fastapi import status
 
-from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserModel
-from ord_app.tests.conftest import create_test_dataset
+from ord_app.tests.conftest import create_test_dataset, create_test_user_with_group
 
 fake = Faker()
-
-
-async def _create_test_user_with_group(test_db_session):
-    user = UserModel(email=fake.email(), external_id=str(fake.uuid4()), auth0_id=str(fake.uuid4()))
-    group = GroupModel(name=fake.word(), owner=user)
-    group_member = UserGroupsMembershipModel(
-        user=user,
-        group=group,
-        role="admin"
-    )
-    test_db_session.add_all([user, group, group_member])
-    await test_db_session.commit()
-    await test_db_session.refresh(user)
-    return user, group
 
 
 async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, test_db_session):
@@ -49,7 +34,7 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert True is primary_user_dataset["is_sharable"]
 
     # secondary user should have 0 datasets
-    secondary_user, secondary_group = await _create_test_user_with_group(test_db_session)
+    secondary_user, secondary_group = await create_test_user_with_group(test_db_session)
     set_user_auth(secondary_user)
     primary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
     assert primary_group_datasets["total"] == 0
@@ -69,7 +54,7 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert secondary_group_datasets["items"][0]["id"] == primary_dataset.id
 
     # And secondary user cannot share that dataset
-    foreign_user, foreign_group = await _create_test_user_with_group(test_db_session)
+    foreign_user, foreign_group = await create_test_user_with_group(test_db_session)
     secondary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
     assert primary_dataset.id == secondary_user_dataset["id"]
     assert False is secondary_user_dataset["is_sharable"]
