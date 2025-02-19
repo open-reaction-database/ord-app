@@ -20,7 +20,7 @@ import { Button, Flex } from '@mantine/core';
 import classes from './reactionEntityForm.module.scss';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/useReactionEntityInfo.tsx';
+import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/getSidebarInfo.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { ReactionEntityBaseNode, reactionEntityToForm } from 'features/reactions/ReactionEntities';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';

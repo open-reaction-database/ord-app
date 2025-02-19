@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 import type { ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { reactionInputs } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/reactionInputs.model.tsx';
 import { reactionNotes } from './reactionNotes.model.ts';
+import { reactionData } from './data/reactionData.models.ts';
+import { reactionInputs } from './inputs/reactionInputs.model.tsx';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
-import { reactionComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponents.model.tsx';
-import { reactionComponentsPreparations } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/preparations/reactionComponentsPreparations.model..ts';
+import { reactionComponents } from './components/reactionComponents.model.tsx';
+import { reactionComponentsPreparations } from './components/preparations/reactionComponentsPreparations.model.ts';
+import { reactionComponentIdentifiers } from './componentIdentifier/reactionComponentIdentifiers.model.ts';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
@@ -26,6 +28,8 @@ export enum ReactionEntity {
   Identifiers = 'identifiers',
   Components = 'components',
   ComponentPreparations = 'preparations',
+  Features = 'features',
+  ComponentIdentifiers = 'component_identifiers',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -34,4 +38,6 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Identifiers]: reactionIdentifiers,
   [ReactionEntity.Components]: reactionComponents,
   [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
+  [ReactionEntity.Features]: reactionData,
+  [ReactionEntity.ComponentIdentifiers]: reactionComponentIdentifiers,
 };

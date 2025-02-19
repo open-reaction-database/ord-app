@@ -93,9 +93,10 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
       [getReactionId(action.payload)]: action.payload,
     }),
   );
-  builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
-    itemsById(action.payload.items, getReactionId),
-  );
+  builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (state, action) => ({
+    ...state,
+    ...itemsById(action.payload.items, getReactionId),
+  }));
 });
 
 const reactionsOrder = createReducer<Array<number>>([], builder => {

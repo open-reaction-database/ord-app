@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import type { SelectOptions } from 'common/types/selectOptions';
-import { SegmentedControl, type SegmentedControlProps } from '@mantine/core';
+import { Input, SegmentedControl, type SegmentedControlProps } from '@mantine/core';
 import { useUncontrolledSelect } from 'common/hooks/useUncontrolledSelect';
+import type { ReactNode } from 'react';
+import { inputWrapperClasses } from 'common/components/display/InputWrapper';
 
 interface AppSegmentedControlProps<T>
   extends Omit<SegmentedControlProps, 'onChange' | 'data' | 'defaultValue' | 'value'> {
@@ -23,6 +25,7 @@ interface AppSegmentedControlProps<T>
   defaultValue?: T;
   value?: T;
   onChange: (value: T) => void;
+  label?: ReactNode;
 }
 
 export function AppSegmentedControl<T>({
@@ -30,13 +33,19 @@ export function AppSegmentedControl<T>({
   defaultValue,
   onChange,
   options,
+  label,
   ...rest
 }: Readonly<AppSegmentedControlProps<T>>) {
   const inputProps = useUncontrolledSelect(false, options, value, defaultValue, onChange);
   return (
-    <SegmentedControl
-      {...inputProps}
-      {...rest}
-    />
+    <Input.Wrapper
+      label={label}
+      className={inputWrapperClasses.inputWrapper}
+    >
+      <SegmentedControl
+        {...inputProps}
+        {...rest}
+      />
+    </Input.Wrapper>
   );
 }

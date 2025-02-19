@@ -13,44 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-.homeIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-icons-default);
-}
-
-.active {
-  color: var(--color-text-primary);
-}
-
-.link {
-  color: var(--mantine-color-primary-0);
-}
-
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.breadcrumb {
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  display: flex;
-  align-items: center;
-  gap: var(--mantine-spacing-xs);
-  max-width: 150px;
-  overflow: hidden;
-}
-
-.text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+export const reactionData: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.value,
+    name: 'name',
+    inputType: 'string',
+    wrapperConfig: {
+      label: 'Data name',
+    },
+  },
+  {
+    type: ReactionFormNodeType.data,
+  },
+  {
+    type: ReactionFormNodeType.value,
+    inputType: 'textarea',
+    name: 'description',
+    wrapperConfig: {
+      label: 'Description',
+    },
+  },
+];

@@ -25,16 +25,17 @@ import { AddCircleIcon } from 'common/icons';
 import { useCallback } from 'react';
 
 interface ReactionEntityAddButtonProps extends Required<Pick<ReactionFormList, 'addItem'>> {
+  items: Array<unknown>;
   nextIndex: number;
 }
 
-function ReactionEntityAddButton({ addItem, nextIndex }: Readonly<ReactionEntityAddButtonProps>) {
+function ReactionEntityAddButton({ items, addItem, nextIndex }: Readonly<ReactionEntityAddButtonProps>) {
   const { label, useCreate } = addItem;
   const onCreate = useCreate();
 
   const handleCreate = useCallback(() => {
-    onCreate(nextIndex);
-  }, [onCreate, nextIndex]);
+    onCreate(nextIndex, items);
+  }, [onCreate, nextIndex, items]);
 
   return (
     <Button
@@ -68,6 +69,7 @@ export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<Re
             node.addItem ? (
               <ReactionEntityAddButton
                 addItem={node.addItem}
+                items={items}
                 nextIndex={nextIndex}
               />
             ) : null
@@ -83,7 +85,7 @@ export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<Re
           // eslint-disable-next-line react/jsx-key
           <ItemDisplay
             entity={item}
-            index={index}
+            entityKey={node.getKey(item, index)}
           />
         ))}
       </Flex>

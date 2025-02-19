@@ -24,7 +24,7 @@ import type { EntityListItemProps } from './entityListItem.types.ts';
 import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineKeyValue.tsx';
 
 export function EntityListItem<T>({
-  index,
+  entityKey,
   entity,
   entityName,
   title,
@@ -33,12 +33,13 @@ export function EntityListItem<T>({
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
-    return [...pathComponents, entityName, index];
-  }, [entityName, index, pathComponents]);
+    return [...pathComponents, entityName, entityKey];
+  }, [entityName, entityKey, pathComponents]);
 
   const titleText = useMemo(() => {
-    return typeof title === 'function' ? title(entity) : `${title} ${index + 1}`;
-  }, [title, entity, index]);
+    const humanFriendlyKey = typeof entityKey === 'string' ? entityKey : `${entityKey + 1}`;
+    return typeof title === 'function' ? title(entity) : `${title} ${humanFriendlyKey}`;
+  }, [title, entity, entityKey]);
 
   const onEdit = useCallback(() => {
     dispatch(addReactionPathComponentToList(itemPathComponents));
