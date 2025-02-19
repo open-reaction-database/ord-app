@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
+import { Breadcrumbs as MantineBreadcrumbs, Flex, Tooltip } from '@mantine/core';
 import { Link } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
 import { HomeIcon } from 'common/icons';
@@ -34,18 +34,30 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
           breadcrumb: classes.breadcrumb,
         }}
       >
-        {items.map((item, index) => {
+        {/* Cannot be moved to the separate component because otherwise mantine class not being applied (even with forwardRef) */}
+        {items.map((breadcrumb, index) => {
           const isActive = index === items.length - 1;
-          return (
-            <Link
-              className={isActive ? classes.active : classes.link}
-              to={item.path}
-              id={item.path}
-              key={item.path}
-            >
+
+          const children = (
+            <>
               {index === 0 && <HomeIcon className={classes.homeIcon} />}
-              {item.title}
+              <Tooltip label={breadcrumb.title}>
+                <span className={classes.text}>{breadcrumb.title}</span>
+              </Tooltip>
+            </>
+          );
+
+          return !isActive ? (
+            <Link
+              className={classes.link}
+              to={breadcrumb.path}
+              id={breadcrumb.path}
+              key={breadcrumb.path}
+            >
+              {children}
             </Link>
+          ) : (
+            <Flex>{children}</Flex>
           );
         })}
       </MantineBreadcrumbs>

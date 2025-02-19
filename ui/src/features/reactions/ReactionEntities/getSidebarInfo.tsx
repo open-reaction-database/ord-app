@@ -44,7 +44,7 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     }),
   },
   {
-    pathComponents: ['components'],
+    pathComponents: ['components', 'inputs'],
     entityName: ReactionEntity.Components,
     label: 'Component',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: false }),
@@ -65,6 +65,18 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     label: 'Preparation',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Preparation', hasDelete: true }),
   },
+  {
+    pathComponents: ['features', 'components', 'inputs'],
+    entityName: ReactionEntity.Features,
+    label: 'Features',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
+  },
+  {
+    pathComponents: ['identifiers', 'components', 'inputs'],
+    entityName: ReactionEntity.ComponentIdentifiers,
+    label: 'Identifiers',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
+  },
 ];
 
 const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity)];
@@ -83,9 +95,14 @@ export function getSidebarInfo(
   sidebarInfoCandidates: Array<ReactionSidebarInfo> = reactionSidebarInfo,
 ): ReactionSidebarInfo {
   const [updatedPathComponents, currentPath] = getEntityPathComponent(pathComponents);
-  const filteredSidebarInfoCandidates = sidebarInfoCandidates.filter(
+  let filteredSidebarInfoCandidates = sidebarInfoCandidates.filter(
     (candidate: ReactionSidebarInfo) => candidate.pathComponents[index] === currentPath,
   );
+  if (updatedPathComponents.length === 0) {
+    filteredSidebarInfoCandidates = filteredSidebarInfoCandidates.filter(
+      (candidate: ReactionSidebarInfo) => candidate.pathComponents.length === index + 1,
+    );
+  }
   if (filteredSidebarInfoCandidates.length === 1) {
     return filteredSidebarInfoCandidates[0];
   } else if (filteredSidebarInfoCandidates.length === 0) {

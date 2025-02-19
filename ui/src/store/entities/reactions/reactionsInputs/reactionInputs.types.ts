@@ -15,6 +15,7 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { UniqueEntity } from 'store/utils/UniqueEntity.ts';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
 export type AppAmountUnspecified = 'UNSPECIFIED';
 
@@ -28,7 +29,8 @@ export interface AppReactionAmount extends Pick<NonNullable<Required<ord.IAmount
   units: AppReactionAmountType;
 }
 
-export interface AppReactionCompound extends Omit<ord.ICompound, 'amount'> {
+export interface AppReactionCompound extends Omit<ord.ICompound, 'amount' | 'features'> {
+  features: Record<string, AppData>;
   amount: AppReactionAmount;
 }
 
