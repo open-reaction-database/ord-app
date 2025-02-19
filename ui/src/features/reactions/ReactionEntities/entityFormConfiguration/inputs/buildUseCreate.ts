@@ -19,15 +19,18 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 
-export const buildUseCreate = (entityName: string, createEmpty: () => unknown) =>
+export const buildUseCreate = (
+  entityName: string,
+  createKeyWithEmpty: (newIndex: number, list: Array<unknown>) => [number | string, unknown],
+) =>
   function useCreate() {
     const dispatch = useAppDispatch();
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
 
     return useCallback(
-      (newIndex: number) => {
-        const updatedPathComponents = [...pathComponents, entityName, newIndex];
-        const newEntity = createEmpty();
+      (newIndex: number, entitiesList: Array<unknown>) => {
+        const [key, newEntity] = createKeyWithEmpty(newIndex, entitiesList);
+        const updatedPathComponents = [...pathComponents, entityName, key];
 
         dispatch(
           addUpdateReactionField({

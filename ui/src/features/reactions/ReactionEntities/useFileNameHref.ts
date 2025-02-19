@@ -13,44 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
+import { useMemo } from 'react';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
-.homeIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-icons-default);
-}
+export function useFileNameHref(name: string, value: AppData['data']) {
+  const format = value.format || '';
+  const stringValue = value.value;
 
-.active {
-  color: var(--color-text-primary);
-}
+  const fileName = useMemo(() => {
+    // In case there are incorrect saved format files
+    return [name, format.replace('.', '')].join('.');
+  }, [format, name]);
 
-.link {
-  color: var(--mantine-color-primary-0);
-}
+  const href = useMemo(() => {
+    return `data:application/octet-stream;base64,${stringValue}`;
+  }, [stringValue]);
 
-.separator {
-  color: var(--color-text-secondary-1);
-}
-
-.breadcrumb {
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 24px;
-  display: flex;
-  align-items: center;
-  gap: var(--mantine-spacing-xs);
-  max-width: 150px;
-  overflow: hidden;
-}
-
-.text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  return { fileName, href };
 }

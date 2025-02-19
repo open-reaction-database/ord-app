@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { AppNativeSelect } from 'common/components/inputs/AppNativeSelect/AppNativeSelect.tsx';
-import { Input } from '@mantine/core';
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -37,13 +36,12 @@ export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEnt
       {...getInputProps(node.name)}
     />
   ) : (
-    <Input.Wrapper label={label}>
-      <AppSegmentedControl
-        name={node.name}
-        options={node.options}
-        fullWidth
-        {...getInputProps(node.name)}
-      />
-    </Input.Wrapper>
+    <AppSegmentedControl
+      name={node.name}
+      options={node.options}
+      label={label}
+      fullWidth
+      {...getInputProps(node.name)}
+    />
   );
 }

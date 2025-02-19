@@ -25,28 +25,19 @@ import { useCallback } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-
-function findValidInputName(inputs: Array<AppReactionInput>): string {
-  let counter = 1;
-  let isValid = false;
-  let name: string = `Input ${counter}`;
-  while (!isValid) {
-    name = `Input ${counter}`;
-    isValid = inputs.every(input => input.name !== name);
-    counter++;
-  }
-  return name;
-}
+import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 
 export function Inputs({ reactionId }: ReactionSectionProps) {
   const dispatch = useAppDispatch();
   const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
 
   const onCreateNew = useCallback(() => {
-    const newInputName = findValidInputName(inputs);
+    const newInputName = findReactionEntityUniqueName(
+      'Input',
+      inputs.map(input => input.name),
+    );
     const appReactionInput = createEmptyReactionInput(newInputName);
     const pathComponents = ['inputs', appReactionInput.id];
     dispatch(addUpdateReactionField({ reactionId, pathComponents: pathComponents, newValue: appReactionInput }));

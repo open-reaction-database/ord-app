@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ActionIcon, Button, Divider, Flex, Text, Title } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { DataTable } from 'common/components/display/DataTable/DataTable.tsx';
@@ -32,6 +31,7 @@ import { ordCompoundToReactionCompound } from 'store/entities/reactions/reaction
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { typographyClasses } from 'common/styling';
 import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 
 const reactionRoleByValue = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
@@ -102,7 +102,9 @@ const columns: Array<MRT_ColumnDef<AppReactionCompound>> = [
   },
 ];
 
-export function InputsComponentList({ useSelectData }: Readonly<ReactionFormCustomProps>) {
+const useSelectData = buildUseSelectItems('components');
+
+export function InputsComponentList() {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData() as Array<AppReactionCompound>;

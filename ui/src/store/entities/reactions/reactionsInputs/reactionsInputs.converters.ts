@@ -27,6 +27,10 @@ import {
   volumeUnitNames,
 } from 'store/entities/reactions/reactionsInputs/reactionsInputs.models.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import {
+  ordDataMapToReactionDataMap,
+  reactionDataMapToOrdDataMap,
+} from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 
 // TODO rewrite this mess NORMALLY
 // eslint-disable-next-line complexity
@@ -92,6 +96,7 @@ export function ordCompoundToReactionCompound(ordCompound: ord.ICompound): AppRe
 
   return {
     ...rest,
+    features: ordDataMapToReactionDataMap(ordCompound.features || {}),
     amount: ordAmountToReactionAmount(amount),
   };
 }
@@ -100,6 +105,7 @@ function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.IC
   const { amount, ...rest } = appCompound;
   return {
     ...rest,
+    features: reactionDataMapToOrdDataMap(appCompound.features),
     amount: reactionAmountToOrdAmount(amount),
   };
 }

@@ -25,7 +25,7 @@ import {
   popReactionPathComponents,
   sliceReactionPathComponentsList,
 } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { getSidebarInfo } from 'features/reactions/ReactionEntities/useReactionEntityInfo.tsx';
+import { getSidebarInfo } from 'features/reactions/ReactionEntities/getSidebarInfo.tsx';
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
@@ -74,6 +74,12 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
     dispatch(clearReactionPathComponentsList());
     closeCloseAllConfirmation();
   }, [dispatch, closeCloseAllConfirmation]);
+
+  useEffect(() => {
+    return () => {
+      onSidebarClose();
+    };
+  }, [onSidebarClose]);
 
   const breadcrumbs = useMemo(() => {
     const length = reactionPathComponentsList.length;

@@ -26,6 +26,7 @@ import {
 } from './components.ts';
 import type { ReactionNodeToComponent } from './reactionEntityNode.types.ts';
 import { ReactionEntityList } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityList/ReactionEntityList.tsx';
+import { ReactionEntityData } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityData/ReactionEntityData.tsx';
 
 // Cannot produce correct type for this map since every item has its own type
 export const reactionNodeToComponent = {
@@ -38,4 +39,5 @@ export const reactionNodeToComponent = {
   [ReactionFormNodeType.objectInitializer]: ReactionEntityObjectInitializer,
   [ReactionFormNodeType.block]: ReactionEntityBlockNode,
   [ReactionFormNodeType.list]: ReactionEntityList,
+  [ReactionFormNodeType.data]: ReactionEntityData,
 } as ReactionNodeToComponent;
