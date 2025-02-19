@@ -39,7 +39,7 @@ export function GroupMembersList() {
   const [opened, { open, close }] = useDisclosure(false);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
   const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(groupId != null ? selectGroupMembersByGroupId(groupId) : () => []);
+  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId)));
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
 
   const handleRoleChange = (user_id: number, role: USER_ROLES) => {
@@ -51,10 +51,15 @@ export function GroupMembersList() {
   };
 
   const sortedGroupMembers = useMemo(() => {
-    return [...groupMembers].sort((a, b) => {
-      const roleComparison = roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
-      if (roleComparison !== 0) return roleComparison;
-      return a.user.name?.localeCompare(b.user.name, undefined, { sensitivity: 'base' }) ?? 0;
+    if (!groupMembers || groupMembers.length === 0) return [];
+
+    return [...groupMembers].sort((memberA, memberB) => {
+      const roleDiff = roleOrder.indexOf(memberA.role) - roleOrder.indexOf(memberB.role);
+      if (roleDiff !== 0) return roleDiff;
+
+      const nameA = memberA.user?.name || '';
+      const nameB = memberB.user?.name || '';
+      return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
     });
   }, [groupMembers]);
 
