@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 /**
  * Formats a string in ISO format into a human-readable date string using date-fns library
@@ -22,7 +23,9 @@ import { format, parseISO } from 'date-fns';
  * @returns
  */
 export function formatDate(inputDate: string) {
-  const date = parseISO(inputDate);
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const utcDate = fromZonedTime(inputDate, 'UTC');
+  const localDate = toZonedTime(utcDate, userTimeZone);
 
-  return format(date, 'dd.MM.yyyy hh:mm a');
+  return format(localDate, 'dd.MM.yyyy hh:mm a');
 }
