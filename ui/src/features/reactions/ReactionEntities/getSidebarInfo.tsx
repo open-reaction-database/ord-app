@@ -95,9 +95,14 @@ export function getSidebarInfo(
   sidebarInfoCandidates: Array<ReactionSidebarInfo> = reactionSidebarInfo,
 ): ReactionSidebarInfo {
   const [updatedPathComponents, currentPath] = getEntityPathComponent(pathComponents);
-  const filteredSidebarInfoCandidates = sidebarInfoCandidates.filter(
+  let filteredSidebarInfoCandidates = sidebarInfoCandidates.filter(
     (candidate: ReactionSidebarInfo) => candidate.pathComponents[index] === currentPath,
   );
+  if (updatedPathComponents.length === 0) {
+    filteredSidebarInfoCandidates = filteredSidebarInfoCandidates.filter(
+      (candidate: ReactionSidebarInfo) => candidate.pathComponents.length === index + 1,
+    );
+  }
   if (filteredSidebarInfoCandidates.length === 1) {
     return filteredSidebarInfoCandidates[0];
   } else if (filteredSidebarInfoCandidates.length === 0) {
