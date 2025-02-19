@@ -39,7 +39,7 @@ export function GroupMembersList() {
   const [opened, { open, close }] = useDisclosure(false);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
   const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(selectGroupMembersByGroupId(groupId));
+  const groupMembers = useSelector(groupId != null ? selectGroupMembersByGroupId(groupId) : () => []);
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
 
   const handleRoleChange = (user_id: number, role: USER_ROLES) => {
@@ -51,8 +51,6 @@ export function GroupMembersList() {
   };
 
   const sortedGroupMembers = useMemo(() => {
-    if (!groupMembers || groupMembers.length === 0) return [];
-
     return [...groupMembers].sort((a, b) => {
       const roleComparison = roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
       if (roleComparison !== 0) return roleComparison;
