@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
 import { Avatar, Flex, Group, Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { RoleSelector } from '../RoleSelector/RoleSelector.tsx';
@@ -31,14 +32,15 @@ import classes from './GroupMembersList.module.scss';
 import { UserDataField } from './UserDataField/UserDataField.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 
+const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
+
 export function GroupMembersList() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
   const { isAdmin, hasTwoAdmins } = useSelector(selectMemberRoles);
   const groupId = useSelector(selectEditingGroupId);
-  const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId))) || [];
+  const groupMembers = useSelector(selectGroupMembersByGroupId(groupId));
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
-  const roleOrder = Object.values(USER_ROLES);
 
   const handleRoleChange = (user_id: number, role: USER_ROLES) => {
     dispatch(updateGroupMembers({ user_id, role }));
@@ -48,14 +50,15 @@ export function GroupMembersList() {
     dispatch(removeGroupMembers([id]));
   };
 
-  const sortedGroupMembers = groupMembers.length
-    ? [...groupMembers].sort(
-        (a, b) =>
-          roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role) ||
-          a.user.name?.localeCompare(b.user.name, undefined, { sensitivity: 'base' }) ||
-          0,
-      )
-    : [];
+  const sortedGroupMembers = useMemo(() => {
+    if (!groupMembers || groupMembers.length === 0) return [];
+
+    return [...groupMembers].sort((a, b) => {
+      const roleComparison = roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
+      if (roleComparison !== 0) return roleComparison;
+      return a.user.name?.localeCompare(b.user.name, undefined, { sensitivity: 'base' }) ?? 0;
+    });
+  }, [groupMembers]);
 
   return (
     <div className={classes.container}>
