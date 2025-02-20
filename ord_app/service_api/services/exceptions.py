@@ -14,27 +14,38 @@
 from functools import wraps
 
 import psycopg.errors
+from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
 
-class BaseError(Exception):
-    pass
+class EntityNotFoundError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_404_NOT_FOUND, detail=detail, **kwargs)
 
 
-class EntityNotFoundError(BaseError):
-    pass
+class ProtobufDecodeError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail=detail, **kwargs)
 
 
-class ProtobufDecodeError(BaseError):
-    pass
+class ConflictError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_409_CONFLICT, detail=detail, **kwargs)
 
 
-class UniqueViolation(BaseError):
-    pass
+class ForbiddenError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_403_FORBIDDEN, detail=detail, **kwargs)
 
 
-class ForbiddenError(BaseError):
-    pass
+class UnauthorizedError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_403_FORBIDDEN, detail=detail, **kwargs)
+
+
+class UnauthenticatedError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
 
 
 def psycopg_error_wrapper(coro):
@@ -44,7 +55,7 @@ def psycopg_error_wrapper(coro):
             return await coro(*args, **kwargs)
         except IntegrityError as err:
             if isinstance(err.orig, psycopg.errors.UniqueViolation):
-                raise UniqueViolation("Unique constraint violation caught") from err
+                raise ConflictError("Unique constraint violation caught") from err
             else:
                 raise
     return wrapper

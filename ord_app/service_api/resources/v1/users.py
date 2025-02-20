@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 
 from ord_app.service_api.domain.auth import authenticate
-from ord_app.service_api.domain.users import get_user_uc
+from ord_app.service_api.domain.users import UserUseCase, get_user_use_case
 from ord_app.service_api.models import UserModel
-from ord_app.service_api.schemas.users import UserSchema
-from ord_app.service_api.services.postgresql import get_db_session
+from ord_app.service_api.schemas.users import UserSchema, UserUpdateSchema
 
 router = APIRouter(tags=["users"], prefix="/users")
 
@@ -29,20 +29,14 @@ async def read_users_me(current_user: UserModel = Depends(authenticate)):
 
 
 @router.get("/{user_id}", response_model=UserSchema)
-async def get_user(
+async def get_user(user_id: int, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]):
+    return await use_case.get(user_id)
+
+
+@router.patch("/{user_id}", response_model=UserSchema)
+async def update_user(
     user_id: int,
-    db_session: AsyncSession = Depends(get_db_session),
+    payload: UserUpdateSchema,
+    use_case: Annotated[UserUseCase, Depends(get_user_use_case)]
 ):
-    if user := await get_user_uc(db_session, user_id):
-        return user
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-
-# @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-# async def delete_user(
-#     user_id: int,
-#     db_session: AsyncSession = Depends(get_db_session),
-# ):
-#     if await delete_user_uc(db_session, user_id):
-#         return "User was deleted", status.HTTP_204_NO_CONTENT
-#     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return await use_case.update(user_id, payload)

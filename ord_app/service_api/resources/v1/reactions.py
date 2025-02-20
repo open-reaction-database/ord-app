@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Response, UploadFile, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,7 +21,6 @@ from ord_app.service_api.domain.auth import dataset_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema, ReactionUpdateSchema
-from ord_app.service_api.services.exceptions import EntityNotFoundError, ProtobufDecodeError, UniqueViolation
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -38,10 +37,7 @@ async def create_reaction(
     payload: ReactionCreateSchema,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    try:
-        return await use_case.create(dataset_id, payload)
-    except UniqueViolation as err:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
+    return await use_case.create(dataset_id, payload)
 
 @router.post(
     "/from-scratch",
@@ -67,13 +63,9 @@ async def upload_reaction(
     background_tasks: BackgroundTasks
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
-
-    try:
-        response =  await use_case.upload(dataset_id, file_data, kind)
-        background_tasks.add_task(validate_reactions_task, db)
-        return response
-    except ProtobufDecodeError as err:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
+    response =  await use_case.upload(dataset_id, file_data, kind)
+    background_tasks.add_task(validate_reactions_task, db)
+    return response
 
 
 @router.get(
@@ -97,10 +89,7 @@ async def reaction(
     reaction_id: int,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    try:
-        return await use_case.get(reaction_id)
-    except EntityNotFoundError as err:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
+    return await use_case.get(reaction_id)
 
 
 @router.patch(
@@ -114,12 +103,7 @@ async def _update_reaction(
     payload: ReactionUpdateSchema,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    try:
-        return await use_case.update(dataset_id, reaction_id, payload)
-    except UniqueViolation as err:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
-    except EntityNotFoundError as err:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
+    return await use_case.update(dataset_id, reaction_id, payload)
 
 
 @router.delete(
@@ -144,10 +128,7 @@ async def _download_reaction(
     file_format: DownloadFileFormats,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    try:
-        reaction, data = await use_case.download(reaction_id, file_format)
-    except EntityNotFoundError as err:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
+    reaction, data = await use_case.download(reaction_id, file_format)
     filename = f"{reaction.pb_reaction_id}-{reaction.id}.{file_format}"
     return Response(
         data,

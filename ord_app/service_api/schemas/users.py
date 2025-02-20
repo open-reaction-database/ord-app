@@ -39,3 +39,7 @@ class UserCreateSchema(BaseSchema):
     orcid_id: str | None
     avatar_url: str | None
 
+
+class UserUpdateSchema(BaseSchema):
+    email: EmailStr | None = None
+    orcid_id: str | None = None
