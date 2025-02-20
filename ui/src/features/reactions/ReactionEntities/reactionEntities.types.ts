@@ -128,7 +128,6 @@ export type ReactionFormMethods = Pick<
 export interface ReactionFormCustomProps {
   name: string;
   formMethods: ReactionFormMethods;
-  useSelectData: () => unknown;
 }
 
 export interface ReactionFormCustom extends ReactionFormNodeBase {

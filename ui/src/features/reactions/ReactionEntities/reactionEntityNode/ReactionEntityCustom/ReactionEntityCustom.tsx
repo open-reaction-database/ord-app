@@ -21,7 +21,6 @@ export function ReactionEntityCustom({ node, formMethods }: Readonly<ReactionEnt
   return (
     <Component
       name={node.name}
-      useSelectData={node.useSelectData}
       formMethods={formMethods}
     />
   );
