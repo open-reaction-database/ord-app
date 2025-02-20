@@ -26,7 +26,7 @@ from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema, UserUpdateSchema
 from ord_app.service_api.services.auth0 import verify_access_token
-from ord_app.service_api.services.exceptions import EntityNotFoundError, UnauthorizedError
+from ord_app.service_api.services.exceptions import EntityNotFoundError, UnauthorizedError, psycopg_error_wrapper
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -64,6 +64,7 @@ def get_user_use_case(
     return UserUseCase(db=db, current_user=current_user)
 
 
+@psycopg_error_wrapper
 async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
     user_use_case = UserUseCase(db_session)
 
