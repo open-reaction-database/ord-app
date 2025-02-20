@@ -15,7 +15,7 @@ import os
 from io import BytesIO
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Response, UploadFile, status
 from fastapi.params import Depends
 from fastapi_pagination import Page
 from ord_schema.templating import generate_dataset, read_spreadsheet
@@ -23,7 +23,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate, dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
-from ord_app.service_api.domain.exceptions import EntityDoesNotExist
 from ord_app.service_api.domain.reactions import validate_reactions_task
 from ord_app.service_api.models import DatasetModel, UserModel
 from ord_app.service_api.schemas.datasets import (
@@ -35,7 +34,7 @@ from ord_app.service_api.schemas.datasets import (
     DatasetWithReactionCountSchema,
     DownloadFileFormats,
 )
-from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
+from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.pb_utils import (
     validate_uploaded_pb_file,
 )
@@ -83,14 +82,8 @@ async def upload_dataset(
     background_tasks: BackgroundTasks
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
-
-    try:
-        response = await use_case.upload(group_id, file_data, kind)
-    except ProtobufDecodeError as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e)) from e
-
+    response = await use_case.upload(group_id, file_data, kind)
     background_tasks.add_task(validate_reactions_task, db)
-
     return response
 
 
@@ -135,7 +128,7 @@ async def get_dataset(
 ):
     if dataset := await use_case.get(dataset_id):
         return dataset
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+    raise EntityNotFoundError("Dataset not found")
 
 
 @router.get(
@@ -149,10 +142,7 @@ async def download_dataset(
 ):
     # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
     # preferred file extensions.
-    try:
-        dataset, data = await use_case.download(dataset_id, file_format)
-    except EntityDoesNotExist as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    dataset, data = await use_case.download(dataset_id, file_format)
 
     return Response(
         data,
@@ -201,10 +191,7 @@ async def share_dataset(
     payload: DatasetShareCreateSchema,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    try:
-        return await use_case.share(group_id, dataset_id, payload)
-    except ForbiddenError as err:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err)) from err
+    return await use_case.share(group_id, dataset_id, payload)
 
 
 @router.post(
@@ -218,7 +205,4 @@ async def unshare_dataset(
     payload: DatasetShareCreateSchema,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    try:
-        await use_case.unshare(group_id, dataset_id, payload)
-    except ForbiddenError as err:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err)) from err
+    await use_case.unshare(group_id, dataset_id, payload)

@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from ord_app.service_api.domain.auth import group_authorization
 from ord_app.service_api.domain.groups import (
@@ -30,7 +30,6 @@ from ord_app.service_api.schemas.groups import (
     GroupUpdateMemberSchema,
     GroupUserSchema,
 )
-from ord_app.service_api.services.exceptions import EntityNotFoundError
 
 router = APIRouter(tags=["group"], prefix="/groups")
 
@@ -98,10 +97,7 @@ async def add_member(
     payload: GroupAddMemberSchema,
     use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)],
 ):
-    try:
-        return await use_case.add_member(group_id, payload)
-    except EntityNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    return await use_case.add_member(group_id, payload)
 
 
 @router.patch(
@@ -115,10 +111,7 @@ async def update_member(
     payload: GroupUpdateMemberSchema,
     use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)],
 ):
-    try:
-        return await use_case.update_member(group_id, payload)
-    except EntityNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    return await use_case.update_member(group_id, payload)
 
 
 @router.post(

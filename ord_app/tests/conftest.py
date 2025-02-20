@@ -137,7 +137,12 @@ async def create_test_dataset(db_session, mock_authenticated_user):
 
 
 async def create_test_user_with_group(test_db_session, role="admin"):
-    user = UserModel(email=fake.email(), external_id=str(fake.uuid4()), auth0_id=str(fake.uuid4()))
+    user = UserModel(
+        email=fake.email(),
+        external_id=str(fake.uuid4()),
+        auth0_id=str(fake.uuid4()),
+        orcid_id=str(fake.uuid4()),
+    )
     group = GroupModel(name=fake.word(), owner=user)
     group_member = UserGroupsMembershipModel(
         user=user,

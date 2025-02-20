@@ -12,24 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import jwt
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
-from starlette import status
 
+from ord_app.service_api.services.exceptions import UnauthenticatedError, UnauthorizedError
 from ord_app.service_api.settings import RuntimeSettings
 
 jwks_client = jwt.PyJWKClient(f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json")
-
-
-class UnauthorizedException(HTTPException):
-    def __init__(self, detail: str, **kwargs):
-        super().__init__(status.HTTP_403_FORBIDDEN, detail=detail, **kwargs)
-
-
-class UnauthenticatedException(HTTPException):
-    def __init__(self, detail: str, **kwargs):
-        super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
 
 
 def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
@@ -53,16 +43,16 @@ def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
 def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
     if token is None:
         logger.error("token is missing")
-        raise UnauthenticatedException
+        raise UnauthenticatedError
 
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token.credentials).key
     except jwt.exceptions.PyJWKClientError as error:
         logger.error(error)
-        raise UnauthorizedException(str(error)) from error
+        raise UnauthorizedError(str(error)) from error
     except jwt.exceptions.DecodeError as error:
         logger.error(error)
-        raise UnauthorizedException(str(error)) from error
+        raise UnauthorizedError(str(error)) from error
 
     try:
         payload = jwt.decode(
@@ -75,7 +65,7 @@ def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience
         )
     except Exception as error:
         logger.error(error)
-        raise UnauthorizedException(str(error)) from error
+        raise UnauthorizedError(str(error)) from error
 
     logger.debug(f"Token verified: {payload}")
 

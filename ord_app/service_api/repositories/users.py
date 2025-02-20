@@ -33,3 +33,10 @@ class UserRepository(BaseRepository[UserModel]):
         )
 
         return await self.db.scalar(stmt)
+
+    async def create_user(self, payload: dict, autocommit=True) -> UserModel:
+        user = UserModel(**payload)
+        if autocommit:
+            await self.db.commit()
+            await self.db.refresh(user)
+        return user
