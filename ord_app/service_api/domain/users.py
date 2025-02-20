@@ -23,14 +23,14 @@ from ord_app.service_api.schemas.users import UserCreateSchema
 from ord_app.service_api.services.auth0 import UnauthorizedException, verify_access_token
 
 
-async def get_user_by_external_id(
+async def get_user_by_auth0_id(
     db_session: AsyncSession,
-    external_id: str,
+    auth0_id: str,
 ) -> UserModel:
     stmt = (
         select(UserModel)
         .where(
-            UserModel.external_id == external_id,
+            UserModel.auth0_id == auth0_id,
         )
         .limit(1)
     )
@@ -86,7 +86,7 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     if "sub" not in user_info:
         raise UnauthorizedException("sub is not provided")
 
-    if user := await get_user_by_external_id(db_session, user_info["sub"]):
+    if user := await get_user_by_auth0_id(db_session, user_info["sub"]):
         logger.info(f"<User(id={user.id})> already exists")
         return user
 
