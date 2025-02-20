@@ -42,7 +42,12 @@ function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
   return (
     <div className={classes.inputCard}>
       <span>{name}</span>
-      <Flex gap="sm">
+      <Flex
+        gap="sm"
+        flex={1}
+        align="center"
+        mt="xs"
+      >
         {components.map(({ svg }, index) =>
           svg ? (
             <img

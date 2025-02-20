@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+import { createActionFactory } from 'store/utils';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-const Routes = lazyWithPreload(() => import('routes'));
+const { createAsyncAction } = createActionFactory('reactionInputs');
 
-export function AppContent() {
-  const isLoading = useAuth();
-
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="top-right"
-      />
-    </Suspense>
-  );
-}
+export const addIdentifierByNameActions = createAsyncAction<
+  { reactionId: number; pathComponents: ReactionPathComponents; name: string },
+  void,
+  void
+>('add_identifier_by_name');

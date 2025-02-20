@@ -19,7 +19,6 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import {
   appAmountUnspecified,
   massUnitNames,
@@ -39,6 +38,8 @@ import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntitie
 import { ordDataToReactionData } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import { useMemo } from 'react';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
+import { CustomIdentifiers } from './CustomIdentifiers/CustomIdentifiers.tsx';
+import type { AppReactionAmount } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
 const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
@@ -112,43 +113,61 @@ export const reactionComponents: Array<ReactionFormNode> = [
       },
     ],
   },
-  {
-    type: ReactionFormNodeType.vpu,
-    name: 'amount',
-    options: appReactionAmountOptions,
-    wrapperConfig: {
-      label: 'Amount',
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.vpu,
+      name: 'amount',
+      options: appReactionAmountOptions,
+      wrapperConfig: {
+        label: 'Amount',
+      },
+      select: 'native-inline',
     },
-    useNativeSelect: true,
-  },
+    {
+      type: ReactionFormNodeType.select,
+      name: 'volumeIncludesSolutes',
+      wrapperConfig: {
+        label: 'Includes solutes',
+      },
+      condition: {
+        name: 'amount',
+        isHidden: (item: unknown) => !volumeUnitNames.includes((item as AppReactionAmount).units),
+      },
+      options: booleanOptions,
+      selectType: 'dropdown',
+    },
+  ),
   {
     type: ReactionFormNodeType.custom,
-    name: 'ketcher',
-    Component: ComponentsKetcherEditor,
+    name: 'customIdentifiers',
+    Component: CustomIdentifiers,
   },
   {
     type: ReactionFormNodeType.list,
     title: {
       label: 'Identifiers',
     },
-    getKey: (_, index) => index,
+    getKey: ([index]) => index,
     useSelectItems: function useSelectIdentifiersWrapper() {
       const identifiers: Array<ord.CompoundIdentifier> = useSelectIdentifiers();
       return useMemo(() => {
-        return (identifiers || []).filter(item => item.type !== ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK);
+        return (identifiers || []).reduce((acc: Array<[number, ord.CompoundIdentifier]>, item, index) => {
+          const isMoblock = item.type === ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK;
+          return isMoblock ? acc : acc.concat([[index, item]]);
+        }, []);
       }, [identifiers]);
     },
-    ItemDisplay: createEntityListItemComponent<ord.ICompoundIdentifier>({
+    ItemDisplay: createEntityListItemComponent<[number, ord.ICompoundIdentifier]>({
       entityName: 'identifiers',
       title: 'Identifier',
       requiredFields: [
         {
           label: 'Type',
-          render: item => identifierKeyByValue[item.type ?? 0],
+          render: ([, item]) => identifierKeyByValue[item.type ?? 0],
         },
         {
           label: 'Value',
-          render: item => item.value,
+          render: ([, item]) => item.value,
         },
       ],
     }),

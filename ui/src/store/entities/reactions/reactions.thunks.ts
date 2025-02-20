@@ -36,6 +36,7 @@ import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { ordReactionToReaction, reactionToOrdReaction } from './reactions.converters.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
 
 const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
@@ -129,11 +130,12 @@ async function updateReaction(reactionId: number, getState: () => AppState): Pro
   ).data;
 }
 
-export const addUpdateReactionField = createThunk(
+export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
-  async (_d, getState, { reactionId }) => {
+  async (dispatch, getState, { reactionId }) => {
     const { binpb: _, ...reaction } = await updateReaction(reactionId, getState);
-    return addUpdateReactionFieldActions.success(reaction);
+    dispatch(addUpdateReactionFieldActions.success(reaction));
+    showNotification({ message: 'Reaction updated.', variant: 'success' });
   },
 );
 

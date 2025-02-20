@@ -76,4 +76,9 @@
 
 .placeholder {
   color: var(--color-text-secondary-1);
+
+  & > svg {
+    width: 14px;
+    height: 14px;
+  }
 }

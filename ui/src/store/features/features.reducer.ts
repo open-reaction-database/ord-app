@@ -16,8 +16,10 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { reactionFormReducer } from './reactionForm/reactionForm.reducer.ts';
 import { groupsSidebar } from './groups/groups.reducer.ts';
+import { reactionLookupReducer } from 'store/features/reactionLookup/reactionLookup.reducer.ts';
 
 export const featuresReducer = combineReducers({
   groupsSidebar: groupsSidebar,
   reactionForm: reactionFormReducer,
+  reactionLookup: reactionLookupReducer,
 });

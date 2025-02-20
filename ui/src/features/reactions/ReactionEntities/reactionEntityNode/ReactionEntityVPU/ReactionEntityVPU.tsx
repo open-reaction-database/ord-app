@@ -26,7 +26,7 @@ export function ReactionEntityVPU({
   return (
     <ValuePrecisionUnitControl
       options={node.options}
-      useNativeSelect={node.useNativeSelect}
+      select={node.select}
       label={label}
       {...getInputProps(node.name)}
     />

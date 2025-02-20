@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+.wrapper {
+  min-width: 80dvw;
+  min-height: 80dvh;
+  width: 80dvw;
+  height: 80dvh;
+}
 
-const Routes = lazyWithPreload(() => import('routes'));
+.body {
+  padding: 0;
+}
 
-export function AppContent() {
-  const isLoading = useAuth();
+.editorWrapper {
+  width: calc(80dvw - 2rem);
+  height: calc(80dvh - 106px);
+}
 
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="top-right"
-      />
-    </Suspense>
-  );
+.actions {
+  border-top: 1px solid #e8ebed;
+  padding: var(--mantine-spacing-sm);
+  margin-top: var(--mantine-spacing-sm);
 }

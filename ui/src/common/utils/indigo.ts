@@ -29,6 +29,7 @@ export function renderSvg(component: string | null, size: number = 120) {
   if (component === null || !indigoModule) return null;
 
   const options = new indigoModule.MapStringString();
+  options.set('bond-length', '24');
   options.set('render-output-format', 'svg');
   options.set('smart-layout', 'true');
   options.set('render-image-max-height', size.toString());

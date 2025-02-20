@@ -1,0 +1,79 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type { ord } from 'ord-schema-protobufjs';
+import { ActionIcon, Flex } from '@mantine/core';
+import classes from './molblockIdentifier.module.scss';
+import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
+import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineKeyValue.tsx';
+import { EditIcon } from 'common/icons';
+import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
+import { useContext } from 'react';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+
+interface MolblockIdentifierProps {
+  index: number;
+  itemKey: number;
+  identifier: ord.CompoundIdentifier;
+  onEdit: (index: number) => void;
+}
+
+export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Readonly<MolblockIdentifierProps>) {
+  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  return (
+    <Flex
+      key={identifier.value}
+      direction="column"
+      gap="sm"
+    >
+      <Flex
+        align="flex-start"
+        gap="md"
+        className={classes.molblock}
+      >
+        <DisplayMolblockPreview
+          molblock={identifier.value}
+          details={identifier.details}
+        />
+        <Flex
+          direction="column"
+          gap="xs"
+        >
+          <InlineKeyValue
+            label="Type"
+            value="Molblock"
+          />
+          <InlineKeyValue
+            label="Details"
+            value={identifier.details}
+          />
+        </Flex>
+        <Flex>
+          <ActionIcon
+            variant="transparent"
+            onClick={() => onEdit(index)}
+          >
+            <EditIcon />
+          </ActionIcon>
+          <ReactionEntityDelete
+            reactionId={reactionId}
+            entityName="Identifier"
+            pathComponents={[...pathComponents, 'identifiers', itemKey]}
+          />
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+}

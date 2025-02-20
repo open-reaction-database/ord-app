@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Grid } from '@mantine/core';
-import { NewDatasetIcon, UploadFileIcon } from 'common/icons';
+import { Grid } from '@mantine/core';
+import { AddCircleIcon, UploadProgressIcon } from 'common/icons';
 import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDataset.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
-import classes from './datasetsListTopActions.module.scss';
+import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
 
 export function DatasetsListTopActions() {
   const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
@@ -34,36 +34,22 @@ export function DatasetsListTopActions() {
         className=""
       >
         <Grid.Col span={4}>
-          <Button
+          <PaperButton
+            title="New Dataset"
+            description="Create dataset from scratch"
+            color="#3C78D8"
+            icon={<AddCircleIcon />}
             onClick={openCreateNew}
-            leftSection={<NewDatasetIcon />}
-            variant="default"
-            classNames={{
-              root: classes.root,
-              inner: classes.inner,
-              label: classes.label,
-              section: classes.section,
-            }}
-          >
-            <span>New Dataset</span>
-            <span className={classes.subtitle}>Create dataset from scratch</span>
-          </Button>
+          />
         </Grid.Col>
         <Grid.Col span={4}>
-          <Button
+          <PaperButton
+            title="From a File"
+            description="Upload Dataset from a file"
+            color="#15B097"
+            icon={<UploadProgressIcon />}
             onClick={openCreateFromFile}
-            leftSection={<UploadFileIcon />}
-            variant="default"
-            classNames={{
-              root: classes.root,
-              inner: classes.inner,
-              label: classes.label,
-              section: classes.section,
-            }}
-          >
-            <span>From a File</span>
-            <span className={classes.subtitle}>Upload Dataset from a file</span>
-          </Button>
+          />
         </Grid.Col>
         <Grid.Col span={4} />
       </Grid>

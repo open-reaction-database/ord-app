@@ -13,32 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.root {
-  width: 100%;
-  height: 80px;
-  padding: var(--mantine-spacing-md);
-  padding-left: 24px;
-}
+import { createActionFactory } from 'store/utils';
 
-.inner {
-  gap: 16px;
-  justify-content: flex-start;
-}
+const { createAction } = createActionFactory('reactionLookup');
 
-.label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
-}
+export const setReactionLookupOpenedAction = createAction<boolean>('open');
 
-.subtitle {
-  color: var(--color-text-secondary-2);
-  font-weight: 500;
-}
-
-.section {
-  width: 32px;
-  height: 32px;
-}
+export const resetReactionLookupErrorAction = createAction<void>('reset_error');

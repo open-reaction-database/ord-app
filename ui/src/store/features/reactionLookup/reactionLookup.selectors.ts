@@ -13,26 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+import { createSelectorFactory } from 'store/utils';
 
-const Routes = lazyWithPreload(() => import('routes'));
+const { buildSelector } = createSelectorFactory(state => state.features.reactionLookup);
 
-export function AppContent() {
-  const isLoading = useAuth();
+export const selectIsReactionLookupOpen = buildSelector(state => state.isOpened);
 
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="top-right"
-      />
-    </Suspense>
-  );
-}
+export const selectReactionLookupIsLoading = buildSelector(state => state.isLoading);
+
+export const selectHasReactionLookupError = buildSelector(state => state.hasError);

@@ -17,11 +17,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: hidden;
   flex-grow: 1;
 }
 
 .content {
-  padding: 0 var(--mantine-spacing-md);
+  padding: 0 var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  overflow-y: auto;
 }
 
 .actions {

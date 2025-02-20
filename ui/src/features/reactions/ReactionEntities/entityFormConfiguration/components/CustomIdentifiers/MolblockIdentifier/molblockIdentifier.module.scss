@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Suspense } from 'react';
-import { useAuth } from 'common/hooks/useAuth';
-import { lazyWithPreload } from 'react-lazy-with-preload';
-import { PageLoader } from '../common/components/display/PageLoader/PageLoader';
-import { Notifications } from '@mantine/notifications';
+.molblock {
+  height: 120px;
+}
 
-const Routes = lazyWithPreload(() => import('routes'));
-
-export function AppContent() {
-  const isLoading = useAuth();
-
-  return isLoading ? (
-    <PageLoader />
-  ) : (
-    <Suspense fallback={<PageLoader />}>
-      <Routes />
-      <Notifications
-        containerWidth={350}
-        position="top-right"
-      />
-    </Suspense>
-  );
+.preview {
+  max-height: 120px;
+  min-height: 60px;
+  width: 200px;
+  max-width: 200px;
 }
