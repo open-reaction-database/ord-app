@@ -97,7 +97,10 @@ async def reaction(
     reaction_id: int,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.get(reaction_id)
+    try:
+        return await use_case.get(reaction_id)
+    except EntityNotFoundError as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
 
 
 @router.patch(
@@ -117,6 +120,19 @@ async def _update_reaction(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(err)) from err
     except EntityNotFoundError as err:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(err)) from err
+
+
+@router.delete(
+    "/{reaction_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def _update_reaction(
+    dataset_id: int,
+    reaction_id: int,
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
+):
+    return await use_case.delete(dataset_id, reaction_id)
 
 
 @router.get(
