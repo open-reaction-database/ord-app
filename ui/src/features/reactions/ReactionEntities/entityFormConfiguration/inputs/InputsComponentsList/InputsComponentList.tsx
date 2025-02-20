@@ -18,9 +18,9 @@ import { ord } from 'ord-schema-protobufjs';
 import { DataTable } from 'common/components/display/DataTable/DataTable.tsx';
 import type { MRT_ColumnDef } from 'mantine-react-table';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-import { AddCircleIcon, EditIcon, EmptyIcon, RemoveIcon } from 'common/icons';
+import { AddCircleIcon, EditIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import {
@@ -32,6 +32,7 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { typographyClasses } from 'common/styling';
 import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 
 const reactionRoleByValue = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
@@ -70,15 +71,17 @@ const columns: Array<MRT_ColumnDef<AppReactionCompound>> = [
     size: 100,
     maxSize: 100,
     Cell: ({ row }) => {
-      const { pathComponents } = useContext(reactionEntityContext);
+      const { reactionId, pathComponents } = useContext(reactionEntityContext);
       const dispatch = useAppDispatch();
       const { id } = row;
+      const entityPath = useMemo(() => {
+        const numericId = parseInt(id);
+        return [...pathComponents, 'components', numericId];
+      }, [pathComponents, id]);
 
       const onEdit = useCallback(() => {
-        const numericId = parseInt(id);
-        const newEntry = [...pathComponents, 'components', numericId];
-        dispatch(addReactionPathComponentToList(newEntry));
-      }, [id, dispatch, pathComponents]);
+        dispatch(addReactionPathComponentToList(entityPath));
+      }, [dispatch, entityPath]);
 
       return (
         <Flex gap="sm">
@@ -90,12 +93,11 @@ const columns: Array<MRT_ColumnDef<AppReactionCompound>> = [
             <EditIcon />
           </ActionIcon>
           <Divider orientation="vertical" />
-          <ActionIcon
-            variant="white"
-            color="red"
-          >
-            <RemoveIcon />
-          </ActionIcon>
+          <ReactionEntityDelete
+            reactionId={reactionId}
+            entityName="Component"
+            pathComponents={entityPath}
+          />
         </Flex>
       );
     },
