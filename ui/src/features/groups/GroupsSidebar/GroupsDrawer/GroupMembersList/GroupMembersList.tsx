@@ -75,13 +75,7 @@ export function GroupMembersList() {
           gap="8"
         >
           <div className={classes.title}>Members</div>
-          {isAddingMember ? (
-            <>
-              <Loader size="sm" />
-            </>
-          ) : (
-            <div className={classes.counter}>{groupMembers?.length}</div>
-          )}
+          {isAddingMember ? <Loader size="sm" /> : <div className={classes.counter}>{groupMembers?.length}</div>}
         </Flex>
         <Group
           className={classes.rolesButton}
@@ -95,9 +89,7 @@ export function GroupMembersList() {
 
       {isGroupUpdating ? (
         <Flex justify="center">
-          <>
-            <Loader />
-          </>
+          <Loader />
         </Flex>
       ) : (
         sortedGroupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (

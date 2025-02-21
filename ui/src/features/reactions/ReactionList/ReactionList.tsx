@@ -53,63 +53,61 @@ export function ReactionList() {
   );
 
   return (
-    <>
-      <Paper
-        radius="sm"
-        p="lg"
-      >
-        <Flex justify="space-between">
-          <Flex
-            align="center"
-            gap="sm"
-          >
-            <Title order={2}>Dataset Reactions</Title>
-            {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
-          </Flex>
-          <CreateReactionMenu />
+    <Paper
+      radius="sm"
+      p="lg"
+    >
+      <Flex justify="space-between">
+        <Flex
+          align="center"
+          gap="sm"
+        >
+          <Title order={2}>Dataset Reactions</Title>
+          {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
         </Flex>
+        <CreateReactionMenu />
+      </Flex>
 
-        {isLoading ? (
+      {isLoading ? (
+        <Flex
+          justify="center"
+          align="center"
+          style={{ height: '100px' }}
+        >
+          <Loader size="lg" />
+        </Flex>
+      ) : !hasReactions ? (
+        <Flex
+          align="center"
+          justify="center"
+        >
           <Flex
-            justify="center"
+            direction="column"
             align="center"
-            style={{ height: '100px' }}
+            gap="8"
           >
-            <Loader size="lg" />
+            <EmptyIcon />
+            <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
           </Flex>
-        ) : !hasReactions ? (
-          <Flex
-            align="center"
-            justify="center"
-          >
-            <Flex
-              direction="column"
-              align="center"
-              gap="8"
-            >
-              <EmptyIcon />
-              <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
-            </Flex>
-          </Flex>
-        ) : (
-          <>
-            {reactionsIds.map((id, index) => (
-              <ReactionCard
-                key={id}
-                id={id}
-                index={(pagination.page - 1) * pagination.size + index + 1}
-              />
-            ))}
-            <Pagination
-              currentPage={pagination.page}
-              onPageChange={handlePageChange}
-              rowsPerPage={pagination.size}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalPages={pagination.pages}
+        </Flex>
+      ) : (
+        <>
+          {reactionsIds.map((id, index) => (
+            <ReactionCard
+              key={id}
+              id={id}
+              index={(pagination.page - 1) * pagination.size + index + 1}
             />
-          </>
-        )}
-      </Paper>
-    </>
+          ))}
+          <Pagination
+            currentPage={pagination.page}
+            onPageChange={handlePageChange}
+            rowsPerPage={pagination.size}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            totalPages={pagination.pages}
+          />
+        </>
+      )}
+    </Paper>
   );
 }
