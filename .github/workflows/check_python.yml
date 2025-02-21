@@ -23,32 +23,9 @@ on:
       - 'main'
 
 jobs:
-  test_python:
-    strategy:
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.12"]
-    runs-on: ${{ matrix.os }}
-
-    env:
-      PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
-      PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
-
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: ord
-          POSTGRES_DB: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 6
-        ports:
-          - 5432:5432
-
+  linter_python:
+    name: Check python lint
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -56,27 +33,70 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          export PATH="$HOME/.local/bin:$PATH"
+          pipx install poetry
 
       - name: Install dependencies
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry config virtualenvs.create false
+          poetry install --with dev --no-interaction --no-ansi
+
+      - name: ruff
+        run: poetry run ruff check ord_app/
+
+      - name: pytype
+        run: poetry run pytype -j auto
+
+  test_python:
+    name: Test
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-14"]
+        python-version: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - uses: ikalnytskyi/action-setup-postgres@v7
+        id: postgres
+        with:
+          username: ord
+          password: password
+          database: test
+          port: 5432
+          postgres-version: "17"
+          ssl: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - name: Install dependencies
+        run: |
           poetry install --with dev --no-interaction --no-ansi
 
       - name: Run alembic migrations
-        run: alembic upgrade head
+        run: poetry run alembic upgrade head
+        env:
+          PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
-      - name: ruff
-        run: ruff check ord_app/
-
-      - name: pytype
-        run: pytype -j auto
-
-      - name: Tests
-        run: pytest -vv --cov=ord_app --durations=10
+      - name: Run tests
+        run: poetry run pytest -vv --cov=ord_app --durations=10
+        env:
+          PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
