@@ -35,6 +35,7 @@ import { setReactionLookupOpenedAction } from 'store/features/reactionLookup/rea
 import { useSelector } from 'react-redux';
 import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reactionLookup.selectors.ts';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
+import { colorToCssVariable } from 'common/styling/colors.ts';
 
 const useSelectIdentifiers = buildUseSelectItems('identifiers');
 
@@ -117,7 +118,7 @@ export function CustomIdentifiers() {
             title="Look up Name"
             description="In open databases"
             icon={<SearchIcon />}
-            color="#EDA145"
+            color={colorToCssVariable['orange']}
             onClick={openAddCustomIdentifier}
           />
         </Grid.Col>
@@ -126,7 +127,7 @@ export function CustomIdentifiers() {
             title="Draw Component"
             description="Via Ketcher"
             icon={<StylusNoteIcon />}
-            color="#15B097"
+            color={colorToCssVariable['green']}
             onClick={openComponentsEditor}
           />
         </Grid.Col>

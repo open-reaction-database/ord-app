@@ -13,15 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+@use 'sass:string';
 
-console.info(colorToCssVariable);
+$themeColors: (
+  'white': #ffffff,
+  'baseWhite': #fcfcfc,
+  'blue': #3c78d8,
+  'green': #15b097,
+  'orange': #eda145,
+  'hover': #ff8d00,
+  'black': #000000,
+);
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
+:export {
+  @each $color, $value in $themeColors {
+    #{string.unquote($color)}: $value;
+  }
+}
 
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+:global {
+  body {
+    @each $color, $value in $themeColors {
+      --color-#{string.unquote($color)}: #{$value};
+    }
+  }
+}

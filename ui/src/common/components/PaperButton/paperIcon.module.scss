@@ -25,7 +25,7 @@
   & > svg {
     width: 16px;
     height: 16px;
-    color: white;
+    color: var(--color-white);
   }
 }
 
@@ -42,11 +42,11 @@
 
   &:hover,
   &:active {
-    color: white;
+    color: var(--color-white);
     background-color: var(--paper-button-color);
 
     & .section {
-      background-color: white;
+      background-color: var(--color-white);
 
       & > svg {
         color: var(--paper-button-color);
@@ -54,7 +54,7 @@
     }
 
     & .subtitle {
-      color: inherit;
+      color: var(--color-baseWhite);
     }
   }
 }

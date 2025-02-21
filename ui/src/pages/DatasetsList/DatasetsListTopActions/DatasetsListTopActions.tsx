@@ -19,6 +19,7 @@ import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDa
 import { useDisclosure } from '@mantine/hooks';
 import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
 import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
+import { colorToCssVariable } from 'common/styling/colors.ts';
 
 export function DatasetsListTopActions() {
   const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
@@ -37,7 +38,7 @@ export function DatasetsListTopActions() {
           <PaperButton
             title="New Dataset"
             description="Create dataset from scratch"
-            color="#3C78D8"
+            color={colorToCssVariable['blue']}
             icon={<AddCircleIcon />}
             onClick={openCreateNew}
           />
@@ -46,7 +47,7 @@ export function DatasetsListTopActions() {
           <PaperButton
             title="From a File"
             description="Upload Dataset from a file"
-            color="#15B097"
+            color={colorToCssVariable['green']}
             icon={<UploadProgressIcon />}
             onClick={openCreateFromFile}
           />
