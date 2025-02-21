@@ -87,7 +87,7 @@ export interface ReactionFormValuePrecisionUnit extends ReactionFormField, React
   type: ReactionFormNodeType.vpu;
   name: string;
   options: SelectOptions<number | string>;
-  useNativeSelect?: boolean;
+  select?: 'native' | 'native-inline' | 'segmented';
 }
 
 export interface ReactionFormObjectInitializer extends ReactionFormNodeBase {
@@ -128,7 +128,6 @@ export type ReactionFormMethods = Pick<
 export interface ReactionFormCustomProps {
   name: string;
   formMethods: ReactionFormMethods;
-  useSelectData: () => unknown;
 }
 
 export interface ReactionFormCustom extends ReactionFormNodeBase {

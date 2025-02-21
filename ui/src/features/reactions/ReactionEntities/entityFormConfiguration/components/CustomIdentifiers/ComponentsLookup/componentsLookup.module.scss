@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.wrapper {
-  min-width: 80dvw;
-  min-height: 80dvh;
-  width: 80dvw;
-  height: 80dvh;
+.content {
+  min-width: 480px;
 }
 
-.parent {
-  width: 80dvw;
-  height: 80dvh;
+.description {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-sm);
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
 }

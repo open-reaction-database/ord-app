@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { createSelectorFactory } from 'store/utils';
 
-console.info(colorToCssVariable);
+const { buildSelector } = createSelectorFactory(state => state.features.reactionLookup);
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
+export const selectIsReactionLookupOpen = buildSelector(state => state.isOpened);
 
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+export const selectReactionLookupIsLoading = buildSelector(state => state.isLoading);
+
+export const selectHasReactionLookupError = buildSelector(state => state.hasError);

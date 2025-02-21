@@ -31,7 +31,7 @@ export function AppContent() {
       <Routes />
       <Notifications
         containerWidth={350}
-        position="bottom-right"
+        position="top-right"
       />
     </Suspense>
   );

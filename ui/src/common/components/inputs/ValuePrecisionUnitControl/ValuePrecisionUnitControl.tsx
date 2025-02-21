@@ -22,6 +22,7 @@ import classes from './valuePrecisionUnitControl.module.scss';
 import { useUncontrolled } from '@mantine/hooks';
 import { AppNativeSelect } from '../AppNativeSelect/AppNativeSelect';
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 
 interface ValuePrecisionUnitControlProps {
   value?: ValuePrecisionUnit;
@@ -29,7 +30,7 @@ interface ValuePrecisionUnitControlProps {
   label?: ReactNode;
   onChange: (value: ValuePrecisionUnit) => void;
   options: Array<SelectOption<number | string>>;
-  useNativeSelect?: boolean;
+  select?: 'native' | 'native-inline' | 'segmented';
 }
 
 export function ValuePrecisionUnitControl({
@@ -38,7 +39,7 @@ export function ValuePrecisionUnitControl({
   options,
   label,
   onChange,
-  useNativeSelect = false,
+  select = 'segmented',
 }: Readonly<ValuePrecisionUnitControlProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled({
     value,
@@ -55,7 +56,7 @@ export function ValuePrecisionUnitControl({
 
   return (
     <Input.Wrapper label={label}>
-      <div className={classes.wrapper}>
+      <div className={clsx(classes.wrapper, { [classes.inline]: select === 'native-inline' })}>
         <InputGroup>
           <NumberInput
             value={uncontrolledValue?.value}
@@ -68,14 +69,22 @@ export function ValuePrecisionUnitControl({
             leftSection="±"
             placeholder="Precision"
           />
+          {select === 'native-inline' && (
+            <AppNativeSelect
+              value={uncontrolledValue?.units}
+              options={options}
+              onChange={unitOnChange}
+            />
+          )}
         </InputGroup>
-        {useNativeSelect ? (
+        {select === 'native' && (
           <AppNativeSelect
             value={uncontrolledValue?.units}
             options={options}
             onChange={unitOnChange}
           />
-        ) : (
+        )}
+        {select === 'segmented' && (
           <AppSegmentedControl
             value={uncontrolledValue?.units}
             options={options}

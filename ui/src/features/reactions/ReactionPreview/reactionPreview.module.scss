@@ -27,6 +27,7 @@
   &,
   & > svg {
     max-height: 120px;
+    min-height: 60px;
   }
 }
 
@@ -40,6 +41,7 @@
   font-size: 24px;
   line-height: 32px;
   color: #090a0b;
+  margin-top: 16px;
 }
 
 .arrow {

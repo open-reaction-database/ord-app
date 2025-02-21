@@ -159,7 +159,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
         type: ReactionFormNodeType.vpu,
         name: 'flowRate',
         options: flowRateOptions,
-        useNativeSelect: true,
+        select: 'native',
       },
     ],
   },

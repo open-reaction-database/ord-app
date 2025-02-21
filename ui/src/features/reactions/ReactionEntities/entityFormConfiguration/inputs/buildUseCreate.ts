@@ -21,15 +21,16 @@ import { addReactionPathComponentToList } from 'store/features/reactionForm/reac
 
 export const buildUseCreate = (
   entityName: string,
-  createKeyWithEmpty: (newIndex: number, list: Array<unknown>) => [number | string, unknown],
+  createKeyWithEmpty: (newIndex: number, list: Array<unknown>, creationInfo?: unknown) => [number | string, unknown],
+  shouldOpenSidebar = true,
 ) =>
   function useCreate() {
     const dispatch = useAppDispatch();
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
 
     return useCallback(
-      (newIndex: number, entitiesList: Array<unknown>) => {
-        const [key, newEntity] = createKeyWithEmpty(newIndex, entitiesList);
+      (newIndex: number, entitiesList: Array<unknown>, creationInfo?: unknown) => {
+        const [key, newEntity] = createKeyWithEmpty(newIndex, entitiesList, creationInfo);
         const updatedPathComponents = [...pathComponents, entityName, key];
 
         dispatch(
@@ -39,7 +40,9 @@ export const buildUseCreate = (
             newValue: newEntity,
           }),
         );
-        dispatch(addReactionPathComponentToList(updatedPathComponents));
+        if (shouldOpenSidebar) {
+          dispatch(addReactionPathComponentToList(updatedPathComponents));
+        }
       },
       [dispatch, pathComponents, reactionId],
     );

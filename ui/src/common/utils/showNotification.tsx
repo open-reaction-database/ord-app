@@ -18,8 +18,7 @@ import { CheckCircleIcon } from 'common/icons';
 
 export function showNotification(options: NotificationData) {
   notifications.show({
-    position: 'top-right',
-    autoClose: 10000,
+    autoClose: 4000,
     icon: <CheckCircleIcon />,
     color: 'transparent',
     radius: '8px',

@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import variables from './colors.module.scss';
 
-console.info(colorToCssVariable);
-
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
-
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+export const colorToCssVariable = Object.keys(variables).reduce(
+  (acc: Record<string, string>, item) => ({
+    ...acc,
+    [item]: `var(--color-${item})`,
+  }),
+  {},
+);

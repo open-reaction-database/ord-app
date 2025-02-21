@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+.wrapper {
+  min-width: 80dvw;
+  min-height: 80dvh;
+  width: 80dvw;
+  height: 80dvh;
+}
 
-console.info(colorToCssVariable);
+.body {
+  padding: 0;
+}
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
+.editorWrapper {
+  width: calc(80dvw - 2rem);
+  height: calc(80dvh - 106px);
+}
 
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+.actions {
+  border-top: 1px solid #e8ebed;
+  padding: var(--mantine-spacing-sm);
+  margin-top: var(--mantine-spacing-sm);
+}

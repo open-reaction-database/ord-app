@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { createActionFactory } from 'store/utils';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-console.info(colorToCssVariable);
+const { createAsyncAction } = createActionFactory('reactionInputs');
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
-
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+export const addIdentifierByNameActions = createAsyncAction<
+  { reactionId: number; pathComponents: ReactionPathComponents; name: string },
+  void,
+  void
+>('add_identifier_by_name');
