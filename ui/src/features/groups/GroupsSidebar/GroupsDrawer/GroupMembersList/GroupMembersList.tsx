@@ -30,7 +30,7 @@ import { PermissionsModal } from '../PermissionModal/PermissionModal.tsx';
 import { InfoCircleIcon } from 'common/icons';
 import classes from './GroupMembersList.module.scss';
 import { UserDataField } from './UserDataField/UserDataField.tsx';
-import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
+import { selectEditingGroupId, selectIsAddingMember } from 'store/features/groups/groups.selectors.ts';
 
 const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
 
@@ -41,6 +41,7 @@ export function GroupMembersList() {
   const groupId = useSelector(selectEditingGroupId);
   const groupMembers = useSelector(selectGroupMembersByGroupId(Number(groupId)));
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
+  const isAddingMember = useSelector(selectIsAddingMember);
 
   const handleRoleChange = (user_id: number, role: USER_ROLES) => {
     dispatch(updateGroupMembers({ user_id, role }));
@@ -74,7 +75,7 @@ export function GroupMembersList() {
           gap="8"
         >
           <div className={classes.title}>Members</div>
-          <div className={classes.counter}>{groupMembers?.length}</div>
+          {isAddingMember ? <Loader size="sm" /> : <div className={classes.counter}>{groupMembers?.length}</div>}
         </Flex>
         <Group
           className={classes.rolesButton}
@@ -86,7 +87,7 @@ export function GroupMembersList() {
         </Group>
       </Flex>
 
-      {!groupMembers?.length ? (
+      {isGroupUpdating ? (
         <Flex justify="center">
           <Loader />
         </Flex>

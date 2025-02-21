@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from './groups.actions.ts';
-import { createGroupActions } from 'store/entities/groups/groups.actions.ts';
+import { addGroupMemberActions, createGroupActions } from 'store/entities/groups/groups.actions.ts';
 
 const activeGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(setActiveGroupIdAction, (_, action) => action.payload);
@@ -26,7 +26,13 @@ const editingGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(createGroupActions.success, (_, action) => action.payload.id);
 });
 
+const isAddingMember = createReducer<boolean>(false, builder => {
+  builder.addMatcher(isAnyOf(addGroupMemberActions.request), () => true);
+  builder.addMatcher(isAnyOf(addGroupMemberActions.success, addGroupMemberActions.failure), () => false);
+});
+
 export const groupsSidebar = combineReducers({
   activeGroupId,
   editingGroupId,
+  isAddingMember,
 });
