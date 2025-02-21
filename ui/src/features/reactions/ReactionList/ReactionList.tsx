@@ -16,11 +16,15 @@
 import { useCallback } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
 import { ReactionCard } from './ReactionCard/ReactionCard.tsx';
-import { Flex, Paper, Title } from '@mantine/core';
+import { Flex, Paper, Title, Loader } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
 import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
-import { selectReactionsOrder, selectReactionsPagination } from 'store/entities/reactions/reactions.selectors.ts';
+import {
+  selectReactionsLoading,
+  selectReactionsOrder,
+  selectReactionsPagination,
+} from 'store/entities/reactions/reactions.selectors.ts';
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
@@ -30,6 +34,7 @@ export function ReactionList() {
   const dispatch = useAppDispatch();
   const reactionsIds = useSelector(selectReactionsOrder);
   const pagination = useSelector(selectReactionsPagination);
+  const isLoading = useSelector(selectReactionsLoading);
 
   const hasReactions = reactionsIds.length > 0;
 
@@ -59,13 +64,20 @@ export function ReactionList() {
             gap="sm"
           >
             <Title order={2}>Dataset Reactions</Title>
-            <Counter amount={pagination.total} />
+            {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
           </Flex>
-
           <CreateReactionMenu />
         </Flex>
 
-        {!hasReactions && (
+        {isLoading ? (
+          <Flex
+            justify="center"
+            align="center"
+            style={{ height: '100px' }}
+          >
+            <Loader size="lg" />
+          </Flex>
+        ) : !hasReactions ? (
           <Flex
             align="center"
             justify="center"
@@ -79,26 +91,25 @@ export function ReactionList() {
               <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
             </Flex>
           </Flex>
+        ) : (
+          <>
+            {reactionsIds.map((id, index) => (
+              <ReactionCard
+                key={id}
+                id={id}
+                index={(pagination.page - 1) * pagination.size + index + 1}
+              />
+            ))}
+            <Pagination
+              currentPage={pagination.page}
+              onPageChange={handlePageChange}
+              rowsPerPage={pagination.size}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalPages={pagination.pages}
+            />
+          </>
         )}
       </Paper>
-      {hasReactions && (
-        <>
-          {reactionsIds.map((id, index) => (
-            <ReactionCard
-              key={id}
-              id={id}
-              index={(pagination.page - 1) * pagination.size + index + 1}
-            />
-          ))}
-          <Pagination
-            currentPage={pagination.page}
-            onPageChange={handlePageChange}
-            rowsPerPage={pagination.size}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            totalPages={pagination.pages}
-          />
-        </>
-      )}
     </>
   );
 }

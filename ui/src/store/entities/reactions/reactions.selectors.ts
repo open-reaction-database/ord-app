@@ -32,6 +32,8 @@ export const selectActiveDatasetId = buildSelector(state => state.activeDatasetI
 
 export const selectIsReactionCreating = buildSelector(state => state.isReactionCreating);
 
+export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
+
 export const selectReactionComponents = (id: number, input: string) =>
   buildSelector(state => state.reactionsById[id].data.inputs[input]?.components || []);
 
