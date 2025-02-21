@@ -72,7 +72,7 @@ export function ReactionList() {
         <Flex
           justify="center"
           align="center"
-          style={{ height: '100px' }}
+          className={classes.loaderContainer}
         >
           <Loader size="lg" />
         </Flex>
@@ -84,7 +84,7 @@ export function ReactionList() {
           <Flex
             direction="column"
             align="center"
-            gap="8"
+            gap="sm"
           >
             <EmptyIcon />
             <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
