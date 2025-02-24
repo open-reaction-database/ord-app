@@ -35,7 +35,10 @@ export function Pagination({
   onRowsPerPageChange,
 }: Readonly<PaginationProps>) {
   return (
-    <Group justify="space-between">
+    <Group
+      justify="space-between"
+      className={classes.paginationContainer}
+    >
       <Group align="center">
         <Button
           className={classes.controlButton}

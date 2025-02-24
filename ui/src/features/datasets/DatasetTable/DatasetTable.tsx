@@ -27,7 +27,8 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback } from 'react';
 import { getDatasetsPage } from 'store/entities/datasets/datasets.thunks.ts';
 import { useLocation } from 'wouter';
-import { Paper } from '@mantine/core';
+import { Flex, Loader, Paper, Title } from '@mantine/core';
+import { Counter } from 'common/components/display/Counter/Counter.tsx';
 
 export function DatasetTable() {
   const dispatch = useAppDispatch();
@@ -52,6 +53,19 @@ export function DatasetTable() {
 
   return (
     <Paper className={classes.tableContainer}>
+      <Flex
+        justify="space-between"
+        align="center"
+      >
+        <Flex
+          align="center"
+          gap="sm"
+        >
+          <Title order={1}>Datasets</Title>
+          {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+        </Flex>
+      </Flex>
+
       <DataTable
         columns={columns}
         data={datasets}

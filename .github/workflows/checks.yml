@@ -35,6 +35,36 @@ jobs:
       - name: addlicense
         run: addlicense -check -c "Open Reaction Database Project Authors" -l apache .
 
+  check_python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-ansi
+
+      - name: ruff
+        run: poetry run ruff check ord_app/
+
+      - name: pytype
+        run: poetry run pytype -j auto
+
   check_javascript:
     runs-on: ubuntu-latest
     steps:

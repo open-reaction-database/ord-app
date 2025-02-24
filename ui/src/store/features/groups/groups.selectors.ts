@@ -20,3 +20,5 @@ const { buildSelector } = createSelectorFactory(state => state.features.groupsSi
 export const selectActiveGroupId = buildSelector(state => state.activeGroupId);
 
 export const selectEditingGroupId = buildSelector(state => state.editingGroupId);
+
+export const selectIsAddingMember = buildSelector(state => state.isAddingMember);

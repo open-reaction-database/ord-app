@@ -16,11 +16,15 @@
 import { useCallback } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
 import { ReactionCard } from './ReactionCard/ReactionCard.tsx';
-import { Flex, Paper, Title } from '@mantine/core';
+import { Flex, Paper, Title, Loader } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
 import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
-import { selectReactionsOrder, selectReactionsPagination } from 'store/entities/reactions/reactions.selectors.ts';
+import {
+  selectReactionsLoading,
+  selectReactionsOrder,
+  selectReactionsPagination,
+} from 'store/entities/reactions/reactions.selectors.ts';
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
@@ -30,6 +34,7 @@ export function ReactionList() {
   const dispatch = useAppDispatch();
   const reactionsIds = useSelector(selectReactionsOrder);
   const pagination = useSelector(selectReactionsPagination);
+  const isLoading = useSelector(selectReactionsLoading);
 
   const hasReactions = reactionsIds.length > 0;
 
@@ -48,40 +53,44 @@ export function ReactionList() {
   );
 
   return (
-    <>
-      <Paper
-        radius="sm"
-        p="lg"
-      >
-        <Flex justify="space-between">
+    <Paper
+      radius="sm"
+      p="lg"
+    >
+      <Flex justify="space-between">
+        <Flex
+          align="center"
+          gap="sm"
+        >
+          <Title order={2}>Dataset Reactions</Title>
+          {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+        </Flex>
+        <CreateReactionMenu />
+      </Flex>
+
+      {isLoading ? (
+        <Flex
+          justify="center"
+          align="center"
+          className={classes.loaderContainer}
+        >
+          <Loader size="lg" />
+        </Flex>
+      ) : !hasReactions ? (
+        <Flex
+          align="center"
+          justify="center"
+        >
           <Flex
+            direction="column"
             align="center"
             gap="sm"
           >
-            <Title order={2}>Dataset Reactions</Title>
-            <Counter amount={pagination.total} />
+            <EmptyIcon />
+            <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
           </Flex>
-
-          <CreateReactionMenu />
         </Flex>
-
-        {!hasReactions && (
-          <Flex
-            align="center"
-            justify="center"
-          >
-            <Flex
-              direction="column"
-              align="center"
-              gap="8"
-            >
-              <EmptyIcon />
-              <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
-            </Flex>
-          </Flex>
-        )}
-      </Paper>
-      {hasReactions && (
+      ) : (
         <>
           {reactionsIds.map((id, index) => (
             <ReactionCard
@@ -99,6 +108,6 @@ export function ReactionList() {
           />
         </>
       )}
-    </>
+    </Paper>
   );
 }

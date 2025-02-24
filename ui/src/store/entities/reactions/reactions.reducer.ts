@@ -148,10 +148,24 @@ const isReactionCreating = createReducer<boolean>(false, builder => {
   );
 });
 
+const areReactionsLoading = createReducer<boolean>(false, builder => {
+  builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(
+      getReactionsListActions.success,
+      getReactionsListActions.failure,
+      getReactionPageActions.success,
+      getReactionPageActions.failure,
+    ),
+    () => false,
+  );
+});
+
 export const reactionsReducer = combineReducers({
   reactionsById,
   reactionsOrder,
   pagination,
   activeDatasetId,
   isReactionCreating,
+  areReactionsLoading,
 });
