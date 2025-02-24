@@ -99,7 +99,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           >
             <ConfirmPopover
               title={`Remove this reaction`}
-              text={`Are you sure to remove this reaction?`}
+              text={`Are you sure you want to remove this reaction?`}
               opened={confirmationOpened}
               onConfirm={onRemove}
               onCancel={closeConfirmation}
