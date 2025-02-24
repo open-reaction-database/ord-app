@@ -106,12 +106,12 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
 
 const reactionsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(getReactionsListActions.request, () => []);
+  builder.addCase(removeReactionActions.success, (state, { payload: { reactionId } }) =>
+    state.filter(id => id !== reactionId),
+  );
   builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
     action.payload.items.map(getReactionId),
-  );
-  builder.addCase(removeReactionActions.success, (state, { payload: { reactionId } }) =>
-    state.filter(id => id !== reactionId),
   );
 });
 
