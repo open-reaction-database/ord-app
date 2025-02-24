@@ -23,6 +23,7 @@ import {
   renameReactionActions,
   addUpdateReactionFieldActions,
   deleteReactionFieldActions,
+  removeReactionActions,
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
@@ -143,3 +144,13 @@ export const deleteReactionField = createThunk(deleteReactionFieldActions, async
   await updateReaction(reactionId, getState);
   return deleteReactionFieldActions.success();
 });
+
+export const removeReaction = createThunkWithExplicitResult(
+  removeReactionActions,
+  async (dispatch, getState, reactionId) => {
+    const datasetId = selectActiveDatasetId(getState());
+    await axiosInstance.delete(`/datasets/${datasetId}/reactions/${reactionId}`);
+    dispatch(removeReactionActions.success(reactionId));
+    navigate(`/datasets/${datasetId}`);
+  },
+);
