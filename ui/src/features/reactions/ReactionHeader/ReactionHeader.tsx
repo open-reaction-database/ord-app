@@ -26,8 +26,9 @@ import classes from 'features/reactions/ReactionHeader/reactionHeader.module.scs
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { addUpdateReactionField, removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
 
 interface ReactionHeaderProps {
   datasetId: number;
@@ -56,6 +57,13 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
     ],
     [reactionId, location],
   );
+
+  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
+
+  const onRemove = useCallback(() => {
+    dispatch(removeReaction(reactionId));
+    closeConfirmation();
+  }, [closeConfirmation, dispatch, reactionId]);
 
   return (
     <Paper
@@ -89,13 +97,23 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             align="center"
             gap="sm"
           >
-            <Button
-              variant="transparent"
-              color="red"
-              leftSection={<TrashIcon />}
-            >
-              Remove
-            </Button>
+            <ConfirmPopover
+              title={`Remove this reaction`}
+              text={`Are you sure to remove this reaction?`}
+              opened={confirmationOpened}
+              onConfirm={onRemove}
+              onCancel={closeConfirmation}
+              target={
+                <Button
+                  onClick={openConfirmation}
+                  variant="transparent"
+                  color="red"
+                  leftSection={<TrashIcon />}
+                >
+                  Remove
+                </Button>
+              }
+            />
             <Button
               variant="transparent"
               leftSection={<CheckListIcon />}
