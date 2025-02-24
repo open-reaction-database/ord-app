@@ -45,4 +45,4 @@ export const addUpdateReactionFieldActions = createAsyncAction<
 
 export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');
 
-export const removeReactionActions = createAsyncAction<number, { reactionId: number }>('remove_dataset');
+export const removeReactionActions = createAsyncAction<number, number>('remove_dataset');

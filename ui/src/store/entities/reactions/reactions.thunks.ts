@@ -150,7 +150,7 @@ export const removeReaction = createThunkWithExplicitResult(
   async (dispatch, getState, reactionId) => {
     const datasetId = selectActiveDatasetId(getState());
     await axiosInstance.delete(`/datasets/${datasetId}/reactions/${reactionId}`);
-    dispatch(removeReactionActions.success({ reactionId }));
+    dispatch(removeReactionActions.success(reactionId));
     navigate(`/datasets/${datasetId}`);
   },
 );
