@@ -57,7 +57,10 @@ export function ReactionList() {
       radius="sm"
       p="lg"
     >
-      <Flex justify="space-between">
+      <Flex
+        justify="space-between"
+        className={classes.titleContainer}
+      >
         <Flex
           align="center"
           gap="sm"
