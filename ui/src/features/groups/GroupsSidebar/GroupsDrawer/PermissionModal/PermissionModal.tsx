@@ -23,7 +23,7 @@ interface Permission {
   admin: boolean;
   editor: boolean;
   viewer: boolean;
-  category: 'Groups' | 'Dataset';
+  category: 'Groups' | 'Datasets';
 }
 
 const permissionsList: Array<Permission> = [
@@ -31,13 +31,13 @@ const permissionsList: Array<Permission> = [
   { feature: 'Add Users', admin: true, editor: false, viewer: false, category: 'Groups' },
   { feature: 'Manage Users', admin: true, editor: false, viewer: false, category: 'Groups' },
   { feature: 'Edit Group Name', admin: true, editor: false, viewer: false, category: 'Groups' },
-  { feature: 'Read', admin: true, editor: true, viewer: true, category: 'Dataset' },
-  { feature: 'Download', admin: true, editor: true, viewer: true, category: 'Dataset' },
-  { feature: 'Copy ID & Dataset Hyperlink', admin: true, editor: true, viewer: true, category: 'Dataset' },
-  { feature: 'Create', admin: true, editor: true, viewer: false, category: 'Dataset' },
-  { feature: 'Edit', admin: true, editor: true, viewer: false, category: 'Dataset' },
-  { feature: 'Delete', admin: true, editor: false, viewer: false, category: 'Dataset' },
-  { feature: 'Share', admin: true, editor: false, viewer: false, category: 'Dataset' },
+  { feature: 'Read', admin: true, editor: true, viewer: true, category: 'Datasets' },
+  { feature: 'Download', admin: true, editor: true, viewer: true, category: 'Datasets' },
+  { feature: 'Copy ID & Dataset Hyperlink', admin: true, editor: true, viewer: true, category: 'Datasets' },
+  { feature: 'Create', admin: true, editor: true, viewer: false, category: 'Datasets' },
+  { feature: 'Edit', admin: true, editor: true, viewer: false, category: 'Datasets' },
+  { feature: 'Delete', admin: true, editor: false, viewer: false, category: 'Datasets' },
+  { feature: 'Share', admin: true, editor: false, viewer: false, category: 'Datasets' },
 ];
 
 interface PermissionsModalProps {
