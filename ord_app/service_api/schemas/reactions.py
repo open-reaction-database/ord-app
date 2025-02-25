@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from base64 import b64decode, b64encode
-from collections import defaultdict
-from itertools import chain
 from typing import Any
 
 from ord_schema.message_helpers import molblock_from_compound
@@ -48,22 +46,23 @@ class ReactionSchema(BaseSchema):
     def _fill_molblocks(cls, data: Any):
         pb = load_message(data.binpb, Reaction, "binpb")
 
-        products = []
-        for product in chain.from_iterable(outcome.products for outcome in pb.outcomes):
+        def safe_molblock(product):
             try:
-                products.append(molblock_from_compound(product))
+                return molblock_from_compound(product)
             except ValueError:
-                products.append(None)
+                return None
 
-        inputs = defaultdict(list)
-        for input_key, input_value in pb.inputs.items():
-            for component in input_value.components:
-                try:
-                    inputs[input_key].append(molblock_from_compound(component))
-                except ValueError:
-                    inputs[input_key].append(None)
+        outcomes = [
+            [safe_molblock(product) for product in outcome.products]
+            for outcome in pb.outcomes
+        ]
 
-        data.molblocks = {"products": products, "inputs": inputs}
+        inputs = {
+            key: [safe_molblock(component) for component in value.components]
+            for key, value in pb.inputs.items()
+        }
+
+        data.molblocks = {"outcomes": outcomes, "inputs": inputs}
         return data
 
     @model_validator(mode="before")
