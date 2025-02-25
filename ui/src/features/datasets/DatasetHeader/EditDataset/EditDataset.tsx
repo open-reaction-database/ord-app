@@ -50,7 +50,7 @@ export function EditDataset({ datasetId, onClose }: Readonly<EditDatasetProps>) 
   return (
     <Modal
       opened
-      title="Edit Dataset"
+      title="Edit Group Name"
       onClose={onClose}
     >
       <form onSubmit={form.onSubmit(onSubmit)}>

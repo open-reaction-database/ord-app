@@ -45,8 +45,8 @@ export function DatasetsListTopActions() {
         </Grid.Col>
         <Grid.Col span={4}>
           <PaperButton
-            title="From a File"
-            description="Upload Dataset from a file"
+            title="From File"
+            description="Create dataset from file"
             color={colorToCssVariable['green']}
             icon={<UploadProgressIcon />}
             onClick={openCreateFromFile}

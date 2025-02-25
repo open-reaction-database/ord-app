@@ -142,9 +142,8 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
         opened={opened}
         onClose={close}
         onSubmit={onReactionNameChange}
-        title="Change Reaction ID"
+        title="Edit Reaction ID"
         inputLabel="Reaction ID"
-        inputPlaceholder="Enter reaction ID"
         initialValue={reaction.pb_reaction_id}
       />
     </Paper>

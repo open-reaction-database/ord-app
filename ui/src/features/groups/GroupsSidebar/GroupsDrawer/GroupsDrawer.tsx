@@ -98,7 +98,7 @@ export function GroupsDrawer() {
         opened={openedModal}
         onClose={closeModal}
         onSubmit={handleGroupRename}
-        title="Rename Group"
+        title="Edit Group Name"
         inputLabel="Group name"
         initialValue={group?.name}
       />

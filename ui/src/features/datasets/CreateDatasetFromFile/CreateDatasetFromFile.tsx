@@ -67,7 +67,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
       title="Create Dataset from File"
-      submitTitle="Create Dataset"
+      submitTitle="Save"
       loading={isDatasetCreating}
     >
       <Select
@@ -79,7 +79,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       <FileInput
         label="Dataset file"
         accept=".binpb,.txtpb,application/json"
-        description=".binpb, .txtpb, or .json"
+        description=".binpb, .txtpb or .json | Max: 100 MB"
         {...form.getInputProps('file')}
       />
     </FormModal>

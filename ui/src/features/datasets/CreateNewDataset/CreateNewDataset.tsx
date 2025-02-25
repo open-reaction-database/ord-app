@@ -68,7 +68,7 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
       onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
       title="Create Dataset from Scratch"
-      submitTitle="Create Dataset"
+      submitTitle="Save"
     >
       <Select
         data={data}
@@ -79,7 +79,7 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
         required
       />
       <TextInput
-        label="Dataset Name"
+        label="Dataset name"
         disabled={isLoading}
         {...form.getInputProps('name')}
       />

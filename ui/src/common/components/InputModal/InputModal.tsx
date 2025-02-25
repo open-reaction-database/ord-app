@@ -85,7 +85,7 @@ export function InputModal({
         <TextInput
           className={classes.inputWrapper}
           label={inputLabel}
-          placeholder={inputPlaceholder || `Enter ${inputLabel?.toLowerCase()}`}
+          placeholder={inputPlaceholder || ''}
           {...getInputProps('value')}
         />
         <Flex
@@ -96,7 +96,7 @@ export function InputModal({
             variant="default"
             onClick={handleClose}
           >
-            Close
+            Cancel
           </Button>
           <Button type="submit">Save</Button>
         </Flex>

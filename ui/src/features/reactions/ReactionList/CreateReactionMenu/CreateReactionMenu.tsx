@@ -48,7 +48,7 @@ export function CreateReactionMenu() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item onClick={handleReactionCreate}>From Scratch</Menu.Item>
-          <Menu.Item onClick={openImportFromFile}>Import from File</Menu.Item>
+          <Menu.Item onClick={openImportFromFile}>From File</Menu.Item>
         </Menu.Dropdown>
       </Menu>
 

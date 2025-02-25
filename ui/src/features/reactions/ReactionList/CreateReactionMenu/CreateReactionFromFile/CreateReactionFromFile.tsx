@@ -58,7 +58,7 @@ export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromF
     <FormModal
       onClose={onClose}
       onSubmit={form.onSubmit(onSubmit)}
-      title="Import Reaction from File"
+      title="Create Reaction from File"
       submitTitle="Save"
       loading={isReactionCreating}
     >
@@ -67,8 +67,7 @@ export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromF
         withAsterisk
         label="Reaction file"
         accept=".pb,.binpb,.txtpb,.pbtxt,application/json"
-        description=".pb, .binpb, .txtpb, .pbtxt or .json"
-        placeholder="Attach file"
+        description=".binpb, .txtpb or .json | Max: 15 MB"
         {...form.getInputProps('file')}
       />
     </FormModal>
