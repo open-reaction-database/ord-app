@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Group, TextInput } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons';
@@ -35,6 +36,11 @@ export function AddMemberInput() {
 
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin } = useSelector(selectMemberRoles);
+
+  const isAddDisabled = useMemo(
+    () => !isAdmin || !!inputError || isGroupUpdating || !inputValue?.trim(),
+    [isAdmin, inputError, isGroupUpdating, inputValue],
+  );
 
   const handleAddMember = async () => {
     dispatch(addGroupMember(inputValue));
@@ -67,7 +73,7 @@ export function AddMemberInput() {
 
       <Button
         onClick={handleAddMember}
-        disabled={!isAdmin || !!inputError || isGroupUpdating}
+        disabled={isAddDisabled}
       >
         Add User
       </Button>
