@@ -16,6 +16,7 @@ import re
 from typing import Literal, get_args
 
 from sqlalchemy import Enum, ForeignKey, LargeBinary, UniqueConstraint, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
 UserRolesList = Literal["admin", "editor", "viewer"]
@@ -44,6 +45,8 @@ class UserModel(BaseModel):
         back_populates="members",
         overlaps="groups_member"
     )
+
+    templates: Mapped["TemplateModel"] = relationship("TemplateModel", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"
@@ -148,3 +151,16 @@ class ReactionModel(BaseModel):
 
     def __repr__(self):
         return f"<Reaction(id={self.id}, dataset_id={self.dataset_id}, name={self.pb_reaction_id})>"
+
+
+class TemplateModel(BaseModel):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    binpb: Mapped[bytes] = mapped_column(LargeBinary)
+    variables: Mapped[JSONB] = mapped_column(JSONB)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    user: Mapped[UserModel] = relationship(UserModel, back_populates="templates")
+
+    def __repr__(self):
+        return f"<Template(id={self.id}, name={self.name})>"
