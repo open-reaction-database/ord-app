@@ -79,7 +79,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       <FileInput
         label="Dataset file"
         accept=".binpb,.txtpb,application/json"
-        description=".binpb, .txtpb, .json | pipe symbol | Max: 100 MB"
+        description=".binpb, .txtpb or .json | Max: 100 MB"
         {...form.getInputProps('file')}
       />
     </FormModal>
