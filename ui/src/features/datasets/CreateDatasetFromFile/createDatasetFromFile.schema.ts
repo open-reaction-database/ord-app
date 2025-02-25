@@ -24,6 +24,7 @@ export const createDatasetFromFileSchema = yup.object({
   file: yup
     .mixed()
     .label('Dataset file')
+    .required()
     .test('isFileProvided', 'Dataset file is a required field', value => {
       return value instanceof File;
     })
