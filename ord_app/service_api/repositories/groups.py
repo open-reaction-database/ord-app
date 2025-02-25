@@ -21,6 +21,7 @@ from sqlalchemy.orm import joinedload
 
 from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel
 from ord_app.service_api.repositories.base import BaseRepository
+from ord_app.service_api.services.exceptions import psycopg_error_wrapper
 
 
 class GroupRepository(BaseRepository[GroupModel]):
@@ -85,6 +86,7 @@ class GroupMembersRepository:
         )
         return (await self.db.scalars(stmt)).all()
 
+    @psycopg_error_wrapper
     async def add_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)

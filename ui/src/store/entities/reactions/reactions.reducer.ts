@@ -23,6 +23,7 @@ import {
   renameReactionActions,
   addUpdateReactionFieldActions,
   deleteReactionFieldActions,
+  removeReactionActions,
 } from './reactions.actions.ts';
 import { itemsById } from 'common/utils';
 import type { AppReaction, ReactionWrapper } from './reactions.types.ts';
@@ -81,6 +82,10 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
       },
     };
   });
+  builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) => {
+    const { [reactionId]: _, ...rest } = state;
+    return rest;
+  });
   builder.addMatcher(
     isAnyOf(
       getReactionActions.success,
@@ -101,6 +106,9 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
 
 const reactionsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(getReactionsListActions.request, () => []);
+  builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) =>
+    state.filter(id => id !== reactionId),
+  );
   builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => []);
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
     action.payload.items.map(getReactionId),
@@ -119,6 +127,11 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
     ...state,
     total: state.total + 1,
     pages: Math.ceil((state.total + 1) / state.size),
+  }));
+  builder.addMatcher(isAnyOf(removeReactionActions.success), state => ({
+    ...state,
+    total: state.total - 1,
+    pages: Math.ceil((state.total - 1) / state.size),
   }));
 });
 
