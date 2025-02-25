@@ -17,8 +17,8 @@ import * as yup from 'yup';
 
 export const createNewDatasetSchema = yup.object({
   name: yup.string().required(),
-  groupId: yup.string().required(),
-  description: yup.string().required(),
+  groupId: yup.string().required('Dataset name is a required field'),
+  description: yup.string().required('Description is a required field'),
 });
 
 export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;

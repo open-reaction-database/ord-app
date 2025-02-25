@@ -20,13 +20,13 @@ const MAX_FILE_SIZE = 1024 * 1024 * 100;
 const MAX_FILE_SIZE_MB = (MAX_FILE_SIZE / 1024 / 1024).toFixed(2);
 
 export const createDatasetFromFileSchema = yup.object({
-  groupId: yup.string().required(),
+  groupId: yup.string().required('Group name is a required field'),
   file: yup
     .mixed()
     .required()
     .label('File')
     .test({
-      message: `Filesize cannot exceed ${MAX_FILE_SIZE_MB} MB`,
+      message: `Dataset file is a required field. File size must not exceed ${MAX_FILE_SIZE_MB} MB`,
       test: value => {
         const file = value as File;
         return file?.size < MAX_FILE_SIZE;
