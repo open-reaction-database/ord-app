@@ -40,7 +40,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const onCreateNew = useCreate();
 
   const handleCreate = () => {
-    onCreateNew(0, outcomes);
+    onCreateNew(outcomes.length, outcomes);
   };
   const onEdit = useCallback(
     (index: number) => {
@@ -63,7 +63,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           onClick={handleCreate}
           leftSection={<AddCircleIcon />}
         >
-          Input
+          Outcome
         </Button>
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
