@@ -71,7 +71,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
         {inputs.map(input => (
           <Accordion.Item
             key={input.id}
-            value={input.name}
+            value={input.id}
           >
             <Accordion.Control
               icon={
