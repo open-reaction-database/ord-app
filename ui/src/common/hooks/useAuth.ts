@@ -15,7 +15,7 @@
  */
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import { setAccessTokenGetter } from '../../store/axiosInstance.ts';
+import { setAccessTokenGetter } from 'store/axiosInstance.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';
 import { createUser } from 'store/entities/users/users.thunks';

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import {
-  ReactionFormNodeType,
   type ReactionFormNode,
+  ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
@@ -28,8 +28,44 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
     name: 'reactionTime',
     wrapperConfig: {
       label: 'Time',
-      hint: ' ',
+      hint: 'The reaction time at which this analysis/characterization was performed.',
     },
     options: timeOptions,
+  },
+  {
+    type: ReactionFormNodeType.objectInitializer,
+    name: 'conversion',
+    field: {
+      type: ReactionFormNodeType.wrapper,
+      grid: 2,
+      wrapperConfig: {
+        label: 'Limiting reactant conversion',
+        hint: 'Reaction conversion with respect to the limiting reactant. Yields should be associated with specific product structures, defined below.',
+      },
+      fields: [
+        {
+          type: ReactionFormNodeType.group,
+          fields: [
+            {
+              type: ReactionFormNodeType.value,
+              name: 'value',
+              inputType: 'number',
+              inputConfig: {
+                placeholder: 'Value',
+              },
+            },
+            {
+              type: ReactionFormNodeType.value,
+              name: 'precision',
+              inputType: 'number',
+              inputConfig: {
+                leftSection: '±',
+                placeholder: 'Precision',
+              },
+            },
+          ],
+        },
+      ],
+    },
   },
 ];

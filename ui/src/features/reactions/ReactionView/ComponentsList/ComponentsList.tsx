@@ -56,11 +56,11 @@ export function ComponentsList({ reactionId, inputPathComponent, components }: C
         </Text>
         <div className={classes.actions}></div>
       </div>
-      {components.map(component => (
+      {components.map((component, index) => (
         <ComponentDisplayRow
           key={component.id}
           reactionId={reactionId}
-          componentPath={inputPathComponent}
+          componentPath={[...inputPathComponent, 'components', index]}
           component={component}
         />
       ))}
