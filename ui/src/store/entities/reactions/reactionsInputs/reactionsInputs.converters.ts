@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import { ord } from 'ord-schema-protobufjs';
 import type { AppReactionInput, AppReactionCompound, AppReactionAmount } from './reactionInputs.types.ts';
-import { v4 as uuid } from 'uuid';
 import {
   appAmountUnspecified,
   massUnitByValue,
@@ -31,6 +30,8 @@ import {
   ordDataMapToReactionDataMap,
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
+
+const IdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 
 // TODO rewrite this mess NORMALLY
 // eslint-disable-next-line complexity
@@ -91,20 +92,38 @@ function reactionAmountToOrdAmount(amount: AppReactionAmount): ord.IAmount | nul
   return null;
 }
 
+const emptyIdentifiersArray: Array<ord.ICompoundIdentifier> = [];
+
 export function ordCompoundToReactionCompound(ordCompound: ord.ICompound): AppReactionCompound {
-  const { amount, ...rest } = ordCompound;
+  const { amount, identifiers, ...rest } = ordCompound;
+
+  const { nonMolBlockIdentifiers, molBlockIdentifiers } = (identifiers || []).reduce(
+    ({ nonMolBlockIdentifiers, molBlockIdentifiers }, item) => {
+      const isMolblock = item.type === IdentifierType.MOLBLOCK;
+
+      return {
+        nonMolBlockIdentifiers: isMolblock ? nonMolBlockIdentifiers : nonMolBlockIdentifiers.concat(item),
+        molBlockIdentifiers: isMolblock ? molBlockIdentifiers.concat(item) : molBlockIdentifiers,
+      };
+    },
+    { nonMolBlockIdentifiers: emptyIdentifiersArray, molBlockIdentifiers: emptyIdentifiersArray },
+  );
 
   return {
+    id: crypto.randomUUID(),
     ...rest,
+    identifiers: nonMolBlockIdentifiers,
+    molBlockIdentifiers: molBlockIdentifiers,
     features: ordDataMapToReactionDataMap(ordCompound.features || {}),
     amount: ordAmountToReactionAmount(amount),
   };
 }
 
 function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.ICompound {
-  const { amount, ...rest } = appCompound;
+  const { amount, molBlockIdentifiers, identifiers, id: _, ...rest } = appCompound;
   return {
     ...rest,
+    identifiers: [...molBlockIdentifiers, ...identifiers],
     features: reactionDataMapToOrdDataMap(appCompound.features),
     amount: reactionAmountToOrdAmount(amount),
   };
@@ -113,7 +132,7 @@ function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.IC
 export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): AppReactionInput {
   const { components, ...rest } = ordInput;
   return {
-    id: uuid(),
+    id: crypto.randomUUID(),
     name,
     ...rest,
     components: (components || []).map(ordCompoundToReactionCompound),

@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Flex, Text } from '@mantine/core';
-import { typographyClasses } from 'common/styling';
-import type { ReactNode } from 'react';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionEntity } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToForm.models.ts';
+import type { FC } from 'react';
+import type { ReactionEntityTitleProps } from 'features/reactions/ReactionEntities/ReactionEntityTitle/reactionEntityTitle.types.ts';
 
-interface InlineKeyValueProps {
+export interface ReactionSidebarInfo {
+  pathComponents: ReactionPathComponents;
+  entityName: ReactionEntity;
   label: string;
-  value: ReactNode;
-}
-
-export function InlineKeyValue({ label, value }: Readonly<InlineKeyValueProps>) {
-  return (
-    <Flex
-      gap="xs"
-      align="center"
-    >
-      <Text className={typographyClasses.secondary2}>{label}:</Text>
-      <Text>{value}</Text>
-    </Flex>
-  );
+  sidebarTitle: FC<ReactionEntityTitleProps>;
+  useInitialValues: (reactionId: number, pathComponents: ReactionPathComponents) => object;
 }

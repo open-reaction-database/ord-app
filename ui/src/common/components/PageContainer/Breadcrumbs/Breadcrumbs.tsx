@@ -57,7 +57,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
               {children}
             </Link>
           ) : (
-            <Flex>{children}</Flex>
+            <Flex key={breadcrumb.path}>{children}</Flex>
           );
         })}
       </MantineBreadcrumbs>

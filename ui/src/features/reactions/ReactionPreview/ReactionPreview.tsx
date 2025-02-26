@@ -14,95 +14,39 @@
  * limitations under the License.
  */
 import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
-import { Fragment, useMemo } from 'react';
-import { renderSvg } from 'common/utils/indigo.ts';
-import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionInputPreview, ReactionProductPreview } from './reactionPreview.types.ts';
+import { Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
-import { Flex } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
+import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
+import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
   reaction: ReactionWrapper;
 }
 
-function ReactionProduct({ svg }: Readonly<ReactionProductPreview>) {
-  return (
-    svg && (
-      <img
-        src={`data:image/svg+xml;base64,${svg}`}
-        className={classes.molecule}
-      />
-    )
-  );
-}
-
-function ReactionInput({ name, components }: Readonly<ReactionInputPreview>) {
-  return (
-    <div className={classes.inputCard}>
-      <span>{name}</span>
-      <Flex
-        gap="sm"
-        flex={1}
-        align="center"
-        mt="xs"
-      >
-        {components.map(({ svg }, index) =>
-          svg ? (
-            <img
-              src={`data:image/svg+xml;base64,${svg}`}
-              key={index}
-              className={classes.molecule}
-            />
-          ) : null,
-        )}
-      </Flex>
-    </div>
-  );
-}
-
 export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
   const inputs = useSelector(selectOrderedInputsWrapper(reaction.id));
-
-  const inputsPreview: Array<ReactionInputPreview> = useMemo(() => {
-    return inputs.map(
-      (input): ReactionInputPreview => ({
-        name: input.name,
-        components: (input.components || []).map((component, index) => ({
-          component,
-          svg: reaction.molblocks.inputs[input.name] ? renderSvg(reaction.molblocks.inputs[input.name][index]) : null,
-        })),
-      }),
-    );
-  }, [inputs, reaction.molblocks.inputs]);
-
-  const products = useMemo(() => {
-    return reaction.molblocks.products.map(
-      (molecule, index): ReactionProductPreview => ({
-        product: (reaction.data.outcomes || [])[index] as ord.IReactionOutcome,
-        svg: molecule ? renderSvg(molecule) : null,
-      }),
-    );
-  }, [reaction.molblocks.products, reaction.data.outcomes]);
+  const outcomes = reaction.data.outcomes;
 
   return (
     <div className={classes.wrapper}>
-      {inputsPreview.map((molecule, index) => (
-        <Fragment key={molecule.name}>
+      {inputs.map((input, index) => (
+        <Fragment key={input.id}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
-          <ReactionInput
-            name={molecule.name}
-            components={molecule.components}
+          <ReactionInputPreview
+            reactionId={reaction.id}
+            key={input.id}
+            inputId={input.id}
           />
         </Fragment>
       ))}
       <span className={classes.arrow}>⟶</span>
-      {products.map((molecule, index) => (
-        <ReactionProduct
-          key={index}
-          product={molecule.product}
-          svg={molecule.svg}
+      {outcomes.map((outcome, index) => (
+        <ReactionOutcomePreview
+          key={outcome.id}
+          reactionId={reaction.id}
+          outcomeIndex={index}
         />
       ))}
     </div>

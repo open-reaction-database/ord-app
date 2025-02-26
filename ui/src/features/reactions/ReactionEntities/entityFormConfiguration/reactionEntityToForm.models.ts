@@ -21,6 +21,7 @@ import { reactionIdentifiers } from './reactionIdentifiers.ts';
 import { reactionComponents } from './components/reactionComponents.model.tsx';
 import { reactionComponentsPreparations } from './components/preparations/reactionComponentsPreparations.model.ts';
 import { reactionComponentIdentifiers } from './componentIdentifier/reactionComponentIdentifiers.model.ts';
+import { reactionOutcomes } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/reactionOutcomes.models.ts';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
@@ -30,6 +31,7 @@ export enum ReactionEntity {
   ComponentPreparations = 'preparations',
   Features = 'features',
   ComponentIdentifiers = 'component_identifiers',
+  Outcomes = 'outcomes',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -40,4 +42,5 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
   [ReactionEntity.Features]: reactionData,
   [ReactionEntity.ComponentIdentifiers]: reactionComponentIdentifiers,
+  [ReactionEntity.Outcomes]: reactionOutcomes,
 };

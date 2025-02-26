@@ -29,9 +29,12 @@ export interface AppReactionAmount extends Pick<NonNullable<Required<ord.IAmount
   units: AppReactionAmountType;
 }
 
-export interface AppReactionCompound extends Omit<ord.ICompound, 'amount' | 'features'> {
+export interface AppReactionCompound extends Omit<ord.ICompound, 'amount' | 'features' | 'identifiers'> {
+  id: string;
   features: Record<string, AppData>;
   amount: AppReactionAmount;
+  identifiers: Array<ord.ICompoundIdentifier>;
+  molBlockIdentifiers: Array<ord.ICompoundIdentifier>;
 }
 
 export interface AppReactionInput extends Omit<ord.IReactionInput, 'components'>, UniqueEntity {

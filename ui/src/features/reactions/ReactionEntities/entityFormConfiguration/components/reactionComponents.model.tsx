@@ -30,13 +30,12 @@ import {
   buildUseSelectItems,
   buildUseSelectItemsListFromMap,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/buildUseCreate.ts';
+import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { ordDataToReactionData } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
-import { useMemo } from 'react';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { CustomIdentifiers } from './CustomIdentifiers/CustomIdentifiers.tsx';
 import type { AppReactionAmount } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
@@ -79,8 +78,6 @@ const appReactionAmountOptions = appReactionAmountType.map(item => ({
 const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
   return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
 };
-
-const useSelectIdentifiers = buildUseSelectItems('identifiers');
 
 const identifierKeyByValue = reversePrimitiveRecord(ord.CompoundIdentifier.CompoundIdentifierType);
 
@@ -147,30 +144,29 @@ export const reactionComponents: Array<ReactionFormNode> = [
     title: {
       label: 'Identifiers',
     },
-    getKey: ([index]) => index,
-    useSelectItems: function useSelectIdentifiersWrapper() {
-      const identifiers: Array<ord.CompoundIdentifier> = useSelectIdentifiers();
-      return useMemo(() => {
-        return (identifiers || []).reduce((acc: Array<[number, ord.CompoundIdentifier]>, item, index) => {
-          const isMoblock = item.type === ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK;
-          return isMoblock ? acc : acc.concat([[index, item]]);
-        }, []);
-      }, [identifiers]);
-    },
-    ItemDisplay: createEntityListItemComponent<[number, ord.ICompoundIdentifier]>({
+    getKey: (_, index) => index,
+    useSelectItems: buildUseSelectItems('identifiers'),
+    ItemDisplay: createEntityListItemComponent<ord.ICompoundIdentifier>({
       entityName: 'identifiers',
       title: 'Identifier',
       requiredFields: [
         {
           label: 'Type',
-          render: ([, item]) => identifierKeyByValue[item.type ?? 0],
+          render: item => identifierKeyByValue[item.type ?? 0],
         },
         {
           label: 'Value',
-          render: ([, item]) => item.value,
+          render: item => item.value,
         },
       ],
     }),
+    addItem: {
+      label: 'Identifier',
+      useCreate: buildUseCreate('identifiers', index => {
+        const emptyItem = ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier());
+        return [index, emptyItem];
+      }),
+    },
   },
   {
     type: ReactionFormNodeType.block,

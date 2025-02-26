@@ -21,20 +21,34 @@
   padding-bottom: var(--mantine-spacing-md);
 }
 
-.molecule {
-  display: flex;
-
-  &,
-  & > svg {
-    max-height: 120px;
-    min-height: 60px;
-  }
-}
-
 .inputCard {
   display: flex;
   flex-direction: column;
-  min-height: 120px;
+  height: 192px;
+  min-width: 200px;
+  border: 1px solid #e7ebef;
+  border-radius: 10px;
+  padding: var(--mantine-spacing-sm);
+}
+
+.component {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  width: 100%;
+}
+
+.molecule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &,
+  & > img {
+    max-height: 80px;
+    min-height: 60px;
+  }
 }
 
 .plus {

@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import type { ord } from 'ord-schema-protobufjs';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
-  );
+export interface AppReactionAnalysis extends Omit<ord.IAnalysis, 'data'> {
+  id: string;
+  name: string;
+  data: Record<string, AppData>;
+}
+
+export interface AppReactionProduct extends ord.IProductCompound {
+  id: string;
+}
+
+export interface AppReactionOutcome extends Omit<ord.IReactionOutcome, 'products' | 'analyses'> {
+  id: string;
+  analyses: Record<string, AppReactionAnalysis>;
+  products: Array<AppReactionProduct>;
 }

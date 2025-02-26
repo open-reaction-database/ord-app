@@ -16,9 +16,6 @@
 import { createRoot } from 'react-dom/client';
 import './index.scss';
 import { AppRoot } from './core/AppRoot.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
-
-console.info(colorToCssVariable);
 
 // Because ketcher depends on draft-js which requires setImmediate package
 // https://github.com/yuzujs/setImmediate

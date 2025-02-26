@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import { Button, type ButtonProps } from '@mantine/core';
+import { EditIcon } from 'common/icons';
+import classes from './editButton.module.scss';
+import type { ReactNode } from 'react';
 
-export function DatasetRoute() {
+interface EditButtonProps extends Omit<ButtonProps, 'classNames' | 'children'> {
+  children?: ReactNode;
+  onClick?: () => void;
+}
+
+export function EditButton({ children, ...props }: Readonly<EditButtonProps>) {
   return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
+    <Button
+      variant="transparent"
+      classNames={{ root: classes.buttonRoot, section: classes.section }}
+      leftSection={<EditIcon />}
+      {...props}
+    >
+      {children ?? 'Edit'}
+    </Button>
   );
 }

@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import { ord } from 'ord-schema-protobufjs';
+import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
-  );
-}
+const timeOptions = ordMapToKeyValueObject(ord.Time.TimeUnit);
+
+export const reactionOutcomes: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.vpu,
+    name: 'reactionTime',
+    wrapperConfig: {
+      label: 'Time',
+      hint: ' ',
+    },
+    options: timeOptions,
+  },
+];

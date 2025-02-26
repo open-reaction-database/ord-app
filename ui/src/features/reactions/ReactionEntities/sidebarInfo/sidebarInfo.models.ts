@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from 'features/reactions/ReactionEntities/index.ts';
-import { type FC } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionEntityTitleProps } from './ReactionEntityTitle/reactionEntityTitle.types.ts';
+import { ReactionEntity } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToForm.models.ts';
 import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/ReactionEntityTitle/ReactionEntityTitle.tsx';
+import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
+import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
+import type { ord } from 'ord-schema-protobufjs';
+import type {
+  AppReactionCompound,
+  AppReactionInput,
+} from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
-export interface ReactionSidebarInfo {
-  pathComponents: ReactionPathComponents;
-  entityName: ReactionEntity;
-  label: string;
-  sidebarTitle: FC<ReactionEntityTitleProps>;
-}
-
-const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
+export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   {
     pathComponents: ['notes'],
     entityName: ReactionEntity.Notes,
     label: 'Notes',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Notes', hasDelete: false }),
+    useInitialValues: buildUseInitialValues((values: ord.IReactionNotes) => values),
   },
   {
     pathComponents: ['inputs'],
@@ -42,12 +40,16 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       hasDelete: true,
       description: 'Reaction inputs include every chemical added to the reaction vessel',
     }),
+    useInitialValues: buildUseInitialValues(({ components: _, ...rest }: AppReactionInput) => rest),
   },
   {
     pathComponents: ['components', 'inputs'],
     entityName: ReactionEntity.Components,
     label: 'Component',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: false }),
+    useInitialValues: buildUseInitialValues(
+      ({ identifiers: _i, molBlockIdentifiers: _m, ...rest }: AppReactionCompound) => rest,
+    ),
   },
   {
     pathComponents: ['identifiers'],
@@ -58,55 +60,34 @@ const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       hasDelete: false,
       description: 'Reaction identifiers define descriptions of the overall reaction',
     }),
+    useInitialValues: buildUseInitialValues(value => value),
   },
   {
     pathComponents: ['preparations', 'components', 'inputs'],
     entityName: ReactionEntity.ComponentPreparations,
     label: 'Preparation',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Preparation', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(value => value),
   },
   {
     pathComponents: ['features', 'components', 'inputs'],
     entityName: ReactionEntity.Features,
     label: 'Features',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(value => value),
   },
   {
     pathComponents: ['identifiers', 'components', 'inputs'],
     entityName: ReactionEntity.ComponentIdentifiers,
     label: 'Identifiers',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
+    pathComponents: ['outcomes'],
+    entityName: ReactionEntity.Outcomes,
+    label: 'Outcomes',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Outcome', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(value => value),
   },
 ];
-
-const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity)];
-
-function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {
-  const [entity, ...rest] = pathComponents;
-  if (typeof entity === 'number' || !allowedEntityNames.includes(entity)) {
-    return getEntityPathComponent(rest);
-  }
-  return [rest, entity];
-}
-
-export function getSidebarInfo(
-  pathComponents: ReactionPathComponents,
-  index: number = 0,
-  sidebarInfoCandidates: Array<ReactionSidebarInfo> = reactionSidebarInfo,
-): ReactionSidebarInfo {
-  const [updatedPathComponents, currentPath] = getEntityPathComponent(pathComponents);
-  let filteredSidebarInfoCandidates = sidebarInfoCandidates.filter(
-    (candidate: ReactionSidebarInfo) => candidate.pathComponents[index] === currentPath,
-  );
-  if (updatedPathComponents.length === 0) {
-    filteredSidebarInfoCandidates = filteredSidebarInfoCandidates.filter(
-      (candidate: ReactionSidebarInfo) => candidate.pathComponents.length === index + 1,
-    );
-  }
-  if (filteredSidebarInfoCandidates.length === 1) {
-    return filteredSidebarInfoCandidates[0];
-  } else if (filteredSidebarInfoCandidates.length === 0) {
-    throw new Error('Invalid path');
-  }
-  return getSidebarInfo(updatedPathComponents, index + 1, filteredSidebarInfoCandidates);
-}

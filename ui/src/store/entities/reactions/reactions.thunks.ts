@@ -27,7 +27,7 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type { ReactionResponse, ReactionWrapper } from './reactions.types.ts';
+import type { AppReaction, ReactionMolBlocks, ReactionResponse, ReactionWrapper } from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
@@ -38,13 +38,49 @@ import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { ordReactionToReaction, reactionToOrdReaction } from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-const parseReaction = ({ binpb, ...rest }: ReactionResponse): ReactionWrapper => {
+const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+  const inputsArray = Object.values(reaction.inputs);
+  const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
+    (acc: PreviewsById, [inputName, input]) => ({
+      ...acc,
+      ...input.reduce((acc: PreviewsById, item, index) => {
+        const component = (inputsArray.find(item => item.name === inputName) as AppReactionInput).components[index];
+        return {
+          ...acc,
+          [component.id]: item,
+        };
+      }, {}),
+    }),
+    {},
+  );
+
+  const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
+    (acc: PreviewsById, products, outcomeIndex) => ({
+      ...acc,
+      ...products.reduce((acc: PreviewsById, item, productIndex) => {
+        const product = reaction.outcomes[outcomeIndex].products[productIndex];
+        return {
+          ...acc,
+          [product.id]: item,
+        };
+      }, {}),
+    }),
+    {},
+  );
+  return { ...inputsPreviews, ...outcomesPreviews };
+};
+
+const parseReaction = ({ binpb, molblocks, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
+  const previews = getReactionPreviews(appReaction, molblocks);
 
   return {
     ...rest,
+    previews,
     data: appReaction,
   };
 };
@@ -81,7 +117,9 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
   }
 
   const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
-  return getReactionActions.success(parseReaction(result.data));
+  const parsedReaction = parseReaction(result.data);
+  console.info(parsedReaction);
+  return getReactionActions.success(parsedReaction);
 });
 
 export const renameReaction = createThunk(renameReactionActions, async (_d, getState, { reactionId, name }) => {
@@ -134,8 +172,15 @@ async function updateReaction(reactionId: number, getState: () => AppState): Pro
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   async (dispatch, getState, { reactionId }) => {
-    const { binpb: _, ...reaction } = await updateReaction(reactionId, getState);
-    dispatch(addUpdateReactionFieldActions.success(reaction));
+    const updatedReactionData = selectReactionById(reactionId)(getState()).data;
+    const { binpb: _, molblocks, ...reactionMetadata } = await updateReaction(reactionId, getState);
+    const updatedReaction = {
+      ...reactionMetadata,
+      previews: getReactionPreviews(updatedReactionData, molblocks),
+      molblocks,
+    };
+
+    dispatch(addUpdateReactionFieldActions.success(updatedReaction));
     showNotification({ message: 'Reaction updated.', variant: 'success' });
   },
 );

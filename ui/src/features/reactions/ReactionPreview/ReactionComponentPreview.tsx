@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import type { PreviewState } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import { Loader, Title } from '@mantine/core';
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
+interface ReactionComponentPreviewProps {
+  previewState?: PreviewState;
+  alt?: string;
+}
+
+export function ReactionComponentPreview({ previewState, alt }: Readonly<ReactionComponentPreviewProps>) {
+  if (!previewState || previewState.isLoading) {
+    return <Loader />;
+  }
+  const { svg } = previewState;
+
+  return svg ? (
+    <img
+      alt={alt}
+      src={`data:image/svg+xml;base64,${svg}`}
+    />
+  ) : (
+    <Title order={3}>No preview</Title>
   );
 }

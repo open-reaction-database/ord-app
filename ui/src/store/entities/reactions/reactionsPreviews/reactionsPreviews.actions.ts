@@ -13,19 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import { createActionFactory } from 'store/utils';
+import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
-  );
-}
+const { createAction } = createActionFactory('reactionsPreviews');
+
+export const setPreviewsByIds = createAction<PreviewsById>('set_previews_by_ids');

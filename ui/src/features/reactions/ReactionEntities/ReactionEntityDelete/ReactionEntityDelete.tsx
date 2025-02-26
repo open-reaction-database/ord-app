@@ -60,7 +60,7 @@ export function ReactionEntityDelete({
         <ActionIcon
           onClick={openConfirmation}
           className={classes.icon}
-          variant="white"
+          variant="transparent"
           color="red"
           ref={ref}
         >

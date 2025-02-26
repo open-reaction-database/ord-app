@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import { initIndigo, renderSvg, waitForIndigo } from 'common/utils/indigo.ts';
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
-  );
-}
+initIndigo();
+
+onmessage = event => {
+  if (typeof event.data !== 'object') {
+    return;
+  }
+
+  const previews: PreviewsById = event.data;
+
+  waitForIndigo().then(() => {
+    const svgPreviews = Object.entries(previews).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [key]: renderSvg(value),
+      }),
+      {},
+    );
+    postMessage(svgPreviews);
+  });
+};

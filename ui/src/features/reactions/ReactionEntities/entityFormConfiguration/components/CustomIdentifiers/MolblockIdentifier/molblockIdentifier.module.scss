@@ -17,9 +17,12 @@
   height: 120px;
 }
 
-.preview {
-  max-height: 120px;
-  min-height: 60px;
+.previewWrapper {
   width: 200px;
+}
+
+.preview {
+  max-height: 80px;
+  min-height: 40px;
   max-width: 200px;
 }

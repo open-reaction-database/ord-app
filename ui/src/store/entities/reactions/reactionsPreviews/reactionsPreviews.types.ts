@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+export type ComponentProductPreview = string | null;
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ReactionPage />
-      </Route>
-      <Route path="/">
-        <DatasetPage />
-      </Route>
-    </Switch>
-  );
+export type PreviewsById = Record<string, ComponentProductPreview>;
+
+export interface PreviewState {
+  isLoading: boolean;
+  svg: ComponentProductPreview;
 }
+
+export type PreviewStatesById = Record<string, PreviewState>;
