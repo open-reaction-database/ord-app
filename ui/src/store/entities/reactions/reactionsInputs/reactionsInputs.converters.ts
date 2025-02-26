@@ -30,6 +30,12 @@ import {
   ordDataMapToReactionDataMap,
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
+import {
+  withId,
+  withIdName,
+  withoutId,
+  withoutIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 const IdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 
@@ -109,18 +115,17 @@ export function ordCompoundToReactionCompound(ordCompound: ord.ICompound): AppRe
     { nonMolBlockIdentifiers: emptyIdentifiersArray, molBlockIdentifiers: emptyIdentifiersArray },
   );
 
-  return {
-    id: crypto.randomUUID(),
+  return withId({
     ...rest,
     identifiers: nonMolBlockIdentifiers,
     molBlockIdentifiers: molBlockIdentifiers,
     features: ordDataMapToReactionDataMap(ordCompound.features || {}),
     amount: ordAmountToReactionAmount(amount),
-  };
+  });
 }
 
 function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.ICompound {
-  const { amount, molBlockIdentifiers, identifiers, id: _, ...rest } = appCompound;
+  const { amount, molBlockIdentifiers, identifiers, ...rest } = withoutId(appCompound);
   return {
     ...rest,
     identifiers: [...molBlockIdentifiers, ...identifiers],
@@ -131,16 +136,17 @@ function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.IC
 
 export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): AppReactionInput {
   const { components, ...rest } = ordInput;
-  return {
-    id: crypto.randomUUID(),
+  return withIdName(
+    {
+      components: (components || []).map(ordCompoundToReactionCompound),
+      ...rest,
+    },
     name,
-    ...rest,
-    components: (components || []).map(ordCompoundToReactionCompound),
-  };
+  );
 }
 
 export function reactionInputToOrdInput(appInput: AppReactionInput): ord.IReactionInput {
-  const { components, id: _i, name: _n, ...rest } = appInput;
+  const { components, ...rest } = withoutIdName(appInput);
   return {
     ...rest,
     components: components.length > 0 ? components.map(reactionCompoundToOrdCompound) : null,

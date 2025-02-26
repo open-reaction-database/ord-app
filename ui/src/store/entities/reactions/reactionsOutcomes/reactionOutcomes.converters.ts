@@ -13,62 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionAnalysis, AppReactionOutcome, AppReactionProduct } from './reactionOutcomes.types.ts';
+import type { AppReactionAnalysis, AppReactionOutcome } from './reactionOutcomes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import { ordDataMapToReactionDataMap } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
+import {
+  withId,
+  withIdName,
+  withoutId,
+  withoutIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
-const ordAnalysisToReactionAnalysis = ({ data, ...rest }: ord.IAnalysis, name: string): AppReactionAnalysis => ({
-  id: crypto.randomUUID(),
-  name,
-  ...rest,
-  data: ordDataMapToReactionDataMap(data || {}),
-});
+const ordAnalysisToReactionAnalysis = ({ data, ...rest }: ord.IAnalysis, name: string): AppReactionAnalysis =>
+  withIdName(
+    {
+      data: ordDataMapToReactionDataMap(data || {}),
+      ...rest,
+    },
+    name,
+  );
 
-const reactionAnalysisToOrdAnalysis = ({ id, name, data, ...rest }: AppReactionAnalysis): ord.IAnalysis => ({
-  ...rest,
-  data: ordDataMapToReactionDataMap(data),
-});
-
-const ordProductToReactionProduct = (product: ord.IProductCompound): AppReactionProduct => ({
-  id: crypto.randomUUID(),
-  ...product,
-});
-
-const reactionProductToOrdProduct = ({ id: _, ...product }: AppReactionProduct): ord.IProductCompound => product;
+const reactionAnalysisToOrdAnalysis = ({ data, ...rest }: AppReactionAnalysis): ord.IAnalysis =>
+  withoutIdName({
+    data: ordDataMapToReactionDataMap(data),
+    ...rest,
+  });
 
 export const ordOutcomeToReactionOutcome = ({
   analyses,
   products,
   ...rest
-}: ord.IReactionOutcome): AppReactionOutcome => ({
-  id: crypto.randomUUID(),
-  analyses: Object.entries(analyses || {}).reduce(
-    (acc, [name, value]) => ({
-      ...acc,
-      [name]: ordAnalysisToReactionAnalysis(value, name),
-    }),
-    {},
-  ),
-  products: (products || []).map(ordProductToReactionProduct),
-  ...rest,
-});
+}: ord.IReactionOutcome): AppReactionOutcome =>
+  withId({
+    analyses: Object.entries(analyses || {}).reduce(
+      (acc, [name, value]) => ({
+        ...acc,
+        [name]: ordAnalysisToReactionAnalysis(value, name),
+      }),
+      {},
+    ),
+    products: (products || []).map(withId),
+    ...rest,
+  });
 
 export const reactionOutcomeToOrdOutcome = ({
-  id: _,
   analyses,
   products,
   ...rest
-}: AppReactionOutcome): ord.IReactionOutcome => ({
-  analyses: Object.values(analyses || {}).reduce(
-    (acc, value) => ({
-      ...acc,
-      [value.name]: reactionAnalysisToOrdAnalysis(value),
-    }),
-    {},
-  ),
-  products: products.map(reactionProductToOrdProduct),
-  ...rest,
-});
+}: AppReactionOutcome): ord.IReactionOutcome =>
+  withoutId({
+    analyses: Object.values(analyses || {}).reduce(
+      (acc, value) => ({
+        ...acc,
+        [value.name]: reactionAnalysisToOrdAnalysis(value),
+      }),
+      {},
+    ),
+    products: products.map(withoutId),
+    ...rest,
+  });
 
 export const ordOutcomesListToReactionOutcomesList = (
   outcomes: Array<ord.IReactionOutcome>,

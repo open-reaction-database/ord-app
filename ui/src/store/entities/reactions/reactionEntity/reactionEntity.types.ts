@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-
-export enum AppDataType {
-  Number = 'Number',
-  Text = 'Text',
-  Url = 'Url',
-  Upload = 'Upload',
+export interface ReactionEntity {
+  id: string;
 }
 
-export interface AppData extends WithIdName<Pick<ord.IData, 'description'>> {
-  data: {
-    value: number | string | null;
-    type: AppDataType;
-  } & Pick<ord.IData, 'format'>;
+export interface ReactionNamedEntity extends ReactionEntity {
+  name: string;
 }
+
+export type WithId<T> = T & ReactionEntity;
+
+export type WithoutId<T extends ReactionEntity> = Omit<T, 'id'>;
+
+export type WithIdName<T> = T & ReactionNamedEntity;
+
+export type WithoutIdName<T extends ReactionNamedEntity> = Omit<T, 'id' | 'name'>;

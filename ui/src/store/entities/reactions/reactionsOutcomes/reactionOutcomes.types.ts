@@ -15,19 +15,15 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import type { WithId, WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export interface AppReactionAnalysis extends Omit<ord.IAnalysis, 'data'> {
-  id: string;
-  name: string;
+export interface AppReactionAnalysis extends WithIdName<Omit<ord.IAnalysis, 'data'>> {
   data: Record<string, AppData>;
 }
 
-export interface AppReactionProduct extends ord.IProductCompound {
-  id: string;
-}
+export type AppReactionProduct = WithId<ord.IProductCompound>;
 
-export interface AppReactionOutcome extends Omit<ord.IReactionOutcome, 'products' | 'analyses'> {
-  id: string;
+export interface AppReactionOutcome extends WithId<Omit<ord.IReactionOutcome, 'products' | 'analyses'>> {
   analyses: Record<string, AppReactionAnalysis>;
   products: Array<AppReactionProduct>;
 }
