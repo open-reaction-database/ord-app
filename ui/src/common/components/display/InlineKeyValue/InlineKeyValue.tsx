@@ -28,7 +28,7 @@ export function InlineKeyValue({ label, value }: Readonly<InlineKeyValueProps>) 
       gap="xs"
       align="center"
     >
-      <Text className={typographyClasses.secondary1}>{label}:</Text>
+      <Text className={typographyClasses.secondary2}>{label}:</Text>
       <Text>{value}</Text>
     </Flex>
   );

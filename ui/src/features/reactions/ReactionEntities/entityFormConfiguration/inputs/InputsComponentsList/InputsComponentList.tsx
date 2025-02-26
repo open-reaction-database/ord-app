@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Button, Divider, Flex, Text, Title } from '@mantine/core';
+import { Button, Flex, Text, Title } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
-import { DataTable } from 'common/components/display/DataTable/DataTable.tsx';
-import type { MRT_ColumnDef } from 'mantine-react-table';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-import { AddCircleIcon, EditIcon, EmptyIcon } from 'common/icons';
+import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import {
@@ -32,77 +29,7 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { typographyClasses } from 'common/styling';
 import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-
-const reactionRoleByValue = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
-
-const columns: Array<MRT_ColumnDef<AppReactionCompound>> = [
-  {
-    id: 'component',
-    header: 'Component',
-  },
-  {
-    id: 'preview',
-    header: 'Preview',
-  },
-  {
-    id: 'role',
-    header: 'Role',
-    Cell: ({ row }) => {
-      const { reactionRole } = row.original;
-      return reactionRole ? <span>{reactionRoleByValue[reactionRole].label}</span> : null;
-    },
-  },
-  {
-    id: 'amount',
-    header: 'Amount',
-    Cell: ({ row }) => {
-      const { value, units } = row?.original?.amount ?? {};
-      return (
-        <span>
-          {value} {units}
-        </span>
-      );
-    },
-  },
-  {
-    id: 'buttons',
-    header: '',
-    size: 100,
-    maxSize: 100,
-    Cell: ({ row }) => {
-      const { reactionId, pathComponents } = useContext(reactionEntityContext);
-      const dispatch = useAppDispatch();
-      const { id } = row;
-      const entityPath = useMemo(() => {
-        const numericId = parseInt(id);
-        return [...pathComponents, 'components', numericId];
-      }, [pathComponents, id]);
-
-      const onEdit = useCallback(() => {
-        dispatch(addReactionPathComponentToList(entityPath));
-      }, [dispatch, entityPath]);
-
-      return (
-        <Flex gap="sm">
-          <ActionIcon
-            variant="white"
-            color="primary"
-            onClick={onEdit}
-          >
-            <EditIcon />
-          </ActionIcon>
-          <Divider orientation="vertical" />
-          <ReactionEntityDelete
-            reactionId={reactionId}
-            entityName="Component"
-            pathComponents={entityPath}
-          />
-        </Flex>
-      );
-    },
-  },
-];
+import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 
 const useSelectData = buildUseSelectItems('components');
 
@@ -143,9 +70,10 @@ export function InputsComponentList() {
       }
     >
       {components.length > 0 ? (
-        <DataTable
-          columns={columns}
-          data={components}
+        <ComponentsList
+          reactionId={reactionId}
+          components={components}
+          inputPathComponent={pathComponents}
         />
       ) : (
         <Flex

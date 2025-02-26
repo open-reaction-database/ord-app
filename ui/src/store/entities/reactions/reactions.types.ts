@@ -16,6 +16,8 @@
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
+import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -23,12 +25,13 @@ export interface ReactionSummary {
 }
 
 export interface ReactionMolBlocks {
-  products: Array<string>;
-  inputs: Record<string, Array<string>>;
+  inputs: Record<string, Array<ComponentProductPreview>>;
+  outcomes: Array<Array<ComponentProductPreview>>;
 }
 
-export interface AppReaction extends Omit<ord.IReaction, 'inputs'> {
+export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes'> {
   inputs: Record<string, AppReactionInput>;
+  outcomes: Array<AppReactionOutcome>;
 }
 
 export interface ReactionResponse {
@@ -39,8 +42,9 @@ export interface ReactionResponse {
   molblocks: ReactionMolBlocks;
 }
 
-export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb'> {
+export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molblocks'> {
   data: AppReaction;
+  previews: PreviewsById;
 }
 
 export interface ImportReactionFromFilePayload {

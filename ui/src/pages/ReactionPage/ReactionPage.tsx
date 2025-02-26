@@ -23,26 +23,27 @@ import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import classes from './reactionPage.module.scss';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
-import { Inputs } from './Inputs/Inputs.tsx';
-import type { ReactionSectionProps } from './reactionPage.types.ts';
+import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
-import { Notes } from './Notes/Notes.tsx';
+import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
-import { Identifiers } from './Identifiers/Identifiers.tsx';
+import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
+import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 
 interface ReactionTab {
   name: string;
   required?: true;
-  Component: FC<ReactionSectionProps>;
+  Component: FC<ReactionViewSectionProps>;
 }
 
 const createEmptyComponent = (name: string) => () => name;
 
 const tabs: Array<ReactionTab> = [
   { name: 'inputs', required: true, Component: Inputs },
-  { name: 'outcomes', required: true, Component: createEmptyComponent('outcomes') },
+  { name: 'outcomes', required: true, Component: Outcomes },
   { name: 'conditions', Component: createEmptyComponent('conditions') },
   { name: 'identifiers', Component: Identifiers },
   { name: 'setup', Component: createEmptyComponent('setup') },

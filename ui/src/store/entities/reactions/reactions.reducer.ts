@@ -34,6 +34,7 @@ import {
   generateDeepPartialReactionByPath,
   removeDeepReactionPart,
 } from './reactions.utils.ts';
+import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 
 const getReactionId = (reaction: ReactionWrapper) => reaction.id;
 
@@ -168,4 +169,5 @@ export const reactionsReducer = combineReducers({
   activeDatasetId,
   isReactionCreating,
   areReactionsLoading,
+  reactionsPreviews: reactionsPreviewsReducer,
 });

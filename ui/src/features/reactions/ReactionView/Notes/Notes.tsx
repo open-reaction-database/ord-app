@@ -17,12 +17,12 @@ import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import type { ReactionSectionProps } from '../reactionPage.types.ts';
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo } from 'react';
-import classes from './notes.module.scss';
+import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from 'common/styling';
 
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
@@ -44,7 +44,7 @@ const defaultNotes: Partial<ord.IReactionNotes> = {};
 const booleanToUppercase = (value: NotEmptyValueType): string =>
   typeof value === 'boolean' ? value.toString().toUpperCase() : value;
 
-export function Notes({ reactionId }: Readonly<ReactionSectionProps>) {
+export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
   const dispatch = useAppDispatch();
   const { data: reaction } = useSelector(selectReactionById(reactionId));
 

@@ -20,9 +20,17 @@ import indigoInit from 'indigo-ketcher';
 import { Buffer } from 'buffer';
 
 let indigoModule: ReturnType<indigoInit>;
+let indigoPromise: Promise<void>;
 
 export function initIndigo() {
-  indigoModule = indigoInit().then((result: typeof indigoModule) => (indigoModule = result));
+  indigoPromise = indigoInit().then((result: typeof indigoModule) => (indigoModule = result));
+}
+
+export function waitForIndigo() {
+  if (!indigoPromise) {
+    initIndigo();
+  }
+  return indigoPromise;
 }
 
 export function renderSvg(component: string | null, size: number = 120) {

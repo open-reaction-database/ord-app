@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { v4 as uuid } from 'uuid';
 import { ord } from 'ord-schema-protobufjs';
 import { AppDataType, type AppData } from './reactionData.types.ts';
 import { Buffer } from 'buffer';
+import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 export function ordDataToReactionData({ description, format, ...data }: ord.IData, name: string): AppData {
   let type: AppData['data']['type'];
@@ -36,16 +36,17 @@ export function ordDataToReactionData({ description, format, ...data }: ord.IDat
     value = data.floatValue ?? data.integerValue ?? null;
   }
 
-  return {
-    id: uuid(),
-    name,
-    data: {
-      value,
-      type,
-      format,
+  return withIdName(
+    {
+      data: {
+        value,
+        type,
+        format,
+      },
+      description,
     },
-    description,
-  };
+    name,
+  );
 }
 
 export function reactionDataToOrdData({ description, data }: AppData): ord.IData {

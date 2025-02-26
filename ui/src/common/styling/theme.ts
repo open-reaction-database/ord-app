@@ -111,6 +111,13 @@ export const theme = createTheme({
         },
       },
     },
+    Badge: {
+      styles: {
+        label: {
+          textTransform: 'none',
+        },
+      },
+    },
     // Almost impossible to properly customize, need to rewrite from scratch
     /*SegmentedControl: {
       styles: {

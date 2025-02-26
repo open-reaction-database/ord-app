@@ -15,7 +15,7 @@
  */
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
-import type { ReactionSectionProps } from '../reactionPage.types.ts';
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { AddCircleIcon, EditIcon, RemoveIcon } from 'common/icons';
@@ -28,6 +28,8 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 
 const entries = Object.entries(ord.ReactionIdentifier.ReactionIdentifierType) as Array<[string, number]>;
 
+const ENTITY_FIELD = 'identifiers';
+
 const reactionIdentifierKeyByValue: Record<number, string> = entries.reduce(
   (acc: Record<number, string>, [key, value]: [string, number]) => {
     return { ...acc, [value]: key };
@@ -38,13 +40,13 @@ const reactionIdentifierKeyByValue: Record<number, string> = entries.reduce(
 const reactionIdentifierTypeValueToKey = (value?: number | null): string =>
   value ? reactionIdentifierKeyByValue[value] : '';
 
-export function Identifiers({ reactionId }: ReactionSectionProps) {
+export function Identifiers({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
   const identifiers = reaction.data.identifiers || [];
 
   const onIdentifierCreate = useCallback(() => {
-    const newIdentifierPath: ReactionPathComponents = ['identifiers', identifiers.length];
+    const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, identifiers.length];
     const newIdentifier = ord.ReactionIdentifier.toObject(new ord.ReactionIdentifier());
 
     dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newIdentifier }));
@@ -53,14 +55,14 @@ export function Identifiers({ reactionId }: ReactionSectionProps) {
 
   const onIdentifierEdit = useCallback(
     (index: number) => {
-      dispatch(setReactionPathComponentsList([['identifiers', index]]));
+      dispatch(setReactionPathComponentsList([[ENTITY_FIELD, index]]));
     },
     [dispatch],
   );
 
   const deleteIdentifier = useCallback(
     (index: number) => {
-      dispatch(deleteReactionField({ reactionId, pathComponents: ['identifiers', index] }));
+      dispatch(deleteReactionField({ reactionId, pathComponents: [ENTITY_FIELD, index] }));
     },
     [dispatch, reactionId],
   );

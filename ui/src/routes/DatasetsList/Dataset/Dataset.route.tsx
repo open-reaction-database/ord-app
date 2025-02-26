@@ -13,24 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch, useParams } from 'wouter';
+import { Route, Switch } from 'wouter';
 import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
 import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect } from 'react';
-import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
-import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 
 export function DatasetRoute() {
-  const dispatch = useAppDispatch();
-  const { datasetId } = useParams();
-  const id = parseInt(datasetId as string);
-
-  useEffect(() => {
-    dispatch(getDataset(id));
-    dispatch(getReactionsList(id));
-  }, [dispatch, id]);
-
   return (
     <Switch>
       <Route path="/reactions/:reactionId">

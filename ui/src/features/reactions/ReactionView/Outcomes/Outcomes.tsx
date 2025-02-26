@@ -13,40 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
+import { useSelector } from 'react-redux';
+import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
+import { ord } from 'ord-schema-protobufjs';
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { AddCircleIcon, EditIcon, NoData } from 'common/icons';
-import classes from './inputs.module.scss';
-import { typographyClasses } from 'common/styling';
-import type { ReactionSectionProps } from '../reactionPage.types.ts';
-import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
-import { useSelector } from 'react-redux';
+import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { useCallback } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
+import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
+import { typographyClasses } from 'common/styling';
+import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 
-export function Inputs({ reactionId }: ReactionSectionProps) {
+const useCreate = buildUseCreate('outcomes', newIndex => [
+  newIndex,
+  ord.ReactionOutcome.toObject(new ord.ReactionOutcome()),
+]);
+
+export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
-  const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
+  const outcomes: Array<AppReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, ['outcomes']));
+  const onCreateNew = useCreate();
 
-  const onCreateNew = useCallback(() => {
-    const newInputName = findReactionEntityUniqueName(
-      'Input',
-      inputs.map(input => input.name),
-    );
-    const appReactionInput = createEmptyReactionInput(newInputName);
-    const pathComponents = ['inputs', appReactionInput.id];
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: pathComponents, newValue: appReactionInput }));
-    dispatch(setReactionPathComponentsList([pathComponents]));
-  }, [dispatch, reactionId, inputs]);
-
-  const onEditInput = useCallback(
-    (id: string) => {
-      dispatch(setReactionPathComponentsList([['inputs', id]]));
+  const handleCreate = () => {
+    onCreateNew(0, outcomes);
+  };
+  const onEdit = useCallback(
+    (index: number) => {
+      dispatch(setReactionPathComponentsList([['outcomes', index]]));
     },
     [dispatch],
   );
@@ -58,34 +56,37 @@ export function Inputs({ reactionId }: ReactionSectionProps) {
           align="center"
           gap="sm"
         >
-          <Title order={2}>Inputs</Title>
-          <Counter amount={inputs.length} />
+          <Title order={2}>Outcomes</Title>
+          <Counter amount={outcomes.length} />
         </Flex>
         <Button
-          onClick={onCreateNew}
+          onClick={handleCreate}
           leftSection={<AddCircleIcon />}
         >
           Input
         </Button>
       </Flex>
-      <span>Reaction inputs include every chemical added to the reaction vessel</span>
-      {inputs.length > 0 ? (
+      <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
+      {outcomes.length > 0 ? (
         <div>
-          {inputs.map(input => (
-            <div key={input.id}>
-              <span>{input.name}</span>
+          {outcomes.map((outcome, index) => (
+            <Flex
+              key={outcome.id}
+              align="center"
+            >
+              <span>Outcome {index + 1}</span>
               <ActionIcon
                 variant="white"
-                onClick={() => onEditInput(input.id)}
+                onClick={() => onEdit(index)}
               >
                 <EditIcon />
               </ActionIcon>
               <ReactionEntityDelete
                 reactionId={reactionId}
                 entityName="Input"
-                pathComponents={['inputs', input.id]}
+                pathComponents={['inputs', index]}
               />
-            </div>
+            </Flex>
           ))}
         </div>
       ) : (

@@ -53,23 +53,22 @@ export function ReactionList() {
   );
 
   return (
-    <Paper
-      radius="sm"
-      p="lg"
-    >
-      <Flex
-        justify="space-between"
-        className={classes.titleContainer}
+    <>
+      <Paper
+        radius="sm"
+        p="lg"
       >
-        <Flex
-          align="center"
-          gap="sm"
-        >
-          <Title order={2}>Dataset Reactions</Title>
-          {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+        <Flex justify="space-between">
+          <Flex
+            align="center"
+            gap="sm"
+          >
+            <Title order={2}>Dataset Reactions</Title>
+            {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+          </Flex>
+          <CreateReactionMenu />
         </Flex>
-        <CreateReactionMenu />
-      </Flex>
+      </Paper>
 
       {isLoading ? (
         <Flex
@@ -111,6 +110,6 @@ export function ReactionList() {
           />
         </>
       )}
-    </Paper>
+    </>
   );
 }
