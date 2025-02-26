@@ -28,10 +28,11 @@ import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/Reacti
 import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
-  ord.ReactionOutcome.toObject(new ord.ReactionOutcome()),
+  ordOutcomeToReactionOutcome(ord.ReactionOutcome.toObject(new ord.ReactionOutcome())),
 ]);
 
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
