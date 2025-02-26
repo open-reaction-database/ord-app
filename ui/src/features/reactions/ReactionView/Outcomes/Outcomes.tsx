@@ -28,10 +28,11 @@ import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/Reacti
 import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
-  ord.ReactionOutcome.toObject(new ord.ReactionOutcome()),
+  ordOutcomeToReactionOutcome(ord.ReactionOutcome.toObject(new ord.ReactionOutcome())),
 ]);
 
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
@@ -40,7 +41,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const onCreateNew = useCreate();
 
   const handleCreate = () => {
-    onCreateNew(0, outcomes);
+    onCreateNew(outcomes.length, outcomes);
   };
   const onEdit = useCallback(
     (index: number) => {
@@ -63,7 +64,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           onClick={handleCreate}
           leftSection={<AddCircleIcon />}
         >
-          Input
+          Outcome
         </Button>
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>

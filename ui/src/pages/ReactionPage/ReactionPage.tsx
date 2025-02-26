@@ -32,6 +32,7 @@ import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 
 interface ReactionTab {
   name: string;
@@ -76,54 +77,64 @@ export function ReactionPage() {
     dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
+  const contextValue = useMemo(
+    () => ({
+      reactionId,
+      pathComponents: [],
+    }),
+    [reactionId],
+  );
+
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      {reaction && (
-        <Flex
-          direction="column"
-          gap="sm"
-        >
-          <ReactionHeader
-            datasetId={datasetId}
-            reactionId={reactionId}
-          />
-          <Paper
-            radius="md"
-            p="lg"
+      <reactionEntityContext.Provider value={contextValue}>
+        {reaction && (
+          <Flex
+            direction="column"
+            gap="sm"
           >
-            <Tabs
-              defaultValue={tabs[0].name}
-              classNames={{ tab: classes.tabTitle, panel: classes.panel }}
+            <ReactionHeader
+              datasetId={datasetId}
+              reactionId={reactionId}
+            />
+            <Paper
+              radius="md"
+              p="lg"
             >
-              <Tabs.List>
-                {tabs.map(({ name, required }) => (
-                  <Fragment key={name}>
-                    {required ? (
-                      <Tooltip label="Mandatory section">
-                        <Tabs.Tab value={name}>
-                          {name}
-                          <RequiredAsterisk />
-                        </Tabs.Tab>
-                      </Tooltip>
-                    ) : (
-                      <Tabs.Tab value={name}>{name}</Tabs.Tab>
-                    )}
-                  </Fragment>
+              <Tabs
+                defaultValue={tabs[0].name}
+                classNames={{ tab: classes.tabTitle, panel: classes.panel }}
+              >
+                <Tabs.List>
+                  {tabs.map(({ name, required }) => (
+                    <Fragment key={name}>
+                      {required ? (
+                        <Tooltip label="Mandatory section">
+                          <Tabs.Tab value={name}>
+                            {name}
+                            <RequiredAsterisk />
+                          </Tabs.Tab>
+                        </Tooltip>
+                      ) : (
+                        <Tabs.Tab value={name}>{name}</Tabs.Tab>
+                      )}
+                    </Fragment>
+                  ))}
+                </Tabs.List>
+                {tabs.map(({ name, Component }) => (
+                  <Tabs.Panel
+                    key={name}
+                    value={name}
+                  >
+                    <Component reactionId={reactionId} />
+                  </Tabs.Panel>
                 ))}
-              </Tabs.List>
-              {tabs.map(({ name, Component }) => (
-                <Tabs.Panel
-                  key={name}
-                  value={name}
-                >
-                  <Component reactionId={reactionId} />
-                </Tabs.Panel>
-              ))}
-            </Tabs>
-          </Paper>
-          <ReactionDetailsSidebar reactionId={reactionId} />
-        </Flex>
-      )}
+              </Tabs>
+            </Paper>
+            <ReactionDetailsSidebar reactionId={reactionId} />
+          </Flex>
+        )}
+      </reactionEntityContext.Provider>
     </PageContainer>
   );
 }
