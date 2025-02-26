@@ -16,13 +16,21 @@ from alembic import command
 from alembic.config import Config
 from faker import Faker
 from fastapi.testclient import TestClient
+from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from ord_app.service_api.main import app
-from ord_app.service_api.models import BaseModel, DatasetModel, GroupModel, UserGroupsMembershipModel, UserModel
+from ord_app.service_api.models import (
+    BaseModel,
+    DatasetModel,
+    GroupModel,
+    TemplateModel,
+    UserGroupsMembershipModel,
+    UserModel,
+)
 from ord_app.service_api.services.auth0 import verify_access_token
 from ord_app.service_api.services.postgresql import get_db_session
 from ord_app.service_api.settings import RuntimeSettings
@@ -153,3 +161,17 @@ async def create_test_user_with_group(test_db_session, role="admin"):
     await test_db_session.commit()
     await test_db_session.refresh(user)
     return user, group
+
+
+async def create_template(test_db_session, user_id):
+    payload = {
+        "binpb": Reaction(reaction_id=fake.name()).SerializeToString(),
+        "name": fake.name(),
+        "variables": fake.json(),
+        "user_id": user_id,
+    }
+    template = TemplateModel(**payload)
+    test_db_session.add(template)
+    await test_db_session.commit()
+    await test_db_session.refresh(template)
+    return template

@@ -59,6 +59,13 @@ class BaseRepository(AbstractRepository[T]):
             )
         return filters
 
+    async def create(self, payload: dict) -> T:
+        instance = self.model(**payload)
+        self.db.add(instance)
+        await self.db.commit()
+        await self.db.refresh(instance)
+        return instance
+
     async def get(self, **kwargs) -> Optional[T]:
         stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalar(stmt)
@@ -84,8 +91,9 @@ class BaseRepository(AbstractRepository[T]):
             logger.debug(f"{self.model.__name__} updated with payload: {payload}")
             return obj
 
-    async def delete(self, **kwargs) -> None:
+    async def delete(self, **kwargs) -> int:
         stmt = delete(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
-        await self.db.execute(stmt)
+        result = await self.db.execute(stmt)
         await self.db.commit()
         logger.debug(f"<{self.model.__name__.title()}({kwargs})> was deleted")
+        return result.rowcount

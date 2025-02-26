@@ -19,7 +19,7 @@ from fastapi_pagination import add_pagination
 from loguru import logger
 
 from ord_app.service_api.constants import AppEnvs
-from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, users, utilities
+from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, templates, users, utilities
 from ord_app.service_api.settings import RuntimeSettings
 
 logger.remove()
@@ -44,7 +44,9 @@ app.add_middleware(
 
 editor = APIRouter(prefix="/api/v1")
 editor.include_router(auth.router)
+
 editor.include_router(users.router)
+editor.include_router(templates.router)
 editor.include_router(datasets.router)
 editor.include_router(reactions.router)
 editor.include_router(group.router)
