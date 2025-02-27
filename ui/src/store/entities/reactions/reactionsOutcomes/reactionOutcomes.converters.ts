@@ -15,7 +15,10 @@
  */
 import type { AppReactionAnalysis, AppReactionOutcome } from './reactionOutcomes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
-import { ordDataMapToReactionDataMap } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
+import {
+  ordDataMapToReactionDataMap,
+  reactionDataMapToOrdDataMap,
+} from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
   withId,
   withIdName,
@@ -42,7 +45,7 @@ const reactionAnalysisToOrdAnalysis = ({
   ...rest
 }: AppReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
-    data: ordDataMapToReactionDataMap(data),
+    data: reactionDataMapToOrdDataMap(data),
     instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
     ...rest,
   });
