@@ -14,7 +14,6 @@ freezegun = "^1.5.1"
 asyncpg = "^0.30.0"
 fastapi = "^0.115.8"
 gunicorn = "^23.0.0"
-psycopg = "^3.2.4"
 ord-schema = "^0.3.96"
 protobuf = "^4.22"
 rdkit = "^2024.9.5"
@@ -25,7 +24,6 @@ sqlalchemy = "^2.0.38"
 pydantic-settings = "^2.7.1"
 fastapi-pagination = "^0.12.34"
 pydantic = {extras = ["email"], version = "^2.10.6"}
-greenlet = "^3.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -36,6 +34,7 @@ httpx = "^0.28.1"
 pytest-cov = "^6.0.0"
 pytype = "^2024.10.11"
 pytest-asyncio = "^0.25.3"
+psycopg = "^3.2.5"
 
 [tool.black]
 line-length = 120

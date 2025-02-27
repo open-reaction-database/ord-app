@@ -14,7 +14,11 @@
 import json
 from datetime import datetime
 
-from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel
+from faker import Faker
+
+from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, ReactionModel
+
+faker = Faker()
 
 
 async def test_paginate_group_datasets(api_client, mock_authenticated_user, test_db_session):
@@ -40,12 +44,16 @@ async def test_paginate_group_datasets(api_client, mock_authenticated_user, test
 async def test_paginate_user_datasets(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
 
-    total_datasets = 5
-    datasets = [
-        DatasetGroupAssociationModel(dataset=DatasetModel(owner=user), group=group)
-        for _ in range(total_datasets)
-    ]
-    test_db_session.add_all(datasets)
+    total_datasets = total_reactions = 5
+    items = []
+    for _ in range(total_datasets):
+        dataset = DatasetModel(owner=user)
+        items.append(DatasetGroupAssociationModel(dataset=dataset, group=group))
+
+        for _ in range(total_reactions):
+            items.append(ReactionModel(pb_reaction_id=faker.uuid4(), dataset=dataset, owner=user))
+
+    test_db_session.add_all(items)
     await test_db_session.commit()
 
     response_data = api_client.get("/api/v1/datasets").raise_for_status().json()

@@ -66,7 +66,8 @@ async def get_group_datasets(
     group_id: int,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
-    return await use_case.paginate_group_datasets(group_id)
+    result = await use_case.paginate_group_datasets(group_id)
+    return result
 
 
 @router.post(

@@ -43,7 +43,7 @@ class UserModel(BaseModel):
     groups: Mapped[list["GroupModel"]] = relationship(
         secondary="user_groups_membership",
         back_populates="members",
-        overlaps="groups_member"
+        overlaps="groups_member",
     )
 
     templates: Mapped["TemplateModel"] = relationship("TemplateModel", back_populates="user")
@@ -61,13 +61,13 @@ class GroupModel(BaseModel):
     datasets: Mapped[list["DatasetModel"]] = relationship(
         secondary="dataset_group_association",
         back_populates="groups",
-        overlaps="dataset_group_associations"
+        overlaps="dataset_group_associations",
     )
 
     members: Mapped[list[UserModel]] = relationship(
         secondary="user_groups_membership",
         back_populates="groups",
-        overlaps="groups_member"
+        overlaps="groups_member",
     )
 
     def __repr__(self):
@@ -76,10 +76,14 @@ class GroupModel(BaseModel):
 
 class UserGroupsMembershipModel(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    user: Mapped[UserModel] = relationship(UserModel, backref="groups_member", overlaps="groups,members")
+    user: Mapped[UserModel] = relationship(
+        UserModel, backref="groups_member", overlaps="groups,members"
+    )
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
-    group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member", overlaps="groups,members")
+    group: Mapped[GroupModel] = relationship(
+        GroupModel, backref="groups_member", overlaps="groups,members"
+    )
 
     role: Mapped[UserRolesList] = mapped_column(
         Enum(
@@ -107,7 +111,7 @@ class DatasetModel(BaseModel):
     groups: Mapped[list[GroupModel]] = relationship(
         secondary="dataset_group_association",
         back_populates="datasets",
-        overlaps="dataset_group_associations"
+        overlaps="dataset_group_associations",
     )
 
     def __repr__(self):
@@ -119,19 +123,25 @@ class DatasetGroupAssociationModel(BaseModel):
     dataset: Mapped[DatasetModel] = relationship(
         DatasetModel,
         backref="dataset_group_associations",
-        overlaps="groups,datasets"
+        overlaps="groups,datasets",
     )
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
     group: Mapped[GroupModel] = relationship(
         GroupModel,
         backref="dataset_group_associations",
-        overlaps="groups,datasets"
+        overlaps="groups,datasets",
     )
 
     # This flag indicates that this is the main group and that related dataset can be shared with another group.
     is_primary: Mapped[bool] = mapped_column(default=True)
 
+    def __repr__(self):
+        return (
+            "<DatasetGroupAssociation("
+            f"dataset_id={self.dataset_id}, group_id={self.group_id}, is_primary={self.is_primary}"
+            ")>"
+        )
 
 class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)

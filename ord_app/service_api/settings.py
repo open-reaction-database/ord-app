@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # databases
-    pg_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"
+    pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
 
     # Encryption and auth
