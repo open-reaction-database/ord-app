@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from 'features/reactions/ReactionEntities/index.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
-import { reactionSidebarInfo } from './sidebarInfo.models.ts';
-
-const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity)];
+import { allowedEntityNames, reactionSidebarInfo } from './sidebarInfo.models.ts';
 
 function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {
   const [entity, ...rest] = pathComponents;

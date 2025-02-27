@@ -118,7 +118,6 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
 
   const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
   const parsedReaction = parseReaction(result.data);
-  console.info(parsedReaction);
   return getReactionActions.success(parsedReaction);
 });
 

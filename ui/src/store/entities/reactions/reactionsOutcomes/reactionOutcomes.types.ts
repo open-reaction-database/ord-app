@@ -17,8 +17,9 @@ import type { ord } from 'ord-schema-protobufjs';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import type { WithId, WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export interface AppReactionAnalysis extends WithIdName<Omit<ord.IAnalysis, 'data'>> {
+export interface AppReactionAnalysis extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated'>> {
   data: Record<string, AppData>;
+  instrumentLastCalibrated: string | null;
 }
 
 export type AppReactionProduct = WithId<ord.IProductCompound>;

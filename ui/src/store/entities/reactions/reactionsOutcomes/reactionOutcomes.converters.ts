@@ -23,18 +23,27 @@ import {
   withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
-const ordAnalysisToReactionAnalysis = ({ data, ...rest }: ord.IAnalysis, name: string): AppReactionAnalysis =>
+export const ordAnalysisToReactionAnalysis = (
+  { data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
+  name: string,
+): AppReactionAnalysis =>
   withIdName(
     {
       data: ordDataMapToReactionDataMap(data || {}),
+      instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
       ...rest,
     },
     name,
   );
 
-const reactionAnalysisToOrdAnalysis = ({ data, ...rest }: AppReactionAnalysis): ord.IAnalysis =>
+const reactionAnalysisToOrdAnalysis = ({
+  data,
+  instrumentLastCalibrated,
+  ...rest
+}: AppReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
     data: ordDataMapToReactionDataMap(data),
+    instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
     ...rest,
   });
 
@@ -44,13 +53,13 @@ export const ordOutcomeToReactionOutcome = ({
   ...rest
 }: ord.IReactionOutcome): AppReactionOutcome =>
   withId({
-    analyses: Object.entries(analyses || {}).reduce(
-      (acc, [name, value]) => ({
+    analyses: Object.entries(analyses || {}).reduce((acc, [name, value]) => {
+      const analysis = ordAnalysisToReactionAnalysis(value, name);
+      return {
         ...acc,
-        [name]: ordAnalysisToReactionAnalysis(value, name),
-      }),
-      {},
-    ),
+        [analysis.id]: analysis,
+      };
+    }, {}),
     products: (products || []).map(withId),
     ...rest,
   });
