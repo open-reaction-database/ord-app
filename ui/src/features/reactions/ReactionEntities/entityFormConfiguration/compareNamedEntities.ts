@@ -13,29 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  type ReactionFormNode,
-  ReactionFormNodeType,
-} from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export const reactionData: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.value,
-    name: 'name',
-    inputType: 'string',
-    wrapperConfig: {
-      label: 'Data name',
-    },
-  },
-  {
-    type: ReactionFormNodeType.data,
-  },
-  {
-    type: ReactionFormNodeType.value,
-    inputType: 'textarea',
-    name: 'description',
-    wrapperConfig: {
-      label: 'Description',
-    },
-  },
-];
+export const compareNamedEntities = <T = unknown>(a: WithIdName<T>, b: WithIdName<T>) => a.name.localeCompare(b.name);

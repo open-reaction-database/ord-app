@@ -17,16 +17,11 @@ import { AppNativeSelect } from 'common/components/inputs/AppNativeSelect/AppNat
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useIsHidden } from '../useIsHidden.ts';
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 
 export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
   const label = useReactionEntityLabel(node.wrapperConfig);
-  const isHidden = useIsHidden(node.condition, formMethods);
   const { getInputProps } = formMethods;
-  if (isHidden) {
-    return null;
-  }
 
   return node.selectType === 'dropdown' ? (
     <AppNativeSelect

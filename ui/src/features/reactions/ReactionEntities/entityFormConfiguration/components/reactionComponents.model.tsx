@@ -34,34 +34,20 @@ import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormCo
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
-import { ordDataToReactionData } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
-import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { CustomIdentifiers } from './CustomIdentifiers/CustomIdentifiers.tsx';
 import type { AppReactionAmount } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import { booleanOptions } from '../booleanOptions.ts';
+import {
+  createReactionDataAddItem,
+  reactionDataDisplay,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
+import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 
 const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
 
 const textureTypeOptions = ordMapToKeyValueObject(ord.Texture.TextureType);
 
 const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
-
-const compareFeatures = (a: AppData, b: AppData): number => a.name.localeCompare(b.name);
-
-const createEmptyFeature = (_: number, features: Array<unknown>): [string, AppData] => {
-  const uniqueName = findReactionEntityUniqueName(
-    'Feature',
-    (features as Array<AppData>).map(f => f.name),
-  );
-  const feature = ordDataToReactionData(ord.Data.toObject(new ord.Data()), uniqueName);
-  return [feature.id, feature];
-};
-
-const booleanOptions = [
-  { label: 'UNSPECIFIED', value: undefined },
-  { label: 'TRUE', value: true },
-  { label: 'FALSE', value: false },
-];
 
 const appReactionAmountType: Array<string> = [
   appAmountUnspecified,
@@ -147,7 +133,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
     getKey: (_, index) => index,
     useSelectItems: buildUseSelectItems('identifiers'),
     ItemDisplay: createEntityListItemComponent<ord.ICompoundIdentifier>({
-      entityName: 'identifiers',
+      entityField: 'identifiers',
       title: 'Identifier',
       requiredFields: [
         {
@@ -214,7 +200,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
     getKey: (_, index) => index,
     useSelectItems: buildUseSelectItems('preparations'),
     ItemDisplay: createEntityListItemComponent<ord.CompoundPreparation>({
-      entityName: 'preparations',
+      entityField: 'preparations',
       title: 'Preparation',
       requiredFields: [
         {
@@ -238,29 +224,9 @@ export const reactionComponents: Array<ReactionFormNode> = [
       label: 'Features',
     },
     getKey: (item: AppData) => item.id,
-    useSelectItems: buildUseSelectItemsListFromMap('features', compareFeatures),
-    ItemDisplay: createEntityListItemComponent<AppData>({
-      entityName: 'features',
-      title: item => item.name,
-      requiredFields: [
-        {
-          label: 'Type',
-          render: item => item.data.type,
-        },
-        {
-          label: 'Value',
-          render: item => <AppDataDisplay appData={item} />,
-        },
-        {
-          label: 'Description',
-          render: item => item.description,
-        },
-      ],
-    }),
-    addItem: {
-      label: 'Feature',
-      useCreate: buildUseCreate('features', createEmptyFeature),
-    },
+    useSelectItems: buildUseSelectItemsListFromMap('features', compareNamedEntities),
+    ItemDisplay: reactionDataDisplay('features'),
+    addItem: createReactionDataAddItem('features', 'Feature'),
   },
   {
     type: ReactionFormNodeType.block,

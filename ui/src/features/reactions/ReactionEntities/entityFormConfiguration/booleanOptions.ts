@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
+import type { SelectOptions } from 'common/types/selectOptions.ts';
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-export function formatDate(inputDate: string) {
-  const date = dayjs(inputDate).tz(dayjs.tz.guess());
-  return date.format('DD.MM.YYYY hh:mm a');
-}
+export const booleanOptions: SelectOptions<boolean | undefined> = [
+  { label: 'UNSPECIFIED', value: undefined },
+  { label: 'TRUE', value: true },
+  { label: 'FALSE', value: false },
+];

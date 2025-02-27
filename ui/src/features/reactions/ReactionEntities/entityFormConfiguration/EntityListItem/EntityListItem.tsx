@@ -26,15 +26,15 @@ import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineK
 export function EntityListItem<T>({
   entityKey,
   entity,
-  entityName,
+  entityField,
   title,
   requiredFields,
 }: Readonly<EntityListItemProps<T>>) {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
-    return [...pathComponents, entityName, entityKey];
-  }, [entityName, entityKey, pathComponents]);
+    return [...pathComponents, entityField, entityKey];
+  }, [entityField, entityKey, pathComponents]);
 
   const titleText = useMemo(() => {
     const humanFriendlyKey = typeof entityKey === 'string' ? entityKey : `${entityKey + 1}`;
@@ -64,7 +64,7 @@ export function EntityListItem<T>({
         </ActionIcon>
         <ReactionEntityDelete
           reactionId={reactionId}
-          entityName={entityName}
+          entityName={titleText}
           pathComponents={itemPathComponents}
         />
       </Flex>

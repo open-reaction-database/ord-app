@@ -15,14 +15,16 @@
  */
 /* stylelint-disable */
 
-.root > :not(:first-child),
-.root > :not(:first-child) :global(.mantine-Input-input) {
+// Mantine's date input have hidden input, need to filter it
+.root > div:not(:first-of-type),
+.root > div:not(:first-of-type) :global(.mantine-Input-input) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.root > :not(:last-child),
-.root > :not(:last-child) :global(.mantine-Input-input) {
+// Mantine's date input have hidden input, need to filter it
+.root > div:not(:last-of-type),
+.root > div:not(:last-of-type) :global(.mantine-Input-input) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right: 0;

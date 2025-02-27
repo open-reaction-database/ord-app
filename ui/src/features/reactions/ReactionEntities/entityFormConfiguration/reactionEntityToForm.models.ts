@@ -15,13 +15,14 @@
  */
 import type { ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { reactionNotes } from './reactionNotes.model.ts';
-import { reactionData } from './data/reactionData.models.ts';
+import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { reactionInputs } from './inputs/reactionInputs.model.tsx';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
 import { reactionComponents } from './components/reactionComponents.model.tsx';
 import { reactionComponentsPreparations } from './components/preparations/reactionComponentsPreparations.model.ts';
 import { reactionComponentIdentifiers } from './componentIdentifier/reactionComponentIdentifiers.model.ts';
-import { reactionOutcomes } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/reactionOutcomes.models.ts';
+import { reactionOutcomes } from './outcomes/reactionOutcomes.models.ts';
+import { reactionAnalyses } from './outcomes/reactionAnalyses.models.ts';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
@@ -29,9 +30,10 @@ export enum ReactionEntity {
   Identifiers = 'identifiers',
   Components = 'components',
   ComponentPreparations = 'preparations',
-  Features = 'features',
+  Data = 'data',
   ComponentIdentifiers = 'component_identifiers',
   Outcomes = 'outcomes',
+  Analyses = 'analyses',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -40,7 +42,8 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Identifiers]: reactionIdentifiers,
   [ReactionEntity.Components]: reactionComponents,
   [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
-  [ReactionEntity.Features]: reactionData,
+  [ReactionEntity.Data]: reactionData,
   [ReactionEntity.ComponentIdentifiers]: reactionComponentIdentifiers,
   [ReactionEntity.Outcomes]: reactionOutcomes,
+  [ReactionEntity.Analyses]: reactionAnalyses,
 };

@@ -30,10 +30,18 @@ export enum ReactionFormNodeType {
   block = 'block',
   list = 'list',
   data = 'data',
+  date = 'date',
   custom = 'custom',
 }
 
-export interface ReactionFormNodeBase {
+export interface ReactionFormConditionalRendering {
+  readonly condition?: {
+    name: string;
+    isHidden: (value: unknown) => boolean;
+  };
+}
+
+export interface ReactionFormNodeBase extends ReactionFormConditionalRendering {
   type: ReactionFormNodeType;
 }
 
@@ -56,13 +64,6 @@ export interface ReactionFormField {
   wrapperConfig?: ReactionFormStandaloneField;
 }
 
-export interface ReactionFormConditionalRendering {
-  readonly condition?: {
-    name: string;
-    isHidden: (value: unknown) => boolean;
-  };
-}
-
 export interface ReactionFormWrapper extends ReactionFormNodeBase, ReactionFormField {
   type: ReactionFormNodeType.wrapper;
   grid: number;
@@ -76,18 +77,23 @@ export interface ReactionFormValue extends ReactionFormField, ReactionFormNodeBa
   inputConfig?: Pick<InputProps, 'leftSection' | 'rightSection'> & { placeholder?: string };
 }
 
-export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeBase, ReactionFormConditionalRendering {
+export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.select;
   name: string;
   options: SelectOptions<unknown>;
   selectType: 'segmented' | 'dropdown';
 }
 
-export interface ReactionFormValuePrecisionUnit extends ReactionFormField, ReactionFormNodeBase, ReactionFormNodeBase {
+export interface ReactionFormValuePrecisionUnit extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.vpu;
   name: string;
   options: SelectOptions<number | string>;
   select?: 'native' | 'native-inline' | 'segmented';
+}
+
+export interface ReactionFormDate extends ReactionFormNodeBase, ReactionFormField {
+  type: ReactionFormNodeType.date;
+  name: string;
 }
 
 export interface ReactionFormObjectInitializer extends ReactionFormNodeBase {
@@ -146,6 +152,7 @@ export type ReactionFormNode =
   | ReactionFormBlock
   | ReactionFormList
   | ReactionFormData
+  | ReactionFormDate
   | ReactionFormCustom;
 
 export interface ReactionEntityContext {

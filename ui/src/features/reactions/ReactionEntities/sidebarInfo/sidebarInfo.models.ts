@@ -22,6 +22,10 @@ import type {
   AppReactionCompound,
   AppReactionInput,
 } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type {
+  AppReactionAnalysis,
+  AppReactionOutcome,
+} from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 
 export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   {
@@ -71,7 +75,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   },
   {
     pathComponents: ['features', 'components', 'inputs'],
-    entityName: ReactionEntity.Features,
+    entityName: ReactionEntity.Data,
     label: 'Features',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
     useInitialValues: buildUseInitialValues(value => value),
@@ -88,6 +92,24 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     entityName: ReactionEntity.Outcomes,
     label: 'Outcomes',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Outcome', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(({ analyses: _a, products: _p, ...rest }: AppReactionOutcome) => rest),
+  },
+  {
+    pathComponents: ['analyses', 'outcomes'],
+    entityName: ReactionEntity.Analyses,
+    label: 'Analyses',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Analysis', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(({ data: _, ...rest }: AppReactionAnalysis) => rest),
+  },
+  {
+    pathComponents: ['data', 'analyses', 'outcomes'],
+    entityName: ReactionEntity.Data,
+    label: 'Analytical Data',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Analytical Data', hasDelete: true }),
     useInitialValues: buildUseInitialValues(value => value),
   },
 ];
+
+const dataEntityNames = ['features', 'data'];
+
+export const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity), ...dataEntityNames];
