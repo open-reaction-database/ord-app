@@ -22,22 +22,22 @@ import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import { USER_ROLES } from 'common/types';
 
 interface GroupsListWithRolesProps {
-  readonly data: Array<GroupItem>;
+  data: Array<GroupItem>;
 }
 
 interface GroupNameRoleProps {
-  readonly name: string;
-  readonly role: string;
+  name: string;
+  role: string;
 }
 
-const GroupNameRole = ({ name, role }: GroupNameRoleProps) => (
+const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
   <>
     <span className={classes.groupName}>{name}: </span>
     <span className={classes.groupRole}>{role} </span>
   </>
 );
 
-export function GroupsListWithRoles({ data = [] }: GroupsListWithRolesProps) {
+export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesProps>) {
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
     return [...data].sort((a, b) => {
@@ -84,7 +84,7 @@ export function GroupsListWithRoles({ data = [] }: GroupsListWithRolesProps) {
           opened={opened}
         >
           <Popover.Target>
-            <span
+            <a
               onMouseEnter={open}
               onMouseLeave={close}
             >
@@ -92,7 +92,7 @@ export function GroupsListWithRoles({ data = [] }: GroupsListWithRolesProps) {
                 amount={'+' + numberOfRemainingGroups}
                 color={'blue'}
               />
-            </span>
+            </a>
           </Popover.Target>
           <Popover.Dropdown>{tooltipContent}</Popover.Dropdown>
         </Popover>
