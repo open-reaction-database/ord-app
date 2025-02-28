@@ -21,6 +21,15 @@
   border-bottom: 1px solid var(--color-border-1);
 }
 
+.placeholder {
+  color: var(--color-text-secondary-1);
+
+  & > svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .groupButton {
   font-weight: 400;
   padding: 0 10px;
@@ -33,6 +42,16 @@
 
   svg {
     color: var(--color-icons-default);
+  }
+
+  &.selected {
+    background-color: var(--color-primary);
+    color: var(--color-background-white);
+
+    .buttonName svg,
+    .buttonSection svg {
+      color: var(--color-background-white);
+    }
   }
 }
 
@@ -72,13 +91,4 @@
   align-items: center;
   justify-content: center;
   margin-top: 12px;
-}
-
-.placeholder {
-  color: var(--color-text-secondary-1);
-
-  & > svg {
-    width: 14px;
-    height: 14px;
-  }
 }

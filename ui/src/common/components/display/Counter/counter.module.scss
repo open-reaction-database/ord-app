@@ -15,8 +15,12 @@
  */
 .counter {
   padding: 2px 8px;
-  background-color: var(--color-background-gray);
   font-size: var(--font-size-sm);
   font-weight: 700;
   border-radius: var(--mantine-spacing-xl);
+}
+
+.defaultColor {
+  background-color: var(--color-background-gray);
+  color: var(--color-text-primary);
 }
