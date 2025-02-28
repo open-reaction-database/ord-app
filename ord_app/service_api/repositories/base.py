@@ -26,6 +26,7 @@ T = TypeVar("T")
 
 filters_map = {
     list: lambda field, values: field.in_(values),
+    tuple: lambda field, values: field.in_(values),
 }
 
 

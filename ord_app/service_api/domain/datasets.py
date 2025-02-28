@@ -67,6 +67,8 @@ class DatasetUseCases:
         return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
 
     async def upload(self, group_id: int, file_data, kind):
+        logger.debug(f"uploading {kind} file")
+
         try:
             dataset_pb = load_message(file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -80,6 +82,9 @@ class DatasetUseCases:
             payload=dataset_payload.model_dump(),
             autocommit=False
         )
+        self.db.add(dataset)
+        await self.db.commit()
+        logger.debug(f"<Dataset(id={dataset.id})> created")
 
         seen_ids = set()
         reactions_ids = []
@@ -89,7 +94,8 @@ class DatasetUseCases:
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)
 
-        for item in await self.reaction_repository.filter(pb_reaction_id=reactions_ids):
+        logger.debug(f"Start processing <Dataset(id={dataset.id})> Reactions. Count={len(reactions_ids)}")
+        async for item in self.reaction_repository.get_by_reaction_ids_gen(reactions_ids):
             pb_reaction_idx = reactions_ids.index(item.pb_reaction_id)
             dataset_pb.reactions[pb_reaction_idx].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
 
@@ -102,8 +108,13 @@ class DatasetUseCases:
             }
             for reaction in dataset_pb.reactions
         ]
+
+        logger.debug(f"Reactions <Dataset(id={dataset.id})> are going to write to database")
+
         await self.reaction_repository.bulk_create(reactions_payload)
         await self.db.refresh(dataset)
+
+        logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
         return await self.dataset_repository.get(dataset.id)
 
