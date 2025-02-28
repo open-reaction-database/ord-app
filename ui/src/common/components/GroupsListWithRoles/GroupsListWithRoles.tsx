@@ -84,15 +84,16 @@ export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesP
           opened={opened}
         >
           <Popover.Target>
-            <a
+            <span
               onMouseEnter={open}
               onMouseLeave={close}
+              role="button"
             >
               <Counter
                 amount={'+' + numberOfRemainingGroups}
                 color={'blue'}
               />
-            </a>
+            </span>
           </Popover.Target>
           <Popover.Dropdown>{tooltipContent}</Popover.Dropdown>
         </Popover>
