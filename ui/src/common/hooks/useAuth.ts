@@ -27,7 +27,7 @@ export function useAuth() {
   const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
   const isUserCreated = useSelector(selectSelf);
 
-  const isAppLoading = isLoading || !isAuthenticated || !isUserCreated;
+  const isAppLoading = !isUserCreated;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
