@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from itertools import batched
+
 from loguru import logger
 from sqlalchemy import select, update
 
@@ -20,6 +22,11 @@ from ord_app.service_api.repositories.base import BaseRepository
 
 class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
+
+    async def get_by_reaction_ids_gen(self, pb_reaction_ids: list[str], max_num_query_args=10_000):
+        for batch in batched(pb_reaction_ids, max_num_query_args):
+            for item in await self.filter(pb_reaction_id=batch):
+                yield item
 
     async def bulk_update(self, values):
         await self.db.execute(update(ReactionModel), values)

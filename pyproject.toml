@@ -9,7 +9,6 @@ readme = "README.md"
 python = "~3.12"
 orjson = "^3.10.12"
 loguru = "^0.7.3"
-ruff = "^0.9.1"
 freezegun = "^1.5.1"
 asyncpg = "^0.30.0"
 fastapi = "^0.115.8"
@@ -35,6 +34,7 @@ pytest-cov = "^6.0.0"
 pytype = "^2024.10.11"
 pytest-asyncio = "^0.25.3"
 psycopg = "^3.2.5"
+ruff = "^0.9.9"
 
 [tool.black]
 line-length = 120

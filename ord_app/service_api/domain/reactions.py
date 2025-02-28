@@ -42,9 +42,9 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 async def validate_reactions_task(db: AsyncSession):
     reaction_repo = ReactionsRepository(db)
-    update_values = []
 
-    async for reactions_chunk in reaction_repo.stream_reactions():
+    async for reactions_chunk in reaction_repo.stream_reactions(chunk_size=1000):
+        update_values = []
         for reaction in reactions_chunk:
             pb_reaction = load_message(reaction.binpb, Reaction, "binpb")
             try:
@@ -58,7 +58,7 @@ async def validate_reactions_task(db: AsyncSession):
             else:
                 update_values.append({"id": reaction.id, "is_valid": True})
 
-    await reaction_repo.bulk_update(update_values)
+        await reaction_repo.bulk_update(update_values)
 
 
 class ReactionsUseCase:
