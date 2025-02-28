@@ -152,7 +152,8 @@ class ReactionsUseCase:
 
         if payload.binpb is not None:
             pb_reaction = load_message(payload.binpb, Reaction, "binpb")
-            if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+            db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
+            if db_reaction:
                 pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
             insert_data["binpb"] = pb_reaction
 
@@ -185,7 +186,8 @@ class ReactionsUseCase:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
-        if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id):
+        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
+        if db_reaction:
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
