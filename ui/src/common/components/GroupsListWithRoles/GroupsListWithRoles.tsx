@@ -37,7 +37,7 @@ const GroupNameRole = ({ name, role }: GroupNameRoleProps) => (
   </>
 );
 
-export function GroupsListWithRoles({ data }: GroupsListWithRolesProps) {
+export function GroupsListWithRoles({ data = [] }: GroupsListWithRolesProps) {
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
     return [...data].sort((a, b) => {
