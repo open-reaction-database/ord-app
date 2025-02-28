@@ -32,6 +32,7 @@ import { domain, fileDownloadOptions } from 'common/constants.ts';
 import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
+import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import classes from './datasetHeader.module.scss';
 
 interface DatasetHeaderProps {
@@ -73,7 +74,9 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
     >
       <div>
         <div className={classes.datasetInfo}>
-          <DataField label="Group">{dataset.group}</DataField>
+          <DataField label="Group">
+            <GroupsListWithRoles data={dataset?.groups || []} />
+          </DataField>
           <DataField label="Dataset Owner">
             <UserField username={dataset?.owner.name} />
           </DataField>

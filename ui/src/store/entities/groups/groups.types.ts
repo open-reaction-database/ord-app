@@ -25,6 +25,13 @@ export interface Group {
 }
 
 export interface GroupMember {
+  id: number;
   role: USER_ROLES;
   user: User;
+}
+
+export interface GroupItem {
+  id: number;
+  role: USER_ROLES;
+  name: string;
 }

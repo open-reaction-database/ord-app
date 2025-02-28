@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { GroupItem } from '../groups/groups.types';
 
 interface DatasetCreator {
   id: number;
@@ -26,7 +27,7 @@ export interface Dataset {
   owner: DatasetCreator;
   created_at: string;
   modified_at: string;
-  group: string;
+  groups: Array<GroupItem>;
   description: string;
 }
 

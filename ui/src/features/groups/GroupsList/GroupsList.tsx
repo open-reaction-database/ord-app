@@ -27,6 +27,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import classes from './GroupsList.module.scss';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
+import clsx from 'clsx';
 
 const GROUP_BUTTON_HEIGHT = 36;
 
@@ -77,7 +78,10 @@ export function GroupsList() {
       />
       <Flex direction="column">
         <Button
-          classNames={{ root: classes.groupButton, section: classes.buttonSection }}
+          classNames={{
+            root: clsx(classes.groupButton, { [classes.selected]: selectedGroupId === null }),
+            section: classes.buttonSection,
+          }}
           variant="white"
           leftSection={<GridViewIcon />}
           onClick={() => selectGroup(null)}
@@ -96,7 +100,7 @@ export function GroupsList() {
           {groups.map(group => (
             <Button
               classNames={{
-                root: classes.groupButton,
+                root: clsx(classes.groupButton, { [classes.selected]: selectedGroupId === group.id }),
                 label: classes.buttonLabel,
               }}
               key={group.id}

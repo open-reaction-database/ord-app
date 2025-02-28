@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import classes from './counter.module.scss';
-import { Badge } from '@mantine/core';
-import clsx from 'clsx';
-
-interface CounterProps {
-  amount: number | string;
-  color?: string;
+.groupName {
+  color: var(--color-text-primary);
 }
 
-export function Counter({ amount, color = 'grey' }: Readonly<CounterProps>) {
-  return (
-    <Badge
-      className={clsx(classes.counter, { [classes.defaultColor]: color === 'grey' })}
-      color={color}
-    >
-      {amount}
-    </Badge>
-  );
+.groupRole {
+  text-transform: capitalize;
+  color: var(--color-text-secondary-2);
+}
+
+.popoverDropdown {
+  padding: 5px 10px;
+}
+
+.resetButton {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: 'pointer';
 }
