@@ -31,6 +31,7 @@ export function AppRoot() {
       domain={auth0Domain}
       clientId={auth0ClientId}
       issuer={auth0Issuer}
+      useRefreshTokens={true}
       authorizationParams={{
         redirect_uri: domain,
         audience: auth0Audience,
