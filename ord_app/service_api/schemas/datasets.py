@@ -15,6 +15,7 @@ from datetime import datetime
 from typing import Any, Literal, Optional
 
 from pydantic import Field, model_validator
+from sqlalchemy import Row
 
 from ord_app.service_api.schemas.base import BaseSchema
 from ord_app.service_api.schemas.users import UserSchema
@@ -48,8 +49,11 @@ class DatasetWithReactionCountSchema(DatasetSchema):
     @model_validator(mode="before")
     @classmethod
     def reaction_count(cls, data: Any):  # noqa: F811
-        if hasattr(data, "reactions"):
-            data.reaction_count = len(data.reactions)
+        if isinstance(data, Row):
+            # first element of the data is Dataset ORM object
+            # second is reactions count
+            data[0].reaction_count = data[1]
+            return data[0]
         return data
 
 

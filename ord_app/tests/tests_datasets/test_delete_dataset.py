@@ -17,19 +17,15 @@ from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetMode
 async def test_delete_dataset(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
 
-    dataset = DatasetModel(owner=user, name="init", description="init")
-    test_db_session.add(dataset)
-    await test_db_session.flush()
-
     test_db_session.add(
-        DatasetGroupAssociationModel(dataset=dataset, group=group)
+        DatasetGroupAssociationModel(dataset=DatasetModel(owner=user, name="init", description="init"), group=group)
     )
     await test_db_session.commit()
 
     response_data = api_client.get(f"/api/v1/groups/{group.id}/datasets").raise_for_status().json()
-    assert response_data["items"][0]["id"] == dataset.id
+    assert len(response_data["items"]) == 1
 
-    api_client.delete(f"/api/v1/datasets/{dataset.id}").raise_for_status().json()
+    api_client.delete(f"/api/v1/datasets/{response_data['items'][0]['id']}").raise_for_status().json()
 
     response_data = api_client.get(f"/api/v1/groups/{group.id}/datasets").raise_for_status().json()
     assert response_data["items"] == []
