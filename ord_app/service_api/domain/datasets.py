@@ -54,14 +54,15 @@ class DatasetUseCases:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
         return await self.dataset_repository.get(dataset.id)
 
-    async def get(self, dataset_id: int) -> DatasetModel:
-        dataset = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
+    async def get(self, dataset_id: int) -> tuple[DatasetModel, int]:
+        dataset, reaction_counts = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
+        dataset, = await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
 
         dataset.is_sharable = False
         if dataset.groups and dataset.dataset_group_associations:
             dataset.is_sharable = True
 
-        return dataset
+        return dataset, reaction_counts
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
         return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
