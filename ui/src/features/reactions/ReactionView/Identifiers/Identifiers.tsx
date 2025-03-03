@@ -26,19 +26,7 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { deleteReactionField, addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-const entries = Object.entries(ord.ReactionIdentifier.ReactionIdentifierType) as Array<[string, number]>;
-
 const ENTITY_FIELD = 'identifiers';
-
-const reactionIdentifierKeyByValue: Record<number, string> = entries.reduce(
-  (acc: Record<number, string>, [key, value]: [string, number]) => {
-    return { ...acc, [value]: key };
-  },
-  {},
-);
-
-const reactionIdentifierTypeValueToKey = (value?: number | null): string =>
-  value ? reactionIdentifierKeyByValue[value] : '';
 
 export function Identifiers({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
@@ -112,7 +100,7 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
             >
               <EditIcon />
             </ActionIcon>
-            <div>{reactionIdentifierTypeValueToKey(identifier.type)}</div>
+            <div>{identifier.type}</div>
             <div>{identifier.details}</div>
             <div>{identifier.value}</div>
           </div>

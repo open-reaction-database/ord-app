@@ -18,6 +18,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -29,9 +30,10 @@ export interface ReactionMolBlocks {
   outcomes: Array<Array<ComponentProductPreview>>;
 }
 
-export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes'> {
+export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers'> {
   inputs: Record<string, AppReactionInput>;
   outcomes: Array<AppReactionOutcome>;
+  identifiers: Array<ReactionIdentifier>;
 }
 
 export interface ReactionResponse {

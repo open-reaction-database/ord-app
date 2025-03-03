@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionAnalysis, AppReactionOutcome } from './reactionOutcomes.types.ts';
+import type { AppReactionAnalysis, AppReactionOutcome, AppReactionProduct } from './reactionOutcomes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import {
   ordDataMapToReactionDataMap,
@@ -25,13 +25,24 @@ import {
   withoutId,
   withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import {
+  ordAnalysisTypeToReaction,
+  ordReactionRoleToReaction,
+  reactionAnalysisTypeToOrd,
+  reactionReactionRoleToOrd,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
+import {
+  ordCompoundIdentifierToReactionCompoundIdentifier,
+  reactionCompoundIdentifierToOrdCompoundIdentifier,
+} from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
 
 export const ordAnalysisToReactionAnalysis = (
-  { data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
+  { type, data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
   name: string,
 ): AppReactionAnalysis =>
   withIdName(
     {
+      type: ordAnalysisTypeToReaction(type),
       data: ordDataMapToReactionDataMap(data || {}),
       instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
       ...rest,
@@ -40,15 +51,41 @@ export const ordAnalysisToReactionAnalysis = (
   );
 
 const reactionAnalysisToOrdAnalysis = ({
+  type,
   data,
   instrumentLastCalibrated,
   ...rest
 }: AppReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
+    type: reactionAnalysisTypeToOrd(type),
     data: reactionDataMapToOrdDataMap(data),
     instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
     ...rest,
   });
+
+const ordProductToReactionProduct = ({
+  reactionRole,
+  identifiers,
+  ...rest
+}: ord.IProductCompound): AppReactionProduct => {
+  return withId({
+    reactionRole: ordReactionRoleToReaction(reactionRole),
+    identifiers: (identifiers || []).map(ordCompoundIdentifierToReactionCompoundIdentifier),
+    ...rest,
+  });
+};
+
+const reactionProductToOrdProduct = ({
+  reactionRole,
+  identifiers,
+  ...rest
+}: AppReactionProduct): ord.IProductCompound => {
+  return withoutId({
+    reactionRole: reactionReactionRoleToOrd(reactionRole),
+    identifiers: identifiers.map(reactionCompoundIdentifierToOrdCompoundIdentifier),
+    ...rest,
+  });
+};
 
 export const ordOutcomeToReactionOutcome = ({
   analyses,
@@ -63,7 +100,7 @@ export const ordOutcomeToReactionOutcome = ({
         [analysis.id]: analysis,
       };
     }, {}),
-    products: (products || []).map(withId),
+    products: (products || []).map(ordProductToReactionProduct),
     ...rest,
   });
 
@@ -80,7 +117,7 @@ export const reactionOutcomeToOrdOutcome = ({
       }),
       {},
     ),
-    products: products.map(withoutId),
+    products: products.map(reactionProductToOrdProduct),
     ...rest,
   });
 

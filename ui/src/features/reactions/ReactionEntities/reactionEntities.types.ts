@@ -80,14 +80,14 @@ export interface ReactionFormValue extends ReactionFormField, ReactionFormNodeBa
 export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.select;
   name: string;
-  options: SelectOptions<unknown>;
+  options: SelectOptions;
   selectType: 'segmented' | 'dropdown';
 }
 
 export interface ReactionFormValuePrecisionUnit extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.vpu;
   name: string;
-  options: SelectOptions<number | string>;
+  options: SelectOptions;
   select?: 'native' | 'native-inline' | 'segmented';
 }
 

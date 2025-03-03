@@ -134,7 +134,7 @@ export const createEmptyReaction = createThunkWithExplicitResult(
   async (dispatch, getState) => {
     const datasetId = selectActiveDatasetId(getState());
 
-    const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions`, {});
+    const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/from-scratch`);
     const reaction = parseReaction(result.data);
     dispatch(createEmptyReactionActions.success(reaction));
     navigate(`/datasets/${datasetId}/reactions/${reaction.id}`);

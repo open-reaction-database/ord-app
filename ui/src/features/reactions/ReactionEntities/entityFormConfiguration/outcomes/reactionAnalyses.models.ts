@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject';
 import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ord } from 'ord-schema-protobufjs';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
@@ -28,8 +26,7 @@ import {
   reactionDataDisplay,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-
-const analysisTypeOptions = ordMapToKeyValueObject(ord.Analysis.AnalysisType);
+import { analysisOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const reactionAnalyses: Array<ReactionFormNode> = [
   wrapInputsWithGrid(
@@ -44,7 +41,7 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
     {
       type: ReactionFormNodeType.select,
       name: 'type',
-      options: analysisTypeOptions,
+      options: analysisOptions,
       selectType: 'dropdown',
       wrapperConfig: {
         label: 'Type',

@@ -17,17 +17,14 @@ import {
   ReactionFormNodeType,
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-import { ord } from 'ord-schema-protobufjs';
-
-const reactionIdentifiersOptions = ordMapToKeyValueObject(ord.ReactionIdentifier.ReactionIdentifierType);
+import { reactionIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const reactionIdentifiers: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.select,
     name: 'type',
     selectType: 'dropdown',
-    options: reactionIdentifiersOptions,
+    options: reactionIdentifierTypeOptions,
     wrapperConfig: {
       label: 'Type',
     },

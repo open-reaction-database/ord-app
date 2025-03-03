@@ -23,12 +23,17 @@ import {
   ordOutcomesListToReactionOutcomesList,
   reactionOutcomesListToOrdOutcomesList,
 } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
+import {
+  ordReactionIdentifierToReaction,
+  reactionIdentifierToOrd,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
     ...reaction,
     inputs: ordInputsToReactionInputs(reaction.inputs),
     outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
+    identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
   };
 }
 
@@ -37,5 +42,6 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     ...reaction,
     inputs: reactionInputsToOrdInputs(reaction.inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
+    identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
   };
 }

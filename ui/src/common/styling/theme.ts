@@ -94,7 +94,6 @@ export const theme = createTheme({
         inputWrapperOrder: ['label', 'input', 'description', 'error'],
       },
       styles: {
-        root: {},
         label: {
           color: 'var(--color-text-secondary-2)',
           paddingBottom: '8px',

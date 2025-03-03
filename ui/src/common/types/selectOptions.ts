@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface SelectOption<T> {
-  label: string;
-  value: T;
-}
+export type SelectOption =
+  | string
+  | {
+      group: string;
+      items: Array<string>;
+    };
 
-export type SelectOptions<T> = Array<SelectOption<T>>;
+export type SelectOptions = Array<SelectOption>;

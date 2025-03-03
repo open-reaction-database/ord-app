@@ -17,12 +17,7 @@ import {
   ReactionFormNodeType,
   type ReactionFormSelect,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-
-const booleanOptions = [
-  { label: 'UNSPECIFIED', value: undefined },
-  { label: 'TRUE', value: true },
-  { label: 'FALSE', value: false },
-];
+import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 
 export function createBooleanInput(
   name: string,

@@ -77,6 +77,7 @@ export function DatasetTable() {
         mantineTableBodyRowProps={({ row }) =>
           row.original.id
             ? {
+                className: classes.row,
                 onClick: () => navigate(`~/datasets/${row.original.id}`),
               }
             : {}

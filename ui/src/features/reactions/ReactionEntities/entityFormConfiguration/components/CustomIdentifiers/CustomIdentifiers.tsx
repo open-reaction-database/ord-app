@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Divider, Grid, Title } from '@mantine/core';
+import { Divider, Grid } from '@mantine/core';
 import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
 import { SearchIcon, StylusNoteIcon } from 'common/icons';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
@@ -26,10 +26,6 @@ import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import {
-  ReactionEntityBlock,
-  ReactionEntityBlockTitle,
-} from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { MolblockIdentifier } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/MolblockIdentifier/MolblockIdentifier.tsx';
 import { setReactionLookupOpenedAction } from 'store/features/reactionLookup/reactionLookup.actions.ts';
 import { useSelector } from 'react-redux';
@@ -137,28 +133,15 @@ export function CustomIdentifiers() {
           />
         </Grid.Col>
       </Grid>
-      <ReactionEntityBlock
-        renderedTitle={
-          <ReactionEntityBlockTitle
-            leftSection={
-              <>
-                <Title order={3}>Molblock identifiers</Title>
-                <span> · {identifiers.length}</span>
-              </>
-            }
-          />
-        }
-      >
-        {identifiers.map((identifier, index) => (
-          <MolblockIdentifier
-            key={identifier.value}
-            identifier={identifier}
-            itemKey={index}
-            index={index}
-            onEdit={onEditMolblock}
-          />
-        ))}
-      </ReactionEntityBlock>
+      {identifiers.map((identifier, index) => (
+        <MolblockIdentifier
+          key={identifier.value}
+          identifier={identifier}
+          itemKey={index}
+          index={index}
+          onEdit={onEditMolblock}
+        />
+      ))}
 
       <ComponentsKetcherEditor
         opened={componentsEditorOpened}

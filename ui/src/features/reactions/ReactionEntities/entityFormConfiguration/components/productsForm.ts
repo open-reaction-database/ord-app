@@ -18,9 +18,7 @@ import {
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-
-const productRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
+import { reactionRoleOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const productsForm: Array<ReactionFormNode> = [
   {
@@ -31,7 +29,7 @@ export const productsForm: Array<ReactionFormNode> = [
         type: ReactionFormNodeType.select,
         name: 'reactionRole',
         selectType: 'dropdown',
-        options: productRoleOptions,
+        options: reactionRoleOptions,
         wrapperConfig: {
           label: 'Reaction role',
         },

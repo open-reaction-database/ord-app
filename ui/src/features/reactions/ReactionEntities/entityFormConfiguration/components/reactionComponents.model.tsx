@@ -18,13 +18,6 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
-import {
-  appAmountUnspecified,
-  massUnitNames,
-  molesUnitNames,
-  volumeUnitNames,
-} from 'store/entities/reactions/reactionsInputs/reactionsInputs.models.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import {
   buildUseSelectItems,
@@ -35,31 +28,19 @@ import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { CustomIdentifiers } from './CustomIdentifiers/CustomIdentifiers.tsx';
-import type { AppReactionAmount } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { booleanOptions } from '../booleanOptions.ts';
 import {
   createReactionDataAddItem,
   reactionDataDisplay,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-
-const reactionRoleOptions = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
-
-const textureTypeOptions = ordMapToKeyValueObject(ord.Texture.TextureType);
+import { reactionAmounts } from 'features/reactions/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
+import {
+  reactionRoleOptions,
+  textureTypeOptions,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
-
-const appReactionAmountType: Array<string> = [
-  appAmountUnspecified,
-  ...molesUnitNames,
-  ...massUnitNames,
-  ...volumeUnitNames,
-];
-
-const appReactionAmountOptions = appReactionAmountType.map(item => ({
-  label: item,
-  value: item,
-}));
 
 const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
   return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
@@ -96,30 +77,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
       },
     ],
   },
-  wrapInputsWithGrid(
-    {
-      type: ReactionFormNodeType.vpu,
-      name: 'amount',
-      options: appReactionAmountOptions,
-      wrapperConfig: {
-        label: 'Amount',
-      },
-      select: 'native-inline',
-    },
-    {
-      type: ReactionFormNodeType.select,
-      name: 'volumeIncludesSolutes',
-      wrapperConfig: {
-        label: 'Includes solutes',
-      },
-      condition: {
-        name: 'amount',
-        isHidden: (item: unknown) => !volumeUnitNames.includes((item as AppReactionAmount).units),
-      },
-      options: booleanOptions,
-      selectType: 'dropdown',
-    },
-  ),
+  ...reactionAmounts,
   {
     type: ReactionFormNodeType.custom,
     name: 'customIdentifiers',

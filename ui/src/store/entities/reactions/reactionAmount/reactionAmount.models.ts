@@ -15,13 +15,14 @@
  */
 import { ord } from 'ord-schema-protobufjs';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
+import type { AppAmountUnitUnspecified } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type {
-  AppAmountUnitUnspecified,
   AppAmountUnspecified,
   AppMassUnit,
   AppMolesUnit,
   AppVolumeUnit,
-} from './reactionInputs.types.ts';
+} from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+import type { SelectOptions } from 'common/types/selectOptions.ts';
 
 export const appAmountUnspecified: AppAmountUnspecified = 'UNSPECIFIED';
 
@@ -48,3 +49,19 @@ export const volumeUnitNames = Object.keys(volumeUnitByName);
 export const molesUnitByValue = reversePrimitiveRecord(molesUnitByName);
 export const massUnitByValue = reversePrimitiveRecord(massUnitByName);
 export const volumeUnitByValue = reversePrimitiveRecord(volumeUnitByName);
+
+export const amountTypeOptions: SelectOptions = [
+  appAmountUnspecified,
+  {
+    group: 'Mass',
+    items: massUnitNames,
+  },
+  {
+    group: 'Moles',
+    items: molesUnitNames,
+  },
+  {
+    group: 'Volume',
+    items: volumeUnitNames,
+  },
+];

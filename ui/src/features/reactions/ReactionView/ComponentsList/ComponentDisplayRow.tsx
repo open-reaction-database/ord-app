@@ -25,8 +25,6 @@ import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/Rea
 import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
-import { ord } from 'ord-schema-protobufjs';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 interface ComponentDisplayRowProps {
@@ -35,10 +33,6 @@ interface ComponentDisplayRowProps {
   component: AppReactionCompound;
   gridClassName?: string;
 }
-
-const identifierNameByValue = reversePrimitiveRecord(ord.CompoundIdentifier.CompoundIdentifierType);
-
-const reactionRoleByValue = reversePrimitiveRecord(ord.ReactionRole.ReactionRoleType);
 
 export function ComponentDisplayRow({
   reactionId,
@@ -67,7 +61,7 @@ export function ComponentDisplayRow({
         {component.identifiers.map(identifier => (
           <InlineKeyValue
             key={identifier.value}
-            label={identifierNameByValue[identifier.type ?? 0]}
+            label={identifier.type}
             value={identifier.value}
           />
         ))}
@@ -82,7 +76,7 @@ export function ComponentDisplayRow({
         align="center"
         className={classes.role}
       >
-        {reactionRoleByValue[component.reactionRole ?? 0]}
+        {component.reactionRole}
       </Flex>
       <Flex
         align="center"

@@ -16,5 +16,5 @@
 export interface ValuePrecisionUnit {
   value?: number;
   precision?: number;
-  units?: number;
+  units?: string;
 }

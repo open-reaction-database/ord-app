@@ -14,30 +14,37 @@
  * limitations under the License.
  */
 import {
-  ReactionFormNodeType,
   type ReactionFormNode,
+  ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { preparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { amountTypeOptions, volumeUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
+import type { AppReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 
-export const reactionComponentsPreparations: Array<ReactionFormNode> = [
+export const reactionAmounts: Array<ReactionFormNode> = [
   wrapInputsWithGrid(
     {
-      type: ReactionFormNodeType.select,
-      name: 'type',
+      type: ReactionFormNodeType.vpu,
+      name: 'amount',
+      options: amountTypeOptions,
       wrapperConfig: {
-        label: 'Type',
+        label: 'Amount',
       },
-      selectType: 'dropdown',
-      options: preparationTypeOptions,
+      select: 'native-inline',
     },
     {
-      type: ReactionFormNodeType.value,
-      name: 'details',
+      type: ReactionFormNodeType.select,
+      name: 'volumeIncludesSolutes',
       wrapperConfig: {
-        label: 'Details',
+        label: 'Includes solutes',
       },
-      inputType: 'string',
+      condition: {
+        name: 'amount',
+        isHidden: (item: unknown) => !volumeUnitNames.includes((item as AppReactionAmount).units),
+      },
+      options: booleanOptions,
+      selectType: 'dropdown',
     },
   ),
 ];
