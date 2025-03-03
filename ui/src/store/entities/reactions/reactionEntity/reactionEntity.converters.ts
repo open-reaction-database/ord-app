@@ -13,14 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type {
-  ReactionEntity,
-  ReactionNamedEntity,
-  WithId,
-  WithIdName,
-  WithoutId,
-  WithoutIdName,
+import {
+  type OrdValuePrecisionUnit,
+  type ReactionValuePrecisionUnit,
+  type ReactionEntity,
+  type ReactionNamedEntity,
+  type WithId,
+  type WithIdName,
+  type WithoutId,
+  type WithoutIdName,
+  type Optional,
+  type OrdOptional,
+  type OrdTypeDetails,
+  type ReactionTypeDetails,
+  type ReactionIdentifier,
+  ReactionBoolean,
 } from './reactionEntity.types';
+import {
+  ordAdditionDeviceTypeToReaction,
+  ordAdditionSpeedTypeToReaction,
+  ordFlowRateTypeToReaction,
+  ordReactionIdentifierTypeToReaction,
+  ordTemperatureTypeToReaction,
+  ordTextureTypeToReaction,
+  ordTimeTypeToReaction,
+  reactionAdditionDeviceTypeToOrd,
+  reactionAdditionSpeedTypeToOrd,
+  reactionFlowRateTypeToOrd,
+  reactionIdentifierTypeToOrd,
+  reactionTemperatureTypeToOrd,
+  reactionTextureTypeToOrd,
+  reactionTimeTypeToOrd,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
+import type { ord } from 'ord-schema-protobufjs';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -46,3 +71,99 @@ export function withoutIdName<T extends ReactionNamedEntity>(entity: T): Without
   const { id: _i, name: _n, ...rest } = entity;
   return rest;
 }
+
+export function ordBooleanToReactionBoolean(value?: boolean | null): ReactionBoolean {
+  if (value === undefined || value === null) {
+    return ReactionBoolean.Unspecified;
+  }
+  return value ? ReactionBoolean.True : ReactionBoolean.False;
+}
+
+export function reactionBooleanToOrdBoolean(value: ReactionBoolean): boolean | null {
+  switch (value) {
+    case ReactionBoolean.Unspecified:
+      return null;
+    case ReactionBoolean.True:
+      return true;
+    case ReactionBoolean.False:
+      return false;
+  }
+}
+
+const generateValuePrecisionUnitConverter = <T extends string>(
+  typeFromOrd: (value: OrdOptional<number>) => T,
+  typeToOrd: (value: T) => OrdOptional<number>,
+) => ({
+  fromOrd: (ordValue: OrdOptional<OrdValuePrecisionUnit>): ReactionValuePrecisionUnit<T> => {
+    const { value, precision, units } = ordValue ?? {};
+    return {
+      value: value ?? null,
+      precision: precision ?? null,
+      units: typeFromOrd(units),
+    };
+  },
+  toOrd: ({ units, ...rest }: ReactionValuePrecisionUnit<T>): Optional<OrdValuePrecisionUnit> => ({
+    ...rest,
+    units: typeToOrd(units),
+  }),
+});
+
+const generateTypeDetailsConverter = <T extends string>(
+  typeFromOrd: (value: OrdOptional<number>) => T,
+  typeToOrd: (value: T) => OrdOptional<number>,
+) => ({
+  fromOrd: (ordValue: OrdOptional<OrdTypeDetails>): ReactionTypeDetails<T> => {
+    const { details, type } = ordValue ?? {};
+    return {
+      type: typeFromOrd(type),
+      details: details ?? null,
+    };
+  },
+  toOrd: ({ type, details }: ReactionTypeDetails<T>): Optional<OrdTypeDetails> => ({
+    type: typeToOrd(type),
+    details,
+  }),
+});
+
+export const { fromOrd: ordTimeToReaction, toOrd: reactionTimeToOrd } = generateValuePrecisionUnitConverter(
+  ordTimeTypeToReaction,
+  reactionTimeTypeToOrd,
+);
+
+export const { fromOrd: ordAdditionDeviceToReaction, toOrd: reactionAdditionDeviceToOrd } =
+  generateTypeDetailsConverter(ordAdditionDeviceTypeToReaction, reactionAdditionDeviceTypeToOrd);
+
+export const { fromOrd: ordAdditionSpeedToReaction, toOrd: reactionAdditionSpeedToOrd } = generateTypeDetailsConverter(
+  ordAdditionSpeedTypeToReaction,
+  reactionAdditionSpeedTypeToOrd,
+);
+
+export const { fromOrd: ordFlowRateToReaction, toOrd: reactionFlowRateToOrd } = generateValuePrecisionUnitConverter(
+  ordFlowRateTypeToReaction,
+  reactionFlowRateTypeToOrd,
+);
+
+export const { fromOrd: ordTemperatureToReaction, toOrd: reactionTemperatureToOrd } =
+  generateValuePrecisionUnitConverter(ordTemperatureTypeToReaction, reactionTemperatureTypeToOrd);
+
+export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } = generateTypeDetailsConverter(
+  ordTextureTypeToReaction,
+  reactionTextureTypeToOrd,
+);
+
+export const ordReactionIdentifierToReaction = ({
+  type,
+  details,
+  value,
+}: ord.IReactionIdentifier): ReactionIdentifier =>
+  withId({
+    type: ordReactionIdentifierTypeToReaction(type),
+    value: value ?? null,
+    details: details ?? null,
+  });
+
+export const reactionIdentifierToOrd = ({ type, ...rest }: ReactionIdentifier) =>
+  withoutId({
+    type: reactionIdentifierTypeToOrd(type),
+    ...rest,
+  });

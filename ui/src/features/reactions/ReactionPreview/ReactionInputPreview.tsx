@@ -24,8 +24,6 @@ import { useMemo } from 'react';
 import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex, Text } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
-import { ord } from 'ord-schema-protobufjs';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
@@ -36,19 +34,15 @@ interface ComponentMetadataProps {
   component: AppReactionCompound;
 }
 
-const reactionRoleByValue = ordMapToKeyValueObject(ord.ReactionRole.ReactionRoleType);
-
 function ComponentMetadata({ component }: Readonly<ComponentMetadataProps>) {
   const name = useMemo(() => {
-    return (component.identifiers || []).find(
-      identifier => identifier.type === ord.CompoundIdentifier.CompoundIdentifierType.NAME,
-    );
+    return (component.identifiers || []).find(identifier => identifier.type === 'NAME');
   }, [component]);
 
   return (
     <Flex direction="column">
       {name?.value && <Text size="xs">{name.value}</Text>}
-      {component?.reactionRole && <Text size="xs">{reactionRoleByValue[component.reactionRole].label}</Text>}
+      {component?.reactionRole && <Text size="xs">{component.reactionRole}</Text>}
       {component?.amount && (
         <Text size="xs">
           {component.amount.value} {component.amount.units}

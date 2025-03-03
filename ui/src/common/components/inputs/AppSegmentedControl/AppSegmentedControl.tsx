@@ -15,35 +15,41 @@
  */
 import type { SelectOptions } from 'common/types/selectOptions';
 import { Input, SegmentedControl, type SegmentedControlProps } from '@mantine/core';
-import { useUncontrolledSelect } from 'common/hooks/useUncontrolledSelect';
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { inputWrapperClasses } from 'common/components/display/InputWrapper';
 
-interface AppSegmentedControlProps<T>
-  extends Omit<SegmentedControlProps, 'onChange' | 'data' | 'defaultValue' | 'value'> {
-  options: SelectOptions<T>;
-  defaultValue?: T;
-  value?: T;
-  onChange: (value: T) => void;
+interface AppSegmentedControlProps extends Omit<SegmentedControlProps, 'data'> {
+  options: SelectOptions;
   label?: ReactNode;
 }
 
-export function AppSegmentedControl<T>({
+export function AppSegmentedControl({
   value,
   defaultValue,
   onChange,
   options,
   label,
   ...rest
-}: Readonly<AppSegmentedControlProps<T>>) {
-  const inputProps = useUncontrolledSelect(false, options, value, defaultValue, onChange);
+}: Readonly<AppSegmentedControlProps>) {
+  const data = useMemo(() => {
+    return options.reduce((acc: Array<string>, option) => {
+      if (typeof option === 'object') {
+        return acc.concat(option.items);
+      }
+      return acc.concat(option);
+    }, []);
+  }, [options]);
+
   return (
     <Input.Wrapper
       label={label}
       className={inputWrapperClasses.inputWrapper}
     >
       <SegmentedControl
-        {...inputProps}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        data={data}
         {...rest}
       />
     </Input.Wrapper>

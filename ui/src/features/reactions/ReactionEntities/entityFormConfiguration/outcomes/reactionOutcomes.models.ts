@@ -18,19 +18,14 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { AppReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { ordAnalysisToReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-
-const timeOptions = ordMapToKeyValueObject(ord.Time.TimeUnit);
-
-const analysisLabelByValue = reversePrimitiveRecord(ord.Analysis.AnalysisType);
+import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, AppReactionAnalysis] => {
   const uniqueName = findReactionEntityUniqueName(
@@ -49,7 +44,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
       label: 'Time',
       hint: 'The reaction time at which this analysis/characterization was performed.',
     },
-    options: timeOptions,
+    options: timeTypeOptions,
   },
   {
     type: ReactionFormNodeType.objectInitializer,
@@ -100,7 +95,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
       requiredFields: [
         {
           label: 'Type',
-          render: item => analysisLabelByValue[item.type ?? 0],
+          render: item => item.type,
         },
         {
           label: 'Details',

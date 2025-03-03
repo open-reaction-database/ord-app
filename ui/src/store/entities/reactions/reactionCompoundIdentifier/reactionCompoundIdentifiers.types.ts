@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SelectOptions } from 'common/types/selectOptions.ts';
+import type { ord } from 'ord-schema-protobufjs';
 
-export const booleanOptions: SelectOptions = ['UNSPECIFIED', 'TRUE', 'FALSE'];
+export type ReactionCompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+
+export interface ReactionCompoundIdentifier extends Omit<ord.ICompoundIdentifier, 'type'> {
+  type: ReactionCompoundIdentifierType;
+}

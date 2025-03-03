@@ -13,6 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SelectOptions } from 'common/types/selectOptions.ts';
+import { ord } from 'ord-schema-protobufjs';
+import type { ReactionCompoundIdentifierType } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
+import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 
-export const booleanOptions: SelectOptions = ['UNSPECIFIED', 'TRUE', 'FALSE'];
+export const compoundIdentifiersNames = Object.keys(
+  ord.CompoundIdentifier.CompoundIdentifierType,
+) as Array<ReactionCompoundIdentifierType>;
+
+export const compoundIdentifiersByValue = reversePrimitiveRecord<ReactionCompoundIdentifierType, number>(
+  ord.CompoundIdentifier.CompoundIdentifierType,
+);

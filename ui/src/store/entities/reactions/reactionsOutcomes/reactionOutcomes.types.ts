@@ -16,13 +16,24 @@
 import type { ord } from 'ord-schema-protobufjs';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import type { WithId, WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
 
-export interface AppReactionAnalysis extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated'>> {
+import type {
+  ReactionAnalysisType,
+  ReactionRole,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+
+export interface AppReactionAnalysis
+  extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated' | 'type'>> {
+  type: ReactionAnalysisType;
   data: Record<string, AppData>;
   instrumentLastCalibrated: string | null;
 }
 
-export type AppReactionProduct = WithId<ord.IProductCompound>;
+export interface AppReactionProduct extends WithId<Omit<ord.IProductCompound, 'identifiers' | 'reactionRole'>> {
+  reactionRole: ReactionRole;
+  identifiers: Array<ReactionCompoundIdentifier>;
+}
 
 export interface AppReactionOutcome extends WithId<Omit<ord.IReactionOutcome, 'products' | 'analyses'>> {
   analyses: Record<string, AppReactionAnalysis>;

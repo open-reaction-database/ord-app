@@ -15,26 +15,35 @@
  */
 import { NativeSelect, type NativeSelectProps } from '@mantine/core';
 import type { SelectOptions } from 'common/types/selectOptions';
-import { useUncontrolledSelect } from 'common/hooks/useUncontrolledSelect';
+import { useUncontrolled } from '@mantine/hooks';
+import { useCallback, type ChangeEvent } from 'react';
 
-interface AppNativeSelectProps<T> extends Omit<NativeSelectProps, 'onChange' | 'data' | 'defaultValue' | 'value'> {
-  options: SelectOptions<T>;
-  defaultValue?: T;
-  value?: T;
-  onChange: (value: T) => void;
+interface AppNativeSelectProps extends Omit<NativeSelectProps, 'onChange' | 'data' | 'value' | 'defaultValue'> {
+  value?: string;
+  defaultValue?: string;
+  options: SelectOptions;
+  onChange: (value: string) => void;
 }
 
-export function AppNativeSelect<T>({
-  value,
-  defaultValue,
-  onChange,
-  options,
-  ...rest
-}: Readonly<AppNativeSelectProps<T>>) {
-  const inputProps = useUncontrolledSelect(true, options, value, defaultValue, onChange);
+export function AppNativeSelect({ value, defaultValue, onChange, options, ...rest }: Readonly<AppNativeSelectProps>) {
+  const [controlledValue, controlledOnChange] = useUncontrolled({
+    value,
+    defaultValue,
+    onChange,
+  });
+
+  const handleChange = useCallback(
+    (value: ChangeEvent<HTMLSelectElement>) => {
+      controlledOnChange(value.target.value);
+    },
+    [controlledOnChange],
+  );
+
   return (
     <NativeSelect
-      {...inputProps}
+      value={controlledValue}
+      onChange={handleChange}
+      data={options}
       {...rest}
     />
   );

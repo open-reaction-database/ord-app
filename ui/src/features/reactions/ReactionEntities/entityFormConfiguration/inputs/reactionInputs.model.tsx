@@ -17,20 +17,15 @@ import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ord } from 'ord-schema-protobufjs';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 import { InputsComponentList } from 'features/reactions/ReactionEntities/entityFormConfiguration/inputs/InputsComponentsList/InputsComponentList.tsx';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-
-const speedOptions = ordMapToKeyValueObject(ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
-
-const deviceOptions = ordMapToKeyValueObject(ord.ReactionInput.AdditionDevice.AdditionDeviceType);
-
-const timeOptions = ordMapToKeyValueObject(ord.Time.TimeUnit);
-
-const temperatureOptions = ordMapToKeyValueObject(ord.Temperature.TemperatureUnit);
-
-const flowRateOptions = ordMapToKeyValueObject(ord.FlowRate.FlowRateUnit);
+import {
+  additionDeviceTypeOptions,
+  additionSpeedTypeOptions,
+  flowRateOptions,
+  temperatureOptions,
+  timeTypeOptions,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const reactionInputs: Array<ReactionFormNode> = [
   {
@@ -81,7 +76,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'additionSpeed.type',
             selectType: 'dropdown',
-            options: speedOptions,
+            options: additionSpeedTypeOptions,
             wrapperConfig: {
               label: 'Speed',
             },
@@ -104,7 +99,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'additionDevice.type',
             selectType: 'dropdown',
-            options: deviceOptions,
+            options: additionDeviceTypeOptions,
             wrapperConfig: {
               label: 'Device',
             },
@@ -126,7 +121,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
           label: 'Time',
           hint: 'Addition time is relative to when the first input was added',
         },
-        options: timeOptions,
+        options: timeTypeOptions,
       },
       {
         type: ReactionFormNodeType.vpu,
@@ -135,7 +130,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
           label: 'Duration',
           hint: 'Addition duration quantifies how long it took to add the input',
         },
-        options: timeOptions,
+        options: timeTypeOptions,
       },
       {
         type: ReactionFormNodeType.vpu,

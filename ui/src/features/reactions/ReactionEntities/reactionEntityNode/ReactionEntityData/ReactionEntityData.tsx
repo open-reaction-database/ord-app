@@ -16,7 +16,6 @@
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormData } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
-import { ordMapToKeyValueObject } from 'common/utils/reactionForm/ordMapToKeyValueObject.ts';
 import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import mime from 'mime/lite';
 import { useUncontrolled } from '@mantine/hooks';
@@ -27,7 +26,7 @@ import { RemoveIcon } from 'common/icons';
 import { inputWrapperClasses } from 'common/components/display/InputWrapper';
 import { useFileNameHref } from 'features/reactions/ReactionEntities/useFileNameHref.ts';
 
-const options = ordMapToKeyValueObject(AppDataType as Record<string, AppDataType>);
+const options = Object.values(AppDataType);
 
 type StringEvent = ChangeEvent<HTMLInputElement>;
 
@@ -130,9 +129,9 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
   const name = formMethods.getValues()['name'];
 
   const onTypeChange = useCallback(
-    (type: AppDataType) => {
+    (type: string) => {
       onChange({
-        type,
+        type: type as AppDataType,
         value: '',
         format: null,
       });
