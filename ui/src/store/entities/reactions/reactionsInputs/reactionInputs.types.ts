@@ -46,19 +46,7 @@ export interface AppReactionCompound
   molBlockIdentifiers: Array<ReactionCompoundIdentifier>;
 }
 
-export interface AppReactionInput
-  extends Omit<
-      ord.IReactionInput,
-      | 'components'
-      | 'additionTime'
-      | 'additionSpeed'
-      | 'additionDuration'
-      | 'flowRate'
-      | 'additionDevice'
-      | 'additionTemperature'
-      | 'texture'
-    >,
-    UniqueEntity {
+export interface AppReactionInput extends Pick<ord.IReactionInput, 'crudeComponents' | 'additionOrder'>, UniqueEntity {
   components: Array<AppReactionCompound>;
   additionDuration: ReactionTime;
   additionTime: ReactionTime;
