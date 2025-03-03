@@ -67,7 +67,7 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
-    async def get_with_sharable_info(self, dataset_id: int, user_id: int) -> DatasetModel:
+    async def get_with_sharable_info(self, dataset_id: int, user_id: int):
         # Subquery to check that a group has a membership record with the specified user_id.
         user_group_exists = exists(
             select(1)
@@ -95,7 +95,11 @@ class DatasetsRepository:
         )
 
         stmt = (
-            select(DatasetModel)
+            select(
+                DatasetModel,
+                func.count(ReactionModel.id).label("reaction_count")
+            )
+            .outerjoin(DatasetModel.reactions)
             .where(DatasetModel.id == dataset_id)
             .options(
                 # Eager-load related owner, associations, and groups.
@@ -121,9 +125,10 @@ class DatasetsRepository:
                     include_aliases=True
                 )
             )
-            .limit(1)
+            .group_by(DatasetModel.id)
         )
-        return await self.db.scalar(stmt)
+        result = (await self.db.execute(stmt)).first()
+        return result
 
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel:
         stmt = (
@@ -134,9 +139,9 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
-    async def _modify_paginated_datasets(self, paginated_datasets, user_id):
+    async def enrich_datasets_with_user_roles(self, datasets, user_id):
         # Collect all group IDs from the paginated datasets
-        group_ids = {group.id for dataset in paginated_datasets.items for group in dataset.groups}
+        group_ids = {group.id for dataset in datasets for group in dataset.groups}
 
         # Query memberships for the specific user and the collected groups
         membership_stmt = (
@@ -150,14 +155,14 @@ class DatasetsRepository:
         membership_by_group = {membership.group_id: membership for membership in memberships.all()}
 
         # Annotate each group in the paginated datasets with the user role
-        for dataset in paginated_datasets.items:
+        for dataset in datasets:
             for group in dataset.groups:
                 membership = membership_by_group.get(group.id)
                 group.role = membership.role if membership else None
             # filter out groups that the user is not a member of
             dataset.groups = [group for group in dataset.groups if group.role is not None]
 
-        return paginated_datasets
+        return datasets
 
     async def group_dataset_stmt(self, group_id: int, user_id: int):
         stmt = (
@@ -179,7 +184,7 @@ class DatasetsRepository:
         )
 
         paginated_datasets = await paginate(self.db, stmt)
-        paginated_datasets = await self._modify_paginated_datasets(paginated_datasets, user_id)
+        paginated_datasets.items = await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
 
         return paginated_datasets
 
@@ -199,7 +204,7 @@ class DatasetsRepository:
             .order_by(DatasetModel.modified_at.desc())
         )
         paginated_datasets = await paginate(self.db, stmt)
-        paginated_datasets = await self._modify_paginated_datasets(paginated_datasets, user_id)
+        paginated_datasets.items = await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
 
         return paginated_datasets
 

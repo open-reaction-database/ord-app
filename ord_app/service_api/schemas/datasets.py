@@ -32,24 +32,36 @@ class DatasetSchema(BaseSchema):
     owner: UserSchema
 
 
-class DatasetSharableSchema(DatasetSchema):
-    is_sharable: bool
-
-
-class DatasetUserGroupSchema(BaseSchema):
+class _DatasetUserGroupSchema(BaseSchema):
     id: int
     name: str
     role: Optional[str] = Field(default=None, alias="role")
 
 
-class DatasetWithReactionCountSchema(DatasetSchema):
+class DatasetSharableSchema(DatasetSchema):
+    is_sharable: bool
     reaction_count: int = Field(default=0)
-    groups: list[DatasetUserGroupSchema]
+    groups: list[_DatasetUserGroupSchema]
 
     @model_validator(mode="before")
     @classmethod
     def reaction_count(cls, data: Any):  # noqa: F811
-        if isinstance(data, Row):
+        if isinstance(data, (Row, tuple)):
+            # first element of the data is Dataset ORM object
+            # second is reactions count
+            data[0].reaction_count = data[1]
+            return data[0]
+        return data
+
+
+class DatasetWithReactionCountSchema(DatasetSchema):
+    reaction_count: int = Field(default=0)
+    groups: list[_DatasetUserGroupSchema]
+
+    @model_validator(mode="before")
+    @classmethod
+    def reaction_count(cls, data: Any):  # noqa: F811
+        if isinstance(data, (Row, tuple)):
             # first element of the data is Dataset ORM object
             # second is reactions count
             data[0].reaction_count = data[1]
