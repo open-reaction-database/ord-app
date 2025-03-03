@@ -42,7 +42,7 @@ button:not([data-variant]) {
   }
 
   &:active {
-    background-color: #2869d2;
+    background-color: var(--color-primaryBackgroundActive);
   }
 }
 
