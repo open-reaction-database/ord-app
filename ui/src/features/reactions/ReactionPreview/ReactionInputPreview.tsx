@@ -15,15 +15,13 @@
  */
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type {
-  AppReactionCompound,
-  AppReactionInput,
-} from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { useMemo } from 'react';
 import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex, Text } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
+import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
@@ -31,7 +29,7 @@ interface ReactionInputPreviewProps {
 }
 
 interface ComponentMetadataProps {
-  component: AppReactionCompound;
+  component: ReactionInputComponent;
 }
 
 function ComponentMetadata({ component }: Readonly<ComponentMetadataProps>) {
@@ -69,9 +67,8 @@ export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionI
       </Badge>
       <Flex
         gap="sm"
-        flex={1}
         align="center"
-        mt="xs"
+        className={classes.componentList}
       >
         {componentsIds.map((id, index) => (
           <div

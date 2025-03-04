@@ -36,7 +36,7 @@
   --font-size-lg: 16px;
 }
 
-button:not([data-variant]) {
+button.mantine-Button-root:not([data-variant]) {
   &:hover {
     outline: var(--mantine-spacing-xs) solid
       color-mix(in srgb, var(--color-bg, var(--mantine-primary-color-filled)) 20%, transparent);

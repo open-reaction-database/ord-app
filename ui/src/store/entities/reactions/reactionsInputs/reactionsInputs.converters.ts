@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppCompoundPreparation, AppReactionCompound, AppReactionInput } from './reactionInputs.types.ts';
+import type { AppReactionInput } from './reactionInputs.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import {
-  ordDataMapToReactionDataMap,
-  reactionDataMapToOrdDataMap,
-} from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
   ordAdditionDeviceToReaction,
   ordAdditionSpeedToReaction,
@@ -33,85 +29,13 @@ import {
   reactionTemperatureToOrd,
   reactionTextureToOrd,
   reactionTimeToOrd,
-  withId,
   withIdName,
-  withoutId,
   withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
-  ordAmountToReactionAmount,
-  reactionAmountToOrdAmount,
-} from 'store/entities/reactions/reactionAmount/reactionAmount.converters.ts';
-import {
-  ordCompoundIdentifierToReactionCompoundIdentifier,
-  reactionCompoundIdentifierToOrdCompoundIdentifier,
-} from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
-import {
-  ordPreparationTypeToReaction,
-  reactionPreparationTypeToOrd,
-  ordReactionRoleToReaction,
-  reactionReactionRoleToOrd,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
-
-const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
-
-const ordPreparationToReactionPreparation = ({ type, ...rest }: ord.ICompoundPreparation): AppCompoundPreparation => {
-  return withId({
-    type: ordPreparationTypeToReaction(type),
-    ...rest,
-  });
-};
-
-const reactionPreparationToOrdPreparation = ({ type, ...rest }: AppCompoundPreparation): ord.ICompoundPreparation => {
-  return withoutId({
-    type: reactionPreparationTypeToOrd(type),
-    ...rest,
-  });
-};
-
-export function ordCompoundToReactionCompound(ordCompound: ord.ICompound): AppReactionCompound {
-  const { amount, identifiers, reactionRole, preparations, ...rest } = ordCompound;
-
-  const reactionIdentifiers = (identifiers || []).map(ordCompoundIdentifierToReactionCompoundIdentifier);
-
-  const { nonMolBlockIdentifiers, molBlockIdentifiers } = reactionIdentifiers.reduce(
-    ({ nonMolBlockIdentifiers, molBlockIdentifiers }, item) => {
-      const isMolblock = item.type === 'MOLBLOCK';
-
-      return {
-        nonMolBlockIdentifiers: isMolblock ? nonMolBlockIdentifiers : nonMolBlockIdentifiers.concat(item),
-        molBlockIdentifiers: isMolblock ? molBlockIdentifiers.concat(item) : molBlockIdentifiers,
-      };
-    },
-    { nonMolBlockIdentifiers: emptyIdentifiersArray, molBlockIdentifiers: emptyIdentifiersArray },
-  );
-
-  return withId({
-    ...rest,
-    preparations: (preparations || []).map(ordPreparationToReactionPreparation),
-    reactionRole: ordReactionRoleToReaction(reactionRole),
-    identifiers: nonMolBlockIdentifiers,
-    molBlockIdentifiers: molBlockIdentifiers,
-    features: ordDataMapToReactionDataMap(ordCompound.features || {}),
-    amount: ordAmountToReactionAmount(amount),
-  });
-}
-
-function reactionCompoundToOrdCompound(appCompound: AppReactionCompound): ord.ICompound {
-  const { amount, molBlockIdentifiers, identifiers, reactionRole, preparations, ...rest } = withoutId(appCompound);
-  const ordIdentifiers = [...molBlockIdentifiers, ...identifiers].map(
-    reactionCompoundIdentifierToOrdCompoundIdentifier,
-  );
-  return {
-    ...rest,
-    preparations: preparations.map(reactionPreparationToOrdPreparation),
-    reactionRole: reactionReactionRoleToOrd(reactionRole),
-    identifiers: ordIdentifiers,
-    features: reactionDataMapToOrdDataMap(appCompound.features),
-    amount: reactionAmountToOrdAmount(amount),
-  };
-}
+  ordInputComponentToReaction,
+  reactionInputComponentToOrd,
+} from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): AppReactionInput {
   const {
@@ -128,7 +52,7 @@ export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: str
   } = ordInput;
   return withIdName(
     {
-      components: (components || []).map(ordCompoundToReactionCompound),
+      components: (components || []).map(ordInputComponentToReaction),
       crudeComponents,
       additionOrder,
       additionSpeed: ordAdditionSpeedToReaction(additionSpeed),
@@ -157,7 +81,7 @@ export function reactionInputToOrdInput(appInput: AppReactionInput): ord.IReacti
     texture,
   } = withoutIdName(appInput);
   return {
-    components: components.length > 0 ? components.map(reactionCompoundToOrdCompound) : null,
+    components: components.length > 0 ? components.map(reactionInputComponentToOrd) : null,
     crudeComponents,
     additionOrder,
     additionSpeed: reactionAdditionSpeedToOrd(additionSpeed),

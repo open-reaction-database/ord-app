@@ -15,7 +15,6 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { UniqueEntity } from 'store/utils/UniqueEntity.ts';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import type {
   ReactionAdditionDevice,
   ReactionFlowRate,
@@ -23,31 +22,11 @@ import type {
   ReactionTemperature,
   ReactionTexture,
   ReactionTime,
-  WithId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import type { AppReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
-import type {
-  CompoundPreparationType,
-  ReactionRole,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-
-export interface AppCompoundPreparation extends WithId<Omit<ord.ICompoundPreparation, 'type'>> {
-  type: CompoundPreparationType;
-}
-
-export interface AppReactionCompound
-  extends WithId<Omit<ord.ICompound, 'amount' | 'features' | 'identifiers' | 'reactionRole' | 'preparations'>> {
-  reactionRole: ReactionRole;
-  features: Record<string, AppData>;
-  preparations: Array<AppCompoundPreparation>;
-  amount: AppReactionAmount;
-  identifiers: Array<ReactionCompoundIdentifier>;
-  molBlockIdentifiers: Array<ReactionCompoundIdentifier>;
-}
+import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 export interface AppReactionInput extends Pick<ord.IReactionInput, 'crudeComponents' | 'additionOrder'>, UniqueEntity {
-  components: Array<AppReactionCompound>;
+  components: Array<ReactionInputComponent>;
   additionDuration: ReactionTime;
   additionTime: ReactionTime;
   additionSpeed: ReactionSpeed;

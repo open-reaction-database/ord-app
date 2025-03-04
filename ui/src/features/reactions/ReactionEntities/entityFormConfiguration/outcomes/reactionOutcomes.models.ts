@@ -20,17 +20,18 @@ import {
 import { ord } from 'ord-schema-protobufjs';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { AppReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { ordAnalysisToReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { ProductsComponentsList } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/ProductComponentsList.tsx';
 
-const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, AppReactionAnalysis] => {
+const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, ReactionAnalysis] => {
   const uniqueName = findReactionEntityUniqueName(
     'Analysis',
-    (analyses as Array<AppReactionAnalysis>).map(({ name }) => name),
+    (analyses as Array<ReactionAnalysis>).map(({ name }) => name),
   );
   const analysis = ordAnalysisToReactionAnalysis(ord.Analysis.toObject(new ord.Analysis()), uniqueName);
   return [analysis.id, analysis];
@@ -83,13 +84,18 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
     },
   },
   {
+    type: ReactionFormNodeType.custom,
+    name: 'products',
+    Component: ProductsComponentsList,
+  },
+  {
     type: ReactionFormNodeType.list,
-    getKey: (item: AppReactionAnalysis) => item.id,
+    getKey: (item: ReactionAnalysis) => item.id,
     title: {
       label: 'Analyses',
     },
     useSelectItems: buildUseSelectItemsListFromMap('analyses', compareNamedEntities),
-    ItemDisplay: createEntityListItemComponent<AppReactionAnalysis>({
+    ItemDisplay: createEntityListItemComponent<ReactionAnalysis>({
       entityField: 'analyses',
       title: entity => entity.name,
       requiredFields: [
@@ -101,6 +107,8 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
           label: 'Details',
           render: item => item.details,
         },
+      ],
+      optionalFields: [
         {
           label: 'Instrument calibration date',
           render: item => item.instrumentLastCalibrated,

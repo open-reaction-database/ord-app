@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { ComponentDisplayRow } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRow.tsx';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { Text } from '@mantine/core';
+import type { ReactNode } from 'react';
 
-interface ComponentsListProps {
-  readonly reactionId: number;
-  readonly inputPathComponent: ReactionPathComponents;
-  readonly components: Array<AppReactionCompound>;
+interface ComponentsListProps<T extends ReactionComponentBase> {
+  reactionId: number;
+  rootPathComponents: ReactionPathComponents;
+  components: Array<T>;
+  detailsHeader: string;
+  entityName: string;
+  renderDetails: (component: T) => ReactNode;
 }
 
-export function ComponentsList({ reactionId, inputPathComponent, components }: ComponentsListProps) {
+export function ComponentsList<T extends ReactionComponentBase>({
+  reactionId,
+  rootPathComponents,
+  components,
+  detailsHeader,
+  renderDetails,
+  entityName,
+}: Readonly<ComponentsListProps<T>>) {
   return (
     <>
       <div className={clsx(classes.grid, classes.row)}>
@@ -50,9 +61,9 @@ export function ComponentsList({ reactionId, inputPathComponent, components }: C
         </Text>
         <Text
           size="md"
-          className={clsx(classes.text, classes.amount)}
+          className={clsx(classes.text, classes.details)}
         >
-          Amount
+          {detailsHeader}
         </Text>
         <div className={classes.actions}></div>
       </div>
@@ -60,7 +71,8 @@ export function ComponentsList({ reactionId, inputPathComponent, components }: C
         <ComponentDisplayRow
           key={component.id}
           reactionId={reactionId}
-          componentPath={[...inputPathComponent, 'components', index]}
+          componentPath={[...rootPathComponents, entityName, index]}
+          renderDetails={renderDetails}
           component={component}
         />
       ))}

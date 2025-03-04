@@ -57,3 +57,7 @@ export const { options: analysisOptions, byValue: analysisTypeByValue } = genera
 
 export const { options: reactionIdentifierTypeOptions, byValue: reactionIdentifierTypeByValue } =
   generateOptionsAndByValue(ord.ReactionIdentifier.ReactionIdentifierType);
+
+export const { options: measurementsTypeOptions, byValue: measurementTypeByValue } = generateOptionsAndByValue(
+  ord.ProductMeasurement.ProductMeasurementType,
+);

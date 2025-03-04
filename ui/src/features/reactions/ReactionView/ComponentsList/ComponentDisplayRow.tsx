@@ -19,34 +19,37 @@ import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPr
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import clsx from 'clsx';
 import classes from 'features/reactions/ReactionView/ComponentsList/componentsList.module.scss';
-import { Divider, Flex } from '@mantine/core';
-import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineKeyValue.tsx';
+import { Divider, Flex, Text, Tooltip } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
 import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactNode } from 'react';
+import { typographyClasses } from 'common/styling';
 
-interface ComponentDisplayRowProps {
+interface ComponentDisplayRowProps<T extends ReactionComponentBase> {
   reactionId: number;
   componentPath: ReactionPathComponents;
-  component: AppReactionCompound;
+  component: T;
+  renderDetails: (component: T) => ReactNode;
   gridClassName?: string;
 }
 
-export function ComponentDisplayRow({
+export function ComponentDisplayRow<T extends ReactionComponentBase>({
   reactionId,
   component,
   componentPath,
+  renderDetails,
   gridClassName = clsx(classes.grid, classes.row),
-}: Readonly<ComponentDisplayRowProps>) {
+}: Readonly<ComponentDisplayRowProps<T>>) {
   const dispatch = useAppDispatch();
   const componentId = component.id;
   const previewState = useSelector(selectPreviewsByIdsWrapper([componentId]));
-  const inputPath = componentPath.slice(0, 2);
+  const previousEntityPath = componentPath.slice(0, 2);
 
   const onEditComponent = () => {
-    dispatch(setReactionPathComponentsList([inputPath, componentPath]));
+    dispatch(setReactionPathComponentsList([previousEntityPath, componentPath]));
   };
 
   return (
@@ -56,18 +59,25 @@ export function ComponentDisplayRow({
     >
       <Flex
         className={classes.identifiers}
-        align="center"
+        align="flex-start"
+        direction="column"
       >
         {component.identifiers.map(identifier => (
-          <InlineKeyValue
+          <Flex
+            className={classes.identifierWrapper}
+            gap="xs"
             key={identifier.value}
-            label={identifier.type}
-            value={identifier.value}
-          />
+          >
+            <Text className={typographyClasses.secondary2}>{identifier.type}:</Text>
+            <Tooltip label={identifier.value}>
+              <Text className={classes.identifierValue}>{identifier.value}</Text>
+            </Tooltip>
+          </Flex>
         ))}
       </Flex>
       <Flex
         align="center"
+        justify="center"
         className={clsx(classes.preview, classes.imagePreview)}
       >
         <ReactionComponentPreview previewState={previewState[component.id]} />
@@ -80,9 +90,9 @@ export function ComponentDisplayRow({
       </Flex>
       <Flex
         align="center"
-        className={classes.amount}
+        className={classes.details}
       >
-        {component.amount.value} {component.amount.units}
+        {renderDetails(component)}
       </Flex>
       <Flex
         className={classes.actions}

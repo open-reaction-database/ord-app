@@ -17,7 +17,7 @@ import { ord } from 'ord-schema-protobufjs';
 import type { ReactionCompoundIdentifier } from './reactionCompoundIdentifiers.types.ts';
 import { compoundIdentifiersByValue } from './reactionCompoundIdentifiers.models.ts';
 
-export const ordCompoundIdentifierToReactionCompoundIdentifier = (
+export const ordCompoundIdentifierToReaction = (
   compoundIdentifier: ord.ICompoundIdentifier,
 ): ReactionCompoundIdentifier => {
   const { type, ...rest } = compoundIdentifier;
@@ -27,7 +27,7 @@ export const ordCompoundIdentifierToReactionCompoundIdentifier = (
   };
 };
 
-export const reactionCompoundIdentifierToOrdCompoundIdentifier = (
+export const reactionCompoundIdentifierToOrd = (
   compoundIdentifier: ReactionCompoundIdentifier,
 ): ord.ICompoundIdentifier => {
   const { type, ...rest } = compoundIdentifier;
