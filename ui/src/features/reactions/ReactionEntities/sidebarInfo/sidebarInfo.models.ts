@@ -28,6 +28,22 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
+type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
+
+const featureSidebarInfo: SidebarInfoPathLess = {
+  entityName: ReactionEntity.Data,
+  label: 'Features',
+  sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
+  useInitialValues: buildUseInitialValues(value => value),
+};
+
+const componentIdentifiersSidebarInfo: SidebarInfoPathLess = {
+  entityName: ReactionEntity.ComponentIdentifiers,
+  label: 'Identifiers',
+  sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
+  useInitialValues: buildUseInitialValues(value => value),
+};
+
 export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   {
     pathComponents: ['notes'],
@@ -77,17 +93,19 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   },
   {
     pathComponents: ['features', 'components', 'inputs'],
-    entityName: ReactionEntity.Data,
-    label: 'Features',
-    sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(value => value),
+    ...featureSidebarInfo,
+  },
+  {
+    pathComponents: ['features', 'products', 'outcomes'],
+    ...featureSidebarInfo,
   },
   {
     pathComponents: ['identifiers', 'components', 'inputs'],
-    entityName: ReactionEntity.ComponentIdentifiers,
-    label: 'Identifiers',
-    sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(value => value),
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
+    pathComponents: ['identifiers', 'products', 'outcomes'],
+    ...componentIdentifiersSidebarInfo,
   },
   {
     pathComponents: ['outcomes'],
