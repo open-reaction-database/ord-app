@@ -44,9 +44,8 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
       </Badge>
       <Flex
         gap="sm"
-        flex={1}
         align="center"
-        mt="xs"
+        className={classes.componentList}
       >
         {componentsIds.map(id => (
           <div

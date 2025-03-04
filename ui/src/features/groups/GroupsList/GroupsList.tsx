@@ -82,7 +82,7 @@ export function GroupsList() {
             root: clsx(classes.groupButton, { [classes.selected]: selectedGroupId === null }),
             section: classes.buttonSection,
           }}
-          variant="white"
+          variant="transparent"
           leftSection={<GridViewIcon />}
           onClick={() => selectGroup(null)}
           justify="flex-start"
@@ -104,7 +104,7 @@ export function GroupsList() {
                 label: classes.buttonLabel,
               }}
               key={group.id}
-              variant="white"
+              variant="transparent"
               justify="flex-start"
               onClick={() => selectGroup(group.id)}
             >
@@ -115,7 +115,7 @@ export function GroupsList() {
 
               <ActionIcon
                 onClick={e => openGroupInformation(e, group.id)}
-                variant="white"
+                variant="transparent"
                 title="Edit group"
               >
                 <SettingsIcon />

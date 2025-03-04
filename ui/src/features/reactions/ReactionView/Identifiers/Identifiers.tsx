@@ -88,14 +88,14 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         {identifiers.map((identifier, index) => (
           <div key={index}>
             <ActionIcon
-              variant="white"
+              variant="transparent"
               color="red"
               onClick={() => deleteIdentifier(index)}
             >
               <RemoveIcon />
             </ActionIcon>
             <ActionIcon
-              variant="white"
+              variant="transparent"
               onClick={() => onIdentifierEdit(index)}
             >
               <EditIcon />

@@ -41,7 +41,7 @@ export function CopyButton({ options }: Readonly<CopyButtonProps>) {
       <Menu.Target>
         <ThemeIcon
           className={classes.target}
-          variant="white"
+          variant="transparent"
         >
           <CopyIcon />
         </ThemeIcon>
