@@ -57,7 +57,7 @@ export function EntityListItem<T>({
       >
         <Title order={3}>{titleText}</Title>
         <ActionIcon
-          variant="white"
+          variant="transparent"
           color="primary"
           onClick={onEdit}
         >

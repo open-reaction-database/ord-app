@@ -77,7 +77,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
             >
               <span>Outcome {index + 1}</span>
               <ActionIcon
-                variant="white"
+                variant="transparent"
                 onClick={() => onEdit(index)}
               >
                 <EditIcon />

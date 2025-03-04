@@ -29,7 +29,7 @@ import { typographyClasses } from 'common/styling';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
-import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 const ENTITY_FIELD = 'products';
 
@@ -44,7 +44,7 @@ export function ProductsComponentsList() {
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {
-    const newComponent = ordInputComponentToReaction(ord.ProductCompound.toObject(new ord.ProductCompound()));
+    const newComponent = ordProductToReaction(ord.ProductCompound.toObject(new ord.ProductCompound()));
     const newPath = [...pathComponents, ENTITY_FIELD, length];
     dispatch(addUpdateReactionField({ reactionId, pathComponents: newPath, newValue: newComponent }));
     dispatch(addReactionPathComponentToList(newPath));
