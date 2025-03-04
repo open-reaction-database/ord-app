@@ -41,7 +41,6 @@ export async function copyPreviewAsImage(node?: HTMLDivElement | null) {
     });
 
     if (blob) {
-      console.info(blob);
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       showNotification(successMessage);
     } else {
