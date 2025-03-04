@@ -81,10 +81,6 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     if "sub" not in user_info:
         raise UnauthorizedError("sub is not provided")
 
-    if user := await user_use_case.get_user_by_auth0_id(user_info["sub"]):
-        logger.info(f"<User(id={user.id})> already exists")
-        return user
-
     external_id = user_info["sub"]
     orcid_id = None
     if "orcid" in user_info["sub"]:
@@ -100,6 +96,14 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         orcid_id=orcid_id,
         auth0_id=user_info["sub"]
     )
+
+    if user := await user_use_case.get_user_by_auth0_id(user_info["sub"]):
+        logger.debug(f"<User(id={user.id})> already exists")
+        return await user_use_case.user_repo.update(
+            payload=user_payload.model_dump(exclude_unset=True),
+            id=user.id
+        )
+
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)
     group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
