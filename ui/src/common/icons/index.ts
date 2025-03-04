@@ -39,5 +39,4 @@ export { default as SearchIcon } from './SearchIcon.svg?react';
 export { default as SettingsIcon } from './SettingsIcon.svg?react';
 export { default as SignOutIcon } from './SignOutIcon.svg?react';
 export { default as StylusNoteIcon } from './StylusNoteIcon.svg?react';
-export { default as TrashIcon } from './TrashIcon.svg?react';
 export { default as UploadProgressIcon } from './UploadProgressIcon.svg?react';

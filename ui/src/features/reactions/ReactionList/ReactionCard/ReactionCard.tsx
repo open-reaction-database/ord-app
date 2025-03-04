@@ -16,7 +16,7 @@
 import { Button, Flex, Paper, Title } from '@mantine/core';
 import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon, RemoveIcon } from 'common/icons';
+import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import classes from './ReactionCard.module.scss';
 import { useSelector } from 'react-redux';
@@ -25,11 +25,8 @@ import { fileDownloadOptions } from 'common/constants.ts';
 import { useCallback, useMemo, useRef } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
-import { removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useDisclosure } from '@mantine/hooks';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 
 interface DescriptorsListProps {
   title: string;
@@ -69,10 +66,8 @@ interface ReactionCardProps {
 }
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
-  const dispatch = useAppDispatch();
   const { datasetId } = useParams();
   const reaction = useSelector(selectReactionById(id));
-  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const onPreviewSave = useCallback(() => {
@@ -83,11 +78,6 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
     { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
     { label: 'Copy Reaction ID', value: id.toString() },
   ];
-
-  const onReactionRemove = useCallback(() => {
-    dispatch(removeReaction(id));
-    closeConfirmation();
-  }, [closeConfirmation, dispatch, id]);
 
   return (
     <Paper
@@ -122,23 +112,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           justify="flex-end"
           className={classes.buttonContainer}
         >
-          <ConfirmPopover
-            title="Remove this reaction?"
-            text="Are you sure you want to remove this reaction?"
-            opened={confirmationOpened}
-            onConfirm={onReactionRemove}
-            onCancel={closeConfirmation}
-            target={
-              <Button
-                variant="transparent"
-                onClick={openConfirmation}
-                color="red"
-                leftSection={<RemoveIcon />}
-              >
-                Remove
-              </Button>
-            }
-          />
+          <RemoveReaction reactionId={id} />
           <Button
             leftSection={<CheckListIcon className={classes.buttonIcon} />}
             variant="transparent"
