@@ -76,17 +76,16 @@ export function EntityListItem<T>({
           value={render(entity)}
         />
       ))}
-      {optionalFields &&
-        optionalFields.map(({ label, render }) => {
-          const value = render(entity);
-          return value ? (
-            <InlineKeyValue
-              key={label}
-              label={label}
-              value={render(entity)}
-            />
-          ) : null;
-        })}
+      {optionalFields?.map(({ label, render }) => {
+        const value = render(entity);
+        return value ? (
+          <InlineKeyValue
+            key={label}
+            label={label}
+            value={render(entity)}
+          />
+        ) : null;
+      })}
     </Flex>
   );
 }
