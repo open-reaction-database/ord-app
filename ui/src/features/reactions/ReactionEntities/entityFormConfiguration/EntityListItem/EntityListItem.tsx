@@ -29,6 +29,7 @@ export function EntityListItem<T>({
   entityField,
   title,
   requiredFields,
+  optionalFields,
 }: Readonly<EntityListItemProps<T>>) {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
@@ -75,6 +76,16 @@ export function EntityListItem<T>({
           value={render(entity)}
         />
       ))}
+      {optionalFields?.map(({ label, render }) => {
+        const value = render(entity);
+        return value ? (
+          <InlineKeyValue
+            key={label}
+            label={label}
+            value={render(entity)}
+          />
+        ) : null;
+      })}
     </Flex>
   );
 }

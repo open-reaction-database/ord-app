@@ -68,7 +68,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
+    { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
     { label: 'Copy Reaction ID', value: id.toString() },
   ];
 

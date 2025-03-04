@@ -27,7 +27,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
 import { typographyClasses } from 'common/styling';
-import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
@@ -37,7 +37,7 @@ const useCreate = buildUseCreate('outcomes', newIndex => [
 
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
-  const outcomes: Array<AppReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, ['outcomes']));
+  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, ['outcomes']));
   const onCreateNew = useCreate();
 
   const handleCreate = () => {
@@ -84,8 +84,8 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
               </ActionIcon>
               <ReactionEntityDelete
                 reactionId={reactionId}
-                entityName="Input"
-                pathComponents={['inputs', index]}
+                entityName="Outcome"
+                pathComponents={['outcomes', index]}
               />
             </Flex>
           ))}

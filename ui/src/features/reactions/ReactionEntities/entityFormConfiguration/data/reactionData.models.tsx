@@ -60,6 +60,8 @@ export const reactionDataDisplay = (entityField: string) =>
         label: 'Value',
         render: item => <AppDataDisplay appData={item} />,
       },
+    ],
+    optionalFields: [
       {
         label: 'Description',
         render: item => item.description,

@@ -39,8 +39,9 @@ export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLa
           <ActionIcon
             variant="transparent"
             color="gray"
+            size="xs"
           >
-            <InfoCircleIcon fontSize="small" />
+            <InfoCircleIcon />
           </ActionIcon>
         </Tooltip>
       )}

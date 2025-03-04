@@ -19,34 +19,27 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import {
-  buildUseSelectItems,
-  buildUseSelectItemsListFromMap,
-} from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import { CustomIdentifiers } from './CustomIdentifiers/CustomIdentifiers.tsx';
 import { booleanOptions } from '../booleanOptions.ts';
-import {
-  createReactionDataAddItem,
-  reactionDataDisplay,
-} from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
-import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { reactionAmounts } from 'features/reactions/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
 import {
   reactionRoleOptions,
   textureTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import {
+  featuresList,
+  identifiersList,
+  molBlockIdentifiers,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponentsBase.model.tsx';
 
 const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
 
 const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
   return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
 };
-
-const identifierKeyByValue = reversePrimitiveRecord(ord.CompoundIdentifier.CompoundIdentifierType);
 
 export const reactionComponents: Array<ReactionFormNode> = [
   {
@@ -78,40 +71,8 @@ export const reactionComponents: Array<ReactionFormNode> = [
     ],
   },
   ...reactionAmounts,
-  {
-    type: ReactionFormNodeType.custom,
-    name: 'customIdentifiers',
-    Component: CustomIdentifiers,
-  },
-  {
-    type: ReactionFormNodeType.list,
-    title: {
-      label: 'Identifiers',
-    },
-    getKey: (_, index) => index,
-    useSelectItems: buildUseSelectItems('identifiers'),
-    ItemDisplay: createEntityListItemComponent<ord.ICompoundIdentifier>({
-      entityField: 'identifiers',
-      title: 'Identifier',
-      requiredFields: [
-        {
-          label: 'Type',
-          render: item => identifierKeyByValue[item.type ?? 0],
-        },
-        {
-          label: 'Value',
-          render: item => item.value,
-        },
-      ],
-    }),
-    addItem: {
-      label: 'Identifier',
-      useCreate: buildUseCreate('identifiers', index => {
-        const emptyItem = ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier());
-        return [index, emptyItem];
-      }),
-    },
-  },
+  molBlockIdentifiers,
+  identifiersList,
   {
     type: ReactionFormNodeType.block,
     title: {
@@ -176,16 +137,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
       useCreate: buildUseCreate('preparations', emptyPreparation),
     },
   },
-  {
-    type: ReactionFormNodeType.list,
-    title: {
-      label: 'Features',
-    },
-    getKey: (item: AppData) => item.id,
-    useSelectItems: buildUseSelectItemsListFromMap('features', compareNamedEntities),
-    ItemDisplay: reactionDataDisplay('features'),
-    addItem: createReactionDataAddItem('features', 'Feature'),
-  },
+  featuresList,
   {
     type: ReactionFormNodeType.block,
     title: {

@@ -26,24 +26,26 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { typographyClasses } from 'common/styling';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
-const useSelectData = buildUseSelectItems('components');
+const ENTITY_FIELD = 'products';
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
+const useSelectData = buildUseSelectItems(ENTITY_FIELD);
 
-export function InputsComponentList() {
+const renderDetails = (_: ReactionProduct) => '';
+
+export function ProductsComponentsList() {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
-  const components = useSelectData() as Array<ReactionInputComponent>;
+  const components = useSelectData() as Array<ReactionProduct>;
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {
-    const newComponent = ordInputComponentToReaction(ord.Compound.toObject(new ord.Compound()));
-    const newPath = [...pathComponents, 'components', length];
+    const newComponent = ordInputComponentToReaction(ord.ProductCompound.toObject(new ord.ProductCompound()));
+    const newPath = [...pathComponents, ENTITY_FIELD, length];
     dispatch(addUpdateReactionField({ reactionId, pathComponents: newPath, newValue: newComponent }));
     dispatch(addReactionPathComponentToList(newPath));
   }, [dispatch, reactionId, pathComponents, length]);
@@ -54,7 +56,7 @@ export function InputsComponentList() {
         <ReactionEntityBlockTitle
           leftSection={
             <>
-              <Title order={3}>Components</Title>
+              <Title order={3}>Products</Title>
               <span>·</span>
               {components.length}
             </>
@@ -65,7 +67,7 @@ export function InputsComponentList() {
               leftSection={<AddCircleIcon />}
               onClick={onCreateComponent}
             >
-              Add component
+              Product
             </Button>
           }
         />
@@ -76,8 +78,8 @@ export function InputsComponentList() {
           reactionId={reactionId}
           components={components}
           rootPathComponents={pathComponents}
-          detailsHeader="Amount"
-          entityName="components"
+          detailsHeader="Measurements"
+          entityName="products"
           renderDetails={renderDetails}
         />
       ) : (
@@ -87,7 +89,7 @@ export function InputsComponentList() {
           gap="8"
         >
           <EmptyIcon />
-          <Text className={typographyClasses.secondary1}>There are no Components yet</Text>
+          <Text className={typographyClasses.secondary1}>There are no Products yet</Text>
         </Flex>
       )}
     </ReactionEntityBlock>

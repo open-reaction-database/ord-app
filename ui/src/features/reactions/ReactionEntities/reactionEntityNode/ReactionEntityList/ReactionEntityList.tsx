@@ -77,18 +77,22 @@ export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<Re
         />
       }
     >
-      <Flex
-        direction="column"
-        gap="sm"
-      >
-        {items.map((item, index) => (
-          // eslint-disable-next-line react/jsx-key
-          <ItemDisplay
-            entity={item}
-            entityKey={node.getKey(item, index)}
-          />
-        ))}
-      </Flex>
+      {!!node.emptyList && items.length === 0 ? (
+        node.emptyList
+      ) : (
+        <Flex
+          direction="column"
+          gap="sm"
+        >
+          {items.map((item, index) => (
+            // eslint-disable-next-line react/jsx-key
+            <ItemDisplay
+              entity={item}
+              entityKey={node.getKey(item, index)}
+            />
+          ))}
+        </Flex>
+      )}
     </ReactionEntityBlock>
   );
 }

@@ -23,6 +23,8 @@ import classes from './inputsComponentsList.module.scss';
 import clsx from 'clsx';
 import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ComponentDisplayRow } from '../../ComponentsList/ComponentDisplayRow';
+import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
 
 interface InputsComponentsListProps {
   reactionId: number;
@@ -31,11 +33,13 @@ interface InputsComponentsListProps {
 
 const headers = [
   { label: 'Input', className: classes.input },
-  { label: 'Identifiers', className: classes.identifiers },
-  { label: 'Preview', className: classes.preview },
-  { label: 'Role', className: classes.role },
-  { label: 'Amount', className: classes.amount },
+  { label: 'Identifiers', className: componentsListClasses.identifiers },
+  { label: 'Preview', className: componentsListClasses.preview },
+  { label: 'Role', className: componentsListClasses.role },
+  { label: 'Amount', className: componentsListClasses.details },
 ];
+
+const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
 export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComponentsListProps>) {
   const dispatch = useAppDispatch();
@@ -100,6 +104,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
                   key={component.id}
                   reactionId={reactionId}
                   component={component}
+                  renderDetails={renderDetails}
                   componentPath={['inputs', input.id, 'components', index]}
                   gridClassName={clsx(classes.grid, classes.row)}
                 />
