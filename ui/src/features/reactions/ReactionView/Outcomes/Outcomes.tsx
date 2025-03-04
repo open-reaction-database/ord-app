@@ -84,8 +84,8 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
               </ActionIcon>
               <ReactionEntityDelete
                 reactionId={reactionId}
-                entityName="Input"
-                pathComponents={['inputs', index]}
+                entityName="Outcome"
+                pathComponents={['outcomes', index]}
               />
             </Flex>
           ))}
