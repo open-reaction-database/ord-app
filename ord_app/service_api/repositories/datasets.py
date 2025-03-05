@@ -36,9 +36,11 @@ class DatasetsRepository:
             update(DatasetModel)
             .where(DatasetModel.id == dataset_id)
             .values(modified_at=func.now())
+            .returning(DatasetModel)
         )
-        await self.db.execute(stmt)
+        dataset = await self.db.scalar(stmt)
         await self.db.commit()
+        return dataset
 
     async def create(
         self,

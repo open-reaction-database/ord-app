@@ -14,13 +14,18 @@
 from io import BytesIO
 
 import pytest
+from faker import Faker
 from fastapi import status
+from ord_schema.proto.dataset_pb2 import Dataset
+from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import select
 
 from ord_app.service_api.domain.reactions import validate_reactions_task
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.settings import RuntimeSettings
+from ord_app.tests.conftest import create_test_dataset
 
+faker = Faker()
 
 async def test_create_dataset(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
@@ -94,3 +99,35 @@ async def test_upload_wrong_file(api_client, mock_authenticated_user):
         f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("wrongfile.pb", BytesIO(b"pdf"))}
     )
     assert response_data.status_code == status.HTTP_400_BAD_REQUEST
+
+
+async def test_dataset_extend(api_client, mock_authenticated_user, test_db_session):
+    user, _, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction_id = faker.uuid4()
+    reaction = ReactionModel(
+        owner=user,
+        pb_reaction_id=reaction_id,
+        dataset=dataset,
+        binpb=Reaction(reaction_id=reaction_id).SerializeToString(),
+    )
+    test_db_session.add(reaction)
+    await test_db_session.commit()
+
+    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
+    assert len(response_data["items"]) == 1
+    assert response_data["items"][0]["pb_reaction_id"] == reaction_id
+
+    enum_reaction_id = faker.uuid4()
+    enum_dataset_pb = Dataset(reactions=[Reaction(reaction_id=enum_reaction_id)])
+    response_data = api_client.post(
+        f"/api/v1/datasets/{dataset.id}/extend",
+        files={"file": ("dataset.binpb", enum_dataset_pb.SerializeToString())}
+    )
+    assert response_data.status_code == status.HTTP_200_OK
+
+    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
+    assert len(response_data["items"]) == 2
+
+    for item in response_data["items"]:
+        assert item["pb_reaction_id"] in (reaction_id, enum_reaction_id)

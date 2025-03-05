@@ -67,9 +67,20 @@ class DatasetUseCases:
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
         return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
 
-    async def upload(self, group_id: int, file_data, kind):
-        logger.debug(f"uploading {kind} file")
+    async def extend(self, dataset_id: int, file_data, kind):
+        try:
+            dataset_pb = load_message(file_data, Dataset, kind)
+        except (DecodeError, JsonParseError, TextParseError) as e:
+            logger.error(e)
+            raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
+        dataset = await self.dataset_repository.get(dataset_id)
+        await self.add_reactions(dataset, dataset_pb.reactions)
+        dataset = await self.dataset_repository.update_modified_at(dataset_id)
+
+        return dataset
+
+    async def upload(self, group_id: int, file_data, kind):
         try:
             dataset_pb = load_message(file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -85,20 +96,25 @@ class DatasetUseCases:
         )
         self.db.add(dataset)
         await self.db.commit()
-        logger.debug(f"<Dataset(id={dataset.id})> created")
 
+        await self.add_reactions(dataset, dataset_pb.reactions)
+        return dataset
+
+    async def add_reactions(self, dataset, reactions):
         seen_ids = set()
         reactions_ids = []
-        for reaction in dataset_pb.reactions:
-            if reaction.reaction_id in seen_ids:
+        for reaction in reactions:
+            if not reaction.reaction_id:
+                reaction.reaction_id = uuid4().hex
+            elif reaction.reaction_id in seen_ids:
                 reaction.reaction_id = f"duplicate-{reaction.reaction_id}-{uuid4().hex}"
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)
 
         logger.debug(f"Start processing <Dataset(id={dataset.id})> Reactions. Count={len(reactions_ids)}")
-        async for item in self.reaction_repository.get_by_reaction_ids_gen(reactions_ids):
+        async for item in self.reaction_repository.get_by_reaction_ids_gen(dataset.id, reactions_ids):
             pb_reaction_idx = reactions_ids.index(item.pb_reaction_id)
-            dataset_pb.reactions[pb_reaction_idx].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
+            reactions[pb_reaction_idx].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
 
         reactions_payload = [
             {
@@ -107,17 +123,12 @@ class DatasetUseCases:
                 "dataset": dataset,
                 "owner_id": self.current_user.id,
             }
-            for reaction in dataset_pb.reactions
+            for reaction in reactions
         ]
 
         logger.debug(f"Reactions <Dataset(id={dataset.id})> are going to write to database")
-
         await self.reaction_repository.bulk_create(reactions_payload)
-        await self.db.refresh(dataset)
-
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
-
-        return await self.dataset_repository.get(dataset.id)
 
     async def paginate_user_datasets(self):
         return await self.dataset_repository.user_datasets_stmt(self.current_user.id)

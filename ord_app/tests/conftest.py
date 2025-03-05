@@ -136,7 +136,7 @@ async def mock_authenticated_user(test_db_session):
     app.dependency_overrides.pop(verify_access_token, None)
 
 
-async def create_test_dataset(db_session, mock_authenticated_user):
+async def create_test_dataset(db_session, mock_authenticated_user) -> DatasetModel:
     user, _, group = mock_authenticated_user
     dataset = DatasetModel(owner=user, groups=[group])
     db_session.add(dataset)
