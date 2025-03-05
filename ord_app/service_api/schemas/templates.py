@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from typing import Any
 
 import orjson
@@ -32,11 +32,21 @@ class TemplateModel(BaseModel):
     def load_variables(cls, raw):
         return orjson.dumps(raw)
 
+    @field_validator("binpb", mode="before")
+    @classmethod
+    def load_binpb(cls, raw):
+        return b64encode(raw)
+
 
 class TemplateCreateModel(BaseModel):
     name: str
     binpb: bytes | Any
     variables: Json
+
+    @field_validator("variables", mode="before")
+    @classmethod
+    def load_variables(cls, raw):
+        return orjson.dumps(raw)
 
     @field_validator("binpb", mode="after")
     @classmethod
@@ -45,7 +55,7 @@ class TemplateCreateModel(BaseModel):
 
     def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
-        data["binpb"] = data["binpb"].SerializeToString()
+        data["binpb"] = b64encode(data["binpb"].SerializeToString())
         return data
 
 
@@ -63,5 +73,5 @@ class TemplateUpdateModel(BaseModel):
     def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         if data["binpb"] is not None:
-            data["binpb"] = data["binpb"].SerializeToString()
+            data["binpb"] = b64encode(data["binpb"].SerializeToString())
         return data
