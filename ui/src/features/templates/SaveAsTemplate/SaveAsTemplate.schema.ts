@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tabTitle {
-  color: var(--color-text-secondary-3);
-  text-transform: uppercase;
-  font-weight: 500;
+import * as yup from 'yup';
 
-  &[data-active] {
-    color: var(--color-text-primary);
-  }
-}
+export const SaveAsTemplateSchema = yup.object({
+  reaction: yup.string().label('Reaction').required(),
+  name: yup.string().label('Template name').required(),
+});
 
-.panel {
-  padding: 20px 20px 0;
-}
-
-.checkIcon {
-  margin-right: 8px;
-}
+export type SaveAsTemplateSchemaFormValues = yup.InferType<typeof SaveAsTemplateSchema>;

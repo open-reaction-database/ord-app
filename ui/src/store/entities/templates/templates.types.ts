@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tabTitle {
-  color: var(--color-text-secondary-3);
-  text-transform: uppercase;
-  font-weight: 500;
 
-  &[data-active] {
-    color: var(--color-text-primary);
-  }
+export interface TemplateCreator {
+  reactionId: number;
+  name: string;
+  variables: string;
 }
 
-.panel {
-  padding: 20px 20px 0;
+export interface Template {
+  id: number;
+  name: string;
+  binpb: string;
+  variables: string;
 }
 
-.checkIcon {
-  margin-right: 8px;
+export interface SaveAsTemplatePayload {
+  reaction: string;
+  name: string;
 }

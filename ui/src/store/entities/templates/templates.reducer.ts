@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers } from '@reduxjs/toolkit';
-import { datasetsReducer } from './datasets/datasets.reducer.ts';
-import { usersReducer } from './users/users.reducer.ts';
-import { groupsReducer } from './groups/groups.reducer.ts';
-import { reactionsReducer } from './reactions/reactions.reducer.ts';
-import { templatesReducer } from './templates/templates.reducer.ts';
+import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
+import { getTemplateActions, createNewTemplateActions } from './templates.actions.ts';
 
-export const entitiesReducer = combineReducers({
-  datasets: datasetsReducer,
-  users: usersReducer,
-  groups: groupsReducer,
-  reactions: reactionsReducer,
-  templates: templatesReducer,
+const isTemplateCreating = createReducer<boolean>(false, builder => {
+  builder.addMatcher(isAnyOf(createNewTemplateActions.request, getTemplateActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(
+      createNewTemplateActions.success,
+      createNewTemplateActions.failure,
+      getTemplateActions.success,
+      getTemplateActions.failure,
+    ),
+    () => false,
+  );
+});
+
+export const templatesReducer = combineReducers({
+  isTemplateCreating,
 });

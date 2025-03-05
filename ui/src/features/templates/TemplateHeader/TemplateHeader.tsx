@@ -17,31 +17,29 @@ import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
+import { EnumerateIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
-import classes from 'features/reactions/ReactionHeader/reactionHeader.module.scss';
+import classes from 'features/templates/TemplateHeader/templateHeader.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { addUpdateReactionField, removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
-import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 
-interface ReactionHeaderProps {
+interface TemplateHeaderProps {
   datasetId: number;
   reactionId: number;
 }
 
-export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
+export function TemplateHeader({ datasetId, reactionId }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
   const [opened, { open, close }] = useDisclosure();
-  const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
 
   const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
 
@@ -72,13 +70,6 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
       radius="md"
       p="lg"
     >
-      {saveAsTemplateOpened && (
-        <SaveAsTemplate
-          reactionId={reactionId}
-          reactionPbId={reaction.pb_reaction_id}
-          onClose={closeSaveAsTemplate}
-        />
-      )}
       <Flex
         direction="column"
         gap="sm"
@@ -93,7 +84,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                 className={classes.title}
                 order={2}
               >
-                Reaction
+                Template
               </Title>
             )}
             <Title order={2}>{reaction.pb_reaction_id}</Title>
@@ -107,8 +98,8 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             gap="sm"
           >
             <ConfirmPopover
-              title={`Remove this reaction`}
-              text={`Are you sure you want to remove this reaction?`}
+              title={`Remove this template`}
+              text={`Are you sure you want to remove this template?`}
               opened={confirmationOpened}
               onConfirm={onRemove}
               onCancel={closeConfirmation}
@@ -125,10 +116,9 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             />
             <Button
               variant="transparent"
-              leftSection={<CheckListIcon />}
-              onClick={openSaveAsTemplate}
+              leftSection={<EnumerateIcon />}
             >
-              Save as Template
+              Enumerate
             </Button>
             <DownloadMenu
               options={fileDownloadOptions}
@@ -139,11 +129,23 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                   rightSection={<ChevronDownIcon />}
                   variant="transparent"
                 >
-                  Download Reaction
+                  Download
                 </Button>
               }
             />
-            <Button>Save</Button>
+            <DownloadMenu
+              options={fileDownloadOptions}
+              url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
+              target={
+                <Button
+                  leftSection={<DownloadIcon />}
+                  rightSection={<ChevronDownIcon />}
+                  variant="transparent"
+                >
+                  Download
+                </Button>
+              }
+            />
           </Flex>
         </Flex>
         <ReactionPreview reaction={reaction} />

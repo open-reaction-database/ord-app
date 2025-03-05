@@ -17,11 +17,11 @@ import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { type FC, Fragment, useEffect, useMemo } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
+import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { Badge, Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import classes from './reactionPage.module.scss';
+import classes from './templatePage.module.scss';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
@@ -29,11 +29,12 @@ import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSideba
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
+// import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { CheckCircleIcon } from 'common/icons';
+// import { getTemplate } from 'store/entities/templates/templates.thunks';
 
 interface ReactionTab {
   name: string;
@@ -55,45 +56,55 @@ const tabs: Array<ReactionTab> = [
   { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
 ];
 
-export function ReactionPage() {
+export function TemplatePage() {
   const dispatch = useAppDispatch();
-  const { reactionId: rawReactionId, datasetId: rawDatasetId } = useParams<{ reactionId: string; datasetId: string }>();
-  const reactionId = parseInt(rawReactionId);
-  const datasetId = parseInt(rawDatasetId);
-  const reaction = useSelector(selectReactionById(reactionId));
-  const dataset = useSelector(selectDatasetById(datasetId));
+  const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
+  const templateId = parseInt(rawTemplateId);
+  const reaction = useSelector(selectReactionById(templateId));
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
-      { title: 'Datasets', path: '~/' },
-      { path: `~/datasets/${datasetId}`, title: dataset?.name ?? datasetId.toString() },
+      { title: 'Templates', path: '~/' },
       {
-        path: `~/datasets/${datasetId}/reactions/${reactionId}`,
-        title: reaction?.pb_reaction_id ?? reactionId.toString(),
+        path: `~/templates/${templateId}`,
+        title: reaction?.pb_reaction_id ?? templateId.toString(),
       },
     ];
-  }, [reactionId, datasetId, dataset?.name, reaction?.pb_reaction_id]);
+  }, [templateId, reaction?.pb_reaction_id]);
 
   useEffect(() => {
-    dispatch(getReaction({ datasetId, reactionId }));
-  }, [dispatch, datasetId, reactionId]);
+    // dispatch(getTemplate(templateId));
+    dispatch(getReaction({ datasetId: 7, reactionId: templateId }));
+  }, [dispatch, templateId]);
 
   const contextValue = useMemo(
     () => ({
-      reactionId,
+      reactionId: templateId,
       pathComponents: [],
     }),
-    [reactionId],
+    [templateId],
   );
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
+  const templateBadge = (
+    <Badge
+      autoContrast
+      className={classes.templateBadge}
+    >
+      Template
+    </Badge>
+  );
 
   return (
-    <PageContainer breadcrumbs={breadcrumbs}>
+    <PageContainer
+      breadcrumbs={breadcrumbs}
+      badge={templateBadge}
+    >
       <reactionEntityContext.Provider value={contextValue}>
         {reaction && (
           <Flex
             direction="column"
             gap="sm"
+            miw={50}
           >
             <Badge
               variant="outline"
@@ -102,9 +113,9 @@ export function ReactionPage() {
             >
               Reaction is valid
             </Badge>
-            <ReactionHeader
-              datasetId={datasetId}
-              reactionId={reactionId}
+            <TemplateHeader
+              datasetId={7}
+              reactionId={templateId}
             />
             <Paper
               radius="md"
@@ -135,12 +146,12 @@ export function ReactionPage() {
                     key={name}
                     value={name}
                   >
-                    <Component reactionId={reactionId} />
+                    <Component reactionId={templateId} />
                   </Tabs.Panel>
                 ))}
               </Tabs>
             </Paper>
-            <ReactionDetailsSidebar reactionId={reactionId} />
+            <ReactionDetailsSidebar reactionId={templateId} />
           </Flex>
         )}
       </reactionEntityContext.Provider>

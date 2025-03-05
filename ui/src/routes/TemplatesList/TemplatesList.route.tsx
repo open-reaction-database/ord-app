@@ -15,10 +15,14 @@
  */
 import { Route, Switch } from 'wouter';
 import { TemplatesListPage } from '../../pages/TemplatesList/TemplatesList.page.tsx';
+import { TemplatePage } from 'pages/TemplatePage/TemplatePage.tsx';
 
 export function TemplatesListRoute() {
   return (
     <Switch>
+      <Route path=":templateId">
+        <TemplatePage />
+      </Route>
       <Route path="/">
         <TemplatesListPage />
       </Route>
