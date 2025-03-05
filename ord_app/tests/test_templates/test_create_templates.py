@@ -28,7 +28,7 @@ async def test_create_template(api_client, mock_authenticated_user, test_db_sess
     payload = {
         "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode(),
         "name": fake.name(),
-        "variables": fake.json(),
+        "variables": {"foo": "bar"},
     }
     response_data = api_client.post("/api/v1/templates", json=payload).raise_for_status().json()
 
