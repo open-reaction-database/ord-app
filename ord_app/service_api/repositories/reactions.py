@@ -23,9 +23,14 @@ from ord_app.service_api.repositories.base import BaseRepository
 class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
 
-    async def get_by_reaction_ids_gen(self, pb_reaction_ids: list[str], max_num_query_args=10_000):
+    async def get_by_reaction_ids_gen(
+        self,
+        dataset_id: int,
+        pb_reaction_ids: list[str],
+        max_num_query_args=10_000
+    ):
         for batch in batched(pb_reaction_ids, max_num_query_args):
-            for item in await self.filter(pb_reaction_id=batch):
+            for item in await self.filter(dataset_id=dataset_id, pb_reaction_id=batch):
                 yield item
 
     async def bulk_update(self, values):
