@@ -29,11 +29,10 @@ import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSideba
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-// import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { CheckCircleIcon } from 'common/icons';
+import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 // import { getTemplate } from 'store/entities/templates/templates.thunks';
 
 interface ReactionTab {
@@ -85,6 +84,8 @@ export function TemplatePage() {
     [templateId],
   );
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
+  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
+  const isReadyForEnumeration = false;
   const templateBadge = (
     <Badge
       autoContrast
@@ -109,9 +110,11 @@ export function TemplatePage() {
             <Badge
               variant="outline"
               size="lg"
-              leftSection={CheckIcon}
+              radius="md"
+              leftSection={isReadyForEnumeration ? CheckIcon : CrossIcon}
+              className={classes.enumerationBadge}
             >
-              Reaction is valid
+              {isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
             </Badge>
             <TemplateHeader
               datasetId={7}

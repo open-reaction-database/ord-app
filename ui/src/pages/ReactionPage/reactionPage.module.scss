@@ -30,3 +30,10 @@
 .checkIcon {
   margin-right: 8px;
 }
+
+.validationBadge {
+  height: auto;
+  padding: 2px 8px;
+  border-color: var(--color-border-2);
+  color: var(--color-text-primary);
+}

@@ -35,3 +35,10 @@
   align-self: center;
   background-color: var(--color-background-dark-gray);
 }
+
+.enumerationBadge {
+  height: auto;
+  padding: 2px 8px;
+  border-color: var(--color-border-2);
+  color: var(--color-text-primary);
+}

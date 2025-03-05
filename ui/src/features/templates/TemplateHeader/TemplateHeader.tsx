@@ -17,25 +17,24 @@ import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { EnumerateIcon, ChevronDownIcon, DownloadIcon, EditIcon, TrashIcon } from 'common/icons';
+import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
-import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
+import { domain } from 'common/constants.ts';
 import classes from 'features/templates/TemplateHeader/templateHeader.module.scss';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField, removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
+import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 
 interface TemplateHeaderProps {
   datasetId: number;
   reactionId: number;
 }
 
-export function TemplateHeader({ datasetId, reactionId }: Readonly<TemplateHeaderProps>) {
+export function TemplateHeader({ reactionId }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
@@ -57,13 +56,6 @@ export function TemplateHeader({ datasetId, reactionId }: Readonly<TemplateHeade
     ],
     [reactionId, location],
   );
-
-  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
-
-  const onRemove = useCallback(() => {
-    dispatch(removeReaction(reactionId));
-    closeConfirmation();
-  }, [closeConfirmation, dispatch, reactionId]);
 
   return (
     <Paper
@@ -97,55 +89,25 @@ export function TemplateHeader({ datasetId, reactionId }: Readonly<TemplateHeade
             align="center"
             gap="sm"
           >
-            <ConfirmPopover
-              title={`Remove this template`}
-              text={`Are you sure you want to remove this template?`}
-              opened={confirmationOpened}
-              onConfirm={onRemove}
-              onCancel={closeConfirmation}
-              target={
-                <Button
-                  onClick={openConfirmation}
-                  variant="transparent"
-                  color="red"
-                  leftSection={<TrashIcon />}
-                >
-                  Remove
-                </Button>
-              }
-            />
+            <RemoveReaction reactionId={reactionId} />
             <Button
               variant="transparent"
               leftSection={<EnumerateIcon />}
             >
               Enumerate
             </Button>
-            <DownloadMenu
-              options={fileDownloadOptions}
-              url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
-              target={
-                <Button
-                  leftSection={<DownloadIcon />}
-                  rightSection={<ChevronDownIcon />}
-                  variant="transparent"
-                >
-                  Download
-                </Button>
-              }
-            />
-            <DownloadMenu
-              options={fileDownloadOptions}
-              url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
-              target={
-                <Button
-                  leftSection={<DownloadIcon />}
-                  rightSection={<ChevronDownIcon />}
-                  variant="transparent"
-                >
-                  Download
-                </Button>
-              }
-            />
+            <Button
+              leftSection={<DownloadIcon />}
+              variant="transparent"
+            >
+              Download Variables in CSV
+            </Button>
+            <Button
+              leftSection={<DownloadIcon />}
+              variant="transparent"
+            >
+              Download Template in JSON
+            </Button>
           </Flex>
         </Flex>
         <ReactionPreview reaction={reaction} />

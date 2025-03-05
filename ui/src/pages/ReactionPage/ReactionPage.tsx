@@ -33,7 +33,7 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { CheckCircleIcon } from 'common/icons';
+import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 
 interface ReactionTab {
   name: string;
@@ -86,6 +86,7 @@ export function ReactionPage() {
     [reactionId],
   );
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
+  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
@@ -98,9 +99,11 @@ export function ReactionPage() {
             <Badge
               variant="outline"
               size="lg"
-              leftSection={CheckIcon}
+              radius="md"
+              leftSection={reaction.is_valid ? CheckIcon : CrossIcon}
+              className={classes.validationBadge}
             >
-              Reaction is valid
+              {reaction.is_valid ? 'Reaction is Valid' : 'Reaction is Not Valid'}
             </Badge>
             <ReactionHeader
               datasetId={datasetId}

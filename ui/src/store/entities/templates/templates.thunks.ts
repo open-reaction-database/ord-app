@@ -38,7 +38,7 @@ export const createTemplate = createThunkWithExplicitResult(
     const payload = {
       name: templateLoad.name,
       binpb: binpb,
-      variables: templateLoad.variables ? JSON.stringify(templateLoad.variables) : '{}',
+      variables: JSON.stringify('[]'),
     };
     const template = (await axiosInstance.post<Template>(`/templates`, payload)).data;
     // console.log('template', template);
