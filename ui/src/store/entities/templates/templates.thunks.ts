@@ -18,7 +18,7 @@ import type { Template } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
 // import type { Pages } from 'common/types';
-// import { ordReactionToReaction, reactionToOrdReaction } from '../reactions/reactions.converters.ts';
+import { reactionToOrdReaction } from '../reactions/reactions.converters.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
