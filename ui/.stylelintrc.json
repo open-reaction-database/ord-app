@@ -4,11 +4,6 @@
   "rules": {
     "import-notation": ["string"],
     "custom-property-pattern": null,
-    "selector-class-pattern": [
-      "^[a-z][a-zA-Z0-9]+$",
-      {
-        "message": "Expected class selector '%s' to be camel case"
-      }
-    ]
+    "selector-class-pattern": null
   }
 }

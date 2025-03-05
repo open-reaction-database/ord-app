@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
-import { Fragment } from 'react';
+import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
@@ -25,12 +25,18 @@ interface ReactionPreviewProps {
   reaction: ReactionWrapper;
 }
 
-export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
+export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
+  { reaction },
+  ref,
+) {
   const inputs = useSelector(selectOrderedInputsWrapper(reaction.id));
   const outcomes = reaction.data.outcomes;
 
   return (
-    <div className={classes.wrapper}>
+    <div
+      className={classes.wrapper}
+      ref={ref}
+    >
       {inputs.map((input, index) => (
         <Fragment key={input.id}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
@@ -51,4 +57,4 @@ export function ReactionPreview({ reaction }: Readonly<ReactionPreviewProps>) {
       ))}
     </div>
   );
-}
+});

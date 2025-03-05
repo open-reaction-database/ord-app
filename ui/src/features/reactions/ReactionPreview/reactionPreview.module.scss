@@ -25,10 +25,15 @@
   display: flex;
   flex-direction: column;
   height: 192px;
-  min-width: 200px;
   border: 1px solid #e7ebef;
   border-radius: 10px;
   padding: var(--mantine-spacing-sm);
+  gap: var(--mantine-spacing-sm);
+}
+
+.componentList {
+  flex-grow: 1;
+  min-width: 200px;
 }
 
 .component {

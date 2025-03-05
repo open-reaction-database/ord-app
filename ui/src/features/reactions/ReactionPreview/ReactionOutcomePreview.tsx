@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo } from 'react';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
-import type { AppReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
@@ -28,7 +28,7 @@ interface ReactionInputPreviewProps {
 }
 
 export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
-  const outcome: AppReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]));
+  const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]));
   const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
@@ -44,9 +44,8 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
       </Badge>
       <Flex
         gap="sm"
-        flex={1}
         align="center"
-        mt="xs"
+        className={classes.componentList}
       >
         {componentsIds.map(id => (
           <div

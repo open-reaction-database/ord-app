@@ -15,32 +15,12 @@
  */
 .grid {
   display: grid;
-  grid-template-areas: 'input identifiers preview role amount actions';
+  grid-template-areas: 'input identifiers preview role details actions';
   grid-template-columns: repeat(5, 1fr) 120px;
 }
 
 .input {
   grid-area: input;
-}
-
-.identifiers {
-  grid-area: identifiers;
-}
-
-.preview {
-  grid-area: preview;
-}
-
-.role {
-  grid-area: role;
-}
-
-.amount {
-  grid-area: amount;
-}
-
-.actions {
-  grid-area: actions;
 }
 
 .row {

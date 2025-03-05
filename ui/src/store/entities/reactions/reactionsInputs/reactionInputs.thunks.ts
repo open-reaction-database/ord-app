@@ -21,6 +21,7 @@ import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ThunkDispatch } from '@reduxjs/toolkit';
+import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
 
 export const addIdentifierByName = createThunkWithExplicitResult(
   addIdentifierByNameActions,
@@ -31,8 +32,10 @@ export const addIdentifierByName = createThunkWithExplicitResult(
         identifier: name,
       });
       const identifierValue = result.data.smiles;
-      const newIdentifier = ord.CompoundIdentifier.toObject(
-        new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue }),
+      const newIdentifier = ordCompoundIdentifierToReaction(
+        ord.CompoundIdentifier.toObject(
+          new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue }),
+        ),
       );
       dispatch(addIdentifierByNameActions.success());
       const identifiers: Array<ord.CompoundIdentifier> =

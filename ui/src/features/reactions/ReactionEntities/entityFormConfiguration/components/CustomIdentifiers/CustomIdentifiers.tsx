@@ -35,8 +35,9 @@ import { colorToCssVariable } from 'common/styling/colors.ts';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { AppReactionCompound } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import classes from './customIdentifiers.module.scss';
+import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
 
 type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
 
@@ -47,11 +48,13 @@ const useSelectIdentifiers = buildUseSelectItems(ENTITY_FIELD);
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
   (newIndex, _, value?: unknown) => {
-    const newIdentifier = ord.CompoundIdentifier.toObject(
-      new ord.CompoundIdentifier({
-        type: CompoundIdentifierType.MOLBLOCK,
-        ...((value as IdentifierData) || {}),
-      }),
+    const newIdentifier = ordCompoundIdentifierToReaction(
+      ord.CompoundIdentifier.toObject(
+        new ord.CompoundIdentifier({
+          type: CompoundIdentifierType.MOLBLOCK,
+          ...((value as IdentifierData) || {}),
+        }),
+      ),
     );
     return [newIndex, newIdentifier];
   },
@@ -61,7 +64,7 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
-  const component: AppReactionCompound = useSelector(selectReactionPartByPath(reactionId, pathComponents));
+  const component: ReactionInputComponent = useSelector(selectReactionPartByPath(reactionId, pathComponents));
   const [componentsEditorOpened, { open: openComponentsEditor, close: closeComponentsEditor }] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
   const createNewMolblockIdentifier = useCreateNewMolblockIdentifier();

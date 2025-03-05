@@ -29,6 +29,7 @@ export interface EntityListItemStaticProps<T> {
   entityField: string;
   title: ((entity: T) => string) | string;
   requiredFields: Array<FieldConfiguration<T>>;
+  optionalFields?: Array<FieldConfiguration<T>>;
 }
 
 export type EntityListItemProps<T> = EntityListItemStaticProps<T> & EntityListItemRuntimeProps<T>;

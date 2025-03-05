@@ -15,7 +15,7 @@
  */
 .grid {
   display: grid;
-  grid-template-areas: 'identifiers preview role amount actions';
+  grid-template-areas: 'identifiers preview role details actions';
   grid-template-columns: repeat(4, 1fr) 120px;
 }
 
@@ -34,8 +34,8 @@
   overflow: hidden;
 }
 
-.amount {
-  grid-area: amount;
+.details {
+  grid-area: details;
   overflow: hidden;
 }
 
@@ -48,12 +48,8 @@
   min-height: 48px;
 }
 
-.imagePreview {
-  max-height: 88px;
-
-  & > img {
-    max-height: 80px;
-  }
+.imagePreview > img {
+  max-height: 80px;
 }
 
 .row:not(:last-of-type) {
@@ -74,4 +70,14 @@
   padding: var(--mantine-spacing-sm);
   font-weight: 700;
   color: var(--mantine-color-secondary-2);
+}
+
+.identifierWrapper {
+  width: 100%;
+}
+
+.identifierValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }

@@ -34,3 +34,5 @@ export type ReactionTextureType = keyof typeof ord.Texture.TextureType;
 export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
 
 export type ReactionIdentifierType = keyof typeof ord.ReactionIdentifier.ReactionIdentifierType;
+
+export type ReactionMeasurementType = keyof typeof ord.ProductMeasurement.ProductMeasurementType;

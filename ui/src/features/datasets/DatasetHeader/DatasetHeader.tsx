@@ -19,7 +19,7 @@ import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { formatDate } from 'common/utils';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
-import { ChevronDownIcon, EditIcon, TrashIcon } from 'common/icons';
+import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
@@ -130,7 +130,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
               classNames={{ section: classes.removeIcon }}
               variant="transparent"
               color="red"
-              leftSection={<TrashIcon />}
+              leftSection={<RemoveIcon />}
               onClick={openRemoveConfirm}
             >
               Remove

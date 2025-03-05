@@ -24,6 +24,7 @@ import {
   timeTypeByValue,
   reactionIdentifierTypeByValue,
   analysisTypeByValue,
+  measurementTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -75,3 +76,6 @@ export const {
 
 export const { ordEntityToEntity: ordAnalysisTypeToReaction, entityToOrdEntity: reactionAnalysisTypeToOrd } =
   generateEntityTypeToFromOrd(analysisTypeByValue, ord.Analysis.AnalysisType);
+
+export const { ordEntityToEntity: ordMeasurementTypeToReaction, entityToOrdEntity: reactionMeasurementTypeToOrd } =
+  generateEntityTypeToFromOrd(measurementTypeByValue, ord.ProductMeasurement.ProductMeasurementType);

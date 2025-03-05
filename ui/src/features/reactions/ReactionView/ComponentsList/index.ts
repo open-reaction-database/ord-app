@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  position: relative;
-  background: #f2f2f2;
-  border-radius: 8px;
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
-}
-
-.paper {
-  border: none;
-}
+export * from './ComponentsList.tsx';
+export * from './ComponentsList';
+export { default as componentsListClasses } from './componentsList.module.scss';

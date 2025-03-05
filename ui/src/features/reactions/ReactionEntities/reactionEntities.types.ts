@@ -123,6 +123,7 @@ export interface ReactionFormList<T = any> extends ReactionFormNodeBase {
   };
   useSelectItems: () => Array<T>;
   ItemDisplay: FC<EntityListItemRuntimeProps<T>>;
+  emptyList?: ReactNode;
 }
 
 export type ReactionFormMethods = Pick<

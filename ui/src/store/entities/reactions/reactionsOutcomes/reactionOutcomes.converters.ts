@@ -13,33 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionAnalysis, AppReactionOutcome, AppReactionProduct } from './reactionOutcomes.types.ts';
+import type { ReactionAnalysis, ReactionOutcome } from './reactionOutcomes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import {
   ordDataMapToReactionDataMap,
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
+  ordTimeToReaction,
+  reactionTimeToOrd,
   withId,
   withIdName,
-  withoutId,
   withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   ordAnalysisTypeToReaction,
-  ordReactionRoleToReaction,
   reactionAnalysisTypeToOrd,
-  reactionReactionRoleToOrd,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
 import {
-  ordCompoundIdentifierToReactionCompoundIdentifier,
-  reactionCompoundIdentifierToOrdCompoundIdentifier,
-} from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
+  ordProductToReaction,
+  reactionProductToOrd,
+} from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export const ordAnalysisToReactionAnalysis = (
   { type, data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
   name: string,
-): AppReactionAnalysis =>
+): ReactionAnalysis =>
   withIdName(
     {
       type: ordAnalysisTypeToReaction(type),
@@ -55,7 +54,7 @@ const reactionAnalysisToOrdAnalysis = ({
   data,
   instrumentLastCalibrated,
   ...rest
-}: AppReactionAnalysis): ord.IAnalysis =>
+}: ReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
     type: reactionAnalysisTypeToOrd(type),
     data: reactionDataMapToOrdDataMap(data),
@@ -63,36 +62,15 @@ const reactionAnalysisToOrdAnalysis = ({
     ...rest,
   });
 
-const ordProductToReactionProduct = ({
-  reactionRole,
-  identifiers,
-  ...rest
-}: ord.IProductCompound): AppReactionProduct => {
-  return withId({
-    reactionRole: ordReactionRoleToReaction(reactionRole),
-    identifiers: (identifiers || []).map(ordCompoundIdentifierToReactionCompoundIdentifier),
-    ...rest,
-  });
-};
-
-const reactionProductToOrdProduct = ({
-  reactionRole,
-  identifiers,
-  ...rest
-}: AppReactionProduct): ord.IProductCompound => {
-  return withoutId({
-    reactionRole: reactionReactionRoleToOrd(reactionRole),
-    identifiers: identifiers.map(reactionCompoundIdentifierToOrdCompoundIdentifier),
-    ...rest,
-  });
-};
-
 export const ordOutcomeToReactionOutcome = ({
+  reactionTime,
+  conversion,
   analyses,
   products,
-  ...rest
-}: ord.IReactionOutcome): AppReactionOutcome =>
+}: ord.IReactionOutcome): ReactionOutcome =>
   withId({
+    reactionTime: ordTimeToReaction(reactionTime),
+    conversion,
     analyses: Object.entries(analyses || {}).reduce((acc, [name, value]) => {
       const analysis = ordAnalysisToReactionAnalysis(value, name);
       return {
@@ -100,35 +78,35 @@ export const ordOutcomeToReactionOutcome = ({
         [analysis.id]: analysis,
       };
     }, {}),
-    products: (products || []).map(ordProductToReactionProduct),
-    ...rest,
+    products: (products || []).map(ordProductToReaction),
   });
 
 export const reactionOutcomeToOrdOutcome = ({
+  reactionTime,
+  conversion,
   analyses,
   products,
-  ...rest
-}: AppReactionOutcome): ord.IReactionOutcome =>
-  withoutId({
-    analyses: Object.values(analyses || {}).reduce(
-      (acc, value) => ({
-        ...acc,
-        [value.name]: reactionAnalysisToOrdAnalysis(value),
-      }),
-      {},
-    ),
-    products: products.map(reactionProductToOrdProduct),
-    ...rest,
-  });
+}: ReactionOutcome): ord.IReactionOutcome => ({
+  reactionTime: reactionTimeToOrd(reactionTime),
+  conversion,
+  analyses: Object.values(analyses || {}).reduce(
+    (acc, value) => ({
+      ...acc,
+      [value.name]: reactionAnalysisToOrdAnalysis(value),
+    }),
+    {},
+  ),
+  products: products.map(reactionProductToOrd),
+});
 
 export const ordOutcomesListToReactionOutcomesList = (
   outcomes: Array<ord.IReactionOutcome>,
-): Array<AppReactionOutcome> => {
+): Array<ReactionOutcome> => {
   return outcomes.map(ordOutcomeToReactionOutcome);
 };
 
 export const reactionOutcomesListToOrdOutcomesList = (
-  outcomes: Array<AppReactionOutcome>,
+  outcomes: Array<ReactionOutcome>,
 ): Array<ord.IReactionOutcome> => {
   return outcomes.map(reactionOutcomeToOrdOutcome);
 };

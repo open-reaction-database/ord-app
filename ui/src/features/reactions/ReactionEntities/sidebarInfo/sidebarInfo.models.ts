@@ -18,14 +18,31 @@ import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/R
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type {
-  AppReactionCompound,
-  AppReactionInput,
-} from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type {
-  AppReactionAnalysis,
-  AppReactionOutcome,
+  ReactionAnalysis,
+  ReactionOutcome,
 } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type {
+  ReactionInputComponent,
+  ReactionProduct,
+} from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+
+type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
+
+const featureSidebarInfo: SidebarInfoPathLess = {
+  entityName: ReactionEntity.Data,
+  label: 'Features',
+  sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
+  useInitialValues: buildUseInitialValues(value => value),
+};
+
+const componentIdentifiersSidebarInfo: SidebarInfoPathLess = {
+  entityName: ReactionEntity.ComponentIdentifiers,
+  label: 'Identifiers',
+  sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
+  useInitialValues: buildUseInitialValues(value => value),
+};
 
 export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   {
@@ -52,7 +69,8 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     label: 'Component',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: false }),
     useInitialValues: buildUseInitialValues(
-      ({ identifiers: _i, molBlockIdentifiers: _m, ...rest }: AppReactionCompound) => rest,
+      ({ identifiers: _i, molBlockIdentifiers: _m, features: _f, preparations: _p, ...rest }: ReactionInputComponent) =>
+        rest,
     ),
   },
   {
@@ -75,31 +93,33 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   },
   {
     pathComponents: ['features', 'components', 'inputs'],
-    entityName: ReactionEntity.Data,
-    label: 'Features',
-    sidebarTitle: createReactionEntityTitle({ entityName: 'Features', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(value => value),
+    ...featureSidebarInfo,
+  },
+  {
+    pathComponents: ['features', 'products', 'outcomes'],
+    ...featureSidebarInfo,
   },
   {
     pathComponents: ['identifiers', 'components', 'inputs'],
-    entityName: ReactionEntity.ComponentIdentifiers,
-    label: 'Identifiers',
-    sidebarTitle: createReactionEntityTitle({ entityName: 'Identifier', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(value => value),
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
+    pathComponents: ['identifiers', 'products', 'outcomes'],
+    ...componentIdentifiersSidebarInfo,
   },
   {
     pathComponents: ['outcomes'],
     entityName: ReactionEntity.Outcomes,
     label: 'Outcomes',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Outcome', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(({ analyses: _a, products: _p, ...rest }: AppReactionOutcome) => rest),
+    useInitialValues: buildUseInitialValues(({ analyses: _a, products: _p, ...rest }: ReactionOutcome) => rest),
   },
   {
     pathComponents: ['analyses', 'outcomes'],
     entityName: ReactionEntity.Analyses,
     label: 'Analyses',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Analysis', hasDelete: true }),
-    useInitialValues: buildUseInitialValues(({ data: _, ...rest }: AppReactionAnalysis) => rest),
+    useInitialValues: buildUseInitialValues(({ data: _, ...rest }: ReactionAnalysis) => rest),
   },
   {
     pathComponents: ['data', 'analyses', 'outcomes'],
@@ -107,6 +127,15 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     label: 'Analytical Data',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Analytical Data', hasDelete: true }),
     useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
+    pathComponents: ['products', 'outcomes'],
+    entityName: ReactionEntity.Products,
+    label: 'Products',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Product', hasDelete: true }),
+    useInitialValues: buildUseInitialValues(
+      ({ measurements: _m, identifiers: _i, molBlockIdentifiers: _, ...value }: ReactionProduct) => value,
+    ),
   },
 ];
 

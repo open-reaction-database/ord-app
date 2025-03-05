@@ -16,15 +16,17 @@
 import { Button, Flex, Paper, Title } from '@mantine/core';
 import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, DotsIcon, DownloadIcon } from 'common/icons';
+import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import classes from './ReactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
+import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 
 interface DescriptorsListProps {
   title: string;
@@ -66,9 +68,14 @@ interface ReactionCardProps {
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
   const reaction = useSelector(selectReactionById(id));
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  const onPreviewSave = useCallback(() => {
+    copyPreviewAsImage(previewRef.current);
+  }, [previewRef]);
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    { label: 'Copy Reaction Link', value: `${window.location.href}/reaction/${id}` },
+    { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
     { label: 'Copy Reaction ID', value: id.toString() },
   ];
 
@@ -102,14 +109,23 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
         </div>
         <Flex
           align="flex-start"
-          direction="column"
+          justify="flex-end"
           className={classes.buttonContainer}
         >
+          <RemoveReaction reactionId={id} />
           <Button
-            leftSection={<CheckListIcon />}
+            leftSection={<CheckListIcon className={classes.buttonIcon} />}
             variant="transparent"
           >
             Save as a Template
+          </Button>
+
+          <Button
+            onClick={onPreviewSave}
+            variant="transparent"
+            leftSection={<CopyImageIcon className={classes.buttonIcon} />}
+          >
+            Copy reaction image
           </Button>
 
           <DownloadMenu
@@ -126,16 +142,12 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
               </Button>
             }
           />
-
-          <Button
-            leftSection={<DotsIcon />}
-            variant="transparent"
-          >
-            More
-          </Button>
         </Flex>
       </div>
-      <ReactionPreview reaction={reaction} />
+      <ReactionPreview
+        reaction={reaction}
+        ref={previewRef}
+      />
       <DescriptorsList
         title="Summary"
         items={reaction.summary.summary}

@@ -22,7 +22,7 @@ export function buildUseInitialValues<Result extends object, Input extends Resul
   filterInitialValues: (values: Input) => Result,
 ) {
   return function useInitialValues(reactionId: number, pathComponents: ReactionPathComponents) {
-    const reactionPart = useSelector(selectReactionPartByPath(reactionId, pathComponents));
+    const { id: _, ...reactionPart } = useSelector(selectReactionPartByPath(reactionId, pathComponents));
 
     return useMemo((): object => {
       return structuredClone(filterInitialValues(reactionPart));
