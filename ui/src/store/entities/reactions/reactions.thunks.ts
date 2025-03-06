@@ -41,7 +41,7 @@ import { showNotification } from 'common/utils/showNotification.tsx';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
   const inputsArray = Object.values(reaction.inputs);
   const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
     (acc: PreviewsById, [inputName, input]) => ({

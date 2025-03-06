@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import { AppShell, Flex } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from './ORDLogo.png';
@@ -23,9 +23,10 @@ import type { Breadcrumb } from 'common/types/breadcrumbs';
 
 interface PageContainerProps extends PropsWithChildren {
   breadcrumbs: Array<Breadcrumb>;
+  badge?: ReactNode;
 }
 
-export function PageContainer({ children, breadcrumbs }: Readonly<PageContainerProps>) {
+export function PageContainer({ children, breadcrumbs, badge }: Readonly<PageContainerProps>) {
   return (
     <AppShell
       classNames={{
@@ -49,7 +50,10 @@ export function PageContainer({ children, breadcrumbs }: Readonly<PageContainerP
           direction="column"
           className={classes.content}
         >
-          <Breadcrumbs items={breadcrumbs} />
+          <Flex direction="row">
+            <Breadcrumbs items={breadcrumbs} />
+            {badge}
+          </Flex>
           {children}
         </Flex>
       </AppShell.Main>

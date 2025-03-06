@@ -13,27 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tabTitle {
-  color: var(--color-text-secondary-3);
-  text-transform: uppercase;
-  font-weight: 500;
+import { createActionFactory } from 'store/utils';
+import type { TemplateCreator, Template, TemplateWrapper } from './templates.types.ts';
 
-  &[data-active] {
-    color: var(--color-text-primary);
-  }
-}
+const { createAsyncAction } = createActionFactory('templates');
 
-.panel {
-  padding: 20px 20px 0;
-}
+export const getTemplateActions = createAsyncAction<number, TemplateWrapper>('get');
 
-.checkIcon {
-  margin-right: 8px;
-}
+export const createNewTemplateActions = createAsyncAction<TemplateCreator, Template>('create');
 
-.validationBadge {
-  height: auto;
-  padding: 2px 8px;
-  border-color: var(--color-border-2);
-  color: var(--color-text-primary);
-}
+export const removeTemplateActions = createAsyncAction<number, number>('remove_template');

@@ -40,3 +40,4 @@ export { default as SettingsIcon } from './SettingsIcon.svg?react';
 export { default as SignOutIcon } from './SignOutIcon.svg?react';
 export { default as StylusNoteIcon } from './StylusNoteIcon.svg?react';
 export { default as UploadProgressIcon } from './UploadProgressIcon.svg?react';
+export { default as EnumerateIcon } from './EnumerateIcon.svg?react';

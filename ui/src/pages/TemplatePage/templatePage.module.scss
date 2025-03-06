@@ -31,7 +31,13 @@
   margin-right: 8px;
 }
 
-.validationBadge {
+.templateBadge {
+  align-self: center;
+  background-color: var(--color-background-dark-gray);
+  margin-left: 8px;
+}
+
+.enumerationBadge {
   height: auto;
   padding: 2px 8px;
   border-color: var(--color-border-2);

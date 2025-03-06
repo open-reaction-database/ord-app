@@ -41,6 +41,7 @@ export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' |
 export interface ReactionResponse {
   id: number;
   pb_reaction_id: string;
+  is_valid: boolean;
   summary: ReactionSummary;
   binpb: string;
   molblocks: ReactionMolBlocks;

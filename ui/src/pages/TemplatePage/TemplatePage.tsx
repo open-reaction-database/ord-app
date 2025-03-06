@@ -1,0 +1,106 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { useParams } from 'wouter';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { useEffect, useMemo } from 'react';
+import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
+import { Badge, Flex, Paper } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import classes from './templatePage.module.scss';
+import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
+import { getTemplate } from 'store/entities/templates/templates.thunks';
+import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
+
+export function TemplatePage() {
+  const dispatch = useAppDispatch();
+  const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
+  const templateId = parseInt(rawTemplateId);
+  const template = useSelector(selectTemplateById(templateId));
+
+  const breadcrumbs = useMemo((): Breadcrumbs => {
+    return [
+      { title: 'Templates', path: '~/' },
+      {
+        path: `~/templates/${templateId}`,
+        title: template?.name ?? templateId.toString(),
+      },
+    ];
+  }, [templateId, template?.name]);
+
+  useEffect(() => {
+    dispatch(getTemplate(templateId));
+  }, [dispatch, templateId]);
+
+  const contextValue = useMemo(
+    () => ({
+      reactionId: templateId,
+      pathComponents: [],
+    }),
+    [templateId],
+  );
+  const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
+  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
+  const variables = template?.variables ?? '[]';
+  const isReadyForEnumeration = variables.length > 0;
+  const templateBadge = (
+    <Badge
+      autoContrast
+      className={classes.templateBadge}
+    >
+      Template
+    </Badge>
+  );
+
+  return (
+    <PageContainer
+      breadcrumbs={breadcrumbs}
+      badge={templateBadge}
+    >
+      <reactionEntityContext.Provider value={contextValue}>
+        {template && (
+          <Flex
+            direction="column"
+            gap="sm"
+            miw={50}
+          >
+            <Badge
+              variant="outline"
+              size="lg"
+              radius="md"
+              leftSection={!isReadyForEnumeration ? CheckIcon : CrossIcon}
+              className={classes.enumerationBadge}
+            >
+              {!isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
+            </Badge>
+            <TemplateHeader
+              isReadyForEnumeration={!isReadyForEnumeration}
+              templateId={templateId}
+            />
+            <Paper
+              radius="md"
+              p="lg"
+            ></Paper>
+            <ReactionDetailsSidebar reactionId={templateId} />
+          </Flex>
+        )}
+      </reactionEntityContext.Provider>
+    </PageContainer>
+  );
+}

@@ -14,50 +14,46 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon } from 'common/icons';
+import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
-import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
+import { domain } from 'common/constants.ts';
 import { typographyClasses } from 'common/styling';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
+import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
 
-interface ReactionHeaderProps {
-  datasetId: number;
-  reactionId: number;
+interface TemplateHeaderProps {
+  templateId: number;
+  isReadyForEnumeration: boolean;
 }
 
-export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
+export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
+  const template = useSelector(selectTemplateById(templateId));
   const [opened, { open, close }] = useDisclosure();
-  const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
 
-  const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
+  const hasReactionDefaultId = template.name === template.id.toString();
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: ['reactionId'], newValue: name }));
+      dispatch(addUpdateReactionField({ reactionId: templateId, pathComponents: ['reactionId'], newValue: name }));
     },
-    [dispatch, reactionId],
+    [dispatch, templateId],
   );
 
   const copyOptions = useMemo(
     () => [
-      { label: 'Copy Reaction Link', value: `${domain}${location}` },
-      { label: 'Copy Reaction ID', value: reactionId.toString() },
+      { label: 'Copy Template Link', value: `${domain}${location}` },
+      { label: 'Copy Template ID', value: templateId.toString() },
     ],
-    [reactionId, location],
+    [templateId, location],
   );
 
   return (
@@ -65,13 +61,6 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
       radius="md"
       p="lg"
     >
-      {saveAsTemplateOpened && (
-        <SaveAsTemplate
-          reactionId={reactionId}
-          reactionPbId={reaction.pb_reaction_id}
-          onClose={closeSaveAsTemplate}
-        />
-      )}
       <Flex
         direction="column"
         gap="sm"
@@ -86,10 +75,10 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
                 className={typographyClasses.secondary1}
                 order={2}
               >
-                Reaction
+                Template
               </Title>
             )}
-            <Title order={2}>{reaction.pb_reaction_id}</Title>
+            <Title order={2}>{template.name}</Title>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="transparent">
               <EditIcon onClick={open} />
@@ -99,39 +88,37 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             align="center"
             gap="sm"
           >
-            <RemoveReaction reactionId={reactionId} />
+            <RemoveReaction reactionId={templateId} />
             <Button
               variant="transparent"
-              leftSection={<CheckListIcon />}
-              onClick={openSaveAsTemplate}
+              leftSection={<EnumerateIcon />}
+              disabled={!isReadyForEnumeration}
             >
-              Save as Template
+              Enumerate
             </Button>
-            <DownloadMenu
-              options={fileDownloadOptions}
-              url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
-              target={
-                <Button
-                  leftSection={<DownloadIcon />}
-                  rightSection={<ChevronDownIcon />}
-                  variant="transparent"
-                >
-                  Download Reaction
-                </Button>
-              }
-            />
-            <Button>Save</Button>
+            <Button
+              leftSection={<DownloadIcon />}
+              variant="transparent"
+              disabled={!isReadyForEnumeration}
+            >
+              Download Variables in CSV
+            </Button>
+            <Button
+              leftSection={<DownloadIcon />}
+              variant="transparent"
+            >
+              Download Template in JSON
+            </Button>
           </Flex>
         </Flex>
-        <ReactionPreview reaction={reaction} />
       </Flex>
       <InputModal
         opened={opened}
         onClose={close}
         onSubmit={onReactionNameChange}
-        title="Edit Reaction ID"
-        inputLabel="Reaction ID"
-        initialValue={reaction.pb_reaction_id}
+        title="Edit Template ID"
+        inputLabel="Template ID"
+        initialValue={template.name}
       />
     </Paper>
   );
