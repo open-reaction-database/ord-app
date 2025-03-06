@@ -37,14 +37,24 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
         await self.db.execute(update(ReactionModel), values)
         await self.db.commit()
 
-    async def stream_reactions(self, chunk_size: int = 10, **filters):
-        stmt = select(ReactionModel).where(*self._get_filter_stmt(filters))
-        scalars = await self.db.stream_scalars(stmt)
+    async def stream_reactions(self, chunk_size: int = 1000, dataset_id: int | None = None):
+        last_id = None
         while True:
-            chunk = await scalars.fetchmany(chunk_size)
-            if not chunk:
+            stmt = (
+                select(ReactionModel)
+                .where(
+                    ReactionModel.id > last_id if last_id is not None else True,
+                    ReactionModel.dataset_id == dataset_id if dataset_id is not None else True,
+                    ReactionModel.is_valid.is_(None),
+                )
+                .order_by(ReactionModel.id)
+                .limit(chunk_size)
+            )
+            reactions = (await self.db.scalars(stmt)).all()
+            if not reactions:
                 break
-            yield chunk
+            yield reactions
+            last_id = reactions[-1].id
 
     async def create(self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True):
         reaction = ReactionModel(owner_id=user_id, dataset_id=dataset_id, **payload)

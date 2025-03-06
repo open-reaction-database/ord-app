@@ -79,9 +79,9 @@ async def upload_dataset(
     background_tasks: BackgroundTasks
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
-    response = await use_case.upload(group_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db)
-    return response
+    dataset = await use_case.upload(group_id, file_data, kind)
+    background_tasks.add_task(validate_reactions_task, db, dataset.id)
+    return dataset
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])

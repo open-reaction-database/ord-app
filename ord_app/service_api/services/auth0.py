@@ -15,6 +15,7 @@ import jwt
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
+from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.services.exceptions import UnauthenticatedError, UnauthorizedError
 from ord_app.service_api.settings import RuntimeSettings
@@ -22,8 +23,8 @@ from ord_app.service_api.settings import RuntimeSettings
 jwks_client = jwt.PyJWKClient(f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json")
 
 
-def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
-    return _verify_token(
+async def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
+    return await _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,
         audience=RuntimeSettings.auth0_audience,
@@ -31,8 +32,8 @@ def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer
     )
 
 
-def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
-    return _verify_token(
+async def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
+    return await _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,
         audience=RuntimeSettings.auth0_client_id,
@@ -40,13 +41,13 @@ def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
     )
 
 
-def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
+async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
     if token is None:
         logger.error("token is missing")
         raise UnauthenticatedError
 
     try:
-        signing_key = jwks_client.get_signing_key_from_jwt(token.credentials).key
+        signing_key = (await run_in_threadpool(jwks_client.get_signing_key_from_jwt, token.credentials)).key
     except jwt.exceptions.PyJWKClientError as error:
         logger.error(error)
         raise UnauthorizedError(str(error)) from error
