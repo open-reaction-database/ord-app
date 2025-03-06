@@ -15,7 +15,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from ord_app.service_api.settings import RuntimeSettings
 
-pg_engine = create_async_engine(RuntimeSettings.pg_dsn)
+pg_engine = create_async_engine(
+    RuntimeSettings.pg_dsn,
+    pool_size=10,
+    max_overflow=20,
+    pool_timeout=30,
+    pool_recycle=1800,
+)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
 
 

@@ -24,6 +24,7 @@ import { reactionComponentIdentifiers } from './componentIdentifier/reactionComp
 import { reactionOutcomes } from './outcomes/reactionOutcomes.models.ts';
 import { reactionAnalyses } from './outcomes/reactionAnalyses.models.ts';
 import { reactionProducts } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionProducts.model.ts';
+import { reactionMeasurements } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.model.ts';
 
 export enum ReactionEntity {
   Inputs = 'inputs',
@@ -36,6 +37,7 @@ export enum ReactionEntity {
   Outcomes = 'outcomes',
   Analyses = 'analyses',
   Products = 'products',
+  Measurements = 'measurements',
 }
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
@@ -49,4 +51,5 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Outcomes]: reactionOutcomes,
   [ReactionEntity.Analyses]: reactionAnalyses,
   [ReactionEntity.Products]: reactionProducts,
+  [ReactionEntity.Measurements]: reactionMeasurements,
 };

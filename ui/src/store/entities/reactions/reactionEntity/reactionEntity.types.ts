@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 import type {
+  CompoundIdentifierType,
   ReactionAdditionDeviceType,
   ReactionFlowRateType,
   ReactionIdentifierType,
+  ReactionMassSpecType,
+  ReactionSelectivityType,
   ReactionSpeedType,
   ReactionTemperatureType,
   ReactionTextureType,
   ReactionTimeType,
+  ReactionWaveLengthType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+import type { ord } from 'ord-schema-protobufjs';
 
 export interface ReactionEntity {
   id: string;
@@ -87,3 +92,16 @@ export type ReactionIdentifier = WithId<{
   value: Optional<string>;
   details: Optional<string>;
 }>;
+
+export type ReactionSelectivity = ReactionTypeDetails<ReactionSelectivityType>;
+
+export type ReactionWaveLength = ReactionValuePrecisionUnit<ReactionWaveLengthType>;
+
+export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementDetails, 'type' | 'eicMasses'> & {
+  type: ReactionMassSpecType;
+  eicMasses: Array<number>;
+};
+
+export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIdentifier, 'type'>> {
+  type: CompoundIdentifierType;
+}

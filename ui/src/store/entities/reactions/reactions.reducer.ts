@@ -35,6 +35,7 @@ import {
   removeDeepReactionPart,
 } from './reactions.utils.ts';
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
+import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 
 const getReactionId = (reaction: ReactionWrapper) => reaction.id;
 
@@ -48,9 +49,11 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
     addUpdateReactionFieldActions.request,
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
       const reaction = state[reactionId];
-      const updatedReaction: AppReaction = deepMergeWithArrayMerge(
-        reaction.data,
-        generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
+      const updatedReaction: AppReaction = linkReactionEntities(
+        deepMergeWithArrayMerge(
+          reaction.data,
+          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
+        ),
       );
       return {
         ...state,
@@ -74,7 +77,7 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
   });
   builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
     const reaction = state[reactionId];
-    const updatedReaction: AppReaction = removeDeepReactionPart(reaction.data, pathComponents);
+    const updatedReaction: AppReaction = linkReactionEntities(removeDeepReactionPart(reaction.data, pathComponents));
     return {
       ...state,
       [reactionId]: {
@@ -96,12 +99,18 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
     ),
     (state, action) => ({
       ...state,
-      [getReactionId(action.payload)]: action.payload,
+      [getReactionId(action.payload)]: {
+        ...action.payload,
+        data: linkReactionEntities(action.payload.data),
+      },
     }),
   );
   builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (state, action) => ({
     ...state,
-    ...itemsById(action.payload.items, getReactionId),
+    ...itemsById(
+      action.payload.items.map(item => ({ ...item, data: linkReactionEntities(item.data) })),
+      getReactionId,
+    ),
   }));
 });
 

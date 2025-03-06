@@ -23,6 +23,7 @@ from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
 from ord_schema.proto.reaction_pb2 import DateTime, Person, Reaction, ReactionProvenance, RecordEvent
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.datasets import load_message, write_message
@@ -40,15 +41,15 @@ from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def validate_reactions_task(db: AsyncSession):
-    reaction_repo = ReactionsRepository(db)
+async def validate_reactions_task(db: AsyncSession, dataset_id: int | None = None):
 
-    async for reactions_chunk in reaction_repo.stream_reactions(chunk_size=1000):
+    reaction_repo = ReactionsRepository(db)
+    async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
-        for reaction in reactions_chunk:
-            pb_reaction = load_message(reaction.binpb, Reaction, "binpb")
+        for reaction in reactions:
+            pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
             try:
-                validation_result = validate_pb_reaction(pb_reaction)
+                validation_result = await run_in_threadpool(validate_pb_reaction, pb_reaction)
             except ValueError as err:
                 validation_result = [err], []
 
@@ -58,7 +59,13 @@ async def validate_reactions_task(db: AsyncSession):
             else:
                 update_values.append({"id": reaction.id, "is_valid": True})
 
-        await reaction_repo.bulk_update(update_values)
+        try:
+            await reaction_repo.bulk_update(update_values)
+        except Exception as err:
+            logger.error(f"Reaction bulk update failed: {err}")
+        else:
+            logger.info(f"Reaction bulk update succeeded updated {len(update_values)} reactions")
+
 
 
 class ReactionsUseCase:

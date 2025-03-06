@@ -15,15 +15,21 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import type { ReactionTime, WithId, WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  ReactionBoolean,
+  ReactionTime,
+  WithId,
+  WithIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionAnalysisType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 export interface ReactionAnalysis
-  extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated' | 'type'>> {
+  extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated' | 'type' | 'isOfIsolatedSpecies'>> {
   type: ReactionAnalysisType;
   data: Record<string, AppData>;
   instrumentLastCalibrated: string | null;
+  isOfIsolatedSpecies: ReactionBoolean;
 }
 
 export interface ReactionOutcome extends WithId<Pick<ord.IReactionOutcome, 'conversion'>> {

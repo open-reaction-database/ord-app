@@ -21,7 +21,7 @@ import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ThunkDispatch } from '@reduxjs/toolkit';
-import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
+import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 export const addIdentifierByName = createThunkWithExplicitResult(
   addIdentifierByNameActions,
