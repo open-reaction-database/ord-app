@@ -26,7 +26,7 @@ import type { AppReaction, ReactionMolBlocks } from '../reactions/reactions.type
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+const getTemplatePreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
   const inputsArray = Object.values(reaction.inputs);
   const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
     (acc: PreviewsById, [inputName, input]) => ({
@@ -63,7 +63,7 @@ const parseTemplate = ({ binpb, ...rest }: Template): TemplateWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(decodedBinpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   // TODO: addapt this to Template structure
-  const previews = getReactionPreviews(appReaction, { inputs: {}, outcomes: [] });
+  const previews = getTemplatePreviews(appReaction, { inputs: {}, outcomes: [] });
 
   return {
     ...rest,
