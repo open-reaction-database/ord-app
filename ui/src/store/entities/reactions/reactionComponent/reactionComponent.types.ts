@@ -18,11 +18,11 @@ import type {
   ReactionMeasurementType,
   ReactionRole,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
 import type {
   Optional,
   OrdOptional,
   ReactionBoolean,
+  ReactionCompoundIdentifier,
   ReactionMassSpec,
   ReactionSelectivity,
   ReactionTexture,

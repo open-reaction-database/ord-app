@@ -43,3 +43,5 @@ export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
 
 export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
+
+export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;

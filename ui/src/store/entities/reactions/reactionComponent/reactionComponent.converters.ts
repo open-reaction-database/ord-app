@@ -15,17 +15,15 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import {
-  ordCompoundIdentifierToReaction,
-  reactionCompoundIdentifierToOrd,
-} from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
-import {
   ordBooleanToReactionBoolean,
+  ordCompoundIdentifierToReaction,
   ordMassSpecToReaction,
   ordSelectivityToReaction,
   ordTextureToReaction,
   ordTimeToReaction,
   ordWaveLengthToReaction,
   reactionBooleanToOrdBoolean,
+  reactionCompoundIdentifierToOrd,
   reactionMassSpecToOrd,
   reactionSelectivityToOrd,
   reactionTextureToOrd,
@@ -60,7 +58,7 @@ import {
   type ReactionProduct,
   ReactionMeasurementValueType,
 } from './reactionComponent.types.ts';
-import type { ReactionCompoundIdentifier } from '../reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
 

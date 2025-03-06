@@ -73,3 +73,6 @@ export const { options: waveLengthTypeOptions, byValue: waveLengthTypeByValue } 
 export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = generateOptionsAndByValue(
   ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
 );
+
+export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
+  generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);

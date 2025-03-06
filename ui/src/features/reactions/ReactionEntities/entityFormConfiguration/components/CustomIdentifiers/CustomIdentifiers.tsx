@@ -37,7 +37,7 @@ import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPr
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import classes from './customIdentifiers.module.scss';
-import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
+import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
 

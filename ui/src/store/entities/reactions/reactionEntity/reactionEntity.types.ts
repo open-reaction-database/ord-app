@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import type {
+  CompoundIdentifierType,
   ReactionAdditionDeviceType,
   ReactionFlowRateType,
   ReactionIdentifierType,
@@ -100,3 +101,7 @@ export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementD
   type: ReactionMassSpecType;
   eicMasses: Array<number>;
 };
+
+export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIdentifier, 'type'>> {
+  type: CompoundIdentifierType;
+}

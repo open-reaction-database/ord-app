@@ -28,11 +28,13 @@ import {
   type OrdTypeDetails,
   type ReactionTypeDetails,
   type ReactionIdentifier,
+  type ReactionCompoundIdentifier,
   ReactionBoolean,
 } from './reactionEntity.types';
 import {
   ordAdditionDeviceTypeToReaction,
   ordAdditionSpeedTypeToReaction,
+  ordCompoundIdentifierTypeToReaction,
   ordFlowRateTypeToReaction,
   ordMassSpecTypeToReaction,
   ordReactionIdentifierTypeToReaction,
@@ -43,6 +45,7 @@ import {
   ordWaveLengthTypeToReaction,
   reactionAdditionDeviceTypeToOrd,
   reactionAdditionSpeedTypeToOrd,
+  reactionCompoundIdentifierTypeToOrd,
   reactionFlowRateTypeToOrd,
   reactionIdentifierTypeToOrd,
   reactionMassSpecTypeToOrd,
@@ -203,5 +206,22 @@ export const reactionMassSpecToOrd = ({
 }: ReactionMassSpec): ord.ProductMeasurement.IMassSpecMeasurementDetails => ({
   type: reactionMassSpecTypeToOrd(type),
   eicMasses: eicMasses.length > 0 ? eicMasses : null,
+  ...rest,
+});
+
+export const ordCompoundIdentifierToReaction = ({
+  type,
+  ...rest
+}: ord.ICompoundIdentifier): ReactionCompoundIdentifier =>
+  withId({
+    type: ordCompoundIdentifierTypeToReaction(type),
+    ...rest,
+  });
+
+export const reactionCompoundIdentifierToOrd = ({
+  type,
+  ...rest
+}: ReactionCompoundIdentifier): ord.ICompoundIdentifier => ({
+  type: reactionCompoundIdentifierTypeToOrd(type),
   ...rest,
 });
