@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
-import type { ReactionCompoundIdentifierType } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
-import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
+import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export const compoundIdentifiersNames = Object.keys(
-  ord.CompoundIdentifier.CompoundIdentifierType,
-) as Array<ReactionCompoundIdentifierType>;
-
-export const compoundIdentifiersByValue = reversePrimitiveRecord<ReactionCompoundIdentifierType, number>(
-  ord.CompoundIdentifier.CompoundIdentifierType,
-);
+export interface ReactionNotes extends Pick<ord.IReactionNotes, 'procedureDetails' | 'safetyNotes'> {
+  isHeterogeneous: ReactionBoolean;
+  formsPrecipitate: ReactionBoolean;
+  isExothermic: ReactionBoolean;
+  offgasses: ReactionBoolean;
+  isSensitiveToMoisture: ReactionBoolean;
+  isSensitiveToOxygen: ReactionBoolean;
+  isSensitiveToLight: ReactionBoolean;
+}

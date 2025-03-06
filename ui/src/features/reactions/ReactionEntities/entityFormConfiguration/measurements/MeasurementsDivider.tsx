@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import { Divider } from '@mantine/core';
 
-export type ReactionCompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
-
-export interface ReactionCompoundIdentifier extends Omit<ord.ICompoundIdentifier, 'type'> {
-  type: ReactionCompoundIdentifierType;
+export function MeasurementsDivider() {
+  return (
+    <Divider
+      orientation="horizontal"
+      mt="md"
+      mb="md"
+    />
+  );
 }

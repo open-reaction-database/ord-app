@@ -34,6 +34,7 @@ import {
   identifiersList,
   molBlockIdentifiers,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponentsBase.model.tsx';
+import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 
 const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
 
@@ -65,7 +66,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
         },
         condition: {
           name: 'reactionRole',
-          isHidden: reactionRole => (reactionRole as number) !== ord.ReactionRole.ReactionRoleType.REACTANT,
+          isHidden: reactionRole => (reactionRole as ReactionRole) !== 'REACTANT',
         },
       },
     ],

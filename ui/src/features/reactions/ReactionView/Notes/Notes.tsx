@@ -19,11 +19,13 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from 'common/styling';
+import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
@@ -37,24 +39,18 @@ const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['isSensitiveToLight', 'Light sensitive'],
 ];
 
-type ValueType = ord.IReactionNotes[keyof ord.IReactionNotes];
+type ValueType = ReactionNotes[keyof ReactionNotes];
 type NotEmptyValueType = Exclude<ValueType, null | undefined>;
-const defaultNotes: Partial<ord.IReactionNotes> = {};
-
-const booleanToUppercase = (value: NotEmptyValueType): string =>
-  typeof value === 'boolean' ? value.toString().toUpperCase() : value;
 
 export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
   const dispatch = useAppDispatch();
-  const { data: reaction } = useSelector(selectReactionById(reactionId));
+  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes']));
 
   const fields = useMemo((): Array<[string, string]> => {
-    const notes: Partial<ord.IReactionNotes> = reaction.notes ?? defaultNotes;
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
-      .filter(([, value]) => typeof value !== 'undefined' && value !== null && value !== '')
-      .map(([label, value]) => [label, booleanToUppercase(value as NotEmptyValueType)]);
-  }, [reaction.notes]);
+      .filter(([, value]) => value && value !== ReactionBoolean.Unspecified) as Array<[string, NotEmptyValueType]>;
+  }, [notes]);
 
   const onEdit = () => {
     dispatch(setReactionPathComponentsList([['notes']]));

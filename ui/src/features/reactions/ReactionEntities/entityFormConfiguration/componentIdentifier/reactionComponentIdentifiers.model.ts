@@ -17,12 +17,14 @@ import {
   ReactionFormNodeType,
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { compoundIdentifiersNames } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.models.ts';
+import { compoundIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+
+const typeOptionsWithoutMolBlock = compoundIdentifierTypeOptions.filter(item => item !== 'MOLBLOCK');
 
 export const reactionComponentIdentifiers: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.select,
-    options: compoundIdentifiersNames,
+    options: typeOptionsWithoutMolBlock,
     name: 'type',
     selectType: 'dropdown',
     wrapperConfig: {

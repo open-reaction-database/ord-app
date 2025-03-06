@@ -76,6 +76,10 @@
   width: 100%;
 }
 
+.identifierType {
+  text-wrap: nowrap;
+}
+
 .identifierValue {
   overflow: hidden;
   text-overflow: ellipsis;

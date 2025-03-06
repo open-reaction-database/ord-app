@@ -68,7 +68,7 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
             gap="xs"
             key={identifier.value}
           >
-            <Text className={typographyClasses.secondary2}>{identifier.type}:</Text>
+            <Text className={clsx(typographyClasses.secondary2, classes.identifierType)}>{identifier.type}:</Text>
             <Tooltip label={identifier.value}>
               <Text className={classes.identifierValue}>{identifier.value}</Text>
             </Tooltip>

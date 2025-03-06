@@ -61,3 +61,18 @@ export const { options: reactionIdentifierTypeOptions, byValue: reactionIdentifi
 export const { options: measurementsTypeOptions, byValue: measurementTypeByValue } = generateOptionsAndByValue(
   ord.ProductMeasurement.ProductMeasurementType,
 );
+
+export const { options: selectivityTypeOptions, byValue: selectivityTypeByValue } = generateOptionsAndByValue(
+  ord.ProductMeasurement.Selectivity.SelectivityType,
+);
+
+export const { options: waveLengthTypeOptions, byValue: waveLengthTypeByValue } = generateOptionsAndByValue(
+  ord.Wavelength.WavelengthUnit,
+);
+
+export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = generateOptionsAndByValue(
+  ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
+);
+
+export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
+  generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);

@@ -18,8 +18,18 @@ import type {
   ReactionMeasurementType,
   ReactionRole,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
-import type { ReactionTexture, WithId } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  OrdOptional,
+  ReactionBoolean,
+  ReactionCompoundIdentifier,
+  ReactionMassSpec,
+  ReactionSelectivity,
+  ReactionTexture,
+  ReactionTime,
+  ReactionWaveLength,
+  WithId,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 import type { AppReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
@@ -39,17 +49,61 @@ export interface ReactionComponentPreparation extends WithId<Omit<ord.ICompoundP
   type: CompoundPreparationType;
 }
 
-export interface ReactionInputComponent extends ReactionComponentBase, Pick<ord.ICompound, 'isLimiting' | 'source'> {
+export interface ReactionInputComponent extends ReactionComponentBase, Pick<ord.ICompound, 'source'> {
+  isLimiting: ReactionBoolean;
   amount: AppReactionAmount;
   preparations: Array<ReactionComponentPreparation>;
 }
 
-export interface ReactionMeasurement extends WithId<Omit<ord.IProductMeasurement, 'type'>> {
-  type: ReactionMeasurementType;
+export interface ReactionMeasurementAnalysis {
+  name: string;
+  id: string | null;
 }
 
-export interface ReactionProduct
-  extends ReactionComponentBase,
-    Pick<ord.IProductCompound, 'isDesiredProduct' | 'isolatedColor'> {
+export enum ReactionMeasurementValueType {
+  Percent = '%',
+  Number = 'Number',
+  String = 'String',
+  Mass = 'Mass',
+}
+
+export interface ReactionMeasurementValueNumber {
+  type: ReactionMeasurementValueType.Number | ReactionMeasurementValueType.Percent;
+  value: {
+    value: OrdOptional<number>;
+    precision: OrdOptional<number>;
+  };
+}
+
+export interface ReactionMeasurementValueString {
+  type: ReactionMeasurementValueType.String;
+  value: string;
+}
+
+export interface ReactionMeasurementValueMass {
+  type: ReactionMeasurementValueType.Mass;
+  value: AppReactionAmount;
+}
+
+export type ReactionMeasurementValue =
+  | ReactionMeasurementValueNumber
+  | ReactionMeasurementValueString
+  | ReactionMeasurementValueMass;
+
+export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement, 'details'>> {
+  analysis: Optional<ReactionMeasurementAnalysis>;
+  type: ReactionMeasurementType;
+  value: ReactionMeasurementValue;
+  usesAuthenticStandard: ReactionBoolean;
+  usesInternalStandard: ReactionBoolean;
+  isNormalized: ReactionBoolean;
+  retentionTime: ReactionTime;
+  selectivity: ReactionSelectivity;
+  waveLength: ReactionWaveLength;
+  massSpecDetails: ReactionMassSpec;
+}
+
+export interface ReactionProduct extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {
+  isDesiredProduct: ReactionBoolean;
   measurements: Array<ReactionMeasurement>;
 }

@@ -20,7 +20,9 @@ import {
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
+  ordBooleanToReactionBoolean,
   ordTimeToReaction,
+  reactionBooleanToOrdBoolean,
   reactionTimeToOrd,
   withId,
   withIdName,
@@ -34,9 +36,10 @@ import {
   ordProductToReaction,
   reactionProductToOrd,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import { itemsById } from 'common/utils';
 
 export const ordAnalysisToReactionAnalysis = (
-  { type, data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
+  { type, data, instrumentLastCalibrated, isOfIsolatedSpecies, ...rest }: ord.IAnalysis,
   name: string,
 ): ReactionAnalysis =>
   withIdName(
@@ -44,6 +47,7 @@ export const ordAnalysisToReactionAnalysis = (
       type: ordAnalysisTypeToReaction(type),
       data: ordDataMapToReactionDataMap(data || {}),
       instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
+      isOfIsolatedSpecies: ordBooleanToReactionBoolean(isOfIsolatedSpecies),
       ...rest,
     },
     name,
@@ -53,12 +57,14 @@ const reactionAnalysisToOrdAnalysis = ({
   type,
   data,
   instrumentLastCalibrated,
+  isOfIsolatedSpecies,
   ...rest
 }: ReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
     type: reactionAnalysisTypeToOrd(type),
     data: reactionDataMapToOrdDataMap(data),
     instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
+    isOfIsolatedSpecies: reactionBooleanToOrdBoolean(isOfIsolatedSpecies),
     ...rest,
   });
 
@@ -109,4 +115,25 @@ export const reactionOutcomesListToOrdOutcomesList = (
   outcomes: Array<ReactionOutcome>,
 ): Array<ord.IReactionOutcome> => {
   return outcomes.map(reactionOutcomeToOrdOutcome);
+};
+
+export const linkReactionOutcome = (outcome: ReactionOutcome): ReactionOutcome => {
+  const analysesById = outcome.analyses;
+  const analysesByNames = itemsById(Object.values(outcome.analyses), item => item.name);
+
+  return {
+    ...outcome,
+    products: outcome.products.map(product => ({
+      ...product,
+      measurements: product.measurements.map(measurement => {
+        const updatedMeasurement = { ...measurement };
+        if (updatedMeasurement.analysis) {
+          const { name, id } = updatedMeasurement.analysis;
+          const analysis = (id ? analysesById[id] : analysesByNames[name]) ?? null;
+          updatedMeasurement.analysis = analysis ? { name: analysis.name, id: analysis.id } : null;
+        }
+        return updatedMeasurement;
+      }),
+    })),
+  };
 };

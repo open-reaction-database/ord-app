@@ -29,6 +29,12 @@ import {
   molBlockIdentifiers,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponentsBase.model.tsx';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
+import type { ReactionMeasurement } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
+import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
+import { ord } from 'ord-schema-protobufjs';
+import { ordMeasurementToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export const reactionProducts: Array<ReactionFormNode> = [
   {
@@ -62,6 +68,35 @@ export const reactionProducts: Array<ReactionFormNode> = [
   },
   molBlockIdentifiers,
   identifiersList,
+  {
+    type: ReactionFormNodeType.list,
+    title: {
+      label: 'Measurements',
+    },
+    getKey: (_: ReactionMeasurement, index) => index,
+    useSelectItems: buildUseSelectItems('measurements'),
+    ItemDisplay: createEntityListItemComponent<ReactionMeasurement>({
+      entityField: 'measurements',
+      title: 'Measurement',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => item.type,
+        },
+        {
+          label: 'Based on',
+          render: item => item.analysis?.name,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Measurement',
+      useCreate: buildUseCreate('measurements', index => {
+        const newMeasurement = ordMeasurementToReaction(ord.ProductMeasurement.toObject(new ord.ProductMeasurement()));
+        return [index, newMeasurement];
+      }),
+    },
+  },
   featuresList,
   {
     type: ReactionFormNodeType.block,

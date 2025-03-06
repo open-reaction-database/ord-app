@@ -34,18 +34,7 @@ function AppDataFileDisplay({ appData }: Readonly<AppDataDisplayProps>) {
 
 export function AppDataDisplay({ appData }: Readonly<AppDataDisplayProps>) {
   switch (appData.data.type) {
-    case AppDataType.Url: {
-      const url = (appData.data.value as string) || '';
-      return (
-        <a
-          target="_blank"
-          href={url}
-          rel="noreferrer"
-        >
-          {url}
-        </a>
-      );
-    }
+    case AppDataType.Url:
     case AppDataType.Text:
     case AppDataType.Number:
       return <span>{appData.data.value}</span>;

@@ -63,7 +63,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
           fields: [
             {
               type: ReactionFormNodeType.value,
-              name: 'value',
+              name: 'conversion.value',
               inputType: 'number',
               inputConfig: {
                 placeholder: 'Value',
@@ -71,7 +71,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
             },
             {
               type: ReactionFormNodeType.value,
-              name: 'precision',
+              name: 'conversion.precision',
               inputType: 'number',
               inputConfig: {
                 leftSection: '±',

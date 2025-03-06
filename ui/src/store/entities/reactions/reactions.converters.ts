@@ -20,6 +20,7 @@ import {
   reactionInputsToOrdInputs,
 } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import {
+  linkReactionOutcome,
   ordOutcomesListToReactionOutcomesList,
   reactionOutcomesListToOrdOutcomesList,
 } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
@@ -27,6 +28,10 @@ import {
   ordReactionIdentifierToReaction,
   reactionIdentifierToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import {
+  ordNotesToReaction,
+  reactionNotesToOrd,
+} from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -34,6 +39,7 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
     inputs: ordInputsToReactionInputs(reaction.inputs),
     outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
     identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
+    notes: ordNotesToReaction(reaction.notes),
   };
 }
 
@@ -43,5 +49,13 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     inputs: reactionInputsToOrdInputs(reaction.inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
     identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
+    notes: reactionNotesToOrd(reaction.notes),
+  };
+}
+
+export function linkReactionEntities(reaction: AppReaction): AppReaction {
+  return {
+    ...reaction,
+    outcomes: reaction.outcomes.map(linkReactionOutcome),
   };
 }

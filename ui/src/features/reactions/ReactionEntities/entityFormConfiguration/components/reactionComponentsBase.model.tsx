@@ -22,7 +22,6 @@ import {
   buildUseSelectItemsListFromMap,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { CustomIdentifiers } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/CustomIdentifiers.tsx';
@@ -32,6 +31,8 @@ import {
   createReactionDataAddItem,
   reactionDataDisplay,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 export const molBlockIdentifiers: ReactionFormNode = {
   type: ReactionFormNodeType.custom,
@@ -63,7 +64,7 @@ export const identifiersList: ReactionFormNode = {
   addItem: {
     label: 'Identifier',
     useCreate: buildUseCreate('identifiers', index => {
-      const emptyItem = ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier());
+      const emptyItem = ordCompoundIdentifierToReaction(ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier()));
       return [index, emptyItem];
     }),
   },
