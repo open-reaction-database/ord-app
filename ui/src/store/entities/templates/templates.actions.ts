@@ -18,7 +18,7 @@ import type { TemplateCreator, Template, TemplateWrapper } from './templates.typ
 
 const { createAsyncAction } = createActionFactory('templates');
 
-export const getTemplateActions = createAsyncAction<{ templateId: number }, TemplateWrapper>('get');
+export const getTemplateActions = createAsyncAction<number, TemplateWrapper>('get');
 
 export const createNewTemplateActions = createAsyncAction<TemplateCreator, Template>('create');
 

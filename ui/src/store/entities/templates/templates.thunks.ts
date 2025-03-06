@@ -37,7 +37,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
   };
 };
 
-export const getTemplate = createThunk(getTemplateActions, async (_d, _s, { templateId }) => {
+export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templateId) => {
   const result = await axiosInstance.get<Template>(`/templates/${templateId}`);
   const template = parseTemplate(result.data);
   return getTemplateActions.success(template);
