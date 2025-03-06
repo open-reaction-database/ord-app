@@ -17,22 +17,28 @@ import type { ord } from 'ord-schema-protobufjs';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 export type ComponentProductPreview = string | null;
 
 export type PreviewsById = Record<string, ComponentProductPreview>;
 
+export interface Variable {
+  id: string;
+  name: string;
+  pathComponents: ReactionPathComponents;
+}
+
 export interface TemplateCreator {
   reactionId: number;
   name: string;
-  variables: string;
 }
 
 export interface Template {
   id: number;
   name: string;
   binpb: string;
-  variables: string;
+  variables: Array<Variable>;
 }
 
 export interface SaveAsTemplatePayload {

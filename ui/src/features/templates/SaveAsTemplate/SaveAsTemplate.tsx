@@ -40,16 +40,12 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
       reaction: reactionPbId,
       name: `${reactionPbId} Template`,
     },
-    transformValues: values => ({
-      reaction: values.reaction,
-      name: values.name,
-    }),
     validate: yupResolver(SaveAsTemplateSchema),
   });
 
   const onSubmit = useCallback(
     (values: SaveAsTemplateSchemaFormValues) => {
-      dispatch(createTemplate({ reactionId, name: values.name, variables: '' }));
+      dispatch(createTemplate({ reactionId, name: values.name }));
     },
     [dispatch],
   );

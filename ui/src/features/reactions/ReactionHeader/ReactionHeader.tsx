@@ -22,7 +22,7 @@ import { useCallback, useMemo } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
-import classes from 'features/reactions/ReactionHeader/reactionHeader.module.scss';
+import { typographyClasses } from 'common/styling';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
@@ -83,7 +83,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           >
             {hasReactionDefaultId && (
               <Title
-                className={classes.title}
+                className={typographyClasses.secondary1}
                 order={2}
               >
                 Reaction

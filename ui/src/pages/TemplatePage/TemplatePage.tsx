@@ -83,7 +83,7 @@ export function TemplatePage() {
   );
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
   const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
-  const isReadyForEnumeration = false;
+  const isReadyForEnumeration = template?.variables.length > 0;
   const templateBadge = (
     <Badge
       autoContrast

@@ -20,7 +20,7 @@ import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { domain } from 'common/constants.ts';
-import classes from 'features/templates/TemplateHeader/templateHeader.module.scss';
+import { typographyClasses } from 'common/styling';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
@@ -71,7 +71,7 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           >
             {hasReactionDefaultId && (
               <Title
-                className={classes.title}
+                className={typographyClasses.secondary1}
                 order={2}
               >
                 Template
