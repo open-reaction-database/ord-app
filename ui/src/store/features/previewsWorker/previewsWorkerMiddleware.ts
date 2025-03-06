@@ -18,6 +18,7 @@ import type { AppState } from 'store/configureAppStore.ts';
 import {
   addUpdateReactionFieldActions,
   getReactionActions,
+  getReactionPageActions,
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
@@ -25,7 +26,7 @@ import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/re
 
 const singleReactionActionsMatcher = isAnyOf(getReactionActions.success, addUpdateReactionFieldActions.success);
 
-const multipleReactionsActionsMatcher = isAnyOf(getReactionsListActions.success);
+const multipleReactionsActionsMatcher = isAnyOf(getReactionsListActions.success, getReactionPageActions.success);
 
 export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
   const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
