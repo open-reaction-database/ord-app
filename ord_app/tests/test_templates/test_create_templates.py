@@ -26,7 +26,7 @@ async def test_create_template(api_client, mock_authenticated_user, test_db_sess
     user, *_, = mock_authenticated_user
 
     payload = {
-        "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode(),
+        "binpb": b64encode(Reaction(reaction_id=fake.uuid4()).SerializeToString()).decode(),
         "name": fake.name(),
         "variables": {"foo": "bar"},
     }
