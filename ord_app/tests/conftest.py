@@ -52,6 +52,22 @@ async def test_db_session():
         yield session
 
 
+async def mock_validate_reactions_task(*args, **kwargs):
+    pass
+
+
+@pytest.fixture(autouse=True)
+def override_validate_reactions_task(monkeypatch):
+    monkeypatch.setattr(
+        "ord_app.service_api.resources.v1.datasets.validate_reactions_task",
+        mock_validate_reactions_task
+    )
+    monkeypatch.setattr(
+        "ord_app.service_api.resources.v1.reactions.validate_reactions_task",
+        mock_validate_reactions_task
+    )
+
+
 @pytest.fixture(autouse=True)
 async def override_engine(monkeypatch):
     monkeypatch.setattr("ord_app.service_api.services.postgresql.pg_engine", pg_engine)

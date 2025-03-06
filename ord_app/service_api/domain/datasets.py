@@ -26,6 +26,7 @@ from loguru import logger
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
@@ -82,7 +83,7 @@ class DatasetUseCases:
 
     async def upload(self, group_id: int, file_data, kind):
         try:
-            dataset_pb = load_message(file_data, Dataset, kind)
+            dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
