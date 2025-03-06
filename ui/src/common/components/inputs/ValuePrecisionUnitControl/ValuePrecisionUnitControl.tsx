@@ -33,23 +33,32 @@ interface ValuePrecisionUnitControlProps {
   select?: 'native' | 'native-inline' | 'segmented';
 }
 
+const useValuePrecisionUnitsUncontrolledValues = (
+  props: Pick<ValuePrecisionUnitControlProps, 'value' | 'defaultValue' | 'onChange'>,
+): [{ value: number | string; precision: number | string; units: string }, (value: ValuePrecisionUnit) => void] => {
+  const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled(props);
+
+  return [
+    {
+      value: uncontrolledValue?.value ?? '',
+      precision: uncontrolledValue?.precision ?? '',
+      units: uncontrolledValue?.units ?? '',
+    },
+    uncontrolledOnChange,
+  ];
+};
+
 export function ValuePrecisionUnitControl({
-  value,
-  defaultValue,
   options,
   label,
-  onChange,
   select = 'segmented',
+  ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
-  const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled({
-    value,
-    defaultValue,
-    onChange,
-  });
+  const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues(rest);
 
   const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number) => {
     const previousValue = uncontrolledValue ?? {};
-    uncontrolledOnChange({ ...previousValue, [name]: newValue });
+    uncontrolledOnChange({ ...previousValue, [name]: newValue } as ValuePrecisionUnit);
   };
 
   const unitOnChange = handleChange.bind(null, 'units');
@@ -59,19 +68,19 @@ export function ValuePrecisionUnitControl({
       <div className={clsx(classes.wrapper, { [classes.inline]: select === 'native-inline' })}>
         <InputGroup>
           <NumberInput
-            value={uncontrolledValue?.value}
+            value={uncontrolledValue.value}
             onChange={(value: string | number) => handleChange('value', value)}
             placeholder="Value"
           />
           <NumberInput
-            value={uncontrolledValue?.precision}
+            value={uncontrolledValue.precision}
             onChange={(value: string | number) => handleChange('precision', value)}
             leftSection="±"
             placeholder="Precision"
           />
           {select === 'native-inline' && (
             <AppNativeSelect
-              value={uncontrolledValue?.units}
+              value={uncontrolledValue.units}
               options={options}
               onChange={unitOnChange}
             />
@@ -79,14 +88,14 @@ export function ValuePrecisionUnitControl({
         </InputGroup>
         {select === 'native' && (
           <AppNativeSelect
-            value={uncontrolledValue?.units}
+            value={uncontrolledValue.units}
             options={options}
             onChange={unitOnChange}
           />
         )}
         {select === 'segmented' && (
           <AppSegmentedControl
-            value={uncontrolledValue?.units}
+            value={uncontrolledValue.units}
             options={options}
             onChange={unitOnChange}
             fullWidth

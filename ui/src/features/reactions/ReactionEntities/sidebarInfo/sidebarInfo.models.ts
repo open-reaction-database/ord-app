@@ -25,6 +25,7 @@ import type {
 } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type {
   ReactionInputComponent,
+  ReactionMeasurement,
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
@@ -136,6 +137,13 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(
       ({ measurements: _m, identifiers: _i, molBlockIdentifiers: _, ...value }: ReactionProduct) => value,
     ),
+  },
+  {
+    pathComponents: ['measurements', 'products', 'outcomes'],
+    entityName: ReactionEntity.Measurements,
+    label: 'Measurements',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Measurement', hasDelete: true }),
+    useInitialValues: buildUseInitialValues((value: ReactionMeasurement) => value),
   },
 ];
 

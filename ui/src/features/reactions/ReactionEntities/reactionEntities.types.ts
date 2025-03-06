@@ -32,6 +32,7 @@ export enum ReactionFormNodeType {
   data = 'data',
   date = 'date',
   custom = 'custom',
+  empty = 'empty',
 }
 
 export interface ReactionFormConditionalRendering {
@@ -126,6 +127,11 @@ export interface ReactionFormList<T = any> extends ReactionFormNodeBase {
   emptyList?: ReactNode;
 }
 
+export interface ReactionFormEmpty extends ReactionFormNodeBase {
+  type: ReactionFormNodeType.empty;
+  fields: Array<ReactionFormNode>;
+}
+
 export type ReactionFormMethods = Pick<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReturnType<typeof useForm<any>>,
@@ -154,6 +160,7 @@ export type ReactionFormNode =
   | ReactionFormList
   | ReactionFormData
   | ReactionFormDate
+  | ReactionFormEmpty
   | ReactionFormCustom;
 
 export interface ReactionEntityContext {

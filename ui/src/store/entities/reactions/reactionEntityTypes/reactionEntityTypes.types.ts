@@ -36,3 +36,10 @@ export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
 export type ReactionIdentifierType = keyof typeof ord.ReactionIdentifier.ReactionIdentifierType;
 
 export type ReactionMeasurementType = keyof typeof ord.ProductMeasurement.ProductMeasurementType;
+
+export type ReactionSelectivityType = keyof typeof ord.ProductMeasurement.Selectivity.SelectivityType;
+
+export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
+
+export type ReactionMassSpecType =
+  keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;

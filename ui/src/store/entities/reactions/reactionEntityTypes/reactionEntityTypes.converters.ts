@@ -25,6 +25,9 @@ import {
   reactionIdentifierTypeByValue,
   analysisTypeByValue,
   measurementTypeByValue,
+  selectivityTypeByValue,
+  waveLengthTypeByValue,
+  massSpecTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -79,3 +82,15 @@ export const { ordEntityToEntity: ordAnalysisTypeToReaction, entityToOrdEntity: 
 
 export const { ordEntityToEntity: ordMeasurementTypeToReaction, entityToOrdEntity: reactionMeasurementTypeToOrd } =
   generateEntityTypeToFromOrd(measurementTypeByValue, ord.ProductMeasurement.ProductMeasurementType);
+
+export const { ordEntityToEntity: ordSelectivityTypeToReaction, entityToOrdEntity: reactionSelectivityTypeToOrd } =
+  generateEntityTypeToFromOrd(selectivityTypeByValue, ord.ProductMeasurement.Selectivity.SelectivityType);
+
+export const { ordEntityToEntity: ordWaveLengthTypeToReaction, entityToOrdEntity: reactionWaveLengthTypeToOrd } =
+  generateEntityTypeToFromOrd(waveLengthTypeByValue, ord.Wavelength.WavelengthUnit);
+
+export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: reactionMassSpecTypeToOrd } =
+  generateEntityTypeToFromOrd(
+    massSpecTypeByValue,
+    ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
+  );

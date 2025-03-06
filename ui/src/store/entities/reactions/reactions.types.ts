@@ -19,6 +19,7 @@ import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -30,10 +31,11 @@ export interface ReactionMolBlocks {
   outcomes: Array<Array<ComponentProductPreview>>;
 }
 
-export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers'> {
+export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {
   inputs: Record<string, AppReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
+  notes: ReactionNotes;
 }
 
 export interface ReactionResponse {

@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export interface ValuePrecisionUnit {
-  value?: Optional<number>;
-  precision?: Optional<number>;
-  units: string;
+export interface ReactionNotes extends Pick<ord.IReactionNotes, 'procedureDetails' | 'safetyNotes'> {
+  isHeterogeneous: ReactionBoolean;
+  formsPrecipitate: ReactionBoolean;
+  isExothermic: ReactionBoolean;
+  offgasses: ReactionBoolean;
+  isSensitiveToMoisture: ReactionBoolean;
+  isSensitiveToOxygen: ReactionBoolean;
+  isSensitiveToLight: ReactionBoolean;
 }

@@ -19,8 +19,18 @@ import {
   reactionCompoundIdentifierToOrd,
 } from 'store/entities/reactions/reactionCompoundIdentifier/reactionCompoundIdentifiers.converters.ts';
 import {
+  ordBooleanToReactionBoolean,
+  ordMassSpecToReaction,
+  ordSelectivityToReaction,
   ordTextureToReaction,
+  ordTimeToReaction,
+  ordWaveLengthToReaction,
+  reactionBooleanToOrdBoolean,
+  reactionMassSpecToOrd,
+  reactionSelectivityToOrd,
   reactionTextureToOrd,
+  reactionTimeToOrd,
+  reactionWaveLengthToOrd,
   withId,
   withoutId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
@@ -40,13 +50,15 @@ import {
   ordAmountToReactionAmount,
   reactionAmountToOrdAmount,
 } from 'store/entities/reactions/reactionAmount/reactionAmount.converters.ts';
-import type {
-  OrdComponentBase,
-  ReactionComponentBase,
-  ReactionComponentPreparation,
-  ReactionInputComponent,
-  ReactionMeasurement,
-  ReactionProduct,
+import {
+  type OrdComponentBase,
+  type ReactionComponentBase,
+  type ReactionComponentPreparation,
+  type ReactionInputComponent,
+  type ReactionMeasurement,
+  type ReactionMeasurementValue,
+  type ReactionProduct,
+  ReactionMeasurementValueType,
 } from './reactionComponent.types.ts';
 import type { ReactionCompoundIdentifier } from '../reactionCompoundIdentifier/reactionCompoundIdentifiers.types.ts';
 
@@ -72,17 +84,104 @@ const reactionPreparationToOrdPreparation = ({
   });
 };
 
-const ordMeasurementToReaction = ({ type, ...rest }: ord.IProductMeasurement): ReactionMeasurement =>
-  withId({
-    type: ordMeasurementTypeToReaction(type),
-    ...rest,
-  });
+const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): ReactionMeasurementValue => {
+  if (measurement.amount) {
+    return {
+      type: ReactionMeasurementValueType.Mass,
+      value: ordAmountToReactionAmount(measurement.amount),
+    };
+  }
+  if (measurement.stringValue) {
+    return {
+      type: ReactionMeasurementValueType.String,
+      value: measurement.stringValue,
+    };
+  }
+  const isFloatingValue = !!measurement.floatValue;
+  const { value, precision } = measurement.floatValue ?? measurement.percentage ?? {};
+  return {
+    type: isFloatingValue ? ReactionMeasurementValueType.Number : ReactionMeasurementValueType.Percent,
+    value: {
+      value: value ?? null,
+      precision: precision ?? null,
+    },
+  };
+};
 
-const reactionMeasurementToOrd = ({ type, ...rest }: ReactionMeasurement): ord.IProductMeasurement =>
-  withoutId({
-    type: reactionMeasurementTypeToOrd(type),
-    ...rest,
+const reactionMeasurementValueToOrd = ({ type, value }: ReactionMeasurementValue): Partial<ord.IProductMeasurement> => {
+  switch (type) {
+    case ReactionMeasurementValueType.Mass:
+      return {
+        amount: reactionAmountToOrdAmount(value),
+      };
+    case ReactionMeasurementValueType.String:
+      return {
+        stringValue: value,
+      };
+    case ReactionMeasurementValueType.Number:
+      return {
+        floatValue: value,
+      };
+    default:
+      return {
+        percentage: value,
+      };
+  }
+};
+
+export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): ReactionMeasurement => {
+  const {
+    type,
+    details,
+    analysisKey,
+    isNormalized,
+    usesInternalStandard,
+    usesAuthenticStandard,
+    retentionTime,
+    selectivity,
+    wavelength,
+    massSpecDetails,
+  } = measurement;
+  return withId({
+    type: ordMeasurementTypeToReaction(type),
+    details,
+    value: ordMeasurementValueToReaction(measurement),
+    analysis: analysisKey ? { name: analysisKey, id: null } : null,
+    isNormalized: ordBooleanToReactionBoolean(isNormalized),
+    usesInternalStandard: ordBooleanToReactionBoolean(usesInternalStandard),
+    usesAuthenticStandard: ordBooleanToReactionBoolean(usesAuthenticStandard),
+    retentionTime: ordTimeToReaction(retentionTime),
+    selectivity: ordSelectivityToReaction(selectivity),
+    waveLength: ordWaveLengthToReaction(wavelength),
+    massSpecDetails: ordMassSpecToReaction(massSpecDetails),
   });
+};
+
+const reactionMeasurementToOrd = ({
+  type,
+  details,
+  value,
+  analysis,
+  isNormalized,
+  usesInternalStandard,
+  usesAuthenticStandard,
+  retentionTime,
+  selectivity,
+  waveLength,
+  massSpecDetails,
+}: ReactionMeasurement): ord.IProductMeasurement => ({
+  type: reactionMeasurementTypeToOrd(type),
+  details,
+  analysisKey: analysis?.name,
+  isNormalized: reactionBooleanToOrdBoolean(isNormalized),
+  usesInternalStandard: reactionBooleanToOrdBoolean(usesInternalStandard),
+  usesAuthenticStandard: reactionBooleanToOrdBoolean(usesAuthenticStandard),
+  retentionTime: reactionTimeToOrd(retentionTime),
+  selectivity: reactionSelectivityToOrd(selectivity),
+  wavelength: reactionWaveLengthToOrd(waveLength),
+  massSpecDetails: reactionMassSpecToOrd(massSpecDetails),
+  ...reactionMeasurementValueToOrd(value),
+});
 
 function ordComponentBaseToReaction({
   reactionRole,
@@ -133,7 +232,7 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
 
   return {
     ...ordComponentBaseToReaction(inputComponent),
-    isLimiting,
+    isLimiting: ordBooleanToReactionBoolean(isLimiting),
     source,
     preparations: (preparations || []).map(ordPreparationToReactionPreparation),
     amount: ordAmountToReactionAmount(amount),
@@ -144,7 +243,7 @@ export function reactionInputComponentToOrd(inputComponent: ReactionInputCompone
   const { amount, preparations, isLimiting, source } = inputComponent;
   return {
     ...reactionComponentBaseToOrd(inputComponent),
-    isLimiting,
+    isLimiting: reactionBooleanToOrdBoolean(isLimiting),
     source,
     preparations: preparations.map(reactionPreparationToOrdPreparation),
     amount: reactionAmountToOrdAmount(amount),
@@ -155,7 +254,7 @@ export function ordProductToReaction(product: ord.IProductCompound): ReactionPro
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...ordComponentBaseToReaction(product),
-    isDesiredProduct,
+    isDesiredProduct: ordBooleanToReactionBoolean(isDesiredProduct),
     isolatedColor,
     measurements: (measurements || []).map(ordMeasurementToReaction),
   };
@@ -165,7 +264,7 @@ export function reactionProductToOrd(product: ReactionProduct): ord.IProductComp
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...reactionComponentBaseToOrd(product),
-    isDesiredProduct,
+    isDesiredProduct: reactionBooleanToOrdBoolean(isDesiredProduct),
     isolatedColor,
     measurements: measurements.map(reactionMeasurementToOrd),
   };

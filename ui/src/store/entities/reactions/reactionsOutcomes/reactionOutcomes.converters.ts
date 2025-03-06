@@ -34,6 +34,7 @@ import {
   ordProductToReaction,
   reactionProductToOrd,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import { itemsById } from 'common/utils';
 
 export const ordAnalysisToReactionAnalysis = (
   { type, data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
@@ -109,4 +110,25 @@ export const reactionOutcomesListToOrdOutcomesList = (
   outcomes: Array<ReactionOutcome>,
 ): Array<ord.IReactionOutcome> => {
   return outcomes.map(reactionOutcomeToOrdOutcome);
+};
+
+export const linkReactionOutcome = (outcome: ReactionOutcome): ReactionOutcome => {
+  const analysesById = outcome.analyses;
+  const analysesByNames = itemsById(Object.values(outcome.analyses), item => item.name);
+
+  return {
+    ...outcome,
+    products: outcome.products.map(product => ({
+      ...product,
+      measurements: product.measurements.map(measurement => {
+        const updatedMeasurement = { ...measurement };
+        if (updatedMeasurement.analysis) {
+          const { name, id } = updatedMeasurement.analysis;
+          const analysis = (id ? analysesById[id] : analysesByNames[name]) ?? null;
+          updatedMeasurement.analysis = analysis ? { name: analysis.name, id: analysis.id } : null;
+        }
+        return updatedMeasurement;
+      }),
+    })),
+  };
 };

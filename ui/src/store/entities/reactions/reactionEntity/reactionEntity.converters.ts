@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {
+  type ReactionMassSpec,
   type OrdValuePrecisionUnit,
   type ReactionValuePrecisionUnit,
   type ReactionEntity,
@@ -33,17 +34,23 @@ import {
   ordAdditionDeviceTypeToReaction,
   ordAdditionSpeedTypeToReaction,
   ordFlowRateTypeToReaction,
+  ordMassSpecTypeToReaction,
   ordReactionIdentifierTypeToReaction,
+  ordSelectivityTypeToReaction,
   ordTemperatureTypeToReaction,
   ordTextureTypeToReaction,
   ordTimeTypeToReaction,
+  ordWaveLengthTypeToReaction,
   reactionAdditionDeviceTypeToOrd,
   reactionAdditionSpeedTypeToOrd,
   reactionFlowRateTypeToOrd,
   reactionIdentifierTypeToOrd,
+  reactionMassSpecTypeToOrd,
+  reactionSelectivityTypeToOrd,
   reactionTemperatureTypeToOrd,
   reactionTextureTypeToOrd,
   reactionTimeTypeToOrd,
+  reactionWaveLengthTypeToOrd,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -151,6 +158,16 @@ export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } = ge
   reactionTextureTypeToOrd,
 );
 
+export const { fromOrd: ordSelectivityToReaction, toOrd: reactionSelectivityToOrd } = generateTypeDetailsConverter(
+  ordSelectivityTypeToReaction,
+  reactionSelectivityTypeToOrd,
+);
+
+export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd } = generateValuePrecisionUnitConverter(
+  ordWaveLengthTypeToReaction,
+  reactionWaveLengthTypeToOrd,
+);
+
 export const ordReactionIdentifierToReaction = ({
   type,
   details,
@@ -167,3 +184,24 @@ export const reactionIdentifierToOrd = ({ type, ...rest }: ReactionIdentifier) =
     type: reactionIdentifierTypeToOrd(type),
     ...rest,
   });
+
+export const ordMassSpecToReaction = (
+  massSpec: OrdOptional<ord.ProductMeasurement.IMassSpecMeasurementDetails>,
+): ReactionMassSpec => {
+  const { type, eicMasses, ...rest } = massSpec ?? {};
+  return {
+    type: ordMassSpecTypeToReaction(type),
+    eicMasses: eicMasses ?? [],
+    ...rest,
+  };
+};
+
+export const reactionMassSpecToOrd = ({
+  type,
+  eicMasses,
+  ...rest
+}: ReactionMassSpec): ord.ProductMeasurement.IMassSpecMeasurementDetails => ({
+  type: reactionMassSpecTypeToOrd(type),
+  eicMasses: eicMasses.length > 0 ? eicMasses : null,
+  ...rest,
+});

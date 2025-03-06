@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { Divider } from '@mantine/core';
 
-export interface ValuePrecisionUnit {
-  value?: Optional<number>;
-  precision?: Optional<number>;
-  units: string;
+export function MeasurementsDivider() {
+  return (
+    <Divider
+      orientation="horizontal"
+      mt="md"
+      mb="md"
+    />
+  );
 }
