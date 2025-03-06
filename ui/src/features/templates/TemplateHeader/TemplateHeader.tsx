@@ -49,8 +49,8 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
 
   const copyOptions = useMemo(
     () => [
-      { label: 'Copy Reaction Link', value: `${domain}${location}` },
-      { label: 'Copy Reaction ID', value: templateId.toString() },
+      { label: 'Copy Template Link', value: `${domain}${location}` },
+      { label: 'Copy Template ID', value: templateId.toString() },
     ],
     [templateId, location],
   );

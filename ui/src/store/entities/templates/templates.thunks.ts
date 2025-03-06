@@ -22,48 +22,12 @@ import { navigate } from 'wouter/use-browser-location';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
-import type { AppReaction, ReactionMolBlocks } from '../reactions/reactions.types.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 
-const getTemplatePreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
-  const inputsArray = Object.values(reaction.inputs);
-  const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
-    (acc: PreviewsById, [inputName, input]) => ({
-      ...acc,
-      ...input.reduce((acc: PreviewsById, item, index) => {
-        const component = (inputsArray.find(item => item.name === inputName) as AppReactionInput).components[index];
-        return {
-          ...acc,
-          [component.id]: item,
-        };
-      }, {}),
-    }),
-    {},
-  );
-
-  const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
-    (acc: PreviewsById, products, outcomeIndex) => ({
-      ...acc,
-      ...products.reduce((acc: PreviewsById, item, productIndex) => {
-        const product = reaction.outcomes[outcomeIndex].products[productIndex];
-        return {
-          ...acc,
-          [product.id]: item,
-        };
-      }, {}),
-    }),
-    {},
-  );
-  return { ...inputsPreviews, ...outcomesPreviews };
-};
-
-const parseTemplate = ({ binpb, ...rest }: Template): TemplateWrapper => {
-  const decodedBinpb = Buffer.from(binpb, 'base64').toString('utf-8');
-  const parsedProtobuf = ord.Reaction.decode(Buffer.from(decodedBinpb, 'base64'));
+const parseTemplate = ({ binpb, molblocks, ...rest }: Template): TemplateWrapper => {
+  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
-  // TODO: addapt this to Template structure
-  const previews = getTemplatePreviews(appReaction, { inputs: {}, outcomes: [] });
+  const previews = getReactionPreviews(appReaction, molblocks);
 
   return {
     ...rest,
@@ -87,7 +51,7 @@ export const createTemplate = createThunkWithExplicitResult(
     const payload = {
       name: templateLoad.name,
       binpb: binpb,
-      variables: '[]',
+      variables: JSON.stringify([]),
     };
     const template = (await axiosInstance.post<Template>(`/templates`, payload)).data;
     dispatch(createNewTemplateActions.success(template));

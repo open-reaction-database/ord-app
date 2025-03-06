@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { AppReaction, ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 export type ComponentProductPreview = string | null;
@@ -39,6 +36,8 @@ export interface Template {
   name: string;
   binpb: string;
   variables: Array<Variable>;
+  summary: ReactionSummary;
+  molblocks: ReactionMolBlocks;
 }
 
 export interface SaveAsTemplatePayload {
@@ -46,13 +45,7 @@ export interface SaveAsTemplatePayload {
   name: string;
 }
 
-export interface AppTemplate extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers'> {
-  inputs: Record<string, AppReactionInput>;
-  outcomes: Array<ReactionOutcome>;
-  identifiers: Array<ReactionIdentifier>;
-}
-
-export interface TemplateWrapper extends Omit<Template, 'binpb'> {
-  data: AppTemplate;
+export interface TemplateWrapper extends Omit<Template, 'binpb' | 'molblocks'> {
+  data: AppReaction;
   previews: PreviewsById;
 }
