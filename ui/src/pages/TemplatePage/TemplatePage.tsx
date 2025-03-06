@@ -16,11 +16,9 @@
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { type FC, Fragment, useEffect, useMemo } from 'react';
-import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { Badge, Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import classes from './templatePage.module.scss';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
@@ -33,7 +31,8 @@ import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identif
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
-// import { getTemplate } from 'store/entities/templates/templates.thunks';
+import { getTemplate } from 'store/entities/templates/templates.thunks';
+import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
 
 interface ReactionTab {
   name: string;
@@ -59,21 +58,20 @@ export function TemplatePage() {
   const dispatch = useAppDispatch();
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
   const templateId = parseInt(rawTemplateId);
-  const reaction = useSelector(selectReactionById(templateId));
+  const template = useSelector(selectTemplateById(templateId));
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
       { title: 'Templates', path: '~/' },
       {
         path: `~/templates/${templateId}`,
-        title: reaction?.pb_reaction_id ?? templateId.toString(),
+        title: template?.name ?? templateId.toString(),
       },
     ];
-  }, [templateId, reaction?.pb_reaction_id]);
+  }, [templateId, template?.name]);
 
   useEffect(() => {
-    // dispatch(getTemplate(templateId));
-    dispatch(getReaction({ datasetId: 7, reactionId: templateId }));
+    dispatch(getTemplate({ templateId }));
   }, [dispatch, templateId]);
 
   const contextValue = useMemo(
@@ -101,7 +99,7 @@ export function TemplatePage() {
       badge={templateBadge}
     >
       <reactionEntityContext.Provider value={contextValue}>
-        {reaction && (
+        {template && (
           <Flex
             direction="column"
             gap="sm"
@@ -116,10 +114,7 @@ export function TemplatePage() {
             >
               {isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
             </Badge>
-            <TemplateHeader
-              datasetId={7}
-              reactionId={templateId}
-            />
+            <TemplateHeader templateId={templateId} />
             <Paper
               radius="md"
               p="lg"
@@ -144,12 +139,12 @@ export function TemplatePage() {
                     </Fragment>
                   ))}
                 </Tabs.List>
-                {tabs.map(({ name, Component }) => (
+                {tabs.map(({ name }) => (
                   <Tabs.Panel
                     key={name}
                     value={name}
                   >
-                    <Component reactionId={templateId} />
+                    <span>Temporarly Replacement {name}</span>
                   </Tabs.Panel>
                 ))}
               </Tabs>

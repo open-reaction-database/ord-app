@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
@@ -26,35 +25,34 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
 
 interface TemplateHeaderProps {
-  datasetId: number;
-  reactionId: number;
+  templateId: number;
 }
 
-export function TemplateHeader({ reactionId }: Readonly<TemplateHeaderProps>) {
+export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
+  const template = useSelector(selectTemplateById(templateId));
   const [opened, { open, close }] = useDisclosure();
 
-  const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
+  const hasReactionDefaultId = template.name === template.id.toString();
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: ['reactionId'], newValue: name }));
+      dispatch(addUpdateReactionField({ reactionId: templateId, pathComponents: ['reactionId'], newValue: name }));
     },
-    [dispatch, reactionId],
+    [dispatch, templateId],
   );
 
   const copyOptions = useMemo(
     () => [
       { label: 'Copy Reaction Link', value: `${domain}${location}` },
-      { label: 'Copy Reaction ID', value: reactionId.toString() },
+      { label: 'Copy Reaction ID', value: templateId.toString() },
     ],
-    [reactionId, location],
+    [templateId, location],
   );
 
   return (
@@ -79,7 +77,7 @@ export function TemplateHeader({ reactionId }: Readonly<TemplateHeaderProps>) {
                 Template
               </Title>
             )}
-            <Title order={2}>{reaction.pb_reaction_id}</Title>
+            <Title order={2}>{template.name}</Title>
             <CopyButton options={copyOptions} />
             <ActionIcon variant="transparent">
               <EditIcon onClick={open} />
@@ -89,7 +87,7 @@ export function TemplateHeader({ reactionId }: Readonly<TemplateHeaderProps>) {
             align="center"
             gap="sm"
           >
-            <RemoveReaction reactionId={reactionId} />
+            <RemoveReaction reactionId={templateId} />
             <Button
               variant="transparent"
               leftSection={<EnumerateIcon />}
@@ -110,15 +108,14 @@ export function TemplateHeader({ reactionId }: Readonly<TemplateHeaderProps>) {
             </Button>
           </Flex>
         </Flex>
-        <ReactionPreview reaction={reaction} />
       </Flex>
       <InputModal
         opened={opened}
         onClose={close}
         onSubmit={onReactionNameChange}
-        title="Edit Reaction ID"
-        inputLabel="Reaction ID"
-        initialValue={reaction.pb_reaction_id}
+        title="Edit Template ID"
+        inputLabel="Template ID"
+        initialValue={template.name}
       />
     </Paper>
   );

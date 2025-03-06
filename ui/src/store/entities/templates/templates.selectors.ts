@@ -13,26 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { createSelector } from '@reduxjs/toolkit';
 import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
 
-const { buildSelector } = createSelectorFactory(state => state.entities.datasets);
+const { buildSelector } = createSelectorFactory(state => state.entities.templates);
 
-const selectDatasets = buildSelector(state => state.datasetsById);
-
-const selectDatasetsOrder = buildSelector(state => state.datasetsOrder);
-
-export const selectAreDatasetsLoading = buildSelector(state => state.areDatasetsLoading);
-
-export const selectDatasetById = (id: number) => buildSelector(state => state.datasetsById[id]);
-
-export const selectDatasetsPagination = buildSelector(state => state.pagination);
-
-export const selectOrderedDatasets = createSelector([selectDatasetsOrder, selectDatasets], (order, datasetsById) =>
-  order.map(id => datasetsById[id]),
-);
-
-export const selectIsDatasetCreating = buildSelector(state => state.isDatasetCreating);
-
-export const selectIsDatasetOpened = buildSelector(state => state.isDatasetEditOpened);
+export const selectTemplateById = (id: number) => buildSelector(state => state.templatesById[id]);

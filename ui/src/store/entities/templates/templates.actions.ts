@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { TemplateCreator, Template } from './templates.types.ts';
-// import type { CurrentPage, Pages } from 'common/types';
+import type { TemplateCreator, Template, TemplateWrapper } from './templates.types.ts';
 
 const { createAsyncAction } = createActionFactory('templates');
 
-export const getTemplateActions = createAsyncAction<number, Template>('get');
+export const getTemplateActions = createAsyncAction<{ templateId: number }, TemplateWrapper>('get');
 
 export const createNewTemplateActions = createAsyncAction<TemplateCreator, Template>('create');
 
-// export const addUpdateReactionFieldActions = createAsyncAction<
-//   AddEditReactionFieldPayload,
-//   Omit<ReactionWrapper, 'data'>
-// >('addUpdateField');
-
-// export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');
-
-export const removeReactionActions = createAsyncAction<number, number>('remove_dataset');
+export const removeTemplateActions = createAsyncAction<number, number>('remove_template');

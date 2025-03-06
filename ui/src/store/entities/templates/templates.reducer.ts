@@ -15,6 +15,17 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import { getTemplateActions, createNewTemplateActions } from './templates.actions.ts';
+import type { ItemsById } from 'common/types';
+import type { TemplateWrapper } from './templates.types.ts';
+
+const getTemplateId = (template: TemplateWrapper) => template.id;
+
+const templatesById = createReducer<ItemsById<TemplateWrapper>>({}, builder => {
+  builder.addMatcher(isAnyOf(getTemplateActions.success), (state, action) => ({
+    ...state,
+    [getTemplateId(action.payload)]: action.payload,
+  }));
+});
 
 const isTemplateCreating = createReducer<boolean>(false, builder => {
   builder.addMatcher(isAnyOf(createNewTemplateActions.request, getTemplateActions.request), () => true);
@@ -30,5 +41,6 @@ const isTemplateCreating = createReducer<boolean>(false, builder => {
 });
 
 export const templatesReducer = combineReducers({
+  templatesById,
   isTemplateCreating,
 });

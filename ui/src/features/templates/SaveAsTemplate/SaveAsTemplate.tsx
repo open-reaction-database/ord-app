@@ -47,11 +47,12 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
     validate: yupResolver(SaveAsTemplateSchema),
   });
 
-  const onSubmit = useCallback(() => {
-    console.log('SaveAsTemplate onSubmit');
-    console.log(form.values);
-    dispatch(createTemplate({ reactionId, name: form.values.name, variables: '' }));
-  }, [dispatch]);
+  const onSubmit = useCallback(
+    (values: SaveAsTemplateSchemaFormValues) => {
+      dispatch(createTemplate({ reactionId, name: values.name, variables: '' }));
+    },
+    [dispatch],
+  );
 
   return (
     <FormModal

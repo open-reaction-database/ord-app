@@ -14,18 +14,67 @@
  * limitations under the License.
  */
 import { createNewTemplateActions, getTemplateActions } from './templates.actions.ts';
-import type { Template } from './templates.types.ts';
+import type { Template, TemplateWrapper } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
-// import type { Pages } from 'common/types';
-import { reactionToOrdReaction } from '../reactions/reactions.converters.ts';
+import { ordReactionToReaction, reactionToOrdReaction } from '../reactions/reactions.converters.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
+import type { AppReaction, ReactionMolBlocks } from '../reactions/reactions.types.ts';
+import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-export const getTemplate = createThunk(getTemplateActions, async (_d, _g, templateId) => {
-  const template = (await axiosInstance.get<Template>(`/templates/${templateId}`)).data;
+const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+  const inputsArray = Object.values(reaction.inputs);
+  const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
+    (acc: PreviewsById, [inputName, input]) => ({
+      ...acc,
+      ...input.reduce((acc: PreviewsById, item, index) => {
+        const component = (inputsArray.find(item => item.name === inputName) as AppReactionInput).components[index];
+        return {
+          ...acc,
+          [component.id]: item,
+        };
+      }, {}),
+    }),
+    {},
+  );
+
+  const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
+    (acc: PreviewsById, products, outcomeIndex) => ({
+      ...acc,
+      ...products.reduce((acc: PreviewsById, item, productIndex) => {
+        const product = reaction.outcomes[outcomeIndex].products[productIndex];
+        return {
+          ...acc,
+          [product.id]: item,
+        };
+      }, {}),
+    }),
+    {},
+  );
+  return { ...inputsPreviews, ...outcomesPreviews };
+};
+
+const parseTemplate = ({ binpb, ...rest }: Template): TemplateWrapper => {
+  const decodedBinpb = Buffer.from(binpb, 'base64').toString('utf-8');
+  const parsedProtobuf = ord.Reaction.decode(Buffer.from(decodedBinpb, 'base64'));
+  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
+  // TODO: addapt this to Template structure
+  const previews = getReactionPreviews(appReaction, { inputs: {}, outcomes: [] });
+
+  return {
+    ...rest,
+    previews,
+    data: appReaction,
+  };
+};
+
+export const getTemplate = createThunk(getTemplateActions, async (_d, _s, { templateId }) => {
+  const result = await axiosInstance.get<Template>(`/templates/${templateId}`);
+  const template = parseTemplate(result.data);
   return getTemplateActions.success(template);
 });
 
@@ -38,22 +87,10 @@ export const createTemplate = createThunkWithExplicitResult(
     const payload = {
       name: templateLoad.name,
       binpb: binpb,
-      variables: JSON.stringify('[]'),
+      variables: '[]',
     };
     const template = (await axiosInstance.post<Template>(`/templates`, payload)).data;
-    // console.log('template', template);
     dispatch(createNewTemplateActions.success(template));
     navigate(`/templates/${template.id}`);
   },
 );
-
-// export const updateTemplate = createThunk(updateTemplateActions, async (_d, _g, { id, ...payload }) => {
-//   const updateTemplate = (await axiosInstance.patch<Template>(`templates/${id}`, payload)).data;
-//   return updateDatasetActions.success(updateTemplate);
-// });
-
-// export const removeTemplate = createThunkWithExplicitResult(removeTemplateActions, async (dispatch, _g, templateId) => {
-//   await axiosInstance.delete(`/templates/${templateId}`);
-//   dispatch(removeTemplateActions.success());
-//   navigate(`/`);
-// });
