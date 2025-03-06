@@ -20,7 +20,9 @@ import {
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
+  ordBooleanToReactionBoolean,
   ordTimeToReaction,
+  reactionBooleanToOrdBoolean,
   reactionTimeToOrd,
   withId,
   withIdName,
@@ -37,7 +39,7 @@ import {
 import { itemsById } from 'common/utils';
 
 export const ordAnalysisToReactionAnalysis = (
-  { type, data, instrumentLastCalibrated, ...rest }: ord.IAnalysis,
+  { type, data, instrumentLastCalibrated, isOfIsolatedSpecies, ...rest }: ord.IAnalysis,
   name: string,
 ): ReactionAnalysis =>
   withIdName(
@@ -45,6 +47,7 @@ export const ordAnalysisToReactionAnalysis = (
       type: ordAnalysisTypeToReaction(type),
       data: ordDataMapToReactionDataMap(data || {}),
       instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
+      isOfIsolatedSpecies: ordBooleanToReactionBoolean(isOfIsolatedSpecies),
       ...rest,
     },
     name,
@@ -54,12 +57,14 @@ const reactionAnalysisToOrdAnalysis = ({
   type,
   data,
   instrumentLastCalibrated,
+  isOfIsolatedSpecies,
   ...rest
 }: ReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
     type: reactionAnalysisTypeToOrd(type),
     data: reactionDataMapToOrdDataMap(data),
     instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
+    isOfIsolatedSpecies: reactionBooleanToOrdBoolean(isOfIsolatedSpecies),
     ...rest,
   });
 

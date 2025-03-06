@@ -70,7 +70,7 @@ export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Reado
           <ReactionEntityDelete
             reactionId={reactionId}
             entityName="Identifier"
-            pathComponents={[...pathComponents, 'identifiers', itemKey]}
+            pathComponents={[...pathComponents, 'molBlockIdentifiers', itemKey]}
           />
         </Flex>
       </Flex>
