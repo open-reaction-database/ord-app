@@ -16,9 +16,10 @@ from typing import Any
 
 import orjson
 from ord_schema.proto.reaction_pb2 import Reaction
-from pydantic import BaseModel, Json, field_validator
+from pydantic import BaseModel, Field, Json, field_validator, model_validator
 
 from ord_app.service_api.domain.datasets import load_message
+from ord_app.service_api.schemas.reactions import get_molblocks
 
 
 class TemplateModel(BaseModel):
@@ -26,6 +27,14 @@ class TemplateModel(BaseModel):
     name: str
     binpb: bytes | Any
     variables: Json
+    molblocks: dict
+    summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
+
+    @model_validator(mode="before")
+    @classmethod
+    def _fill_molblocks(cls, data: Any):
+        data.molblocks = get_molblocks(load_message(data.binpb, Reaction, "binpb"))
+        return data
 
     @field_validator("variables", mode="before")
     @classmethod
@@ -55,7 +64,7 @@ class TemplateCreateModel(BaseModel):
 
     def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
-        data["binpb"] = b64encode(data["binpb"].SerializeToString())
+        data["binpb"] = data["binpb"].SerializeToString()
         return data
 
 
@@ -73,5 +82,5 @@ class TemplateUpdateModel(BaseModel):
     def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         if data["binpb"] is not None:
-            data["binpb"] = b64encode(data["binpb"].SerializeToString())
+            data["binpb"] = data["binpb"].SerializeToString()
         return data

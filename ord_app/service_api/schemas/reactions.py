@@ -27,6 +27,25 @@ class _ReactionValidation(BaseSchema):
     warnings: list[str] = Field(default_factory=list)
 
 
+def safe_molblock(product):
+    try:
+        return molblock_from_compound(product)
+    except ValueError:
+        return None
+
+
+def get_molblocks(pb):
+    outcomes = [
+        [safe_molblock(product) for product in outcome.products]
+        for outcome in pb.outcomes
+    ]
+    inputs = {
+        key: [safe_molblock(component) for component in value.components]
+        for key, value in pb.inputs.items()
+    }
+    return {"outcomes": outcomes, "inputs": inputs}
+
+
 class ReactionSchema(BaseSchema):
     id: int
     pb_reaction_id: str
@@ -44,25 +63,7 @@ class ReactionSchema(BaseSchema):
     @model_validator(mode="before")
     @classmethod
     def _fill_molblocks(cls, data: Any):
-        pb = load_message(data.binpb, Reaction, "binpb")
-
-        def safe_molblock(product):
-            try:
-                return molblock_from_compound(product)
-            except ValueError:
-                return None
-
-        outcomes = [
-            [safe_molblock(product) for product in outcome.products]
-            for outcome in pb.outcomes
-        ]
-
-        inputs = {
-            key: [safe_molblock(component) for component in value.components]
-            for key, value in pb.inputs.items()
-        }
-
-        data.molblocks = {"outcomes": outcomes, "inputs": inputs}
+        data.molblocks = get_molblocks(load_message(data.binpb, Reaction, "binpb"))
         return data
 
     @model_validator(mode="before")
