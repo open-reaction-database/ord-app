@@ -15,9 +15,9 @@
  */
 import * as yup from 'yup';
 
-export const SaveAsTemplateSchema = yup.object({
+export const saveAsTemplateSchema = yup.object({
   reaction: yup.string().label('Reaction').required(),
   name: yup.string().label('Template name').required(),
 });
 
-export type SaveAsTemplateSchemaFormValues = yup.InferType<typeof SaveAsTemplateSchema>;
+export type SaveAsTemplateSchemaFormValues = yup.InferType<typeof saveAsTemplateSchema>;

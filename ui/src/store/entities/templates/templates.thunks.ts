@@ -45,7 +45,7 @@ export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templa
 
 export const createTemplate = createThunkWithExplicitResult(
   createNewTemplateActions,
-  async (dispatch, getState, { ...templateLoad }) => {
+  async (dispatch, getState, templateLoad) => {
     const reaction = selectReactionById(templateLoad.reactionId)(getState());
     const ordReaction = reactionToOrdReaction(reaction.data);
     const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');

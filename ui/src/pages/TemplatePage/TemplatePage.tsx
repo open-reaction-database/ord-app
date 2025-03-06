@@ -45,7 +45,7 @@ export function TemplatePage() {
   }, [templateId, template?.name]);
 
   useEffect(() => {
-    dispatch(getTemplate({ templateId }));
+    dispatch(getTemplate(templateId));
   }, [dispatch, templateId]);
 
   const contextValue = useMemo(

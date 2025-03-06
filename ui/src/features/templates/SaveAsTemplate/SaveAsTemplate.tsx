@@ -17,7 +17,7 @@ import { TextInput, Select } from '@mantine/core';
 import { useCallback } from 'react';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
-import { type SaveAsTemplateSchemaFormValues, SaveAsTemplateSchema } from './SaveAsTemplate.schema.ts';
+import { type SaveAsTemplateSchemaFormValues, saveAsTemplateSchema } from './SaveAsTemplate.schema.ts';
 import type { SaveAsTemplatePayload } from 'store/entities/templates/templates.types.ts';
 import { createTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -40,7 +40,7 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
       reaction: reactionPbId,
       name: `${reactionPbId} Template`,
     },
-    validate: yupResolver(SaveAsTemplateSchema),
+    validate: yupResolver(saveAsTemplateSchema),
   });
 
   const onSubmit = useCallback(
