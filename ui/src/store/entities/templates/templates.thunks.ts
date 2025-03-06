@@ -74,9 +74,7 @@ const parseTemplate = ({ binpb, ...rest }: Template): TemplateWrapper => {
 
 export const getTemplate = createThunk(getTemplateActions, async (_d, _s, { templateId }) => {
   const result = await axiosInstance.get<Template>(`/templates/${templateId}`);
-  // console.log('result', result);
   const template = parseTemplate(result.data);
-  // console.log('template', template);
   return getTemplateActions.success(template);
 });
 
