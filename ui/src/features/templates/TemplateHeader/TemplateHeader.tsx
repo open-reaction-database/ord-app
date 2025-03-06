@@ -30,9 +30,10 @@ import { selectTemplateById } from 'store/entities/templates/templates.selectors
 
 interface TemplateHeaderProps {
   templateId: number;
+  isReadyForEnumeration: boolean;
 }
 
-export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
+export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
   const dispatch = useAppDispatch();
   const template = useSelector(selectTemplateById(templateId));
@@ -91,12 +92,14 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
             <Button
               variant="transparent"
               leftSection={<EnumerateIcon />}
+              disabled={!isReadyForEnumeration}
             >
               Enumerate
             </Button>
             <Button
               leftSection={<DownloadIcon />}
               variant="transparent"
+              disabled={!isReadyForEnumeration}
             >
               Download Variables in CSV
             </Button>

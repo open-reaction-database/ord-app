@@ -24,13 +24,14 @@ import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 
-const parseTemplate = ({ binpb, molblocks, ...rest }: Template): TemplateWrapper => {
+const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): TemplateWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   const previews = getReactionPreviews(appReaction, molblocks);
 
   return {
     ...rest,
+    variables: variables,
     previews,
     data: appReaction,
   };
