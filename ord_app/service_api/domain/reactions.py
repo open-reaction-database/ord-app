@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import asyncio
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -188,7 +189,7 @@ class ReactionsUseCase:
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            pb_reaction = load_message(file_data, Reaction, kind)
+            pb_reaction = await run_in_threadpool(load_message, file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
@@ -198,8 +199,10 @@ class ReactionsUseCase:
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
-        reaction = await self._create_reaction(dataset_id, insert_data)
-        await self.dataset_repo.update_modified_at(dataset_id)
+        reaction, _ = await asyncio.gather(
+            self._create_reaction(dataset_id, insert_data),
+            self.dataset_repo.update_modified_at(dataset_id)
+        )
         return reaction
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
@@ -224,7 +227,7 @@ class ReactionsUseCase:
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):
-            reaction_pb = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
+            reaction_pb = await run_in_threadpool(write_message, Reaction.FromString(reaction.binpb), kind=file_format)
             return reaction, reaction_pb
         raise EntityNotFoundError("Reaction not found")
 
