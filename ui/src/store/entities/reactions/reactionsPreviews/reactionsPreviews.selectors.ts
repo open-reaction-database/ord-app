@@ -27,7 +27,7 @@ export const selectPreviewsIds = (_state: unknown, entityIds: Array<string>) => 
 export const selectPreviewsByIds = createSelector(
   [selectReactionsPreviews, selectPreviewsIds],
   (previews, ids): PreviewStatesById =>
-    ids.reduce(
+    ids?.reduce(
       (acc, id) => ({
         ...acc,
         [id]: previews[id],

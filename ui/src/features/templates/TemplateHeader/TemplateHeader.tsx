@@ -27,6 +27,7 @@ import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
+import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 
 interface TemplateHeaderProps {
   templateId: number;
@@ -111,6 +112,7 @@ export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<T
             </Button>
           </Flex>
         </Flex>
+        <ReactionPreview reaction={template} />
       </Flex>
       <InputModal
         opened={opened}

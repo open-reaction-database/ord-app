@@ -29,7 +29,7 @@ interface ReactionInputPreviewProps {
 
 export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
   const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]));
-  const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
+  const componentsIds = useMemo(() => outcome?.products.map(({ id }) => id), [outcome]);
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 
@@ -47,7 +47,7 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
         align="center"
         className={classes.componentList}
       >
-        {componentsIds.map(id => (
+        {componentsIds?.map(id => (
           <div
             key={id}
             className={classes.component}

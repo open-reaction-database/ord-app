@@ -14,7 +14,26 @@
  * limitations under the License.
  */
 import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
+import { createSelector } from '@reduxjs/toolkit';
+import type { AppState } from 'store/configureAppStore.ts';
+// import { selectOrderedInputs } from 'store/entities/reactions/reactions.selectors.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.templates);
 
+export const selectTemplates = buildSelector(state => state.templatesById);
+
 export const selectTemplateById = (id: number) => buildSelector(state => state.templatesById[id]);
+
+export const selectTemplateId = (_state: unknown, id: number) => id;
+
+export const selectOrderedInputsTemplate = createSelector([selectTemplates, selectTemplateId], (templates, id) => {
+  const inputsMap = templates[id].data.inputs;
+  return Object.values(inputsMap).sort((a, b) => {
+    const aOrder = a.additionOrder ?? Infinity;
+    const bOrder = b.additionOrder ?? Infinity;
+    return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
+  });
+});
+
+export const selectOrderedInputsTemplateWrapper = (id: number) => (state: AppState) =>
+  selectOrderedInputsTemplate(state, id);

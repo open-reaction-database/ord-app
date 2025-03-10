@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
+import type { TemplateWrapper } from 'store/entities/templates/templates.types';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectOrderedInputsTemplateWrapper } from 'store/entities/templates/templates.selectors.ts';
 import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
-  reaction: ReactionWrapper;
+  reaction: ReactionWrapper | TemplateWrapper;
+  isTemplate?: boolean;
 }
 
 export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
-  { reaction },
+  { reaction, isTemplate = false },
   ref,
 ) {
-  const inputs = useSelector(selectOrderedInputsWrapper(reaction.id));
+  const inputsTemplate = useSelector(selectOrderedInputsTemplateWrapper(reaction.id));
+  const inputsReaction = useSelector(selectOrderedInputsWrapper(reaction.id));
+  const inputs = isTemplate ? inputsTemplate : inputsReaction;
   const outcomes = reaction.data.outcomes;
+
+  console.log('ReactionPreview rendered', inputs);
 
   return (
     <div
