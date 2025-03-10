@@ -16,7 +16,15 @@
 import * as yup from 'yup';
 
 export const createNewDatasetSchema = yup.object({
-  name: yup.string().label('Dataset name').required(),
+  name: yup
+    .string()
+    .label('Dataset name')
+    .required('')
+    .test(
+      'no-only-spaces',
+      'Dataset name cannot be just spaces',
+      value => value === undefined || value === '' || value.trim().length > 0,
+    ),
   groupId: yup.string().required(),
   description: yup.string().label('Description').required(),
 });
