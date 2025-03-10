@@ -15,18 +15,18 @@
  */
 import * as yup from 'yup';
 
+const emptyFieldMessage = ({ label }: { label: string }) => `${label} should not be empty`;
+
+const requiredTextField = yup
+  .string()
+  .label('Field')
+  .required(emptyFieldMessage)
+  .test('no-only-spaces', emptyFieldMessage, value => value?.trim().length > 0);
+
 export const createNewDatasetSchema = yup.object({
-  name: yup
-    .string()
-    .label('Dataset name')
-    .required('')
-    .test(
-      'no-only-spaces',
-      'Dataset name cannot be just spaces',
-      value => value === undefined || value === '' || value.trim().length > 0,
-    ),
-  groupId: yup.string().required(),
-  description: yup.string().label('Description').required(),
+  name: requiredTextField.label('Dataset name'),
+  description: requiredTextField.label('Description'),
+  groupId: requiredTextField.label('Group name'),
 });
 
 export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;

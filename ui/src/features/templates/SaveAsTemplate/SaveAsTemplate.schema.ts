@@ -15,9 +15,17 @@
  */
 import * as yup from 'yup';
 
+const emptyFieldMessage = ({ label }: { label: string }) => `${label} should not be empty`;
+
+const requiredTextField = yup
+  .string()
+  .label('Field')
+  .required(emptyFieldMessage)
+  .test('no-only-spaces', emptyFieldMessage, value => value?.trim().length > 0);
+
 export const saveAsTemplateSchema = yup.object({
-  reaction: yup.string().label('Reaction').required(),
-  name: yup.string().label('Template name').required(),
+  reaction: requiredTextField.label('Reaction'),
+  name: requiredTextField.label('Template name'),
 });
 
 export type SaveAsTemplateSchemaFormValues = yup.InferType<typeof saveAsTemplateSchema>;
