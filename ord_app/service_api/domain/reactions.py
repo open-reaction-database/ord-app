@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import asyncio
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -199,10 +198,8 @@ class ReactionsUseCase:
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
-        reaction, _ = await asyncio.gather(
-            self._create_reaction(dataset_id, insert_data),
-            self.dataset_repo.update_modified_at(dataset_id)
-        )
+        reaction = await self._create_reaction(dataset_id, insert_data)
+        await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:

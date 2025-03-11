@@ -40,7 +40,6 @@ from ord_app.service_api.schemas.datasets import (
 )
 from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
 from ord_app.service_api.services.postgresql import get_db_session
-from starlette.concurrency import run_in_threadpool
 
 
 class DatasetUseCases:
