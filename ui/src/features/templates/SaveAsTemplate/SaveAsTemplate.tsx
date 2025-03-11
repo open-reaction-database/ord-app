@@ -37,7 +37,6 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
   >({
     mode: 'controlled',
     initialValues: {
-      reaction: reactionPbId,
       name: `${reactionPbId} Template`,
     },
     validate: yupResolver(saveAsTemplateSchema),
@@ -47,7 +46,7 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
     (values: SaveAsTemplateSchemaFormValues) => {
       dispatch(createTemplate({ reactionId, name: values.name }));
     },
-    [dispatch],
+    [dispatch, reactionId],
   );
 
   return (

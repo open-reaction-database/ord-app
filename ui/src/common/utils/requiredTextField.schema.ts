@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { requiredTextField } from 'common/utils/requiredTextField.schema';
 import * as yup from 'yup';
 
-export const createNewDatasetSchema = yup.object({
-  name: requiredTextField.label('Dataset name'),
-  description: requiredTextField.label('Description'),
-  groupId: yup.string().required(),
-});
+export const emptyFieldMessage = ({ label }: { label: string }) => `${label} should not be empty`;
 
-export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;
+export const requiredTextField = yup
+  .string()
+  .label('Field')
+  .required(emptyFieldMessage)
+  .test('no-only-spaces', emptyFieldMessage, value => value?.trim().length > 0);
