@@ -21,14 +21,6 @@ from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
 
 
-async def test_create_reaction_without_pb(api_client, mock_authenticated_user, test_db_session):
-    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json={}).raise_for_status().json()
-    reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
-    assert reaction_pb.reaction_id == str(response_data["id"]) == response_data["pb_reaction_id"]
-
-
 async def test_create_reaction_with_pb(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 

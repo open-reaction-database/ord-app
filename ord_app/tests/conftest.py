@@ -27,6 +27,7 @@ from ord_app.service_api.models import (
     BaseModel,
     DatasetModel,
     GroupModel,
+    ReactionModel,
     TemplateModel,
     UserGroupsMembershipModel,
     UserModel,
@@ -154,10 +155,24 @@ async def mock_authenticated_user(test_db_session):
 
 async def create_test_dataset(db_session, mock_authenticated_user) -> DatasetModel:
     user, _, group = mock_authenticated_user
-    dataset = DatasetModel(owner=user, groups=[group])
+    dataset = DatasetModel(owner=user, groups=[group], name=fake.uuid4())
     db_session.add(dataset)
     await db_session.commit()
     return dataset
+
+
+async def create_test_reaction(db_session, mock_authenticated_user, dataset, pb_reaction=None) -> ReactionModel:
+    pb_reaction = pb_reaction or Reaction(reaction_id=fake.uuid4())
+    user, _, group = mock_authenticated_user
+    reaction = ReactionModel(
+        pb_reaction_id=pb_reaction.reaction_id,
+        dataset=dataset,
+        owner=user,
+        binpb=pb_reaction.SerializeToString()
+    )
+    db_session.add(reaction)
+    await db_session.commit()
+    return reaction
 
 
 async def create_test_user_with_group(test_db_session, role="admin"):

@@ -46,7 +46,7 @@ def get_molblocks(pb):
     return {"outcomes": outcomes, "inputs": inputs}
 
 
-class ReactionSchema(BaseSchema):
+class ReactionResponseSchema(BaseSchema):
     id: int
     pb_reaction_id: str
     binpb: str
@@ -75,25 +75,17 @@ class ReactionSchema(BaseSchema):
 
 
 class ReactionCreateSchema(BaseSchema):
-    binpb: bytes | None = None
+    binpb: bytes
 
-    @field_validator("binpb", mode="after")
-    @classmethod
-    def binpb_validation(cls, raw):
-        return None if raw is None else load_message(b64decode(raw), Reaction, "binpb").SerializeToString()
+    @field_validator("binpb", mode="before")
+    def load_binpb(cls, raw):
+        return b64decode(raw)
 
 
 class ReactionUpdateSchema(BaseSchema):
     model_config = ConfigDict(arbitrary_types_allowed=True)
+    binpb: bytes
 
-    binpb: bytes | Any
-
-    @field_validator("binpb", mode="after")
-    @classmethod
+    @field_validator("binpb", mode="before")
     def load_binpb(cls, raw):
-        return load_message(b64decode(raw), Reaction, "binpb")
-
-    def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
-        data = super().model_dump(*args, **kwargs)
-        data["binpb"] = data["binpb"].SerializeToString()
-        return data
+        return b64decode(raw)

@@ -18,22 +18,22 @@ from fastapi import APIRouter, Depends
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.users import UserUseCase, get_user_use_case
 from ord_app.service_api.models import UserModel
-from ord_app.service_api.schemas.users import UserSchema, UserUpdateSchema
+from ord_app.service_api.schemas.users import UserResponseSchema, UserUpdateSchema
 
 router = APIRouter(tags=["users"], prefix="/users")
 
 
-@router.get("/me", response_model=UserSchema)
+@router.get("/me", response_model=UserResponseSchema)
 async def read_users_me(current_user: UserModel = Depends(authenticate)):
     return current_user
 
 
-@router.get("/{user_id}", response_model=UserSchema)
+@router.get("/{user_id}", response_model=UserResponseSchema)
 async def get_user(user_id: int, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]):
     return await use_case.get(user_id)
 
 
-@router.patch("/{user_id}", response_model=UserSchema)
+@router.patch("/{user_id}", response_model=UserResponseSchema)
 async def update_user(
     user_id: int,
     payload: UserUpdateSchema,

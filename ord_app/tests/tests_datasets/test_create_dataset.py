@@ -40,13 +40,17 @@ async def test_create_dataset(api_client, mock_authenticated_user):
     assert response_data["owner"]["external_id"] == user.external_id
 
 
-async def test_create_empty_dataset(api_client, mock_authenticated_user):
+async def test_create_dataset_with_generating_name(api_client, mock_authenticated_user):
     *_, group = mock_authenticated_user
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={"name": ""}).raise_for_status().json()
+    assert response_data["name"] != ""
 
-    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={}).raise_for_status().json()
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={"name": " "}).raise_for_status().json()
+    assert response_data["name"] != " "
 
-    assert response_data["name"] == ""
-    assert response_data["description"] == ""
+    payload = {"name": f" {faker.name()} "}
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload).raise_for_status().json()
+    assert response_data["name"] == payload["name"].strip()
 
 
 @pytest.mark.parametrize(
