@@ -13,18 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { requiredTextField } from 'common/utils/requiredTextField.schema';
 import * as yup from 'yup';
 
-const emptyFieldMessage = ({ label }: { label: string }) => `${label} should not be empty`;
-
-const requiredTextField = yup
-  .string()
-  .label('Field')
-  .required(emptyFieldMessage)
-  .test('no-only-spaces', emptyFieldMessage, value => value?.trim().length > 0);
-
 export const saveAsTemplateSchema = yup.object({
-  reaction: requiredTextField.label('Reaction'),
   name: requiredTextField.label('Template name'),
 });
 
