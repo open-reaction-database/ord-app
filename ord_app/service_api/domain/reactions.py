@@ -188,7 +188,7 @@ class ReactionsUseCase:
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            pb_reaction = load_message(file_data, Reaction, kind)
+            pb_reaction = await run_in_threadpool(load_message, file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
@@ -224,7 +224,7 @@ class ReactionsUseCase:
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):
-            reaction_pb = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
+            reaction_pb = await run_in_threadpool(write_message, Reaction.FromString(reaction.binpb), kind=file_format)
             return reaction, reaction_pb
         raise EntityNotFoundError("Reaction not found")
 

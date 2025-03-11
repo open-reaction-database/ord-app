@@ -70,7 +70,7 @@ class DatasetUseCases:
 
     async def extend(self, dataset_id: int, file_data, kind):
         try:
-            dataset_pb = load_message(file_data, Dataset, kind)
+            dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
@@ -155,7 +155,7 @@ class DatasetUseCases:
 
         dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
 
-        data = write_message(dataset_pb, kind=file_format)
+        data = await run_in_threadpool(write_message, dataset_pb, kind=file_format)
         return dataset, data
 
     async def share(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
