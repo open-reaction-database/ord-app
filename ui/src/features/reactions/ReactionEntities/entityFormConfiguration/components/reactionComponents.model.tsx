@@ -21,7 +21,6 @@ import { ord } from 'ord-schema-protobufjs';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { booleanOptions } from '../booleanOptions.ts';
 import { reactionAmounts } from 'features/reactions/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
@@ -35,8 +34,6 @@ import {
   molBlockIdentifiers,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponentsBase.model.tsx';
 import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-
-const preparationNameByValue = reversePrimitiveRecord(ord.CompoundPreparation.CompoundPreparationType);
 
 const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
   return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
@@ -125,7 +122,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
       requiredFields: [
         {
           label: 'Type',
-          render: item => preparationNameByValue[item.type ?? 0],
+          render: item => item.type,
         },
         {
           label: 'Details',

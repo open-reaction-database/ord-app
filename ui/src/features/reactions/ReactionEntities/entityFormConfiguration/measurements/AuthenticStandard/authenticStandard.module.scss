@@ -13,6 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './ComponentDisplayRow.tsx';
-export * from './ComponentsList.tsx';
-export { default as componentsListClasses } from './componentsList.module.scss';
+.wrapper {
+  width: 100%;
+}
+
+.createButton {
+  padding: 0;
+}
+
+.icon {
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}

@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 import type { PreviewState } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
-import { Loader, Title } from '@mantine/core';
+import { Loader, Tooltip } from '@mantine/core';
+import { NoPreviewIcon } from 'common/icons';
+import classes from './reactionPreview.module.scss';
 
 interface ReactionComponentPreviewProps {
-  previewState?: PreviewState;
+  previewState?: PreviewState | null;
   alt?: string;
 }
 
 export function ReactionComponentPreview({ previewState, alt }: Readonly<ReactionComponentPreviewProps>) {
-  if (!previewState || previewState.isLoading) {
+  if (previewState?.isLoading === true) {
     return <Loader />;
   }
-  const { svg } = previewState;
+  const svg = previewState?.svg ?? null;
 
   return svg ? (
     <img
@@ -33,6 +35,10 @@ export function ReactionComponentPreview({ previewState, alt }: Readonly<Reactio
       src={`data:image/svg+xml;base64,${svg}`}
     />
   ) : (
-    <Title order={3}>No preview</Title>
+    <Tooltip label="No preview">
+      <div className={classes.noPreviewWrapper}>
+        <NoPreviewIcon className={classes.noPreviewIcon} />
+      </div>
+    </Tooltip>
   );
 }

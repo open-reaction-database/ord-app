@@ -17,38 +17,33 @@ import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/r
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { ActionIcon, Button, Flex, Title } from '@mantine/core';
+import { Accordion, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
-import { AddCircleIcon, EditIcon, NoData } from 'common/icons';
+import { AddCircleIcon, NoData } from 'common/icons';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { useCallback } from 'react';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
+import classes from './outcomes.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
+import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
+import { useMemo } from 'react';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
   ordOutcomeToReactionOutcome(ord.ReactionOutcome.toObject(new ord.ReactionOutcome())),
 ]);
 
+const ENTITY_NAME = 'outcomes';
+
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
-  const dispatch = useAppDispatch();
-  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, ['outcomes']));
+  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
   const onCreateNew = useCreate();
 
   const handleCreate = () => {
     onCreateNew(outcomes.length, outcomes);
   };
-  const onEdit = useCallback(
-    (index: number) => {
-      dispatch(setReactionPathComponentsList([['outcomes', index]]));
-    },
-    [dispatch],
-  );
+
+  const ids = useMemo(() => outcomes.map(outcome => outcome.id), [outcomes]);
 
   return (
     <Flex direction="column">
@@ -69,27 +64,22 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
       {outcomes.length > 0 ? (
-        <div>
+        <Accordion
+          variant="separated"
+          chevronPosition="left"
+          multiple={true}
+          className={classes.itemsList}
+          defaultValue={ids}
+        >
           {outcomes.map((outcome, index) => (
-            <Flex
+            <OutcomeListItem
               key={outcome.id}
-              align="center"
-            >
-              <span>Outcome {index + 1}</span>
-              <ActionIcon
-                variant="transparent"
-                onClick={() => onEdit(index)}
-              >
-                <EditIcon />
-              </ActionIcon>
-              <ReactionEntityDelete
-                reactionId={reactionId}
-                entityName="Outcome"
-                pathComponents={['outcomes', index]}
-              />
-            </Flex>
+              reactionId={reactionId}
+              outcome={outcome}
+              outcomeIndex={index}
+            />
           ))}
-        </div>
+        </Accordion>
       ) : (
         <Flex
           direction="column"
@@ -97,7 +87,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <NoData className={classes.icon} />
-          <span className={typographyClasses.secondary1}>There are no Inputs yet</span>
+          <span className={typographyClasses.secondary1}>There are no Outcomes yet</span>
         </Flex>
       )}
     </Flex>

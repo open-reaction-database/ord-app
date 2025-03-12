@@ -41,6 +41,10 @@ const headers = [
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
+const onActionClick = (event: MouseEvent) => {
+  event.stopPropagation();
+};
+
 export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComponentsListProps>) {
   const dispatch = useAppDispatch();
   const onEditInput = useCallback(
@@ -50,9 +54,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
     [dispatch],
   );
 
-  const onActionClick = (event: MouseEvent) => {
-    event.stopPropagation();
-  };
+  const ids = inputs.map(input => input.id);
 
   return (
     <>
@@ -71,6 +73,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
         variant="separated"
         chevronPosition="left"
         multiple={true}
+        defaultValue={ids}
       >
         {inputs.map(input => (
           <Accordion.Item

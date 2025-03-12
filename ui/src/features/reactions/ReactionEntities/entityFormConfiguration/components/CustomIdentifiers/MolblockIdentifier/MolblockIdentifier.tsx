@@ -17,7 +17,7 @@ import type { ord } from 'ord-schema-protobufjs';
 import { ActionIcon, Flex } from '@mantine/core';
 import classes from './molblockIdentifier.module.scss';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
-import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineKeyValue.tsx';
+import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
 import { EditIcon } from 'common/icons';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { useContext } from 'react';
@@ -51,13 +51,15 @@ export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Reado
           direction="column"
           gap="xs"
         >
-          <InlineKeyValue
+          <KeyValueDisplay
             label="Type"
             value="Molblock"
+            multiline
           />
-          <InlineKeyValue
+          <KeyValueDisplay
             label="Details"
             value={identifier.details}
+            multiline
           />
         </Flex>
         <Flex>

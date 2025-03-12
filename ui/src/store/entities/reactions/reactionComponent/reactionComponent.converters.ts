@@ -139,6 +139,7 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     selectivity,
     wavelength,
     massSpecDetails,
+    authenticStandard,
   } = measurement;
   return withId({
     type: ordMeasurementTypeToReaction(type),
@@ -152,6 +153,7 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     selectivity: ordSelectivityToReaction(selectivity),
     waveLength: ordWaveLengthToReaction(wavelength),
     massSpecDetails: ordMassSpecToReaction(massSpecDetails),
+    authenticStandard: authenticStandard ? ordInputComponentToReaction(authenticStandard) : null,
   });
 };
 
@@ -167,6 +169,7 @@ const reactionMeasurementToOrd = ({
   selectivity,
   waveLength,
   massSpecDetails,
+  authenticStandard,
 }: ReactionMeasurement): ord.IProductMeasurement => ({
   type: reactionMeasurementTypeToOrd(type),
   details,
@@ -178,6 +181,7 @@ const reactionMeasurementToOrd = ({
   selectivity: reactionSelectivityToOrd(selectivity),
   wavelength: reactionWaveLengthToOrd(waveLength),
   massSpecDetails: reactionMassSpecToOrd(massSpecDetails),
+  authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
   ...reactionMeasurementValueToOrd(value),
 });
 

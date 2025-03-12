@@ -45,6 +45,7 @@
 }
 
 .row {
+  width: 100%;
   min-height: 48px;
 }
 
@@ -70,18 +71,4 @@
   padding: var(--mantine-spacing-sm);
   font-weight: 700;
   color: var(--mantine-color-secondary-2);
-}
-
-.identifierWrapper {
-  width: 100%;
-}
-
-.identifierType {
-  text-wrap: nowrap;
-}
-
-.identifierValue {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-wrap: nowrap;
 }

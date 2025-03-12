@@ -14,38 +14,23 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useSelector } from 'react-redux';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import clsx from 'clsx';
-import classes from 'features/reactions/ReactionView/ComponentsList/componentsList.module.scss';
-import { Divider, Flex, Text, Tooltip } from '@mantine/core';
-import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
+import classes from './componentsList.module.scss';
+import { Divider } from '@mantine/core';
 import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactNode } from 'react';
-import { typographyClasses } from 'common/styling';
-
-interface ComponentDisplayRowProps<T extends ReactionComponentBase> {
-  reactionId: number;
-  componentPath: ReactionPathComponents;
-  component: T;
-  renderDetails: (component: T) => ReactNode;
-  gridClassName?: string;
-}
+import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
+import type { ComponentDisplayRowProps } from './componentsList.types.ts';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
   reactionId,
   component,
   componentPath,
   renderDetails,
-  gridClassName = clsx(classes.grid, classes.row),
+  gridClassName,
 }: Readonly<ComponentDisplayRowProps<T>>) {
   const dispatch = useAppDispatch();
-  const componentId = component.id;
-  const previewState = useSelector(selectPreviewsByIdsWrapper([componentId]));
   const previousEntityPath = componentPath.slice(0, 2);
 
   const onEditComponent = () => {
@@ -53,63 +38,24 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
   };
 
   return (
-    <div
-      key={component.id}
-      className={gridClassName}
-    >
-      <Flex
-        className={classes.identifiers}
-        align="flex-start"
-        direction="column"
-      >
-        {component.identifiers.map(identifier => (
-          <Flex
-            className={classes.identifierWrapper}
-            gap="xs"
-            key={identifier.value}
-          >
-            <Text className={clsx(typographyClasses.secondary2, classes.identifierType)}>{identifier.type}:</Text>
-            <Tooltip label={identifier.value}>
-              <Text className={classes.identifierValue}>{identifier.value}</Text>
-            </Tooltip>
-          </Flex>
-        ))}
-      </Flex>
-      <Flex
-        align="center"
-        justify="center"
-        className={clsx(classes.preview, classes.imagePreview)}
-      >
-        <ReactionComponentPreview previewState={previewState[component.id]} />
-      </Flex>
-      <Flex
-        align="center"
-        className={classes.role}
-      >
-        {component.reactionRole}
-      </Flex>
-      <Flex
-        align="center"
-        className={classes.details}
-      >
-        {renderDetails(component)}
-      </Flex>
-      <Flex
-        className={classes.actions}
-        align="center"
-        justify="flex-end"
-      >
-        <EditButton onClick={onEditComponent} />
-        <Divider
-          className={classes.actionDivider}
-          orientation="vertical"
-        />
-        <ReactionEntityDelete
-          reactionId={reactionId}
-          entityName="Component"
-          pathComponents={componentPath}
-        />
-      </Flex>
-    </div>
+    <ComponentDisplayRowCustomActions
+      component={component}
+      renderDetails={renderDetails}
+      gridClassName={gridClassName}
+      actions={
+        <>
+          <EditButton onClick={onEditComponent} />
+          <Divider
+            className={classes.actionDivider}
+            orientation="vertical"
+          />
+          <ReactionEntityDelete
+            reactionId={reactionId}
+            entityName="Component"
+            pathComponents={componentPath}
+          />
+        </>
+      }
+    />
   );
 }

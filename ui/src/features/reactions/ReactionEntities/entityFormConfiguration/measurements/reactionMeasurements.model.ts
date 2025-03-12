@@ -32,6 +32,8 @@ import { MeasurementsBasedOn } from 'features/reactions/ReactionEntities/entityF
 import { MeasurementValueControl } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementValueControl/MeasurementValueControl.tsx';
 import { MeasurementMasses } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementMasses.tsx';
 import { MeasurementsDivider } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementsDivider.tsx';
+import { AuthenticStandard } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/AuthenticStandard/AuthenticStandard.tsx';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const retentionTimeCompatibleTypes: Array<ReactionMeasurementType> = [
   'CUSTOM',
@@ -226,5 +228,14 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
         },
       },
     ],
+  },
+  {
+    type: ReactionFormNodeType.custom,
+    condition: {
+      name: 'usesAuthenticStandard',
+      isHidden: isUsing => (isUsing as ReactionBoolean) !== ReactionBoolean.True,
+    },
+    name: 'authenticStandard',
+    Component: AuthenticStandard,
   },
 ];
