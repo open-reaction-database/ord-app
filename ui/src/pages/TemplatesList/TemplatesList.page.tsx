@@ -25,6 +25,7 @@ import { selectTemplates } from 'store/entities/templates/templates.selectors.ts
 import { TemplateCard } from 'features/templates/TemplateCard/TemplateCard.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 
 export function TemplatesListPage() {
   const dispatch = useAppDispatch();
@@ -50,29 +51,36 @@ export function TemplatesListPage() {
     <PageContainer breadcrumbs={breadcrumbs}>
       <reactionEntityContext.Provider value={contextValue}>
         <div className={classes.container}>
-          <Paper
-            radius="sm"
-            p="lg"
+          <EntitiesMenu />
+          <Flex
+            direction="column"
+            gap="sm"
+            className={classes.templates}
           >
-            <Flex justify="space-between">
-              <Flex
-                align="center"
-                gap="sm"
-              >
-                <Title order={2}>Templates</Title>
-                <Counter amount={templates.length} />
+            <Paper
+              radius="sm"
+              p="lg"
+            >
+              <Flex justify="space-between">
+                <Flex
+                  align="center"
+                  gap="sm"
+                >
+                  <Title order={2}>Templates</Title>
+                  <Counter amount={templates.length} />
+                </Flex>
               </Flex>
-            </Flex>
-          </Paper>
-          <>
-            {templates.map(template => (
-              <TemplateCard
-                key={template.id}
-                id={template.id}
-                template={template}
-              />
-            ))}
-          </>
+            </Paper>
+            <>
+              {templates.map(template => (
+                <TemplateCard
+                  key={template.id}
+                  id={template.id}
+                  template={template}
+                />
+              ))}
+            </>
+          </Flex>
         </div>
       </reactionEntityContext.Provider>
     </PageContainer>
