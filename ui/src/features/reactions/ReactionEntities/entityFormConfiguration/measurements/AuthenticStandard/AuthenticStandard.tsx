@@ -20,17 +20,22 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ActionIcon, Button, Divider, Flex, Input } from '@mantine/core';
+import { ActionIcon, Button, Flex, Title } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { AddCircleIcon, EditIcon, RemoveIcon } from 'common/icons';
+import { AddCircleIcon, RemoveIcon } from 'common/icons';
 import classes from './authenticStandard.module.scss';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
+import {
+  ReactionEntityBlock,
+  ReactionEntityBlockTitle,
+} from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
@@ -61,23 +66,14 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   }, [currentPath, dispatch, reactionId]);
 
   return (
-    <Input.Wrapper label="Authentic Standard">
-      <Flex>
-        {authenticStandard ? (
-          <ComponentDisplayRowCustomActions
-            component={authenticStandard}
-            renderDetails={renderDetails}
-            actions={
+    <ReactionEntityBlock
+      renderedTitle={
+        <ReactionEntityBlockTitle
+          leftSection={<Title order={4}>Authentic Standard</Title>}
+          rightSection={
+            authenticStandard ? (
               <>
-                <Button
-                  variant="transparent"
-                  leftSection={<EditIcon />}
-                  classNames={{ section: classes.icon }}
-                  onClick={onEdit}
-                >
-                  Edit
-                </Button>
-                <Divider />
+                <EditButton onClick={onEdit} />
                 <ConfirmPopover
                   opened={opened}
                   target={
@@ -96,19 +92,29 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
                   onCancel={close}
                 />
               </>
-            }
+            ) : (
+              <Button
+                classNames={{ root: classes.createButton, section: classes.icon }}
+                variant="transparent"
+                leftSection={<AddCircleIcon />}
+                onClick={onCreate}
+              >
+                Authentic standard
+              </Button>
+            )
+          }
+        />
+      }
+    >
+      <Flex>
+        {authenticStandard && (
+          <ComponentDisplayRowCustomActions
+            component={authenticStandard}
+            renderDetails={renderDetails}
+            actions={null}
           />
-        ) : (
-          <Button
-            classNames={{ root: classes.createButton, section: classes.icon }}
-            variant="transparent"
-            leftSection={<AddCircleIcon />}
-            onClick={onCreate}
-          >
-            Create authentic standard
-          </Button>
         )}
       </Flex>
-    </Input.Wrapper>
+    </ReactionEntityBlock>
   );
 }
