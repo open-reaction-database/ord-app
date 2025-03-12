@@ -17,7 +17,7 @@ from pydantic import EmailStr, field_validator
 from ord_app.service_api.schemas.base import BaseSchema
 
 
-class UserSchema(BaseSchema):
+class UserResponseSchema(BaseSchema):
     id: int
     email: EmailStr | None = None
     name: str | None = None

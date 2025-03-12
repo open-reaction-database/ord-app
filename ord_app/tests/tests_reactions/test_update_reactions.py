@@ -13,28 +13,29 @@
 # limitations under the License.
 from base64 import b64decode, b64encode
 
+from faker import Faker
 from fastapi import status
 from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.domain.datasets import load_message
-from ord_app.tests.conftest import create_test_dataset
+from ord_app.tests.conftest import create_test_dataset, create_test_reaction
+
+faker = Faker()
 
 
 async def test_update_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    reaction_id = response_data["id"]
-
-    payload = {"binpb": b64encode(Reaction(reaction_id="updated").SerializeToString()).decode()}
+    reaction_id = faker.uuid4()
+    payload = {"binpb": b64encode(Reaction(reaction_id=reaction_id).SerializeToString()).decode()}
     response_data = api_client.patch(
-        f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}",
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}",
         json=payload
     ).raise_for_status().json()
 
     reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
-    assert reaction_pb.reaction_id == "updated"
+    assert reaction_pb.reaction_id == reaction_id
 
 
 async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, test_db_session):
@@ -47,20 +48,15 @@ async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, 
 
 async def test_update_reaction_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
-    # create reaction
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    assert "test" == response_data["pb_reaction_id"]
-
-    # update created reaction with new `reaction_id`
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
+    payload = {"binpb": b64encode(Reaction(reaction_id=reaction.pb_reaction_id).SerializeToString()).decode()}
     response_data = api_client.patch(
-        f"/api/v1/datasets/{dataset.id}/reactions/{response_data['id']}", json=payload
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
     ).raise_for_status().json()
-    assert response_data["pb_reaction_id"] == "test"
+    assert f"duplicate-{reaction.pb_reaction_id}" in response_data["pb_reaction_id"]
 
     # try to create new reaction with the reaction_id="updated"
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
+    payload = {"binpb": b64encode(Reaction(reaction_id=response_data["pb_reaction_id"]).SerializeToString()).decode()}
     response = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    assert "duplicate-test" in response["pb_reaction_id"]
+    assert f"duplicate-{reaction.pb_reaction_id}" in response["pb_reaction_id"]

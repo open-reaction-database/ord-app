@@ -13,35 +13,36 @@
 # limitations under the License.
 from datetime import datetime
 from typing import Any, Literal, Optional
+from uuid import uuid4
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from sqlalchemy import Row
 
 from ord_app.service_api.schemas.base import BaseSchema
-from ord_app.service_api.schemas.users import UserSchema
+from ord_app.service_api.schemas.users import UserResponseSchema
 
 DownloadFileFormats = Literal["binpb", "json", "txtpb"]
 
 
-class DatasetSchema(BaseSchema):
+class DatasetResponseSchema(BaseSchema):
     id: int
-    name: str | None = ""
-    description: str | None = ""
+    name: str
+    description: str | None
     created_at: datetime
     modified_at: datetime
-    owner: UserSchema
+    owner: UserResponseSchema
 
 
-class _DatasetUserGroupSchema(BaseSchema):
+class _DatasetResponseUserGroupSchema(BaseSchema):
     id: int
     name: str
     role: Optional[str] = Field(default=None, alias="role")
 
 
-class DatasetSharableSchema(DatasetSchema):
+class DatasetSharableResponseSchema(DatasetResponseSchema):
     is_sharable: bool
     reaction_count: int = Field(default=0)
-    groups: list[_DatasetUserGroupSchema]
+    groups: list[_DatasetResponseUserGroupSchema]
 
     @model_validator(mode="before")
     @classmethod
@@ -54,9 +55,9 @@ class DatasetSharableSchema(DatasetSchema):
         return data
 
 
-class DatasetWithReactionCountSchema(DatasetSchema):
+class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
     reaction_count: int = Field(default=0)
-    groups: list[_DatasetUserGroupSchema]
+    groups: list[_DatasetResponseUserGroupSchema]
 
     @model_validator(mode="before")
     @classmethod
@@ -70,8 +71,15 @@ class DatasetWithReactionCountSchema(DatasetSchema):
 
 
 class DatasetCreateSchema(BaseSchema):
-    name: str | None = ""
+    name: str | None
     description: str | None = ""
+
+    @field_validator("name", mode="after")
+    def set_name_default(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            return uuid4().hex
+        return value
 
 
 class DatasetShareSchema(BaseSchema):

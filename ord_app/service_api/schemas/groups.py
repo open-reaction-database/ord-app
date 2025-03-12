@@ -15,15 +15,15 @@ from pydantic import constr
 
 from ord_app.service_api.models import UserRolesList
 from ord_app.service_api.schemas.base import BaseSchema
-from ord_app.service_api.schemas.users import UserSchema
+from ord_app.service_api.schemas.users import UserResponseSchema
 
 
-class GroupSchema(BaseSchema):
+class GroupResponseSchema(BaseSchema):
     id: int
     name: str
 
 
-class GroupUserSchema(BaseSchema):
+class GroupUserResponseSchema(BaseSchema):
     id: int
     name: str
     role: UserRolesList
@@ -43,6 +43,6 @@ class GroupUpdateMemberSchema(BaseSchema):
     role: UserRolesList
 
 
-class GroupMemberSchema(BaseSchema):
+class GroupMemberResponseSchema(BaseSchema):
     role: UserRolesList
-    user: UserSchema
+    user: UserResponseSchema

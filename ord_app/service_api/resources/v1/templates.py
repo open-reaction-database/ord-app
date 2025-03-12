@@ -16,12 +16,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 
 from ord_app.service_api.domain.templates import TemplatesUseCase, get_templates_use_case
-from ord_app.service_api.schemas.templates import TemplateCreateModel, TemplateModel, TemplateUpdateModel
+from ord_app.service_api.schemas.templates import TemplateCreateModel, TemplateResponseModel, TemplateUpdateModel
 
 router = APIRouter(tags=["templates"], prefix="/templates")
 
 
-@router.post("", response_model=TemplateModel)
+@router.post("", response_model=TemplateResponseModel)
 async def create_template(
     payload: TemplateCreateModel,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
@@ -29,14 +29,14 @@ async def create_template(
     return await use_case.create(payload)
 
 
-@router.get("", response_model=list[TemplateModel])
+@router.get("", response_model=list[TemplateResponseModel])
 async def get_all_templates(
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
 ):
     return await use_case.all()
 
 
-@router.get("/{template_id}", response_model=TemplateModel)
+@router.get("/{template_id}", response_model=TemplateResponseModel)
 async def get_template(
     template_id: int,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
@@ -44,7 +44,7 @@ async def get_template(
     return await use_case.get(template_id)
 
 
-@router.patch("/{template_id}", response_model=TemplateModel)
+@router.patch("/{template_id}", response_model=TemplateResponseModel)
 async def update_template(
     template_id: int,
     payload: TemplateUpdateModel,

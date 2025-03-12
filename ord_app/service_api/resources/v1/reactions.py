@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.domain.auth import dataset_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
-from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionSchema, ReactionUpdateSchema
+from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionResponseSchema, ReactionUpdateSchema
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -30,7 +30,7 @@ router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions"
 @router.post(
     "",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
-    response_model=ReactionSchema,
+    response_model=ReactionResponseSchema,
 )
 async def create_reaction(
     dataset_id: int,
@@ -42,7 +42,7 @@ async def create_reaction(
 @router.post(
     "/from-scratch",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
-    response_model=ReactionSchema
+    response_model=ReactionResponseSchema
 )
 async def create_reaction_from_scratch(
     dataset_id: int,
@@ -53,7 +53,7 @@ async def create_reaction_from_scratch(
 @router.post(
     "/upload",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
-    response_model=ReactionSchema,
+    response_model=ReactionResponseSchema,
 )
 async def upload_reaction(
     dataset_id: int,
@@ -71,7 +71,7 @@ async def upload_reaction(
 @router.get(
     "",
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
-    response_model=Page[ReactionSchema],
+    response_model=Page[ReactionResponseSchema],
 )
 async def reactions(
     dataset_id: int,
@@ -83,7 +83,7 @@ async def reactions(
 @router.get(
     "/{reaction_id}",
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
-    response_model=ReactionSchema,
+    response_model=ReactionResponseSchema,
 )
 async def reaction(
     reaction_id: int,
@@ -95,7 +95,7 @@ async def reaction(
 @router.patch(
     "/{reaction_id}",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
-    response_model=ReactionSchema,
+    response_model=ReactionResponseSchema,
 )
 async def _update_reaction(
     dataset_id: int,

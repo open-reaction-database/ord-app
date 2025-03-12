@@ -22,7 +22,7 @@ from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.reactions import get_molblocks
 
 
-class TemplateModel(BaseModel):
+class TemplateResponseModel(BaseModel):
     id: int
     name: str
     binpb: bytes | Any
