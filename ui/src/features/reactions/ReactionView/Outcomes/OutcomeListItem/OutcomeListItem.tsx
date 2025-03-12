@@ -15,24 +15,18 @@
  */
 import { Accordion, Flex, Text, Tooltip } from '@mantine/core';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { useAppDispatch } from 'store/useAppDispatch';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
-import { useMemo, type MouseEvent } from 'react';
+import { useMemo } from 'react';
 import { ComponentDisplayRow, componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
 import clsx from 'clsx';
 import classes from './outcomeListItem.module.scss';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
-import { FlaskIcon, TimeIcon } from 'common/icons';
-import { typographyClasses } from 'common/styling';
 import type {
   ReactionMeasurement,
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { renderValuePrecisionUnit } from '../../renderValuePrecisionUnit';
-import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
+import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
 
 const ENTITY_NAME = 'outcomes';
 
@@ -96,75 +90,20 @@ const renderDetails = (product: ReactionProduct) => (
   </Flex>
 );
 
-const onActionClick = (event: MouseEvent) => {
-  event.stopPropagation();
-};
-
 export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<OutcomeListItemProps>) {
-  const dispatch = useAppDispatch();
   const outcomePathComponents = useMemo(() => [ENTITY_NAME, outcomeIndex], [outcomeIndex]);
 
   const orderedAnalyses = useMemo(() => {
     return Object.values(outcome.analyses).sort(compareNamedEntities);
   }, [outcome.analyses]);
 
-  const onEditOutcome = () => {
-    dispatch(setReactionPathComponentsList([outcomePathComponents]));
-  };
-
   return (
     <Accordion.Item value={outcome.id}>
-      <Accordion.Control
-        classNames={{ label: classes.label }}
-        icon={
-          <Flex
-            onClick={onActionClick}
-            align="center"
-          >
-            <EditButton onClick={onEditOutcome} />
-            <ReactionEntityDelete
-              reactionId={reactionId}
-              entityName="Outcome"
-              pathComponents={outcomePathComponents}
-            />
-          </Flex>
-        }
-      >
-        <Flex
-          align="center"
-          gap="xs"
-        >
-          <TitleDelimiterAmount
-            title="Outcome"
-            amount={outcome.products.length}
-          />
-        </Flex>
-        {outcome.reactionTime && outcome.reactionTime.value && (
-          <Flex
-            align="center"
-            gap="xs"
-          >
-            <TimeIcon className={classes.shortInfoIcon} />
-            <Text className={clsx(classes.shortInfoText, typographyClasses.secondary2)}>Time: </Text>
-            <Text className={classes.shortInfoText}>{renderValuePrecisionUnit(outcome.reactionTime)}</Text>
-          </Flex>
-        )}
-        {outcome.conversion && outcome.conversion.value && (
-          <Flex
-            align="center"
-            gap="xs"
-          >
-            <FlaskIcon className={classes.shortInfoIcon} />
-            <Text className={clsx(classes.shortInfoText, typographyClasses.secondary2)}>
-              Limiting reactant conversion:{' '}
-            </Text>
-            <Text className={classes.shortInfoText}>
-              {renderValuePrecisionUnit({ ...outcome.conversion, units: '' })}
-            </Text>
-          </Flex>
-        )}
-        <Flex></Flex>
-      </Accordion.Control>
+      <OutcomeListItemHeader
+        reactionId={reactionId}
+        outcome={outcome}
+        pathComponents={outcomePathComponents}
+      />
       <Accordion.Panel>
         <div className={classes.analysesList}>
           {orderedAnalyses.map(analysis => (
