@@ -44,7 +44,7 @@ type NotEmptyValueType = Exclude<ValueType, null | undefined>;
 
 export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
   const dispatch = useAppDispatch();
-  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes']));
+  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes'])) || {};
 
   const fields = useMemo((): Array<[string, string]> => {
     return notesFields

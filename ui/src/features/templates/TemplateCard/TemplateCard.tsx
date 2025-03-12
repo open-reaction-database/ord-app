@@ -23,7 +23,7 @@ import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import type { TemplateWrapper } from 'store/entities/templates/templates.types';
-import { downloadTemplateAsJson } from 'common/utils';
+import { downloadAsJson } from 'common/utils';
 
 interface DescriptorsListProps {
   title: string;
@@ -70,8 +70,8 @@ export function TemplateCard({ id, template }: Readonly<TemplateCardProps>) {
     { label: 'Copy Template Link', value: `${window.location.href}/templates/${id}` },
     { label: 'Copy Template ID', value: id.toString() },
   ];
-  const downloadAsJson = () => {
-    downloadTemplateAsJson(reaction, `${reaction.data.reactionId}.json`);
+  const downloadAsJsonHandle = () => {
+    downloadAsJson(reaction, `${reaction.data.reactionId}.json`);
   };
 
   return (
@@ -112,7 +112,7 @@ export function TemplateCard({ id, template }: Readonly<TemplateCardProps>) {
           <Button
             leftSection={<DownloadIcon />}
             variant="transparent"
-            onClick={downloadAsJson}
+            onClick={downloadAsJsonHandle}
           >
             Download Template in JSON
           </Button>

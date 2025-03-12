@@ -15,45 +15,20 @@
  */
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { type FC, Fragment, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { Badge, Flex, Paper, Tabs, Tooltip } from '@mantine/core';
+import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import classes from './reactionPage.module.scss';
-import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
-import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
-import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
-import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
-import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
-
-interface ReactionTab {
-  name: string;
-  required?: true;
-  Component: FC<ReactionViewSectionProps>;
-}
-
-const createEmptyComponent = (name: string) => () => name;
-
-const tabs: Array<ReactionTab> = [
-  { name: 'inputs', required: true, Component: Inputs },
-  { name: 'outcomes', required: true, Component: Outcomes },
-  { name: 'conditions', Component: createEmptyComponent('conditions') },
-  { name: 'identifiers', Component: Identifiers },
-  { name: 'setup', Component: createEmptyComponent('setup') },
-  { name: 'notes', Component: Notes },
-  { name: 'observations', Component: createEmptyComponent('observations') },
-  { name: 'workups', Component: createEmptyComponent('workups') },
-  { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
-];
+import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 
 export function ReactionPage() {
   const dispatch = useAppDispatch();
@@ -113,35 +88,7 @@ export function ReactionPage() {
               radius="md"
               p="lg"
             >
-              <Tabs
-                defaultValue={tabs[0].name}
-                classNames={{ tab: classes.tabTitle, panel: classes.panel }}
-              >
-                <Tabs.List>
-                  {tabs.map(({ name, required }) => (
-                    <Fragment key={name}>
-                      {required ? (
-                        <Tooltip label="Mandatory section">
-                          <Tabs.Tab value={name}>
-                            {name}
-                            <RequiredAsterisk />
-                          </Tabs.Tab>
-                        </Tooltip>
-                      ) : (
-                        <Tabs.Tab value={name}>{name}</Tabs.Tab>
-                      )}
-                    </Fragment>
-                  ))}
-                </Tabs.List>
-                {tabs.map(({ name, Component }) => (
-                  <Tabs.Panel
-                    key={name}
-                    value={name}
-                  >
-                    <Component reactionId={reactionId} />
-                  </Tabs.Panel>
-                ))}
-              </Tabs>
+              <ReactionTabs reactionId={reactionId} />
             </Paper>
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>

@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function downloadAsJson<T>(object: T, filename: string) {
-  const jsonString = JSON.stringify(object, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  const link = document.createElement('a');
+.tabTitle {
+  color: var(--color-text-secondary-3);
+  text-transform: uppercase;
+  font-weight: 500;
 
-  link.href = URL.createObjectURL(blob);
-  link.download = filename || 'data.json';
-  link.click();
+  &[data-active] {
+    color: var(--color-text-primary);
+  }
+}
 
-  URL.revokeObjectURL(link.href);
+.panel {
+  padding: 20px 20px 0;
 }
