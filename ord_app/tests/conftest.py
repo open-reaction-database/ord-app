@@ -199,7 +199,7 @@ async def create_template(test_db_session, user_id):
         "binpb": Reaction(reaction_id=fake.name()).SerializeToString(),
         "name": fake.name(),
         "variables": fake.json(),
-        "user_id": user_id,
+        "owner_id": user_id,
     }
     template = TemplateModel(**payload)
     test_db_session.add(template)
