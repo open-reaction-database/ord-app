@@ -26,7 +26,7 @@ async def test_paginate_group_datasets(api_client, mock_authenticated_user, test
 
     total_datasets = 10
     datasets = [
-        DatasetGroupAssociationModel(dataset=DatasetModel(owner=user), group=group)
+        DatasetGroupAssociationModel(dataset=DatasetModel(owner=user, name=faker.uuid4()), group=group)
         for _ in range(total_datasets)
     ]
     test_db_session.add_all(datasets)
@@ -47,7 +47,7 @@ async def test_paginate_user_datasets(api_client, mock_authenticated_user, test_
     total_datasets = total_reactions = 5
     items = []
     for _ in range(total_datasets):
-        dataset = DatasetModel(owner=user)
+        dataset = DatasetModel(owner=user, name=faker.uuid4())
         items.append(DatasetGroupAssociationModel(dataset=dataset, group=group))
 
         for _ in range(total_reactions):

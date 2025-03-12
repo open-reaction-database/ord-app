@@ -108,7 +108,7 @@ class ReactionsUseCase:
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
         if "binpb" in insert_data:
             try:
-                validation_result = validate_pb_reaction(insert_data["binpb"])
+                validation_result = await run_in_threadpool(validate_pb_reaction, insert_data["binpb"])
             except ValueError as err:
                 validation_result = [err], []
 
@@ -157,12 +157,11 @@ class ReactionsUseCase:
     async def create(self, dataset_id: int, payload: ReactionCreateSchema):
         insert_data = {"pb_reaction_id": uuid4().hex}
 
-        if payload.binpb is not None:
-            pb_reaction = load_message(payload.binpb, Reaction, "binpb")
-            db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
-            if db_reaction:
-                pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
-            insert_data["binpb"] = pb_reaction
+        pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
+        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
+        if db_reaction:
+            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
+        insert_data["binpb"] = pb_reaction
 
         reaction = await self._create_reaction(dataset_id, insert_data)
         await self.dataset_repo.update_modified_at(dataset_id)
@@ -188,14 +187,14 @@ class ReactionsUseCase:
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            pb_reaction = load_message(file_data, Reaction, kind)
+            pb_reaction = await run_in_threadpool(load_message, file_data, Reaction, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
         db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
         if db_reaction:
-            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}-{uuid4().hex}"
+            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
         reaction = await self._create_reaction(dataset_id, insert_data)
@@ -211,7 +210,13 @@ class ReactionsUseCase:
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
-        updating_data = payload.model_dump() | {"pb_reaction_id": payload.binpb.reaction_id}
+        pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
+
+        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
+        if db_reaction and db_reaction.pb_reaction_id == pb_reaction.reaction_id:
+            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
+
+        updating_data = {"binpb": pb_reaction.SerializeToString(), "pb_reaction_id": pb_reaction.reaction_id}
 
         if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
             await self.dataset_repo.update_modified_at(dataset_id)
@@ -224,7 +229,7 @@ class ReactionsUseCase:
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):
-            reaction_pb = write_message(Reaction.FromString(reaction.binpb), kind=file_format)
+            reaction_pb = await run_in_threadpool(write_message, Reaction.FromString(reaction.binpb), kind=file_format)
             return reaction, reaction_pb
         raise EntityNotFoundError("Reaction not found")
 

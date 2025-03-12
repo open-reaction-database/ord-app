@@ -25,21 +25,21 @@ from ord_app.service_api.domain.groups import (
 from ord_app.service_api.schemas.groups import (
     GroupAddMemberSchema,
     GroupCreateSchema,
-    GroupMemberSchema,
-    GroupSchema,
+    GroupMemberResponseSchema,
+    GroupResponseSchema,
     GroupUpdateMemberSchema,
-    GroupUserSchema,
+    GroupUserResponseSchema,
 )
 
 router = APIRouter(tags=["group"], prefix="/groups")
 
 
-@router.post("", response_model=GroupSchema, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=GroupResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_group(payload: GroupCreateSchema, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
     return await use_case.create(payload)
 
 
-@router.get("", response_model=list[GroupUserSchema])
+@router.get("", response_model=list[GroupUserResponseSchema])
 async def list_current_user_groups(use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
     response = await use_case.user_groups()
     return response
@@ -47,7 +47,7 @@ async def list_current_user_groups(use_case: Annotated[GroupUseCases, Depends(ge
 
 @router.get(
     "/{group_id}",
-    response_model=GroupSchema,
+    response_model=GroupResponseSchema,
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def get_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
@@ -57,7 +57,7 @@ async def get_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(ge
 @router.patch(
     "/{group_id}",
     status_code=status.HTTP_201_CREATED,
-    response_model=GroupSchema,
+    response_model=GroupResponseSchema,
     dependencies=[Depends(group_authorization(("admin",)))],
 )
 async def update_group(
@@ -78,7 +78,7 @@ async def delete_group(group_id: int, use_case: Annotated[GroupUseCases, Depends
 @router.get(
     "/{group_id}/members",
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
-    response_model=list[GroupMemberSchema],
+    response_model=list[GroupMemberResponseSchema],
 )
 async def get_group_members(
     group_id: int, use_case: Annotated[GroupMembersUseCases, Depends(get_group_members_use_case)]
@@ -89,7 +89,7 @@ async def get_group_members(
 @router.post(
     "/{group_id}/members",
     dependencies=[Depends(group_authorization(("admin",)))],
-    response_model=GroupMemberSchema,
+    response_model=GroupMemberResponseSchema,
     status_code=status.HTTP_201_CREATED,
 )
 async def add_member(
@@ -103,7 +103,7 @@ async def add_member(
 @router.patch(
     "/{group_id}/members",
     dependencies=[Depends(group_authorization(("admin",)))],
-    response_model=GroupMemberSchema,
+    response_model=GroupMemberResponseSchema,
     status_code=status.HTTP_201_CREATED,
 )
 async def update_member(
