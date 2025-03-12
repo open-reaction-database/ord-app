@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Accordion, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { Accordion, Flex, Text, Tooltip } from '@mantine/core';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types';
 import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
@@ -32,6 +32,7 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { renderValuePrecisionUnit } from '../../renderValuePrecisionUnit';
+import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 
 const ENTITY_NAME = 'outcomes';
 
@@ -133,9 +134,10 @@ export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<
           align="center"
           gap="xs"
         >
-          <Title order={3}>Outcome</Title>
-          <span>·</span>
-          {outcome.products.length}
+          <TitleDelimiterAmount
+            title="Outcome"
+            amount={outcome.products.length}
+          />
         </Flex>
         {outcome.reactionTime && outcome.reactionTime.value && (
           <Flex
