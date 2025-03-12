@@ -23,7 +23,7 @@ from ord_app.service_api.settings import RuntimeSettings
 # access to the values within the .ini file in use.
 config = context.config
 section = config.config_ini_section
-config.set_section_option(section, "PG_DSN", RuntimeSettings.pg_dsn)
+config.set_section_option(section, "PG_DSN", RuntimeSettings.pg_alembic_dsn)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

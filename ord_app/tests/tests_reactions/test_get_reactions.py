@@ -34,6 +34,17 @@ async def test_get_reaction(api_client, mock_authenticated_user, test_db_session
     assert response_data["id"] == reaction.id
 
 
+async def test_search_reaction(api_client, mock_authenticated_user, test_db_session):
+    user, _, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+
+    response_data = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/reactions/search?pb_reaction_id={reaction.pb_reaction_id}"
+    ).raise_for_status().json()
+    assert response_data["id"] == reaction.id
+
+
 async def test_download_reaction(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)

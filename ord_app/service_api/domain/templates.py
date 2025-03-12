@@ -32,25 +32,25 @@ class TemplatesUseCase:
         self.template_repo = TemplateRepository(db)
 
     async def create(self, payload: TemplateCreateModel) -> TemplateModel:
-        payload = payload.model_dump() | {"user_id": self.current_user.id}
+        payload = payload.model_dump() | {"owner_id": self.current_user.id}
         return await self.template_repo.create(payload)
 
     async def all(self) -> Sequence[TemplateModel]:
-        return await self.template_repo.filter(user_id=self.current_user.id)
+        return await self.template_repo.filter(owner_id=self.current_user.id)
 
     async def get(self, template_id: int) -> TemplateModel:
-        if template := await self.template_repo.get(id=template_id, user_id=self.current_user.id):
+        if template := await self.template_repo.get(id=template_id, owner_id=self.current_user.id):
             return template
         raise EntityNotFoundError("Template not found")
 
     async def update(self, template_id: int, payload: TemplateUpdateModel):
         payload = payload.model_dump(exclude_none=True)
-        if template := await self.template_repo.update(payload, id=template_id, user_id=self.current_user.id):
+        if template := await self.template_repo.update(payload, id=template_id, owner_id=self.current_user.id):
             return template
         raise EntityNotFoundError("Template not found")
 
     async def delete(self, template_id: int):
-        if count := await self.template_repo.delete(id=template_id, user_id=self.current_user.id):
+        if count := await self.template_repo.delete(id=template_id, owner_id=self.current_user.id):
             return count
         raise EntityNotFoundError("Template not found")
 

@@ -63,10 +63,12 @@ jobs:
         run: poetry run alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
         run: poetry run pytest -vv --cov=ord_app --durations=10
         env:
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
+          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
