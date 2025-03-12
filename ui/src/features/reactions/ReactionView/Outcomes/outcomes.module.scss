@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './ComponentDisplayRow.tsx';
-export * from './ComponentsList.tsx';
-export { default as componentsListClasses } from './componentsList.module.scss';
+.itemsList {
+  margin-top: 20px;
+}
+
+.icon {
+  width: 64px;
+  height: 41px;
+}

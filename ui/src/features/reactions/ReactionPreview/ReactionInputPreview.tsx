@@ -19,35 +19,13 @@ import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { useMemo } from 'react';
 import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
-import { Badge, Flex, Text } from '@mantine/core';
+import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
   inputId: string;
-}
-
-interface ComponentMetadataProps {
-  component: ReactionInputComponent;
-}
-
-function ComponentMetadata({ component }: Readonly<ComponentMetadataProps>) {
-  const name = useMemo(() => {
-    return (component.identifiers || []).find(identifier => identifier.type === 'NAME');
-  }, [component]);
-
-  return (
-    <Flex direction="column">
-      {name?.value && <Text size="xs">{name.value}</Text>}
-      {component?.reactionRole && <Text size="xs">{component.reactionRole}</Text>}
-      {component?.amount && (
-        <Text size="xs">
-          {component.amount.value} {component.amount.units}
-        </Text>
-      )}
-    </Flex>
-  );
 }
 
 export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
@@ -70,17 +48,21 @@ export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionI
         align="center"
         className={classes.componentList}
       >
-        {componentsIds.map((id, index) => (
-          <div
-            key={id}
-            className={classes.component}
-          >
-            <div className={classes.molecule}>
-              <ReactionComponentPreview previewState={componentsPreviews[id]} />
+        {componentsIds.length === 0 ? (
+          <ReactionComponentPreview previewState={null} />
+        ) : (
+          componentsIds.map((id, index) => (
+            <div
+              key={id}
+              className={classes.component}
+            >
+              <div className={classes.molecule}>
+                <ReactionComponentPreview previewState={componentsPreviews[id]} />
+              </div>
+              <ComponentMetadata component={input.components[index]} />
             </div>
-            <ComponentMetadata component={input.components[index]} />
-          </div>
-        ))}
+          ))
+        )}
       </Flex>
     </div>
   );

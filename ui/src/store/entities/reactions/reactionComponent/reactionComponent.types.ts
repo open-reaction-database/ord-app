@@ -101,6 +101,7 @@ export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement
   selectivity: ReactionSelectivity;
   waveLength: ReactionWaveLength;
   massSpecDetails: ReactionMassSpec;
+  authenticStandard: ReactionInputComponent | null;
 }
 
 export interface ReactionProduct extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {

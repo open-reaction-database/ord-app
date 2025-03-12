@@ -1,0 +1,45 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { Flex, Text, Tooltip } from '@mantine/core';
+import { typographyClasses } from 'common/styling';
+import type { ReactNode } from 'react';
+import clsx from 'clsx';
+import classes from './keyValueDisplay.module.scss';
+
+interface InlineKeyValueProps {
+  label: string;
+  value: ReactNode;
+  multiline?: boolean;
+}
+
+export function KeyValueDisplay({ label, value, multiline }: Readonly<InlineKeyValueProps>) {
+  return (
+    <Flex
+      gap="xs"
+      align="flex-start"
+      className={clsx({ [classes.multilineWrapper]: !multiline })}
+    >
+      <Text className={clsx(typographyClasses.secondary2, classes.label)}>{label}:</Text>
+      {multiline ? (
+        <Text>{value}</Text>
+      ) : (
+        <Tooltip label={value}>
+          <Text className={classes.inlineValue}>{value}</Text>
+        </Tooltip>
+      )}
+    </Flex>
+  );
+}
