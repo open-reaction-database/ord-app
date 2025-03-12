@@ -35,7 +35,7 @@ export interface Template {
   id: number;
   name: string;
   binpb: string;
-  variables: Array<Variable>;
+  variables: Array<Variable> | string;
   summary: ReactionSummary;
   molblocks: ReactionMolBlocks;
 }

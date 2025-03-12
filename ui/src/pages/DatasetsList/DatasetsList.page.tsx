@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Flex } from '@mantine/core';
+import { Flex, Paper, Button } from '@mantine/core';
 import { GroupsSidebar } from 'features/groups';
 import { DatasetTable } from 'features/datasets';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { DatasetsListTopActions } from './DatasetsListTopActions/DatasetsListTopActions.tsx';
+import { DatasetsIcon, TemplatesIcon } from 'common/icons';
+import classes from './datasetsList.page.module.scss';
+import clsx from 'clsx';
 
 export function DatasetsListPage() {
   return (
@@ -31,7 +34,44 @@ export function DatasetsListPage() {
           gap="sm"
           align="flex-start"
         >
-          <GroupsSidebar />
+          <Flex
+            direction="column"
+            gap="sm"
+            w={200}
+          >
+            <Paper
+              radius="sm"
+              p="sm"
+            >
+              <Flex direction="column">
+                <Button
+                  classNames={{
+                    root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/datasets' }),
+                    section: classes.buttonSection,
+                  }}
+                  variant="transparent"
+                  leftSection={<DatasetsIcon />}
+                  onClick={() => (window.location.href = '/datasets')}
+                  justify="flex-start"
+                >
+                  Datasets
+                </Button>
+                <Button
+                  classNames={{
+                    root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/templates' }),
+                    section: classes.buttonSection,
+                  }}
+                  variant="transparent"
+                  leftSection={<TemplatesIcon />}
+                  onClick={() => (window.location.href = '/templates')}
+                  justify="flex-start"
+                >
+                  Templates
+                </Button>
+              </Flex>
+            </Paper>
+            <GroupsSidebar />
+          </Flex>
           <DatasetTable />
         </Flex>
       </Flex>

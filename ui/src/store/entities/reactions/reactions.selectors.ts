@@ -35,17 +35,20 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
 export const selectReactionComponents = (id: number, input: string) =>
-  buildSelector(state => state.reactionsById[id].data.inputs[input]?.components || []);
+  buildSelector(state => state.reactionsById[id].data?.inputs[input]?.components || []);
 
 export const selectReactionPartByPath =
   (reactionId: number, pathComponents: ReactionPathComponents) => (state: AppState) => {
     const reaction = selectReactionById(reactionId)(state);
+    if (!reaction) {
+      return null;
+    }
     try {
       // If the path is incorrect we will get an error
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return pathComponents.reduce((reactionPart: any, key) => {
         return reactionPart[key];
-      }, reaction.data);
+      }, reaction?.data);
     } catch (e) {
       console.info(pathComponents, e);
       return null;
@@ -55,7 +58,7 @@ export const selectReactionPartByPath =
 export const selectReactionId = (_state: unknown, id: number) => id;
 
 export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
-  const inputsMap = reactions[id].data.inputs;
+  const inputsMap = reactions[id]?.data?.inputs || {};
   return Object.values(inputsMap).sort((a, b) => {
     const aOrder = a.additionOrder ?? Infinity;
     const bOrder = b.additionOrder ?? Infinity;

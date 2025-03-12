@@ -31,7 +31,7 @@ const ENTITY_FIELD = 'identifiers';
 export function Identifiers({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
-  const identifiers = reaction.data.identifiers || [];
+  const identifiers = reaction?.data.identifiers || [];
 
   const onIdentifierCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, identifiers.length];

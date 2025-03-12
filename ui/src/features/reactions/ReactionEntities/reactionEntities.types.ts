@@ -166,4 +166,5 @@ export type ReactionFormNode =
 export interface ReactionEntityContext {
   pathComponents: ReactionPathComponents;
   reactionId: number;
+  isTemplate?: boolean;
 }

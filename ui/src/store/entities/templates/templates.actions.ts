@@ -20,6 +20,8 @@ const { createAsyncAction } = createActionFactory('templates');
 
 export const getTemplateActions = createAsyncAction<number, TemplateWrapper>('get');
 
+export const getAllTemplatesActions = createAsyncAction<void, Array<TemplateWrapper>>('get_all_templates');
+
 export const createNewTemplateActions = createAsyncAction<TemplateCreator, Template>('create');
 
 export const removeTemplateActions = createAsyncAction<number, number>('remove_template');

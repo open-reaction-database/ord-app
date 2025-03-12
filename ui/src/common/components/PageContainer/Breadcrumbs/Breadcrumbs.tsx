@@ -40,7 +40,12 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
 
           const children = (
             <>
-              {index === 0 && <HomeIcon className={classes.homeIcon} />}
+              {index === 0 && (
+                <HomeIcon
+                  className={classes.homeIcon}
+                  onClick={() => (window.location.href = '/')}
+                />
+              )}
               <Tooltip label={breadcrumb.title}>
                 <span className={classes.text}>{breadcrumb.title}</span>
               </Tooltip>

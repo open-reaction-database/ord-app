@@ -58,7 +58,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <Title order={2}>Outcomes</Title>
-          <Counter amount={outcomes.length} />
+          <Counter amount={outcomes?.length} />
         </Flex>
         <Button
           onClick={handleCreate}
@@ -68,7 +68,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
         </Button>
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
-      {outcomes.length > 0 ? (
+      {outcomes?.length > 0 ? (
         <div>
           {outcomes.map((outcome, index) => (
             <Flex

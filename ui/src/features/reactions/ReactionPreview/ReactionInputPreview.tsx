@@ -15,13 +15,15 @@
  */
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectTemplatePartByPath } from 'store/entities/templates/templates.selectors.ts';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
 import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex, Text } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
@@ -51,8 +53,11 @@ function ComponentMetadata({ component }: Readonly<ComponentMetadataProps>) {
 }
 
 export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
-  const input: AppReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
-  const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
+  const { isTemplate } = useContext(reactionEntityContext);
+  const inputReaction: AppReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId])) || [];
+  const inputTemplate: AppReactionInput = useSelector(selectTemplatePartByPath(reactionId, ['inputs', inputId])) || [];
+  const input = isTemplate ? inputTemplate : inputReaction;
+  const componentsIds = useMemo(() => input?.components.map(({ id }) => id), [input]);
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 
@@ -63,14 +68,14 @@ export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionI
         color="primary"
         size="lg"
       >
-        {input.name}
+        {input?.name}
       </Badge>
       <Flex
         gap="sm"
         align="center"
         className={classes.componentList}
       >
-        {componentsIds.map((id, index) => (
+        {componentsIds?.map((id, index) => (
           <div
             key={id}
             className={classes.component}
@@ -78,7 +83,7 @@ export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionI
             <div className={classes.molecule}>
               <ReactionComponentPreview previewState={componentsPreviews[id]} />
             </div>
-            <ComponentMetadata component={input.components[index]} />
+            <ComponentMetadata component={input?.components[index]} />
           </div>
         ))}
       </Flex>

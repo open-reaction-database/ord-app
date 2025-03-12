@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
-import { getTemplateActions, createNewTemplateActions } from './templates.actions.ts';
+import { getTemplateActions, createNewTemplateActions, getAllTemplatesActions } from './templates.actions.ts';
 import type { ItemsById } from 'common/types';
-import type { TemplateWrapper } from './templates.types.ts';
+import type { TemplateWrapper, Template } from './templates.types.ts';
 
 const getTemplateId = (template: TemplateWrapper) => template.id;
 
@@ -24,6 +24,23 @@ const templatesById = createReducer<ItemsById<TemplateWrapper>>({}, builder => {
   builder.addMatcher(isAnyOf(getTemplateActions.success), (state, action) => ({
     ...state,
     [getTemplateId(action.payload)]: action.payload,
+  }));
+  builder.addMatcher(isAnyOf(getAllTemplatesActions.success), (state, action) => {
+    const allTemplates = action.payload.reduce((acc, template) => {
+      acc[getTemplateId(template)] = template;
+      return acc;
+    }, {} as ItemsById<TemplateWrapper>);
+    return {
+      ...state,
+      ...allTemplates,
+    };
+  });
+});
+
+const templatesOrder = createReducer<Array<Template>>([], builder => {
+  builder.addMatcher(isAnyOf(getAllTemplatesActions.success), (state, action) => ({
+    ...state,
+    templates: action.payload,
   }));
 });
 
@@ -43,4 +60,5 @@ const isTemplateCreating = createReducer<boolean>(false, builder => {
 export const templatesReducer = combineReducers({
   templatesById,
   isTemplateCreating,
+  templatesOrder,
 });

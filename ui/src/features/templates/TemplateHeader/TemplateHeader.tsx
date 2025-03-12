@@ -28,6 +28,7 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { downloadTemplateAsJson } from 'common/utils';
 
 interface TemplateHeaderProps {
   templateId: number;
@@ -56,6 +57,10 @@ export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<T
     ],
     [templateId, location],
   );
+
+  const downloadAsJson = () => {
+    downloadTemplateAsJson(template, `${template.data.reactionId}.json`);
+  };
 
   return (
     <Paper
@@ -107,6 +112,7 @@ export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<T
             <Button
               leftSection={<DownloadIcon />}
               variant="transparent"
+              onClick={downloadAsJson}
             >
               Download Template in JSON
             </Button>
