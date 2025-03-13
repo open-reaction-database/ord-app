@@ -25,8 +25,10 @@ import {
   deleteReactionFieldActions,
   removeReactionActions,
 } from './reactions.actions.ts';
+import { getTemplateActions, getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
 import type { AppReaction, ReactionWrapper } from './reactions.types.ts';
+import type { TemplateWrapper } from '../templates/templates.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {
@@ -37,7 +39,7 @@ import {
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 
-const getReactionId = (reaction: ReactionWrapper) => reaction.id;
+const getReactionId = (reaction: ReactionWrapper | TemplateWrapper) => reaction.id;
 
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
@@ -89,6 +91,38 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
   builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) => {
     const { [reactionId]: _, ...rest } = state;
     return rest;
+  });
+  builder.addCase(getTemplateActions.success, (state, action) => {
+    const templateId = `template_${action.payload.id}`;
+    const templatePayload = action.payload as TemplateWrapper;
+    const reactionWrapper: ReactionWrapper = {
+      ...templatePayload,
+      data: linkReactionEntities(templatePayload.data),
+      pb_reaction_id: '',
+      is_valid: true,
+    };
+    return {
+      ...state,
+      [templateId]: reactionWrapper,
+    };
+  });
+  builder.addCase(getAllTemplatesActions.success, (state, action) => {
+    const templates = action.payload;
+    const templatesById = templates.reduce<ItemsById<ReactionWrapper>>((acc, template) => {
+      const templateId = `template_${template.id}`;
+      const reactionWrapper: ReactionWrapper = {
+        ...template,
+        data: linkReactionEntities(template.data),
+        pb_reaction_id: '',
+        is_valid: true,
+      };
+      acc[templateId] = reactionWrapper;
+      return acc;
+    }, {});
+    return {
+      ...state,
+      ...templatesById,
+    };
   });
   builder.addMatcher(
     isAnyOf(

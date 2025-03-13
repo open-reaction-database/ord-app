@@ -27,6 +27,7 @@ import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 
 interface DescriptorsListProps {
   title: string;
@@ -61,23 +62,30 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 }
 
 interface ReactionCardProps {
-  id: number;
-  index: number;
+  id: number | string;
+  index?: number;
 }
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
   const reaction = useSelector(selectReactionById(id));
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const isTemplate = id.toString().startsWith('template_');
 
   const onPreviewSave = useCallback(() => {
     copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
-    { label: 'Copy Reaction ID', value: id.toString() },
+    {
+      label: 'Copy Link',
+      value: isTemplate ? `${window.location.href}/${reaction.id}` : `${window.location.href}/reactions/${id}`,
+    },
+    { label: 'Copy ID', value: id.toString() },
   ];
+
+  const isReadyForEnumeration = false;
+  const linkToPage = isTemplate ? `~/templates/${reaction.id}` : `~/datasets/${datasetId}/reactions/${id}`;
 
   return (
     <Paper
@@ -91,12 +99,12 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
             align="center"
             gap="4"
           >
-            <span className={classes.index}>{index}.</span>
+            {isTemplate ? '' : <span className={classes.index}>{index}.</span>}
             <Link
               className={classes.link}
-              to={`~/datasets/${datasetId}/reactions/${id}`}
+              to={linkToPage}
             >
-              {reaction.pb_reaction_id}
+              {isTemplate ? `${reaction.name}` : `${reaction.pb_reaction_id}`}
             </Link>
 
             <CopyButton options={copyToClipboardOptions} />
@@ -113,39 +121,54 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           className={classes.buttonContainer}
         >
           <RemoveReaction reactionId={id} />
-          <Button
-            leftSection={<CheckListIcon className={classes.buttonIcon} />}
-            variant="transparent"
-          >
-            Save as a Template
-          </Button>
-
-          <Button
-            onClick={onPreviewSave}
-            variant="transparent"
-            leftSection={<CopyImageIcon className={classes.buttonIcon} />}
-          >
-            Copy reaction image
-          </Button>
-
-          <DownloadMenu
-            options={fileDownloadOptions}
-            url={`/datasets/${datasetId}/reactions/${id}/download`}
-            target={
+          {isTemplate ? (
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              <TemplateHeader
+                templateId={id}
+                isReadyForEnumeration={isReadyForEnumeration}
+              />
+            </Flex>
+          ) : (
+            <>
               <Button
-                className={classes.target}
-                leftSection={<DownloadIcon />}
-                rightSection={<ChevronDownIcon />}
+                leftSection={<CheckListIcon className={classes.buttonIcon} />}
                 variant="transparent"
               >
-                Download Reaction
+                Save as a Template
               </Button>
-            }
-          />
+
+              <Button
+                onClick={onPreviewSave}
+                variant="transparent"
+                leftSection={<CopyImageIcon className={classes.buttonIcon} />}
+              >
+                Copy reaction image
+              </Button>
+
+              <DownloadMenu
+                options={fileDownloadOptions}
+                url={`/datasets/${datasetId}/reactions/${id}/download`}
+                target={
+                  <Button
+                    className={classes.target}
+                    leftSection={<DownloadIcon />}
+                    rightSection={<ChevronDownIcon />}
+                    variant="transparent"
+                  >
+                    Download Reaction
+                  </Button>
+                }
+              />
+            </>
+          )}
         </Flex>
       </div>
       <ReactionPreview
         reaction={reaction}
+        reactionId={id}
         ref={previewRef}
       />
       <DescriptorsList

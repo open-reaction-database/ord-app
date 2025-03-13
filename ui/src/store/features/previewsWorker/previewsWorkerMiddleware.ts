@@ -21,12 +21,21 @@ import {
   getReactionPageActions,
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
+import { getTemplateActions, getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-const singleReactionActionsMatcher = isAnyOf(getReactionActions.success, addUpdateReactionFieldActions.success);
+const singleReactionActionsMatcher = isAnyOf(
+  getReactionActions.success,
+  addUpdateReactionFieldActions.success,
+  getTemplateActions.success,
+);
 
-const multipleReactionsActionsMatcher = isAnyOf(getReactionsListActions.success, getReactionPageActions.success);
+const multipleReactionsActionsMatcher = isAnyOf(
+  getReactionsListActions.success,
+  getReactionPageActions.success,
+  getAllTemplatesActions.success,
+);
 
 export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
   const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
@@ -46,7 +55,12 @@ export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
     }
 
     if (multipleReactionsActionsMatcher(action)) {
-      const previews = action.payload.items.reduce((acc, reaction) => ({ ...acc, ...reaction.previews }), {});
+      let previews: PreviewsById = {};
+      if (getAllTemplatesActions.success.match(action)) {
+        previews = action.payload.reduce((acc, template) => ({ ...acc, ...template.previews }), {});
+      } else {
+        previews = action.payload.items.reduce((acc, reaction) => ({ ...acc, ...reaction.previews }), {});
+      }
       worker.postMessage(previews);
     }
 

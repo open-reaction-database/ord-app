@@ -16,7 +16,7 @@
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
-import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
+import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader';
 import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import classes from './TemplatePage.module.scss';
@@ -26,14 +26,15 @@ import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 import { getTemplate } from 'store/entities/templates/templates.thunks';
-import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 
 export function TemplatePage() {
   const dispatch = useAppDispatch();
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
   const templateId = parseInt(rawTemplateId);
-  const template = useSelector(selectTemplateById(templateId));
+  const templateIdString = `template_${templateId}`;
+  const template = useSelector(selectReactionById(templateIdString));
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -91,9 +92,9 @@ export function TemplatePage() {
             >
               {!isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
             </Badge>
-            <TemplateHeader
+            <ReactionHeader
               isReadyForEnumeration={!isReadyForEnumeration}
-              templateId={templateId}
+              reactionId={templateIdString}
             />
             <Paper
               radius="md"

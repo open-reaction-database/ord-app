@@ -13,121 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
-import { useCallback, useMemo } from 'react';
-import { useLocation } from 'wouter';
-import { domain } from 'common/constants.ts';
-import { typographyClasses } from 'common/styling';
-import { useDisclosure } from '@mantine/hooks';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { selectTemplateById } from 'store/entities/templates/templates.selectors.ts';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { EnumerateIcon, DownloadIcon } from 'common/icons';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { downloadAsJson } from 'common/utils';
 
 interface TemplateHeaderProps {
-  templateId: number;
+  templateId: number | string;
   isReadyForEnumeration: boolean;
 }
 
 export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderProps>) {
-  const [location] = useLocation();
-  const dispatch = useAppDispatch();
-  const template = useSelector(selectTemplateById(templateId));
-  const [opened, { open, close }] = useDisclosure();
-
-  const hasReactionDefaultId = template.name === template.id.toString();
-
-  const onReactionNameChange = useCallback(
-    async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId: templateId, pathComponents: ['reactionId'], newValue: name }));
-    },
-    [dispatch, templateId],
-  );
-
-  const copyOptions = useMemo(
-    () => [
-      { label: 'Copy Template Link', value: `${domain}${location}` },
-      { label: 'Copy Template ID', value: templateId.toString() },
-    ],
-    [templateId, location],
-  );
+  const template = useSelector(selectReactionById(templateId));
 
   const downloadAsJsonHandle = () => {
     downloadAsJson(template, `${template.data.reactionId}.json`);
   };
 
   return (
-    <Paper
-      radius="md"
-      p="lg"
-    >
-      <Flex
-        direction="column"
-        gap="sm"
+    <>
+      <Button
+        variant="transparent"
+        leftSection={<EnumerateIcon />}
+        disabled={!isReadyForEnumeration}
       >
-        <Flex justify="space-between">
-          <Flex
-            align="center"
-            gap="sm"
-          >
-            {hasReactionDefaultId && (
-              <Title
-                className={typographyClasses.secondary1}
-                order={2}
-              >
-                Template
-              </Title>
-            )}
-            <Title order={2}>{template.name}</Title>
-            <CopyButton options={copyOptions} />
-            <ActionIcon variant="transparent">
-              <EditIcon onClick={open} />
-            </ActionIcon>
-          </Flex>
-          <Flex
-            align="center"
-            gap="sm"
-          >
-            <RemoveReaction reactionId={templateId} />
-            <Button
-              variant="transparent"
-              leftSection={<EnumerateIcon />}
-              disabled={!isReadyForEnumeration}
-            >
-              Enumerate
-            </Button>
-            <Button
-              leftSection={<DownloadIcon />}
-              variant="transparent"
-              disabled={!isReadyForEnumeration}
-            >
-              Download Variables in CSV
-            </Button>
-            <Button
-              leftSection={<DownloadIcon />}
-              variant="transparent"
-              onClick={downloadAsJsonHandle}
-            >
-              Download Template in JSON
-            </Button>
-          </Flex>
-        </Flex>
-        <ReactionPreview reaction={template} />
-      </Flex>
-      <InputModal
-        opened={opened}
-        onClose={close}
-        onSubmit={onReactionNameChange}
-        title="Edit Template ID"
-        inputLabel="Template ID"
-        initialValue={template.name}
-      />
-    </Paper>
+        Enumerate
+      </Button>
+      <Button
+        leftSection={<DownloadIcon />}
+        variant="transparent"
+        disabled={!isReadyForEnumeration}
+      >
+        Download Variables in CSV
+      </Button>
+      <Button
+        leftSection={<DownloadIcon />}
+        variant="transparent"
+        onClick={downloadAsJsonHandle}
+      >
+        Download Template in JSON
+      </Button>
+    </>
   );
 }

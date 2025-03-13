@@ -22,10 +22,10 @@ import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
 import { getAllTemplates } from 'store/entities/templates/templates.thunks';
 import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
-import { TemplateCard } from 'features/templates/TemplateCard/TemplateCard.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
+import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
 
 export function TemplatesListPage() {
   const dispatch = useAppDispatch();
@@ -73,10 +73,9 @@ export function TemplatesListPage() {
             </Paper>
             <>
               {templates.map(template => (
-                <TemplateCard
+                <ReactionCard
                   key={template.id}
-                  id={template.id}
-                  template={template}
+                  id={`template_${template.id}`}
                 />
               ))}
             </>

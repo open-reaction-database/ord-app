@@ -24,7 +24,7 @@ export const selectReactionsOrder = buildSelector(state => state.reactionsOrder)
 
 export const selectReactions = buildSelector(state => state.reactionsById);
 
-export const selectReactionById = (id: number) => buildSelector(state => state.reactionsById[id]);
+export const selectReactionById = (id: number | string) => buildSelector(state => state.reactionsById[id]);
 
 export const selectReactionsPagination = buildSelector(state => state.pagination);
 
@@ -34,7 +34,7 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
-export const selectReactionComponents = (id: number, input: string) =>
+export const selectReactionComponents = (id: number | string, input: string) =>
   buildSelector(state => state.reactionsById[id].data?.inputs[input]?.components || []);
 
 export const selectReactionPartByPath =
@@ -55,7 +55,7 @@ export const selectReactionPartByPath =
     }
   };
 
-export const selectReactionId = (_state: unknown, id: number) => id;
+export const selectReactionId = (_state: unknown, id: number | string) => id;
 
 export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
   const inputsMap = reactions[id]?.data?.inputs || {};
@@ -66,4 +66,4 @@ export const selectOrderedInputs = createSelector([selectReactions, selectReacti
   });
 });
 
-export const selectOrderedInputsWrapper = (id: number) => (state: AppState) => selectOrderedInputs(state, id);
+export const selectOrderedInputsWrapper = (id: number | string) => (state: AppState) => selectOrderedInputs(state, id);
