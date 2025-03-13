@@ -36,24 +36,29 @@ def safe_molblock(product):
 
 def get_molblocks(pb):
     outcomes = []
-    authentic_standards = []
 
     for outcome in pb.outcomes:
-        products = []
+        outcome_item = []
         for product in outcome.products:
-            outcomes.append(safe_molblock(product))
-            measurements = []
+            product_item = {
+                "molblock": safe_molblock(product),
+                "measurements": []
+            }
             for measurement in product.measurements:
-                measurements.append(safe_molblock(measurement.authentic_standard))
+                product_item["measurements"].append({
+                    "authentic_standard": {
+                        "molblock": safe_molblock(measurement.authentic_standard)
+                    },
+                })
 
-            products.append(measurements)
-        authentic_standards.append(products)
+            outcome_item.append(product_item)
+        outcomes.append({"products": outcome_item})
 
     inputs = {
         key: [safe_molblock(component) for component in value.components]
         for key, value in pb.inputs.items()
     }
-    return {"outcomes": outcomes, "inputs": inputs, "authentic_standards": authentic_standards}
+    return {"outcomes": outcomes, "inputs": inputs}
 
 
 class ReactionResponseSchema(BaseSchema):

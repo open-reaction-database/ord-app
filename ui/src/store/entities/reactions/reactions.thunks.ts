@@ -62,13 +62,13 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
   );
 
   const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
-    (acc: PreviewsById, products, outcomeIndex) => ({
+    (acc: PreviewsById, { products }, outcomeIndex) => ({
       ...acc,
       ...products.reduce((acc: PreviewsById, item, productIndex) => {
         const product = reaction.outcomes[outcomeIndex].products[productIndex];
         return {
           ...acc,
-          [product.id]: item,
+          [product.id]: item.molblock,
         };
       }, {}),
     }),
