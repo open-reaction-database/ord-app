@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Text, Title } from '@mantine/core';
+import { Button, Flex, Text } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -30,6 +30,7 @@ import type { ReactionInputComponent } from 'store/entities/reactions/reactionCo
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 
 const useSelectData = buildUseSelectItems('components');
 
@@ -53,11 +54,10 @@ export function InputsComponentList() {
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <>
-              <Title order={3}>Components</Title>
-              <span>·</span>
-              {components.length}
-            </>
+            <TitleDelimiterAmount
+              title="Components"
+              amount={components.length}
+            />
           }
           rightSection={
             <Button

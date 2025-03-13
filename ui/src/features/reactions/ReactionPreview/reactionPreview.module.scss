@@ -24,7 +24,7 @@
 .inputCard {
   display: flex;
   flex-direction: column;
-  height: 192px;
+  height: 224px;
   border: 1px solid #e7ebef;
   border-radius: 10px;
   padding: var(--mantine-spacing-sm);
@@ -51,6 +51,7 @@
 
   &,
   & > img {
+    min-width: min-content;
     max-height: 80px;
     min-height: 60px;
   }
@@ -67,4 +68,25 @@
   font-size: 24px;
   line-height: 32px;
   color: #090a0b;
+}
+
+.noPreviewWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.noPreviewIcon {
+  width: 48px;
+  height: 48px;
+  color: rgb(6 15 44 / 10%);
+}
+
+.desiredProductBadge {
+  min-width: max-content;
+  background-color: var(--color-purple);
+
+  .badgeLabel {
+    font-weight: 400;
+  }
 }

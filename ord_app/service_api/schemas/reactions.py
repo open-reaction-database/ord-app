@@ -35,10 +35,25 @@ def safe_molblock(product):
 
 
 def get_molblocks(pb):
-    outcomes = [
-        [safe_molblock(product) for product in outcome.products]
-        for outcome in pb.outcomes
-    ]
+    outcomes = []
+
+    for outcome in pb.outcomes:
+        outcome_item = []
+        for product in outcome.products:
+            product_item = {
+                "molblock": safe_molblock(product),
+                "measurements": []
+            }
+            for measurement in product.measurements:
+                product_item["measurements"].append({
+                    "authentic_standard": {
+                        "molblock": safe_molblock(measurement.authentic_standard)
+                    },
+                })
+
+            outcome_item.append(product_item)
+        outcomes.append({"products": outcome_item})
+
     inputs = {
         key: [safe_molblock(component) for component in value.components]
         for key, value in pb.inputs.items()

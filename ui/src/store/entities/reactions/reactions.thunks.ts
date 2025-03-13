@@ -36,7 +36,11 @@ import { type Action, type ThunkDispatch } from '@reduxjs/toolkit';
 import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
-import { ordReactionToReaction, reactionToOrdReaction } from './reactions.converters.ts';
+import {
+  convertReactionFloatsToDoubles,
+  ordReactionToReaction,
+  reactionToOrdReaction,
+} from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
@@ -58,13 +62,13 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
   );
 
   const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
-    (acc: PreviewsById, products, outcomeIndex) => ({
+    (acc: PreviewsById, { products }, outcomeIndex) => ({
       ...acc,
       ...products.reduce((acc: PreviewsById, item, productIndex) => {
         const product = reaction.outcomes[outcomeIndex].products[productIndex];
         return {
           ...acc,
-          [product.id]: item,
+          [product.id]: item.molblock,
         };
       }, {}),
     }),
@@ -76,6 +80,7 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
 const parseReaction = ({ binpb, molblocks, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
+  convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
 
   return {

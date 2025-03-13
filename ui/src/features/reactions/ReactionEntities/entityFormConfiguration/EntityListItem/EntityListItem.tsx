@@ -21,7 +21,7 @@ import { addReactionPathComponentToList } from 'store/features/reactionForm/reac
 import { EditIcon } from 'common/icons';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { EntityListItemProps } from './entityListItem.types.ts';
-import { InlineKeyValue } from 'common/components/display/InlineKeyValue/InlineKeyValue.tsx';
+import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
 
 export function EntityListItem<T>({
   entityKey,
@@ -70,19 +70,21 @@ export function EntityListItem<T>({
         />
       </Flex>
       {requiredFields.map(({ label, render }) => (
-        <InlineKeyValue
+        <KeyValueDisplay
           key={label}
           label={label}
           value={render(entity)}
+          multiline
         />
       ))}
       {optionalFields?.map(({ label, render }) => {
         const value = render(entity);
         return value ? (
-          <InlineKeyValue
+          <KeyValueDisplay
             key={label}
             label={label}
             value={render(entity)}
+            multiline
           />
         ) : null;
       })}

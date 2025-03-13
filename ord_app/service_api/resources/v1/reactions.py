@@ -81,6 +81,18 @@ async def reactions(
 
 
 @router.get(
+    "/search",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
+    response_model=ReactionResponseSchema,
+)
+async def search_reaction(
+    pb_reaction_id: str,
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
+):
+    return await use_case.search(pb_reaction_id=pb_reaction_id)
+
+
+@router.get(
     "/{reaction_id}",
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
     response_model=ReactionResponseSchema,

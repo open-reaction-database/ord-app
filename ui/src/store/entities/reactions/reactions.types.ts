@@ -29,7 +29,7 @@ export interface ReactionSummary {
 
 export interface ReactionMolBlocks {
   inputs: Record<string, Array<ComponentProductPreview>>;
-  outcomes: Array<Array<ComponentProductPreview>>;
+  outcomes: Array<{ products: Array<{ molblock: ComponentProductPreview }> }>;
 }
 
 export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {

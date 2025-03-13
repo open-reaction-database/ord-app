@@ -13,6 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './ComponentDisplayRow.tsx';
-export * from './ComponentsList.tsx';
-export { default as componentsListClasses } from './componentsList.module.scss';
+import { Title, type TitleProps } from '@mantine/core';
+import { DOT_DELIMITER } from 'common/constants.ts';
+import type { ReactNode } from 'react';
+
+type TitleOrder = TitleProps['order'];
+
+interface TitleDelimiterAmountProps {
+  title: ReactNode;
+  amount: number;
+  titleOrder?: TitleOrder;
+}
+
+export function TitleDelimiterAmount({ title, amount, titleOrder = 3 }: Readonly<TitleDelimiterAmountProps>) {
+  return (
+    <>
+      <Title order={titleOrder}>{title}</Title>
+      <span>{DOT_DELIMITER}</span>
+      {amount}
+    </>
+  );
+}

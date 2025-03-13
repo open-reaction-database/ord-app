@@ -33,3 +33,5 @@ export const fileDownloadOptions: Array<DownloadMenuOptions> = [
   { label: '.txtpb', format: 'txtpb' },
   { label: '.json', format: 'json' },
 ];
+
+export const DOT_DELIMITER = '·';

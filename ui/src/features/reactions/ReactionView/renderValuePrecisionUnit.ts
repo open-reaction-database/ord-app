@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './ComponentDisplayRow.tsx';
-export * from './ComponentsList.tsx';
-export { default as componentsListClasses } from './componentsList.module.scss';
+import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
+
+export function renderValuePrecisionUnit(valuePrecision: ValuePrecisionUnit | Omit<ValuePrecisionUnit, 'units'>) {
+  const { value, precision } = valuePrecision;
+  const units = 'units' in valuePrecision ? valuePrecision.units : '';
+  const precisionString = precision ? `±${precision}` : '';
+  return [value, precisionString, units].filter(item => item !== '').join(' ');
+}

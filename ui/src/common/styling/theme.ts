@@ -110,6 +110,16 @@ export const theme = createTheme({
         },
       },
     },
+    Accordion: {
+      styles: {
+        control: {
+          backgroundColor: '#F2F2F2',
+        },
+        content: {
+          padding: 'var(--mantine-spacing-xs) var(--mantine-spacing-md)',
+        },
+      },
+    },
     Badge: {
       styles: {
         label: {
@@ -117,23 +127,5 @@ export const theme = createTheme({
         },
       },
     },
-    // Almost impossible to properly customize, need to rewrite from scratch
-    /*SegmentedControl: {
-      styles: {
-        root: {
-          backgroundColor: 'white',
-          border: '1px solid #D2D6DB',
-          borderRadius: 8,
-          padding: 0,
-        },
-        control: {
-          padding: 0,
-        },
-        indicator: {
-          backgroundColor: '#F8F8F8',
-          height: 32,
-        },
-      },
-    },*/
   },
 });

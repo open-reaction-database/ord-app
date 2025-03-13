@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Text, Title } from '@mantine/core';
+import { Button, Flex, Text } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -30,6 +30,7 @@ import type { ReactionProduct } from 'store/entities/reactions/reactionComponent
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 
 const ENTITY_FIELD = 'products';
 
@@ -55,11 +56,10 @@ export function ProductsComponentsList() {
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <>
-              <Title order={3}>Products</Title>
-              <span>·</span>
-              {components.length}
-            </>
+            <TitleDelimiterAmount
+              title="Products"
+              amount={components.length}
+            />
           }
           rightSection={
             <Button

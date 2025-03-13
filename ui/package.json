@@ -30,7 +30,7 @@
     ]
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.2.4",
+    "@auth0/auth0-react": "^2.3.0",
     "@fastify/deepmerge": "^2.0.2",
     "@mantine/core": "^7.15.3",
     "@mantine/dates": "^7.15.3",
@@ -39,7 +39,7 @@
     "@mantine/notifications": "^7.15.3",
     "@reduxjs/toolkit": "^2.5.0",
     "@tabler/icons-react": "^3.22.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "buffer": "^6.0.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
@@ -49,8 +49,8 @@
     "mantine-react-table": "^2.0.0-beta.8",
     "mime": "^4.0.6",
     "ord-schema-protobufjs": "^0.3.96",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-lazy-with-preload": "^2.2.1",
     "react-redux": "^9.2.0",
     "uuid": "^11.0.5",
@@ -88,5 +88,11 @@
     "vite-plugin-svgr": "^4.3.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.7"
+  },
+  "overrides": {
+    "ketcher-react": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    }
   }
 }

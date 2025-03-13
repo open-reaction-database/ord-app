@@ -209,6 +209,11 @@ class ReactionsUseCase:
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
+    async def search(self, **kwargs):
+        if reaction := await self.reaction_repo.get(**kwargs):
+            return reaction
+        raise EntityNotFoundError(f"Reaction with {kwargs} not found")
+
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
 
