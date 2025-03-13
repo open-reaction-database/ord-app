@@ -18,7 +18,7 @@ import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/R
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type {
   ReactionAnalysis,
   ReactionOutcome,
@@ -66,6 +66,13 @@ const componentsSidebars: Array<ReactionSidebarInfo> = [
     label: 'Component',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: true }),
     ...componentSidebarInfo,
+  },
+  {
+    pathComponents: ['crudeComponents', 'inputs'],
+    label: 'Crude Component',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Crude Component', hasDelete: true }),
+    entityName: ReactionEntity.CrudeComponents,
+    useInitialValues: buildUseInitialValues(values => values),
   },
   {
     pathComponents: ['authenticStandard'],
@@ -140,7 +147,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       hasDelete: true,
       description: 'Reaction inputs include every chemical added to the reaction vessel',
     }),
-    useInitialValues: buildUseInitialValues(({ components: _, ...rest }: AppReactionInput) => rest),
+    useInitialValues: buildUseInitialValues(({ components: _, ...rest }: ReactionInput) => rest),
   },
   {
     pathComponents: ['identifiers'],

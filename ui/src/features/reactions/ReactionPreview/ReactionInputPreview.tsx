@@ -15,7 +15,7 @@
  */
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { useMemo } from 'react';
 import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
@@ -29,7 +29,7 @@ interface ReactionInputPreviewProps {
 }
 
 export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
-  const input: AppReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
+  const input: ReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
   const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));

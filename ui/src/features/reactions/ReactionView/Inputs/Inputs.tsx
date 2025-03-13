@@ -24,10 +24,10 @@ import { useSelector } from 'react-redux';
 import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
 
-const useCreate = buildUseCreate<AppReactionInput>('inputs', (_, list) => {
+const useCreate = buildUseCreate<ReactionInput>('inputs', (_, list) => {
   const newInputName = findReactionEntityUniqueName(
     'Input',
     list.map(input => input.name),

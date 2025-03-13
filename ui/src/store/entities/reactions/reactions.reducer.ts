@@ -20,7 +20,6 @@ import {
   getReactionPageActions,
   getReactionsListActions,
   importReactionFromFileActions,
-  renameReactionActions,
   addUpdateReactionFieldActions,
   deleteReactionFieldActions,
   removeReactionActions,
@@ -91,12 +90,7 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
     return rest;
   });
   builder.addMatcher(
-    isAnyOf(
-      getReactionActions.success,
-      renameReactionActions.success,
-      createEmptyReactionActions.success,
-      importReactionFromFileActions.success,
-    ),
+    isAnyOf(getReactionActions.success, createEmptyReactionActions.success, importReactionFromFileActions.success),
     (state, action) => ({
       ...state,
       [getReactionId(action.payload)]: {

@@ -16,8 +16,8 @@
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import {
-  ordBooleanToReactionBoolean,
-  reactionBooleanToOrdBoolean,
+  ordBooleanToReaction,
+  reactionBooleanToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import type { OrdOptional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
@@ -34,13 +34,13 @@ export const ordNotesToReaction = (notes: OrdOptional<ord.IReactionNotes>): Reac
   } = notes ?? {};
 
   return {
-    isHeterogeneous: ordBooleanToReactionBoolean(isHeterogeneous),
-    formsPrecipitate: ordBooleanToReactionBoolean(formsPrecipitate),
-    isExothermic: ordBooleanToReactionBoolean(isExothermic),
-    isSensitiveToLight: ordBooleanToReactionBoolean(isSensitiveToLight),
-    isSensitiveToMoisture: ordBooleanToReactionBoolean(isSensitiveToMoisture),
-    isSensitiveToOxygen: ordBooleanToReactionBoolean(isSensitiveToOxygen),
-    offgasses: ordBooleanToReactionBoolean(offgasses),
+    isHeterogeneous: ordBooleanToReaction(isHeterogeneous),
+    formsPrecipitate: ordBooleanToReaction(formsPrecipitate),
+    isExothermic: ordBooleanToReaction(isExothermic),
+    isSensitiveToLight: ordBooleanToReaction(isSensitiveToLight),
+    isSensitiveToMoisture: ordBooleanToReaction(isSensitiveToMoisture),
+    isSensitiveToOxygen: ordBooleanToReaction(isSensitiveToOxygen),
+    offgasses: ordBooleanToReaction(offgasses),
     ...rest,
   };
 };
@@ -55,12 +55,12 @@ export const reactionNotesToOrd = ({
   offgasses,
   ...rest
 }: ReactionNotes): ord.IReactionNotes => ({
-  isHeterogeneous: reactionBooleanToOrdBoolean(isHeterogeneous),
-  formsPrecipitate: reactionBooleanToOrdBoolean(formsPrecipitate),
-  isExothermic: reactionBooleanToOrdBoolean(isExothermic),
-  isSensitiveToLight: reactionBooleanToOrdBoolean(isSensitiveToLight),
-  isSensitiveToMoisture: reactionBooleanToOrdBoolean(isSensitiveToMoisture),
-  isSensitiveToOxygen: reactionBooleanToOrdBoolean(isSensitiveToOxygen),
-  offgasses: reactionBooleanToOrdBoolean(offgasses),
+  isHeterogeneous: reactionBooleanToOrd(isHeterogeneous),
+  formsPrecipitate: reactionBooleanToOrd(formsPrecipitate),
+  isExothermic: reactionBooleanToOrd(isExothermic),
+  isSensitiveToLight: reactionBooleanToOrd(isSensitiveToLight),
+  isSensitiveToMoisture: reactionBooleanToOrd(isSensitiveToMoisture),
+  isSensitiveToOxygen: reactionBooleanToOrd(isSensitiveToOxygen),
+  offgasses: reactionBooleanToOrd(offgasses),
   ...rest,
 });

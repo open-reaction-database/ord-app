@@ -15,7 +15,7 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
@@ -32,7 +32,7 @@ export interface ReactionMolBlocks {
 }
 
 export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {
-  inputs: Record<string, AppReactionInput>;
+  inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
   notes: ReactionNotes;
