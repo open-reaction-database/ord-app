@@ -26,9 +26,16 @@ export interface ReactionSummary {
   summary: Record<string, string | number>;
 }
 
+interface ReactionMolBlockProducts {
+  molblock: ComponentProductPreview;
+  measurements: Array<{
+    authentic_standard: { molblock: ComponentProductPreview };
+  }>;
+}
+
 export interface ReactionMolBlocks {
   inputs: Record<string, Array<ComponentProductPreview>>;
-  outcomes: Array<{ products: Array<{ molblock: ComponentProductPreview }> }>;
+  outcomes: Array<{ products: Array<ReactionMolBlockProducts> }>;
 }
 
 export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {

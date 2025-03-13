@@ -70,6 +70,15 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
         return {
           ...acc,
           [product.id]: item.molblock,
+          ...item.measurements.reduce((acc: PreviewsById, measurementMolblock, index) => {
+            const measurement = product.measurements[index];
+            return measurement.authenticStandard
+              ? {
+                  ...acc,
+                  [measurement.authenticStandard.id]: measurementMolblock.authentic_standard.molblock,
+                }
+              : acc;
+          }, {}),
         };
       }, {}),
     }),
