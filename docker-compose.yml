@@ -58,6 +58,7 @@ services:
         condition: service_healthy
     environment:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
+      PG_ALEMBIC_DSN: "postgresql+psycopg://ord@db:5432/ord"
     volumes:
       - .:/app
     entrypoint: >
