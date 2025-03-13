@@ -16,7 +16,6 @@
 import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
-// import { selectOrderedInputs } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.templates);

@@ -20,39 +20,37 @@ import clsx from 'clsx';
 
 export function EntitiesMenu() {
   return (
-    <>
-      <Paper
-        className={classes.root}
-        radius="sm"
-        p="sm"
-      >
-        <Flex direction="column">
-          <Button
-            classNames={{
-              root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/datasets' }),
-              section: classes.buttonSection,
-            }}
-            variant="transparent"
-            leftSection={<DatasetsIcon />}
-            onClick={() => (window.location.href = '/datasets')}
-            justify="flex-start"
-          >
-            Datasets
-          </Button>
-          <Button
-            classNames={{
-              root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/templates' }),
-              section: classes.buttonSection,
-            }}
-            variant="transparent"
-            leftSection={<TemplatesIcon />}
-            onClick={() => (window.location.href = '/templates')}
-            justify="flex-start"
-          >
-            Templates
-          </Button>
-        </Flex>
-      </Paper>
-    </>
+    <Paper
+      className={classes.root}
+      radius="sm"
+      p="sm"
+    >
+      <Flex direction="column">
+        <Button
+          classNames={{
+            root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/datasets' }),
+            section: classes.buttonSection,
+          }}
+          variant="transparent"
+          leftSection={<DatasetsIcon />}
+          onClick={() => (window.location.href = '/datasets')}
+          justify="flex-start"
+        >
+          Datasets
+        </Button>
+        <Button
+          classNames={{
+            root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/templates' }),
+            section: classes.buttonSection,
+          }}
+          variant="transparent"
+          leftSection={<TemplatesIcon />}
+          onClick={() => (window.location.href = '/templates')}
+          justify="flex-start"
+        >
+          Templates
+        </Button>
+      </Flex>
+    </Paper>
   );
 }
