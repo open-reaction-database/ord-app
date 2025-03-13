@@ -18,6 +18,5 @@ import type { ReactionEntityContext } from './reactionEntities.types.ts';
 
 export const reactionEntityContext = createContext<ReactionEntityContext>({
   reactionId: 0,
-  isTemplate: false,
   pathComponents: [],
 });

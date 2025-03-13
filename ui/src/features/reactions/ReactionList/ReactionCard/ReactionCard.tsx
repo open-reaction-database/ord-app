@@ -90,7 +90,6 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
   const linkToPage = isTemplate ? `~/templates/${reaction.id}` : `~/datasets/${datasetId}/reactions/${id}`;
   const isReadyForEnumeration = (reaction.variables?.length ?? 0) > 0;
-  console.log('RemoveReaction id', id);
 
   return (
     <Paper

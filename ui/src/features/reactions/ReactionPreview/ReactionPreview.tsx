@@ -32,7 +32,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
   ref,
 ) {
   const itemId = reactionId || reaction.id;
-  const inputs = useSelector(selectOrderedInputsWrapper(itemId)) || [];
+  const inputs = useSelector(selectOrderedInputsWrapper(itemId));
   const outcomes = reaction.data.outcomes;
 
   return (

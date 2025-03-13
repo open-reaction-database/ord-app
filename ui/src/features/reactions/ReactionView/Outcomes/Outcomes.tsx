@@ -43,7 +43,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
     onCreateNew(outcomes.length, outcomes);
   };
 
-  const ids = useMemo(() => outcomes.map(outcome => outcome.id), [outcomes]);
+  const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
 
   return (
     <Flex direction="column">
@@ -63,7 +63,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
         </Button>
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
-      {outcomes.length > 0 ? (
+      {outcomes?.length > 0 ? (
         <Accordion
           variant="separated"
           chevronPosition="left"

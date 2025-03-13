@@ -33,10 +33,8 @@ interface ReactionInputPreviewProps {
 
 export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
   const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex])) || [];
-  const componentsIds = useMemo(() => outcome?.products?.map(({ id }) => id), [outcome]);
-
+  const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
-
   const outcomeTime = useMemo(() => {
     return outcome.reactionTime?.value ? renderValuePrecisionUnit(outcome.reactionTime) : '';
   }, [outcome.reactionTime]);
