@@ -21,9 +21,10 @@ import { type SaveAsTemplateSchemaFormValues, saveAsTemplateSchema } from './Sav
 import type { SaveAsTemplatePayload } from 'store/entities/templates/templates.types.ts';
 import { createTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface SaveAsTemplateProps {
-  reactionId: number | string;
+  reactionId: ReactionId;
   reactionPbId: string;
   onClose: () => void;
 }

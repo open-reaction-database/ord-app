@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 import type { AppReaction, ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 export type ComponentProductPreview = string | null;
 
 export type PreviewsById = Record<string, ComponentProductPreview>;
-
-export interface Variable {
-  id: string;
-  name: string;
-  pathComponents: ReactionPathComponents;
-}
 
 export interface TemplateCreator {
   reactionId: number;
@@ -35,7 +28,7 @@ export interface Template {
   id: number;
   name: string;
   binpb: string;
-  variables: Array<Variable> | string;
+  variables: string;
   summary: ReactionSummary;
   molblocks: ReactionMolBlocks;
 }

@@ -18,16 +18,20 @@ import { Link, useParams } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
-import classes from './ReactionCard.module.scss';
+import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useContext } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
+import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { useDisclosure } from '@mantine/hooks';
+import { templatesContext } from 'features/templates/templates.context';
+import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
 
 interface DescriptorsListProps {
   title: string;
@@ -62,30 +66,31 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 }
 
 interface ReactionCardProps {
-  id: number | string;
+  id: ReactionId;
   index?: number;
 }
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
+  const { isTemplate } = useContext(templatesContext);
   const reaction = useSelector(selectReactionById(id));
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const isTemplate = id.toString().startsWith('template_');
-
   const onPreviewSave = useCallback(() => {
     copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     {
-      label: 'Copy Link',
-      value: isTemplate ? `${window.location.href}/${reaction.id}` : `${window.location.href}/reactions/${id}`,
+      label: 'Copy Reaction Link',
+      value: `${window.location.href}/reactions/${id}`,
     },
-    { label: 'Copy ID', value: id.toString() },
+    { label: 'Copy Reaction ID', value: id.toString() },
   ];
 
-  const isReadyForEnumeration = false;
+  const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
   const linkToPage = isTemplate ? `~/templates/${reaction.id}` : `~/datasets/${datasetId}/reactions/${id}`;
+  const isReadyForEnumeration = (reaction.variables?.length ?? 0) > 0;
+  console.log('RemoveReaction id', id);
 
   return (
     <Paper
@@ -93,6 +98,13 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
       radius="sm"
       p="lg"
     >
+      {saveAsTemplateOpened && (
+        <SaveAsTemplate
+          reactionId={reaction.id}
+          reactionPbId={reaction.pb_reaction_id}
+          onClose={closeSaveAsTemplate}
+        />
+      )}
       <div className={classes.topContainer}>
         <div className={classes.titleContainer}>
           <Flex
@@ -107,7 +119,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
               {isTemplate ? `${reaction.name}` : `${reaction.pb_reaction_id}`}
             </Link>
 
-            <CopyButton options={copyToClipboardOptions} />
+            {isTemplate ? '' : <CopyButton options={copyToClipboardOptions} />}
           </Flex>
 
           <DescriptorsList
@@ -126,7 +138,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
               align="center"
               gap="sm"
             >
-              <TemplateHeader
+              <TemplateHeaderActions
                 templateId={id}
                 isReadyForEnumeration={isReadyForEnumeration}
               />
@@ -136,6 +148,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
               <Button
                 leftSection={<CheckListIcon className={classes.buttonIcon} />}
                 variant="transparent"
+                onClick={openSaveAsTemplate}
               >
                 Save as a Template
               </Button>

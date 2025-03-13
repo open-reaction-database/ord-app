@@ -68,3 +68,5 @@ export interface AddEditReactionFieldPayload extends UpdateReactionPayload {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newValue: any;
 }
+
+export type ReactionId = number | string;

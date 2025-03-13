@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createNewTemplateActions, getTemplateActions, getAllTemplatesActions } from './templates.actions.ts';
+import {
+  createNewTemplateActions,
+  getTemplateActions,
+  getAllTemplatesActions,
+  removeTemplateActions,
+} from './templates.actions.ts';
 import type { Template, TemplateWrapper } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
@@ -31,7 +36,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
 
   return {
     ...rest,
-    variables: variables,
+    variables: variables ? JSON.parse(variables) : [],
     previews,
     data: appReaction,
   };
@@ -53,8 +58,8 @@ export const getAllTemplates = createThunk(getAllTemplatesActions, async (_d, _s
 export const createTemplate = createThunkWithExplicitResult(
   createNewTemplateActions,
   async (dispatch, getState, templateLoad) => {
-    const reaction = selectReactionById(templateLoad.reactionId)(getState());
-    const ordReaction = reactionToOrdReaction(reaction.data);
+    const baseReaction = selectReactionById(templateLoad.reactionId)(getState());
+    const ordReaction = reactionToOrdReaction(baseReaction.data);
     const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
     const payload = {
       name: templateLoad.name,
@@ -66,3 +71,9 @@ export const createTemplate = createThunkWithExplicitResult(
     navigate(`/templates/${template.id}`);
   },
 );
+
+export const removeTemplate = createThunkWithExplicitResult(removeTemplateActions, async (dispatch, _s, templateId) => {
+  await axiosInstance.delete(`/templates/${templateId}`);
+  dispatch(removeTemplateActions.success(templateId));
+  navigate(`/templates`);
+});

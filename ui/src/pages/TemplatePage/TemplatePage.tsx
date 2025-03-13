@@ -16,18 +16,17 @@
 import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader';
 import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import classes from './TemplatePage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 import { getTemplate } from 'store/entities/templates/templates.thunks';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
+import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 
 export function TemplatePage() {
   const dispatch = useAppDispatch();
@@ -50,14 +49,6 @@ export function TemplatePage() {
     dispatch(getTemplate(templateId));
   }, [dispatch, templateId]);
 
-  const contextValue = useMemo(
-    () => ({
-      reactionId: templateId,
-      isTemplate: true,
-      pathComponents: [],
-    }),
-    [templateId],
-  );
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
   const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
   const variables = template?.variables ?? '[]';
@@ -76,36 +67,34 @@ export function TemplatePage() {
       breadcrumbs={breadcrumbs}
       badge={templateBadge}
     >
-      <reactionEntityContext.Provider value={contextValue}>
-        {template && (
-          <Flex
-            direction="column"
-            gap="sm"
-            miw={50}
+      {template && (
+        <Flex
+          direction="column"
+          gap="sm"
+          miw={50}
+        >
+          <Badge
+            variant="outline"
+            size="lg"
+            radius="md"
+            leftSection={!isReadyForEnumeration ? CheckIcon : CrossIcon}
+            className={classes.enumerationBadge}
           >
-            <Badge
-              variant="outline"
-              size="lg"
-              radius="md"
-              leftSection={!isReadyForEnumeration ? CheckIcon : CrossIcon}
-              className={classes.enumerationBadge}
-            >
-              {!isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
-            </Badge>
-            <ReactionHeader
-              isReadyForEnumeration={!isReadyForEnumeration}
-              reactionId={templateIdString}
-            />
-            <Paper
-              radius="md"
-              p="lg"
-            >
-              <ReactionTabs reactionId={templateId} />
-            </Paper>
-            <ReactionDetailsSidebar reactionId={templateId} />
-          </Flex>
-        )}
-      </reactionEntityContext.Provider>
+            {!isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
+          </Badge>
+          <TemplateHeader
+            isReadyForEnumeration={!isReadyForEnumeration}
+            templateId={templateIdString}
+          />
+          <Paper
+            radius="md"
+            p="lg"
+          >
+            <ReactionTabs reactionId={templateId} />
+          </Paper>
+          <ReactionDetailsSidebar reactionId={templateId} />
+        </Flex>
+      )}
     </PageContainer>
   );
 }

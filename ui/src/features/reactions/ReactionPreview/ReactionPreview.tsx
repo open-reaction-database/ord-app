@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionWrapper, ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import type { TemplateWrapper } from 'store/entities/templates/templates.types';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
@@ -24,7 +24,7 @@ import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/React
 
 interface ReactionPreviewProps {
   reaction: ReactionWrapper | TemplateWrapper;
-  reactionId?: number | string;
+  reactionId?: ReactionId;
 }
 
 export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
@@ -44,7 +44,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
         <Fragment key={input.id}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
           <ReactionInputPreview
-            reactionId={reaction.id}
+            reactionId={itemId}
             key={input.id}
             inputId={input.id}
           />
@@ -54,7 +54,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
       {outcomes.map((outcome, index) => (
         <ReactionOutcomePreview
           key={outcome.id}
-          reactionId={reaction.id}
+          reactionId={itemId}
           outcomeIndex={index}
         />
       ))}

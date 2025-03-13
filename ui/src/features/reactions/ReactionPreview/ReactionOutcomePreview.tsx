@@ -18,25 +18,19 @@ import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import { selectTemplatePartByPath } from 'store/entities/templates/templates.selectors.ts';
-import { useMemo, useContext } from 'react';
+import { useMemo } from 'react';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionInputPreviewProps {
-  reactionId: number;
+  reactionId: ReactionId;
   outcomeIndex: number;
 }
 
 export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
-  const { isTemplate } = useContext(reactionEntityContext);
-  const outcomeReaction: ReactionOutcome =
-    useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex])) || [];
-  const outcomeTemplate: ReactionOutcome =
-    useSelector(selectTemplatePartByPath(reactionId, ['outcomes', outcomeIndex])) || [];
-  const outcome = isTemplate ? outcomeTemplate : outcomeReaction;
-  const componentsIds = useMemo(() => outcome?.products.map(({ id }) => id), [outcome]);
+  const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex])) || [];
+  const componentsIds = useMemo(() => outcome?.products?.map(({ id }) => id), [outcome]);
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 

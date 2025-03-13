@@ -13,47 +13,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button } from '@mantine/core';
-import { useSelector } from 'react-redux';
-import { EnumerateIcon, DownloadIcon } from 'common/icons';
+import { ActionIcon, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { downloadAsJson } from 'common/utils';
+import { useSelector } from 'react-redux';
+import { EditIcon } from 'common/icons';
+import { useCallback } from 'react';
+import { useDisclosure } from '@mantine/hooks';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { InputModal } from 'common/components/InputModal/InputModal.tsx';
+import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface TemplateHeaderProps {
-  templateId: number | string;
-  isReadyForEnumeration: boolean;
+  templateId: ReactionId;
+  isReadyForEnumeration?: boolean;
 }
 
-export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderProps>) {
+export function TemplateHeader({ templateId, isReadyForEnumeration = false }: Readonly<TemplateHeaderProps>) {
+  const dispatch = useAppDispatch();
   const template = useSelector(selectReactionById(templateId));
-
-  const downloadAsJsonHandle = () => {
-    downloadAsJson(template, `${template.data.reactionId}.json`);
-  };
+  const [opened, { open, close }] = useDisclosure();
+  const onReactionNameChange = useCallback(
+    async (name: string) => {
+      dispatch(
+        addUpdateReactionField({ reactionId: Number(templateId), pathComponents: ['reactionId'], newValue: name }),
+      );
+    },
+    [dispatch, templateId],
+  );
 
   return (
-    <>
-      <Button
-        variant="transparent"
-        leftSection={<EnumerateIcon />}
-        disabled={!isReadyForEnumeration}
+    <Paper
+      radius="md"
+      p="lg"
+    >
+      <Flex
+        direction="column"
+        gap="sm"
       >
-        Enumerate
-      </Button>
-      <Button
-        leftSection={<DownloadIcon />}
-        variant="transparent"
-        disabled={!isReadyForEnumeration}
-      >
-        Download Variables in CSV
-      </Button>
-      <Button
-        leftSection={<DownloadIcon />}
-        variant="transparent"
-        onClick={downloadAsJsonHandle}
-      >
-        Download Template in JSON
-      </Button>
-    </>
+        <Flex justify="space-between">
+          <Flex
+            align="center"
+            gap="sm"
+          >
+            <Title order={2}>{template.name}</Title>
+            <ActionIcon variant="transparent">
+              <EditIcon onClick={open} />
+            </ActionIcon>
+          </Flex>
+          <Flex
+            align="center"
+            gap="sm"
+          >
+            <RemoveReaction reactionId={templateId} />
+            <TemplateHeaderActions
+              templateId={templateId}
+              isReadyForEnumeration={isReadyForEnumeration}
+            />
+          </Flex>
+        </Flex>
+        <ReactionPreview
+          reaction={template}
+          reactionId={templateId}
+        />
+      </Flex>
+      <InputModal
+        opened={opened}
+        onClose={close}
+        onSubmit={onReactionNameChange}
+        title="Edit Reaction ID"
+        inputLabel="Reaction ID"
+        initialValue={template.pb_reaction_id}
+      />
+    </Paper>
   );
 }

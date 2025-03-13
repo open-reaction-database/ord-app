@@ -18,6 +18,7 @@ import { Link } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
 import { HomeIcon } from 'common/icons';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import { navigate } from 'wouter/use-browser-location';
 
 interface BreadcrumbsProps {
   items: Breadcrumbs;
@@ -43,7 +44,7 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
               {index === 0 && (
                 <HomeIcon
                   className={classes.homeIcon}
-                  onClick={() => (window.location.href = '/')}
+                  onClick={() => navigate('/')}
                 />
               )}
               <Tooltip label={breadcrumb.title}>

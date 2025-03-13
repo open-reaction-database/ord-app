@@ -17,6 +17,7 @@ import { createSelectorFactory } from 'store/utils';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 
@@ -24,7 +25,7 @@ export const selectReactionsOrder = buildSelector(state => state.reactionsOrder)
 
 export const selectReactions = buildSelector(state => state.reactionsById);
 
-export const selectReactionById = (id: number | string) => buildSelector(state => state.reactionsById[id]);
+export const selectReactionById = (id: ReactionId) => buildSelector(state => state.reactionsById[id]);
 
 export const selectReactionsPagination = buildSelector(state => state.pagination);
 
@@ -34,11 +35,11 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
-export const selectReactionComponents = (id: number | string, input: string) =>
+export const selectReactionComponents = (id: ReactionId, input: string) =>
   buildSelector(state => state.reactionsById[id].data?.inputs[input]?.components || []);
 
 export const selectReactionPartByPath =
-  (reactionId: number, pathComponents: ReactionPathComponents) => (state: AppState) => {
+  (reactionId: ReactionId, pathComponents: ReactionPathComponents) => (state: AppState) => {
     const reaction = selectReactionById(reactionId)(state);
     if (!reaction) {
       return null;
@@ -55,7 +56,7 @@ export const selectReactionPartByPath =
     }
   };
 
-export const selectReactionId = (_state: unknown, id: number | string) => id;
+export const selectReactionId = (_state: unknown, id: ReactionId) => id;
 
 export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
   const inputsMap = reactions[id]?.data?.inputs || {};
@@ -66,4 +67,4 @@ export const selectOrderedInputs = createSelector([selectReactions, selectReacti
   });
 });
 
-export const selectOrderedInputsWrapper = (id: number | string) => (state: AppState) => selectOrderedInputs(state, id);
+export const selectOrderedInputsWrapper = (id: ReactionId) => (state: AppState) => selectOrderedInputs(state, id);

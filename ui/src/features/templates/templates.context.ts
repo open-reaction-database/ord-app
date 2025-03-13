@@ -13,5 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './formatDate.ts';
-export * from './itemsById.ts';
+import { createContext } from 'react';
+import type { TemplatesContext } from './templates.types.ts';
+
+export const templatesContext = createContext<TemplatesContext>({
+  isTemplate: false,
+});
