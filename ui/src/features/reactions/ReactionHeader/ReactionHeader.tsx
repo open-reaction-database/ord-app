@@ -36,8 +36,7 @@ import classes from './reactionHeader.module.scss';
 
 interface ReactionHeaderProps {
   reactionId: ReactionId;
-  datasetId?: number;
-  isReadyForEnumeration?: boolean;
+  datasetId: number;
 }
 
 export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
