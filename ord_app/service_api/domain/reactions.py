@@ -52,8 +52,8 @@ async def validate_reaction(reaction: ReactionModel):
         validation_result = [err], []
 
     if any(validation_result):
-        return False
-    return True
+        return False, validation_result
+    return True, validation_result
 
 
 async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = None):
@@ -61,7 +61,8 @@ async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = 
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
         for reaction in reactions:
-            update_values.append({"id": reaction.id, "is_valid": await validate_reaction(reaction)})
+            is_valid, = await validate_reaction(reaction)
+            update_values.append({"id": reaction.id, "is_valid": is_valid})
         try:
             await reaction_repo.bulk_update(update_values)
         except Exception as err:
@@ -230,14 +231,16 @@ class ReactionsUseCase:
         if duplicated := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id):
             pb_reaction.reaction_id = f"duplicate-{duplicated.pb_reaction_id}_{uuid4().hex}"
 
+        is_valid, (errors, warning) = await validate_reaction(db_reaction)
         updating_data = {
             "binpb": pb_reaction.SerializeToString(),
             "pb_reaction_id": pb_reaction.reaction_id,
-            "is_valid": await validate_reaction(db_reaction),
+            "is_valid": is_valid,
         }
 
         if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
             await self.dataset_repo.update_modified_at(dataset_id)
+            reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
 
         raise EntityNotFoundError("Reaction not found")
