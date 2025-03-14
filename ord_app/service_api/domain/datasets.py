@@ -59,10 +59,6 @@ class DatasetUseCases:
         dataset, reaction_counts = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
         dataset, = await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
 
-        dataset.is_sharable = False
-        if dataset.groups and dataset.dataset_group_associations:
-            dataset.is_sharable = True
-
         return dataset, reaction_counts
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:

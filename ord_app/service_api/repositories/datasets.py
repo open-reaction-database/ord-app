@@ -13,7 +13,7 @@
 # limitations under the License.
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
-from sqlalchemy import and_, delete, exists, func, select, update
+from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, with_loader_criteria
 
@@ -70,32 +70,6 @@ class DatasetsRepository:
         return await self.db.scalar(stmt)
 
     async def get_with_sharable_info(self, dataset_id: int, user_id: int):
-        # Subquery to check that a group has a membership record with the specified user_id.
-        user_group_exists = exists(
-            select(1)
-            .where(
-                and_(
-                    UserGroupsMembershipModel.group_id == GroupModel.id,
-                    UserGroupsMembershipModel.user_id == user_id
-                )
-            )
-            .correlate(GroupModel)  # Explicitly correlate with GroupModel for correct scoping
-        )
-
-        # Subquery to check that there is an association for the given dataset in the group
-        # where the 'is_primary' flag is True.
-        dataset_assoc_exists = exists(
-            select(1)
-            .where(
-                and_(
-                    DatasetGroupAssociationModel.group_id == GroupModel.id,
-                    DatasetGroupAssociationModel.dataset_id == dataset_id,
-                    DatasetGroupAssociationModel.is_primary.is_(True)
-                )
-            )
-            .correlate(GroupModel)  # Correlate with GroupModel to ensure proper linkage
-        )
-
         stmt = (
             select(
                 DatasetModel,
@@ -106,7 +80,6 @@ class DatasetsRepository:
             .options(
                 # Eager-load related owner, associations, and groups.
                 joinedload(DatasetModel.owner),
-                joinedload(DatasetModel.dataset_group_associations),
                 joinedload(DatasetModel.groups),
                 # Apply loader criteria to filter associations: only include those with is_primary True.
                 with_loader_criteria(
@@ -114,23 +87,30 @@ class DatasetsRepository:
                     DatasetGroupAssociationModel.is_primary.is_(True),
                     include_aliases=True
                 ),
-                # Apply loader criteria to filter groups:
-                # Only include groups where both conditions are met:
-                #   1. The group has a membership record with the specified user_id.
-                #   2. The group is associated with the dataset with is_primary True.
-                with_loader_criteria(
-                    GroupModel,
-                    and_(
-                        user_group_exists,
-                        dataset_assoc_exists
-                    ),
-                    include_aliases=True
-                )
             )
             .group_by(DatasetModel.id)
         )
-        result = (await self.db.execute(stmt)).first()
-        return result
+        dataset = (await self.db.execute(stmt)).first()
+
+        dataset_associations_stmt = (
+            select(DatasetGroupAssociationModel)
+            .where(
+                DatasetGroupAssociationModel.group_id.in_({group.id for group in dataset[0].groups}),
+                DatasetGroupAssociationModel.dataset_id == dataset[0].id,
+                DatasetGroupAssociationModel.is_primary.is_(True),
+                DatasetGroupAssociationModel.group.has(
+                    GroupModel.members.any(
+                        UserModel.id == user_id
+                    )
+                )
+            )
+        )
+
+        dataset[0].is_sharable = False
+        if (await self.db.execute(dataset_associations_stmt)).all():
+            dataset[0].is_sharable = True
+
+        return dataset
 
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel:
         stmt = (
