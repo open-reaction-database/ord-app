@@ -27,7 +27,13 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type { AppReaction, ReactionMolBlocks, ReactionResponse, ReactionWrapper } from './reactions.types.ts';
+import type {
+  ReactionParsedProtobuf,
+  ReactionId,
+  ReactionMolBlocks,
+  ReactionResponse,
+  ReactionWrapper,
+} from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
@@ -45,7 +51,7 @@ import { showNotification } from 'common/utils/showNotification.tsx';
 import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+export const getReactionPreviews = (reaction: ReactionParsedProtobuf, molblocks: ReactionMolBlocks): PreviewsById => {
   const inputsArray = Object.values(reaction.inputs);
   const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
     (acc: PreviewsById, [inputName, input]) => ({
@@ -161,7 +167,7 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-async function updateReaction(reactionId: number, getState: () => AppState): Promise<ReactionResponse> {
+async function updateReaction(reactionId: ReactionId, getState: () => AppState): Promise<ReactionResponse> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);

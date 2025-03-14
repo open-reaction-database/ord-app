@@ -21,14 +21,12 @@ import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface TemplateHeaderProps {
-  templateId: ReactionId;
+  templateId: string;
   isReadyForEnumeration?: boolean;
 }
 
@@ -36,11 +34,12 @@ export function TemplateHeader({ templateId, isReadyForEnumeration = false }: Re
   const dispatch = useAppDispatch();
   const template = useSelector(selectReactionById(templateId));
   const [opened, { open, close }] = useDisclosure();
-  const onReactionNameChange = useCallback(
-    async (name: string) => {
-      dispatch(
+  const onTemplateNameChange = useCallback(
+    async (_name: string) => {
+      // Todo update template name
+      /*dispatch(
         addUpdateReactionField({ reactionId: Number(templateId), pathComponents: ['reactionId'], newValue: name }),
-      );
+      );*/
     },
     [dispatch, templateId],
   );
@@ -83,10 +82,10 @@ export function TemplateHeader({ templateId, isReadyForEnumeration = false }: Re
       <InputModal
         opened={opened}
         onClose={close}
-        onSubmit={onReactionNameChange}
-        title="Edit Reaction ID"
-        inputLabel="Reaction ID"
-        initialValue={template.pb_reaction_id}
+        onSubmit={onTemplateNameChange}
+        title="Edit Template Name"
+        inputLabel="Template Name"
+        initialValue={template.name}
       />
     </Paper>
   );

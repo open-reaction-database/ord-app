@@ -27,9 +27,10 @@ import type { MouseEvent } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface OutcomeListItemHeaderProps {
-  reactionId: number;
+  reactionId: ReactionId;
   outcome: ReactionOutcome;
   pathComponents: ReactionPathComponents;
 }

@@ -15,7 +15,7 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type { AppReactionInput } from './reactionInputs.types.ts';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionParsedProtobuf } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordAdditionDeviceToReaction,
   ordAdditionSpeedToReaction,
@@ -94,7 +94,7 @@ export function reactionInputToOrdInput(appInput: AppReactionInput): ord.IReacti
   };
 }
 
-export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): AppReaction['inputs'] {
+export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): ReactionParsedProtobuf['inputs'] {
   return Object.entries(ordInputs || {}).reduce((acc, [name, ordInput]) => {
     const reactionInput = ordInputToReactionsInput(ordInput, name);
     return {
@@ -104,7 +104,7 @@ export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): A
   }, {});
 }
 
-export function reactionInputsToOrdInputs(reactionInputs: AppReaction['inputs']): ord.IReaction['inputs'] {
+export function reactionInputsToOrdInputs(reactionInputs: ReactionParsedProtobuf['inputs']): ord.IReaction['inputs'] {
   return Object.values(reactionInputs).reduce(
     (acc, item) => ({
       ...acc,
