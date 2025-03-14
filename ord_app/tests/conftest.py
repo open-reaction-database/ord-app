@@ -60,11 +60,11 @@ async def mock_validate_reactions_task(*args, **kwargs):
 @pytest.fixture(autouse=True)
 def override_validate_reactions_task(monkeypatch):
     monkeypatch.setattr(
-        "ord_app.service_api.resources.v1.datasets.validate_reactions_task",
+        "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions",
         mock_validate_reactions_task
     )
     monkeypatch.setattr(
-        "ord_app.service_api.resources.v1.reactions.validate_reactions_task",
+        "ord_app.service_api.resources.v1.reactions.validate_dataset_reactions",
         mock_validate_reactions_task
     )
 

@@ -41,24 +41,27 @@ from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def validate_reactions_task(db: AsyncSession, dataset_id: int | None = None):
+async def validate_reaction(reaction: ReactionModel):
+    if reaction.binpb is None:
+        return
 
+    pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
+    try:
+        validation_result = await run_in_threadpool(validate_pb_reaction, pb_reaction)
+    except ValueError as err:
+        validation_result = [err], []
+
+    if any(validation_result):
+        return False
+    return True
+
+
+async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = None):
     reaction_repo = ReactionsRepository(db)
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
         for reaction in reactions:
-            pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
-            try:
-                validation_result = await run_in_threadpool(validate_pb_reaction, pb_reaction)
-            except ValueError as err:
-                validation_result = [err], []
-
-            if any(validation_result):
-                update_values.append({"id": reaction.id, "is_valid": False})
-                logger.debug(f"Reaction validation failed: {validation_result}")
-            else:
-                update_values.append({"id": reaction.id, "is_valid": True})
-
+            update_values.append({"id": reaction.id, "is_valid": await validate_reaction(reaction)})
         try:
             await reaction_repo.bulk_update(update_values)
         except Exception as err:
@@ -116,7 +119,7 @@ class ReactionsUseCase:
         else:
             validation_result = [], []
 
-        reaction = await self.reaction_repo.create(
+        db_reaction = await self.reaction_repo.create(
             dataset_id,
             self.current_user.id,
             insert_data,
@@ -127,32 +130,35 @@ class ReactionsUseCase:
         if any(validation_result):
             errors, warnings = validation_result
             # This field is written to the database
-            reaction.is_valid = False
+            db_reaction.is_valid = False
 
             # And this is not, it is only stored in the object
             # There is no need to store these fields in the database yet
-            reaction.validation = {"errors": errors, "warnings": warnings}
+            db_reaction.validation = {"errors": errors, "warnings": warnings}
         else:
-            reaction.is_valid = True  # same
-            reaction.validation = {"errors": [], "warnings": []}  # same
+            db_reaction.is_valid = True  # same
+            db_reaction.validation = {"errors": [], "warnings": []}  # same
 
-        self.db.add(reaction)
+        self.db.add(db_reaction)
         await self.db.flush()
 
         # Update pb_reaction_id and binpb based on whether binpb is already set
-        if reaction.binpb is None:
-            reaction.pb_reaction_id = reaction.id  # Use reaction.id as fallback
-            reaction.binpb = Reaction(reaction_id=str(reaction.id)).SerializeToString()
+        generated_pb_reaction_id = uuid4().hex
+        if db_reaction.binpb is None:
+            db_reaction.pb_reaction_id = generated_pb_reaction_id  # Use reaction.id as fallback
+            db_reaction.binpb = Reaction(reaction_id=generated_pb_reaction_id).SerializeToString()
         else:
-            pb_reaction = load_message(reaction.binpb, Reaction, "binpb")
+            pb_reaction = await run_in_threadpool(load_message, db_reaction.binpb, Reaction, "binpb")
             # If the loaded message has a valid reaction_id, use it; otherwise, fallback to reaction.id
-            reaction.pb_reaction_id = pb_reaction.reaction_id = str(pb_reaction.reaction_id or reaction.id)
-            reaction.binpb = pb_reaction.SerializeToString()
+            db_reaction.pb_reaction_id = pb_reaction.reaction_id = str(
+                pb_reaction.reaction_id or generated_pb_reaction_id
+            )
+            db_reaction.binpb = pb_reaction.SerializeToString()
 
         await self.db.commit()
-        await self.db.refresh(reaction)
+        await self.db.refresh(db_reaction)
 
-        return reaction
+        return db_reaction
 
     async def create(self, dataset_id: int, payload: ReactionCreateSchema):
         insert_data = {"pb_reaction_id": uuid4().hex}
@@ -217,11 +223,18 @@ class ReactionsUseCase:
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
 
-        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
-        if db_reaction and db_reaction.pb_reaction_id == pb_reaction.reaction_id:
-            pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
+        db_reaction = await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id)
+        if db_reaction is None:
+            raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
-        updating_data = {"binpb": pb_reaction.SerializeToString(), "pb_reaction_id": pb_reaction.reaction_id}
+        if duplicated := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id):
+            pb_reaction.reaction_id = f"duplicate-{duplicated.pb_reaction_id}_{uuid4().hex}"
+
+        updating_data = {
+            "binpb": pb_reaction.SerializeToString(),
+            "pb_reaction_id": pb_reaction.reaction_id,
+            "is_valid": await validate_reaction(db_reaction),
+        }
 
         if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
             await self.dataset_repo.update_modified_at(dataset_id)

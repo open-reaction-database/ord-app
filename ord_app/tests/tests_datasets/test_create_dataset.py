@@ -20,7 +20,7 @@ from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import select
 
-from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
@@ -84,7 +84,7 @@ async def test_upload_dataset_with_reaction_validation(api_client, mock_authenti
         response_data["owner"]["id"] = user.id
 
     stmt = select(ReactionModel.is_valid).where(ReactionModel.dataset_id == response_data["id"])
-    await validate_reactions_task(test_db_session)
+    await validate_dataset_reactions(test_db_session)
     assert {True,} == set((await test_db_session.scalars(stmt)).all())
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):

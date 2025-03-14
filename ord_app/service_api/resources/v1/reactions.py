@@ -18,7 +18,7 @@ from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import dataset_authorization
-from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_reactions_task
+from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case, validate_dataset_reactions
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionResponseSchema, ReactionUpdateSchema
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
@@ -64,7 +64,7 @@ async def upload_reaction(
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     response =  await use_case.upload(dataset_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db)
+    background_tasks.add_task(validate_dataset_reactions, db)
     return response
 
 
