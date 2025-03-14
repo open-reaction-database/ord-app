@@ -18,6 +18,7 @@ import {
   getTemplateActions,
   getAllTemplatesActions,
   removeTemplateActions,
+  renameTemplateActions,
 } from './templates.actions.ts';
 import type { Template, TemplateWrapper } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
@@ -28,6 +29,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
 
 const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): TemplateWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
@@ -36,7 +38,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
 
   return {
     ...rest,
-    variables: variables ? JSON.parse(variables) : [],
+    variables: variables,
     previews,
     data: appReaction,
   };
@@ -76,4 +78,19 @@ export const removeTemplate = createThunkWithExplicitResult(removeTemplateAction
   await axiosInstance.delete(`/templates/${templateId}`);
   dispatch(removeTemplateActions.success(templateId));
   navigate(`/templates`);
+});
+
+export const renameTemplate = createThunk(renameTemplateActions, async (_d, getState, { templateId, name }) => {
+  const baseReaction = selectReactionById(templateId)(getState());
+  const ordReaction = reactionToOrdReaction(baseReaction.data);
+  const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  const payload = {
+    name: name,
+    binpb: binpb,
+    variables: JSON.stringify(baseReaction.variables),
+  };
+  const result = await axiosInstance.patch<Template>(`templates/${templateId.split('_')[1]}`, payload);
+  showNotification({ message: 'Template updated.', variant: 'success' });
+
+  return renameTemplateActions.success(parseTemplate(result.data));
 });

@@ -51,8 +51,7 @@ export function TemplatePage() {
 
   const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
   const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
-  const variables = template?.variables ?? '[]';
-  const isReadyForEnumeration = variables.length > 0;
+  const isReadyForEnumeration = template?.variables.length > 0;
   const templateBadge = (
     <Badge
       autoContrast
@@ -77,15 +76,12 @@ export function TemplatePage() {
             variant="outline"
             size="lg"
             radius="md"
-            leftSection={!isReadyForEnumeration ? CheckIcon : CrossIcon}
+            leftSection={isReadyForEnumeration ? CheckIcon : CrossIcon}
             className={classes.enumerationBadge}
           >
-            {!isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
+            {isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
           </Badge>
-          <TemplateHeader
-            isReadyForEnumeration={!isReadyForEnumeration}
-            templateId={templateIdString}
-          />
+          <TemplateHeader templateId={templateIdString} />
           <Paper
             radius="md"
             p="lg"

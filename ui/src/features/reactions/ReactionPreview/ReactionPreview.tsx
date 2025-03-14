@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionData, ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
-import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectOrderedInputsWrapper, selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
-  reaction: ReactionData;
-  reactionId?: ReactionId;
+  reactionId: ReactionId;
 }
 
 export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
-  { reaction, reactionId },
+  { reactionId },
   ref,
 ) {
-  const itemId = reactionId || reaction.id;
-  const inputs = useSelector(selectOrderedInputsWrapper(itemId));
+  const reaction = useSelector(selectReactionById(reactionId));
+  const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
   const outcomes = reaction.data.outcomes;
 
   return (
@@ -43,7 +42,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
         <Fragment key={input.id}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
           <ReactionInputPreview
-            reactionId={itemId}
+            reactionId={reactionId}
             key={input.id}
             inputId={input.id}
           />
@@ -53,7 +52,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
       {outcomes.map((outcome, index) => (
         <ReactionOutcomePreview
           key={outcome.id}
-          reactionId={itemId}
+          reactionId={reactionId}
           outcomeIndex={index}
         />
       ))}

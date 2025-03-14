@@ -25,3 +25,5 @@ export const getAllTemplatesActions = createAsyncAction<void, Array<TemplateWrap
 export const createNewTemplateActions = createAsyncAction<TemplateCreator, Template>('create');
 
 export const removeTemplateActions = createAsyncAction<number, number>('remove_template');
+
+export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, TemplateWrapper>('rename');

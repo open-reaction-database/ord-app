@@ -18,21 +18,22 @@ import { useSelector } from 'react-redux';
 import { EnumerateIcon, DownloadIcon } from 'common/icons';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { downloadAsJson } from 'store/utils/downloadFile.thunks.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 
 interface TemplateHeaderActionsProps {
-  templateId: ReactionId;
-  isReadyForEnumeration: boolean;
+  templateId: string;
 }
 
-export function TemplateHeaderActions({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderActionsProps>) {
+export function TemplateHeaderActions({ templateId }: Readonly<TemplateHeaderActionsProps>) {
   const template = useSelector(selectReactionById(templateId));
   const downloadAsJsonHandle = () => {
     downloadAsJson(template, `${template.data.reactionId}.json`);
   };
+  const isReadyForEnumeration = template.variables.length > 0;
 
   return (
     <>
+      <RemoveReaction reactionId={templateId} />
       <Button
         variant="transparent"
         leftSection={<EnumerateIcon />}

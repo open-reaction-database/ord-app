@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.container {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
+.target {
+  &:active {
+    transform: none;
+  }
 }
 
-.templates {
-  width: calc(100% - 200px);
-}
-
-.index {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary-3);
-}
-
-.link {
-  font-size: var(--font-size-lg);
-  color: var(--color-primary);
-  text-decoration: none;
+.buttonIcon {
+  width: 16px;
+  height: 16px;
 }

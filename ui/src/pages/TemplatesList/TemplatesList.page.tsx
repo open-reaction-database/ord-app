@@ -15,6 +15,7 @@
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
+import { Link } from 'wouter';
 import { Flex, Paper, Title } from '@mantine/core';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
@@ -26,6 +27,29 @@ import { reactionEntityContext } from 'features/reactions/ReactionEntities/react
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
+import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
+import type { TemplateWrapper } from 'store/entities/templates/templates.types';
+
+interface TemplateTitleProps {
+  index: number;
+  template: TemplateWrapper;
+}
+
+function TemplateTitle({ index, template }: Readonly<TemplateTitleProps>) {
+  const linkToPage = `~/templates/${template.id}`;
+
+  return (
+    <>
+      <span className={classes.index}>{index}.</span>
+      <Link
+        className={classes.link}
+        to={linkToPage}
+      >
+        {template.name}
+      </Link>
+    </>
+  );
+}
 
 export function TemplatesListPage() {
   const dispatch = useAppDispatch();
@@ -72,10 +96,17 @@ export function TemplatesListPage() {
               </Flex>
             </Paper>
             <>
-              {templates.map(template => (
+              {templates.map((template, index) => (
                 <ReactionCard
                   key={template.id}
                   id={`template_${template.id}`}
+                  actions={<TemplateHeaderActions templateId={`template_${template.id}`} />}
+                  title={
+                    <TemplateTitle
+                      index={index + 1}
+                      template={template}
+                    />
+                  }
                 />
               ))}
             </>

@@ -20,6 +20,7 @@ import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
+import type { Variable } from '../templates/templates.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -47,24 +48,24 @@ export interface ReactionResponse {
   molblocks: ReactionMolBlocks;
 }
 
-export interface ReactionData {
+export interface ReactionDataBase {
   id: ReactionId;
   data: ReactionParsedProtobuf;
   previews: PreviewsById;
   summary: ReactionSummary;
 }
 
-export interface AppReaction extends ReactionData {
+export interface ReactionData extends ReactionDataBase {
   pb_reaction_id: string;
   is_valid: boolean;
 }
 
-export interface AppTemplate extends ReactionData {
+export interface TemplateData extends ReactionDataBase {
   name: string;
-  variables: Array<unknown>;
+  variables: Array<Variable>;
 }
 
-export type ReactionOrTemplate = AppReaction | AppTemplate;
+export type ReactionOrTemplate = ReactionData | TemplateData;
 
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molblocks'> {
   data: ReactionParsedProtobuf;

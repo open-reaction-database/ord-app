@@ -17,7 +17,7 @@ import { createSelectorFactory } from 'store/utils';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { AppReaction, AppTemplate, ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionData, TemplateData, ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 
@@ -25,11 +25,11 @@ export const selectReactionsOrder = buildSelector(state => state.reactionsOrder)
 
 export const selectReactions = buildSelector(state => state.reactionsById);
 
-export function selectReactionById(id: string): (state: AppState) => AppTemplate;
-export function selectReactionById(id: number): (state: AppState) => AppReaction;
-export function selectReactionById(id: ReactionId): (state: AppState) => AppReaction | AppTemplate;
+export function selectReactionById(id: string): (state: AppState) => TemplateData;
+export function selectReactionById(id: number): (state: AppState) => ReactionData;
+export function selectReactionById(id: ReactionId): (state: AppState) => ReactionData | TemplateData;
 
-export function selectReactionById(id: ReactionId): (state: AppState) => AppReaction | AppTemplate {
+export function selectReactionById(id: ReactionId): (state: AppState) => ReactionData | TemplateData {
   return (state: AppState) => state.entities.reactions.reactionsById[id];
 }
 

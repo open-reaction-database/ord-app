@@ -34,7 +34,7 @@ import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionP
 import classes from './reactionHeader.module.scss';
 
 interface ReactionHeaderProps {
-  reactionId: ReactionId;
+  reactionId: number;
   datasetId: number;
 }
 
@@ -48,9 +48,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(
-        addUpdateReactionField({ reactionId: Number(reactionId), pathComponents: ['reactionId'], newValue: name }),
-      );
+      dispatch(addUpdateReactionField({ reactionId: reactionId, pathComponents: ['reactionId'], newValue: name }));
     },
     [dispatch, reactionId],
   );
@@ -137,10 +135,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             />
           </Flex>
         </Flex>
-        <ReactionPreview
-          reaction={reaction}
-          reactionId={reactionId}
-        />
+        <ReactionPreview reactionId={reactionId} />
       </Flex>
       <InputModal
         opened={opened}

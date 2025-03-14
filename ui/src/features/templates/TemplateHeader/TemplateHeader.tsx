@@ -22,24 +22,20 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
-import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
+import { renameTemplate } from 'store/entities/templates/templates.thunks.ts';
 
 interface TemplateHeaderProps {
   templateId: string;
-  isReadyForEnumeration?: boolean;
 }
 
-export function TemplateHeader({ templateId, isReadyForEnumeration = false }: Readonly<TemplateHeaderProps>) {
+export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
   const dispatch = useAppDispatch();
   const template = useSelector(selectReactionById(templateId));
   const [opened, { open, close }] = useDisclosure();
   const onTemplateNameChange = useCallback(
     async (_name: string) => {
-      // Todo update template name
-      /*dispatch(
-        addUpdateReactionField({ reactionId: Number(templateId), pathComponents: ['reactionId'], newValue: name }),
-      );*/
+      dispatch(renameTemplate({ templateId: templateId, name: _name }));
     },
     [dispatch, templateId],
   );
@@ -67,17 +63,10 @@ export function TemplateHeader({ templateId, isReadyForEnumeration = false }: Re
             align="center"
             gap="sm"
           >
-            <RemoveReaction reactionId={templateId} />
-            <TemplateHeaderActions
-              templateId={templateId}
-              isReadyForEnumeration={isReadyForEnumeration}
-            />
+            <TemplateHeaderActions templateId={templateId} />
           </Flex>
         </Flex>
-        <ReactionPreview
-          reaction={template}
-          reactionId={templateId}
-        />
+        <ReactionPreview reactionId={templateId} />
       </Flex>
       <InputModal
         opened={opened}
