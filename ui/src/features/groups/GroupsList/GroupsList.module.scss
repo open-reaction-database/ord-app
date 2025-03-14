@@ -30,6 +30,18 @@
   }
 }
 
+.buttonName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  div {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .groupButton {
   font-weight: 400;
   padding: 0 10px;
@@ -48,8 +60,7 @@
     background-color: var(--color-primary);
     color: var(--color-background-white);
 
-    .buttonName svg,
-    .buttonSection svg {
+    svg {
       color: var(--color-background-white);
     }
   }
@@ -62,23 +73,12 @@
   align-items: center;
 
   & button {
-    display: none;
+    transition: opacity 0.15s ease-out;
+    opacity: 0;
   }
 
   &:hover button {
-    display: block;
-  }
-}
-
-.buttonName {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  div {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    opacity: 1;
   }
 }
 
