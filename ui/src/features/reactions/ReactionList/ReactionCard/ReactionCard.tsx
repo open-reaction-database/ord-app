@@ -76,7 +76,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
-    { label: 'Copy Reaction ID', value: id.toString() },
+    { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
   ];
 
   return (

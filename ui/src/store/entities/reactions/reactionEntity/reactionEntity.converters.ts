@@ -82,14 +82,14 @@ export function withoutIdName<T extends ReactionNamedEntity>(entity: T): Without
   return rest;
 }
 
-export function ordBooleanToReactionBoolean(value?: boolean | null): ReactionBoolean {
+export function ordBooleanToReaction(value?: boolean | null): ReactionBoolean {
   if (value === undefined || value === null) {
     return ReactionBoolean.Unspecified;
   }
   return value ? ReactionBoolean.True : ReactionBoolean.False;
 }
 
-export function reactionBooleanToOrdBoolean(value: ReactionBoolean): boolean | null {
+export function reactionBooleanToOrd(value: ReactionBoolean): boolean | null {
   switch (value) {
     case ReactionBoolean.Unspecified:
       return null;

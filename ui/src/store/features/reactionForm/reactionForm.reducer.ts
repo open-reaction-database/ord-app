@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import {
   addReactionPathComponentToList,
   clearReactionPathComponentsList,
@@ -22,6 +22,7 @@ import {
   sliceReactionPathComponentsList,
 } from './reactionForm.actions.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { searchReactionActions } from 'store/entities/reactions/reactions.actions.ts';
 
 const defaultReactionPathComponentsList: Array<ReactionPathComponents> = [];
 
@@ -30,7 +31,10 @@ const reactionPathComponentsList = createReducer(defaultReactionPathComponentsLi
   builder.addCase(addReactionPathComponentToList, (state, action) => state.concat([action.payload]));
   builder.addCase(popReactionPathComponents, state => state.slice(0, state.length - 1));
   builder.addCase(sliceReactionPathComponentsList, (state, action) => state.slice(0, action.payload + 1));
-  builder.addCase(clearReactionPathComponentsList, () => defaultReactionPathComponentsList);
+  builder.addMatcher(
+    isAnyOf(clearReactionPathComponentsList, searchReactionActions.success),
+    () => defaultReactionPathComponentsList,
+  );
 });
 
 export const reactionFormReducer = combineReducers({

@@ -29,6 +29,7 @@ import { createThunk } from 'store/utils';
 import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
   const group = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
@@ -50,6 +51,7 @@ export const updateGroup = createThunk(updateGroupActions, async (_d, _g, update
 
   showNotification({
     message: `${group.name} group changes have been successfully saved`,
+    variant: NotificationVariant.SUCCESS,
   });
   return updateGroupActions.success(group);
 });
@@ -67,6 +69,7 @@ export const updateGroupMembers = createThunk(updateGroupMembersActions, async (
 
   showNotification({
     message: `${updatedMember.user.name}'s role has been successfully updated`,
+    variant: NotificationVariant.SUCCESS,
   });
   return updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember });
 });
@@ -79,6 +82,7 @@ export const removeGroupMembers = createThunk(removeGroupMembersActions, async (
 
   showNotification({
     message: 'Member has been removed',
+    variant: NotificationVariant.SUCCESS,
   });
   return removeGroupMembersActions.success({ groupId: Number(groupId), membersId });
 });
@@ -93,6 +97,7 @@ export const addGroupMember = createThunk(addGroupMemberActions, async (_d, getS
 
   showNotification({
     message: `${member.user.name} has been successfully added`,
+    variant: NotificationVariant.SUCCESS,
   });
   return addGroupMemberActions.success({ groupId: Number(groupId), member });
 });

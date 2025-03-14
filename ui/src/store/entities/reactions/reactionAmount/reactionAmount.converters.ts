@@ -15,8 +15,8 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import type {
-  AppReactionAmount,
-  AppReactionAmountType,
+  ReactionAmount,
+  ReactionAmountType,
 } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import {
   appAmountUnspecified,
@@ -29,22 +29,22 @@ import {
   volumeUnitNames,
 } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import {
-  ordBooleanToReactionBoolean,
-  reactionBooleanToOrdBoolean,
+  ordBooleanToReaction,
+  reactionBooleanToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-const amountOptions: Array<['moles' | 'mass' | 'volume', Record<number, AppReactionAmountType>]> = [
+const amountOptions: Array<['moles' | 'mass' | 'volume', Record<number, ReactionAmountType>]> = [
   ['moles', molesUnitByValue],
   ['mass', massUnitByValue],
   ['volume', volumeUnitByValue],
 ];
 
-export function ordAmountToReactionAmount(ordAmount?: ord.IAmount | null): AppReactionAmount {
+export function ordAmountToReaction(ordAmount?: ord.IAmount | null): ReactionAmount {
   const requiredOrdAmount = ordAmount || ({} as ord.IAmount);
-  const volumeIncludesSolutes = ordBooleanToReactionBoolean(requiredOrdAmount.volumeIncludesSolutes);
+  const volumeIncludesSolutes = ordBooleanToReaction(requiredOrdAmount.volumeIncludesSolutes);
 
-  const result = amountOptions.reduce((acc: AppReactionAmount | null, [key, unitsByValue]) => {
+  const result = amountOptions.reduce((acc: ReactionAmount | null, [key, unitsByValue]) => {
     const currentValue = requiredOrdAmount[key];
     const units = unitsByValue[currentValue?.units ?? 0];
     if (currentValue?.units && units) {
@@ -69,11 +69,11 @@ const x: Array<['moles' | 'mass' | 'volume', Array<string>]> = [
   ['volume', volumeUnitNames],
 ];
 
-export function reactionAmountToOrdAmount(amount: AppReactionAmount): ord.IAmount | null {
+export function reactionAmountToOrd(amount: ReactionAmount): ord.IAmount | null {
   if (amount.units === appAmountUnspecified) {
     return null;
   }
-  const volumeIncludesSolutes = reactionBooleanToOrdBoolean(amount.volumeIncludesSolutes);
+  const volumeIncludesSolutes = reactionBooleanToOrd(amount.volumeIncludesSolutes);
   const ordAmountValue = {
     value: amount.value,
     precision: amount.precision,

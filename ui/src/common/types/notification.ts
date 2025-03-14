@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface UniqueEntity {
-  id: string;
-  name: string;
+import type { NotificationData } from '@mantine/notifications';
+
+export enum NotificationVariant {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+
+export interface AppNotification extends Omit<NotificationData, 'variant' | 'icon'> {
+  variant: NotificationVariant;
 }
