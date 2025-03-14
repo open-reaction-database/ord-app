@@ -43,7 +43,7 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 async def validate_reaction(reaction: ReactionModel):
     if reaction.binpb is None:
-        return
+        return None, ([], [])
 
     pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
     try:
@@ -61,7 +61,7 @@ async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = 
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
         for reaction in reactions:
-            is_valid, = await validate_reaction(reaction)
+            is_valid, _ = await validate_reaction(reaction)
             update_values.append({"id": reaction.id, "is_valid": is_valid})
         try:
             await reaction_repo.bulk_update(update_values)
@@ -213,6 +213,8 @@ class ReactionsUseCase:
 
     async def get(self, reaction_id):
         if reaction := await self.reaction_repo.get(id=reaction_id):
+            is_valid, (errors, warning) = await validate_reaction(reaction)
+            reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
