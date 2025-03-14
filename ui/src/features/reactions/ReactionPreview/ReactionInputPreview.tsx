@@ -31,7 +31,7 @@ interface ReactionInputPreviewProps {
 
 export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
   const input: AppReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
-  const componentsIds = useMemo(() => input?.components?.map(({ id }) => id), [input]);
+  const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 
   return (

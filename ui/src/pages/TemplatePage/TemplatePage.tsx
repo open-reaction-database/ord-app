@@ -18,7 +18,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
 import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import classes from './TemplatePage.module.scss';
+import classes from './templatePage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
@@ -90,7 +90,7 @@ export function TemplatePage() {
             radius="md"
             p="lg"
           >
-            <ReactionTabs reactionId={templateId} />
+            <ReactionTabs reactionId={templateIdString} />
           </Paper>
           <ReactionDetailsSidebar reactionId={templateId} />
         </Flex>

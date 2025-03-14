@@ -27,7 +27,7 @@ import {
 } from './reactions.actions.ts';
 import { getTemplateActions, getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { AppReaction, ReactionWrapper } from './reactions.types.ts';
+import type { ReactionOrTemplate, ReactionParsedProtobuf, ReactionWrapper } from './reactions.types.ts';
 import type { TemplateWrapper } from '../templates/templates.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
@@ -46,15 +46,15 @@ const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionsListActions.request, (_, action) => action.payload);
 });
 
-const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
+const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder => {
   builder.addCase(
     addUpdateReactionFieldActions.request,
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
       const reaction = state[reactionId];
-      const updatedReaction: AppReaction = linkReactionEntities(
+      const updatedReaction: ReactionParsedProtobuf = linkReactionEntities(
         deepMergeWithArrayMerge(
           reaction.data,
-          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
+          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as ReactionParsedProtobuf,
         ),
       );
       return {
@@ -79,7 +79,9 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
   });
   builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
     const reaction = state[reactionId];
-    const updatedReaction: AppReaction = linkReactionEntities(removeDeepReactionPart(reaction.data, pathComponents));
+    const updatedReaction: ReactionParsedProtobuf = linkReactionEntities(
+      removeDeepReactionPart(reaction.data, pathComponents),
+    );
     return {
       ...state,
       [reactionId]: {

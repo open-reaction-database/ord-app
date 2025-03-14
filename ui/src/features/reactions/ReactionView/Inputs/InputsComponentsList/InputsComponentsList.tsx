@@ -25,9 +25,10 @@ import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ComponentDisplayRow } from '../../ComponentsList/ComponentDisplayRow';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface InputsComponentsListProps {
-  reactionId: number;
+  reactionId: ReactionId;
   inputs: Array<AppReactionInput>;
 }
 

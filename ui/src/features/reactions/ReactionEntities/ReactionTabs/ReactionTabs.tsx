@@ -22,6 +22,7 @@ import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import classes from './reactionTabs.module.scss';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionTab {
   name: string;
@@ -44,10 +45,10 @@ const tabs: Array<ReactionTab> = [
 ];
 
 interface TemplateTabsProps {
-  readonly reactionId: number;
+  reactionId: ReactionId;
 }
 
-export function ReactionTabs({ reactionId }: TemplateTabsProps) {
+export function ReactionTabs({ reactionId }: Readonly<TemplateTabsProps>) {
   return (
     <Tabs
       defaultValue={tabs[0].name}

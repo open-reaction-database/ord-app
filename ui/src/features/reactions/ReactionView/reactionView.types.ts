@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+
 export type ReactionViewSectionProps = Readonly<{
-  reactionId: number;
+  reactionId: ReactionId;
 }>;

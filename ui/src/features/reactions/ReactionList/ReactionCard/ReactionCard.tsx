@@ -22,7 +22,7 @@ import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
-import { useCallback, useMemo, useRef, useContext } from 'react';
+import { useCallback, useMemo, useRef, useContext, type ReactNode } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
@@ -68,6 +68,8 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 interface ReactionCardProps {
   id: ReactionId;
   index?: number;
+  title: ReactNode;
+  actions: ReactNode;
 }
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {

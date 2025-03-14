@@ -16,6 +16,7 @@
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactNode } from 'react';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 export interface ComponentsDisplayRowCustomActions<T extends ReactionComponentBase> {
   component: T;
@@ -26,6 +27,6 @@ export interface ComponentsDisplayRowCustomActions<T extends ReactionComponentBa
 
 export interface ComponentDisplayRowProps<T extends ReactionComponentBase>
   extends Omit<ComponentsDisplayRowCustomActions<T>, 'actions'> {
-  reactionId: number;
+  reactionId: ReactionId;
   componentPath: ReactionPathComponents;
 }

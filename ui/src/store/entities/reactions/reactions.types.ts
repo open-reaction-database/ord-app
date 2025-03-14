@@ -20,7 +20,6 @@ import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
-import type { Variable } from 'store/entities/templates/templates.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -32,7 +31,7 @@ export interface ReactionMolBlocks {
   outcomes: Array<{ products: Array<{ molblock: ComponentProductPreview }> }>;
 }
 
-export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {
+export interface ReactionParsedProtobuf extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {
   inputs: Record<string, AppReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
@@ -48,19 +47,38 @@ export interface ReactionResponse {
   molblocks: ReactionMolBlocks;
 }
 
+export interface ReactionData {
+  id: ReactionId;
+  data: ReactionParsedProtobuf;
+  previews: PreviewsById;
+  summary: ReactionSummary;
+}
+
+export interface AppReaction extends ReactionData {
+  pb_reaction_id: string;
+  is_valid: boolean;
+}
+
+export interface AppTemplate extends ReactionData {
+  name: string;
+  variables: Array<unknown>;
+}
+
+export type ReactionOrTemplate = AppReaction | AppTemplate;
+
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molblocks'> {
-  variables?: Array<Variable> | string;
-  name?: string;
-  data: AppReaction;
+  data: ReactionParsedProtobuf;
   previews: PreviewsById;
 }
+
+export type ReactionId = number | string;
 
 export interface ImportReactionFromFilePayload {
   file: File;
 }
 
 export interface UpdateReactionPayload {
-  reactionId: number;
+  reactionId: ReactionId;
   pathComponents: ReactionPathComponents;
 }
 
@@ -68,5 +86,3 @@ export interface AddEditReactionFieldPayload extends UpdateReactionPayload {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newValue: any;
 }
-
-export type ReactionId = number | string;

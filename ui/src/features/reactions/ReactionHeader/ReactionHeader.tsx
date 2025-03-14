@@ -30,12 +30,11 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
 import classes from './reactionHeader.module.scss';
 
 interface ReactionHeaderProps {
-  reactionId: ReactionId;
+  reactionId: number;
   datasetId?: number;
   isReadyForEnumeration?: boolean;
 }
