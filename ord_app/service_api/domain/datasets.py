@@ -38,7 +38,7 @@ from ord_app.service_api.schemas.datasets import (
     DatasetShareCreateSchema,
     DownloadFileFormats,
 )
-from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
+from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError, UnprocessableEntityError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -159,6 +159,9 @@ class DatasetUseCases:
         return dataset, data
 
     async def share(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+        if primary_group_id == payload.secondary_group_id:
+            raise UnprocessableEntityError("Cannot share datasets with the same secondary group")
+
         dataset_group_association = (
             await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )
@@ -168,6 +171,9 @@ class DatasetUseCases:
         raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
 
     async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+        if primary_group_id == payload.secondary_group_id:
+            raise UnprocessableEntityError("Cannot unshare datasets with the same secondary group")
+
         dataset_group_association = (
             await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )
