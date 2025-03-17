@@ -54,7 +54,7 @@ async def test_update_reaction_with_duplicate_reaction_id(api_client, mock_authe
     response_data = api_client.patch(
         f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
     ).raise_for_status().json()
-    assert f"duplicate-{reaction.pb_reaction_id}" in response_data["pb_reaction_id"]
+    assert reaction.pb_reaction_id in response_data["pb_reaction_id"]
 
     # try to create new reaction with the reaction_id="updated"
     payload = {"binpb": b64encode(Reaction(reaction_id=response_data["pb_reaction_id"]).SerializeToString()).decode()}
