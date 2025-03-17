@@ -18,7 +18,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { type FC, Fragment, useEffect, useMemo } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { Badge, Flex, Paper, Tabs, Tooltip } from '@mantine/core';
+import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import classes from './reactionPage.module.scss';
@@ -33,7 +33,6 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 
 interface ReactionTab {
   name: string;
@@ -85,8 +84,6 @@ export function ReactionPage() {
     }),
     [reactionId],
   );
-  const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
-  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
@@ -96,15 +93,6 @@ export function ReactionPage() {
             direction="column"
             gap="sm"
           >
-            <Badge
-              variant="outline"
-              size="lg"
-              radius="md"
-              leftSection={reaction.is_valid ? CheckIcon : CrossIcon}
-              className={classes.validationBadge}
-            >
-              {reaction.is_valid ? 'Reaction is Valid' : 'Reaction is Not Valid'}
-            </Badge>
             <ReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}

@@ -32,7 +32,7 @@ export function CopyButton({ options }: Readonly<CopyButtonProps>) {
     <Menu
       width={160}
       trigger="hover"
-      position="right"
+      position="bottom"
       classNames={{
         dropdown: classes.dropdown,
         item: classes.menuItem,

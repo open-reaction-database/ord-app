@@ -44,3 +44,4 @@ export { default as StylusNoteIcon } from './StylusNoteIcon.svg?react';
 export { default as TimeIcon } from './TimeIcon.svg?react';
 export { default as UploadProgressIcon } from './UploadProgressIcon.svg?react';
 export { default as EnumerateIcon } from './EnumerateIcon.svg?react';
+export { default as WarningIcon } from './WarningIcon.svg?react';
