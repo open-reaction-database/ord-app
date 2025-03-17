@@ -17,8 +17,8 @@ import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon } from 'common/icons';
-import { useCallback, useMemo } from 'react';
+import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon, EditIcon } from 'common/icons';
+import { useCallback, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
@@ -31,6 +31,8 @@ import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPrev
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { ReactionValidationResult } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationResult.tsx';
+import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
+import classes from 'features/reactions/ReactionList/ReactionCard/ReactionCard.module.scss';
 
 interface ReactionHeaderProps {
   datasetId: number;
@@ -43,6 +45,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const reaction = useSelector(selectReactionById(reactionId));
   const [opened, { open, close }] = useDisclosure();
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
+  const previewRef = useRef<HTMLDivElement | null>(null);
 
   const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
 
@@ -52,6 +55,10 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
     },
     [dispatch, reactionId],
   );
+
+  const onPreviewSave = useCallback(() => {
+    copyPreviewAsImage(previewRef.current);
+  }, [previewRef]);
 
   const copyOptions = useMemo(
     () => [
@@ -79,6 +86,13 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
             onClick={openSaveAsTemplate}
           >
             Save as Template
+          </Button>
+          <Button
+            onClick={onPreviewSave}
+            variant="transparent"
+            leftSection={<CopyImageIcon className={classes.buttonIcon} />}
+          >
+            Copy reaction image
           </Button>
           <DownloadMenu
             options={fileDownloadOptions}
@@ -130,7 +144,10 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
               </ActionIcon>
             </Flex>
           </Flex>
-          <ReactionPreview reaction={reaction} />
+          <ReactionPreview
+            reaction={reaction}
+            ref={previewRef}
+          />
         </Flex>
       </Paper>
       <InputModal
