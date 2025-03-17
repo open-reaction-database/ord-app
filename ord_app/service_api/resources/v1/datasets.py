@@ -20,14 +20,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
-from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
-    DatasetSchema,
-    DatasetSharableSchema,
+    DatasetResponseSchema,
+    DatasetSharableResponseSchema,
     DatasetShareCreateSchema,
     DatasetShareSchema,
-    DatasetWithReactionCountSchema,
+    DatasetWithReactionCountResponseSchema,
     DownloadFileFormats,
 )
 from ord_app.service_api.services.exceptions import EntityNotFoundError
@@ -41,7 +41,7 @@ router = APIRouter(tags=["datasets"])
 
 @router.post(
     "/groups/{group_id}/datasets",
-    response_model=DatasetSchema,
+    response_model=DatasetResponseSchema,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(group_authorization(("admin", "editor")))],
 )
@@ -55,7 +55,7 @@ async def create_dataset(
 
 @router.get(
     "/groups/{group_id}/datasets",
-    response_model=Page[DatasetWithReactionCountSchema],
+    response_model=Page[DatasetWithReactionCountResponseSchema],
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def get_group_datasets(
@@ -68,7 +68,7 @@ async def get_group_datasets(
 
 @router.post(
     "/groups/{group_id}/datasets/upload",
-    response_model=DatasetSchema,
+    response_model=DatasetResponseSchema,
     dependencies=[Depends(group_authorization(("admin", "editor")))],
 )
 async def upload_dataset(
@@ -80,11 +80,11 @@ async def upload_dataset(
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     dataset = await use_case.upload(group_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db, dataset.id)
+    background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
     return dataset
 
 
-@router.get("/datasets", response_model=Page[DatasetWithReactionCountSchema])
+@router.get("/datasets", response_model=Page[DatasetWithReactionCountResponseSchema])
 async def get_user_datasets(
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
@@ -93,7 +93,7 @@ async def get_user_datasets(
 
 @router.patch(
     "/datasets/{dataset_id}",
-    response_model=DatasetSchema,
+    response_model=DatasetResponseSchema,
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
 )
 async def update_dataset(
@@ -116,7 +116,7 @@ async def delete_dataset(
 
 @router.get(
     "/datasets/{dataset_id}",
-    response_model=DatasetSharableSchema,
+    response_model=DatasetSharableResponseSchema,
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def get_dataset(
@@ -160,7 +160,7 @@ async def extend_dataset(
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     response = await use_case.extend(dataset_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db)
+    background_tasks.add_task(validate_dataset_reactions, db)
     return response
 
 

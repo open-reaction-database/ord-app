@@ -25,7 +25,7 @@ async def test_create_reaction_from_scratch(api_client, mock_authenticated_user,
 
     response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions/from-scratch").raise_for_status().json()
     reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
-    assert reaction_pb.reaction_id == str(response_data["id"]) == response_data["pb_reaction_id"]
+    assert reaction_pb.reaction_id == response_data["pb_reaction_id"]
 
     record_event = reaction_pb.provenance.record_created
     person = record_event.person

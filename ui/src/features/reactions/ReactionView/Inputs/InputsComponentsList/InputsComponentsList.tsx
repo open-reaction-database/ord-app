@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { Accordion, Divider, Flex, Text } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { useCallback, type MouseEvent } from 'react';
@@ -28,7 +28,7 @@ import { componentsListClasses } from 'features/reactions/ReactionView/Component
 
 interface InputsComponentsListProps {
   reactionId: number;
-  inputs: Array<AppReactionInput>;
+  inputs: Array<ReactionInput>;
 }
 
 const headers = [
@@ -41,6 +41,10 @@ const headers = [
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
+const onActionClick = (event: MouseEvent) => {
+  event.stopPropagation();
+};
+
 export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComponentsListProps>) {
   const dispatch = useAppDispatch();
   const onEditInput = useCallback(
@@ -50,9 +54,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
     [dispatch],
   );
 
-  const onActionClick = (event: MouseEvent) => {
-    event.stopPropagation();
-  };
+  const ids = inputs.map(input => input.id);
 
   return (
     <>
@@ -71,6 +73,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
         variant="separated"
         chevronPosition="left"
         multiple={true}
+        defaultValue={ids}
       >
         {inputs.map(input => (
           <Accordion.Item

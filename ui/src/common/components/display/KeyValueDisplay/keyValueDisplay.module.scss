@@ -13,7 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface UniqueEntity {
-  id: string;
-  name: string;
+.label {
+  text-wrap: nowrap;
+}
+
+.multilineWrapper {
+  overflow-x: hidden;
+}
+
+.inlineValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }

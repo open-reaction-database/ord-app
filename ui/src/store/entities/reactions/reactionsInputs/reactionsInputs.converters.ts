@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppReactionInput } from './reactionInputs.types.ts';
+import type { ReactionInput, ReactionCrudeComponent } from './reactionInputs.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordAdditionDeviceToReaction,
   ordAdditionSpeedToReaction,
+  ordBooleanToReaction,
   ordFlowRateToReaction,
   ordTemperatureToReaction,
   ordTextureToReaction,
   ordTimeToReaction,
   reactionAdditionDeviceToOrd,
   reactionAdditionSpeedToOrd,
+  reactionBooleanToOrd,
   reactionFlowRateToOrd,
   reactionTemperatureToOrd,
   reactionTextureToOrd,
   reactionTimeToOrd,
+  withId,
   withIdName,
   withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
@@ -36,8 +39,44 @@ import {
   ordInputComponentToReaction,
   reactionInputComponentToOrd,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import {
+  ordAmountToReaction,
+  reactionAmountToOrd,
+} from 'store/entities/reactions/reactionAmount/reactionAmount.converters.ts';
 
-export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): AppReactionInput {
+export function ordCrudeComponentToReaction({
+  reactionId,
+  includesWorkup,
+  hasDerivedAmount,
+  texture,
+  amount,
+}: ord.ICrudeComponent): ReactionCrudeComponent {
+  return withId({
+    reactionId,
+    includesWorkup: ordBooleanToReaction(includesWorkup),
+    hasDerivedAmount: ordBooleanToReaction(hasDerivedAmount),
+    texture: ordTextureToReaction(texture),
+    amount: ordAmountToReaction(amount),
+  });
+}
+
+export function reactionCrudeComponentToOrd({
+  reactionId,
+  includesWorkup,
+  hasDerivedAmount,
+  amount,
+  texture,
+}: ReactionCrudeComponent): ord.ICrudeComponent {
+  return {
+    reactionId,
+    includesWorkup: reactionBooleanToOrd(includesWorkup),
+    hasDerivedAmount: reactionBooleanToOrd(hasDerivedAmount),
+    amount: reactionAmountToOrd(amount),
+    texture: reactionTextureToOrd(texture),
+  };
+}
+
+export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): ReactionInput {
   const {
     components,
     additionDuration,
@@ -53,7 +92,7 @@ export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: str
   return withIdName(
     {
       components: (components || []).map(ordInputComponentToReaction),
-      crudeComponents,
+      crudeComponents: (crudeComponents || []).map(ordCrudeComponentToReaction),
       additionOrder,
       additionSpeed: ordAdditionSpeedToReaction(additionSpeed),
       additionDuration: ordTimeToReaction(additionDuration),
@@ -67,7 +106,7 @@ export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: str
   );
 }
 
-export function reactionInputToOrdInput(appInput: AppReactionInput): ord.IReactionInput {
+export function reactionInputToOrdInput(appInput: ReactionInput): ord.IReactionInput {
   const {
     components,
     crudeComponents,
@@ -81,8 +120,8 @@ export function reactionInputToOrdInput(appInput: AppReactionInput): ord.IReacti
     texture,
   } = withoutIdName(appInput);
   return {
-    components: components.length > 0 ? components.map(reactionInputComponentToOrd) : null,
-    crudeComponents,
+    components: components.map(reactionInputComponentToOrd),
+    crudeComponents: crudeComponents.map(reactionCrudeComponentToOrd),
     additionOrder,
     additionSpeed: reactionAdditionSpeedToOrd(additionSpeed),
     additionDuration: reactionTimeToOrd(additionDuration),

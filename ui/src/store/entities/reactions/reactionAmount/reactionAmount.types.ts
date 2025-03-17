@@ -24,11 +24,11 @@ export type AppMassUnit = Exclude<keyof typeof ord.Mass.MassUnit, AppAmountUnspe
 
 export type AppVolumeUnit = Exclude<keyof typeof ord.Volume.VolumeUnit, AppAmountUnspecified>;
 
-export type AppReactionAmountType = AppMolesUnit | AppMassUnit | AppVolumeUnit | AppAmountUnspecified;
+export type ReactionAmountType = AppMolesUnit | AppMassUnit | AppVolumeUnit | AppAmountUnspecified;
 
-type AppReactionAmountValuePrecision = Pick<NonNullable<Required<ord.IAmount>['mass']>, 'value' | 'precision'>;
+type ReactionAmountValuePrecision = Pick<NonNullable<Required<ord.IAmount>['mass']>, 'value' | 'precision'>;
 
-export interface AppReactionAmount extends AppReactionAmountValuePrecision {
+export interface ReactionAmount extends ReactionAmountValuePrecision {
   volumeIncludesSolutes: ReactionBoolean;
-  units: AppReactionAmountType;
+  units: ReactionAmountType;
 }

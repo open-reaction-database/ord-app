@@ -34,7 +34,8 @@ async def test_dataset_modified_at(api_client, mock_authenticated_user):
     assert parse_dt(resp1["modified_at"]) < parse_dt(resp2["modified_at"])
 
     # create reaction
-    reaction_resp = api_client.post(f"/api/v1/datasets/{dataset_id}/reactions", json={}).raise_for_status().json()
+    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
+    reaction_resp = api_client.post(f"/api/v1/datasets/{dataset_id}/reactions", json=payload).raise_for_status().json()
     resp3 = api_client.get(f"/api/v1/datasets/{dataset_id}").raise_for_status().json()
     assert parse_dt(resp2["modified_at"]) < parse_dt(resp3["modified_at"])
 

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionInput } from './reactionInputs.types.ts';
+import type { ReactionInput } from './reactionInputs.types.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { ordInputToReactionsInput } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 
-export function createEmptyReactionInput(name: string): AppReactionInput {
+export function createEmptyReactionInput(name: string): ReactionInput {
   return ordInputToReactionsInput(ord.ReactionInput.toObject(new ord.ReactionInput()), name);
 }

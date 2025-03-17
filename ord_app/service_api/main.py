@@ -22,7 +22,7 @@ from loguru import logger
 from rdkit import RDLogger
 
 from ord_app.service_api.constants import AppEnvs
-from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, templates, users, utilities
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
@@ -40,7 +40,7 @@ match RuntimeSettings.app_env:
 
 async def run_background_task():
     async with db_session_maker() as db:
-        await validate_reactions_task(db)
+        await validate_dataset_reactions(db)
 
 
 @asynccontextmanager

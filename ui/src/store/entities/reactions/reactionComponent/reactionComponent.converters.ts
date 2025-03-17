@@ -15,14 +15,14 @@
  */
 import type { ord } from 'ord-schema-protobufjs';
 import {
-  ordBooleanToReactionBoolean,
+  ordBooleanToReaction,
   ordCompoundIdentifierToReaction,
   ordMassSpecToReaction,
   ordSelectivityToReaction,
   ordTextureToReaction,
   ordTimeToReaction,
   ordWaveLengthToReaction,
-  reactionBooleanToOrdBoolean,
+  reactionBooleanToOrd,
   reactionCompoundIdentifierToOrd,
   reactionMassSpecToOrd,
   reactionSelectivityToOrd,
@@ -45,8 +45,8 @@ import {
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
-  ordAmountToReactionAmount,
-  reactionAmountToOrdAmount,
+  ordAmountToReaction,
+  reactionAmountToOrd,
 } from 'store/entities/reactions/reactionAmount/reactionAmount.converters.ts';
 import {
   type OrdComponentBase,
@@ -86,7 +86,7 @@ const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Re
   if (measurement.amount) {
     return {
       type: ReactionMeasurementValueType.Mass,
-      value: ordAmountToReactionAmount(measurement.amount),
+      value: ordAmountToReaction(measurement.amount),
     };
   }
   if (measurement.stringValue) {
@@ -110,7 +110,7 @@ const reactionMeasurementValueToOrd = ({ type, value }: ReactionMeasurementValue
   switch (type) {
     case ReactionMeasurementValueType.Mass:
       return {
-        amount: reactionAmountToOrdAmount(value),
+        amount: reactionAmountToOrd(value),
       };
     case ReactionMeasurementValueType.String:
       return {
@@ -139,19 +139,21 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     selectivity,
     wavelength,
     massSpecDetails,
+    authenticStandard,
   } = measurement;
   return withId({
     type: ordMeasurementTypeToReaction(type),
     details,
     value: ordMeasurementValueToReaction(measurement),
     analysis: analysisKey ? { name: analysisKey, id: null } : null,
-    isNormalized: ordBooleanToReactionBoolean(isNormalized),
-    usesInternalStandard: ordBooleanToReactionBoolean(usesInternalStandard),
-    usesAuthenticStandard: ordBooleanToReactionBoolean(usesAuthenticStandard),
+    isNormalized: ordBooleanToReaction(isNormalized),
+    usesInternalStandard: ordBooleanToReaction(usesInternalStandard),
+    usesAuthenticStandard: ordBooleanToReaction(usesAuthenticStandard),
     retentionTime: ordTimeToReaction(retentionTime),
     selectivity: ordSelectivityToReaction(selectivity),
     waveLength: ordWaveLengthToReaction(wavelength),
     massSpecDetails: ordMassSpecToReaction(massSpecDetails),
+    authenticStandard: authenticStandard ? ordInputComponentToReaction(authenticStandard) : null,
   });
 };
 
@@ -167,17 +169,19 @@ const reactionMeasurementToOrd = ({
   selectivity,
   waveLength,
   massSpecDetails,
+  authenticStandard,
 }: ReactionMeasurement): ord.IProductMeasurement => ({
   type: reactionMeasurementTypeToOrd(type),
   details,
   analysisKey: analysis?.name,
-  isNormalized: reactionBooleanToOrdBoolean(isNormalized),
-  usesInternalStandard: reactionBooleanToOrdBoolean(usesInternalStandard),
-  usesAuthenticStandard: reactionBooleanToOrdBoolean(usesAuthenticStandard),
+  isNormalized: reactionBooleanToOrd(isNormalized),
+  usesInternalStandard: reactionBooleanToOrd(usesInternalStandard),
+  usesAuthenticStandard: reactionBooleanToOrd(usesAuthenticStandard),
   retentionTime: reactionTimeToOrd(retentionTime),
   selectivity: reactionSelectivityToOrd(selectivity),
   wavelength: reactionWaveLengthToOrd(waveLength),
   massSpecDetails: reactionMassSpecToOrd(massSpecDetails),
+  authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
   ...reactionMeasurementValueToOrd(value),
 });
 
@@ -230,10 +234,10 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
 
   return {
     ...ordComponentBaseToReaction(inputComponent),
-    isLimiting: ordBooleanToReactionBoolean(isLimiting),
+    isLimiting: ordBooleanToReaction(isLimiting),
     source,
     preparations: (preparations || []).map(ordPreparationToReactionPreparation),
-    amount: ordAmountToReactionAmount(amount),
+    amount: ordAmountToReaction(amount),
   };
 }
 
@@ -241,10 +245,10 @@ export function reactionInputComponentToOrd(inputComponent: ReactionInputCompone
   const { amount, preparations, isLimiting, source } = inputComponent;
   return {
     ...reactionComponentBaseToOrd(inputComponent),
-    isLimiting: reactionBooleanToOrdBoolean(isLimiting),
+    isLimiting: reactionBooleanToOrd(isLimiting),
     source,
     preparations: preparations.map(reactionPreparationToOrdPreparation),
-    amount: reactionAmountToOrdAmount(amount),
+    amount: reactionAmountToOrd(amount),
   };
 }
 
@@ -252,7 +256,7 @@ export function ordProductToReaction(product: ord.IProductCompound): ReactionPro
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...ordComponentBaseToReaction(product),
-    isDesiredProduct: ordBooleanToReactionBoolean(isDesiredProduct),
+    isDesiredProduct: ordBooleanToReaction(isDesiredProduct),
     isolatedColor,
     measurements: (measurements || []).map(ordMeasurementToReaction),
   };
@@ -262,7 +266,7 @@ export function reactionProductToOrd(product: ReactionProduct): ord.IProductComp
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...reactionComponentBaseToOrd(product),
-    isDesiredProduct: reactionBooleanToOrdBoolean(isDesiredProduct),
+    isDesiredProduct: reactionBooleanToOrd(isDesiredProduct),
     isolatedColor,
     measurements: measurements.map(reactionMeasurementToOrd),
   };

@@ -29,7 +29,7 @@ import { Input, NumberInput, TextInput } from '@mantine/core';
 import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisionUnitControl/ValuePrecisionUnitControl.tsx';
 import { appAmountUnspecified, massUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
-import type { AppReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { ChangeEvent } from 'react';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
@@ -68,7 +68,7 @@ function MeasurementValueControlNumber({ value, onChange }: Readonly<ControlProp
 
 function MeasurementValueControlMass({ value, onChange }: Readonly<ControlProps<ReactionMeasurementValueMass>>) {
   const handleChange = (value: ValuePrecisionUnit) => {
-    onChange(value as AppReactionAmount);
+    onChange(value as ReactionAmount);
   };
 
   return (

@@ -28,8 +28,10 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # databases
-    pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"
-    pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"
+    pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"  # NOSONAR
+    # Alembic can't work with asynchronous driver
+    pg_alembic_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"  # NOSONAR
+    pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"  # NOSONAR
 
     # Encryption and auth
     auth0_domain: str = Field("", validation_alias="vite_auth0_domain")

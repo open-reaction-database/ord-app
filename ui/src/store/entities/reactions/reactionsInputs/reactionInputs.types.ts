@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { UniqueEntity } from 'store/utils/UniqueEntity.ts';
 import type {
   ReactionAdditionDevice,
+  ReactionBoolean,
   ReactionFlowRate,
   ReactionSpeed,
   ReactionTemperature,
   ReactionTexture,
   ReactionTime,
+  WithId,
+  WithIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 
-export interface AppReactionInput extends Pick<ord.IReactionInput, 'crudeComponents' | 'additionOrder'>, UniqueEntity {
+export interface ReactionCrudeComponent extends WithId<Pick<ord.ICrudeComponent, 'reactionId'>> {
+  includesWorkup: ReactionBoolean;
+  hasDerivedAmount: ReactionBoolean;
+  amount: ReactionAmount;
+  texture: ReactionTexture;
+}
+
+export interface ReactionInput extends WithIdName<Pick<ord.IReactionInput, 'additionOrder'>> {
+  crudeComponents: Array<ReactionCrudeComponent>;
   components: Array<ReactionInputComponent>;
   additionDuration: ReactionTime;
   additionTime: ReactionTime;

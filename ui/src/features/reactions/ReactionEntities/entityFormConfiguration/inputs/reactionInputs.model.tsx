@@ -26,6 +26,18 @@ import {
   temperatureOptions,
   timeTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
+import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
+import { ordCrudeComponentToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
+import { ord } from 'ord-schema-protobufjs';
+import { CrudeComponentView } from 'features/reactions/ReactionView/CrudeComponentView/CrudeComponentView.tsx';
+
+const createEmptyCrudeComponent = buildUseCreate('crudeComponents', index => {
+  const newCrudeComponent = ordCrudeComponentToReaction(ord.CrudeComponent.toObject(new ord.CrudeComponent()));
+  return [index, newCrudeComponent];
+});
 
 export const reactionInputs: Array<ReactionFormNode> = [
   {
@@ -46,6 +58,28 @@ export const reactionInputs: Array<ReactionFormNode> = [
     type: ReactionFormNodeType.custom,
     name: 'components',
     Component: InputsComponentList,
+  },
+  {
+    type: ReactionFormNodeType.list,
+    title: {
+      label: 'Crude components',
+    },
+    getKey: (_, index) => index,
+    useSelectItems: buildUseSelectItems('crudeComponents'),
+    ItemDisplay: createEntityListItemComponent<ReactionCrudeComponent>({
+      entityField: 'crudeComponents',
+      title: 'Crude component',
+      requiredFields: [
+        {
+          label: 'reactionId',
+          render: value => <CrudeComponentView crudeComponent={value} />,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Crude Component',
+      useCreate: createEmptyCrudeComponent,
+    },
   },
   {
     type: ReactionFormNodeType.block,

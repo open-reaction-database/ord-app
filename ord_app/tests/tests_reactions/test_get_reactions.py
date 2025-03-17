@@ -13,67 +13,46 @@
 # limitations under the License.
 import json
 
-from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel
+from ord_app.tests.conftest import create_test_dataset, create_test_reaction
 
 
 async def test_paginate_reactions(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
-
-    dataset = DatasetModel(owner=user, name="init", description="init")
-    test_db_session.add(dataset)
-    await test_db_session.flush()
-
-    test_db_session.add(
-        DatasetGroupAssociationModel(dataset=dataset, group=group)
-    )
-    await test_db_session.commit()
-
-    api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json={}).raise_for_status()
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
     response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
-
     assert response_data["total"] == 1
 
 
 async def test_get_reaction(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
-    dataset = DatasetModel(owner=user, name="init", description="init")
-    test_db_session.add(dataset)
-    await test_db_session.flush()
+    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}").raise_for_status().json()
+    assert response_data["id"] == reaction.id
 
-    test_db_session.add(
-        DatasetGroupAssociationModel(dataset=dataset, group=group)
-    )
-    await test_db_session.commit()
 
-    payload = {"name": "test reaction name"}
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    reaction_id = response_data["id"]
+async def test_search_reaction(api_client, mock_authenticated_user, test_db_session):
+    user, _, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}").raise_for_status().json()
-
-    assert response_data["id"] == reaction_id
+    response_data = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/reactions/search?pb_reaction_id={reaction.pb_reaction_id}"
+    ).raise_for_status().json()
+    assert response_data["id"] == reaction.id
 
 
 async def test_download_reaction(api_client, mock_authenticated_user, test_db_session):
     user, _, group = mock_authenticated_user
-
-    dataset = DatasetModel(owner=user, name="init", description="init")
-    test_db_session.add(dataset)
-    await test_db_session.flush()
-
-    test_db_session.add(
-        DatasetGroupAssociationModel(dataset=dataset, group=group)
-    )
-    await test_db_session.commit()
-
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json={}).raise_for_status().json()
-    reaction_id = response_data["id"]
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
     response_data = api_client.get(
-        f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}/download?file_format=json"
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}/download?file_format=json"
     ).raise_for_status()
 
     decompressed_data = json.loads(response_data.content)
-    assert decompressed_data["reactionId"] == str(reaction_id)
+    assert decompressed_data["reactionId"] == reaction.pb_reaction_id

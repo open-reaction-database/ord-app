@@ -31,7 +31,7 @@ import type {
   WithId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
 export type OrdComponentBase = Pick<ord.ICompound, 'identifiers' | 'reactionRole' | 'texture' | 'features'> &
@@ -51,7 +51,7 @@ export interface ReactionComponentPreparation extends WithId<Omit<ord.ICompoundP
 
 export interface ReactionInputComponent extends ReactionComponentBase, Pick<ord.ICompound, 'source'> {
   isLimiting: ReactionBoolean;
-  amount: AppReactionAmount;
+  amount: ReactionAmount;
   preparations: Array<ReactionComponentPreparation>;
 }
 
@@ -82,7 +82,7 @@ export interface ReactionMeasurementValueString {
 
 export interface ReactionMeasurementValueMass {
   type: ReactionMeasurementValueType.Mass;
-  value: AppReactionAmount;
+  value: ReactionAmount;
 }
 
 export type ReactionMeasurementValue =
@@ -101,6 +101,7 @@ export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement
   selectivity: ReactionSelectivity;
   waveLength: ReactionWaveLength;
   massSpecDetails: ReactionMassSpec;
+  authenticStandard: ReactionInputComponent | null;
 }
 
 export interface ReactionProduct extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {

@@ -34,9 +34,6 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
-export const selectReactionComponents = (id: number, input: string) =>
-  buildSelector(state => state.reactionsById[id].data.inputs[input]?.components || []);
-
 export const selectReactionPartByPath =
   (reactionId: number, pathComponents: ReactionPathComponents) => (state: AppState) => {
     const reaction = selectReactionById(reactionId)(state);

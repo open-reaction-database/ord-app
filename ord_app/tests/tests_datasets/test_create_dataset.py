@@ -20,7 +20,7 @@ from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import select
 
-from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
@@ -40,13 +40,17 @@ async def test_create_dataset(api_client, mock_authenticated_user):
     assert response_data["owner"]["external_id"] == user.external_id
 
 
-async def test_create_empty_dataset(api_client, mock_authenticated_user):
+async def test_create_dataset_with_generating_name(api_client, mock_authenticated_user):
     *_, group = mock_authenticated_user
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={"name": ""}).raise_for_status().json()
+    assert response_data["name"] != ""
 
-    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={}).raise_for_status().json()
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json={"name": " "}).raise_for_status().json()
+    assert response_data["name"] != " "
 
-    assert response_data["name"] == ""
-    assert response_data["description"] == ""
+    payload = {"name": f" {faker.name()} "}
+    response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload).raise_for_status().json()
+    assert response_data["name"] == payload["name"].strip()
 
 
 @pytest.mark.parametrize(
@@ -80,7 +84,7 @@ async def test_upload_dataset_with_reaction_validation(api_client, mock_authenti
         response_data["owner"]["id"] = user.id
 
     stmt = select(ReactionModel.is_valid).where(ReactionModel.dataset_id == response_data["id"])
-    await validate_reactions_task(test_db_session)
+    await validate_dataset_reactions(test_db_session)
     assert {True,} == set((await test_db_session.scalars(stmt)).all())
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):

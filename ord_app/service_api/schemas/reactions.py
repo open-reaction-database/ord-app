@@ -35,10 +35,25 @@ def safe_molblock(product):
 
 
 def get_molblocks(pb):
-    outcomes = [
-        [safe_molblock(product) for product in outcome.products]
-        for outcome in pb.outcomes
-    ]
+    outcomes = []
+
+    for outcome in pb.outcomes:
+        outcome_item = []
+        for product in outcome.products:
+            product_item = {
+                "molblock": safe_molblock(product),
+                "measurements": []
+            }
+            for measurement in product.measurements:
+                product_item["measurements"].append({
+                    "authentic_standard": {
+                        "molblock": safe_molblock(measurement.authentic_standard)
+                    },
+                })
+
+            outcome_item.append(product_item)
+        outcomes.append({"products": outcome_item})
+
     inputs = {
         key: [safe_molblock(component) for component in value.components]
         for key, value in pb.inputs.items()
@@ -46,7 +61,7 @@ def get_molblocks(pb):
     return {"outcomes": outcomes, "inputs": inputs}
 
 
-class ReactionSchema(BaseSchema):
+class ReactionResponseSchema(BaseSchema):
     id: int
     pb_reaction_id: str
     binpb: str
@@ -75,25 +90,17 @@ class ReactionSchema(BaseSchema):
 
 
 class ReactionCreateSchema(BaseSchema):
-    binpb: bytes | None = None
+    binpb: bytes
 
-    @field_validator("binpb", mode="after")
-    @classmethod
-    def binpb_validation(cls, raw):
-        return None if raw is None else load_message(b64decode(raw), Reaction, "binpb").SerializeToString()
+    @field_validator("binpb", mode="before")
+    def load_binpb(cls, raw):
+        return b64decode(raw)
 
 
 class ReactionUpdateSchema(BaseSchema):
     model_config = ConfigDict(arbitrary_types_allowed=True)
+    binpb: bytes
 
-    binpb: bytes | Any
-
-    @field_validator("binpb", mode="after")
-    @classmethod
+    @field_validator("binpb", mode="before")
     def load_binpb(cls, raw):
-        return load_message(b64decode(raw), Reaction, "binpb")
-
-    def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
-        data = super().model_dump(*args, **kwargs)
-        data["binpb"] = data["binpb"].SerializeToString()
-        return data
+        return b64decode(raw)

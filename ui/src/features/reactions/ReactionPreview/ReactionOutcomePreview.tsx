@@ -21,6 +21,9 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import { useMemo } from 'react';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 
 interface ReactionInputPreviewProps {
   reactionId: number;
@@ -33,6 +36,10 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
 
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 
+  const outcomeTime = useMemo(() => {
+    return outcome.reactionTime?.value ? renderValuePrecisionUnit(outcome.reactionTime) : '';
+  }, [outcome.reactionTime]);
+
   return (
     <div className={classes.inputCard}>
       <Badge
@@ -40,23 +47,37 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
         color="primary"
         size="lg"
       >
-        Outcome
+        Outcome ({outcomeTime})
       </Badge>
       <Flex
         gap="sm"
         align="center"
         className={classes.componentList}
       >
-        {componentsIds.map(id => (
-          <div
-            key={id}
-            className={classes.component}
-          >
-            <div className={classes.molecule}>
-              <ReactionComponentPreview previewState={componentsPreviews[id]} />
-            </div>
-          </div>
-        ))}
+        {componentsIds.length === 0 ? (
+          <ReactionComponentPreview previewState={null} />
+        ) : (
+          componentsIds.map((id, index) => {
+            const product = outcome.products[index];
+
+            return (
+              <div
+                key={id}
+                className={classes.component}
+              >
+                <div className={classes.molecule}>
+                  <ReactionComponentPreview previewState={componentsPreviews[id]} />
+                </div>
+                {product?.isDesiredProduct === ReactionBoolean.True && (
+                  <Badge classNames={{ root: classes.desiredProductBadge, label: classes.badgeLabel }}>
+                    ✨ Desired
+                  </Badge>
+                )}
+                <ComponentMetadata component={product} />
+              </div>
+            );
+          })
+        )}
       </Flex>
     </div>
   );

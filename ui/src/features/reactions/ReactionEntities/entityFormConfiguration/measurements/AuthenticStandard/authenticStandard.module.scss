@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Flex, Text } from '@mantine/core';
-import { typographyClasses } from 'common/styling';
-import type { ReactNode } from 'react';
-
-interface InlineKeyValueProps {
-  label: string;
-  value: ReactNode;
+.wrapper {
+  width: 100%;
 }
 
-export function InlineKeyValue({ label, value }: Readonly<InlineKeyValueProps>) {
-  return (
-    <Flex
-      gap="xs"
-      align="center"
-    >
-      <Text className={typographyClasses.secondary2}>{label}:</Text>
-      <Text>{value}</Text>
-    </Flex>
-  );
+.createButton {
+  padding: 0;
+}
+
+.icon {
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }

@@ -35,8 +35,6 @@ export const getReactionActions = createAsyncAction<
   RejectValue
 >('get');
 
-export const renameReactionActions = createAsyncAction<{ reactionId: number; name: string }, ReactionWrapper>('rename');
-
 export const createEmptyReactionActions = createAsyncAction<void, ReactionWrapper>('create_empty');
 
 export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, ReactionWrapper>(
@@ -47,6 +45,8 @@ export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
   Omit<ReactionWrapper, 'data'>
 >('addUpdateField');
+
+export const searchReactionActions = createAsyncAction<string, ReactionWrapper>('search');
 
 export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');
 

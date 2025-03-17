@@ -16,13 +16,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.users import jit_provisioning
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
-from ord_app.service_api.schemas.users import UserSchema
+from ord_app.service_api.schemas.users import UserResponseSchema
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 
-@router.post("/jit-provisioning", status_code=status.HTTP_201_CREATED, response_model=UserSchema)
+@router.post("/jit-provisioning", status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
 async def _jit_provisioning(
     payload: Auth0CreateSchema,
     db_session: AsyncSession = Depends(get_db_session),
