@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 import { useParams } from 'wouter';
-import ReactionPage from './ReactionPage';
+import { ReactionPageWrapper } from './ReactionPageWrapper';
 
-export function ReactionPageContainer() {
-  const params = useParams<{ reactionId: string; datasetId: string }>();
-  const { reactionId, datasetId } = params;
-
-  if (!reactionId || !datasetId) {
-    throw new Error('Missing required URL parameters: reactionId and datasetId');
-  }
+export const ReactionPageContainer = () => {
+  const { reactionId, datasetId } = useParams<{ reactionId: string; datasetId: string }>();
 
   return (
-    <ReactionPage
-      reactionId={parseInt(reactionId)}
-      datasetId={parseInt(datasetId)}
+    <ReactionPageWrapper
+      reactionId={reactionId}
+      datasetId={datasetId}
     />
   );
-}
+};

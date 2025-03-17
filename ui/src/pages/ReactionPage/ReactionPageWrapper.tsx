@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useParams } from 'wouter';
-import { DatasetPageWrapper } from './DatasetPageWrapper';
+import { Component } from 'react';
+import { ReactionPage } from './ReactionPage';
 
-export function DatasetPageContainer() {
-  const { datasetId } = useParams<{ datasetId: string }>();
+interface ReactionPageWrapperProps {
+  readonly reactionId: string;
+  readonly datasetId: string;
+}
 
-  return <DatasetPageWrapper datasetId={datasetId} />;
+export class ReactionPageWrapper extends Component<ReactionPageWrapperProps> {
+  render() {
+    const reactionId = parseInt(this.props.reactionId, 10);
+    const datasetId = parseInt(this.props.datasetId, 10);
+
+    return (
+      <ReactionPage
+        reactionId={reactionId}
+        datasetId={datasetId}
+      />
+    );
+  }
 }

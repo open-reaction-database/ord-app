@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useParams } from 'wouter';
-import { DatasetPageWrapper } from './DatasetPageWrapper';
+import { Component } from 'react';
+import { DatasetPage } from './Dataset.page';
 
-export function DatasetPageContainer() {
-  const { datasetId } = useParams<{ datasetId: string }>();
+interface DatasetPageWrapperProps {
+  readonly datasetId: string;
+}
 
-  return <DatasetPageWrapper datasetId={datasetId} />;
+export class DatasetPageWrapper extends Component<DatasetPageWrapperProps> {
+  render() {
+    const { datasetId } = this.props;
+    const id = parseInt(datasetId as string);
+
+    return <DatasetPage datasetId={id} />;
+  }
 }
