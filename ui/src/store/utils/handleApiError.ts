@@ -25,15 +25,16 @@ export interface RejectValue {
 const ERROR_MESSAGES: Record<number, string> = {
   403: 'Access denied',
   404: 'Entity not found',
+  500: 'Unknown error',
 };
 
 export function getErrorDetails(error: unknown): RejectValue {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 500;
-    const message = ERROR_MESSAGES[status] ?? error.response?.data?.message ?? 'Request error';
+    const message = ERROR_MESSAGES[status] ?? error.response?.data?.message ?? ERROR_MESSAGES[500];
     return { errorCode: status, errorMessage: message };
   }
-  return { errorCode: 500, errorMessage: 'Unknown error' };
+  return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };
 }
 
 export const handleApiError = (error: unknown, dispatch: AppDispatch): RejectValue => {
