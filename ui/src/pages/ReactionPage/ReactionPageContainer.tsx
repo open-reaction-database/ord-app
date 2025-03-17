@@ -21,7 +21,7 @@ export function ReactionPageContainer() {
   const { reactionId, datasetId } = params;
 
   if (!reactionId || !datasetId) {
-    return <div>Error: missing parameters.</div>;
+    throw new Error('Missing required URL parameters: reactionId and datasetId');
   }
 
   return (

@@ -20,7 +20,7 @@ export function DatasetPageContainer() {
   const { datasetId } = useParams();
 
   if (!datasetId) {
-    return <div>Error: datasetId is missing.</div>;
+    throw new Error('datasetId is missing');
   }
 
   return <DatasetPageClass datasetId={datasetId} />;
