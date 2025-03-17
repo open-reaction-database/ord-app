@@ -33,6 +33,7 @@ from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionUpdateSchema
 from ord_app.service_api.services.exceptions import (
+    ConflictError,
     EntityNotFoundError,
     ProtobufDecodeError,
     psycopg_error_wrapper,
@@ -41,11 +42,11 @@ from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def validate_reaction(reaction: ReactionModel):
-    if reaction.binpb is None:
+async def validate_reaction(binpb):
+    if binpb is None:
         return None, ([], [])
 
-    pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
+    pb_reaction = await run_in_threadpool(load_message, binpb, Reaction, "binpb")
     try:
         validation_result = await run_in_threadpool(validate_pb_reaction, pb_reaction)
     except ValueError as err:
@@ -61,7 +62,7 @@ async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = 
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
         for reaction in reactions:
-            is_valid, _ = await validate_reaction(reaction)
+            is_valid, _ = await validate_reaction(getattr(reaction, "binpb", None))
             update_values.append({"id": reaction.id, "is_valid": is_valid})
         try:
             await reaction_repo.bulk_update(update_values)
@@ -152,7 +153,7 @@ class ReactionsUseCase:
             pb_reaction = await run_in_threadpool(load_message, db_reaction.binpb, Reaction, "binpb")
             # If the loaded message has a valid reaction_id, use it; otherwise, fallback to reaction.id
             db_reaction.pb_reaction_id = pb_reaction.reaction_id = str(
-                pb_reaction.reaction_id or generated_pb_reaction_id
+                (pb_reaction.reaction_id or "").strip() or generated_pb_reaction_id
             )
             db_reaction.binpb = pb_reaction.SerializeToString()
 
@@ -165,8 +166,9 @@ class ReactionsUseCase:
         insert_data = {"pb_reaction_id": uuid4().hex}
 
         pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
-        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
-        if db_reaction:
+        pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
+
+        if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id):
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
         insert_data["binpb"] = pb_reaction
 
@@ -190,6 +192,7 @@ class ReactionsUseCase:
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
         reaction = await self._create_reaction(dataset_id, insert_data)
+        await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
     async def upload(self, dataset_id: int, file_data, kind):
@@ -199,8 +202,8 @@ class ReactionsUseCase:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
-        db_reaction = await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id)
-        if db_reaction:
+        pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
+        if db_reaction := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id):
             pb_reaction.reaction_id = f"duplicate-{db_reaction.pb_reaction_id}_{uuid4().hex}"
 
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
@@ -213,7 +216,7 @@ class ReactionsUseCase:
 
     async def get(self, reaction_id):
         if reaction := await self.reaction_repo.get(id=reaction_id):
-            is_valid, (errors, warning) = await validate_reaction(reaction)
+            is_valid, (errors, warning) = await validate_reaction(getattr(reaction, "binpb", None))
             reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
@@ -225,30 +228,35 @@ class ReactionsUseCase:
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
+        pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
 
         db_reaction = await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id)
         if db_reaction is None:
             raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
-        if duplicated := await self.reaction_repo.get(pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id):
-            pb_reaction.reaction_id = f"duplicate-{duplicated.pb_reaction_id}_{uuid4().hex}"
+        duplicated_reactions = await self.reaction_repo.find_duplicated_by_pb_reaction_id(
+            dataset_id=dataset_id,
+            pb_reaction_id=pb_reaction.reaction_id,
+            exclude_pb_reaction_ids=[db_reaction.pb_reaction_id]
+        )
+        if duplicated_reactions:
+            raise ConflictError(f"Reaction with id={pb_reaction.reaction_id} already exists")
 
-        is_valid, (errors, warning) = await validate_reaction(db_reaction)
+        is_valid, (errors, warning) = await validate_reaction(getattr(pb_reaction, "binpb", None))
         updating_data = {
             "binpb": pb_reaction.SerializeToString(),
             "pb_reaction_id": pb_reaction.reaction_id,
             "is_valid": is_valid,
         }
 
-        if reaction := await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id):
-            await self.dataset_repo.update_modified_at(dataset_id)
-            reaction.validation = {"errors": errors, "warnings": warning}
-            return reaction
-
-        raise EntityNotFoundError("Reaction not found")
+        reaction = await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id)
+        await self.dataset_repo.update_modified_at(dataset_id)
+        reaction.validation = {"errors": errors, "warnings": warning}
+        return reaction
 
     async def delete(self, dataset_id: int, reaction_id: int):
         await self.reaction_repo.delete(dataset_id=dataset_id, id=reaction_id)
+        await self.dataset_repo.update_modified_at(dataset_id)
 
     async def download(self, reaction_id: int, file_format: DownloadFileFormats):
         if reaction := await self.reaction_repo.get(id=reaction_id):

@@ -100,11 +100,15 @@ class DatasetUseCases:
     async def add_reactions(self, dataset, reactions):
         seen_ids = set()
         reactions_ids = []
+
         for reaction in reactions:
             if not reaction.reaction_id:
                 reaction.reaction_id = uuid4().hex
             elif reaction.reaction_id in seen_ids:
                 reaction.reaction_id = f"duplicate-{reaction.reaction_id}-{uuid4().hex}"
+            else:
+                reaction.reaction_id = (reaction.reaction_id or "").strip()
+
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)
 
