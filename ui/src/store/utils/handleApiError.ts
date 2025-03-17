@@ -37,14 +37,13 @@ export function getErrorDetails(error: unknown): RejectValue {
 }
 
 export const handleApiError = (error: unknown, dispatch: AppDispatch): RejectValue => {
-  if (axios.isAxiosError(error)) {
-    const status = error.response?.status || 500;
-    const message = error.response?.data?.message || 'Request error';
-
-    dispatch(setPageStatus({ status: 'error', errorCode: status, errorMessage: message }));
-
-    return { errorCode: status, errorMessage: message };
-  }
-
-  return { errorCode: 500, errorMessage: 'Unknown error' };
+  const errorDetails = getErrorDetails(error);
+  dispatch(
+    setPageStatus({
+      status: 'error',
+      errorCode: errorDetails.errorCode,
+      errorMessage: errorDetails.errorMessage,
+    }),
+  );
+  return errorDetails;
 };
