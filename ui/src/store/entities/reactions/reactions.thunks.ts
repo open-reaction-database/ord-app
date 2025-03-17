@@ -27,7 +27,13 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type { AppReaction, ReactionMolBlocks, ReactionResponse, ReactionWrapper } from './reactions.types.ts';
+import type {
+  AppReaction,
+  ReactionMolBlocks,
+  ReactionResponse,
+  ReactionValidation,
+  ReactionWrapper,
+} from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
@@ -87,16 +93,27 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
   return { ...inputsPreviews, ...outcomesPreviews };
 };
 
-const parseReaction = ({ binpb, molblocks, ...rest }: ReactionResponse): ReactionWrapper => {
+const protobufClassRegExp = /<class '.+'> /g;
+
+const parseValidation = (validation: ReactionValidation): ReactionValidation => {
+  return {
+    errors: validation.errors.map(item => item.replace(protobufClassRegExp, '')),
+    warnings: validation.warnings.map(item => item.replace(protobufClassRegExp, '')),
+  };
+};
+
+const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
+  const updatedValidation = validation ? parseValidation(validation) : null;
 
   return {
     ...rest,
     previews,
     data: appReaction,
+    validation: updatedValidation,
   };
 };
 

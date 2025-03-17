@@ -18,12 +18,17 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;
+}
+
+export interface ReactionValidation {
+  errors: Array<string>;
+  warnings: Array<string>;
 }
 
 interface ReactionMolBlockProducts {
@@ -50,6 +55,7 @@ export interface ReactionResponse {
   pb_reaction_id: string;
   is_valid: boolean;
   summary: ReactionSummary;
+  validation: Optional<ReactionValidation>;
   binpb: string;
   molblocks: ReactionMolBlocks;
 }
