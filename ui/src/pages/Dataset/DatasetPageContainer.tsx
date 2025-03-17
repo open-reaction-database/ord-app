@@ -13,29 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
-import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
-import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
+import { useParams } from 'wouter';
+import { DatasetPageClass } from './Dataset.page';
 
-export function Routes() {
-  return (
-    <Switch>
-      <Route
-        path="/datasets"
-        nest
-      >
-        <DatasetsListRoute />
-      </Route>
-      <Route
-        path="/templates"
-        nest
-      >
-        <TemplatesListRoute />
-      </Route>
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
-  );
+export function DatasetPageContainer() {
+  const { datasetId } = useParams();
+
+  if (!datasetId) {
+    return <div>Error: datasetId is missing.</div>;
+  }
+
+  return <DatasetPageClass datasetId={datasetId} />;
 }

@@ -29,10 +29,17 @@ import type { Pages } from 'common/types';
 import { selectDatasetsPagination } from './datasets.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { selectActiveGroupId } from '../../features/groups/groups.selectors.ts';
+import { handleApiError } from 'store/utils/handleApiError.ts';
 
 export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetId) => {
-  const dataset = (await axiosInstance.get<Dataset>(`/datasets/${datasetId}`)).data;
-  return getDatasetActions.success(dataset);
+  try {
+    const response = await axiosInstance.get<Dataset>(`/datasets/${datasetId}`);
+    return getDatasetActions.success(response.data);
+  } catch (error) {
+    console.error(error);
+    navigate('/404');
+    throw handleApiError(error, _d);
+  }
 });
 
 export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {

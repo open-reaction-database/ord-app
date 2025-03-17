@@ -13,29 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
-import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
-import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
+import type { AppState } from 'store/configureAppStore.ts';
 
-export function Routes() {
-  return (
-    <Switch>
-      <Route
-        path="/datasets"
-        nest
-      >
-        <DatasetsListRoute />
-      </Route>
-      <Route
-        path="/templates"
-        nest
-      >
-        <TemplatesListRoute />
-      </Route>
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
-  );
-}
+export const selectPageErrorCode = (state: AppState) => state.features.page.errorCode;
+export const selectPageErrorMessage = (state: AppState) => state.features.page.errorMessage;

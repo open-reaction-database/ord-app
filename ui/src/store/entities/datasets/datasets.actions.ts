@@ -16,10 +16,11 @@
 import { createActionFactory } from 'store/utils';
 import type { CreateDatasetFromFilePayload, CreateNewDatasetPayload, Dataset } from './datasets.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
+import type { RejectValue } from 'store/utils/handleApiError.ts';
 
 const { createAsyncAction, createAction } = createActionFactory('datasets');
 
-export const getDatasetActions = createAsyncAction<number, Dataset>('get');
+export const getDatasetActions = createAsyncAction<number, Dataset, RejectValue>('get');
 
 export const getGroupsInitialDatasetListActions = createAsyncAction<number | null, Pages<Dataset>>('list_initial');
 

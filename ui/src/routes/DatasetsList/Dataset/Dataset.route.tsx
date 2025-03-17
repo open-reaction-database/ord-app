@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 import { Route, Switch } from 'wouter';
-import { ReactionPage } from 'pages/ReactionPage/ReactionPage.tsx';
-import { DatasetPage } from 'pages/Dataset/Dataset.page.tsx';
+import { ErrorBoundary } from 'common/components/ErrorBoundary/ErrorBoundary';
+import { DatasetPageContainer } from 'pages/Dataset/DatasetPageContainer';
+import { ReactionPageContainer } from 'pages/ReactionPage/ReactionPageContainer';
 
 export function DatasetRoute() {
   return (
     <Switch>
       <Route path="/reactions/:reactionId">
-        <ReactionPage />
+        <ErrorBoundary>
+          <ReactionPageContainer />
+        </ErrorBoundary>
       </Route>
       <Route path="/">
-        <DatasetPage />
+        <ErrorBoundary>
+          <DatasetPageContainer />
+        </ErrorBoundary>
       </Route>
     </Switch>
   );

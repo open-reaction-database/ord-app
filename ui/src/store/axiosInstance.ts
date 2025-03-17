@@ -15,6 +15,9 @@
  */
 import axios from 'axios';
 import type { GetAccessToken } from 'common/types/auth.ts';
+import { setPageStatus } from './features/page/page.reducer';
+import { configureAppStore } from 'store/configureAppStore.ts';
+import { handleApiError } from './utils/handleApiError';
 
 export let getAccessToken: GetAccessToken;
 
@@ -27,8 +30,31 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getAccessToken()}`;
+  try {
+    const token = await getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.error('Error retrieving access token:', error);
+  }
   return config;
 });
+
+axiosInstance.interceptors.response.use(
+  response => response,
+  error => {
+    const store = configureAppStore();
+    const { errorCode, errorMessage } = handleApiError(error, store.dispatch);
+
+    store.dispatch(setPageStatus({ status: 'error', errorCode, errorMessage }));
+
+    if (errorCode === 404) {
+      store.dispatch(setPageStatus({ status: 'notFound', errorCode, errorMessage }));
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default axiosInstance;

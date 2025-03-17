@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'wouter';
+import { connect } from 'react-redux';
+import React from 'react';
 import { Flex, Loader } from '@mantine/core';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { ReactionList } from 'features/reactions/ReactionList/ReactionList.tsx';
@@ -25,41 +24,71 @@ import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx
 import classes from './dataset.page.module.scss';
 import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
+import type { Dataset } from 'store/entities/datasets/datasets.types';
+import type { AppState } from 'store/configureAppStore';
 
-export function DatasetPage() {
-  const dispatch = useAppDispatch();
-  const { datasetId } = useParams();
-  const id = parseInt(datasetId as string);
-  const dataset = useSelector(selectDatasetById(id));
+interface DatasetPageProps {
+  readonly datasetId: string;
+  readonly dataset?: Dataset;
+  readonly getDataset: (id: number) => void;
+  readonly getReactionsList: (id: number) => void;
+}
 
-  useEffect(() => {
-    dispatch(getDataset(id));
-    dispatch(getReactionsList(id));
-  }, [dispatch, id]);
+export class DatasetPage extends React.Component<DatasetPageProps> {
+  private id: number;
 
-  const breadcrumbs = useMemo((): Breadcrumbs => {
+  constructor(props: DatasetPageProps) {
+    super(props);
+    this.id = parseInt(props.datasetId, 10);
+  }
+
+  componentDidMount() {
+    const { getDataset, getReactionsList } = this.props;
+    getDataset(this.id);
+    getReactionsList(this.id);
+  }
+
+  getBreadcrumbs(): Breadcrumbs {
+    const { dataset } = this.props;
     return [
       { title: 'Datasets', path: '~/' },
-      { path: `~/datasets/${id}`, title: dataset?.name ?? id },
+      { path: `~/datasets/${this.id}`, title: dataset?.name ?? `${this.id}` },
     ];
-  }, [dataset?.name, id]);
+  }
 
-  return (
-    <PageContainer breadcrumbs={breadcrumbs}>
-      {!dataset ? (
-        <Flex
-          justify="center"
-          align="center"
-        >
-          <Loader size="xl" />
-        </Flex>
-      ) : (
-        <div className={classes.container}>
-          <DatasetHeader dataset={dataset} />
-          <ReactionList />
-        </div>
-      )}
-    </PageContainer>
-  );
+  render() {
+    const { dataset } = this.props;
+    const breadcrumbs = this.getBreadcrumbs();
+
+    return (
+      <PageContainer breadcrumbs={breadcrumbs}>
+        {!dataset ? (
+          <Flex
+            justify="center"
+            align="center"
+          >
+            <Loader size="xl" />
+          </Flex>
+        ) : (
+          <div className={classes.container}>
+            <DatasetHeader dataset={dataset} />
+            <ReactionList />
+          </div>
+        )}
+      </PageContainer>
+    );
+  }
 }
+
+const mapStateToProps = (state: AppState, ownProps: { datasetId: string }) => {
+  const id = parseInt(ownProps.datasetId, 10);
+  return {
+    dataset: selectDatasetById(id)(state),
+    datasetId: ownProps.datasetId,
+  };
+};
+
+export const DatasetPageClass = connect(mapStateToProps, {
+  getDataset,
+  getReactionsList,
+})(DatasetPage);

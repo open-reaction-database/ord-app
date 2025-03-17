@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
-import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
-import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
+import { useParams } from 'wouter';
+import ReactionPage from './ReactionPage';
 
-export function Routes() {
+export function ReactionPageContainer() {
+  const params = useParams<{ reactionId: string; datasetId: string }>();
+  const { reactionId, datasetId } = params;
+
+  if (!reactionId || !datasetId) {
+    return <div>Error: missing parameters.</div>;
+  }
+
   return (
-    <Switch>
-      <Route
-        path="/datasets"
-        nest
-      >
-        <DatasetsListRoute />
-      </Route>
-      <Route
-        path="/templates"
-        nest
-      >
-        <TemplatesListRoute />
-      </Route>
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
+    <ReactionPage
+      reactionId={parseInt(reactionId)}
+      datasetId={parseInt(datasetId)}
+    />
   );
 }

@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
-import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
-import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
+import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { Title, Text, Button } from '@mantine/core';
+import { navigate } from 'wouter/use-browser-location';
 
-export function Routes() {
+export function NotFoundPage() {
   return (
-    <Switch>
-      <Route
-        path="/datasets"
-        nest
+    <PageContainer breadcrumbs={[]}>
+      <Title order={1}>404</Title>
+      <Text size="lg">The requested page or resource could not be found</Text>
+      <Button
+        mt="lg"
+        onClick={() => navigate('/datasets')}
       >
-        <DatasetsListRoute />
-      </Route>
-      <Route
-        path="/templates"
-        nest
-      >
-        <TemplatesListRoute />
-      </Route>
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
+        Go to Datasets Page
+      </Button>
+    </PageContainer>
   );
 }
