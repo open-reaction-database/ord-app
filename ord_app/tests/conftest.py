@@ -63,11 +63,6 @@ def override_validate_reactions_task(monkeypatch):
         "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions",
         mock_validate_reactions_task
     )
-    monkeypatch.setattr(
-        "ord_app.service_api.resources.v1.reactions.validate_dataset_reactions",
-        mock_validate_reactions_task
-    )
-
 
 @pytest.fixture(autouse=True)
 async def override_engine(monkeypatch):
