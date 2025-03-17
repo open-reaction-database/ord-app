@@ -57,7 +57,7 @@ export function ReactionValidationBadge({ isValid, validation }: Readonly<Reacti
             gap="xs"
           >
             <WarningIcon className={classes.icon} />
-            <Text className={classes.text}>{amountText(validation.warnings.length, 'error')}</Text>
+            <Text className={classes.text}>{amountText(validation.warnings.length, 'warning')}</Text>
           </Flex>
         </Flex>
       </Badge>
