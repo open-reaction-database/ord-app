@@ -108,6 +108,8 @@ class DatasetUseCases:
                 reaction.reaction_id = f"duplicate-{reaction.reaction_id}-{uuid4().hex}"
             else:
                 reaction.reaction_id = (reaction.reaction_id or "").strip()
+                if not reaction.reaction_id:
+                    reaction.reaction_id = uuid4().hex
 
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)

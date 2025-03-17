@@ -209,6 +209,10 @@ class ReactionsUseCase:
         insert_data = {"pb_reaction_id": uuid4().hex, "binpb": pb_reaction}
         reaction = await self._create_reaction(dataset_id, insert_data)
         await self.dataset_repo.update_modified_at(dataset_id)
+
+        is_valid, (errors, warning) = await validate_reaction(reaction.binpb)
+        reaction.is_valid = is_valid
+        reaction.validation = {"errors": errors, "warnings": warning}
         return reaction
 
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
@@ -242,7 +246,7 @@ class ReactionsUseCase:
         if duplicated_reactions:
             raise ConflictError(f"Reaction with id={pb_reaction.reaction_id} already exists")
 
-        is_valid, (errors, warning) = await validate_reaction(getattr(pb_reaction, "binpb", None))
+        is_valid, (errors, warning) = await validate_reaction(payload.binpb)
         updating_data = {
             "binpb": pb_reaction.SerializeToString(),
             "pb_reaction_id": pb_reaction.reaction_id,
