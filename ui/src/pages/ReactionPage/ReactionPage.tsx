@@ -43,6 +43,7 @@ interface ReactionTab {
 }
 
 const createEmptyComponent = (name: string) => () => name;
+
 const tabs: Array<ReactionTab> = [
   { name: 'inputs', required: true, Component: Inputs },
   { name: 'outcomes', required: true, Component: Outcomes },
