@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
-import type { TemplateWrapper } from 'store/entities/templates/templates.types.ts';
+import type { ReactionOrTemplate } from 'store/entities/reactions/reactions.types.ts';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
@@ -23,7 +22,7 @@ import { ReactionInputPreview } from 'features/reactions/ReactionPreview/Reactio
 import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
-  reaction: ReactionWrapper | TemplateWrapper;
+  reaction: ReactionOrTemplate;
 }
 
 export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(

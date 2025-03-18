@@ -69,3 +69,16 @@
   width: 16px;
   height: 16px;
 }
+
+.titleWrapper {
+  overflow: hidden;
+}
+
+.title {
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.copyButton {
+  min-width: min-content;
+}

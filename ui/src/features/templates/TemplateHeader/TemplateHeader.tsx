@@ -66,7 +66,7 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
             <TemplateHeaderActions templateId={templateId} />
           </Flex>
         </Flex>
-        <ReactionPreview reactionId={templateId} />
+        <ReactionPreview reaction={template} />
       </Flex>
       <InputModal
         opened={opened}

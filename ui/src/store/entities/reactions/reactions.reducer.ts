@@ -70,17 +70,6 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       };
     },
   );
-  builder.addCase(addUpdateReactionFieldActions.success, (state, { payload }) => {
-    const { id } = payload;
-    const { data } = state[id];
-    return {
-      ...state,
-      [id]: {
-        ...payload,
-        data,
-      },
-    };
-  });
   builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
     const reaction = state[reactionId];
     const updatedReaction: ReactionParsedProtobuf = linkReactionEntities(
@@ -140,6 +129,20 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       [`template_${action.payload.id}`]: action.payload,
     };
   });
+  builder.addMatcher(
+    isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),
+    (state, { payload }) => {
+      const { id } = payload;
+      const { data } = state[id];
+      return {
+        ...state,
+        [id]: {
+          ...payload,
+          data,
+        },
+      };
+    },
+  );
   builder.addMatcher(
     isAnyOf(getReactionActions.success, createEmptyReactionActions.success, importReactionFromFileActions.success),
     (state, action) => ({

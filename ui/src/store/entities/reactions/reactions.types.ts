@@ -87,6 +87,8 @@ export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molbl
 
 export type ReactionId = number | string;
 
+export type UpdateReactionSuccessPayload = Omit<ReactionWrapper, 'data'>;
+
 export interface ImportReactionFromFilePayload {
   file: File;
 }
