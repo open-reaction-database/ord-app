@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useCallback, type ChangeEvent, type MouseEvent } from 'react';
+import { useEffect, useCallback, type ChangeEvent, type MouseEvent, type PropsWithChildren } from 'react';
 import { useSelector } from 'react-redux';
 import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
 import {
@@ -27,9 +27,30 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import classes from './GroupsList.module.scss';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
-import clsx from 'clsx';
 
 const GROUP_BUTTON_HEIGHT = 36;
+
+interface GroupButtonProps {
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+function GroupButton({ isSelected, onClick, children }: Readonly<PropsWithChildren<GroupButtonProps>>) {
+  return (
+    <Button
+      classNames={{
+        root: classes.groupButton,
+        label: classes.buttonLabel,
+      }}
+      variant={isSelected ? 'filled' : 'transparent'}
+      color={isSelected ? 'primary' : 'default'}
+      justify="flex-start"
+      onClick={onClick}
+    >
+      {children}
+    </Button>
+  );
+}
 
 export function GroupsList() {
   const appDispatch = useAppDispatch();
@@ -77,18 +98,18 @@ export function GroupsList() {
         placeholder="Search by group"
       />
       <Flex direction="column">
-        <Button
-          classNames={{
-            root: clsx(classes.groupButton, { [classes.selected]: selectedGroupId === null }),
-            section: classes.buttonSection,
-          }}
-          variant="transparent"
-          leftSection={<GridViewIcon />}
+        <GroupButton
+          isSelected={selectedGroupId === null}
           onClick={() => selectGroup(null)}
-          justify="flex-start"
         >
-          All Groups
-        </Button>
+          <Flex
+            align="center"
+            gap="xs"
+          >
+            <GridViewIcon />
+            All Groups
+          </Flex>
+        </GroupButton>
 
         <ScrollArea
           h={scrollAreaHeight}
@@ -98,14 +119,9 @@ export function GroupsList() {
           type="auto"
         >
           {groups.map(group => (
-            <Button
-              classNames={{
-                root: clsx(classes.groupButton, { [classes.selected]: selectedGroupId === group.id }),
-                label: classes.buttonLabel,
-              }}
+            <GroupButton
               key={group.id}
-              variant="transparent"
-              justify="flex-start"
+              isSelected={selectedGroupId === group.id}
               onClick={() => selectGroup(group.id)}
             >
               <div className={classes.buttonName}>
@@ -120,7 +136,7 @@ export function GroupsList() {
               >
                 <SettingsIcon />
               </ActionIcon>
-            </Button>
+            </GroupButton>
           ))}
         </ScrollArea>
       </Flex>

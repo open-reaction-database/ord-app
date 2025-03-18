@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ValuePrecisionUnit } from './valuePrecisionUnitControl.types';
-import { Input, NumberInput } from '@mantine/core';
+import { Input } from '@mantine/core';
 import { InputGroup } from '../InputGroup/InputGroup';
 import type { SelectOptions } from 'common/types/selectOptions';
 import { AppSegmentedControl } from '../AppSegmentedControl/AppSegmentedControl';
@@ -23,6 +23,8 @@ import { useUncontrolled } from '@mantine/hooks';
 import { AppNativeSelect } from '../AppNativeSelect/AppNativeSelect';
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
+import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
+import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 interface ValuePrecisionUnitControlProps {
   value?: ValuePrecisionUnit;
@@ -35,14 +37,14 @@ interface ValuePrecisionUnitControlProps {
 
 const useValuePrecisionUnitsUncontrolledValues = (
   props: Pick<ValuePrecisionUnitControlProps, 'value' | 'defaultValue' | 'onChange'>,
-): [{ value: number | string; precision: number | string; units: string }, (value: ValuePrecisionUnit) => void] => {
+): [ValuePrecisionUnit, (value: ValuePrecisionUnit) => void] => {
   const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled(props);
 
   return [
     {
-      value: uncontrolledValue?.value ?? '',
-      precision: uncontrolledValue?.precision ?? '',
-      units: uncontrolledValue?.units ?? '',
+      value: uncontrolledValue?.value ?? null,
+      precision: uncontrolledValue?.precision ?? null,
+      units: uncontrolledValue.units,
     },
     uncontrolledOnChange,
   ];
@@ -56,7 +58,7 @@ export function ValuePrecisionUnitControl({
 }: Readonly<ValuePrecisionUnitControlProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues(rest);
 
-  const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number) => {
+  const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number | null) => {
     const previousValue = uncontrolledValue ?? {};
     uncontrolledOnChange({ ...previousValue, [name]: newValue } as ValuePrecisionUnit);
   };
@@ -67,14 +69,14 @@ export function ValuePrecisionUnitControl({
     <Input.Wrapper label={label}>
       <div className={clsx(classes.wrapper, { [classes.inline]: select === 'native-inline' })}>
         <InputGroup>
-          <NumberInput
+          <AppNumberInput
             value={uncontrolledValue.value}
-            onChange={(value: string | number) => handleChange('value', value)}
+            onChange={(value: Optional<number>) => handleChange('value', value)}
             placeholder="Value"
           />
-          <NumberInput
+          <AppNumberInput
             value={uncontrolledValue.precision}
-            onChange={(value: string | number) => handleChange('precision', value)}
+            onChange={(value: Optional<number>) => handleChange('precision', value)}
             leftSection="±"
             placeholder="Precision"
           />

@@ -13,20 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tabTitle {
-  color: var(--color-text-secondary-3);
-  text-transform: uppercase;
-  font-weight: 500;
+.validationBadge {
+  height: auto;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  border-color: var(--color-border-2);
+  color: var(--color-text-primary);
+}
 
-  &[data-active] {
-    color: var(--color-text-primary);
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.closed {
+  svg {
+    transform: rotate(-90deg);
   }
 }
 
-.panel {
-  padding: 20px 20px 0;
+.text {
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
-.checkIcon {
-  margin-right: 8px;
+.sidebar {
+  min-width: 680px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
 }

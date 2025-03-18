@@ -19,6 +19,7 @@ import type {
   ImportReactionFromFilePayload,
   ReactionWrapper,
   UpdateReactionPayload,
+  UpdateReactionSuccessPayload,
 } from './reactions.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
@@ -43,11 +44,13 @@ export const importReactionFromFileActions = createAsyncAction<ImportReactionFro
 
 export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
-  Omit<ReactionWrapper, 'data'>
+  UpdateReactionSuccessPayload
 >('addUpdateField');
 
 export const searchReactionActions = createAsyncAction<string, ReactionWrapper>('search');
 
-export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');
+export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, UpdateReactionSuccessPayload>(
+  'deleteField',
+);
 
 export const removeReactionActions = createAsyncAction<number, number>('remove_dataset');

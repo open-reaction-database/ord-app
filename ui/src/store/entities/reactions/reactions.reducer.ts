@@ -63,17 +63,6 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
       };
     },
   );
-  builder.addCase(addUpdateReactionFieldActions.success, (state, { payload }) => {
-    const { id } = payload;
-    const { data } = state[id];
-    return {
-      ...state,
-      [id]: {
-        ...payload,
-        data,
-      },
-    };
-  });
   builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
     const reaction = state[reactionId];
     const updatedReaction: AppReaction = linkReactionEntities(removeDeepReactionPart(reaction.data, pathComponents));
@@ -89,6 +78,20 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
     const { [reactionId]: _, ...rest } = state;
     return rest;
   });
+  builder.addMatcher(
+    isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),
+    (state, { payload }) => {
+      const { id } = payload;
+      const { data } = state[id];
+      return {
+        ...state,
+        [id]: {
+          ...payload,
+          data,
+        },
+      };
+    },
+  );
   builder.addMatcher(
     isAnyOf(getReactionActions.success, createEmptyReactionActions.success, importReactionFromFileActions.success),
     (state, action) => ({
