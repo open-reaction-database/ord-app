@@ -39,7 +39,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
 
   return {
     ...rest,
-    variables: Array.isArray(variables) ? variables : JSON.parse(variables),
+    variables: JSON.parse(variables),
     previews,
     data: appReaction,
   };
