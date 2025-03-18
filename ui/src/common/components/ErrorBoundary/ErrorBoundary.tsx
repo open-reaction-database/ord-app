@@ -16,6 +16,8 @@
 import { Button, Container, Title } from '@mantine/core';
 import React from 'react';
 import { navigate } from 'wouter/use-browser-location';
+import classes from './errorBoundary.module.scss';
+import { HomeIcon } from 'common/icons';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -42,12 +44,17 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<unkno
   render() {
     if (this.state.hasError) {
       return (
-        <Container style={{ textAlign: 'center', paddingTop: '50px' }}>
+        <Container className={classes.container}>
           <Title order={2}>Unexpected Error</Title>
           <Button
             mt="lg"
-            onClick={this.handleGoHome}
+            className={classes.button}
+            onClick={() => navigate('/datasets')}
           >
+            <HomeIcon
+              className={classes.homeIcon}
+              style={{ marginRight: 8 }}
+            />
             Go Home
           </Button>
         </Container>
