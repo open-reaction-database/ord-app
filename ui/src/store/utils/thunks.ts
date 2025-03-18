@@ -26,8 +26,11 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
       try {
         const result = await appThunk(dispatch, getState, extraArgument);
         dispatch(result);
-      } catch (e) {
-        console.error(e);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        const errorCode = e.errorCode || 'Unknown Code';
+        const errorMessage = e.errorMessage || 'No error message provided';
+        console.error(`Content message: [${errorCode}] ${errorMessage}`);
         dispatch(asyncActionCreator.failure(e));
       }
     };

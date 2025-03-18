@@ -14,20 +14,43 @@
  * limitations under the License.
  */
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import { Title, Text, Button } from '@mantine/core';
+import { Title, Text, Button, Flex } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
+import { HomeIcon } from 'common/icons';
+import classes from './notFoundPage.module.scss';
 
 export function NotFoundPage() {
   return (
     <PageContainer breadcrumbs={[]}>
-      <Title order={1}>404</Title>
-      <Text size="lg">The requested page or resource could not be found</Text>
-      <Button
-        mt="lg"
-        onClick={() => navigate('/datasets')}
+      <Flex
+        direction="column"
+        align="center"
+        justify="space-between"
       >
-        Go to Datasets Page
-      </Button>
+        <Title
+          order={1}
+          className={classes.title}
+        >
+          404
+        </Title>
+        <Text
+          size="lg"
+          className={classes.text}
+        >
+          The requested page or resource could not be found
+        </Text>
+        <Button
+          mt="lg"
+          className={classes.button}
+          onClick={() => navigate('/datasets')}
+        >
+          <HomeIcon
+            className={classes.homeIcon}
+            style={{ marginRight: 8 }}
+          />
+          Go to Datasets Page
+        </Button>
+      </Flex>
     </PageContainer>
   );
 }

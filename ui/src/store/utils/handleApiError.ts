@@ -13,38 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { setPageStatus } from 'store/features/page/page.reducer.ts';
 import axios from 'axios';
-import type { AppDispatch } from 'store/configureAppStore';
-
 export interface RejectValue {
   errorCode: number;
   errorMessage: string;
 }
 
-const ERROR_MESSAGES: Record<number, string> = {
-  403: 'Access denied',
-  404: 'Entity not found',
-  500: 'Unknown error',
-};
-
 export function getErrorDetails(error: unknown): RejectValue {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 500;
-    const message = ERROR_MESSAGES[status] ?? error.response?.data?.message ?? ERROR_MESSAGES[500];
+    const message = error.response?.data?.message || 'Unknown error';
     return { errorCode: status, errorMessage: message };
   }
-  return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };
+  return { errorCode: 500, errorMessage: 'Unknown error' };
 }
 
-export const handleApiError = (error: unknown, dispatch: AppDispatch): RejectValue => {
+export const handleApiError = (error: unknown): RejectValue => {
   const errorDetails = getErrorDetails(error);
-  dispatch(
-    setPageStatus({
-      status: 'error',
-      errorCode: errorDetails.errorCode,
-      errorMessage: errorDetails.errorMessage,
-    }),
-  );
   return errorDetails;
 };

@@ -36,9 +36,8 @@ export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetI
     const response = await axiosInstance.get<Dataset>(`/datasets/${datasetId}`);
     return getDatasetActions.success(response.data);
   } catch (error) {
-    console.error(error);
     navigate('/404');
-    throw handleApiError(error, _d);
+    throw handleApiError(error);
   }
 });
 

@@ -116,8 +116,7 @@ export const getReactionsList = createThunk(getReactionsListActions, async (_d, 
 
     return getReactionsListActions.success(parseReactionList(response.data));
   } catch (error) {
-    console.error('Error fetching reactions list:', error);
-    const errorData: RejectValue = handleApiError(error, _d);
+    const errorData: RejectValue = handleApiError(error);
     navigate('/404');
     throw errorData;
   }
@@ -147,8 +146,7 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
     const parsedReaction = parseReaction(response.data);
     return getReactionActions.success(parsedReaction);
   } catch (error) {
-    console.error('Error fetching reaction:', error);
-    const errorData = handleApiError(error, dispatch);
+    const errorData = handleApiError(error);
     navigate('/404');
     throw errorData;
   }

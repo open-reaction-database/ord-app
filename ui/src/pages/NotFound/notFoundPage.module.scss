@@ -13,7 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppState } from 'store/configureAppStore.ts';
+.homeIcon {
+  width: 14px;
+  height: 15.7px;
+}
 
-export const selectPageErrorCode = (state: AppState) => state.features.page.errorCode;
-export const selectPageErrorMessage = (state: AppState) => state.features.page.errorMessage;
+.title {
+  color: var(--mantine-color-primary-0);
+  font-weight: 700;
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.text {
+  color: var(--color-text-primary);
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.button {
+  gap: 8px;
+  margin-top: 16px;
+}
