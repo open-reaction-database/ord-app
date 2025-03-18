@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { useParams } from 'wouter';
-import { DatasetPageWrapper } from './DatasetPageWrapper';
+import { DatasetPage } from './Dataset.page';
 
 export function DatasetPageContainer() {
   const { datasetId } = useParams<{ datasetId: string }>();
 
-  return <DatasetPageWrapper datasetId={datasetId} />;
+  return <DatasetPage datasetId={Number(datasetId)} />;
 }

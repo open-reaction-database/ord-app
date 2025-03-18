@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import { useParams } from 'wouter';
-import { ReactionPageWrapper } from './ReactionPageWrapper';
+import { ReactionPage } from './ReactionPage';
 
 export const ReactionPageContainer = () => {
   const { reactionId, datasetId } = useParams<{ reactionId: string; datasetId: string }>();
 
   return (
-    <ReactionPageWrapper
-      reactionId={reactionId}
-      datasetId={datasetId}
+    <ReactionPage
+      reactionId={Number(reactionId)}
+      datasetId={Number(datasetId)}
     />
   );
 };

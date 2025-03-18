@@ -22,11 +22,7 @@ import classes from './notFoundPage.module.scss';
 export function NotFoundPage() {
   return (
     <PageContainer breadcrumbs={[]}>
-      <Flex
-        direction="column"
-        align="center"
-        justify="space-between"
-      >
+      <Flex className={classes.container}>
         <Title
           order={1}
           className={classes.title}
@@ -37,7 +33,7 @@ export function NotFoundPage() {
           size="lg"
           className={classes.text}
         >
-          The requested page or resource could not be found
+          The requested page <br /> or resource could not be found
         </Text>
         <Button
           mt="lg"

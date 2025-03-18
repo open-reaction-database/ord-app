@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Flex, Loader } from '@mantine/core';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
@@ -25,6 +25,7 @@ import classes from './dataset.page.module.scss';
 import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 
 interface DatasetPageProps {
   readonly datasetId: number;
@@ -32,11 +33,20 @@ interface DatasetPageProps {
 
 export function DatasetPage({ datasetId: id }: DatasetPageProps) {
   const dispatch = useAppDispatch();
+  const [error, setError] = useState(false);
   const dataset = useSelector(selectDatasetById(id));
 
   useEffect(() => {
-    dispatch(getDataset(id));
-    dispatch(getReactionsList(id));
+    const fetchData = async () => {
+      try {
+        await dispatch(getDataset(id));
+        await dispatch(getReactionsList(id));
+      } catch {
+        setError(true);
+      }
+    };
+
+    fetchData();
   }, [dispatch, id]);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
@@ -45,6 +55,10 @@ export function DatasetPage({ datasetId: id }: DatasetPageProps) {
       { path: `~/datasets/${id}`, title: dataset?.name ?? id },
     ];
   }, [dataset?.name, id]);
+
+  if (error) {
+    return <NotFoundPage />;
+  }
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>

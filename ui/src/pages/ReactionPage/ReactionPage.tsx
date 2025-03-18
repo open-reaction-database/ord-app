@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { Fragment, useEffect, useMemo, type FC } from 'react';
+import { Fragment, useEffect, useMemo, useState, type FC } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
@@ -32,6 +32,7 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 interface ReactionPageProps {
   readonly reactionId: number;
   readonly datasetId: number;
@@ -58,6 +59,7 @@ const tabs: Array<ReactionTab> = [
 
 export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
   const dispatch = useAppDispatch();
+  const [error, setError] = useState(false);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
 
@@ -73,7 +75,15 @@ export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
   }, [reactionId, datasetId, dataset?.name, reaction?.pb_reaction_id]);
 
   useEffect(() => {
-    dispatch(getReaction({ datasetId, reactionId }));
+    const fetchReaction = async () => {
+      try {
+        await dispatch(getReaction({ datasetId, reactionId }));
+      } catch {
+        setError(true);
+      }
+    };
+
+    fetchReaction();
   }, [dispatch, datasetId, reactionId]);
 
   const contextValue = useMemo(
@@ -83,6 +93,11 @@ export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
     }),
     [reactionId],
   );
+  console.log(error);
+
+  if (error) {
+    return <NotFoundPage />;
+  }
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>

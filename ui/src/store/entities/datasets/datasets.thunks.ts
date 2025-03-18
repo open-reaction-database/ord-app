@@ -36,17 +36,20 @@ export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetI
     const response = await axiosInstance.get<Dataset>(`/datasets/${datasetId}`);
     return getDatasetActions.success(response.data);
   } catch (error) {
-    navigate('/404');
     throw handleApiError(error);
   }
 });
 
 export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {
-  const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
-  const params = { page: 1, size: 10 };
+  try {
+    const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
+    const params = { page: 1, size: 10 };
 
-  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
-  return getGroupsInitialDatasetListActions.success(datasetsPages);
+    const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
+    return getGroupsInitialDatasetListActions.success(datasetsPages);
+  } catch (error) {
+    throw handleApiError(error);
+  }
 });
 
 export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, getState) => {

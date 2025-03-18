@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 .container {
-  padding-top: 50px;
-}
-
-.button {
-  gap: 8px;
-  margin-top: 16px;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .homeIcon {
   width: 14px;
-  height: 15.7px;
+  height: 15px;
+}
+
+.button {
+  width: 188px;
+  height: 36px;
+  padding: 8px;
 }

@@ -15,7 +15,6 @@
  */
 import axios from 'axios';
 import type { GetAccessToken } from 'common/types/auth.ts';
-import { handleApiError } from './utils/handleApiError';
 
 export let getAccessToken: GetAccessToken;
 
@@ -34,8 +33,8 @@ axiosInstance.interceptors.request.use(async config => {
 
 axiosInstance.interceptors.response.use(
   response => response,
-  error => {
-    throw handleApiError(error);
+  async error => {
+    return Promise.reject(error);
   },
 );
 

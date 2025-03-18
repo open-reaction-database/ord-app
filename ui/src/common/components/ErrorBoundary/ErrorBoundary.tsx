@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
+import { Component } from 'react';
 import { Button, Container, Title } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
 import classes from './errorBoundary.module.scss';
@@ -23,7 +23,7 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-export class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<React.PropsWithChildren<unknown>, ErrorBoundaryState> {
   constructor(props: React.PropsWithChildren<unknown>) {
     super(props);
     this.state = { hasError: false };

@@ -26,12 +26,10 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
       try {
         const result = await appThunk(dispatch, getState, extraArgument);
         dispatch(result);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        const errorCode = e.errorCode || 'Unknown Code';
-        const errorMessage = e.errorMessage || 'No error message provided';
-        console.error(`Content message: [${errorCode}] ${errorMessage}`);
+        return result;
+      } catch (e) {
         dispatch(asyncActionCreator.failure(e));
+        throw e;
       }
     };
   };
@@ -47,8 +45,8 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       try {
         await appThunk(dispatch, getState, extraArgument);
       } catch (e) {
-        console.error(e);
         dispatch(asyncActionCreator.failure(e));
+        throw e;
       }
     };
   };

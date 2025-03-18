@@ -48,7 +48,7 @@ import {
 import { showNotification } from 'common/utils/showNotification.tsx';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
-import { handleApiError, type RejectValue } from 'store/utils/handleApiError.ts';
+import { handleApiError } from 'store/utils/handleApiError.ts';
 import type { Action, ThunkDispatch } from '@reduxjs/toolkit';
 import { getDataset } from '../datasets/datasets.thunks.ts';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
@@ -134,9 +134,7 @@ export const getReactionsList = createThunk(getReactionsListActions, async (_d, 
 
     return getReactionsListActions.success(parseReactionList(response.data));
   } catch (error) {
-    const errorData: RejectValue = handleApiError(error);
-    navigate('/404');
-    throw errorData;
+    throw handleApiError(error);
   }
 });
 
@@ -157,16 +155,14 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
     const dataset = selectDatasetById(datasetId)(getState());
 
     if (!dataset) {
-      await (dispatch as ThunkDispatch<AppState, never, Action>)(getDataset(datasetId));
+      (dispatch as ThunkDispatch<AppState, never, Action>)(getDataset(datasetId));
     }
 
     const response = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
     const parsedReaction = parseReaction(response.data);
     return getReactionActions.success(parsedReaction);
   } catch (error) {
-    const errorData = handleApiError(error);
-    navigate('/404');
-    throw errorData;
+    throw handleApiError(error);
   }
 });
 
