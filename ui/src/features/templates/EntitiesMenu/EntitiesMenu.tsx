@@ -17,8 +17,11 @@ import { Button, Flex, Paper } from '@mantine/core';
 import classes from './EntitiesMenu.module.scss';
 import { DatasetsIcon, TemplatesIcon } from 'common/icons';
 import clsx from 'clsx';
+import { useLocation, useRouter } from 'wouter';
 
 export function EntitiesMenu() {
+  const [, navigate] = useLocation();
+  const router = useRouter();
   return (
     <Paper
       className={classes.root}
@@ -28,24 +31,24 @@ export function EntitiesMenu() {
       <Flex direction="column">
         <Button
           classNames={{
-            root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/datasets' }),
+            root: clsx(classes.groupButton, { [classes.selected]: router.base === '/datasets' }),
             section: classes.buttonSection,
           }}
           variant="transparent"
           leftSection={<DatasetsIcon />}
-          onClick={() => (window.location.href = '/datasets')}
+          onClick={() => navigate('~/datasets')}
           justify="flex-start"
         >
           Datasets
         </Button>
         <Button
           classNames={{
-            root: clsx(classes.groupButton, { [classes.selected]: window.location.pathname === '/templates' }),
+            root: clsx(classes.groupButton, { [classes.selected]: router.base === '/templates' }),
             section: classes.buttonSection,
           }}
           variant="transparent"
           leftSection={<TemplatesIcon />}
-          onClick={() => (window.location.href = '/templates')}
+          onClick={() => navigate('~/templates')}
           justify="flex-start"
         >
           Templates
