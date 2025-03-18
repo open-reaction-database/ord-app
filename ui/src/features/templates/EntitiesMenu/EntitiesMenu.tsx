@@ -16,7 +16,6 @@
 import { Button, Flex, Paper } from '@mantine/core';
 import classes from './EntitiesMenu.module.scss';
 import { DatasetsIcon, TemplatesIcon } from 'common/icons';
-import { navigate } from 'wouter/use-browser-location';
 import clsx from 'clsx';
 
 export function EntitiesMenu() {
@@ -34,7 +33,7 @@ export function EntitiesMenu() {
           }}
           variant="transparent"
           leftSection={<DatasetsIcon />}
-          onClick={() => navigate('/datasets')}
+          onClick={() => (window.location.href = '/datasets')}
           justify="flex-start"
         >
           Datasets

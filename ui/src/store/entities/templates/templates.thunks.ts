@@ -38,7 +38,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
 
   return {
     ...rest,
-    variables: variables,
+    variables: Array.isArray(variables) ? variables : JSON.parse(variables),
     previews,
     data: appReaction,
   };
@@ -47,6 +47,7 @@ const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): Temp
 export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templateId) => {
   const result = await axiosInstance.get<Template>(`/templates/${templateId}`);
   const template = parseTemplate(result.data);
+
   return getTemplateActions.success(template);
 });
 
@@ -54,6 +55,7 @@ export const getAllTemplates = createThunk(getAllTemplatesActions, async (_d, _s
   const result = await axiosInstance.get<Array<Template>>(`/templates`);
   const templates = result.data;
   const parsedTemplates = templates.map(template => parseTemplate(template));
+
   return getAllTemplatesActions.success(parsedTemplates);
 });
 
@@ -68,7 +70,9 @@ export const createTemplate = createThunkWithExplicitResult(
       binpb: binpb,
       variables: JSON.stringify([]),
     };
-    const template = (await axiosInstance.post<Template>(`/templates`, payload)).data;
+    const templateData = (await axiosInstance.post<Template>(`/templates`, payload)).data;
+    const template = parseTemplate(templateData);
+
     dispatch(createNewTemplateActions.success(template));
     navigate(`/templates/${template.id}`);
   },
@@ -89,8 +93,10 @@ export const renameTemplate = createThunk(renameTemplateActions, async (_d, getS
     binpb: binpb,
     variables: JSON.stringify(baseReaction.variables),
   };
-  const result = await axiosInstance.patch<Template>(`templates/${templateId.split('_')[1]}`, payload);
+  const templateIdNumber = parseInt(templateId.split('_')[1]);
+  const result = await axiosInstance.patch<Template>(`templates/${templateIdNumber}`, payload);
+  const template = parseTemplate(result.data);
   showNotification({ message: 'Template updated.', variant: 'success' });
 
-  return renameTemplateActions.success(parseTemplate(result.data));
+  return renameTemplateActions.success(template);
 });

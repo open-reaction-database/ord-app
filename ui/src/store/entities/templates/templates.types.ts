@@ -50,9 +50,10 @@ export interface SaveAsTemplatePayload {
   name: string;
 }
 
-export interface TemplateWrapper extends Omit<Template, 'binpb' | 'molblocks'> {
+export interface TemplateWrapper extends Omit<Template, 'binpb' | 'molblocks' | 'variables'> {
   data: ReactionParsedProtobuf;
   previews: PreviewsById;
+  variables: Array<Variable>;
 }
 
 export interface UpdateTemplatePayload {

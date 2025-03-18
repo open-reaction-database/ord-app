@@ -21,10 +21,11 @@ import { useSelector } from 'react-redux';
 import { AddCircleIcon, EditIcon, RemoveIcon } from 'common/icons';
 import { ord } from 'ord-schema-protobufjs';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { deleteReactionField, addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { templatesContext } from 'features/templates/templates.context';
 
 const ENTITY_FIELD = 'identifiers';
 
@@ -32,7 +33,7 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
   const identifiers = reaction.data.identifiers || [];
-
+  const { isTemplate } = useContext(templatesContext);
   const onIdentifierCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, identifiers.length];
     const newIdentifier = ord.ReactionIdentifier.toObject(new ord.ReactionIdentifier());
@@ -71,12 +72,14 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
           <Title order={2}>Identifiers</Title>
           <Counter amount={identifiers.length} />
         </Flex>
-        <Button
-          onClick={onIdentifierCreate}
-          leftSection={<AddCircleIcon />}
-        >
-          Identifier
-        </Button>
+        {!isTemplate && (
+          <Button
+            onClick={onIdentifierCreate}
+            leftSection={<AddCircleIcon />}
+          >
+            Identifier
+          </Button>
+        )}
       </Flex>
       <span>Reaction identifiers define descriptions of the overall reaction</span>
 
@@ -87,19 +90,23 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
       >
         {identifiers.map((identifier, index) => (
           <div key={index}>
-            <ActionIcon
-              variant="transparent"
-              color="red"
-              onClick={() => deleteIdentifier(index)}
-            >
-              <RemoveIcon />
-            </ActionIcon>
-            <ActionIcon
-              variant="transparent"
-              onClick={() => onIdentifierEdit(index)}
-            >
-              <EditIcon />
-            </ActionIcon>
+            {!isTemplate && (
+              <>
+                <ActionIcon
+                  variant="transparent"
+                  color="red"
+                  onClick={() => deleteIdentifier(index)}
+                >
+                  <RemoveIcon />
+                </ActionIcon>
+                <ActionIcon
+                  variant="transparent"
+                  onClick={() => onIdentifierEdit(index)}
+                >
+                  <EditIcon />
+                </ActionIcon>
+              </>
+            )}
             <div>{identifier.type}</div>
             <div>{identifier.details}</div>
             <div>{identifier.value}</div>

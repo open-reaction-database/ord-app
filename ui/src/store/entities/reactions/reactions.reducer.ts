@@ -25,7 +25,12 @@ import {
   deleteReactionFieldActions,
   removeReactionActions,
 } from './reactions.actions.ts';
-import { getTemplateActions, getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
+import {
+  getTemplateActions,
+  getAllTemplatesActions,
+  removeTemplateActions,
+  renameTemplateActions,
+} from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
 import type { ReactionOrTemplate, ReactionParsedProtobuf, ReactionWrapper } from './reactions.types.ts';
 import type { TemplateWrapper } from '../templates/templates.types.ts';
@@ -94,6 +99,10 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     const { [reactionId]: _, ...rest } = state;
     return rest;
   });
+  builder.addCase(removeTemplateActions.success, (state, { payload: templateId }) => {
+    const { [`template_${templateId}`]: _, ...rest } = state;
+    return rest;
+  });
   builder.addCase(getTemplateActions.success, (state, action) => {
     const templateId = `template_${action.payload.id}`;
     const templatePayload = action.payload as TemplateWrapper;
@@ -124,6 +133,12 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     return {
       ...state,
       ...templatesById,
+    };
+  });
+  builder.addCase(renameTemplateActions.success, (state, action) => {
+    return {
+      ...state,
+      [`template_${action.payload.id}`]: action.payload,
     };
   });
   builder.addMatcher(

@@ -34,7 +34,7 @@ export function TemplatesListRoute() {
           <TemplatePage />
         </Route>
         <Route path="/">
-          <TemplatesListPage />
+          <TemplatesListPage key="templates" />
         </Route>
       </templatesContext.Provider>
     </Switch>

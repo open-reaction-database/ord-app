@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 import { Breadcrumbs as MantineBreadcrumbs, Flex, Tooltip } from '@mantine/core';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
 import { HomeIcon } from 'common/icons';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import { navigate } from 'wouter/use-browser-location';
 
 interface BreadcrumbsProps {
   items: Breadcrumbs;
 }
 
 export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
+  const [, navigate] = useLocation();
+
   return (
     <div className={classes.container}>
       <MantineBreadcrumbs

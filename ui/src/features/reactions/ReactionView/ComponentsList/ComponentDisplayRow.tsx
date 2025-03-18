@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useContext } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import classes from './componentsList.module.scss';
@@ -22,6 +23,7 @@ import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/Reacti
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ComponentDisplayRowProps } from './componentsList.types.ts';
+import { templatesContext } from 'features/templates/templates.context';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
   reactionId,
@@ -32,7 +34,7 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
 }: Readonly<ComponentDisplayRowProps<T>>) {
   const dispatch = useAppDispatch();
   const previousEntityPath = componentPath.slice(0, 2);
-
+  const { isTemplate } = useContext(templatesContext);
   const onEditComponent = () => {
     dispatch(setReactionPathComponentsList([previousEntityPath, componentPath]));
   };
@@ -43,18 +45,20 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
       renderDetails={renderDetails}
       gridClassName={gridClassName}
       actions={
-        <>
-          <EditButton onClick={onEditComponent} />
-          <Divider
-            className={classes.actionDivider}
-            orientation="vertical"
-          />
-          <ReactionEntityDelete
-            reactionId={reactionId}
-            entityName="Component"
-            pathComponents={componentPath}
-          />
-        </>
+        !isTemplate && (
+          <>
+            <EditButton onClick={onEditComponent} />
+            <Divider
+              className={classes.actionDivider}
+              orientation="vertical"
+            />
+            <ReactionEntityDelete
+              reactionId={reactionId}
+              entityName="Component"
+              pathComponents={componentPath}
+            />
+          </>
+        )
       }
     />
   );

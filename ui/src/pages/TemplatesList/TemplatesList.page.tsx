@@ -23,7 +23,6 @@ import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
 import { getAllTemplates } from 'store/entities/templates/templates.thunks';
 import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
@@ -54,14 +53,6 @@ function TemplateTitle({ index, template }: Readonly<TemplateTitleProps>) {
 export function TemplatesListPage() {
   const dispatch = useAppDispatch();
   const templates = Object.values(useSelector(selectTemplates));
-  const contextValue = useMemo(
-    () => ({
-      reactionId: 0,
-      isTemplate: true,
-      pathComponents: [],
-    }),
-    [],
-  );
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [{ title: 'Templates', path: '~/' }];
@@ -73,46 +64,44 @@ export function TemplatesListPage() {
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <reactionEntityContext.Provider value={contextValue}>
-        <div className={classes.container}>
-          <EntitiesMenu />
-          <Flex
-            direction="column"
-            gap="sm"
-            className={classes.templates}
+      <div className={classes.container}>
+        <EntitiesMenu />
+        <Flex
+          direction="column"
+          gap="sm"
+          className={classes.templates}
+        >
+          <Paper
+            radius="sm"
+            p="lg"
           >
-            <Paper
-              radius="sm"
-              p="lg"
-            >
-              <Flex justify="space-between">
-                <Flex
-                  align="center"
-                  gap="sm"
-                >
-                  <Title order={2}>Templates</Title>
-                  <Counter amount={templates.length} />
-                </Flex>
+            <Flex justify="space-between">
+              <Flex
+                align="center"
+                gap="sm"
+              >
+                <Title order={2}>Templates</Title>
+                <Counter amount={templates.length} />
               </Flex>
-            </Paper>
-            <>
-              {templates.map((template, index) => (
-                <ReactionCard
-                  key={template.id}
-                  id={`template_${template.id}`}
-                  actions={<TemplateHeaderActions templateId={`template_${template.id}`} />}
-                  title={
-                    <TemplateTitle
-                      index={index + 1}
-                      template={template}
-                    />
-                  }
-                />
-              ))}
-            </>
-          </Flex>
-        </div>
-      </reactionEntityContext.Provider>
+            </Flex>
+          </Paper>
+          <>
+            {templates.map((template, index) => (
+              <ReactionCard
+                key={template.id}
+                id={`template_${template.id}`}
+                actions={<TemplateHeaderActions templateId={`template_${template.id}`} />}
+                title={
+                  <TemplateTitle
+                    index={index + 1}
+                    template={template}
+                  />
+                }
+              />
+            ))}
+          </>
+        </Flex>
+      </div>
     </PageContainer>
   );
 }

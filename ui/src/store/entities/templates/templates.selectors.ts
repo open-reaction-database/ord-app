@@ -22,8 +22,6 @@ const { buildSelector } = createSelectorFactory(state => state.entities.template
 
 export const selectTemplates = buildSelector(state => state.templatesById);
 
-export const selectTemplatesOrder = buildSelector(state => state.templatesOrder);
-
 export const selectTemplateById = (id: number) => buildSelector(state => state.templatesById[id]);
 
 export const selectTemplateId = (_state: unknown, id: number) => id;

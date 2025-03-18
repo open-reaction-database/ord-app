@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Redirect, Route, Switch } from 'wouter';
+import { Router, Redirect, Route, Switch } from 'wouter';
 import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
 import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
 
 const defaultPath = '/datasets';
+
+export function App() {
+  return (
+    <Router base="/">
+      {' '}
+      {/* Set the base path to ensure absolute paths */}
+      <Routes />
+    </Router>
+  );
+}
 
 export function Routes() {
   return (
