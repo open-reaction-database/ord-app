@@ -29,7 +29,7 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
         return result;
       } catch (e) {
         dispatch(asyncActionCreator.failure(e));
-        throw e;
+        return;
       }
     };
   };
@@ -46,7 +46,7 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
         await appThunk(dispatch, getState, extraArgument);
       } catch (e) {
         dispatch(asyncActionCreator.failure(e));
-        throw e;
+        return;
       }
     };
   };

@@ -16,7 +16,7 @@
 import axios from 'axios';
 export interface RejectValue {
   errorCode: number;
-  errorMessage: string;
+  errorMessage?: string;
 }
 
 const ERROR_MESSAGES: Record<number, string> = {

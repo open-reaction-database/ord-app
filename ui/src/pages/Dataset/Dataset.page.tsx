@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Flex, Loader } from '@mantine/core';
+import classes from './dataset.page.module.scss';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { AppState } from '@auth0/auth0-react';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { ReactionList } from 'features/reactions/ReactionList/ReactionList.tsx';
 import { DatasetHeader } from 'features/datasets/DatasetHeader/DatasetHeader.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import classes from './dataset.page.module.scss';
 import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -33,20 +34,12 @@ interface DatasetPageProps {
 
 export function DatasetPage({ datasetId: id }: DatasetPageProps) {
   const dispatch = useAppDispatch();
-  const [error, setError] = useState(false);
+  const error = useSelector((state: AppState) => state.entities.datasets.error);
   const dataset = useSelector(selectDatasetById(id));
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(getDataset(id));
-        await dispatch(getReactionsList(id));
-      } catch {
-        setError(true);
-      }
-    };
-
-    fetchData();
+    dispatch(getDataset(id));
+    dispatch(getReactionsList(id));
   }, [dispatch, id]);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {

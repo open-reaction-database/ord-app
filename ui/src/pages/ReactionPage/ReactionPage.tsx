@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { Fragment, useEffect, useMemo, useState, type FC } from 'react';
+import { Fragment, useEffect, useMemo, type FC } from 'react';
+import classes from './reactionPage.module.scss';
+import type { AppState } from '@auth0/auth0-react';
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import classes from './reactionPage.module.scss';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
@@ -59,7 +60,7 @@ const tabs: Array<ReactionTab> = [
 
 export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
   const dispatch = useAppDispatch();
-  const [error, setError] = useState(false);
+  const error = useSelector((state: AppState) => state.entities.reactions?.error);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
 
@@ -75,15 +76,7 @@ export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
   }, [reactionId, datasetId, dataset?.name, reaction?.pb_reaction_id]);
 
   useEffect(() => {
-    const fetchReaction = async () => {
-      try {
-        await dispatch(getReaction({ datasetId, reactionId }));
-      } catch {
-        setError(true);
-      }
-    };
-
-    fetchReaction();
+    dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
   const contextValue = useMemo(
@@ -93,7 +86,6 @@ export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
     }),
     [reactionId],
   );
-  console.log(error);
 
   if (error) {
     return <NotFoundPage />;

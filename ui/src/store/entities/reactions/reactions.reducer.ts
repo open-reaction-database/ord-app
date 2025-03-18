@@ -168,6 +168,28 @@ const areReactionsLoading = createReducer<boolean>(false, builder => {
   );
 });
 
+const error = createReducer<string | null>(null, builder => {
+  builder.addMatcher(isAnyOf(getReactionActions.failure, getReactionsListActions.failure), (_, action) => {
+    const payload = action.payload;
+    if (payload && typeof payload === 'object' && 'errorMessage' in payload) {
+      return (payload as { errorMessage: string }).errorMessage;
+    } else if (payload instanceof Error) {
+      return payload.message;
+    }
+    return 'Unexpected error occurred.';
+  });
+
+  builder.addMatcher(
+    isAnyOf(
+      getReactionActions.request,
+      getReactionActions.success,
+      getReactionsListActions.request,
+      getReactionsListActions.success,
+    ),
+    () => null,
+  );
+});
+
 export const reactionsReducer = combineReducers({
   reactionsById,
   reactionsOrder,
@@ -175,5 +197,6 @@ export const reactionsReducer = combineReducers({
   activeDatasetId,
   isReactionCreating,
   areReactionsLoading,
+  error,
   reactionsPreviews: reactionsPreviewsReducer,
 });
