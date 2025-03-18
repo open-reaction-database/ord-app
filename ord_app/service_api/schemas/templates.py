@@ -84,3 +84,8 @@ class TemplateUpdateModel(BaseModel):
         if data["binpb"] is not None:
             data["binpb"] = data["binpb"].SerializeToString()
         return data
+
+    @field_validator("variables", mode="before")
+    @classmethod
+    def load_variables(cls, raw):
+        return orjson.dumps(raw)
