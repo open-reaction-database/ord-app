@@ -22,7 +22,6 @@ import { useCallback, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation } from 'wouter';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
-import { typographyClasses } from 'common/styling';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
@@ -46,8 +45,6 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const [opened, { open, close }] = useDisclosure();
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
   const previewRef = useRef<HTMLDivElement | null>(null);
-
-  const hasReactionDefaultId = reaction.pb_reaction_id === reaction.id.toString();
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
@@ -87,13 +84,6 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           >
             Save as Template
           </Button>
-          <Button
-            onClick={onPreviewSave}
-            variant="transparent"
-            leftSection={<CopyImageIcon className={classes.buttonIcon} />}
-          >
-            Copy reaction image
-          </Button>
           <DownloadMenu
             options={fileDownloadOptions}
             url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
@@ -124,25 +114,34 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           direction="column"
           gap="sm"
         >
-          <Flex justify="space-between">
+          <Flex
+            justify="space-between"
+            align="center"
+          >
             <Flex
               align="center"
               gap="sm"
+              className={classes.titleWrapper}
             >
-              {hasReactionDefaultId && (
-                <Title
-                  className={typographyClasses.secondary1}
-                  order={2}
-                >
-                  Reaction
-                </Title>
-              )}
-              <Title order={2}>{reaction.pb_reaction_id}</Title>
+              <Title
+                className={classes.title}
+                order={2}
+              >
+                {reaction.pb_reaction_id}
+              </Title>
               <CopyButton options={copyOptions} />
               <ActionIcon variant="transparent">
                 <EditIcon onClick={open} />
               </ActionIcon>
             </Flex>
+            <Button
+              onClick={onPreviewSave}
+              variant="transparent"
+              leftSection={<CopyImageIcon className={classes.buttonIcon} />}
+              className={classes.copyButton}
+            >
+              Copy reaction image
+            </Button>
           </Flex>
           <ReactionPreview
             reaction={reaction}

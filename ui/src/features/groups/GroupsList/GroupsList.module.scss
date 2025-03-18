@@ -46,23 +46,20 @@
   font-weight: 400;
   padding: 0 10px;
   width: 100%;
-  color: var(--color-text-primary);
-
-  &:hover {
-    color: var(--color-text-primary);
-  }
 
   svg {
+    width: 20px;
+    height: 20px;
     color: var(--color-icons-default);
+  }
+
+  &[data-variant='filled'] svg {
+    color: var(--color-background-white);
   }
 
   &.selected {
     background-color: var(--color-primary);
     color: var(--color-background-white);
-
-    svg {
-      color: var(--color-background-white);
-    }
   }
 }
 

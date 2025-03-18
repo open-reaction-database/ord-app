@@ -65,6 +65,8 @@ export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molbl
   previews: PreviewsById;
 }
 
+export type UpdateReactionSuccessPayload = Omit<ReactionWrapper, 'data'>;
+
 export interface ImportReactionFromFilePayload {
   file: File;
 }

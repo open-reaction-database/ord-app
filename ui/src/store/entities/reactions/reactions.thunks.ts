@@ -33,6 +33,7 @@ import type {
   ReactionResponse,
   ReactionValidation,
   ReactionWrapper,
+  UpdateReactionSuccessPayload,
 } from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
@@ -180,38 +181,46 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-async function updateReaction(reactionId: number, getState: () => AppState): Promise<ReactionResponse> {
+async function updateReaction(reactionId: number, getState: () => AppState): Promise<UpdateReactionSuccessPayload> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);
   const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
-  return (
-    await axiosInstance.patch(`datasets/${datasetId}/reactions/${reactionId}`, {
+  const {
+    binpb: _,
+    molblocks,
+    validation,
+    ...reactionMetadata
+  } = (
+    await axiosInstance.patch<ReactionResponse>(`datasets/${datasetId}/reactions/${reactionId}`, {
       binpb: payload,
     })
   ).data;
+  const updatedValidation = validation ? parseValidation(validation) : null;
+  return {
+    ...reactionMetadata,
+    previews: getReactionPreviews(reaction.data, molblocks),
+    validation: updatedValidation,
+  };
 }
 
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   async (dispatch, getState, { reactionId }) => {
-    const updatedReactionData = selectReactionById(reactionId)(getState()).data;
-    const { binpb: _, molblocks, ...reactionMetadata } = await updateReaction(reactionId, getState);
-    const updatedReaction = {
-      ...reactionMetadata,
-      previews: getReactionPreviews(updatedReactionData, molblocks),
-      molblocks,
-    };
-
-    dispatch(addUpdateReactionFieldActions.success(updatedReaction));
+    const result = await updateReaction(reactionId, getState);
+    dispatch(addUpdateReactionFieldActions.success(result));
     showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
   },
 );
 
-export const deleteReactionField = createThunk(deleteReactionFieldActions, async (_d, getState, { reactionId }) => {
-  await updateReaction(reactionId, getState);
-  return deleteReactionFieldActions.success();
-});
+export const deleteReactionField = createThunkWithExplicitResult(
+  deleteReactionFieldActions,
+  async (dispatch, getState, { reactionId }) => {
+    const result = await updateReaction(reactionId, getState);
+    dispatch(deleteReactionFieldActions.success(result));
+    showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+  },
+);
 
 export const removeReaction = createThunkWithExplicitResult(
   removeReactionActions,
