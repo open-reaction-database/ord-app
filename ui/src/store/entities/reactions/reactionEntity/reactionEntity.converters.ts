@@ -112,10 +112,11 @@ const generateValuePrecisionUnitConverter = <T extends string>(
       units: typeFromOrd(units),
     };
   },
-  toOrd: ({ units, ...rest }: ReactionValuePrecisionUnit<T>): Optional<OrdValuePrecisionUnit> => ({
-    ...rest,
-    units: typeToOrd(units),
-  }),
+  toOrd: ({ units, ...rest }: ReactionValuePrecisionUnit<T>): Optional<OrdValuePrecisionUnit> => {
+    const unitsOrd = typeToOrd(units);
+    const isDefault = unitsOrd === 0 && Object.values(rest).every(value => value === null);
+    return isDefault ? null : { units: unitsOrd, ...rest };
+  },
 });
 
 const generateTypeDetailsConverter = <T extends string>(
@@ -129,10 +130,11 @@ const generateTypeDetailsConverter = <T extends string>(
       details: details ?? null,
     };
   },
-  toOrd: ({ type, details }: ReactionTypeDetails<T>): Optional<OrdTypeDetails> => ({
-    type: typeToOrd(type),
-    details,
-  }),
+  toOrd: ({ type, details }: ReactionTypeDetails<T>): Optional<OrdTypeDetails> => {
+    const typeOrd = typeToOrd(type);
+    const isDefault = typeOrd === 0 && (details === null || details === '');
+    return isDefault ? null : { type: typeOrd, details: details };
+  },
 });
 
 export const { fromOrd: ordTimeToReaction, toOrd: reactionTimeToOrd } = generateValuePrecisionUnitConverter(
