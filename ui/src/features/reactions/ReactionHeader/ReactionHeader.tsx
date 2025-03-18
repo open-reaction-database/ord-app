@@ -149,14 +149,15 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           />
         </Flex>
       </Paper>
-      <InputModal
-        opened={opened}
-        onClose={close}
-        onSubmit={onReactionNameChange}
-        title="Edit Reaction ID"
-        inputLabel="Reaction ID"
-        initialValue={reaction.pb_reaction_id}
-      />
+      {opened && (
+        <InputModal
+          onClose={close}
+          onSubmit={onReactionNameChange}
+          title="Edit Reaction ID"
+          inputLabel="Reaction ID"
+          initialValue={reaction.data.reactionId ?? ''}
+        />
+      )}
     </>
   );
 }

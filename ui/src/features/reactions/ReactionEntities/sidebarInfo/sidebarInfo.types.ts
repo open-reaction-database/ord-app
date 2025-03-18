@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionEntity } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToForm.models.ts';
 import type { FC } from 'react';
 import type { ReactionEntityTitleProps } from 'features/reactions/ReactionEntities/ReactionEntityTitle/reactionEntityTitle.types.ts';
+import type { ReactionEntity } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
 export interface ReactionSidebarInfo {
   pathComponents: ReactionPathComponents;

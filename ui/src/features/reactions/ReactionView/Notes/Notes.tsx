@@ -30,9 +30,9 @@ import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactio
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
   ['safetyNotes', 'Safety notes'],
-  ['isHeterogeneous', 'Is Heterogeneous'],
+  ['isHeterogeneous', 'Is heterogeneous'],
   ['formsPrecipitate', 'Forms precipitate'],
-  ['isExothermic', 'Is Exothermic'],
+  ['isExothermic', 'Is exothermic'],
   ['offgasses', 'Offgasses'],
   ['isSensitiveToOxygen', 'Oxygen sensitive'],
   ['isSensitiveToMoisture', 'Moisture sensitive'],

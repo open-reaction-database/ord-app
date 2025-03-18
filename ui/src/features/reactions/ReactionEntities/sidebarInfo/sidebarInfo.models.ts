@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToForm.models.ts';
 import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/ReactionEntityTitle/ReactionEntityTitle.tsx';
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
@@ -28,6 +27,7 @@ import type {
   ReactionMeasurement,
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { ReactionEntity } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
 type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
 
@@ -118,7 +118,7 @@ const componentsSidebars: Array<ReactionSidebarInfo> = [
     label: 'Products',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Product', hasDelete: true }),
     useInitialValues: buildUseInitialValues(
-      ({ measurements: _m, identifiers: _i, molBlockIdentifiers: _, ...value }: ReactionProduct) => value,
+      ({ measurements: _m, identifiers: _i, molBlockIdentifiers: _, features: _f, ...value }: ReactionProduct) => value,
     ),
   },
   {

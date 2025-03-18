@@ -31,7 +31,7 @@ export function MeasurementMasses({ name, formMethods }: Readonly<ReactionFormCu
   };
 
   const stringValues = useMemo(() => {
-    return values.map(item => item.toString());
+    return (values || []).map(item => item.toString());
   }, [values]);
 
   return (

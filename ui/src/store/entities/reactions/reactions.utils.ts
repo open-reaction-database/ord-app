@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 
@@ -33,7 +34,6 @@ function mergeArray({ isMergeableObject, deepmerge, clone }: MergeArrayOptions) 
 
 export const deepMergeWithArrayMerge = deepmergeFactory({ mergeArray });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function generateDeepPartialReactionByPath(pathComponents: ReactionPathComponents, value: any): any {
   if (pathComponents.length === 0) {
     return value;
@@ -49,11 +49,27 @@ export function generateDeepPartialReactionByPath(pathComponents: ReactionPathCo
   return object;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function removeDeepReactionPart(reactionPart: any, pathComponents: ReactionPathComponents): any {
+function iterateReactionPart(
+  reactionPart: any,
+  pathComponents: ReactionPathComponents,
+  callback: (object: any, pathComponent: ReactionPathComponents) => any,
+): any {
   const [currentPathComponent, ...rest] = pathComponents;
+  if (typeof currentPathComponent === 'number') {
+    return reactionPart
+      .slice(0, currentPathComponent)
+      .concat(callback(reactionPart[currentPathComponent], rest))
+      .concat(reactionPart.slice(currentPathComponent + 1));
+  }
+  return {
+    ...reactionPart,
+    [currentPathComponent]: callback(reactionPart[currentPathComponent], rest),
+  };
+}
 
-  if (rest.length === 0) {
+export function removeDeepReactionPart(reactionPart: any, pathComponents: ReactionPathComponents): any {
+  if (pathComponents.length === 1) {
+    const [currentPathComponent] = pathComponents;
     if (typeof currentPathComponent === 'number') {
       return reactionPart.slice(0, currentPathComponent).concat(reactionPart.slice(currentPathComponent + 1));
     }
@@ -61,15 +77,6 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
     const { [currentPathComponent]: _, ...value } = reactionPart;
     return value;
   } else {
-    if (typeof currentPathComponent === 'number') {
-      return reactionPart
-        .slice(0, currentPathComponent)
-        .concat(removeDeepReactionPart(reactionPart[currentPathComponent], rest))
-        .concat(reactionPart.slice(currentPathComponent + 1));
-    }
-    return {
-      ...reactionPart,
-      [currentPathComponent]: removeDeepReactionPart(reactionPart[currentPathComponent], rest),
-    };
+    return iterateReactionPart(reactionPart, pathComponents, removeDeepReactionPart);
   }
 }

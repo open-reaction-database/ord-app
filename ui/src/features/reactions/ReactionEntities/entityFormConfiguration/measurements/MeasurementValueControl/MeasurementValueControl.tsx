@@ -25,12 +25,13 @@ import {
   ReactionMeasurementValueType,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
-import { Input, NumberInput, TextInput } from '@mantine/core';
+import { Input, TextInput } from '@mantine/core';
 import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisionUnitControl/ValuePrecisionUnitControl.tsx';
 import { appAmountUnspecified, massUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { ChangeEvent } from 'react';
+import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 
@@ -42,23 +43,23 @@ interface ControlProps<T extends ReactionMeasurementValue> {
 }
 
 function MeasurementValueControlNumber({ value, onChange }: Readonly<ControlProps<ReactionMeasurementValueNumber>>) {
-  const handleChange = (field: keyof typeof value, updatedValue: number | string) => {
+  const handleChange = (field: keyof typeof value, updatedValue: number | null) => {
     onChange({
       ...value,
-      [field]: updatedValue as number,
+      [field]: updatedValue,
     });
   };
 
   return (
     <InputGroup>
-      <NumberInput
+      <AppNumberInput
         onChange={handleChange.bind(null, 'value')}
-        value={value.value ?? ''}
+        value={value.value}
         placeholder="Value"
       />
-      <NumberInput
+      <AppNumberInput
         onChange={handleChange.bind(null, 'precision')}
-        value={value.precision ?? ''}
+        value={value.precision}
         placeholder="Precision"
         leftSection="±"
       />
@@ -103,21 +104,29 @@ const typeToComponent = {
 };
 
 const typeToDefaultValue = {
-  [ReactionMeasurementValueType.Number]: { value: '', precision: '' },
-  [ReactionMeasurementValueType.Percent]: { value: '', precision: '' },
-  [ReactionMeasurementValueType.Mass]: { value: '', precision: '', units: appAmountUnspecified },
+  [ReactionMeasurementValueType.Number]: { value: null, precision: null },
+  [ReactionMeasurementValueType.Percent]: { value: null, precision: null },
+  [ReactionMeasurementValueType.Mass]: { value: null, precision: null, units: appAmountUnspecified },
   [ReactionMeasurementValueType.String]: '',
 };
 
+const defaultValueType = ReactionMeasurementValueType.Percent;
+
+const defaultMeasurementValue: ReactionMeasurementValueNumber = {
+  type: defaultValueType,
+  value: typeToDefaultValue[defaultValueType],
+};
+
 export function MeasurementValueControl({ name, formMethods }: Readonly<ReactionFormCustomProps>) {
-  const [value, onChange] = useUncontrolled<ReactionMeasurementValue>({
+  const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
   });
+  const { value, type } = measurementValue ?? defaultMeasurementValue;
 
-  const Component = typeToComponent[value.type];
+  const Component = typeToComponent[type];
 
   const handleValueChange = (newValue: ReactionMeasurementValue['value']) => {
-    onChange({ type: value.type, value: newValue } as ReactionMeasurementValue);
+    onChange({ type: type, value: newValue } as ReactionMeasurementValue);
   };
 
   const handleTypeChange = (newType: string) => {
@@ -127,7 +136,7 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
 
   // Cannot produce correct type because of the map
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const controlValue = value.value as any;
+  const controlValue = value as any;
 
   return (
     <Input.Wrapper label="Value">
@@ -137,7 +146,7 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
           onChange={handleValueChange}
         />
         <AppSegmentedControl
-          value={value.type}
+          value={type}
           options={valueTypeOptions}
           onChange={handleTypeChange}
         />

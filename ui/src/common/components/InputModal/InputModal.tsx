@@ -20,7 +20,6 @@ import { useEffect } from 'react';
 import * as yup from 'yup';
 
 interface InputModalProps {
-  opened: boolean;
   onClose: () => void;
   onSubmit: (value: string) => Promise<void>;
   title: string;
@@ -34,7 +33,6 @@ interface InputModalForm {
 }
 
 export function InputModal({
-  opened,
   onClose,
   onSubmit,
   title,
@@ -75,8 +73,8 @@ export function InputModal({
 
   return (
     <Modal
+      opened
       classNames={{ content: classes.modal, header: classes.header, body: classes.body }}
-      opened={opened}
       onClose={handleClose}
       title={title}
       centered
