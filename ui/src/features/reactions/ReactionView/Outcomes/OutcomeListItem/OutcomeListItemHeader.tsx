@@ -51,19 +51,17 @@ export function OutcomeListItemHeader({ reactionId, outcome, pathComponents }: R
       classNames={{ label: classes.label }}
       icon={
         !isTemplate && (
-          <>
-            <Flex
-              onClick={onActionClick}
-              align="center"
-            >
-              <EditButton onClick={onEditOutcome} />
-              <ReactionEntityDelete
-                reactionId={reactionId}
-                entityName="Outcome"
-                pathComponents={pathComponents}
-              />
-            </Flex>
-          </>
+          <Flex
+            onClick={onActionClick}
+            align="center"
+          >
+            <EditButton onClick={onEditOutcome} />
+            <ReactionEntityDelete
+              reactionId={reactionId}
+              entityName="Outcome"
+              pathComponents={pathComponents}
+            />
+          </Flex>
         )
       }
     >
