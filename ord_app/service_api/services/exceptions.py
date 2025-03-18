@@ -18,19 +18,14 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
 
-class EntityNotFoundError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
-        super().__init__(status.HTTP_404_NOT_FOUND, detail=detail, **kwargs)
-
-
 class ProtobufDecodeError(HTTPException):
     def __init__(self, detail: str, **kwargs):
         super().__init__(status.HTTP_400_BAD_REQUEST, detail=detail, **kwargs)
 
 
-class ConflictError(HTTPException):
+class UnauthenticatedError(HTTPException):
     def __init__(self, detail: str, **kwargs):
-        super().__init__(status.HTTP_409_CONFLICT, detail=detail, **kwargs)
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
 
 
 class ForbiddenError(HTTPException):
@@ -43,9 +38,19 @@ class UnauthorizedError(HTTPException):
         super().__init__(status.HTTP_403_FORBIDDEN, detail=detail, **kwargs)
 
 
-class UnauthenticatedError(HTTPException):
+class EntityNotFoundError(HTTPException):
     def __init__(self, detail: str, **kwargs):
-        super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
+        super().__init__(status.HTTP_404_NOT_FOUND, detail=detail, **kwargs)
+
+
+class ConflictError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_409_CONFLICT, detail=detail, **kwargs)
+
+
+class UnprocessableEntityError(HTTPException):
+    def __init__(self, detail: str, **kwargs):
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, **kwargs)
 
 
 def psycopg_error_wrapper(coro):

@@ -15,15 +15,15 @@
  */
 import { showNotification } from 'common/utils/showNotification.tsx';
 import * as htmlToImage from 'html-to-image';
-import type { NotificationData } from '@mantine/notifications';
+import { NotificationVariant, type AppNotification } from 'common/types/notification.ts';
 
-const errorMessage: NotificationData = {
-  variant: 'error',
+const errorMessage: AppNotification = {
+  variant: NotificationVariant.ERROR,
   message: 'Could not copy image to clipboard.',
 };
 
-const successMessage: NotificationData = {
-  variant: 'success',
+const successMessage: AppNotification = {
+  variant: NotificationVariant.SUCCESS,
   message: 'Image copied to clipboard.',
 };
 

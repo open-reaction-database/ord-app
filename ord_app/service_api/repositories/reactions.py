@@ -84,3 +84,20 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
             logger.debug("Bulk reaction created with payload")
 
         return reactions
+
+    async def find_duplicated_by_pb_reaction_id(
+        self,
+        dataset_id: int,
+        pb_reaction_id,
+        exclude_pb_reaction_ids: list[str]
+    ):
+        stmt = (
+            select(ReactionModel)
+            .where(
+                ReactionModel.dataset_id == dataset_id,
+                ReactionModel.pb_reaction_id == pb_reaction_id,
+                ReactionModel.pb_reaction_id.not_in(exclude_pb_reaction_ids),
+            )
+            .limit(1)
+        )
+        return await self.db.scalar(stmt)

@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { notifications, type NotificationData } from '@mantine/notifications';
-import { CheckCircleIcon } from 'common/icons';
+import { notifications } from '@mantine/notifications';
+import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
+import { NotificationVariant, type AppNotification } from 'common/types/notification.ts';
+import type { ReactNode } from 'react';
 
-export function showNotification(options: NotificationData) {
+const iconByVariant: Record<NotificationVariant, ReactNode> = {
+  [NotificationVariant.ERROR]: <CrossCircleIcon />,
+  [NotificationVariant.SUCCESS]: <CheckCircleIcon />,
+};
+
+export function showNotification({ variant, ...rest }: AppNotification) {
   notifications.show({
     autoClose: 4000,
-    icon: <CheckCircleIcon />,
+    icon: iconByVariant[variant],
     color: 'transparent',
     radius: '8px',
     withBorder: false,
-    ...options,
+    ...rest,
   });
 }

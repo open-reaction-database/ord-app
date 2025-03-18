@@ -15,15 +15,15 @@
  */
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import {
+  addUpdateReactionFieldActions,
   createEmptyReactionActions,
+  deleteReactionFieldActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
   importReactionFromFileActions,
-  renameReactionActions,
-  addUpdateReactionFieldActions,
-  deleteReactionFieldActions,
   removeReactionActions,
+  searchReactionActions,
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
@@ -48,8 +48,9 @@ import {
   reactionToOrdReaction,
 } from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getReactionPreviews = (reaction: ReactionParsedProtobuf, molblocks: ReactionMolBlocks): PreviewsById => {
   const inputsArray = Object.values(reaction.inputs);
@@ -57,7 +58,7 @@ export const getReactionPreviews = (reaction: ReactionParsedProtobuf, molblocks:
     (acc: PreviewsById, [inputName, input]) => ({
       ...acc,
       ...input.reduce((acc: PreviewsById, item, index) => {
-        const component = (inputsArray.find(item => item.name === inputName) as AppReactionInput).components[index];
+        const component = (inputsArray.find(item => item.name === inputName) as ReactionInput).components[index];
         return {
           ...acc,
           [component.id]: item,
@@ -75,6 +76,15 @@ export const getReactionPreviews = (reaction: ReactionParsedProtobuf, molblocks:
         return {
           ...acc,
           [product.id]: item.molblock,
+          ...item.measurements.reduce((acc: PreviewsById, measurementMolblock, index) => {
+            const measurement = product.measurements[index];
+            return measurement.authenticStandard
+              ? {
+                  ...acc,
+                  [measurement.authenticStandard.id]: measurementMolblock.authentic_standard.molblock,
+                }
+              : acc;
+          }, {}),
         };
       }, {}),
     }),
@@ -83,16 +93,27 @@ export const getReactionPreviews = (reaction: ReactionParsedProtobuf, molblocks:
   return { ...inputsPreviews, ...outcomesPreviews };
 };
 
-const parseReaction = ({ binpb, molblocks, ...rest }: ReactionResponse): ReactionWrapper => {
+const protobufClassRegExp = /<class '.+'> /g;
+
+const parseValidation = (validation: ReactionValidation): ReactionValidation => {
+  return {
+    errors: validation.errors.map(item => item.replace(protobufClassRegExp, '')),
+    warnings: validation.warnings.map(item => item.replace(protobufClassRegExp, '')),
+  };
+};
+
+const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): ReactionWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
+  const updatedValidation = validation ? parseValidation(validation) : null;
 
   return {
     ...rest,
     previews,
     data: appReaction,
+    validation: updatedValidation,
   };
 };
 
@@ -130,14 +151,6 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
   const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
   const parsedReaction = parseReaction(result.data);
   return getReactionActions.success(parsedReaction);
-});
-
-export const renameReaction = createThunk(renameReactionActions, async (_d, getState, { reactionId, name }) => {
-  const datasetId = selectActiveDatasetId(getState());
-  const result = await axiosInstance.patch<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`, {
-    name,
-  });
-  return renameReactionActions.success(parseReaction(result.data));
 });
 
 export const createEmptyReaction = createThunkWithExplicitResult(
@@ -189,7 +202,7 @@ export const addUpdateReactionField = createThunkWithExplicitResult(
     };
 
     dispatch(addUpdateReactionFieldActions.success(updatedReaction));
-    showNotification({ message: 'Reaction updated.', variant: 'success' });
+    showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
   },
 );
 
@@ -205,5 +218,28 @@ export const removeReaction = createThunkWithExplicitResult(
     await axiosInstance.delete(`/datasets/${datasetId}/reactions/${reactionId}`);
     dispatch(removeReactionActions.success(reactionId));
     navigate(`/datasets/${datasetId}`);
+  },
+);
+
+export const searchReaction = createThunkWithExplicitResult(
+  searchReactionActions,
+  async (dispatch, getState, reactionPbId) => {
+    const datasetId = selectActiveDatasetId(getState());
+    try {
+      const result = (
+        await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/search`, {
+          params: { pb_reaction_id: reactionPbId },
+        })
+      ).data;
+      const parsedReaction = parseReaction(result);
+      dispatch(searchReactionActions.success(parsedReaction));
+      navigate(`/datasets/${datasetId}/reactions/${parsedReaction.id}`);
+    } catch (_e: unknown) {
+      dispatch(searchReactionActions.failure(null));
+      showNotification({
+        message: 'Reaction with this ID do not exist in this dataset',
+        variant: NotificationVariant.ERROR,
+      });
+    }
   },
 );

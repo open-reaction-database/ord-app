@@ -81,8 +81,7 @@ async def test_create_duplicate_reaction_without_reaction_id(api_client, mock_au
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     payload = {"binpb": b64encode(Reaction().SerializeToString()).decode()}
 
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    assert response_data["pb_reaction_id"] == str(response_data["id"])
-
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    assert response_data["pb_reaction_id"] == str(response_data["id"])
+    response_data1 = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data2 = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    assert response_data1["id"] != response_data2["id"]
+    assert response_data1["pb_reaction_id"] != response_data2["pb_reaction_id"]

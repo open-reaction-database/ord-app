@@ -30,8 +30,6 @@ export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pa
 
 export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, ReactionWrapper>('get');
 
-export const renameReactionActions = createAsyncAction<{ reactionId: number; name: string }, ReactionWrapper>('rename');
-
 export const createEmptyReactionActions = createAsyncAction<void, ReactionWrapper>('create_empty');
 
 export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, ReactionWrapper>(
@@ -42,6 +40,8 @@ export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
   Omit<ReactionWrapper, 'data'>
 >('addUpdateField');
+
+export const searchReactionActions = createAsyncAction<string, ReactionWrapper>('search');
 
 export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, void>('deleteField');
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { Accordion, Divider, Flex, Text } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { useCallback, useContext, type MouseEvent } from 'react';
@@ -30,7 +30,7 @@ import { templatesContext } from 'features/templates/templates.context';
 
 interface InputsComponentsListProps {
   reactionId: ReactionId;
-  inputs: Array<AppReactionInput>;
+  inputs: Array<ReactionInput>;
 }
 
 const headers = [

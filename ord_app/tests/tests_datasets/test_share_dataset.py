@@ -93,3 +93,14 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert secondary_group_datasets["total"] == 0
     secondary_user_response = api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
     assert status.HTTP_403_FORBIDDEN == secondary_user_response.status_code
+
+
+async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_user, test_db_session):
+    *_, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+
+    response = api_client.post(
+        f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share",
+        json={"secondary_group_id": group.id}
+    )
+    assert status.HTTP_422_UNPROCESSABLE_ENTITY == response.status_code

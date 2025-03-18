@@ -20,7 +20,9 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
+
 export function formatDate(inputDate: string) {
-  const date = dayjs(inputDate).tz(dayjs.tz.guess());
-  return date.format('DD.MM.YYYY hh:mm a');
+  const timezone = dayjs.tz.guess();
+  return dayjs.utc(inputDate).tz(timezone).format(TZ_FORMAT);
 }

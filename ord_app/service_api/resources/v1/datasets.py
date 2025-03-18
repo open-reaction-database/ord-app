@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
-from ord_app.service_api.domain.reactions import validate_reactions_task
+from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
     DatasetResponseSchema,
@@ -80,7 +80,7 @@ async def upload_dataset(
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     dataset = await use_case.upload(group_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db, dataset.id)
+    background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
     return dataset
 
 
@@ -160,7 +160,7 @@ async def extend_dataset(
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     response = await use_case.extend(dataset_id, file_data, kind)
-    background_tasks.add_task(validate_reactions_task, db)
+    background_tasks.add_task(validate_dataset_reactions, db)
     return response
 
 

@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type {
-  ReactionParsedProtobuf,
-  ReactionSummary,
-  ReactionMolBlocks,
-  ReactionId,
-} from '../reactions/reactions.types';
+import type { AppReaction, ReactionSummary, ReactionMolBlocks, ReactionId } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
 export type ComponentProductPreview = string | null;
@@ -51,7 +46,7 @@ export interface SaveAsTemplatePayload {
 }
 
 export interface TemplateWrapper extends Omit<Template, 'binpb' | 'molblocks' | 'variables'> {
-  data: ReactionParsedProtobuf;
+  data: AppReaction;
   previews: PreviewsById;
   variables: Array<Variable>;
 }

@@ -18,16 +18,14 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { Badge, Flex, Paper } from '@mantine/core';
+import { Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import classes from './reactionPage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 
 export function ReactionPage() {
@@ -60,8 +58,6 @@ export function ReactionPage() {
     }),
     [reactionId],
   );
-  const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
-  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
@@ -71,15 +67,6 @@ export function ReactionPage() {
             direction="column"
             gap="sm"
           >
-            <Badge
-              variant="outline"
-              size="lg"
-              radius="md"
-              leftSection={reaction.is_valid ? CheckIcon : CrossIcon}
-              className={classes.validationBadge}
-            >
-              {reaction.is_valid ? 'Reaction is Valid' : 'Reaction is Not Valid'}
-            </Badge>
             <ReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}

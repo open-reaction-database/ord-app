@@ -38,7 +38,7 @@ from ord_app.service_api.schemas.datasets import (
     DatasetShareCreateSchema,
     DownloadFileFormats,
 )
-from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError
+from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError, UnprocessableEntityError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -58,10 +58,6 @@ class DatasetUseCases:
     async def get(self, dataset_id: int) -> tuple[DatasetModel, int]:
         dataset, reaction_counts = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
         dataset, = await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
-
-        dataset.is_sharable = False
-        if dataset.groups and dataset.dataset_group_associations:
-            dataset.is_sharable = True
 
         return dataset, reaction_counts
 
@@ -104,11 +100,17 @@ class DatasetUseCases:
     async def add_reactions(self, dataset, reactions):
         seen_ids = set()
         reactions_ids = []
+
         for reaction in reactions:
             if not reaction.reaction_id:
                 reaction.reaction_id = uuid4().hex
             elif reaction.reaction_id in seen_ids:
                 reaction.reaction_id = f"duplicate-{reaction.reaction_id}-{uuid4().hex}"
+            else:
+                reaction.reaction_id = (reaction.reaction_id or "").strip()
+                if not reaction.reaction_id:
+                    reaction.reaction_id = uuid4().hex
+
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)
 
@@ -159,6 +161,9 @@ class DatasetUseCases:
         return dataset, data
 
     async def share(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+        if primary_group_id == payload.secondary_group_id:
+            raise UnprocessableEntityError("Cannot share datasets with the same secondary group")
+
         dataset_group_association = (
             await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )
@@ -168,6 +173,9 @@ class DatasetUseCases:
         raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
 
     async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+        if primary_group_id == payload.secondary_group_id:
+            raise UnprocessableEntityError("Cannot unshare datasets with the same secondary group")
+
         dataset_group_association = (
             await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
         )

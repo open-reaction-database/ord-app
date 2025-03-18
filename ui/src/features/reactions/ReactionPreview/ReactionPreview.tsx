@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionWrapper } from 'store/entities/reactions/reactions.types.ts';
+import type { TemplateWrapper } from 'store/entities/templates/templates.types.ts';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
-import { selectOrderedInputsWrapper, selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
-  reactionId: ReactionId;
+  reaction: ReactionWrapper | TemplateWrapper;
 }
 
 export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
-  { reactionId },
+  { reaction },
   ref,
 ) {
-  const reaction = useSelector(selectReactionById(reactionId));
-  const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
+  const inputs = useSelector(selectOrderedInputsWrapper(reaction.id));
   const outcomes = reaction.data.outcomes;
 
   return (
@@ -42,7 +42,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
         <Fragment key={input.id}>
           {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
           <ReactionInputPreview
-            reactionId={reactionId}
+            reactionId={reaction.id}
             key={input.id}
             inputId={input.id}
           />
@@ -52,7 +52,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
       {outcomes.map((outcome, index) => (
         <ReactionOutcomePreview
           key={outcome.id}
-          reactionId={reactionId}
+          reactionId={reaction.id}
           outcomeIndex={index}
         />
       ))}

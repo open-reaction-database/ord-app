@@ -33,6 +33,8 @@ import {
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
+import { textureTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const molBlockIdentifiers: ReactionFormNode = {
   type: ReactionFormNodeType.custom,
@@ -80,4 +82,36 @@ export const featuresList: ReactionFormNode = {
   useSelectItems: buildUseSelectItemsListFromMap('features', compareNamedEntities),
   ItemDisplay: reactionDataDisplay('features'),
   addItem: createReactionDataAddItem('features', 'Feature'),
+};
+
+export const textureDetails: ReactionFormNode = {
+  type: ReactionFormNodeType.block,
+  title: {
+    label: 'Isolated Product Characteristics',
+  },
+  fields: [
+    {
+      type: ReactionFormNodeType.objectInitializer,
+      name: 'texture',
+      field: wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'texture.type',
+          selectType: 'dropdown',
+          options: textureTypeOptions,
+          wrapperConfig: {
+            label: 'Texture',
+          },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'texture.details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Texture details',
+          },
+        },
+      ),
+    },
+  ],
 };
