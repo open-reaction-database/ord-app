@@ -41,15 +41,11 @@ export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetI
 });
 
 export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {
-  try {
-    const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
-    const params = { page: 1, size: 10 };
+  const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
+  const params = { page: 1, size: 10 };
 
-    const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
-    return getGroupsInitialDatasetListActions.success(datasetsPages);
-  } catch (error) {
-    throw handleApiError(error);
-  }
+  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
+  return getGroupsInitialDatasetListActions.success(datasetsPages);
 });
 
 export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, getState) => {
