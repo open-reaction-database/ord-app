@@ -213,10 +213,14 @@ export const addUpdateReactionField = createThunkWithExplicitResult(
   },
 );
 
-export const deleteReactionField = createThunk(deleteReactionFieldActions, async (_d, getState, { reactionId }) => {
-  const result = await updateReaction(reactionId, getState);
-  return deleteReactionFieldActions.success(result);
-});
+export const deleteReactionField = createThunkWithExplicitResult(
+  deleteReactionFieldActions,
+  async (dispatch, getState, { reactionId }) => {
+    const result = await updateReaction(reactionId, getState);
+    dispatch(deleteReactionFieldActions.success(result));
+    showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+  },
+);
 
 export const removeReaction = createThunkWithExplicitResult(
   removeReactionActions,
