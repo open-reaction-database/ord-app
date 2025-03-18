@@ -104,7 +104,7 @@ async def reaction(
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     response_model=ReactionResponseSchema,
 )
-async def _update_reaction(
+async def update_reaction(
     dataset_id: int,
     reaction_id: int,
     payload: ReactionUpdateSchema,
@@ -118,7 +118,7 @@ async def _update_reaction(
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def _update_reaction(
+async def delete_reaction(
     dataset_id: int,
     reaction_id: int,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
@@ -130,13 +130,13 @@ async def _update_reaction(
     "/{reaction_id}/download",
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
-async def _download_reaction(
+async def download_reaction(
     reaction_id: int,
     file_format: DownloadFileFormats,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
     reaction, data = await use_case.download(reaction_id, file_format)
-    filename = f"{reaction.pb_reaction_id}-{reaction.id}.{file_format}"
+    filename = f"{reaction.pb_reaction_id}.{file_format}"
     return Response(
         data,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
