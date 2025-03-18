@@ -30,6 +30,7 @@ import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): TemplateWrapper => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
@@ -96,7 +97,7 @@ export const renameTemplate = createThunk(renameTemplateActions, async (_d, getS
   const templateIdNumber = parseInt(templateId.split('_')[1]);
   const result = await axiosInstance.patch<Template>(`templates/${templateIdNumber}`, payload);
   const template = parseTemplate(result.data);
-  showNotification({ message: 'Template updated.', variant: 'success' });
+  showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
 
   return renameTemplateActions.success(template);
 });

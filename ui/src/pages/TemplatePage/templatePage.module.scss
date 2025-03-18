@@ -30,6 +30,9 @@
   color: var(--color-text-primary);
 
   svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
     margin-right: 8px;
   }
 }

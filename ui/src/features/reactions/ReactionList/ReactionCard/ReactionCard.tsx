@@ -98,7 +98,7 @@ export function ReactionCard({ id, title, actions }: Readonly<ReactionCardProps>
         </Flex>
       </div>
       <ReactionPreview
-        reactionId={id}
+        reaction={reaction}
         ref={previewRef}
       />
       <DescriptorsList
