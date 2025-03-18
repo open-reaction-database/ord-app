@@ -39,35 +39,40 @@ class _DatasetResponseUserGroupSchema(BaseSchema):
     role: Optional[str] = Field(default=None, alias="role")
 
 
+class _DatasetReactionCountingSchema(BaseSchema):
+    total: int = Field(default=0)
+    invalid: int = Field(default=0)
+    valid: int = Field(default=0)
+    none: int = Field(default=0)
+
+
 class DatasetSharableResponseSchema(DatasetResponseSchema):
     is_sharable: bool
-    reaction_count: int = Field(default=0)
     groups: list[_DatasetResponseUserGroupSchema]
-
-    @model_validator(mode="before")
-    @classmethod
-    def reaction_count(cls, data: Any):  # noqa: F811
-        if isinstance(data, (Row, tuple)):
-            # first element of the data is Dataset ORM object
-            # second is reactions count
-            data[0].reaction_count = data[1]
-            return data[0]
-        return data
+    reactions_count: _DatasetReactionCountingSchema
 
 
 class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
-    reaction_count: int = Field(default=0)
     groups: list[_DatasetResponseUserGroupSchema]
+
+    reactions_count: _DatasetReactionCountingSchema
 
     @model_validator(mode="before")
     @classmethod
     def reaction_count(cls, data: Any):  # noqa: F811
         if isinstance(data, (Row, tuple)):
+            dataset, rct_total, rct_invalid, rct_valid, rct_none = data
             # first element of the data is Dataset ORM object
             # second is reactions count
-            data[0].reaction_count = data[1]
+            data[0].reactions_count = _DatasetReactionCountingSchema(
+                total=rct_total,
+                invalid=rct_invalid,
+                valid=rct_valid,
+                none=rct_none,
+            )
             return data[0]
         return data
+
 
 
 class DatasetCreateSchema(BaseSchema):

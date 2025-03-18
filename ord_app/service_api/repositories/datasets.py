@@ -26,6 +26,16 @@ from ord_app.service_api.models import (
     UserModel,
 )
 
+SELECT_STMT = (
+    DatasetModel,
+    func.count(ReactionModel.id).label("reaction_count"),
+    func.count().filter(ReactionModel.is_valid.is_(False)).label("invalid_reaction_count"),
+    func.count().filter(ReactionModel.is_valid.is_(True)).label("valid_reaction_count"),
+    func.count().filter(ReactionModel.id.isnot(None), ReactionModel.is_valid.is_(None)).label(
+        "none_reaction_count"
+    ),
+)
+
 
 class DatasetsRepository:
     def __init__(self, db: AsyncSession):
@@ -71,10 +81,7 @@ class DatasetsRepository:
 
     async def get_with_sharable_info(self, dataset_id: int, user_id: int):
         stmt = (
-            select(
-                DatasetModel,
-                func.count(ReactionModel.id).label("reaction_count")
-            )
+            select(*SELECT_STMT)
             .outerjoin(DatasetModel.reactions)
             .where(DatasetModel.id == dataset_id)
             .options(
@@ -90,13 +97,19 @@ class DatasetsRepository:
             )
             .group_by(DatasetModel.id)
         )
-        dataset = (await self.db.execute(stmt)).first()
+        dataset, rct_total, rct_invalid, rct_valid, rct_none = (await self.db.execute(stmt)).first()
+        dataset.reactions_count = {
+            "total": rct_total,
+            "invalid": rct_invalid,
+            "valid": rct_valid,
+            "none": rct_none,
+        }
 
         dataset_associations_stmt = (
             select(DatasetGroupAssociationModel)
             .where(
-                DatasetGroupAssociationModel.group_id.in_({group.id for group in dataset[0].groups}),
-                DatasetGroupAssociationModel.dataset_id == dataset[0].id,
+                DatasetGroupAssociationModel.group_id.in_({group.id for group in dataset.groups}),
+                DatasetGroupAssociationModel.dataset_id == dataset.id,
                 DatasetGroupAssociationModel.is_primary.is_(True),
                 DatasetGroupAssociationModel.group.has(
                     GroupModel.members.any(
@@ -106,9 +119,9 @@ class DatasetsRepository:
             )
         )
 
-        dataset[0].is_sharable = False
+        dataset.is_sharable = False
         if (await self.db.execute(dataset_associations_stmt)).all():
-            dataset[0].is_sharable = True
+            dataset.is_sharable = True
 
         return dataset
 
@@ -144,14 +157,9 @@ class DatasetsRepository:
             # filter out groups that the user is not a member of
             dataset.groups = [group for group in dataset.groups if group.role is not None]
 
-        return datasets
-
     async def group_dataset_stmt(self, group_id: int, user_id: int):
         stmt = (
-            select(
-                DatasetModel,
-                func.count(ReactionModel.id).label("reaction_count")
-            )
+            select(*SELECT_STMT)
             .outerjoin(DatasetModel.reactions)
             .where(
                 DatasetModel.groups.any(
@@ -166,16 +174,13 @@ class DatasetsRepository:
         )
 
         paginated_datasets = await paginate(self.db, stmt)
-        paginated_datasets.items = await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
+        await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
 
         return paginated_datasets
 
     async def user_datasets_stmt(self, user_id):
         stmt = (
-            select(
-                DatasetModel,
-                func.count(ReactionModel.id).label("reaction_count")
-            )
+            select(*SELECT_STMT)
             .where(
                 DatasetModel.groups.any(
                     GroupModel.members.any(UserModel.id == user_id)
@@ -186,7 +191,7 @@ class DatasetsRepository:
             .order_by(DatasetModel.modified_at.desc())
         )
         paginated_datasets = await paginate(self.db, stmt)
-        paginated_datasets.items = await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
+        await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
 
         return paginated_datasets
 
