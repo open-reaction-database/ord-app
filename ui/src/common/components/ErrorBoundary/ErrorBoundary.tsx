@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Container, Title } from '@mantine/core';
 import React from 'react';
+import { Button, Container, Title } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
 import classes from './errorBoundary.module.scss';
 import { HomeIcon } from 'common/icons';
