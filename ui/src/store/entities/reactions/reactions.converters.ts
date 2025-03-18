@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionParsedProtobuf } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordInputsToReactionInputs,
   reactionInputsToOrdInputs,
@@ -32,8 +31,9 @@ import {
   ordNotesToReaction,
   reactionNotesToOrd,
 } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
+import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 
-export function ordReactionToReaction(reaction: ord.IReaction): ReactionParsedProtobuf {
+export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
     ...reaction,
     inputs: ordInputsToReactionInputs(reaction.inputs),
@@ -43,7 +43,7 @@ export function ordReactionToReaction(reaction: ord.IReaction): ReactionParsedPr
   };
 }
 
-export function reactionToOrdReaction(reaction: ReactionParsedProtobuf): ord.IReaction {
+export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
   return {
     ...reaction,
     inputs: reactionInputsToOrdInputs(reaction.inputs),
@@ -53,7 +53,7 @@ export function reactionToOrdReaction(reaction: ReactionParsedProtobuf): ord.IRe
   };
 }
 
-export function linkReactionEntities(reaction: ReactionParsedProtobuf): ReactionParsedProtobuf {
+export function linkReactionEntities(reaction: AppReaction): AppReaction {
   return {
     ...reaction,
     outcomes: reaction.outcomes.map(linkReactionOutcome),

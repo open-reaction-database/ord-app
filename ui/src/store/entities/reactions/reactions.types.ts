@@ -71,6 +71,7 @@ export interface ReactionDataBase {
 export interface ReactionData extends ReactionDataBase {
   pb_reaction_id: string;
   is_valid: boolean;
+  validation: Optional<ReactionValidation>;
 }
 
 export interface TemplateData extends ReactionDataBase {
