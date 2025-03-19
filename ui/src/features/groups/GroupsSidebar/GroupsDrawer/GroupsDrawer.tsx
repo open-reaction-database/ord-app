@@ -93,15 +93,15 @@ export function GroupsDrawer() {
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>
-
-      <InputModal
-        opened={openedModal}
-        onClose={closeModal}
-        onSubmit={handleGroupRename}
-        title="Edit Group Name"
-        inputLabel="Group name"
-        initialValue={group?.name}
-      />
+      {openedModal && (
+        <InputModal
+          onClose={closeModal}
+          onSubmit={handleGroupRename}
+          title="Edit Group Name"
+          inputLabel="Group name"
+          initialValue={group?.name}
+        />
+      )}
     </>
   );
 }

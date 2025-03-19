@@ -35,16 +35,20 @@ interface ValuePrecisionUnitControlProps {
   select?: 'native' | 'native-inline' | 'segmented';
 }
 
-const useValuePrecisionUnitsUncontrolledValues = (
-  props: Pick<ValuePrecisionUnitControlProps, 'value' | 'defaultValue' | 'onChange'>,
-): [ValuePrecisionUnit, (value: ValuePrecisionUnit) => void] => {
+const useValuePrecisionUnitsUncontrolledValues = ({
+  options,
+  ...props
+}: Pick<ValuePrecisionUnitControlProps, 'value' | 'defaultValue' | 'onChange' | 'options'>): [
+  ValuePrecisionUnit,
+  (value: ValuePrecisionUnit) => void,
+] => {
   const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled(props);
 
   return [
     {
       value: uncontrolledValue?.value ?? null,
       precision: uncontrolledValue?.precision ?? null,
-      units: uncontrolledValue.units,
+      units: uncontrolledValue?.units ?? options[0],
     },
     uncontrolledOnChange,
   ];
@@ -56,7 +60,7 @@ export function ValuePrecisionUnitControl({
   select = 'segmented',
   ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
-  const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues(rest);
+  const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
 
   const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number | null) => {
     const previousValue = uncontrolledValue ?? {};

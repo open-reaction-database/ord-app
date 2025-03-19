@@ -68,14 +68,15 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
         </Flex>
         <ReactionPreview reaction={template} />
       </Flex>
-      <InputModal
-        opened={opened}
-        onClose={close}
-        onSubmit={onTemplateNameChange}
-        title="Edit Template Name"
-        inputLabel="Template Name"
-        initialValue={template.name}
-      />
+      {opened && (
+        <InputModal
+          onClose={close}
+          onSubmit={onTemplateNameChange}
+          title="Edit Template ID"
+          inputLabel="Template ID"
+          initialValue={template.name}
+        />
+      )}
     </Paper>
   );
 }

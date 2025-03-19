@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo } from 'react';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper } from '@mantine/core';
@@ -23,16 +23,21 @@ import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
+import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
+import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
 
-export function ReactionPage() {
+interface ReactionPageProps {
+  reactionId: number;
+  datasetId: number;
+}
+
+export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPageProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId: rawReactionId, datasetId: rawDatasetId } = useParams<{ reactionId: string; datasetId: string }>();
-  const reactionId = parseInt(rawReactionId);
-  const datasetId = parseInt(rawDatasetId);
+  const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
 
@@ -58,6 +63,17 @@ export function ReactionPage() {
     }),
     [reactionId],
   );
+
+  useEffect(
+    () => () => {
+      dispatch(resetErrorPageAction());
+    },
+    [dispatch],
+  );
+
+  if (error) {
+    return <NotFoundPage rejectValue={error} />;
+  }
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>

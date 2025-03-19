@@ -22,14 +22,19 @@ import type {
   UpdateReactionSuccessPayload,
 } from './reactions.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
+import type { RejectValue } from 'store/utils/handleApiError.ts';
 
 const { createAsyncAction } = createActionFactory('reactions');
 
-export const getReactionsListActions = createAsyncAction<number, Pages<ReactionWrapper>>('get_list');
+export const getReactionsListActions = createAsyncAction<number, Pages<ReactionWrapper>, RejectValue>('get_list');
 
 export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<ReactionWrapper>>('get_page');
 
-export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, ReactionWrapper>('get');
+export const getReactionActions = createAsyncAction<
+  { datasetId: number; reactionId: number },
+  ReactionWrapper,
+  RejectValue
+>('get');
 
 export const createEmptyReactionActions = createAsyncAction<void, ReactionWrapper>('create_empty');
 

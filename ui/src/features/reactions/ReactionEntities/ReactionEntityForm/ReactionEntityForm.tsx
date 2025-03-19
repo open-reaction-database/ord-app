@@ -24,6 +24,7 @@ import { reactionEntityContext } from 'features/reactions/ReactionEntities/react
 import { useCallback, useEffect, useMemo } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
+import { getReactionEntityTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToTransform.ts';
 
 interface ReactionEntityFormProps {
   reactionId: number;
@@ -53,12 +54,14 @@ export function ReactionEntityForm({
   );
 
   const formEntity = sidebarInfo.entityName;
+  const transform = getReactionEntityTransform(formEntity);
 
   const initialValues = sidebarInfo.useInitialValues(reactionId, reactionPathComponents);
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: { ...initialValues },
+    transformValues: transform,
   });
   const { watch, getValues, getInputProps, setValues, resetDirty } = form;
   const formMethods = useMemo(

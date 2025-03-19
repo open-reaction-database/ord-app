@@ -67,7 +67,13 @@ class ReactionResponseSchema(BaseSchema):
     binpb: str
     is_valid: bool | None
     validation: _ReactionValidation | None = None
-    summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
+    summary: dict = Field(
+        default_factory=lambda: {
+            "provenance": {"doi": "foo"},
+            "summary": {"yield": 25.5},
+            "conditions": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis."
+        }
+    )
     molblocks: dict
 
     @field_validator("binpb", mode="before")

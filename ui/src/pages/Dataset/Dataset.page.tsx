@@ -15,22 +15,27 @@
  */
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'wouter';
 import { Flex, Loader } from '@mantine/core';
+import classes from './dataset.page.module.scss';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { ReactionList } from 'features/reactions/ReactionList/ReactionList.tsx';
 import { DatasetHeader } from 'features/datasets/DatasetHeader/DatasetHeader.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import classes from './dataset.page.module.scss';
 import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
+import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
+import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 
-export function DatasetPage() {
+interface DatasetPageProps {
+  datasetId: number;
+}
+
+export function DatasetPage({ datasetId: id }: Readonly<DatasetPageProps>) {
   const dispatch = useAppDispatch();
-  const { datasetId } = useParams();
-  const id = parseInt(datasetId as string);
+  const error = useSelector(selectErrorPage);
   const dataset = useSelector(selectDatasetById(id));
 
   useEffect(() => {
@@ -44,6 +49,17 @@ export function DatasetPage() {
       { path: `~/datasets/${id}`, title: dataset?.name ?? id },
     ];
   }, [dataset?.name, id]);
+
+  useEffect(
+    () => () => {
+      dispatch(resetErrorPageAction());
+    },
+    [dispatch],
+  );
+
+  if (error) {
+    return <NotFoundPage rejectValue={error} />;
+  }
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
