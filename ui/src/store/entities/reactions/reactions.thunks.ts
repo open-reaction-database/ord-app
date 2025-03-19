@@ -134,7 +134,7 @@ export const getReactionsList = createThunk(getReactionsListActions, async (_d, 
 
     return getReactionsListActions.success(parseReactionList(response.data));
   } catch (error) {
-    return _d(getReactionsListActions.failure(handleApiError(error)));
+    return getReactionsListActions.failure(handleApiError(error));
   }
 });
 
@@ -162,7 +162,7 @@ export const getReaction = createThunk(getReactionActions, async (dispatch, getS
     const parsedReaction = parseReaction(response.data);
     return getReactionActions.success(parsedReaction);
   } catch (error) {
-    return dispatch(getReactionActions.failure(handleApiError(error)));
+    return getReactionActions.failure(handleApiError(error));
   }
 });
 

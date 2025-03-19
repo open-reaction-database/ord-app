@@ -16,7 +16,6 @@
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { Fragment, useEffect, useMemo, type FC } from 'react';
 import classes from './reactionPage.module.scss';
-import type { AppState } from '@auth0/auth0-react';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
@@ -34,9 +33,12 @@ import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identif
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
+import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
+import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
+
 interface ReactionPageProps {
-  readonly reactionId: number;
-  readonly datasetId: number;
+  reactionId: number;
+  datasetId: number;
 }
 interface ReactionTab {
   name: string;
@@ -58,9 +60,9 @@ const tabs: Array<ReactionTab> = [
   { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
 ];
 
-export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
+export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPageProps>) {
   const dispatch = useAppDispatch();
-  const error = useSelector((state: AppState) => state.entities.reactions?.error);
+  const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
 
@@ -87,8 +89,15 @@ export function ReactionPage({ reactionId, datasetId }: ReactionPageProps) {
     [reactionId],
   );
 
+  useEffect(
+    () => () => {
+      dispatch(resetErrorPageAction());
+    },
+    [dispatch],
+  );
+
   if (error) {
-    return <NotFoundPage />;
+    return <NotFoundPage rejectValue={error} />;
   }
 
   return (

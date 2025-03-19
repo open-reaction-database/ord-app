@@ -13,30 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Redirect, Route, Switch } from 'wouter';
-import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
-import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
+import { createActionFactory } from 'store/utils';
 
-const defaultPath = '/datasets';
+const { createAction } = createActionFactory('errorPage');
 
-export function Routes() {
-  return (
-    <Switch>
-      <Route
-        path="/datasets"
-        nest
-      >
-        <DatasetsListRoute />
-      </Route>
-      <Route
-        path="/templates"
-        nest
-      >
-        <TemplatesListRoute />
-      </Route>
-      <Route>
-        <Redirect to={defaultPath} />
-      </Route>
-    </Switch>
-  );
-}
+export const resetErrorPageAction = createAction<void>('reset');

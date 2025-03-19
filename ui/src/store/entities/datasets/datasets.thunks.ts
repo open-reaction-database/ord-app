@@ -31,12 +31,12 @@ import { navigate } from 'wouter/use-browser-location';
 import { selectActiveGroupId } from '../../features/groups/groups.selectors.ts';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 
-export const getDataset = createThunk(getDatasetActions, async (dispatch, _g, datasetId) => {
+export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetId) => {
   try {
     const response = await axiosInstance.get<Dataset>(`/datasets/${datasetId}`);
     return getDatasetActions.success(response.data);
   } catch (error) {
-    return dispatch(getDatasetActions.failure(handleApiError(error)));
+    return getDatasetActions.failure(handleApiError(error));
   }
 });
 

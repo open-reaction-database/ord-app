@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 import { Flex, Loader } from '@mantine/core';
 import classes from './dataset.page.module.scss';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import type { AppState } from '@auth0/auth0-react';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { ReactionList } from 'features/reactions/ReactionList/ReactionList.tsx';
 import { DatasetHeader } from 'features/datasets/DatasetHeader/DatasetHeader.tsx';
@@ -27,14 +26,16 @@ import { getDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { getReactionsList } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
+import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
+import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 
 interface DatasetPageProps {
-  readonly datasetId: number;
+  datasetId: number;
 }
 
-export function DatasetPage({ datasetId: id }: DatasetPageProps) {
+export function DatasetPage({ datasetId: id }: Readonly<DatasetPageProps>) {
   const dispatch = useAppDispatch();
-  const error = useSelector((state: AppState) => state.entities.datasets.error);
+  const error = useSelector(selectErrorPage);
   const dataset = useSelector(selectDatasetById(id));
 
   useEffect(() => {
@@ -49,8 +50,15 @@ export function DatasetPage({ datasetId: id }: DatasetPageProps) {
     ];
   }, [dataset?.name, id]);
 
+  useEffect(
+    () => () => {
+      dispatch(resetErrorPageAction());
+    },
+    [dispatch],
+  );
+
   if (error) {
-    return <NotFoundPage />;
+    return <NotFoundPage rejectValue={error} />;
   }
 
   return (

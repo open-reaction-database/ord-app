@@ -105,20 +105,6 @@ const isDatasetEditOpened = createReducer<boolean>(false, builder => {
   builder.addCase(updateDatasetActions.success, () => false);
 });
 
-const error = createReducer<string | null>(null, builder => {
-  builder.addMatcher(isAnyOf(getDatasetActions.failure), (_, action) => {
-    const payload = action.payload;
-    if (payload && typeof payload === 'object' && 'errorMessage' in payload) {
-      return (payload as { errorMessage: string }).errorMessage;
-    } else if (payload instanceof Error) {
-      return payload.message;
-    }
-    return 'Unexpected error occurred.';
-  });
-
-  builder.addMatcher(isAnyOf(getDatasetActions.request, getDatasetActions.success), () => null);
-});
-
 export const datasetsReducer = combineReducers({
   datasetsById,
   datasetsOrder,
@@ -126,5 +112,4 @@ export const datasetsReducer = combineReducers({
   areDatasetsLoading,
   isDatasetCreating,
   isDatasetEditOpened,
-  error,
 });

@@ -18,8 +18,15 @@ import { Title, Text, Button, Flex } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
 import { HomeIcon } from 'common/icons';
 import classes from './notFoundPage.module.scss';
+import type { RejectValue } from 'store/utils/handleApiError';
 
-export function NotFoundPage() {
+interface NotFoundPageProps {
+  rejectValue?: RejectValue;
+}
+
+export function NotFoundPage({ rejectValue }: Readonly<NotFoundPageProps>) {
+  const errorCode = rejectValue?.errorCode ?? 404;
+  const errorMessage = rejectValue?.errorMessage ?? 'The requested page or resource could not be found';
   return (
     <PageContainer breadcrumbs={[]}>
       <Flex className={classes.container}>
@@ -27,23 +34,20 @@ export function NotFoundPage() {
           order={1}
           className={classes.title}
         >
-          404
+          {errorCode}
         </Title>
         <Text
           size="lg"
           className={classes.text}
         >
-          The requested page <br /> or resource could not be found
+          {errorMessage}
         </Text>
         <Button
           mt="lg"
           className={classes.button}
           onClick={() => navigate('/datasets')}
         >
-          <HomeIcon
-            className={classes.homeIcon}
-            style={{ marginRight: 8 }}
-          />
+          <HomeIcon className={classes.homeIcon} />
           Go to Datasets Page
         </Button>
       </Flex>
