@@ -13,27 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useParams } from 'wouter';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { type FC, Fragment, useEffect, useMemo } from 'react';
+import { Fragment, useEffect, useMemo, type FC } from 'react';
+import classes from './reactionPage.module.scss';
+import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { Flex, Paper, Tabs, Tooltip } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import classes from './reactionPage.module.scss';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
+import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
+import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
 
+interface ReactionPageProps {
+  reactionId: number;
+  datasetId: number;
+}
 interface ReactionTab {
   name: string;
   required?: true;
@@ -54,11 +60,9 @@ const tabs: Array<ReactionTab> = [
   { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
 ];
 
-export function ReactionPage() {
+export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPageProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId: rawReactionId, datasetId: rawDatasetId } = useParams<{ reactionId: string; datasetId: string }>();
-  const reactionId = parseInt(rawReactionId);
-  const datasetId = parseInt(rawDatasetId);
+  const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
 
@@ -84,6 +88,17 @@ export function ReactionPage() {
     }),
     [reactionId],
   );
+
+  useEffect(
+    () => () => {
+      dispatch(resetErrorPageAction());
+    },
+    [dispatch],
+  );
+
+  if (error) {
+    return <NotFoundPage rejectValue={error} />;
+  }
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>

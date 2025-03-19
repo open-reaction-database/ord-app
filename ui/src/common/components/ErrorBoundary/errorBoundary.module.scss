@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ErrorBoundary } from 'common/components/ErrorBoundary/ErrorBoundary';
-import { DatasetPageContainer } from 'pages/Dataset/DatasetPageContainer';
-import { ReactionPageContainer } from 'pages/ReactionPage/ReactionPageContainer';
+.container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 
-export function DatasetRoute() {
-  return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ErrorBoundary>
-          <ReactionPageContainer />
-        </ErrorBoundary>
-      </Route>
-      <Route path="/">
-        <ErrorBoundary>
-          <DatasetPageContainer />
-        </ErrorBoundary>
-      </Route>
-    </Switch>
-  );
+.homeIcon {
+  width: 14px;
+  height: 15px;
+}
+
+.button {
+  width: 188px;
+  height: 36px;
+  padding: 8px;
 }

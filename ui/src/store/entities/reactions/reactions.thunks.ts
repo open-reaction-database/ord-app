@@ -37,9 +37,6 @@ import type {
 } from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
-import { selectDatasetById } from '../datasets/datasets.selectors.ts';
-import { getDataset } from '../datasets/datasets.thunks.ts';
-import { type Action, type ThunkDispatch } from '@reduxjs/toolkit';
 import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
@@ -51,6 +48,10 @@ import {
 import { showNotification } from 'common/utils/showNotification.tsx';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import { handleApiError } from 'store/utils/handleApiError.ts';
+import type { Action, ThunkDispatch } from '@reduxjs/toolkit';
+import { getDataset } from '../datasets/datasets.thunks.ts';
+import { selectDatasetById } from '../datasets/datasets.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
@@ -125,10 +126,16 @@ const parseReactionList = (pages: Pages<ReactionResponse>): Pages<ReactionWrappe
 };
 
 export const getReactionsList = createThunk(getReactionsListActions, async (_d, getState, datasetId) => {
-  const currentPage = selectReactionsPagination(getState());
-  const params = { page: currentPage.page, size: currentPage.size };
-  const result = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
-  return getReactionsListActions.success(parseReactionList(result.data));
+  try {
+    const currentPage = selectReactionsPagination(getState());
+    const params = { page: currentPage.page, size: currentPage.size };
+
+    const response = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
+
+    return getReactionsListActions.success(parseReactionList(response.data));
+  } catch (error) {
+    return getReactionsListActions.failure(handleApiError(error));
+  }
 });
 
 export const getReactionsPage = createThunk(getReactionPageActions, async (_d, getState) => {
@@ -142,16 +149,21 @@ export const getReactionsPage = createThunk(getReactionPageActions, async (_d, g
 });
 
 export const getReaction = createThunk(getReactionActions, async (dispatch, getState, { reactionId }) => {
-  const datasetId = selectActiveDatasetId(getState());
-  const dataset = selectDatasetById(datasetId)(getState());
+  try {
+    const state = getState();
+    const datasetId = selectActiveDatasetId(state);
+    const dataset = selectDatasetById(datasetId)(getState());
 
-  if (!dataset) {
-    (dispatch as ThunkDispatch<AppState, never, Action>)(getDataset(datasetId));
+    if (!dataset) {
+      (dispatch as ThunkDispatch<AppState, never, Action>)(getDataset(datasetId));
+    }
+
+    const response = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
+    const parsedReaction = parseReaction(response.data);
+    return getReactionActions.success(parsedReaction);
+  } catch (error) {
+    return getReactionActions.failure(handleApiError(error));
   }
-
-  const result = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
-  const parsedReaction = parseReaction(result.data);
-  return getReactionActions.success(parsedReaction);
 });
 
 export const createEmptyReaction = createThunkWithExplicitResult(

@@ -26,9 +26,10 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
       try {
         const result = await appThunk(dispatch, getState, extraArgument);
         dispatch(result);
+        return result;
       } catch (e) {
-        console.error(e);
         dispatch(asyncActionCreator.failure(e));
+        return;
       }
     };
   };
@@ -44,8 +45,8 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       try {
         await appThunk(dispatch, getState, extraArgument);
       } catch (e) {
-        console.error(e);
         dispatch(asyncActionCreator.failure(e));
+        return;
       }
     };
   };

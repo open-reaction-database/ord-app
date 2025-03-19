@@ -28,4 +28,6 @@ export function configureAppStore() {
   });
 }
 
-export type AppState = ReturnType<ReturnType<typeof configureAppStore>['getState']>;
+export const store = configureAppStore();
+export type AppDispatch = typeof store.dispatch;
+export type AppState = ReturnType<typeof store.getState>;

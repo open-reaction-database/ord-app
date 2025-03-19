@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { ErrorBoundary } from 'common/components/ErrorBoundary/ErrorBoundary';
-import { DatasetPageContainer } from 'pages/Dataset/DatasetPageContainer';
-import { ReactionPageContainer } from 'pages/ReactionPage/ReactionPageContainer';
+import { useParams } from 'wouter';
+import { ReactionPage } from './ReactionPage';
 
-export function DatasetRoute() {
+export const ReactionPageContainer = () => {
+  const { reactionId, datasetId } = useParams<{ reactionId: string; datasetId: string }>();
+
   return (
-    <Switch>
-      <Route path="/reactions/:reactionId">
-        <ErrorBoundary>
-          <ReactionPageContainer />
-        </ErrorBoundary>
-      </Route>
-      <Route path="/">
-        <ErrorBoundary>
-          <DatasetPageContainer />
-        </ErrorBoundary>
-      </Route>
-    </Switch>
+    <ReactionPage
+      reactionId={Number(reactionId)}
+      datasetId={Number(datasetId)}
+    />
   );
-}
+};
