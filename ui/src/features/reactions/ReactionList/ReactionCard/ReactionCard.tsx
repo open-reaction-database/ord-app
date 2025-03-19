@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 import { Button, Flex, Paper, Title } from '@mantine/core';
-import { Link, useParams } from 'wouter';
+import { Link, useParams, useRouter } from 'wouter';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import classes from './ReactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { fileDownloadOptions } from 'common/constants.ts';
+import { domain, fileDownloadOptions } from 'common/constants.ts';
 import { useCallback, useMemo, useRef } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
@@ -67,6 +67,7 @@ interface ReactionCardProps {
 
 export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   const { datasetId } = useParams();
+  const { base } = useRouter();
   const reaction = useSelector(selectReactionById(id));
   const previewRef = useRef<HTMLDivElement | null>(null);
 
@@ -75,7 +76,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
   }, [previewRef]);
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    { label: 'Copy Reaction Link', value: `${window.location.href}/reactions/${id}` },
+    { label: 'Copy Reaction Link', value: `${domain}${base}/reactions/${id}` },
     { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
   ];
 

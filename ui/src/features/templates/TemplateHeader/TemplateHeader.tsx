@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { EnumerateIcon, DownloadIcon, EditIcon } from 'common/icons';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, useRouter } from 'wouter';
 import { domain } from 'common/constants.ts';
 import { typographyClasses } from 'common/styling';
 import { useDisclosure } from '@mantine/hooks';
@@ -35,6 +35,7 @@ interface TemplateHeaderProps {
 
 export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<TemplateHeaderProps>) {
   const [location] = useLocation();
+  const { base } = useRouter();
   const dispatch = useAppDispatch();
   const template = useSelector(selectTemplateById(templateId));
   const [opened, { open, close }] = useDisclosure();
@@ -50,10 +51,10 @@ export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<T
 
   const copyOptions = useMemo(
     () => [
-      { label: 'Copy Template Link', value: `${domain}${location}` },
+      { label: 'Copy Template Link', value: `${domain}${base}${location}` },
       { label: 'Copy Template ID', value: templateId.toString() },
     ],
-    [templateId, location],
+    [base, location, templateId],
   );
 
   return (
