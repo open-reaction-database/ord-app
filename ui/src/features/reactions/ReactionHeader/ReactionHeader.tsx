@@ -61,7 +61,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const copyOptions = useMemo(
     () => [
       { label: 'Copy Reaction Link', value: `${domain}${base}${location}` },
-      { label: 'Copy Reaction ID', value: reactionId.toString() },
+      { label: 'Copy Reaction ID', value: reaction.pb_reaction_id ?? '' },
     ],
     [base, location, reactionId],
   );

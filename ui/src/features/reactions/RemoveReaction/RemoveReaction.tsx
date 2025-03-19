@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -22,26 +22,26 @@ import { RemoveIcon } from 'common/icons';
 import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
 import { removeTemplate } from 'store/entities/templates/templates.thunks.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
-import { templatesContext } from 'features/templates/templates.context';
 
 interface RemoveReactionProps {
   reactionId: ReactionId;
 }
 
 export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
-  const { isTemplate } = useContext(templatesContext);
+  const isTemplate = typeof reactionId === 'string';
   const dispatch = useAppDispatch();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
   const entityToRemove = isTemplate ? 'template' : 'reaction';
-  const entitieId = isTemplate ? String(reactionId).split('_')[1] : 'reactionId';
+
   const onReactionRemove = useCallback(() => {
     if (isTemplate) {
-      dispatch(removeTemplate(Number(entitieId)));
+      const entityId = parseInt(reactionId.split('_')[1]);
+      dispatch(removeTemplate(Number(entityId)));
     } else {
-      dispatch(removeReaction(Number(entitieId)));
+      dispatch(removeReaction(reactionId));
     }
     closeConfirmation();
-  }, [closeConfirmation, dispatch, reactionId]);
+  }, [closeConfirmation, dispatch, isTemplate, reactionId]);
 
   return (
     <ConfirmPopover
