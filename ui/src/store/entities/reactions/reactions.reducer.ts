@@ -31,7 +31,7 @@ import {
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { ReactionOrTemplate, ReactionParsedProtobuf, ReactionWrapper } from './reactions.types.ts';
+import type { ReactionOrTemplate, AppReaction, ReactionWrapper } from './reactions.types.ts';
 import type { TemplateWrapper } from '../templates/templates.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
@@ -55,10 +55,10 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     addUpdateReactionFieldActions.request,
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
       const reaction = state[reactionId];
-      const updatedReaction: ReactionParsedProtobuf = linkReactionEntities(
+      const updatedReaction: AppReaction = linkReactionEntities(
         deepMergeWithArrayMerge(
           reaction.data,
-          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as ReactionParsedProtobuf,
+          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
         ),
       );
       return {
@@ -72,9 +72,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   );
   builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
     const reaction = state[reactionId];
-    const updatedReaction: ReactionParsedProtobuf = linkReactionEntities(
-      removeDeepReactionPart(reaction.data, pathComponents),
-    );
+    const updatedReaction: AppReaction = linkReactionEntities(removeDeepReactionPart(reaction.data, pathComponents));
     return {
       ...state,
       [reactionId]: {
@@ -94,28 +92,26 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   builder.addCase(getTemplateActions.success, (state, action) => {
     const templateId = `template_${action.payload.id}`;
     const templatePayload = action.payload as TemplateWrapper;
-    const reactionWrapper: ReactionWrapper = {
+    const templateWrapper = {
       ...templatePayload,
       data: linkReactionEntities(templatePayload.data),
-      pb_reaction_id: '',
       is_valid: true,
     };
     return {
       ...state,
-      [templateId]: reactionWrapper,
+      [templateId]: templateWrapper,
     };
   });
   builder.addCase(getAllTemplatesActions.success, (state, action) => {
     const templates = action.payload;
-    const templatesById = templates.reduce<ItemsById<ReactionWrapper>>((acc, template) => {
+    const templatesById = templates.reduce<ItemsById<TemplateWrapper>>((acc, template) => {
       const templateId = `template_${template.id}`;
-      const reactionWrapper: ReactionWrapper = {
+      const TemplateWrapper = {
         ...template,
         data: linkReactionEntities(template.data),
-        pb_reaction_id: '',
         is_valid: true,
       };
-      acc[templateId] = reactionWrapper;
+      acc[templateId] = TemplateWrapper;
       return acc;
     }, {});
     return {
