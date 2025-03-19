@@ -29,6 +29,12 @@ export interface Dataset {
   modified_at: string;
   groups: Array<GroupItem>;
   description: string;
+  reactions_count: {
+    total: number;
+    invalid: number;
+    valid: number;
+    none: number;
+  };
 }
 
 export interface CreateNewDatasetPayload {

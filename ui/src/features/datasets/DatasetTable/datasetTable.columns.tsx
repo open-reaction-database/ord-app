@@ -31,7 +31,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
   },
   {
     id: 'size',
-    accessorKey: 'reaction_count',
+    accessorFn: originalRow => originalRow.reactions_count.total,
     header: 'Size',
     size: 80,
   },
