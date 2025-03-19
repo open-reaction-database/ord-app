@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
+
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
 from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, with_loader_criteria
+from sqlalchemy.orm import contains_eager, joinedload, with_loader_criteria
 
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
@@ -129,8 +131,12 @@ class DatasetsRepository:
         stmt = (
             select(DatasetModel)
             .where(DatasetModel.id == dataset_id)
-            .options(joinedload(DatasetModel.reactions))
-            .order_by(DatasetModel.modified_at.desc())
+            .outerjoin(DatasetModel.reactions)
+            .options(contains_eager(DatasetModel.reactions))
+            .order_by(
+                DatasetModel.modified_at.desc(),
+                ReactionModel.id.desc(),
+            )
         )
         return await self.db.scalar(stmt)
 
@@ -157,39 +163,26 @@ class DatasetsRepository:
             # filter out groups that the user is not a member of
             dataset.groups = [group for group in dataset.groups if group.role is not None]
 
-    async def group_dataset_stmt(self, group_id: int, user_id: int):
+    async def datasets_stmt(self, user_id: int, group_id: Optional[int] = None):
+        filters = [
+            DatasetModel.groups.any(
+                GroupModel.members.any(UserModel.id == user_id)
+            )
+        ]
+
+        if group_id is not None:
+            filters.append(
+                DatasetModel.groups.any(GroupModel.id == group_id)
+            )
+
         stmt = (
             select(*SELECT_STMT)
             .outerjoin(DatasetModel.reactions)
-            .where(
-                DatasetModel.groups.any(
-                    and_(
-                        GroupModel.id == group_id,
-                        GroupModel.members.any(UserModel.id == user_id),
-                    )
-                )
-            )
+            .where(and_(*filters))
             .group_by(DatasetModel.id)
             .order_by(DatasetModel.modified_at.desc())
         )
 
-        paginated_datasets = await paginate(self.db, stmt)
-        await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
-
-        return paginated_datasets
-
-    async def user_datasets_stmt(self, user_id):
-        stmt = (
-            select(*SELECT_STMT)
-            .where(
-                DatasetModel.groups.any(
-                    GroupModel.members.any(UserModel.id == user_id)
-                )
-            )
-            .outerjoin(DatasetModel.reactions)
-            .group_by(DatasetModel.id)
-            .order_by(DatasetModel.modified_at.desc())
-        )
         paginated_datasets = await paginate(self.db, stmt)
         await self.enrich_datasets_with_user_roles(paginated_datasets.items, user_id)
 

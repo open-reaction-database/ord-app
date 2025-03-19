@@ -61,7 +61,7 @@ class DatasetUseCases:
         return dataset
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
-        return await self.dataset_repository.group_dataset_stmt(group_id, self.current_user.id)
+        return await self.dataset_repository.datasets_stmt(self.current_user.id, group_id)
 
     async def extend(self, dataset_id: int, file_data, kind):
         try:
@@ -133,7 +133,7 @@ class DatasetUseCases:
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
     async def paginate_user_datasets(self):
-        return await self.dataset_repository.user_datasets_stmt(self.current_user.id)
+        return await self.dataset_repository.datasets_stmt(self.current_user.id)
 
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
