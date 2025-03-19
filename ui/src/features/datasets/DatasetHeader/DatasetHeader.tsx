@@ -22,7 +22,7 @@ import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, useRouter } from 'wouter';
 import { EditDataset } from './EditDataset/EditDataset.tsx';
 import { useSelector } from 'react-redux';
 import { selectIsDatasetOpened } from 'store/entities/datasets/datasets.selectors.ts';
@@ -41,6 +41,7 @@ interface DatasetHeaderProps {
 
 export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const [location] = useLocation();
+  const { base } = useRouter();
   const dispatch = useAppDispatch();
   const isEditOpened = useSelector(selectIsDatasetOpened);
   const [removeConfirmOpened, { open: openRemoveConfirm, close: closeRemoveConfirm }] = useDisclosure(false);
@@ -55,10 +56,10 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
 
   const copyToClipboardOptions: Array<CopyButtonOptions> = useMemo(
     () => [
-      { label: 'Copy Dataset Link', value: `${domain}${location}` },
+      { label: 'Copy Dataset Link', value: `${domain}${base}${location}` },
       { label: 'Copy Dataset ID', value: dataset.id.toString() },
     ],
-    [dataset.id, location],
+    [base, dataset.id, location],
   );
 
   const handleDatasetRemove = useCallback(() => {

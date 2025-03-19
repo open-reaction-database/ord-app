@@ -20,7 +20,7 @@ import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton
 import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon, EditIcon } from 'common/icons';
 import { useCallback, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
-import { useLocation } from 'wouter';
+import { useLocation, useRouter } from 'wouter';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -40,6 +40,7 @@ interface ReactionHeaderProps {
 
 export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
   const [location] = useLocation();
+  const { base } = useRouter();
   const dispatch = useAppDispatch();
   const reaction = useSelector(selectReactionById(reactionId));
   const [opened, { open, close }] = useDisclosure();
@@ -59,10 +60,10 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
 
   const copyOptions = useMemo(
     () => [
-      { label: 'Copy Reaction Link', value: `${domain}${location}` },
+      { label: 'Copy Reaction Link', value: `${domain}${base}${location}` },
       { label: 'Copy Reaction ID', value: reactionId.toString() },
     ],
-    [reactionId, location],
+    [base, location, reactionId],
   );
 
   return (
