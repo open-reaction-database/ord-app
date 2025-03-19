@@ -20,6 +20,7 @@ import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
+import type { Variable } from '../templates/templates.types.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -60,10 +61,32 @@ export interface ReactionResponse {
   molblocks: ReactionMolBlocks;
 }
 
+export interface ReactionDataBase {
+  id: ReactionId;
+  data: AppReaction;
+  previews: PreviewsById;
+  summary: ReactionSummary;
+}
+
+export interface ReactionData extends ReactionDataBase {
+  pb_reaction_id: string;
+  is_valid: boolean;
+  validation: Optional<ReactionValidation>;
+}
+
+export interface TemplateData extends ReactionDataBase {
+  name: string;
+  variables: Array<Variable>;
+}
+
+export type ReactionOrTemplate = ReactionData | TemplateData;
+
 export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molblocks'> {
   data: AppReaction;
   previews: PreviewsById;
 }
+
+export type ReactionId = number | string;
 
 export type UpdateReactionSuccessPayload = Omit<ReactionWrapper, 'data'>;
 
@@ -72,7 +95,7 @@ export interface ImportReactionFromFilePayload {
 }
 
 export interface UpdateReactionPayload {
-  reactionId: number;
+  reactionId: ReactionId;
   pathComponents: ReactionPathComponents;
 }
 

@@ -24,18 +24,17 @@ import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes
 import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionInputPreviewProps {
-  reactionId: number;
+  reactionId: ReactionId;
   outcomeIndex: number;
 }
 
 export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
   const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]));
   const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
-
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
-
   const outcomeTime = useMemo(() => {
     return outcome.reactionTime?.value ? renderValuePrecisionUnit(outcome.reactionTime) : '';
   }, [outcome.reactionTime]);

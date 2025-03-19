@@ -13,10 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createContext } from 'react';
-import type { ReactionEntityContext } from './reactionEntities.types.ts';
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
 
-export const reactionEntityContext = createContext<ReactionEntityContext>({
-  reactionId: 0,
-  pathComponents: [],
-});
+.templates {
+  width: calc(100% - 200px);
+}
+
+.index {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary-3);
+}
+
+.link {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  text-decoration: none;
+}

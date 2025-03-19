@@ -16,7 +16,7 @@
 import React from 'react';
 import { Flex, Modal, Table } from '@mantine/core';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
-import classes from './PermissionModal.module.scss';
+import classes from './permissionModal.module.scss';
 
 interface Permission {
   feature: string;
@@ -49,7 +49,7 @@ interface FeatureIconProps {
 }
 
 function FeatureIcon({ hasAccess }: Readonly<FeatureIconProps>) {
-  return <Flex>{hasAccess ? <CheckCircleIcon /> : <CrossCircleIcon />}</Flex>;
+  return <Flex className={classes.icon}>{hasAccess ? <CheckCircleIcon /> : <CrossCircleIcon />}</Flex>;
 }
 
 export function PermissionsModal({ opened, onClose }: Readonly<PermissionsModalProps>) {

@@ -16,7 +16,7 @@
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { Accordion, Divider, Flex, Text } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { useCallback, type MouseEvent } from 'react';
+import { useCallback, useContext, type MouseEvent } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import classes from './inputsComponentsList.module.scss';
@@ -25,9 +25,11 @@ import { EditButton } from 'common/components/EditButton/EditButton.tsx';
 import { ComponentDisplayRow } from '../../ComponentsList/ComponentDisplayRow';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { templatesContext } from 'features/templates/templates.context';
 
 interface InputsComponentsListProps {
-  reactionId: number;
+  reactionId: ReactionId;
   inputs: Array<ReactionInput>;
 }
 
@@ -53,6 +55,7 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
     },
     [dispatch],
   );
+  const { isTemplate } = useContext(templatesContext);
 
   const ids = inputs.map(input => input.id);
 
@@ -82,21 +85,23 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
           >
             <Accordion.Control
               icon={
-                <Flex
-                  onClick={onActionClick}
-                  align="center"
-                >
-                  <EditButton onClick={() => onEditInput(input.id)} />
-                  <Divider
-                    className={classes.actionDivider}
-                    orientation="vertical"
-                  />
-                  <ReactionEntityDelete
-                    reactionId={reactionId}
-                    entityName="Input"
-                    pathComponents={['inputs', input.id]}
-                  />
-                </Flex>
+                !isTemplate && (
+                  <Flex
+                    onClick={onActionClick}
+                    align="center"
+                  >
+                    <EditButton onClick={() => onEditInput(input.id)} />
+                    <Divider
+                      className={classes.actionDivider}
+                      orientation="vertical"
+                    />
+                    <ReactionEntityDelete
+                      reactionId={reactionId}
+                      entityName="Input"
+                      pathComponents={['inputs', input.id]}
+                    />
+                  </Flex>
+                )
               }
             >
               {input.name}

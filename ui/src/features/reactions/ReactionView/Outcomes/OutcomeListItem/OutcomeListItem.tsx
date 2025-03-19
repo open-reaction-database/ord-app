@@ -27,11 +27,12 @@ import type {
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { renderValuePrecisionUnit } from '../../renderValuePrecisionUnit';
 import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 const ENTITY_NAME = 'outcomes';
 
 interface OutcomeListItemProps {
-  reactionId: number;
+  reactionId: ReactionId;
   outcome: ReactionOutcome;
   outcomeIndex: number;
 }

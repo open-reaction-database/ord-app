@@ -13,46 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  padding-bottom: 0;
-}
-
-.tableBody {
-  td {
-    padding: 12px;
-    vertical-align: middle;
-  }
-}
-
-.tableHeader {
-  height: 48px;
-  color: var(--color-text-secondary-2);
-
-  tr {
-    border-bottom: none;
-  }
-}
-
-.featureCell {
-  width: 225px;
-}
-
-.category {
-  border-bottom: none;
-
-  td {
-    background-color: #f2f2f2;
-    border-radius: 8px;
-    font-weight: 700;
-    padding: 8px 12px;
-  }
-}
-
-.lastRow {
-  border-bottom: none;
-  height: 56px;
-
-  td {
-    vertical-align: top;
-  }
+.buttonIcon {
+  width: 16px;
+  height: 16px;
 }

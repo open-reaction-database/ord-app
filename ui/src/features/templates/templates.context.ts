@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 import { createContext } from 'react';
-import type { ReactionEntityContext } from './reactionEntities.types.ts';
+import type { TemplatesContext } from './templates.types.ts';
 
-export const reactionEntityContext = createContext<ReactionEntityContext>({
-  reactionId: 0,
-  pathComponents: [],
+export const templatesContext = createContext<TemplatesContext>({
+  isTemplate: false,
 });

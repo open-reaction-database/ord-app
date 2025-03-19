@@ -24,3 +24,14 @@
 .loaderContainer {
   height: 100px;
 }
+
+.index {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary-3);
+}
+
+.link {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  text-decoration: none;
+}

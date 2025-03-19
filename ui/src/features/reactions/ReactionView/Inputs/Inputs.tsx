@@ -18,6 +18,7 @@ import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { AddCircleIcon, NoData } from 'common/icons';
 import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
 import { typographyClasses } from 'common/styling';
+import { useContext } from 'react';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
@@ -26,6 +27,7 @@ import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntitie
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
+import { templatesContext } from 'features/templates/templates.context';
 
 const useCreate = buildUseCreate<ReactionInput>('inputs', (_, list) => {
   const newInputName = findReactionEntityUniqueName(
@@ -37,7 +39,8 @@ const useCreate = buildUseCreate<ReactionInput>('inputs', (_, list) => {
 });
 
 export function Inputs({ reactionId }: ReactionViewSectionProps) {
-  const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
+  const { isTemplate } = useContext(templatesContext);
+  const inputs = useSelector(selectOrderedInputsWrapper(reactionId)) || [];
 
   const onCreateNew = useCreate();
   const handleCreate = () => {
@@ -54,12 +57,14 @@ export function Inputs({ reactionId }: ReactionViewSectionProps) {
           <Title order={2}>Inputs</Title>
           <Counter amount={inputs.length} />
         </Flex>
-        <Button
-          onClick={handleCreate}
-          leftSection={<AddCircleIcon />}
-        >
-          Input
-        </Button>
+        {!isTemplate ? (
+          <Button
+            onClick={handleCreate}
+            leftSection={<AddCircleIcon />}
+          >
+            Input
+          </Button>
+        ) : null}
       </Flex>
       <span>Reaction inputs include every chemical added to the reaction vessel</span>
       {inputs.length > 0 ? (

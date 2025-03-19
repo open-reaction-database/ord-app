@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useCallback, type ChangeEvent, type MouseEvent, type PropsWithChildren } from 'react';
+import { useEffect, useCallback, type ChangeEvent, type MouseEvent } from 'react';
 import { useSelector } from 'react-redux';
-import { ActionIcon, Button, Flex, Input, ScrollArea } from '@mantine/core';
+import { ActionIcon, Flex, Input, ScrollArea } from '@mantine/core';
 import {
   selectGroupSearch,
   selectHaveAnyGroups,
@@ -27,30 +27,9 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import classes from './GroupsList.module.scss';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
+import { SelectableButton } from 'common/components/SelectableButton/SelectableButton.tsx';
 
 const GROUP_BUTTON_HEIGHT = 36;
-
-interface GroupButtonProps {
-  isSelected: boolean;
-  onClick: () => void;
-}
-
-function GroupButton({ isSelected, onClick, children }: Readonly<PropsWithChildren<GroupButtonProps>>) {
-  return (
-    <Button
-      classNames={{
-        root: classes.groupButton,
-        label: classes.buttonLabel,
-      }}
-      variant={isSelected ? 'filled' : 'transparent'}
-      color={isSelected ? 'primary' : 'default'}
-      justify="flex-start"
-      onClick={onClick}
-    >
-      {children}
-    </Button>
-  );
-}
 
 export function GroupsList() {
   const appDispatch = useAppDispatch();
@@ -98,7 +77,7 @@ export function GroupsList() {
         placeholder="Search by group"
       />
       <Flex direction="column">
-        <GroupButton
+        <SelectableButton
           isSelected={selectedGroupId === null}
           onClick={() => selectGroup(null)}
         >
@@ -109,7 +88,7 @@ export function GroupsList() {
             <GridViewIcon />
             All Groups
           </Flex>
-        </GroupButton>
+        </SelectableButton>
 
         <ScrollArea
           h={scrollAreaHeight}
@@ -119,7 +98,7 @@ export function GroupsList() {
           type="auto"
         >
           {groups.map(group => (
-            <GroupButton
+            <SelectableButton
               key={group.id}
               isSelected={selectedGroupId === group.id}
               onClick={() => selectGroup(group.id)}
@@ -136,7 +115,7 @@ export function GroupsList() {
               >
                 <SettingsIcon />
               </ActionIcon>
-            </GroupButton>
+            </SelectableButton>
           ))}
         </ScrollArea>
       </Flex>

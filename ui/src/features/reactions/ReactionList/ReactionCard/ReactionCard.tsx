@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Paper, Title } from '@mantine/core';
-import { Link, useParams, useRouter } from 'wouter';
-import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
-import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
-import classes from './ReactionCard.module.scss';
+import { Flex, Paper, Title } from '@mantine/core';
+import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef, type ReactNode } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
-import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
-import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface DescriptorsListProps {
   title: string;
@@ -61,24 +55,14 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 }
 
 interface ReactionCardProps {
-  id: number;
-  index: number;
+  id: ReactionId;
+  title: ReactNode;
+  actions: ReactNode;
 }
 
-export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
-  const { datasetId } = useParams();
-  const { base } = useRouter();
+export function ReactionCard({ id, title, actions }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
   const previewRef = useRef<HTMLDivElement | null>(null);
-
-  const onPreviewSave = useCallback(() => {
-    copyPreviewAsImage(previewRef.current);
-  }, [previewRef]);
-
-  const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    { label: 'Copy Reaction Link', value: `${domain}${base}/reactions/${id}` },
-    { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
-  ];
 
   return (
     <Paper
@@ -92,15 +76,7 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
             align="center"
             gap="4"
           >
-            <span className={classes.index}>{index}.</span>
-            <Link
-              className={classes.link}
-              to={`~/datasets/${datasetId}/reactions/${id}`}
-            >
-              {reaction.pb_reaction_id}
-            </Link>
-
-            <CopyButton options={copyToClipboardOptions} />
+            {title}
           </Flex>
 
           <DescriptorsList
@@ -113,36 +89,12 @@ export function ReactionCard({ id, index }: Readonly<ReactionCardProps>) {
           justify="flex-end"
           className={classes.buttonContainer}
         >
-          <RemoveReaction reactionId={id} />
-          <Button
-            leftSection={<CheckListIcon className={classes.buttonIcon} />}
-            variant="transparent"
+          <Flex
+            align="center"
+            gap="sm"
           >
-            Save as a Template
-          </Button>
-
-          <Button
-            onClick={onPreviewSave}
-            variant="transparent"
-            leftSection={<CopyImageIcon className={classes.buttonIcon} />}
-          >
-            Copy reaction image
-          </Button>
-
-          <DownloadMenu
-            options={fileDownloadOptions}
-            url={`/datasets/${datasetId}/reactions/${id}/download`}
-            target={
-              <Button
-                className={classes.target}
-                leftSection={<DownloadIcon />}
-                rightSection={<ChevronDownIcon />}
-                variant="transparent"
-              >
-                Download Reaction
-              </Button>
-            }
-          />
+            {actions}
+          </Flex>
         </Flex>
       </div>
       <ReactionPreview

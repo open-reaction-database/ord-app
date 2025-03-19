@@ -14,17 +14,38 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
-import { getTemplateActions, createNewTemplateActions } from './templates.actions.ts';
+import {
+  getTemplateActions,
+  createNewTemplateActions,
+  getAllTemplatesActions,
+  removeTemplateActions,
+} from './templates.actions.ts';
 import type { ItemsById } from 'common/types';
 import type { TemplateWrapper } from './templates.types.ts';
 
 const getTemplateId = (template: TemplateWrapper) => template.id;
 
 const templatesById = createReducer<ItemsById<TemplateWrapper>>({}, builder => {
-  builder.addMatcher(isAnyOf(getTemplateActions.success), (state, action) => ({
-    ...state,
-    [getTemplateId(action.payload)]: action.payload,
-  }));
+  builder.addCase(removeTemplateActions.success, (state, { payload: templateId }) => {
+    const { [templateId]: _, ...rest } = state;
+    return rest;
+  });
+  builder.addMatcher(isAnyOf(getTemplateActions.success), (state, action) => {
+    return {
+      ...state,
+      [getTemplateId(action.payload)]: action.payload,
+    };
+  });
+  builder.addMatcher(isAnyOf(getAllTemplatesActions.success), (state, action) => {
+    const allTemplates = action.payload.reduce((acc, template) => {
+      acc[getTemplateId(template)] = template;
+      return acc;
+    }, {} as ItemsById<TemplateWrapper>);
+    return {
+      ...state,
+      ...allTemplates,
+    };
+  });
 });
 
 const isTemplateCreating = createReducer<boolean>(false, builder => {

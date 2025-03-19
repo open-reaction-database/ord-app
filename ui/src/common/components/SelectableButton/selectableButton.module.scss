@@ -13,10 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createContext } from 'react';
-import type { ReactionEntityContext } from './reactionEntities.types.ts';
+.groupButton {
+  font-weight: 400;
+  padding: 0 10px;
+  width: 100%;
 
-export const reactionEntityContext = createContext<ReactionEntityContext>({
-  reactionId: 0,
-  pathComponents: [],
-});
+  svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-icons-default);
+  }
+
+  &[data-variant='filled'] svg {
+    color: var(--color-background-white);
+  }
+
+  &.selected {
+    background-color: var(--color-primary);
+    color: var(--color-background-white);
+  }
+}
+
+.buttonLabel {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & button {
+    transition: opacity 0.15s ease-out;
+    opacity: 0;
+  }
+
+  &:hover button {
+    opacity: 1;
+  }
+}

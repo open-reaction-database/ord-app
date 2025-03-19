@@ -22,16 +22,16 @@ import classes from 'features/reactions/ReactionPreview/reactionPreview.module.s
 import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
 import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionInputPreviewProps {
-  reactionId: number;
+  reactionId: ReactionId;
   inputId: string;
 }
 
 export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
   const input: ReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
   const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
-
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 
   return (

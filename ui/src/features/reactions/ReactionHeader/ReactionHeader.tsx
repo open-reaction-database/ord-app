@@ -31,7 +31,7 @@ import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { ReactionValidationResult } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationResult.tsx';
 import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
-import classes from 'features/reactions/ReactionList/ReactionCard/ReactionCard.module.scss';
+import classes from 'features/reactions/ReactionList/ReactionCard/reactionCard.module.scss';
 
 interface ReactionHeaderProps {
   datasetId: number;

@@ -23,13 +23,15 @@ import clsx from 'clsx';
 import { typographyClasses } from 'common/styling';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type { MouseEvent } from 'react';
+import { type MouseEvent, useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { templatesContext } from 'features/templates/templates.context';
 
 interface OutcomeListItemHeaderProps {
-  reactionId: number;
+  reactionId: ReactionId;
   outcome: ReactionOutcome;
   pathComponents: ReactionPathComponents;
 }
@@ -40,7 +42,7 @@ const onActionClick = (event: MouseEvent) => {
 
 export function OutcomeListItemHeader({ reactionId, outcome, pathComponents }: Readonly<OutcomeListItemHeaderProps>) {
   const dispatch = useAppDispatch();
-
+  const { isTemplate } = useContext(templatesContext);
   const onEditOutcome = () => {
     dispatch(setReactionPathComponentsList([pathComponents]));
   };
@@ -48,17 +50,19 @@ export function OutcomeListItemHeader({ reactionId, outcome, pathComponents }: R
     <Accordion.Control
       classNames={{ label: classes.label }}
       icon={
-        <Flex
-          onClick={onActionClick}
-          align="center"
-        >
-          <EditButton onClick={onEditOutcome} />
-          <ReactionEntityDelete
-            reactionId={reactionId}
-            entityName="Outcome"
-            pathComponents={pathComponents}
-          />
-        </Flex>
+        !isTemplate && (
+          <Flex
+            onClick={onActionClick}
+            align="center"
+          >
+            <EditButton onClick={onEditOutcome} />
+            <ReactionEntityDelete
+              reactionId={reactionId}
+              entityName="Outcome"
+              pathComponents={pathComponents}
+            />
+          </Flex>
+        )
       }
     >
       <Flex

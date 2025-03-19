@@ -49,3 +49,15 @@ export const downloadFile =
       }
     }
   };
+
+export function downloadAsJson<T>(object: T, filename: string) {
+  const jsonString = JSON.stringify(object, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const link = document.createElement('a');
+
+  link.href = URL.createObjectURL(blob);
+  link.download = filename || 'data.json';
+  link.click();
+
+  URL.revokeObjectURL(link.href);
+}

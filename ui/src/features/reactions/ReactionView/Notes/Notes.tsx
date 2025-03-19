@@ -21,11 +21,12 @@ import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/r
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useContext } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { templatesContext } from 'features/templates/templates.context';
 
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
@@ -44,8 +45,8 @@ type NotEmptyValueType = Exclude<ValueType, null | undefined>;
 
 export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
   const dispatch = useAppDispatch();
-  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes']));
-
+  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes'])) || {};
+  const { isTemplate } = useContext(templatesContext);
   const fields = useMemo((): Array<[string, string]> => {
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
@@ -63,12 +64,14 @@ export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
     >
       <Flex justify="space-between">
         <Title order={2}>Notes</Title>
-        <Button
-          onClick={onEdit}
-          leftSection={<AddCircleIcon />}
-        >
-          Edit
-        </Button>
+        {!isTemplate && (
+          <Button
+            onClick={onEdit}
+            leftSection={<AddCircleIcon />}
+          >
+            Edit
+          </Button>
+        )}
       </Flex>
       <div className={classes.grid}>
         {fields.map(([label, value]) => (

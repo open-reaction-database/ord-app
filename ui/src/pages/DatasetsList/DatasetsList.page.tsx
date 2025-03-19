@@ -18,6 +18,7 @@ import { GroupsSidebar } from 'features/groups';
 import { DatasetTable } from 'features/datasets';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { DatasetsListTopActions } from './DatasetsListTopActions/DatasetsListTopActions.tsx';
+import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu.tsx';
 
 export function DatasetsListPage() {
   return (
@@ -31,7 +32,14 @@ export function DatasetsListPage() {
           gap="sm"
           align="flex-start"
         >
-          <GroupsSidebar />
+          <Flex
+            direction="column"
+            gap="sm"
+            w={200}
+          >
+            <EntitiesMenu />
+            <GroupsSidebar />
+          </Flex>
           <DatasetTable />
         </Flex>
       </Flex>

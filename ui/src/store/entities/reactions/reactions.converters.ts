@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordInputsToReactionInputs,
   reactionInputsToOrdInputs,
@@ -32,6 +31,7 @@ import {
   ordNotesToReaction,
   reactionNotesToOrd,
 } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
+import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {

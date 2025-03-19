@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Breadcrumbs as MantineBreadcrumbs, Flex, Tooltip } from '@mantine/core';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
 import { HomeIcon } from 'common/icons';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
@@ -24,6 +24,8 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
+  const [, navigate] = useLocation();
+
   return (
     <div className={classes.container}>
       <MantineBreadcrumbs
@@ -40,7 +42,12 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
 
           const children = (
             <>
-              {index === 0 && <HomeIcon className={classes.homeIcon} />}
+              {index === 0 && (
+                <HomeIcon
+                  className={classes.homeIcon}
+                  onClick={() => navigate('/')}
+                />
+              )}
               <Tooltip label={breadcrumb.title}>
                 <span className={classes.text}>{breadcrumb.title}</span>
               </Tooltip>

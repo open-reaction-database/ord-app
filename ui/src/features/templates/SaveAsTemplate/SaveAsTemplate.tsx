@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TextInput, Select } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { useCallback } from 'react';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
@@ -21,9 +21,10 @@ import { type SaveAsTemplateSchemaFormValues, saveAsTemplateSchema } from './Sav
 import type { SaveAsTemplatePayload } from 'store/entities/templates/templates.types.ts';
 import { createTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface SaveAsTemplateProps {
-  reactionId: number;
+  reactionId: ReactionId;
   reactionPbId: string;
   onClose: () => void;
 }
@@ -37,6 +38,7 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
   >({
     mode: 'controlled',
     initialValues: {
+      reaction: reactionPbId,
       name: `${reactionPbId} Template`,
     },
     validate: yupResolver(saveAsTemplateSchema),
@@ -44,7 +46,7 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
 
   const onSubmit = useCallback(
     (values: SaveAsTemplateSchemaFormValues) => {
-      dispatch(createTemplate({ reactionId, name: values.name }));
+      dispatch(createTemplate({ reactionId: Number(reactionId), name: values.name }));
     },
     [dispatch, reactionId],
   );
@@ -56,10 +58,8 @@ export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<S
       title="Create Template"
       submitTitle="Save"
     >
-      <Select
-        data={[reactionPbId]}
+      <TextInput
         label="Create from reaction"
-        searchable
         disabled
         {...form.getInputProps('reaction')}
       />

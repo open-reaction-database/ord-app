@@ -24,8 +24,15 @@ import {
   deleteReactionFieldActions,
   removeReactionActions,
 } from './reactions.actions.ts';
+import {
+  getTemplateActions,
+  getAllTemplatesActions,
+  removeTemplateActions,
+  renameTemplateActions,
+} from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { AppReaction, ReactionWrapper } from './reactions.types.ts';
+import type { ReactionOrTemplate, AppReaction, ReactionWrapper } from './reactions.types.ts';
+import type { TemplateWrapper } from '../templates/templates.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {
@@ -36,14 +43,14 @@ import {
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 
-const getReactionId = (reaction: ReactionWrapper) => reaction.id;
+const getReactionId = (reaction: ReactionWrapper | TemplateWrapper) => reaction.id;
 
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
   builder.addCase(getReactionsListActions.request, (_, action) => action.payload);
 });
 
-const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
+const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder => {
   builder.addCase(
     addUpdateReactionFieldActions.request,
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
@@ -77,6 +84,46 @@ const reactionsById = createReducer<ItemsById<ReactionWrapper>>({}, builder => {
   builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) => {
     const { [reactionId]: _, ...rest } = state;
     return rest;
+  });
+  builder.addCase(removeTemplateActions.success, (state, { payload: templateId }) => {
+    const { [`template_${templateId}`]: _, ...rest } = state;
+    return rest;
+  });
+  builder.addCase(getTemplateActions.success, (state, action) => {
+    const templateId = `template_${action.payload.id}`;
+    const templatePayload = action.payload as TemplateWrapper;
+    const templateWrapper = {
+      ...templatePayload,
+      data: linkReactionEntities(templatePayload.data),
+      is_valid: true,
+    };
+    return {
+      ...state,
+      [templateId]: templateWrapper,
+    };
+  });
+  builder.addCase(getAllTemplatesActions.success, (state, action) => {
+    const templates = action.payload;
+    const templatesById = templates.reduce<ItemsById<TemplateWrapper>>((acc, template) => {
+      const templateId = `template_${template.id}`;
+      const TemplateWrapper = {
+        ...template,
+        data: linkReactionEntities(template.data),
+        is_valid: true,
+      };
+      acc[templateId] = TemplateWrapper;
+      return acc;
+    }, {});
+    return {
+      ...state,
+      ...templatesById,
+    };
+  });
+  builder.addCase(renameTemplateActions.success, (state, action) => {
+    return {
+      ...state,
+      [`template_${action.payload.id}`]: action.payload,
+    };
   });
   builder.addMatcher(
     isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),

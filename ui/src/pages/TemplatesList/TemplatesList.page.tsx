@@ -13,6 +13,95 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { useEffect, useMemo } from 'react';
+import { Link } from 'wouter';
+import { Flex, Paper, Title } from '@mantine/core';
+import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import { useSelector } from 'react-redux';
+import classes from './templatesList.page.module.scss';
+import { getAllTemplates } from 'store/entities/templates/templates.thunks';
+import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
+import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
+import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
+import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
+import type { TemplateWrapper } from 'store/entities/templates/templates.types';
+
+interface TemplateTitleProps {
+  index: number;
+  template: TemplateWrapper;
+}
+
+function TemplateTitle({ index, template }: Readonly<TemplateTitleProps>) {
+  const linkToPage = `~/templates/${template.id}`;
+
+  return (
+    <>
+      <span className={classes.index}>{index}.</span>
+      <Link
+        className={classes.link}
+        to={linkToPage}
+      >
+        {template.name}
+      </Link>
+    </>
+  );
+}
+
 export function TemplatesListPage() {
-  return null;
+  const dispatch = useAppDispatch();
+  const templates = Object.values(useSelector(selectTemplates));
+
+  const breadcrumbs = useMemo((): Breadcrumbs => {
+    return [{ title: 'Templates', path: '~/' }];
+  }, []);
+
+  useEffect(() => {
+    dispatch(getAllTemplates());
+  }, [dispatch]);
+
+  return (
+    <PageContainer breadcrumbs={breadcrumbs}>
+      <div className={classes.container}>
+        <EntitiesMenu />
+        <Flex
+          direction="column"
+          gap="sm"
+          className={classes.templates}
+        >
+          <Paper
+            radius="sm"
+            p="lg"
+          >
+            <Flex justify="space-between">
+              <Flex
+                align="center"
+                gap="sm"
+              >
+                <Title order={2}>Templates</Title>
+                <Counter amount={templates.length} />
+              </Flex>
+            </Flex>
+          </Paper>
+          <>
+            {templates.map((template, index) => (
+              <ReactionCard
+                key={template.id}
+                id={`template_${template.id}`}
+                actions={<TemplateHeaderActions templateId={`template_${template.id}`} />}
+                title={
+                  <TemplateTitle
+                    index={index + 1}
+                    template={template}
+                  />
+                }
+              />
+            ))}
+          </>
+        </Flex>
+      </div>
+    </PageContainer>
+  );
 }

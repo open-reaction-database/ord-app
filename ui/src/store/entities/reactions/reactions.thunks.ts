@@ -29,6 +29,7 @@ import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import type {
   AppReaction,
+  ReactionId,
   ReactionMolBlocks,
   ReactionResponse,
   ReactionValidation,
@@ -170,7 +171,6 @@ export const createEmptyReaction = createThunkWithExplicitResult(
   createEmptyReactionActions,
   async (dispatch, getState) => {
     const datasetId = selectActiveDatasetId(getState());
-
     const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/from-scratch`);
     const reaction = parseReaction(result.data);
     dispatch(createEmptyReactionActions.success(reaction));
@@ -182,7 +182,6 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   importReactionFromFileActions,
   async (dispatch, getState, { file }) => {
     const datasetId = selectActiveDatasetId(getState());
-
     const formData = new FormData();
     formData.append('file', file);
 
@@ -193,7 +192,7 @@ export const importReactionFromFile = createThunkWithExplicitResult(
   },
 );
 
-async function updateReaction(reactionId: number, getState: () => AppState): Promise<UpdateReactionSuccessPayload> {
+async function updateReaction(reactionId: ReactionId, getState: () => AppState): Promise<UpdateReactionSuccessPayload> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);

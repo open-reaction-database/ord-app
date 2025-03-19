@@ -26,7 +26,8 @@ import { typographyClasses } from 'common/styling';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
+import { templatesContext } from 'features/templates/templates.context';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
@@ -38,12 +39,12 @@ const ENTITY_NAME = 'outcomes';
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
   const onCreateNew = useCreate();
-
+  const { isTemplate } = useContext(templatesContext);
   const handleCreate = () => {
     onCreateNew(outcomes.length, outcomes);
   };
 
-  const ids = useMemo(() => outcomes.map(outcome => outcome.id), [outcomes]);
+  const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
 
   return (
     <Flex direction="column">
@@ -53,17 +54,19 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <Title order={2}>Outcomes</Title>
-          <Counter amount={outcomes.length} />
+          <Counter amount={outcomes?.length} />
         </Flex>
-        <Button
-          onClick={handleCreate}
-          leftSection={<AddCircleIcon />}
-        >
-          Outcome
-        </Button>
+        {!isTemplate && (
+          <Button
+            onClick={handleCreate}
+            leftSection={<AddCircleIcon />}
+          >
+            Outcome
+          </Button>
+        )}
       </Flex>
       <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
-      {outcomes.length > 0 ? (
+      {outcomes?.length > 0 ? (
         <Accordion
           variant="separated"
           chevronPosition="left"

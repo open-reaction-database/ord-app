@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createContext } from 'react';
-import type { ReactionEntityContext } from './reactionEntities.types.ts';
-
-export const reactionEntityContext = createContext<ReactionEntityContext>({
-  reactionId: 0,
-  pathComponents: [],
-});
+export interface TemplatesContext {
+  isTemplate: boolean;
+}

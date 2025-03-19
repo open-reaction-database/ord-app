@@ -13,20 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tabTitle {
-  color: var(--color-text-secondary-3);
-  text-transform: uppercase;
-  font-weight: 500;
-
-  &[data-active] {
-    color: var(--color-text-primary);
-  }
-}
-
-.panel {
-  padding: 20px 20px 0;
-}
-
 .checkIcon {
   margin-right: 8px;
 }
@@ -42,4 +28,11 @@
   padding: 2px 8px;
   border-color: var(--color-border-2);
   color: var(--color-text-primary);
+
+  svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
 }
