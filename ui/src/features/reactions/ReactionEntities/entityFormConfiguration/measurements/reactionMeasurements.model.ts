@@ -34,31 +34,13 @@ import { MeasurementMasses } from 'features/reactions/ReactionEntities/entityFor
 import { MeasurementsDivider } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementsDivider.tsx';
 import { AuthenticStandard } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/AuthenticStandard/AuthenticStandard.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-
-const retentionTimeCompatibleTypes: Array<ReactionMeasurementType> = [
-  'CUSTOM',
-  'IDENTITY',
-  'AREA',
-  'COUNTS',
-  'INTENSITY',
-];
-
-const selectivityCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'SELECTIVITY'];
-
-const waveLengthCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'PURITY', 'AREA', 'INTENSITY'];
-
-const massSpecCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'AREA', 'COUNTS', 'INTENSITY'];
-
-const valueCompatibleTypes: Array<ReactionMeasurementType> = [
-  'CUSTOM',
-  'YIELD',
-  'SELECTIVITY',
-  'PURITY',
-  'AREA',
-  'COUNTS',
-  'INTENSITY',
-  'AMOUNT',
-];
+import {
+  massSpecCompatibleTypes,
+  retentionTimeCompatibleTypes,
+  selectivityCompatibleTypes,
+  valueCompatibleTypes,
+  waveLengthCompatibleTypes,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.constants.ts';
 
 const createCondition = (types: Array<ReactionMeasurementType>): ReactionFormConditionalRendering['condition'] => ({
   name: 'type',
@@ -158,76 +140,84 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
     condition: createCondition(waveLengthCompatibleTypes),
   },
   {
-    type: ReactionFormNodeType.empty,
+    type: ReactionFormNodeType.objectInitializer,
+    name: 'massSpecDetails',
     condition: createCondition(massSpecCompatibleTypes),
-    fields: [
-      wrapInputsWithGrid(
-        {
-          type: ReactionFormNodeType.select,
-          name: 'massSpecDetails.type',
-          wrapperConfig: {
-            label: 'Mass spec type',
+    field: {
+      type: ReactionFormNodeType.empty,
+      fields: [
+        wrapInputsWithGrid(
+          {
+            type: ReactionFormNodeType.select,
+            name: 'massSpecDetails.type',
+            wrapperConfig: {
+              label: 'Mass spec type',
+            },
+            selectType: 'dropdown',
+            options: massSpecTypeOptions,
           },
-          selectType: 'dropdown',
-          options: massSpecTypeOptions,
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'massSpecDetails.details',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'Mass spec details',
+          {
+            type: ReactionFormNodeType.value,
+            name: 'massSpecDetails.details',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Mass spec details',
+            },
           },
-        },
-      ),
-      wrapInputsWithGrid(
-        {
-          type: ReactionFormNodeType.value,
-          name: 'massSpecDetails.ticMinimumMz',
-          inputType: 'number',
-          wrapperConfig: {
-            label: 'TIC minimum m/z',
+        ),
+        wrapInputsWithGrid(
+          {
+            type: ReactionFormNodeType.value,
+            name: 'massSpecDetails.ticMinimumMz',
+            inputType: 'number',
+            wrapperConfig: {
+              label: 'TIC minimum m/z',
+            },
           },
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'massSpecDetails.ticMaximumMz',
-          inputType: 'number',
-          wrapperConfig: {
-            label: 'TIC maximum m/z',
+          {
+            type: ReactionFormNodeType.value,
+            name: 'massSpecDetails.ticMaximumMz',
+            inputType: 'number',
+            wrapperConfig: {
+              label: 'TIC maximum m/z',
+            },
           },
-        },
-        {
-          type: ReactionFormNodeType.custom,
-          name: 'massSpecDetails.eicMasses',
-          Component: MeasurementMasses,
-        },
-      ),
-    ],
+          {
+            type: ReactionFormNodeType.custom,
+            name: 'massSpecDetails.eicMasses',
+            Component: MeasurementMasses,
+          },
+        ),
+      ],
+    },
   },
   {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
+    type: ReactionFormNodeType.objectInitializer,
+    name: 'selectivity',
     condition: createCondition(selectivityCompatibleTypes),
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'selectivity.type',
-        selectType: 'dropdown',
-        options: selectivityTypeOptions,
-        wrapperConfig: {
-          label: 'Selectivity type',
+    field: {
+      type: ReactionFormNodeType.wrapper,
+      grid: 2,
+      fields: [
+        {
+          type: ReactionFormNodeType.select,
+          name: 'selectivity.type',
+          selectType: 'dropdown',
+          options: selectivityTypeOptions,
+          wrapperConfig: {
+            label: 'Selectivity type',
+          },
         },
-      },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'selectivity.details',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Selectivity details',
+        {
+          type: ReactionFormNodeType.value,
+          name: 'selectivity.details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Selectivity details',
+          },
         },
-      },
-    ],
+      ],
+    },
   },
   {
     type: ReactionFormNodeType.custom,

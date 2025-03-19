@@ -49,6 +49,7 @@ const headers = [
 
 function MeasurementPreview({ measurement }: Readonly<MeasurementPreviewProps>) {
   const valuePreview = useMemo(() => {
+    if (!measurement.value) return null;
     if (measurement.value.type === 'Mass') {
       return renderValuePrecisionUnit(measurement.value.value);
     } else if (measurement.value.type === 'String') {
@@ -67,7 +68,7 @@ function MeasurementPreview({ measurement }: Readonly<MeasurementPreviewProps>) 
     >
       {measurement.type && <Text className={classes.measurementKeyType}>{measurement.type}</Text>}
       {measurement?.analysis?.name && <Text className={classes.measurementKeyType}>{measurement?.analysis?.name}</Text>}
-      {measurement.value.value && (
+      {measurement.value && (
         <Tooltip label={valuePreview}>
           <Text className={classes.measurementValue}>{valuePreview}</Text>
         </Tooltip>

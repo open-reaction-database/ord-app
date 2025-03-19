@@ -60,15 +60,14 @@ export function GroupsSidebar() {
 
         <GroupsList />
       </Paper>
-
-      <InputModal
-        opened={opened}
-        onClose={close}
-        onSubmit={handleGroupAddition}
-        title="Create Group"
-        inputLabel="Group name"
-      />
-
+      {opened && (
+        <InputModal
+          onClose={close}
+          onSubmit={handleGroupAddition}
+          title="Create Group"
+          inputLabel="Group name"
+        />
+      )}
       <GroupsDrawer />
     </>
   );

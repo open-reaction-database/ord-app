@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './entityFormConfiguration/reactionEntityToForm.models.ts';
+export * from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToForm.ts';
 export * from './reactionEntityNode/ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 export * from './reactionEntityNode/reactionNodeToComponent.ts';
+export * from './reactionEntities.types.ts';

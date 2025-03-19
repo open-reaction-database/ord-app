@@ -112,14 +112,15 @@ export function TemplateHeader({ templateId, isReadyForEnumeration }: Readonly<T
           </Flex>
         </Flex>
       </Flex>
-      <InputModal
-        opened={opened}
-        onClose={close}
-        onSubmit={onReactionNameChange}
-        title="Edit Template ID"
-        inputLabel="Template ID"
-        initialValue={template.name}
-      />
+      {opened && (
+        <InputModal
+          onClose={close}
+          onSubmit={onReactionNameChange}
+          title="Edit Template ID"
+          inputLabel="Template ID"
+          initialValue={template.name}
+        />
+      )}
     </Paper>
   );
 }

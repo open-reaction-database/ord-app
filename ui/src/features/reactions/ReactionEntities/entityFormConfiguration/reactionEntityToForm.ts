@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import { ReactionEntity, type ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { reactionInputs } from './inputs/reactionInputs.model.tsx';
@@ -26,21 +26,6 @@ import { reactionAnalyses } from './outcomes/reactionAnalyses.models.ts';
 import { reactionProducts } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionProducts.model.ts';
 import { reactionMeasurements } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.model.ts';
 import { reactionCrudeComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionCrudeComponents.model.ts';
-
-export enum ReactionEntity {
-  Inputs = 'inputs',
-  Notes = 'notes',
-  Identifiers = 'identifiers',
-  Components = 'components',
-  CrudeComponents = 'crudeComponents',
-  ComponentPreparations = 'preparations',
-  Data = 'data',
-  ComponentIdentifiers = 'component_identifiers',
-  Outcomes = 'outcomes',
-  Analyses = 'analyses',
-  Products = 'products',
-  Measurements = 'measurements',
-}
 
 export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
   [ReactionEntity.Inputs]: reactionInputs,

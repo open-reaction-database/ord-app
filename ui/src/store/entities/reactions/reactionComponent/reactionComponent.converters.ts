@@ -55,10 +55,13 @@ import {
   type ReactionInputComponent,
   type ReactionMeasurement,
   type ReactionMeasurementValue,
-  type ReactionProduct,
   ReactionMeasurementValueType,
+  type ReactionProduct,
 } from './reactionComponent.types.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  ReactionCompoundIdentifier,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
 
@@ -82,7 +85,7 @@ const reactionPreparationToOrdPreparation = ({
   });
 };
 
-const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): ReactionMeasurementValue => {
+const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Optional<ReactionMeasurementValue> => {
   if (measurement.amount) {
     return {
       type: ReactionMeasurementValueType.Mass,
@@ -95,15 +98,19 @@ const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Re
       value: measurement.stringValue,
     };
   }
-  const isFloatingValue = !!measurement.floatValue;
-  const { value, precision } = measurement.floatValue ?? measurement.percentage ?? {};
-  return {
-    type: isFloatingValue ? ReactionMeasurementValueType.Number : ReactionMeasurementValueType.Percent,
-    value: {
-      value: value ?? null,
-      precision: precision ?? null,
-    },
-  };
+  if (measurement.floatValue) {
+    return {
+      type: ReactionMeasurementValueType.Number,
+      value: measurement.floatValue,
+    };
+  }
+  if (measurement.percentage) {
+    return {
+      type: ReactionMeasurementValueType.Percent,
+      value: measurement.percentage,
+    };
+  }
+  return null;
 };
 
 const reactionMeasurementValueToOrd = ({ type, value }: ReactionMeasurementValue): Partial<ord.IProductMeasurement> => {
@@ -149,10 +156,10 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     isNormalized: ordBooleanToReaction(isNormalized),
     usesInternalStandard: ordBooleanToReaction(usesInternalStandard),
     usesAuthenticStandard: ordBooleanToReaction(usesAuthenticStandard),
-    retentionTime: ordTimeToReaction(retentionTime),
-    selectivity: ordSelectivityToReaction(selectivity),
-    waveLength: ordWaveLengthToReaction(wavelength),
-    massSpecDetails: ordMassSpecToReaction(massSpecDetails),
+    retentionTime: retentionTime ? ordTimeToReaction(retentionTime) : null,
+    selectivity: selectivity ? ordSelectivityToReaction(selectivity) : null,
+    waveLength: wavelength ? ordWaveLengthToReaction(wavelength) : null,
+    massSpecDetails: massSpecDetails ? ordMassSpecToReaction(massSpecDetails) : null,
     authenticStandard: authenticStandard ? ordInputComponentToReaction(authenticStandard) : null,
   });
 };
@@ -177,12 +184,12 @@ const reactionMeasurementToOrd = ({
   isNormalized: reactionBooleanToOrd(isNormalized),
   usesInternalStandard: reactionBooleanToOrd(usesInternalStandard),
   usesAuthenticStandard: reactionBooleanToOrd(usesAuthenticStandard),
-  retentionTime: reactionTimeToOrd(retentionTime),
-  selectivity: reactionSelectivityToOrd(selectivity),
-  wavelength: reactionWaveLengthToOrd(waveLength),
-  massSpecDetails: reactionMassSpecToOrd(massSpecDetails),
+  retentionTime: retentionTime ? reactionTimeToOrd(retentionTime) : null,
+  selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : null,
+  wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : null,
+  massSpecDetails: massSpecDetails ? reactionMassSpecToOrd(massSpecDetails) : null,
   authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
-  ...reactionMeasurementValueToOrd(value),
+  ...(value ? reactionMeasurementValueToOrd(value) : {}),
 });
 
 function ordComponentBaseToReaction({

@@ -70,8 +70,8 @@ export enum ReactionMeasurementValueType {
 export interface ReactionMeasurementValueNumber {
   type: ReactionMeasurementValueType.Number | ReactionMeasurementValueType.Percent;
   value: {
-    value: OrdOptional<number>;
-    precision: OrdOptional<number>;
+    value?: OrdOptional<number>;
+    precision?: OrdOptional<number>;
   };
 }
 
@@ -93,15 +93,15 @@ export type ReactionMeasurementValue =
 export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement, 'details'>> {
   analysis: Optional<ReactionMeasurementAnalysis>;
   type: ReactionMeasurementType;
-  value: ReactionMeasurementValue;
   usesAuthenticStandard: ReactionBoolean;
   usesInternalStandard: ReactionBoolean;
   isNormalized: ReactionBoolean;
-  retentionTime: ReactionTime;
-  selectivity: ReactionSelectivity;
-  waveLength: ReactionWaveLength;
-  massSpecDetails: ReactionMassSpec;
-  authenticStandard: ReactionInputComponent | null;
+  value: Optional<ReactionMeasurementValue>;
+  retentionTime: Optional<ReactionTime>;
+  selectivity: Optional<ReactionSelectivity>;
+  waveLength: Optional<ReactionWaveLength>;
+  massSpecDetails: Optional<ReactionMassSpec>;
+  authenticStandard: Optional<ReactionInputComponent>;
 }
 
 export interface ReactionProduct extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {
