@@ -13,42 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.searchInput {
-  border-radius: 0;
-  padding-right: 28px;
-  padding-left: 0;
-  border: none;
-  border-bottom: 1px solid var(--color-border-1);
-}
+.groupButton {
+  font-weight: 400;
+  padding: 0 10px;
+  width: 100%;
 
-.placeholder {
-  color: var(--color-text-secondary-1);
+  svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-icons-default);
+  }
 
-  & > svg {
-    width: 14px;
-    height: 14px;
+  &[data-variant='filled'] svg {
+    color: var(--color-background-white);
+  }
+
+  &.selected {
+    background-color: var(--color-primary);
+    color: var(--color-background-white);
   }
 }
 
-.buttonName {
+.buttonLabel {
+  width: 100%;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
 
-  div {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  & button {
+    transition: opacity 0.15s ease-out;
+    opacity: 0;
   }
-}
 
-.buttonSection {
-  margin-right: 8px;
-}
-
-.emptyContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 12px;
+  &:hover button {
+    opacity: 1;
+  }
 }

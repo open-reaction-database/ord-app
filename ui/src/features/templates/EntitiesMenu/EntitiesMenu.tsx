@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Paper } from '@mantine/core';
+import { Flex, Paper } from '@mantine/core';
 import classes from './EntitiesMenu.module.scss';
 import { DatasetsIcon, TemplatesIcon } from 'common/icons';
-import clsx from 'clsx';
 import { useLocation, useRouter } from 'wouter';
+import { SelectableButton } from 'common/components/SelectableButton/SelectableButton.tsx';
 
 export function EntitiesMenu() {
   const [, navigate] = useLocation();
@@ -29,30 +29,20 @@ export function EntitiesMenu() {
       p="sm"
     >
       <Flex direction="column">
-        <Button
-          classNames={{
-            root: clsx(classes.groupButton, { [classes.selected]: router.base === '/datasets' }),
-            section: classes.buttonSection,
-          }}
-          variant="transparent"
+        <SelectableButton
+          isSelected={router.base === '/datasets'}
           leftSection={<DatasetsIcon />}
           onClick={() => navigate('~/datasets')}
-          justify="flex-start"
         >
           Datasets
-        </Button>
-        <Button
-          classNames={{
-            root: clsx(classes.groupButton, { [classes.selected]: router.base === '/templates' }),
-            section: classes.buttonSection,
-          }}
-          variant="transparent"
+        </SelectableButton>
+        <SelectableButton
+          isSelected={router.base === '/templates'}
           leftSection={<TemplatesIcon />}
           onClick={() => navigate('~/templates')}
-          justify="flex-start"
         >
           Templates
-        </Button>
+        </SelectableButton>
       </Flex>
     </Paper>
   );
