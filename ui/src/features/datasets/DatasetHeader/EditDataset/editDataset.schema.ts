@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { requiredTextField } from 'common/utils/requiredTextField.schema';
 import * as yup from 'yup';
 
 export const editDatasetSchema = yup.object({
-  name: yup.string().required(),
-  description: yup.string().required(),
+  name: requiredTextField('Dataset name'),
+  description: requiredTextField('Description'),
 });
 
 export type EditDatasetFormValues = yup.InferType<typeof editDatasetSchema>;

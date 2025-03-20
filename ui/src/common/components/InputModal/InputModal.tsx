@@ -16,6 +16,7 @@
 import { Button, Flex, Modal, TextInput } from '@mantine/core';
 import { useForm, yupResolver } from '@mantine/form';
 import classes from './InputModal.module.scss';
+import { requiredTextField } from 'common/utils/requiredTextField.schema';
 import { useEffect } from 'react';
 import * as yup from 'yup';
 
@@ -51,9 +52,10 @@ export function InputModal({
     },
     validate: yupResolver(
       yup.object({
-        value: yup.string().required().label(inputLabel),
+        value: requiredTextField(inputLabel),
       }),
     ),
+    validateInputOnChange: true,
   });
 
   useEffect(() => {
