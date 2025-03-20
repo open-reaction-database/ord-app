@@ -25,9 +25,10 @@ import { useCallback, useEffect, useMemo } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import { getReactionEntityTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToTransform.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionEntityFormProps {
-  reactionId: number;
+  reactionId: ReactionId;
   isHidden: boolean;
   reactionPathComponents: ReactionPathComponents;
   sidebarInfo: ReactionSidebarInfo;

@@ -28,15 +28,14 @@ interface RemoveReactionProps {
 }
 
 export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
-  const isTemplate = typeof reactionId === 'string';
   const dispatch = useAppDispatch();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
+  const isTemplate = typeof reactionId === 'string';
   const entityToRemove = isTemplate ? 'template' : 'reaction';
 
   const onReactionRemove = useCallback(() => {
     if (isTemplate) {
-      const entityId = parseInt(reactionId.split('_')[1]);
-      dispatch(removeTemplate(Number(entityId)));
+      dispatch(removeTemplate(reactionId));
     } else {
       dispatch(removeReaction(reactionId));
     }

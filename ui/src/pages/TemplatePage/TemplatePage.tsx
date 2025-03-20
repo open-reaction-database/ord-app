@@ -22,7 +22,6 @@ import classes from './templatePage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
 import { getTemplate } from 'store/entities/templates/templates.thunks';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
@@ -31,9 +30,8 @@ import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader
 export function TemplatePage() {
   const dispatch = useAppDispatch();
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
-  const templateId = parseInt(rawTemplateId);
-  const templateIdString = `template_${templateId}`;
-  const template = useSelector(selectReactionById(templateIdString));
+  const templateId = `template_${rawTemplateId}`;
+  const template = useSelector(selectReactionById(templateId));
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -46,25 +44,20 @@ export function TemplatePage() {
   }, [templateId, template?.name]);
 
   useEffect(() => {
-    dispatch(getTemplate(templateId));
-  }, [dispatch, templateId]);
-
-  const CheckIcon = <CheckCircleIcon className={classes.checkIcon} />;
-  const CrossIcon = <CrossCircleIcon className={classes.crossIcon} />;
-  const isReadyForEnumeration = template?.variables.length > 0;
-  const templateBadge = (
-    <Badge
-      autoContrast
-      className={classes.templateBadge}
-    >
-      Template
-    </Badge>
-  );
+    dispatch(getTemplate(parseInt(rawTemplateId)));
+  }, [dispatch, rawTemplateId]);
 
   return (
     <PageContainer
       breadcrumbs={breadcrumbs}
-      badge={templateBadge}
+      badge={
+        <Badge
+          autoContrast
+          className={classes.templateBadge}
+        >
+          Template
+        </Badge>
+      }
     >
       {template && (
         <Flex
@@ -72,21 +65,12 @@ export function TemplatePage() {
           gap="sm"
           miw={50}
         >
-          <Badge
-            variant="outline"
-            size="lg"
-            radius="md"
-            leftSection={isReadyForEnumeration ? CheckIcon : CrossIcon}
-            className={classes.enumerationBadge}
-          >
-            {isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
-          </Badge>
-          <TemplateHeader templateId={templateIdString} />
+          <TemplateHeader templateId={templateId} />
           <Paper
             radius="md"
             p="lg"
           >
-            <ReactionTabs reactionId={templateIdString} />
+            <ReactionTabs reactionId={templateId} />
           </Paper>
           <ReactionDetailsSidebar reactionId={templateId} />
         </Flex>

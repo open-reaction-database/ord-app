@@ -20,31 +20,19 @@ import {
   getAllTemplatesActions,
   removeTemplateActions,
 } from './templates.actions.ts';
-import type { ItemsById } from 'common/types';
-import type { TemplateWrapper } from './templates.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
-const getTemplateId = (template: TemplateWrapper) => template.id;
+const getTemplateId = (template: ReactionTemplate) => template.id;
 
-const templatesById = createReducer<ItemsById<TemplateWrapper>>({}, builder => {
-  builder.addCase(removeTemplateActions.success, (state, { payload: templateId }) => {
-    const { [templateId]: _, ...rest } = state;
-    return rest;
+const templatesOrder = createReducer<Array<string>>([], builder => {
+  builder.addCase(getAllTemplatesActions.success, (state, action) => {
+    return [...state, ...action.payload.map(getTemplateId)];
   });
-  builder.addMatcher(isAnyOf(getTemplateActions.success), (state, action) => {
-    return {
-      ...state,
-      [getTemplateId(action.payload)]: action.payload,
-    };
+  builder.addCase(createNewTemplateActions.success, (state, action) => {
+    return [getTemplateId(action.payload), ...state];
   });
-  builder.addMatcher(isAnyOf(getAllTemplatesActions.success), (state, action) => {
-    const allTemplates = action.payload.reduce((acc, template) => {
-      acc[getTemplateId(template)] = template;
-      return acc;
-    }, {} as ItemsById<TemplateWrapper>);
-    return {
-      ...state,
-      ...allTemplates,
-    };
+  builder.addCase(removeTemplateActions.success, (state, action) => {
+    return state.filter(id => id !== action.payload);
   });
 });
 
@@ -62,6 +50,6 @@ const isTemplateCreating = createReducer<boolean>(false, builder => {
 });
 
 export const templatesReducer = combineReducers({
-  templatesById,
+  templatesOrder,
   isTemplateCreating,
 });

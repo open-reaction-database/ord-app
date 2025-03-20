@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AppReaction, ReactionSummary, ReactionMolBlocks, ReactionId } from '../reactions/reactions.types';
+import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-
-export type ComponentProductPreview = string | null;
-
-export type PreviewsById = Record<string, ComponentProductPreview>;
 
 export interface Variable {
   id: string;
@@ -31,7 +27,7 @@ export interface TemplateCreator {
   name: string;
 }
 
-export interface Template {
+export interface TemplateResponse {
   id: number;
   name: string;
   binpb: string;
@@ -43,20 +39,4 @@ export interface Template {
 export interface SaveAsTemplatePayload {
   reaction: string;
   name: string;
-}
-
-export interface TemplateWrapper extends Omit<Template, 'binpb' | 'molblocks' | 'variables'> {
-  data: AppReaction;
-  previews: PreviewsById;
-  variables: Array<Variable>;
-}
-
-export interface UpdateTemplatePayload {
-  templateId: ReactionId;
-  pathComponents: ReactionPathComponents;
-}
-
-export interface AddEditTemplateFieldPayload extends UpdateTemplatePayload {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  newValue: any;
 }

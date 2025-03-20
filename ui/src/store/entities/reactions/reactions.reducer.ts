@@ -31,8 +31,7 @@ import {
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { ReactionOrTemplate, AppReaction, ReactionWrapper } from './reactions.types.ts';
-import type { TemplateWrapper } from '../templates/templates.types.ts';
+import type { ReactionOrTemplate, AppReaction, DatasetReaction, ReactionTemplate } from './reactions.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {
@@ -43,7 +42,9 @@ import {
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 
-const getReactionId = (reaction: ReactionWrapper | TemplateWrapper) => reaction.id;
+const getReactionId = (reaction: DatasetReaction) => reaction.id;
+
+const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
@@ -89,40 +90,24 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     const { [`template_${templateId}`]: _, ...rest } = state;
     return rest;
   });
-  builder.addCase(getTemplateActions.success, (state, action) => {
-    const templateId = `template_${action.payload.id}`;
-    const templatePayload = action.payload as TemplateWrapper;
-    const templateWrapper = {
-      ...templatePayload,
-      data: linkReactionEntities(templatePayload.data),
-      is_valid: true,
-    };
-    return {
-      ...state,
-      [templateId]: templateWrapper,
-    };
-  });
-  builder.addCase(getAllTemplatesActions.success, (state, action) => {
-    const templates = action.payload;
-    const templatesById = templates.reduce<ItemsById<TemplateWrapper>>((acc, template) => {
-      const templateId = `template_${template.id}`;
-      const TemplateWrapper = {
-        ...template,
-        data: linkReactionEntities(template.data),
-        is_valid: true,
-      };
-      acc[templateId] = TemplateWrapper;
-      return acc;
-    }, {});
-    return {
-      ...state,
-      ...templatesById,
-    };
-  });
+  builder.addCase(getTemplateActions.success, (state, action) => ({
+    ...state,
+    [getTemplateId(action.payload)]: {
+      ...action.payload,
+      data: linkReactionEntities(action.payload.data),
+    },
+  }));
+  builder.addCase(getAllTemplatesActions.success, (state, action) => ({
+    ...state,
+    ...itemsById(
+      action.payload.map(item => ({ ...item, data: linkReactionEntities(item.data) })),
+      getTemplateId,
+    ),
+  }));
   builder.addCase(renameTemplateActions.success, (state, action) => {
     return {
       ...state,
-      [`template_${action.payload.id}`]: action.payload,
+      [action.payload.id]: action.payload,
     };
   });
   builder.addMatcher(

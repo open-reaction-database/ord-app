@@ -17,11 +17,12 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { FC } from 'react';
 import type { ReactionEntityTitleProps } from 'features/reactions/ReactionEntities/ReactionEntityTitle/reactionEntityTitle.types.ts';
 import type { ReactionEntity } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 export interface ReactionSidebarInfo {
   pathComponents: ReactionPathComponents;
   entityName: ReactionEntity;
   label: string;
   sidebarTitle: FC<ReactionEntityTitleProps>;
-  useInitialValues: (reactionId: number, pathComponents: ReactionPathComponents) => object;
+  useInitialValues: (reactionId: ReactionId, pathComponents: ReactionPathComponents) => object;
 }

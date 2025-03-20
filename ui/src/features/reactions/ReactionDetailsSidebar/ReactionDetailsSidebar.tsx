@@ -31,9 +31,10 @@ import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmationModal } from 'common/components/ConfirmationModal/ConfirmationModal.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface EditSidebarProps {
-  reactionId: number;
+  reactionId: ReactionId;
 }
 
 function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarProps>) {
