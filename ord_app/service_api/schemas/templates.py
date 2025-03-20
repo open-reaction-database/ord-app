@@ -16,13 +16,14 @@ from typing import Any
 
 import orjson
 from ord_schema.proto.reaction_pb2 import Reaction
-from pydantic import BaseModel, Field, Json, field_validator, model_validator
+from pydantic import Field, Json, constr, field_validator, model_validator
 
 from ord_app.service_api.domain.datasets import load_message
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
 from ord_app.service_api.schemas.reactions import get_molblocks
 
 
-class TemplateResponseModel(BaseModel):
+class TemplateResponseModel(BaseSchema):
     id: int
     name: str
     binpb: bytes | Any
@@ -47,8 +48,8 @@ class TemplateResponseModel(BaseModel):
         return b64encode(raw)
 
 
-class TemplateCreateModel(BaseModel):
-    name: str
+class TemplateCreateModel(BaseSchema):
+    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
     binpb: bytes | Any
     variables: Json
 
@@ -68,8 +69,8 @@ class TemplateCreateModel(BaseModel):
         return data
 
 
-class TemplateUpdateModel(BaseModel):
-    name: str | None = None
+class TemplateUpdateModel(BaseSchema):
+    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH) | None = None
     binpb: bytes | None = None
     variables: Json | None = None
 

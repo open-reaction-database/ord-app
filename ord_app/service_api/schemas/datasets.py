@@ -15,10 +15,10 @@ from datetime import datetime
 from typing import Any, Literal, Optional
 from uuid import uuid4
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, constr, field_validator, model_validator
 from sqlalchemy import Row
 
-from ord_app.service_api.schemas.base import BaseSchema
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
 DownloadFileFormats = Literal["binpb", "json", "txtpb"]
@@ -76,15 +76,14 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
 
 
 class DatasetCreateSchema(BaseSchema):
-    name: str | None
-    description: str | None = ""
+    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
+    description: constr(max_length=8192) | None = ""
 
-    @field_validator("name", mode="after")
-    def set_name_default(cls, value: str) -> str:
-        value = value.strip()
-        if not value:
-            return uuid4().hex
-        return value
+    @field_validator("name", mode="before")
+    def set_name_default(cls, value: str | None) -> str:
+        if value := (value or "").strip():
+            return value
+        return uuid4().hex
 
 
 class DatasetShareSchema(BaseSchema):
