@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { Flex, Paper, Title } from '@mantine/core';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
-import { getAllTemplates } from 'store/entities/templates/templates.thunks';
-import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
+import { selectTemplatesOrder } from 'store/entities/templates/templates.selectors.ts';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
-import type { TemplateWrapper } from 'store/entities/templates/templates.types';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 
 interface TemplateTitleProps {
   index: number;
-  template: TemplateWrapper;
+  templateId: string;
 }
 
-function TemplateTitle({ index, template }: Readonly<TemplateTitleProps>) {
-  const linkToPage = `~/templates/${template.id}`;
+function TemplateTitle({ index, templateId }: Readonly<TemplateTitleProps>) {
+  const id = templateId.split('_')[1];
+  const linkToPage = `~/templates/${id}`;
+  const template = useSelector(selectReactionById(templateId));
 
   return (
     <>
@@ -51,16 +51,11 @@ function TemplateTitle({ index, template }: Readonly<TemplateTitleProps>) {
 }
 
 export function TemplatesListPage() {
-  const dispatch = useAppDispatch();
-  const templates = Object.values(useSelector(selectTemplates));
+  const templatesOrder = useSelector(selectTemplatesOrder);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [{ title: 'Templates', path: '~/' }];
   }, []);
-
-  useEffect(() => {
-    dispatch(getAllTemplates());
-  }, [dispatch]);
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
@@ -81,20 +76,20 @@ export function TemplatesListPage() {
                 gap="sm"
               >
                 <Title order={2}>Templates</Title>
-                <Counter amount={templates.length} />
+                <Counter amount={templatesOrder.length} />
               </Flex>
             </Flex>
           </Paper>
           <>
-            {templates.map((template, index) => (
+            {templatesOrder.map((templateId, index) => (
               <ReactionCard
-                key={template.id}
-                id={`template_${template.id}`}
-                actions={<TemplateHeaderActions templateId={`template_${template.id}`} />}
+                key={templateId}
+                id={templateId}
+                actions={<TemplateHeaderActions templateId={templateId} />}
                 title={
                   <TemplateTitle
                     index={index + 1}
-                    template={template}
+                    templateId={templateId}
                   />
                 }
               />

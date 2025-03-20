@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { TemplateCreator, TemplateWrapper } from './templates.types.ts';
-import type { TemplateData } from 'store/entities/reactions/reactions.types.ts';
+import type { TemplateCreator } from './templates.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 const { createAsyncAction } = createActionFactory('templates');
 
-export const getTemplateActions = createAsyncAction<number, TemplateWrapper>('get');
+export const getTemplateActions = createAsyncAction<number, ReactionTemplate>('get');
 
-export const getAllTemplatesActions = createAsyncAction<void, Array<TemplateWrapper>>('get_all_templates');
+export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemplate>>('get_all_templates');
 
-export const createNewTemplateActions = createAsyncAction<TemplateCreator, TemplateWrapper>('create');
+export const createNewTemplateActions = createAsyncAction<TemplateCreator, ReactionTemplate>('create');
 
 export const removeTemplateActions = createAsyncAction<number, number>('remove_template');
 
-export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, TemplateData>(
+export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, ReactionTemplate>(
   'rename_template',
 );

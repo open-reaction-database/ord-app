@@ -16,10 +16,19 @@
 import { Redirect, Route, Switch } from 'wouter';
 import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
 import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
+import { useEffect } from 'react';
+import { getAllTemplates } from 'store/entities/templates/templates.thunks.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 const defaultPath = '/datasets';
 
 export function Routes() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getAllTemplates());
+  }, [dispatch]);
+
   return (
     <Switch>
       <Route

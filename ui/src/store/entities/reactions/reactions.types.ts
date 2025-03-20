@@ -61,34 +61,30 @@ export interface ReactionResponse {
   molblocks: ReactionMolBlocks;
 }
 
-export interface ReactionDataBase {
-  id: ReactionId;
+export interface BaseReaction {
   data: AppReaction;
   previews: PreviewsById;
   summary: ReactionSummary;
 }
 
-export interface ReactionData extends ReactionDataBase {
+export interface Reaction extends BaseReaction {
+  id: number;
   pb_reaction_id: string;
   is_valid: boolean;
   validation: Optional<ReactionValidation>;
 }
 
-export interface TemplateData extends ReactionDataBase {
+export interface ReactionTemplate extends BaseReaction {
+  id: string;
   name: string;
   variables: Array<Variable>;
 }
 
-export type ReactionOrTemplate = ReactionData | TemplateData;
-
-export interface ReactionWrapper extends Omit<ReactionResponse, 'binpb' | 'molblocks'> {
-  data: AppReaction;
-  previews: PreviewsById;
-}
+export type ReactionOrTemplate = Reaction | ReactionTemplate;
 
 export type ReactionId = number | string;
 
-export type UpdateReactionSuccessPayload = Omit<ReactionWrapper, 'data'>;
+export type UpdateReactionSuccessPayload = Omit<Reaction, 'data'>;
 
 export interface ImportReactionFromFilePayload {
   file: File;

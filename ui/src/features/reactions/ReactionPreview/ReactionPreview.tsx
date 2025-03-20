@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import type { ReactionOrTemplate } from 'store/entities/reactions/reactions.types.ts';
-import { forwardRef, Fragment, useContext } from 'react';
+import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
-import { templatesContext } from 'features/templates/templates.context';
 
 interface ReactionPreviewProps {
   reaction: ReactionOrTemplate;
@@ -30,8 +29,7 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
   { reaction },
   ref,
 ) {
-  const { isTemplate } = useContext(templatesContext);
-  const reactionId = isTemplate ? `template_${reaction.id}` : reaction.id;
+  const reactionId = reaction.id;
   const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
   const outcomes = reaction.data.outcomes;
 

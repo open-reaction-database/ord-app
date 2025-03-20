@@ -20,10 +20,14 @@ import {
   removeTemplateActions,
   renameTemplateActions,
 } from './templates.actions.ts';
-import type { Template, TemplateWrapper } from './templates.types.ts';
+import type { TemplateResponse } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
-import { ordReactionToReaction, reactionToOrdReaction } from '../reactions/reactions.converters.ts';
+import {
+  convertReactionFloatsToDoubles,
+  ordReactionToReaction,
+  reactionToOrdReaction,
+} from '../reactions/reactions.converters.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
@@ -31,29 +35,32 @@ import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
-const parseTemplate = ({ binpb, molblocks, variables, ...rest }: Template): TemplateWrapper => {
+const parseTemplate = ({ id, binpb, molblocks, variables, ...rest }: TemplateResponse): ReactionTemplate => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
+  convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
 
   return {
-    ...rest,
+    id: `template_${id}`,
     variables: JSON.parse(variables),
     previews,
     data: appReaction,
+    ...rest,
   };
 };
 
 export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templateId) => {
-  const result = await axiosInstance.get<Template>(`/templates/${templateId}`);
+  const result = await axiosInstance.get<TemplateResponse>(`/templates/${templateId}`);
   const template = parseTemplate(result.data);
 
   return getTemplateActions.success(template);
 });
 
 export const getAllTemplates = createThunk(getAllTemplatesActions, async (_d, _s) => {
-  const result = await axiosInstance.get<Array<Template>>(`/templates`);
+  const result = await axiosInstance.get<Array<TemplateResponse>>(`/templates`);
   const templates = result.data;
   const parsedTemplates = templates.map(template => parseTemplate(template));
 
@@ -71,7 +78,7 @@ export const createTemplate = createThunkWithExplicitResult(
       binpb: binpb,
       variables: JSON.stringify([]),
     };
-    const templateData = (await axiosInstance.post<Template>(`/templates`, payload)).data;
+    const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
     const template = parseTemplate(templateData);
 
     dispatch(createNewTemplateActions.success(template));
@@ -95,7 +102,7 @@ export const renameTemplate = createThunk(renameTemplateActions, async (_d, getS
     variables: JSON.stringify(baseReaction.variables),
   };
   const templateIdNumber = parseInt(templateId.split('_')[1]);
-  const result = await axiosInstance.patch<Template>(`templates/${templateIdNumber}`, payload);
+  const result = await axiosInstance.patch<TemplateResponse>(`templates/${templateIdNumber}`, payload);
   const template = parseTemplate(result.data);
   showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
 

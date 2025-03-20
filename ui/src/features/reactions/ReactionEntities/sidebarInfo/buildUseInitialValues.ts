@@ -17,11 +17,12 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 export function buildUseInitialValues<Result extends object, Input extends Result>(
   filterInitialValues: (values: Input) => Result,
 ) {
-  return function useInitialValues(reactionId: number, pathComponents: ReactionPathComponents) {
+  return function useInitialValues(reactionId: ReactionId, pathComponents: ReactionPathComponents) {
     const { id: _, ...reactionPart } = useSelector(selectReactionPartByPath(reactionId, pathComponents));
 
     return useMemo((): object => {
