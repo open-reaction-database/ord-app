@@ -17,8 +17,8 @@ import { requiredTextField } from 'common/utils/requiredTextField.schema';
 import * as yup from 'yup';
 
 export const createNewDatasetSchema = yup.object({
-  name: requiredTextField.label('Dataset name'),
-  description: requiredTextField.label('Description'),
+  name: requiredTextField('Dataset name'),
+  description: requiredTextField('Description'),
   groupId: yup.string().required(),
 });
 

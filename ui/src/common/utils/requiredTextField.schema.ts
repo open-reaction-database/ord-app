@@ -15,10 +15,11 @@
  */
 import * as yup from 'yup';
 
-export const emptyFieldMessage = ({ label }: { label: string }) => `${label} should not be empty`;
+export const emptyFieldMessage = (label: string) => `${label} should not be empty`;
 
-export const requiredTextField = yup
-  .string()
-  .label('Field')
-  .required(emptyFieldMessage)
-  .test('no-only-spaces', emptyFieldMessage, value => value?.trim().length > 0);
+export const requiredTextField = (label: string) =>
+  yup
+    .string()
+    .label(label)
+    .required(emptyFieldMessage(label))
+    .test('no-only-spaces', emptyFieldMessage(label), value => value?.trim().length > 0);
