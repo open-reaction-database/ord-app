@@ -81,10 +81,11 @@ async def reactions(
     response_model=ReactionResponseSchema,
 )
 async def search_reaction(
+    dataset_id: int,
     pb_reaction_id: str,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.search(pb_reaction_id=pb_reaction_id)
+    return await use_case.search(dataset_id=dataset_id, pb_reaction_id=pb_reaction_id)
 
 
 @router.get(
@@ -93,10 +94,11 @@ async def search_reaction(
     response_model=ReactionResponseSchema,
 )
 async def reaction(
+    dataset_id: int,
     reaction_id: int,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    return await use_case.get(reaction_id)
+    return await use_case.get(dataset_id, reaction_id)
 
 
 @router.patch(
@@ -131,11 +133,12 @@ async def delete_reaction(
     dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
 )
 async def download_reaction(
+    dataset_id: int,
     reaction_id: int,
     file_format: DownloadFileFormats,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
-    reaction, data = await use_case.download(reaction_id, file_format)
+    reaction, data = await use_case.download(dataset_id, reaction_id, file_format)
     filename = f"{reaction.pb_reaction_id}.{file_format}"
     return Response(
         data,

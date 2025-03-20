@@ -218,8 +218,8 @@ class ReactionsUseCase:
     async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
         return await paginate(self.db, self.reaction_repo.all_reactions_stmt(dataset_id))
 
-    async def get(self, reaction_id):
-        if reaction := await self.reaction_repo.get(id=reaction_id):
+    async def get(self, dataset_id: int, reaction_id: int):
+        if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
             is_valid, (errors, warning) = await validate_reaction(getattr(reaction, "binpb", None))
             reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
@@ -262,8 +262,8 @@ class ReactionsUseCase:
         await self.reaction_repo.delete(dataset_id=dataset_id, id=reaction_id)
         await self.dataset_repo.update_modified_at(dataset_id)
 
-    async def download(self, reaction_id: int, file_format: DownloadFileFormats):
-        if reaction := await self.reaction_repo.get(id=reaction_id):
+    async def download(self, dataset_id: int, reaction_id: int, file_format: DownloadFileFormats):
+        if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
             reaction_pb = await run_in_threadpool(write_message, Reaction.FromString(reaction.binpb), kind=file_format)
             return reaction, reaction_pb
         raise EntityNotFoundError("Reaction not found")
