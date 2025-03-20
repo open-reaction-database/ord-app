@@ -82,12 +82,13 @@ export const createTemplate = createThunkWithExplicitResult(
     const template = parseTemplate(templateData);
 
     dispatch(createNewTemplateActions.success(template));
-    navigate(`/templates/${template.id}`);
+    navigate(`/templates/${templateData.id}`);
   },
 );
 
 export const removeTemplate = createThunkWithExplicitResult(removeTemplateActions, async (dispatch, _s, templateId) => {
-  await axiosInstance.delete(`/templates/${templateId}`);
+  const entityId = parseInt(templateId.split('_')[1]);
+  await axiosInstance.delete(`/templates/${entityId}`);
   dispatch(removeTemplateActions.success(templateId));
   navigate(`/templates`);
 });

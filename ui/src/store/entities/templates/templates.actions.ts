@@ -25,7 +25,7 @@ export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemp
 
 export const createNewTemplateActions = createAsyncAction<TemplateCreator, ReactionTemplate>('create');
 
-export const removeTemplateActions = createAsyncAction<number, number>('remove_template');
+export const removeTemplateActions = createAsyncAction<string, string>('remove_template');
 
 export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, ReactionTemplate>(
   'rename_template',

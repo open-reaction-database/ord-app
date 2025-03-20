@@ -29,7 +29,7 @@ import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import type {
   AppReaction,
-  Reaction,
+  DatasetReaction,
   ReactionId,
   ReactionMolBlocks,
   ReactionResponse,
@@ -105,7 +105,7 @@ const parseValidation = (validation: ReactionValidation): ReactionValidation => 
   };
 };
 
-const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): Reaction => {
+const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): DatasetReaction => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
@@ -120,7 +120,7 @@ const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionRespon
   };
 };
 
-const parseReactionList = (pages: Pages<ReactionResponse>): Pages<Reaction> => {
+const parseReactionList = (pages: Pages<ReactionResponse>): Pages<DatasetReaction> => {
   const { items, ...pagination } = pages;
   const wrappedItems = items.map(parseReaction);
   return { ...pagination, items: wrappedItems };

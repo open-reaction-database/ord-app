@@ -31,7 +31,7 @@ import {
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { ReactionOrTemplate, AppReaction, Reaction, ReactionTemplate } from './reactions.types.ts';
+import type { ReactionOrTemplate, AppReaction, DatasetReaction, ReactionTemplate } from './reactions.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {
@@ -42,7 +42,7 @@ import {
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 
-const getReactionId = (reaction: Reaction) => reaction.id;
+const getReactionId = (reaction: DatasetReaction) => reaction.id;
 
 const getTemplateId = (template: ReactionTemplate) => template.id;
 

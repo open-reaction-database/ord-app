@@ -17,7 +17,7 @@ import { createActionFactory } from 'store/utils';
 import type {
   AddEditReactionFieldPayload,
   ImportReactionFromFilePayload,
-  Reaction,
+  DatasetReaction,
   UpdateReactionPayload,
   UpdateReactionSuccessPayload,
 } from './reactions.types.ts';
@@ -26,17 +26,19 @@ import type { RejectValue } from 'store/utils/handleApiError.ts';
 
 const { createAsyncAction } = createActionFactory('reactions');
 
-export const getReactionsListActions = createAsyncAction<number, Pages<Reaction>, RejectValue>('get_list');
+export const getReactionsListActions = createAsyncAction<number, Pages<DatasetReaction>, RejectValue>('get_list');
 
-export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<Reaction>>('get_page');
+export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<DatasetReaction>>('get_page');
 
-export const getReactionActions = createAsyncAction<{ datasetId: number; reactionId: number }, Reaction, RejectValue>(
-  'get',
-);
+export const getReactionActions = createAsyncAction<
+  { datasetId: number; reactionId: number },
+  DatasetReaction,
+  RejectValue
+>('get');
 
-export const createEmptyReactionActions = createAsyncAction<void, Reaction>('create_empty');
+export const createEmptyReactionActions = createAsyncAction<void, DatasetReaction>('create_empty');
 
-export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, Reaction>(
+export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, DatasetReaction>(
   'import_from_file',
 );
 
@@ -45,7 +47,7 @@ export const addUpdateReactionFieldActions = createAsyncAction<
   UpdateReactionSuccessPayload
 >('addUpdateField');
 
-export const searchReactionActions = createAsyncAction<string, Reaction>('search');
+export const searchReactionActions = createAsyncAction<string, DatasetReaction>('search');
 
 export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, UpdateReactionSuccessPayload>(
   'deleteField',

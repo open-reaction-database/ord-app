@@ -67,7 +67,7 @@ export interface BaseReaction {
   summary: ReactionSummary;
 }
 
-export interface Reaction extends BaseReaction {
+export interface DatasetReaction extends BaseReaction {
   id: number;
   pb_reaction_id: string;
   is_valid: boolean;
@@ -80,11 +80,11 @@ export interface ReactionTemplate extends BaseReaction {
   variables: Array<Variable>;
 }
 
-export type ReactionOrTemplate = Reaction | ReactionTemplate;
+export type ReactionOrTemplate = DatasetReaction | ReactionTemplate;
 
 export type ReactionId = number | string;
 
-export type UpdateReactionSuccessPayload = Omit<Reaction, 'data'>;
+export type UpdateReactionSuccessPayload = Omit<DatasetReaction, 'data'>;
 
 export interface ImportReactionFromFilePayload {
   file: File;
