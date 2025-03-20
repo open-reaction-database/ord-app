@@ -20,9 +20,10 @@ import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { Text } from '@mantine/core';
 import type { ReactNode } from 'react';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ComponentsListProps<T extends ReactionComponentBase> {
-  reactionId: number;
+  reactionId: ReactionId;
   rootPathComponents: ReactionPathComponents;
   components: Array<T>;
   detailsHeader: string;

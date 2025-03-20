@@ -15,11 +15,12 @@
  */
 import { createActionFactory } from 'store/utils';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 const { createAsyncAction } = createActionFactory('reactionInputs');
 
 export const addIdentifierByNameActions = createAsyncAction<
-  { reactionId: number; pathComponents: ReactionPathComponents; name: string },
+  { reactionId: ReactionId; pathComponents: ReactionPathComponents; name: string },
   void,
   void
 >('add_identifier_by_name');

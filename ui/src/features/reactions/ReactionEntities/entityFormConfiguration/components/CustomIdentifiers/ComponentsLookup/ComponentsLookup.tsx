@@ -63,7 +63,7 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
   const onSubmit = (values: { search: string }, event?: FormEvent<HTMLFormElement>) => {
     event?.stopPropagation();
     const path = pathComponents.concat('identifiers');
-    dispatch(addIdentifierByName({ reactionId, pathComponents: path, name: values.search }));
+    dispatch(addIdentifierByName({ reactionId: reactionId, pathComponents: path, name: values.search }));
   };
 
   const inputProps = form.getInputProps('search');
