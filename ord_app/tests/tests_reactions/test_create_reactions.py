@@ -13,13 +13,17 @@
 # limitations under the License.
 from base64 import b64decode, b64encode
 
+from faker import Faker
+from fastapi import status
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.domain.datasets import load_message
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
 
+fake = Faker()
 
 async def test_create_reaction_with_pb(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
@@ -85,3 +89,17 @@ async def test_create_duplicate_reaction_without_reaction_id(api_client, mock_au
     response_data2 = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
     assert response_data1["id"] != response_data2["id"]
     assert response_data1["pb_reaction_id"] != response_data2["pb_reaction_id"]
+
+
+async def test_create_reaction_with_character_limitations(api_client, mock_authenticated_user, test_db_session):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    payload = {
+        "binpb": b64encode(
+            Reaction(
+                reaction_id=fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
+            ).SerializeToString()
+        ).decode()
+    }
+
+    response = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

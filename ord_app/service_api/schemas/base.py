@@ -13,6 +13,8 @@
 # limitations under the License.
 from pydantic import BaseModel
 
+MAX_CRITICAL_FIELD_LENGTH = 512
+
 
 class BaseSchema(BaseModel):
     pass
