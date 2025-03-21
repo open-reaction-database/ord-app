@@ -26,9 +26,8 @@ import {
   updateGroupActions,
   updateGroupInDatasetActions,
   updateGroupMembersActions,
-  updateGroupMembersInDatasetActions,
 } from './groups.actions.ts';
-import { createThunk } from 'store/utils';
+import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
@@ -89,41 +88,45 @@ const updateGroupInDatasets = (
   return updatedDatasets;
 };
 
-export const updateGroup = createThunk(updateGroupActions, async (dispatch, getState, updatedGroup) => {
-  const updatedGroupData = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
+export const updateGroup = createThunkWithExplicitResult(
+  updateGroupActions,
+  async (dispatch, getState, updatedGroup) => {
+    const updatedGroupData = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
+    dispatch(updateGroupActions.success(updatedGroupData));
 
-  showNotification({
-    message: `${updatedGroupData.name} group changes have been successfully saved`,
-    variant: NotificationVariant.SUCCESS,
-  });
-
-  const state = getState();
-  const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, updatedGroup as GroupItem);
-  dispatch(updateGroupInDatasetActions.success(updatedDatasets));
-
-  return updateGroupActions.success(updatedGroupData);
-});
-
-export const updateGroupMembers = createThunk(updateGroupMembersActions, async (dispatch, getState, memberInfo) => {
-  const state = getState();
-  const groupId = selectEditingGroupId(state);
-  const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
-
-  showNotification({
-    message: `${updatedMember.user.name}'s role has been successfully updated`,
-    variant: NotificationVariant.SUCCESS,
-  });
-
-  if (state.entities.users.self?.id === updatedMember.user.id) {
-    const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, {
-      id: Number(groupId),
-      role: updatedMember.role,
+    showNotification({
+      message: `${updatedGroupData.name} group changes have been successfully saved`,
+      variant: NotificationVariant.SUCCESS,
     });
-    dispatch(updateGroupMembersInDatasetActions.success(updatedDatasets));
-  }
 
-  return updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember });
-});
+    const state = getState();
+    const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, updatedGroup as GroupItem);
+    dispatch(updateGroupInDatasetActions.success(updatedDatasets));
+  },
+);
+
+export const updateGroupMembers = createThunkWithExplicitResult(
+  updateGroupMembersActions,
+  async (dispatch, getState, memberInfo) => {
+    const state = getState();
+    const groupId = selectEditingGroupId(state);
+    const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
+    dispatch(updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember }));
+
+    showNotification({
+      message: `${updatedMember.user.name}'s role has been successfully updated`,
+      variant: NotificationVariant.SUCCESS,
+    });
+
+    if (state.entities.users.self?.id === updatedMember.user.id) {
+      const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, {
+        id: Number(groupId),
+        role: updatedMember.role,
+      });
+      dispatch(updateGroupInDatasetActions.success(updatedDatasets));
+    }
+  },
+);
 
 export const removeGroupMembers = createThunk(removeGroupMembersActions, async (_d, getState, membersId) => {
   const state = getState();

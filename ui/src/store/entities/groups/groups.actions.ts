@@ -45,10 +45,6 @@ export const updateGroupMembersActions = createAsyncAction<
   { groupId: number; member: GroupMember }
 >('update_group_members');
 
-export const updateGroupMembersInDatasetActions = createAsyncAction<void, Record<string, Dataset>>(
-  'update_group_members_in_dataset',
-);
-
 export const removeGroupMembersActions = createAsyncAction<
   Array<number>,
   { groupId: number; membersId: Array<number> }
