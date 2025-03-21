@@ -27,7 +27,11 @@ import {
 } from './datasets.actions.ts';
 import { itemsById } from 'common/utils';
 import { emptyPagination } from 'common/constants.ts';
-import { setActiveGroupIdAction } from '../groups/groups.actions.ts';
+import {
+  setActiveGroupIdAction,
+  updateGroupInDatasetActions,
+  updateGroupMembersInDatasetActions,
+} from '../groups/groups.actions.ts';
 
 const getDatasetId = (dataset: Dataset) => dataset.id;
 
@@ -76,6 +80,15 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
   );
   builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
     itemsById(action.payload.items, getDatasetId),
+  );
+  builder.addMatcher(
+    isAnyOf(updateGroupInDatasetActions.success, updateGroupMembersInDatasetActions.success),
+    (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
   );
 });
 

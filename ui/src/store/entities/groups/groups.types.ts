@@ -32,6 +32,6 @@ export interface GroupMember {
 
 export interface GroupItem {
   id: number;
-  role: USER_ROLES;
-  name: string;
+  role?: USER_ROLES;
+  name?: string;
 }

@@ -15,6 +15,7 @@
  */
 import { createActionFactory } from 'store/utils';
 import type { Group, GroupMember } from './groups.types.ts';
+import type { Dataset } from '../datasets/datasets.types.ts';
 import type { USER_ROLES } from 'common/types';
 
 const { createAsyncAction, createAction } = createActionFactory('groups');
@@ -26,6 +27,8 @@ export const getGroupListActions = createAsyncAction<void, Array<Group>>('list')
 export const createGroupActions = createAsyncAction<string, Group>('create');
 
 export const updateGroupActions = createAsyncAction<Partial<Group>, Group>('update');
+
+export const updateGroupInDatasetActions = createAsyncAction<void, Record<string, Dataset>>('update_group_in_dataset');
 
 export const setGroupSearchAction = createAction<string>('set_search');
 
@@ -41,6 +44,10 @@ export const updateGroupMembersActions = createAsyncAction<
   { user_id: number; role: USER_ROLES },
   { groupId: number; member: GroupMember }
 >('update_group_members');
+
+export const updateGroupMembersInDatasetActions = createAsyncAction<void, Record<string, Dataset>>(
+  'update_group_members_in_dataset',
+);
 
 export const removeGroupMembersActions = createAsyncAction<
   Array<number>,
