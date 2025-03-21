@@ -30,6 +30,12 @@ interface GroupNameRoleProps {
   role: string;
 }
 
+const roleOrder = {
+  [USER_ROLES.ADMIN]: 1,
+  [USER_ROLES.EDITOR]: 2,
+  [USER_ROLES.VIEWER]: 3,
+};
+
 const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
   <>
     <span className={classes.groupName}>{name}: </span>
@@ -40,11 +46,7 @@ const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
 export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesProps>) {
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
-    return [...data].sort((a, b) => {
-      if (a.role === USER_ROLES.ADMIN && b.role !== USER_ROLES.ADMIN) return -1;
-      if (b.role === USER_ROLES.ADMIN && a.role !== USER_ROLES.ADMIN) return 1;
-      return 0;
-    });
+    return data.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
   }, [data]);
 
   const [firstGroup, ...remainingGroups] = sortedGroups;

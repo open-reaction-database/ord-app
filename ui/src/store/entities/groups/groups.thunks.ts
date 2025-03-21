@@ -54,7 +54,10 @@ export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g
   return getGroupMembersActions.success({ groupId, members });
 });
 
-const updateGroupInDatasets = (datasets: Record<string, Dataset>, updatedGroup: GroupItem): Record<string, Dataset> => {
+const updateGroupInDatasets = (
+  datasets: Record<string, Dataset>,
+  updatedGroup: Partial<GroupItem>,
+): Record<string, Dataset> => {
   const updatedDatasets: Record<string, Dataset> = {};
 
   Object.keys(datasets).forEach(datasetId => {
