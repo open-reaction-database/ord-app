@@ -25,7 +25,7 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.services.auth0 import verify_access_token
-from ord_app.service_api.services.exceptions import UnauthenticatedError, UnauthorizedError
+from ord_app.service_api.services.exceptions import ForbiddenError, UnauthenticatedError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -52,7 +52,7 @@ def group_authorization(allowed_roles: tuple[UserRolesList, ...]):
             )
         )
         if not await db_session.scalar(stmt):
-            raise UnauthorizedError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
+            raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
 
     return _authorize
 
@@ -73,6 +73,6 @@ def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]):
             )
         )
         if not await db_session.scalar(stmt):
-            raise UnauthorizedError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
+            raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
 
     return _authorize
