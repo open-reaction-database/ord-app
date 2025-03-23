@@ -36,3 +36,5 @@ export type AppVoidThunk<T extends AnyAsyncAction> = ThunkAction<
 export type ThunkWrapper<T extends AnyAsyncAction> = (
   extraParameter: Parameters<T['request']>[0],
 ) => ThunkAction<void, AppState, never, Action>;
+
+export type ThunkCustomWrapper<T> = (param: T) => ThunkAction<void, AppState, never, Action>;

@@ -19,7 +19,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 export interface Variable {
   id: string;
   name: string;
-  pathComponents: ReactionPathComponents;
+  path: ReactionPathComponents;
 }
 
 export interface TemplateCreator {

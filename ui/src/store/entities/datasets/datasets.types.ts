@@ -37,6 +37,11 @@ export interface Dataset {
   };
 }
 
+export interface CreateDatasetBase {
+  name: string;
+  description: string;
+}
+
 export interface CreateNewDatasetPayload {
   groupId: number;
   name: string;

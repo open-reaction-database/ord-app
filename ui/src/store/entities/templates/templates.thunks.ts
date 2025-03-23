@@ -52,9 +52,22 @@ const parseTemplate = ({ id, binpb, molblocks, variables, ...rest }: TemplateRes
   };
 };
 
+/*const variables = [
+  {
+    id: '7d8c504e-37c4-4db6-87ba-b596d6522079',
+    name: 'procedureDetails',
+    path: ['notes', 'procedureDetails'],
+  },
+];*/
+
 export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templateId) => {
   const result = await axiosInstance.get<TemplateResponse>(`/templates/${templateId}`);
   const template = parseTemplate(result.data);
+
+  /*  await axiosInstance.patch(`/templates/${templateId}`, {
+    variables: JSON.stringify(variables),
+    binpb: result.data.binpb,
+  });*/
 
   return getTemplateActions.success(template);
 });

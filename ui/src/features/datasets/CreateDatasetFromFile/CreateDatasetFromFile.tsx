@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FileInput, Select } from '@mantine/core';
-import { useCallback, useMemo } from 'react';
+import { FileInput } from '@mantine/core';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
@@ -24,7 +24,7 @@ import { createDatasetFromFile } from 'store/entities/datasets/datasets.thunks.t
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { selectIsDatasetCreating } from 'store/entities/datasets/datasets.selectors.ts';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
-import { selectOrderedGroupsList } from 'store/entities/groups/groups.selectors.ts';
+import { GroupSelector } from 'features/groups/GroupSelector/GroupSelector.tsx';
 
 interface CreateDatasetFromFileProps {
   onClose: () => void;
@@ -32,12 +32,8 @@ interface CreateDatasetFromFileProps {
 
 export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFileProps>) {
   const dispatch = useAppDispatch();
-  const groupsList = useSelector(selectOrderedGroupsList);
   const activeGroupId = useSelector(selectActiveGroupId);
   const isDatasetCreating = useSelector(selectIsDatasetCreating);
-  const data = useMemo(() => {
-    return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
-  }, [groupsList]);
 
   const form = useForm<
     CreateDatasetFromFileFormValues,
@@ -70,12 +66,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       submitTitle="Save"
       loading={isDatasetCreating}
     >
-      <Select
-        data={data}
-        label="Group"
-        searchable
-        {...form.getInputProps('groupId')}
-      />
+      <GroupSelector {...form.getInputProps('groupId')} />
       <FileInput
         label="Dataset file"
         accept=".binpb,.txtpb,application/json"

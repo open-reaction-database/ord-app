@@ -25,8 +25,8 @@ import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.
 const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const templatesOrder = createReducer<Array<string>>([], builder => {
-  builder.addCase(getAllTemplatesActions.success, (state, action) => {
-    return [...state, ...action.payload.map(getTemplateId)];
+  builder.addCase(getAllTemplatesActions.success, (_, action) => {
+    return action.payload.map(getTemplateId);
   });
   builder.addCase(createNewTemplateActions.success, (state, action) => {
     return [getTemplateId(action.payload), ...state];
