@@ -33,8 +33,8 @@ export function GroupsDrawer() {
   const dispatch = useAppDispatch();
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
 
-  const groupId = useSelector(selectEditingGroupId);
-  const group = useSelector(selectGroupById(String(groupId)));
+  const groupId = useSelector(selectEditingGroupId) as number;
+  const group = useSelector(selectGroupById(groupId));
 
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin } = useSelector(selectMemberRoles);
