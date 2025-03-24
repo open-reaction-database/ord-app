@@ -38,7 +38,6 @@ from ord_app.service_api.services.exceptions import (
     EntityNotFoundError,
     ProtobufDecodeError,
     UnprocessableEntityError,
-    psycopg_error_wrapper,
 )
 from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
@@ -110,8 +109,6 @@ class ReactionsUseCase:
         dt = DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
         pb_reaction.provenance.record_created = RecordEvent(time=dt, person=person)
 
-
-    @psycopg_error_wrapper
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
         if "binpb" in insert_data:
             try:
