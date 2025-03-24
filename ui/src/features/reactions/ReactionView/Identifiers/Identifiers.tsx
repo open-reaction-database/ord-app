@@ -116,16 +116,15 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
               <Flex
                 align="start"
                 gap="sm"
-                className={classes.container}
               >
-                <span className={classes.type}>{identifier.type}:</span>
+                <span className={classes.identifier}>{identifier.type}:</span>
                 <span>{identifier.value}</span>
               </Flex>
               <Flex
                 align="start"
                 gap="sm"
               >
-                <span className={classes.type}>Details:</span>
+                <span className={classes.identifier}>Details:</span>
                 <span>{identifier.details}</span>
               </Flex>
             </Flex>
