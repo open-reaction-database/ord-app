@@ -38,7 +38,6 @@ export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => 
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
   const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;
-  console.log('getGroupList', groups);
   return getGroupListActions.success(groups);
 });
 
