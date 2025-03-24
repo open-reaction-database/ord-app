@@ -15,7 +15,6 @@
  */
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Group, GroupMember, GroupItem } from './groups.types.ts';
-import type { Dataset } from '../datasets/datasets.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -24,7 +23,6 @@ import {
   getGroupMembersActions,
   removeGroupMembersActions,
   updateGroupActions,
-  updateGroupInDatasetActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
@@ -34,17 +32,18 @@ import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts'
 import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
-  const group = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
+  const group = (await axiosInstance.get<GroupItem>(`/groups/${groupId}`)).data;
   return getGroupActions.success(group);
 });
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
-  const groups = (await axiosInstance.get<Array<Group>>(`/groups`)).data;
+  const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;
+  console.log('getGroupList', groups);
   return getGroupListActions.success(groups);
 });
 
 export const createGroup = createThunk(createGroupActions, async (_d, _g, name) => {
-  const group = (await axiosInstance.post<Group>('/groups', { name })).data;
+  const group = (await axiosInstance.post<GroupItem>('/groups', { name })).data;
   return createGroupActions.success(group);
 });
 
@@ -53,55 +52,18 @@ export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g
   return getGroupMembersActions.success({ groupId, members });
 });
 
-const updateGroupInDatasets = (
-  datasets: Record<string, Dataset>,
-  updatedGroup: Partial<GroupItem>,
-): Record<string, Dataset> => {
-  const updatedDatasets: Record<string, Dataset> = {};
-
-  Object.keys(datasets).forEach(datasetId => {
-    const dataset = datasets[datasetId];
-    const updatedGroups = dataset.groups.map(group => {
-      if (group.id === updatedGroup.id) {
-        return {
-          ...group,
-          ...updatedGroup,
-        };
-      }
-      return group;
-    });
-    const hasChanges = dataset.groups.some((group, index) => {
-      return (Object.keys(updatedGroup) as Array<keyof GroupItem>).some(key => {
-        if (key === 'id') return false;
-        return group[key] !== updatedGroups[index][key];
-      });
-    });
-
-    if (hasChanges) {
-      updatedDatasets[datasetId] = {
-        ...dataset,
-        groups: updatedGroups,
-      };
-    }
-  });
-
-  return updatedDatasets;
-};
-
 export const updateGroup = createThunkWithExplicitResult(
   updateGroupActions,
   async (dispatch, getState, updatedGroup) => {
     const updatedGroupData = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
-    dispatch(updateGroupActions.success(updatedGroupData));
-
+    const state = getState();
+    const groupId = Number(selectEditingGroupId(state));
+    const group = state.entities.groups.groupsById[groupId];
+    dispatch(updateGroupActions.success({ id: groupId, name: updatedGroupData.name, role: group.role }));
     showNotification({
       message: `${updatedGroupData.name} group changes have been successfully saved`,
       variant: NotificationVariant.SUCCESS,
     });
-
-    const state = getState();
-    const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, updatedGroup as GroupItem);
-    dispatch(updateGroupInDatasetActions.success(updatedDatasets));
   },
 );
 
@@ -119,11 +81,13 @@ export const updateGroupMembers = createThunkWithExplicitResult(
     });
 
     if (state.entities.users.self?.id === updatedMember.user.id) {
-      const updatedDatasets = updateGroupInDatasets(state.entities.datasets.datasetsById, {
-        id: Number(groupId),
+      const groupIdNumber = Number(groupId);
+      const updatedGroupItem = {
+        id: groupIdNumber,
+        name: state.entities.groups.groupsById[groupIdNumber].name,
         role: updatedMember.role,
-      });
-      dispatch(updateGroupInDatasetActions.success(updatedDatasets));
+      };
+      dispatch(updateGroupActions.success(updatedGroupItem));
     }
   },
 );

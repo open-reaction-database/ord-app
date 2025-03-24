@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import classes from './GroupsListWithRoles.module.scss';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { Popover } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import { USER_ROLES } from 'common/types';
+import { selectGroupsByIdsList } from 'store/entities/groups/groups.selectors.ts';
 
 interface GroupsListWithRolesProps {
   data: Array<GroupItem>;
@@ -44,10 +46,13 @@ const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
 );
 
 export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesProps>) {
+  const groupsList = useSelector(selectGroupsByIdsList(data.map(group => group.id)));
+  // If we on Dataset page and do not have groups data yet
+  const groups = groupsList.length === 0 ? data : groupsList;
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
-    return data.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
-  }, [data]);
+    return [...groups].sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
+  }, [groups]);
 
   const [firstGroup, ...remainingGroups] = sortedGroups;
 

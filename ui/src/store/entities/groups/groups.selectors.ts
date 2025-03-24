@@ -26,9 +26,12 @@ export const selectGroupSearch = buildSelector(state => state.groupNameSearch);
 
 export const selectGroupsByIds = buildSelector(state => state.groupsById);
 
-export const selectGroupById = (id: string) => (state: AppState) => selectGroupsByIds(state)[id];
+export const selectGroupById = (id: number) => (state: AppState) => selectGroupsByIds(state)[id];
 
 export const selectHaveAnyGroups = createSelector([selectGroupsByIds], groups => Object.keys(groups).length > 0);
+
+export const selectGroupsByIdsList = (groupIds: Array<number>) =>
+  createSelector([selectGroupsByIds], groups => groupIds.map(id => groups[id]).filter(Boolean));
 
 export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroupsByIds], (search, groups) => {
   const lowerCaseSearch = search.toLowerCase();
