@@ -27,6 +27,7 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { deleteReactionField, addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { templatesContext } from 'features/templates/templates.context';
+import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 
 const ENTITY_FIELD = 'identifiers';
 
@@ -109,25 +110,17 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
                 </ActionIcon>
               </Flex>
             )}
-            <Flex
-              align="start"
-              direction="column"
-            >
-              <Flex
-                align="start"
-                gap="sm"
-              >
-                <span className={classes.identifier}>{identifier.type}:</span>
-                <span>{identifier.value}</span>
-              </Flex>
-              <Flex
-                align="start"
-                gap="sm"
-              >
-                <span className={classes.identifier}>Details:</span>
-                <span>{identifier.details}</span>
-              </Flex>
-            </Flex>
+
+            <KeyValueDisplay
+              label={identifier.type}
+              value={identifier.value}
+              multiline
+            />
+            <KeyValueDisplay
+              label="Details"
+              value={identifier.details}
+              multiline
+            />
           </div>
         ))}
       </Flex>
