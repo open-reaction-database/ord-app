@@ -82,7 +82,7 @@ class TemplateUpdateModel(BaseSchema):
 
     def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
-        if data["binpb"] is not None:
+        if data.get("binpb") is not None:
             data["binpb"] = data["binpb"].SerializeToString()
         return data
 
