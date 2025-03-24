@@ -129,7 +129,13 @@ class DatasetUseCases:
         ]
 
         logger.debug(f"Reactions <Dataset(id={dataset.id})> are going to write to database")
-        await self.reaction_repository.bulk_create(reactions_payload)
+
+        # Recording in chunks of 30k is due to the fact that there are restrictions
+        # on the maximum number of elements that can be written to the database at a time
+        chunk_size = 1_000
+        for i in range(0, len(reactions_payload), chunk_size):
+            await self.reaction_repository.bulk_create(reactions_payload[i:i + chunk_size])
+
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
     async def paginate_user_datasets(self):
