@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
+import classes from './identifiers.module.scss';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
@@ -26,6 +27,7 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { deleteReactionField, addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { templatesContext } from 'features/templates/templates.context';
+import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 
 const ENTITY_FIELD = 'identifiers';
 
@@ -81,7 +83,7 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
           </Button>
         )}
       </Flex>
-      <span>Reaction identifiers define descriptions of the overall reaction</span>
+      <span className={classes.text}>Reaction identifiers define descriptions of the overall reaction</span>
 
       <Flex
         direction="column"
@@ -91,7 +93,8 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         {identifiers.map((identifier, index) => (
           <div key={index}>
             {!isTemplate && (
-              <>
+              <Flex align="center">
+                <span className={classes.identifierLabel}>Identifier {index + 1}</span>
                 <ActionIcon
                   variant="transparent"
                   color="red"
@@ -105,11 +108,19 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
                 >
                   <EditIcon />
                 </ActionIcon>
-              </>
+              </Flex>
             )}
-            <div>{identifier.type}</div>
-            <div>{identifier.details}</div>
-            <div>{identifier.value}</div>
+
+            <KeyValueDisplay
+              label={identifier.type}
+              value={identifier.value}
+              multiline
+            />
+            <KeyValueDisplay
+              label="Details"
+              value={identifier.details}
+              multiline
+            />
           </div>
         ))}
       </Flex>

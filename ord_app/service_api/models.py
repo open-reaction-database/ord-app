@@ -106,7 +106,11 @@ class DatasetModel(BaseModel):
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
-    reactions: Mapped[list["ReactionModel"]] = relationship("ReactionModel", back_populates="dataset")
+    reactions: Mapped[list["ReactionModel"]] = relationship(
+        "ReactionModel",
+        back_populates="dataset",
+        order_by="ReactionModel.id"
+    )
 
     groups: Mapped[list[GroupModel]] = relationship(
         secondary="dataset_group_association",
