@@ -14,7 +14,7 @@
 from pydantic import constr
 
 from ord_app.service_api.models import UserRolesList
-from ord_app.service_api.schemas.base import BaseSchema
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
 
@@ -30,7 +30,7 @@ class GroupUserResponseSchema(BaseSchema):
 
 
 class GroupCreateSchema(BaseSchema):
-    name: str | None
+    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
 
 
 class GroupAddMemberSchema(BaseSchema):

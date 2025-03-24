@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect } from 'react';
 import { Button, Flex, Paper, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { GroupsDrawer } from 'features/groups/GroupsSidebar/GroupsDrawer/GroupsDrawer.tsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { createGroup, getGroupList } from 'store/entities/groups/groups.thunks.ts';
+import { createGroup } from 'store/entities/groups/groups.thunks.ts';
 import { GroupsList } from 'features/groups/GroupsList/GroupsList.tsx';
 import classes from './GroupsSidebar.module.scss';
 
 export function GroupsSidebar() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
-
-  useEffect(() => {
-    dispatch(getGroupList());
-  }, [dispatch]);
 
   const handleGroupAddition = async (value: string) => {
     dispatch(createGroup(value));

@@ -15,6 +15,7 @@ import json
 from datetime import datetime
 
 from faker import Faker
+from fastapi import status
 
 from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, ReactionModel
 from ord_app.tests.conftest import create_test_dataset
@@ -72,6 +73,11 @@ async def test_get_dataset(api_client, mock_authenticated_user, test_db_session)
 
     assert response_data["id"] == dataset.id
     assert response_data["reactions_count"] == {"invalid": 0, "none": 0, "total": 0, "valid": 0}
+
+
+async def test_get_dataset_by_long_id(api_client, mock_authenticated_user, test_db_session):
+    response_data = api_client.get("/api/v1/datasets/1234567891011")
+    assert response_data.status_code == status.HTTP_400_BAD_REQUEST
 
 
 async def test_download_dataset(api_client, mock_authenticated_user, test_db_session):

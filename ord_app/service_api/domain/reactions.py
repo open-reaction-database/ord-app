@@ -30,13 +30,14 @@ from ord_app.service_api.domain.datasets import load_message, write_message
 from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionUpdateSchema
 from ord_app.service_api.services.exceptions import (
     ConflictError,
     EntityNotFoundError,
     ProtobufDecodeError,
-    psycopg_error_wrapper,
+    UnprocessableEntityError,
 )
 from ord_app.service_api.services.pb_utils import validate_pb_reaction
 from ord_app.service_api.services.postgresql import get_db_session
@@ -108,8 +109,6 @@ class ReactionsUseCase:
         dt = DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
         pb_reaction.provenance.record_created = RecordEvent(time=dt, person=person)
 
-
-    @psycopg_error_wrapper
     async def _create_reaction(self, dataset_id: int, insert_data: dict):
         if "binpb" in insert_data:
             try:
@@ -152,9 +151,12 @@ class ReactionsUseCase:
         else:
             pb_reaction = await run_in_threadpool(load_message, db_reaction.binpb, Reaction, "binpb")
             # If the loaded message has a valid reaction_id, use it; otherwise, fallback to reaction.id
-            db_reaction.pb_reaction_id = pb_reaction.reaction_id = str(
-                (pb_reaction.reaction_id or "").strip() or generated_pb_reaction_id
-            )
+            pb_reaction_id = (pb_reaction.reaction_id or "").strip()
+            if len(pb_reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
+                raise UnprocessableEntityError(
+                    f"Reaction ID {pb_reaction_id} exceeds {MAX_CRITICAL_FIELD_LENGTH} characters"
+                )
+            db_reaction.pb_reaction_id = pb_reaction.reaction_id = pb_reaction_id or generated_pb_reaction_id
             db_reaction.binpb = pb_reaction.SerializeToString()
 
         await self.db.commit()
@@ -232,7 +234,12 @@ class ReactionsUseCase:
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
-        pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
+        pb_reaction_id = (pb_reaction.reaction_id or "").strip()
+        if len(pb_reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
+            raise UnprocessableEntityError(
+                f"Reaction ID {pb_reaction_id} exceeds {MAX_CRITICAL_FIELD_LENGTH} characters"
+            )
+        pb_reaction.reaction_id = pb_reaction_id
 
         db_reaction = await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id)
         if db_reaction is None:

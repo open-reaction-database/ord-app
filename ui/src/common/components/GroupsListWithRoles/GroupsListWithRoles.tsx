@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import classes from './GroupsListWithRoles.module.scss';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { Popover } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import { USER_ROLES } from 'common/types';
+import { selectGroupsByIdsList } from 'store/entities/groups/groups.selectors.ts';
 
 interface GroupsListWithRolesProps {
   data: Array<GroupItem>;
@@ -30,6 +32,12 @@ interface GroupNameRoleProps {
   role: string;
 }
 
+const roleOrder = {
+  [USER_ROLES.ADMIN]: 1,
+  [USER_ROLES.EDITOR]: 2,
+  [USER_ROLES.VIEWER]: 3,
+};
+
 const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
   <>
     <span className={classes.groupName}>{name}: </span>
@@ -38,14 +46,11 @@ const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
 );
 
 export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesProps>) {
+  const groupsList = useSelector(selectGroupsByIdsList(data.map(group => group.id)));
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
-    return [...data].sort((a, b) => {
-      if (a.role === USER_ROLES.ADMIN && b.role !== USER_ROLES.ADMIN) return -1;
-      if (b.role === USER_ROLES.ADMIN && a.role !== USER_ROLES.ADMIN) return 1;
-      return 0;
-    });
-  }, [data]);
+    return [...groupsList].sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
+  }, [groupsList]);
 
   const [firstGroup, ...remainingGroups] = sortedGroups;
 

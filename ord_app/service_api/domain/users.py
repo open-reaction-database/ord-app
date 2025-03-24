@@ -26,7 +26,7 @@ from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema, UserUpdateSchema
 from ord_app.service_api.services.auth0 import verify_access_token
-from ord_app.service_api.services.exceptions import EntityNotFoundError, UnauthorizedError, psycopg_error_wrapper
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -47,7 +47,7 @@ class UserUseCase:
 
     async def update(self, user_id: int, payload: UserUpdateSchema):
         if self.current_user.id != user_id:
-            raise UnauthorizedError("Action prohibited")
+            raise ForbiddenError("Action prohibited")
         if user := await self.user_repo.update(payload.model_dump(exclude_unset=True), id=user_id):
             return user
         raise EntityNotFoundError(f"User {user_id} not found")
@@ -64,7 +64,6 @@ def get_user_use_case(
     return UserUseCase(db=db, current_user=current_user)
 
 
-@psycopg_error_wrapper
 async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
     user_use_case = UserUseCase(db_session)
 
@@ -79,7 +78,7 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
 
     logger.debug(f"user_info: {user_info}")
     if "sub" not in user_info:
-        raise UnauthorizedError("sub is not provided")
+        raise ForbiddenError("sub is not provided")
 
     external_id = user_info["sub"]
     orcid_id = None

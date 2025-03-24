@@ -39,7 +39,7 @@
 .text {
   color: var(--color-text-primary);
   font-weight: 400;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   text-align: center;
 }
 

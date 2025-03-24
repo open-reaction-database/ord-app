@@ -32,7 +32,7 @@
   --pagination-control-radius: 8px;
 
   button {
-    font-size: 14px;
+    font-size: var(--font-size-md);
     border: none;
     color: var(--color-text-primary);
   }

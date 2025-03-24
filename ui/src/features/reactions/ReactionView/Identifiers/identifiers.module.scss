@@ -13,3 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.text {
+  font-size: var(--font-size-md);
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.identifierLabel {
+  color: var(--mantine-color-primary);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  line-height: 20px;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+  margin-bottom: var(--mantine-spacing-xs);
+}

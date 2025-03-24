@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { Group, GroupMember } from './groups.types.ts';
+import type { Group, GroupMember, GroupItem } from './groups.types.ts';
 import type { USER_ROLES } from 'common/types';
 
 const { createAsyncAction, createAction } = createActionFactory('groups');
 
-export const getGroupActions = createAsyncAction<number, Group>('get');
+export const getGroupActions = createAsyncAction<number, GroupItem>('get');
 
-export const getGroupListActions = createAsyncAction<void, Array<Group>>('list');
+export const getGroupListActions = createAsyncAction<void, Array<GroupItem>>('list');
 
-export const createGroupActions = createAsyncAction<string, Group>('create');
+export const createGroupActions = createAsyncAction<string, GroupItem>('create');
 
-export const updateGroupActions = createAsyncAction<Partial<Group>, Group>('update');
+export const updateGroupActions = createAsyncAction<Partial<Group>, GroupItem>('update');
 
 export const setGroupSearchAction = createAction<string>('set_search');
 

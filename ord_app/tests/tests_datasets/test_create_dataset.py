@@ -22,6 +22,7 @@ from sqlalchemy import select
 
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.models import ReactionModel
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
 
@@ -135,3 +136,13 @@ async def test_dataset_extend(api_client, mock_authenticated_user, test_db_sessi
 
     for item in response_data["items"]:
         assert item["pb_reaction_id"] in (reaction_id, enum_reaction_id)
+
+
+async def test_create_dataset_with_character_limitations(api_client, mock_authenticated_user):
+    *_, group = mock_authenticated_user
+    payload = {
+        "name": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2),
+        "description": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
+    }
+    response = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

@@ -16,7 +16,7 @@
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
 import { itemsById } from 'common/utils';
-import type { Group, GroupMember } from './groups.types.ts';
+import type { GroupMember, GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -32,7 +32,7 @@ import {
   updateGroupMembersActions,
 } from './groups.actions.ts';
 
-const getGroupId = (group: Group) => group.id;
+const getGroupId = (group: GroupItem) => group.id;
 
 const editingGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(setEditingGroupIdAction, (_, action) => action.payload);
@@ -42,13 +42,15 @@ const groupNameSearch = createReducer('', builder => {
   builder.addCase(setGroupSearchAction, (_, action) => action.payload);
 });
 
-const groupsById = createReducer<ItemsById<Group>>({}, builder => {
+const groupsById = createReducer<ItemsById<GroupItem>>({}, builder => {
   builder.addCase(getGroupListActions.success, (_, action) => itemsById(action.payload, getGroupId));
   [getGroupActions.success, createGroupActions.success, updateGroupActions.success].forEach(action =>
-    builder.addCase(action, (state, action) => ({
-      ...state,
-      [getGroupId(action.payload)]: action.payload,
-    })),
+    builder.addCase(action, (state, action) => {
+      return {
+        ...state,
+        [getGroupId(action.payload)]: action.payload,
+      };
+    }),
   );
 });
 

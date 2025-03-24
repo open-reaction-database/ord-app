@@ -19,7 +19,6 @@ from sqlalchemy import BinaryExpression, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import UserModel
-from ord_app.service_api.services.exceptions import psycopg_error_wrapper
 
 T = TypeVar("T")
 
@@ -77,7 +76,6 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    @psycopg_error_wrapper
     async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> Optional[T] | None:
         stmt = (
             update(self.model)
