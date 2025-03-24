@@ -122,7 +122,7 @@ class DatasetUseCases:
             {
                 "pb_reaction_id": reaction.reaction_id,
                 "binpb": reaction.SerializeToString(),
-                "dataset": dataset,
+                "dataset_id": dataset.id,
                 "owner_id": self.current_user.id,
             }
             for reaction in reactions

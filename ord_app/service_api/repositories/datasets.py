@@ -17,7 +17,7 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
 from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import contains_eager, joinedload, with_loader_criteria
+from sqlalchemy.orm import joinedload, selectinload, with_loader_criteria
 
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
@@ -131,12 +131,7 @@ class DatasetsRepository:
         stmt = (
             select(DatasetModel)
             .where(DatasetModel.id == dataset_id)
-            .outerjoin(DatasetModel.reactions)
-            .options(contains_eager(DatasetModel.reactions))
-            .order_by(
-                DatasetModel.modified_at.desc(),
-                ReactionModel.id.desc(),
-            )
+            .options(selectinload(DatasetModel.reactions))
         )
         return await self.db.scalar(stmt)
 
