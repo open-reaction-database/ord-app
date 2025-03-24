@@ -47,12 +47,10 @@ const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
 
 export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesProps>) {
   const groupsList = useSelector(selectGroupsByIdsList(data.map(group => group.id)));
-  // If we on Dataset page and do not have groups data yet
-  const groups = groupsList.length === 0 ? data : groupsList;
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
-    return [...groups].sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
-  }, [groups]);
+    return [...groupsList].sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
+  }, [groupsList]);
 
   const [firstGroup, ...remainingGroups] = sortedGroups;
 
