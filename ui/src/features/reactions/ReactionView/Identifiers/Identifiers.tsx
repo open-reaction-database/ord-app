@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { ActionIcon, Button, Flex, Title } from '@mantine/core';
+import classes from './identifiers.module.scss';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
@@ -81,7 +82,7 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
           </Button>
         )}
       </Flex>
-      <span>Reaction identifiers define descriptions of the overall reaction</span>
+      <span className={classes.text}>Reaction identifiers define descriptions of the overall reaction</span>
 
       <Flex
         direction="column"
@@ -91,7 +92,8 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         {identifiers.map((identifier, index) => (
           <div key={index}>
             {!isTemplate && (
-              <>
+              <Flex align="center">
+                <span className={classes.identifierLabel}>Identifier {index + 1}</span>
                 <ActionIcon
                   variant="transparent"
                   color="red"
@@ -105,11 +107,28 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
                 >
                   <EditIcon />
                 </ActionIcon>
-              </>
+              </Flex>
             )}
-            <div>{identifier.type}</div>
-            <div>{identifier.details}</div>
-            <div>{identifier.value}</div>
+            <Flex
+              align="start"
+              direction="column"
+            >
+              <Flex
+                align="start"
+                gap="sm"
+                className={classes.container}
+              >
+                <span className={classes.type}>{identifier.type}:</span>
+                <span>{identifier.value}</span>
+              </Flex>
+              <Flex
+                align="start"
+                gap="sm"
+              >
+                <span className={classes.type}>Details:</span>
+                <span>{identifier.details}</span>
+              </Flex>
+            </Flex>
           </div>
         ))}
       </Flex>
