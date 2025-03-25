@@ -51,8 +51,9 @@ onmessage = event => {
   if (typeof event.data !== 'object') {
     return;
   }
-  const { data, variables, templateCSV, matching } = event.data as EnumerationBatchRequest;
+  const { data, variables, templateCSV, matching, index: baseIndex } = event.data as EnumerationBatchRequest;
   const template = structuredClone(data);
+  template.reactionId = null;
   const templateCSVRows = templateCSV.content;
   let reactions: Array<string> = [];
   let errors: Array<number> = [];
@@ -62,7 +63,7 @@ onmessage = event => {
       reactions = reactions.concat(enumerateReaction(template, variables, matching, templateCSVRows[index]));
     } catch (e) {
       console.info(e);
-      errors = errors.concat(index);
+      errors = errors.concat(baseIndex + index + 2);
     }
   }
   const result: EnumerationBatchResult = {

@@ -45,6 +45,7 @@ export type StartEnumeration = EnumerationBase & TemplateInformation;
 
 export interface EnumerationBatchRequest extends TemplateInformation, Pick<EnumerationBase, 'matching'> {
   templateCSV: TemplateCSV;
+  index: number;
 }
 
 export interface EnumerationBatchResult {
@@ -54,4 +55,5 @@ export interface EnumerationBatchResult {
 
 export interface EnumerationProgress extends StartEnumeration, EnumerationBatchResult {
   index: number;
+  resultDatasetId: number | null;
 }

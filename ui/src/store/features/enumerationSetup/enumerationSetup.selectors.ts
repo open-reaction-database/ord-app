@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createActionFactory } from '../../utils';
-import type { EnumerationBatchRequest, EnumerationBatchResult, StartEnumeration } from './enumeration.types.ts';
+import { createSelectorFactory } from '../../utils';
 
-const { createAction, createAsyncAction } = createActionFactory('enumeration');
+const { buildSelector } = createSelectorFactory(state => state.features.enumerationSetup);
 
-export const startEnumerationActions = createAction<StartEnumeration>('start');
-
-export const enumerateBatchActions = createAsyncAction<EnumerationBatchRequest, EnumerationBatchResult>(
-  'enumerateBatch',
-);
-
-export const interruptEnumerationAction = createAction<void>('interruptEnumeration');
-
-export const finishEnumerationAction = createAction<number>('finishEnumeration');
+export const selectIsEnumerationSetupOpened = buildSelector(state => state.isEnumerationSetupOpened);

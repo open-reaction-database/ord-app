@@ -21,34 +21,30 @@ interface DatasetCreator {
   name: string;
 }
 
-export interface Dataset {
-  id: number;
+export interface CreateDatasetBase {
   name: string;
+  description: string;
+}
+
+export interface CreateNewDatasetPayload extends CreateDatasetBase {
+  groupId: number;
+}
+
+export interface CreateDatasetFromFilePayload {
+  groupId: number;
+  file: File;
+}
+
+export interface Dataset extends CreateDatasetBase {
+  id: number;
   owner: DatasetCreator;
   created_at: string;
   modified_at: string;
   groups: Array<GroupItem>;
-  description: string;
   reactions_count: {
     total: number;
     invalid: number;
     valid: number;
     none: number;
   };
-}
-
-export interface CreateDatasetBase {
-  name: string;
-  description: string;
-}
-
-export interface CreateNewDatasetPayload {
-  groupId: number;
-  name: string;
-  description: string;
-}
-
-export interface CreateDatasetFromFilePayload {
-  groupId: number;
-  file: File;
 }

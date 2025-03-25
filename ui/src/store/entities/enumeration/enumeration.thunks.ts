@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { enumerateBatchActions, startEnumerationActions } from './enumeration.actions.ts';
+import { enumerateBatchActions, finishEnumerationAction, startEnumerationActions } from './enumeration.actions.ts';
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import type { ActionPayload } from 'common/types';
 import { selectEnumerationProgress } from './enumeration.selectors.ts';
 import type { EnumerationProgress, SetupEnumeration } from './enumeration.types.ts';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
-import { createDatasetFromFile } from '../datasets/datasets.thunks.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { Buffer } from 'buffer';
 import type { CreateDatasetBase } from '../datasets/datasets.types.ts';
+import { createDatasetFromFileOperation } from '../datasets/datasets.thunks.ts';
 
 const BATCH_SIZE = 50;
 
@@ -59,6 +58,7 @@ export const enumerateBatchResult: ThunkCustomWrapper<ActionPayload<typeof enume
 
     dispatch(
       enumerateBatchActions.request({
+        index: index,
         templateCSV: templateCSVBatch,
         matching,
         data,
@@ -69,11 +69,10 @@ export const enumerateBatchResult: ThunkCustomWrapper<ActionPayload<typeof enume
 
 const fakeDataset: CreateDatasetBase = { name: '', description: '' };
 
-export const finishEnumeration: ThunkCustomWrapper<void> = () => (dispatch, getState) => {
-  const { dataset, reactions } = selectEnumerationProgress(getState()) as EnumerationProgress;
-  console.info(dataset);
-  const jsonReactions = reactions.map(binpb => ord.Reaction.decode(Buffer.from(binpb, 'base64')));
+function prepareDatasetFile(enumerationProgress: EnumerationProgress): File {
+  const { dataset, reactions } = enumerationProgress;
   const isNewDataset = typeof dataset === 'object';
+  const jsonReactions = reactions.map(binpb => ord.Reaction.decode(Buffer.from(binpb, 'base64')));
   const datasetForFile = isNewDataset
     ? {
         name: dataset.name,
@@ -85,12 +84,23 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => (dispatch, getS
     ...datasetForFile,
     reactions: jsonReactions,
   });
+  return new File([datasetWithReactions], 'dataset.json');
+}
 
-  const file = new File([datasetWithReactions], 'dataset.json');
+//
 
-  if (typeof dataset !== 'object') {
+export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch, getState) => {
+  const enumerationProgress = selectEnumerationProgress(getState());
+  if (!enumerationProgress) {
     return;
   }
+  const { dataset } = enumerationProgress;
 
-  dispatch(createDatasetFromFile({ groupId: dataset.groupId, file }));
+  const file = prepareDatasetFile(enumerationProgress);
+  const isNewDataset = typeof dataset === 'object';
+
+  if (isNewDataset) {
+    const createdDataset = await createDatasetFromFileOperation(dataset.groupId, file);
+    dispatch(finishEnumerationAction(createdDataset.data.id));
+  }
 };

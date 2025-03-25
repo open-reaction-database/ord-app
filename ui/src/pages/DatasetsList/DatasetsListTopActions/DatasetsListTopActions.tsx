@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 import { Grid } from '@mantine/core';
-import { AddCircleIcon, ArticleIcon, UploadProgressIcon } from 'common/icons';
+import { AddCircleIcon, UploadProgressIcon } from 'common/icons';
 import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDataset.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
 import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
-import { EnumerationSetup } from 'features/enumeration/EnumerationSetup/EnumerationSetup.tsx';
+import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 
 export function DatasetsListTopActions() {
   const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
   const [createFromFileOpened, { open: openCreateFromFile, close: closeCreateFromFile }] = useDisclosure();
-  const [createFromEnumerationOpened, { open: openCreateFromEnumeration, close: closeCreateFromEnumeration }] =
-    useDisclosure();
 
   return (
     <>
       {createNewOpened && <CreateNewDataset onClose={closeCreateNew} />}
       {createFromFileOpened && <CreateDatasetFromFile onClose={closeCreateFromFile} />}
-      {createFromEnumerationOpened && <EnumerationSetup onClose={closeCreateFromEnumeration} />}
       <Grid
         align="center"
         justify="space-between"
@@ -57,13 +54,7 @@ export function DatasetsListTopActions() {
           />
         </Grid.Col>
         <Grid.Col span={4}>
-          <PaperButton
-            title="Enumerate"
-            description="Create dataset from template"
-            icon={<ArticleIcon />}
-            color={colorToCssVariable['orange']}
-            onClick={openCreateFromEnumeration}
-          />
+          <EnumerateButton />
         </Grid.Col>
       </Grid>
     </>

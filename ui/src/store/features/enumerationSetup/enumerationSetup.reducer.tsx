@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as yup from 'yup';
-import { requiredTextField } from 'common/utils/requiredTextField.schema.ts';
+import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import { setEnumerationSetupOpenedAction } from './enumerationSetup.actions.ts';
+import { startEnumerationActions } from '../../entities/enumeration/enumeration.actions.ts';
 
-export const enumerationSetupSchema = yup.object({
-  dataset: yup.object({
-    groupId: yup.number().required().label('Group'),
-    name: requiredTextField('Name'),
-    description: requiredTextField('Description'),
-  }),
-  templateId: yup.string().required().label('Template'),
-  csvFile: yup.mixed().required().label('CSV File'),
-  matching: yup.array().of(
-    yup.object({
-      variable: yup.string().required().label('Variable Name'),
-      csvColumn: yup.string().required().label('CSV Column'),
-    }),
-  ),
+const isEnumerationSetupOpened = createReducer(false, builder => {
+  builder.addCase(setEnumerationSetupOpenedAction, (_, { payload }) => payload);
+  builder.addCase(startEnumerationActions, () => false);
+});
+
+export const enumerationSetupReducer = combineReducers({
+  isEnumerationSetupOpened,
 });

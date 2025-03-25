@@ -15,14 +15,30 @@
  */
 import { combineReducers, createReducer } from '@reduxjs/toolkit';
 import type { EnumerationProgress } from './enumeration.types.ts';
-import { enumerateBatchActions, startEnumerationActions } from './enumeration.actions.ts';
+import {
+  enumerateBatchActions,
+  finishEnumerationAction,
+  interruptEnumerationAction,
+  startEnumerationActions,
+} from './enumeration.actions.ts';
 
 const enumerationProgress = createReducer<null | EnumerationProgress>(null, builder => {
+  builder.addCase(interruptEnumerationAction, () => null);
+  builder.addCase(finishEnumerationAction, (state, { payload }) => {
+    if (state === null) {
+      return state;
+    }
+    return {
+      ...state,
+      resultDatasetId: payload,
+    };
+  });
   builder.addCase(startEnumerationActions, (_, action) => ({
     ...action.payload,
     reactions: [],
     errors: [],
     index: 0,
+    resultDatasetId: null,
   }));
   builder.addCase(enumerateBatchActions.success, (state, { payload }) => {
     if (state === null) {

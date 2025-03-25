@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 import { createActionFactory } from '../../utils';
-import type { EnumerationBatchRequest, EnumerationBatchResult, StartEnumeration } from './enumeration.types.ts';
 
-const { createAction, createAsyncAction } = createActionFactory('enumeration');
+const { createAction } = createActionFactory('enumerationSetup');
 
-export const startEnumerationActions = createAction<StartEnumeration>('start');
-
-export const enumerateBatchActions = createAsyncAction<EnumerationBatchRequest, EnumerationBatchResult>(
-  'enumerateBatch',
-);
-
-export const interruptEnumerationAction = createAction<void>('interruptEnumeration');
-
-export const finishEnumerationAction = createAction<number>('finishEnumeration');
+export const setEnumerationSetupOpenedAction = createAction<boolean>('enumerationSetupOpened');
