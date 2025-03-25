@@ -32,6 +32,7 @@ cluster_subnet_group = aws.rds.SubnetGroup("cluster_subnet_group", subnet_ids=vp
 cluster = aws.rds.Cluster(
     "cluster",
     apply_immediately=True,
+    database_name="ord",
     db_subnet_group_name=cluster_subnet_group.name,
     engine=aws.rds.EngineType.AURORA_POSTGRESQL,
     engine_mode=aws.rds.EngineMode.PROVISIONED,
@@ -44,6 +45,14 @@ cluster = aws.rds.Cluster(
         seconds_until_auto_pause=3600,
     ),
     vpc_security_group_ids=[cluster_security_group.id],
+)
+
+cluster_instance = aws.rds.ClusterInstance(
+    "cluster_instance",
+    cluster_identifier=cluster.id,
+    engine=cluster.engine,
+    engine_version=cluster.engine_version,
+    instance_class="db.serverless",
 )
 
 dev_security_group = aws.ec2.SecurityGroup(
