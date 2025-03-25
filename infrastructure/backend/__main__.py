@@ -3,6 +3,7 @@
 import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx
+import pulumi_random as random
 
 
 vpc = awsx.ec2.Vpc(
@@ -29,6 +30,8 @@ cluster_security_group = aws.ec2.SecurityGroup(
 
 cluster_subnet_group = aws.rds.SubnetGroup("cluster_subnet_group", subnet_ids=vpc.private_subnet_ids)
 
+rds_password = random.RandomPassword("rds_password", length=16, special=True, override_special="!#$%&*()-_=+[]{}<>:?")
+
 cluster = aws.rds.Cluster(
     "cluster",
     cluster_identifier="cluster",
@@ -37,8 +40,8 @@ cluster = aws.rds.Cluster(
     db_subnet_group_name=cluster_subnet_group.name,
     engine=aws.rds.EngineType.AURORA_POSTGRESQL,
     engine_mode=aws.rds.EngineMode.PROVISIONED,
-    manage_master_user_password=True,
     master_username="ord",
+    master_password=rds_password.result,
     skip_final_snapshot=True,
     storage_encrypted=True,
     serverlessv2_scaling_configuration=aws.rds.ClusterServerlessv2ScalingConfigurationArgs(
@@ -47,6 +50,17 @@ cluster = aws.rds.Cluster(
         seconds_until_auto_pause=3600,
     ),
     vpc_security_group_ids=[cluster_security_group.id],
+)
+
+rds_secret = aws.secretsmanager.Secret("rds_secret")
+aws.secretsmanager.SecretVersion(
+    "rds_secret_version",
+    aws.secretsmanager.SecretVersionArgs(
+        secret_id=rds_secret.id,
+        secret_string=pulumi.Output.format(
+            "psycopg+postgresql://ord:{0}@{1}:5432/app", rds_password.result, cluster.endpoint
+        ),
+    ),
 )
 
 cluster_instance = aws.rds.ClusterInstance(
@@ -84,4 +98,4 @@ dev_security_group = aws.ec2.SecurityGroup(
 pulumi.export("vpc_id", vpc.vpc_id)
 pulumi.export("public_subnet_ids", vpc.public_subnet_ids)
 pulumi.export("private_subnet_ids", vpc.private_subnet_ids)
-pulumi.export("rds_endpoint", cluster.endpoint)
+pulumi.export("rds_secret_arn", rds_secret.arn)

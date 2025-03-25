@@ -86,7 +86,7 @@ RUN mkdir -p /var/lib/nginx /var/tmp/nginx /var/log/nginx && \
 USER appuser
 
 # Expose both FastAPI and Nginx ports
-EXPOSE 8000 80
+EXPOSE 8000 8080
 
 # Copy Supervisor config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
