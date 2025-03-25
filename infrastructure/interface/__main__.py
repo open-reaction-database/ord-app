@@ -4,7 +4,7 @@ import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx
 
-stack = pulumi.StackReference(f"ord/backend/prod")
+stack = pulumi.StackReference("ord/backend/prod")
 
 repository = awsx.ecr.Repository(
     "repository",
@@ -27,8 +27,8 @@ lb = awsx.lb.ApplicationLoadBalancer(
     subnet_ids=stack.get_output("public_subnet_ids"),
 )
 
-ecs_security_group = aws.ec2.SecurityGroup(
-    "ecs_security_group",
+security_group = aws.ec2.SecurityGroup(
+    "security_group",
     vpc_id=stack.get_output("vpc_id"),
     egress=[
         aws.ec2.SecurityGroupEgressArgs(
@@ -47,7 +47,7 @@ service = awsx.ecs.FargateService(
         cluster=cluster.arn,
         network_configuration=aws.ecs.ServiceNetworkConfigurationArgs(
             subnets=stack.get_output("private_subnet_ids"),
-            security_groups=[ecs_security_group.id],
+            security_groups=[security_group.id],
         ),
         task_definition_args=awsx.ecs.FargateServiceTaskDefinitionArgs(
             container=awsx.ecs.TaskDefinitionContainerDefinitionArgs(

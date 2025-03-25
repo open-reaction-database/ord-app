@@ -18,10 +18,10 @@ cluster_security_group = aws.ec2.SecurityGroup(
     "cluster_security_group",
     ingress=[
         aws.ec2.SecurityGroupIngressArgs(
-            cidr_blocks=[vpc.vpc.cidr_block],
             from_port=5432,
-            protocol="tcp",
             to_port=5432,
+            protocol="tcp",
+            cidr_blocks=[vpc.vpc.cidr_block],
         )
     ],
     vpc_id=vpc.vpc_id,
@@ -31,6 +31,7 @@ cluster_subnet_group = aws.rds.SubnetGroup("cluster_subnet_group", subnet_ids=vp
 
 cluster = aws.rds.Cluster(
     "cluster",
+    cluster_identifier="cluster",
     apply_immediately=True,
     database_name="ord",
     db_subnet_group_name=cluster_subnet_group.name,
@@ -38,10 +39,11 @@ cluster = aws.rds.Cluster(
     engine_mode=aws.rds.EngineMode.PROVISIONED,
     manage_master_user_password=True,
     master_username="ord",
+    skip_final_snapshot=True,
     storage_encrypted=True,
     serverlessv2_scaling_configuration=aws.rds.ClusterServerlessv2ScalingConfigurationArgs(
-        max_capacity=1,
         min_capacity=0,
+        max_capacity=1,
         seconds_until_auto_pause=3600,
     ),
     vpc_security_group_ids=[cluster_security_group.id],
@@ -49,6 +51,7 @@ cluster = aws.rds.Cluster(
 
 cluster_instance = aws.rds.ClusterInstance(
     "cluster_instance",
+    identifier="cluster-instance-0",
     cluster_identifier=cluster.id,
     engine=cluster.engine,
     engine_version=cluster.engine_version,
@@ -59,18 +62,20 @@ dev_security_group = aws.ec2.SecurityGroup(
     "dev_security_group",
     egress=[
         aws.ec2.SecurityGroupEgressArgs(
-            cidr_blocks=["0.0.0.0/0"],
             from_port=0,
             to_port=0,
             protocol="-1",
+            cidr_blocks=["0.0.0.0/0"],
+            ipv6_cidr_blocks=["::/0"],
         )
     ],
     ingress=[
         aws.ec2.SecurityGroupIngressArgs(
-            cidr_blocks=["0.0.0.0/0"],
             from_port=22,
             to_port=22,
             protocol="tcp",
+            cidr_blocks=["0.0.0.0/0"],
+            ipv6_cidr_blocks=["::/0"],
         )
     ],
     vpc_id=vpc.vpc_id,
@@ -79,3 +84,4 @@ dev_security_group = aws.ec2.SecurityGroup(
 pulumi.export("vpc_id", vpc.vpc_id)
 pulumi.export("public_subnet_ids", vpc.public_subnet_ids)
 pulumi.export("private_subnet_ids", vpc.private_subnet_ids)
+pulumi.export("rds_endpoint", cluster.endpoint)
