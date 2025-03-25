@@ -15,6 +15,7 @@
  */
 export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
 export { default as AlertCircleIcon } from './AlertCircleIcon.svg?react';
+export { default as ArticleIcon } from './ArticleIcon.svg?react';
 export { default as CheckCircleIcon } from './CheckCircleIcon.svg?react';
 export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';

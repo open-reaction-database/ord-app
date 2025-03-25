@@ -18,8 +18,8 @@ import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
-import { ReactionInputPreview } from 'features/reactions/ReactionPreview/ReactionInputPreview.tsx';
-import { ReactionOutcomePreview } from 'features/reactions/ReactionPreview/ReactionOutcomePreview.tsx';
+import { ReactionInputPreview } from 'common/components/ReactionPreview/ReactionInputPreview.tsx';
+import { ReactionOutcomePreview } from 'common/components/ReactionPreview/ReactionOutcomePreview.tsx';
 
 interface ReactionPreviewProps {
   reaction: ReactionOrTemplate;

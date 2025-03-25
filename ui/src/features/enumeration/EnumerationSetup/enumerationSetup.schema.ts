@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useMemo } from 'react';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import * as yup from 'yup';
 
-export function useFileNameHref(name: string, value: AppData['data']) {
-  const format = value.format || '';
-  const stringValue = value.value;
-
-  const fileName = useMemo(() => {
-    // In case there are incorrect saved format files
-    return [name, format.replace('.', '')].join('.');
-  }, [format, name]);
-
-  const href = useMemo(() => {
-    return `data:application/octet-stream;base64,${stringValue}`;
-  }, [stringValue]);
-
-  return { fileName, href };
-}
+export const enumerationSetupSchema = yup.object({
+  dataset: yup.object({
+    groupId: yup.number().required().label('Group'),
+    name: yup.string().required().label('Name'),
+    description: yup.string().required().label('Description'),
+  }),
+  templateId: yup.string().required().label('Template'),
+  csvFile: yup.mixed().required().label('CSV File'),
+  matching: yup.array().of(
+    yup.object({
+      variable: yup.string().required().label('Variable Name'),
+      csvColumn: yup.string().required().label('CSV Column'),
+    }),
+  ),
+});

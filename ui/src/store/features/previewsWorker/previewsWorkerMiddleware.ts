@@ -17,6 +17,7 @@ import { isAnyOf, type Middleware } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import {
   addUpdateReactionFieldActions,
+  deleteReactionFieldActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
@@ -28,6 +29,7 @@ import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/re
 const singleReactionActionsMatcher = isAnyOf(
   getReactionActions.success,
   addUpdateReactionFieldActions.success,
+  deleteReactionFieldActions.success,
   getTemplateActions.success,
 );
 

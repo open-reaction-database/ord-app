@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { Buffer } from 'buffer';
-
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
-window.Buffer = Buffer;
-
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+export interface FileControlValue {
+  value: string;
+  format: string;
+}

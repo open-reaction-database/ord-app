@@ -32,7 +32,7 @@ import { useSelector } from 'react-redux';
 import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reactionLookup.selectors.ts';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
-import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
+import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';

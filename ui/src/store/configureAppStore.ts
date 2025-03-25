@@ -17,6 +17,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from './rootReducer';
 import { isDev } from 'common/constants';
 import { previewsWorkerMiddleware } from 'store/features/previewsWorker/previewsWorkerMiddleware.ts';
+import { enumerationWorkerMiddleware } from './features/enumerationWorker/enumerationWorkerMiddleware.ts';
 
 export function configureAppStore() {
   return configureStore({
@@ -24,10 +25,10 @@ export function configureAppStore() {
     devTools: isDev,
     // For some reason redux usage example not working correctly with types here
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    middleware: (getDefaultMiddleware): any => getDefaultMiddleware().concat(previewsWorkerMiddleware),
+    middleware: (getDefaultMiddleware): any =>
+      getDefaultMiddleware().concat([previewsWorkerMiddleware, enumerationWorkerMiddleware]),
   });
 }
 
 export const store = configureAppStore();
-export type AppDispatch = typeof store.dispatch;
 export type AppState = ReturnType<typeof store.getState>;

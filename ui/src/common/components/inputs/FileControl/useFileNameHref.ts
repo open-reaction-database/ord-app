@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { Buffer } from 'buffer';
+import { useMemo } from 'react';
+import type { FileControlValue } from './fileControl.types.ts';
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-window.global ||= window;
-window.Buffer = Buffer;
+export function useFileNameHref(name: string, value: FileControlValue | null) {
+  const format = value?.format ?? '';
+  const stringValue = value?.value ?? '';
 
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+  const fileName = useMemo(() => {
+    // In case there are incorrect saved format files
+    return [name, format.replace('.', '')].join('.');
+  }, [format, name]);
+
+  const href = useMemo(() => {
+    return `data:application/octet-stream;base64,${stringValue}`;
+  }, [stringValue]);
+
+  return { fileName, href };
+}

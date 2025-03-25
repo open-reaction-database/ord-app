@@ -26,12 +26,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { ReactionValidationResult } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationResult.tsx';
-import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
-import classes from 'features/reactions/ReactionList/ReactionCard/reactionCard.module.scss';
+import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
+import classes from 'common/components/ReactionCard/reactionCard.module.scss';
 
 interface ReactionHeaderProps {
   datasetId: number;

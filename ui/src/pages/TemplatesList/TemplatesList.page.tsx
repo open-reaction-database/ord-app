@@ -23,7 +23,7 @@ import classes from './templatesList.page.module.scss';
 import { selectTemplatesOrder } from 'store/entities/templates/templates.selectors.ts';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
-import { ReactionCard } from 'features/reactions/ReactionList/ReactionCard/ReactionCard.tsx';
+import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 

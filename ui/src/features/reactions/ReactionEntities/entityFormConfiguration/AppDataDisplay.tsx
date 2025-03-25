@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 import { AppDataType, type AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import { useFileNameHref } from 'features/reactions/ReactionEntities/useFileNameHref.ts';
+import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
+import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
 
 interface AppDataDisplayProps {
   appData: AppData;
 }
 
 function AppDataFileDisplay({ appData }: Readonly<AppDataDisplayProps>) {
-  const { fileName, href } = useFileNameHref(appData.name, appData.data);
+  const { fileName, href } = useFileNameHref(appData.name, appData.data as FileControlValue);
   return (
     <a
       download={fileName}

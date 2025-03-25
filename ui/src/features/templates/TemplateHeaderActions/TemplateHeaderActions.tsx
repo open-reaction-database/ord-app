@@ -17,8 +17,9 @@ import { Button } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { EnumerateIcon, DownloadIcon } from 'common/icons';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { downloadAsJson } from 'store/utils/downloadFile.thunks.ts';
+import { downloadAsJson, downloadFile } from 'store/utils/downloadFile.thunks.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import { useCallback } from 'react';
 
 interface TemplateHeaderActionsProps {
   templateId: string;
@@ -26,9 +27,17 @@ interface TemplateHeaderActionsProps {
 
 export function TemplateHeaderActions({ templateId }: Readonly<TemplateHeaderActionsProps>) {
   const template = useSelector(selectReactionById(templateId));
-  const downloadAsJsonHandle = () => {
-    downloadAsJson(template, `${template.data.reactionId}.json`);
+  const { variables, name } = template;
+
+  const onJsonDownload = () => {
+    downloadAsJson(template, `${name}.json`);
   };
+  const onCSVDownload = useCallback(() => {
+    const content = variables.map(variable => variable.name).join('; ');
+    const blob = new Blob([content], { type: 'text/csv' });
+    downloadFile(blob, `${name}.csv`);
+  }, [name, variables]);
+
   const isReadyForEnumeration = template.variables.length > 0;
 
   return (
@@ -45,13 +54,14 @@ export function TemplateHeaderActions({ templateId }: Readonly<TemplateHeaderAct
         leftSection={<DownloadIcon />}
         variant="transparent"
         disabled={!isReadyForEnumeration}
+        onClick={onCSVDownload}
       >
         Download Variables in CSV
       </Button>
       <Button
         leftSection={<DownloadIcon />}
         variant="transparent"
-        onClick={downloadAsJsonHandle}
+        onClick={onJsonDownload}
       >
         Download Template in JSON
       </Button>

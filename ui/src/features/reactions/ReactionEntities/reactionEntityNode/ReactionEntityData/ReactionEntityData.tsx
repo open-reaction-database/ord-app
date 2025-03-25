@@ -17,76 +17,22 @@ import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntitie
 import type { ReactionFormData } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import mime from 'mime/lite';
 import { useUncontrolled } from '@mantine/hooks';
 import { type ChangeEvent, useCallback } from 'react';
-import { ActionIcon, FileInput, Flex, Input, NumberInput, TextInput } from '@mantine/core';
-import { Buffer } from 'buffer';
-import { RemoveIcon } from 'common/icons';
-import { inputWrapperClasses } from 'common/components/display/InputWrapper';
-import { useFileNameHref } from 'features/reactions/ReactionEntities/useFileNameHref.ts';
+import { NumberInput, TextInput } from '@mantine/core';
+import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
+import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
 
 const options = Object.values(AppDataType);
 
 type StringEvent = ChangeEvent<HTMLInputElement>;
 
-type ChangeType = StringEvent | string | [string, string] | number | null;
+type ChangeType = StringEvent | string | FileControlValue | number | null;
 
 interface ReactionEntityValueProps {
-  readonly name: string;
-  readonly value: AppData['data'];
-  readonly onChange: (value: ChangeType) => void;
-}
-
-function ReactionEntityDataFile({ value, name, onChange }: ReactionEntityValueProps) {
-  const { fileName, href } = useFileNameHref(name, value);
-
-  const handleChange = useCallback(
-    (file: File | null) => {
-      if (file) {
-        const fileParts = file.name.split('.');
-        const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
-        file.arrayBuffer().then(buffer => {
-          const extensionFromBlob = mime.getExtension(file.type);
-          const extension = extensionFromFile ?? extensionFromBlob ?? 'txt';
-          const stringContent = Buffer.from(buffer).toString('base64');
-          onChange([stringContent, extension]);
-        });
-      }
-    },
-    [onChange],
-  );
-
-  const handleRemoveFile = useCallback(() => {
-    onChange(null);
-  }, [onChange]);
-
-  return (
-    <Input.Wrapper
-      label="Data"
-      className={inputWrapperClasses.inputWrapper}
-    >
-      {value.value ? (
-        <Flex gap="xs">
-          <a
-            download={fileName}
-            href={href}
-          >
-            {fileName}
-          </a>
-          <ActionIcon
-            onClick={handleRemoveFile}
-            variant="transparent"
-            color="red"
-          >
-            <RemoveIcon />
-          </ActionIcon>
-        </Flex>
-      ) : (
-        <FileInput onChange={handleChange} />
-      )}
-    </Input.Wrapper>
-  );
+  name: string;
+  value: AppData['data'];
+  onChange: (value: ChangeType) => void;
 }
 
 function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEntityValueProps>) {
@@ -110,9 +56,9 @@ function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEnt
       );
     case AppDataType.Upload:
       return (
-        <ReactionEntityDataFile
+        <FileControl
           name={name}
-          value={value}
+          value={value as FileControlValue}
           onChange={onChange}
         />
       );
@@ -140,9 +86,8 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
   );
 
   const onValueChange = (newValue: ChangeType) => {
-    if (Array.isArray(newValue)) {
-      const [fileContent, fileExtension] = newValue;
-      onChange({ type: dataValue.type, value: fileContent, format: fileExtension });
+    if (typeof newValue === 'object' && newValue !== null && 'format' in newValue) {
+      onChange({ type: dataValue.type, ...newValue });
     } else if (newValue !== null && typeof newValue === 'object') {
       onChange({ type: dataValue.type, value: newValue.target.value });
     } else {

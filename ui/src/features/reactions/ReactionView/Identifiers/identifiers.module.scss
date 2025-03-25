@@ -19,15 +19,17 @@
   line-height: 20px;
 }
 
-.identifierLabel {
-  color: var(--mantine-color-primary);
-  font-size: var(--font-size-md);
-  font-weight: 700;
-  line-height: 20px;
-}
+.identifier {
+  .identifierLabel {
+    color: var(--mantine-color-primary);
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    line-height: 20px;
+  }
 
-svg {
-  width: 20px;
-  height: 20px;
-  margin-bottom: var(--mantine-spacing-xs);
+  svg {
+    width: 20px;
+    height: 20px;
+    margin-bottom: var(--mantine-spacing-xs);
+  }
 }

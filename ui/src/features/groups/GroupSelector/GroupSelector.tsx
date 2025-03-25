@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Select } from '@mantine/core';
-import { useSelector } from 'react-redux';
-import { selectOrderedGroupsList } from 'store/entities/groups/groups.selectors';
+import { Select, type SelectProps } from '@mantine/core';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectOrderedGroupsList } from 'store/entities/groups/groups.selectors.ts';
 
-export function GroupSelector() {
+type GroupSelectorProps = Omit<SelectProps, 'data'>;
+
+export function GroupSelector({ ...rest }: Readonly<GroupSelectorProps>) {
   const groupsList = useSelector(selectOrderedGroupsList);
   const data = useMemo(() => {
     return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
@@ -27,8 +29,10 @@ export function GroupSelector() {
     <Select
       data={data}
       label="Group"
+      placeholder="Select a group"
       searchable
       required
+      {...rest}
     />
   );
 }
