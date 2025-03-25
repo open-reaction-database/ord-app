@@ -93,7 +93,10 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         {identifiers.map((identifier, index) => (
           <div key={index}>
             {!isTemplate && (
-              <Flex align="center">
+              <Flex
+                align="center"
+                className={classes.identifier}
+              >
                 <span className={classes.identifierLabel}>Identifier {index + 1}</span>
                 <ActionIcon
                   variant="transparent"
