@@ -156,14 +156,21 @@ async def create_test_dataset(db_session, mock_authenticated_user) -> DatasetMod
     return dataset
 
 
-async def create_test_reaction(db_session, mock_authenticated_user, dataset, pb_reaction=None) -> ReactionModel:
+async def create_test_reaction(
+    db_session,
+    mock_authenticated_user,
+    dataset,
+    pb_reaction=None,
+    is_valid=None
+) -> ReactionModel:
     pb_reaction = pb_reaction or Reaction(reaction_id=fake.uuid4())
     user, _, group = mock_authenticated_user
     reaction = ReactionModel(
         pb_reaction_id=pb_reaction.reaction_id,
         dataset=dataset,
         owner=user,
-        binpb=pb_reaction.SerializeToString()
+        binpb=pb_reaction.SerializeToString(),
+        is_valid=is_valid
     )
     db_session.add(reaction)
     await db_session.commit()

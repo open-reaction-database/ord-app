@@ -11,10 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
+
 from pydantic import BaseModel
 
 MAX_CRITICAL_FIELD_LENGTH = 512
 
 
 class BaseSchema(BaseModel):
-    pass
+    @staticmethod
+    def parse_bool(value: str) -> Optional[bool]:
+        value_lower = value.lower()
+        if value_lower in {"none", "null"}:
+            return None
+        if value_lower in {"true", "1"}:
+            return True
+        if value_lower in {"false", "0"}:
+            return False
+        raise ValueError(f"Incorrect value: {value}")

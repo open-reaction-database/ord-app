@@ -14,7 +14,7 @@
 from itertools import batched
 
 from loguru import logger
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, or_, select, update
 
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
@@ -67,13 +67,20 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
 
         return reaction
 
-    @staticmethod
-    def all_reactions_stmt(dataset_id: int):
+    def all_reactions_stmt(self, dataset_id: int, is_valid_query: dict | None = None):
         stmt = (
             select(ReactionModel)
             .where(ReactionModel.dataset_id == dataset_id)
             .order_by(ReactionModel.id)
         )
+
+        if is_valid_query is not None:
+            or_stmt = []
+            for value in is_valid_query.get("is_valid", []):
+                or_stmt.append(ReactionModel.is_valid.is_(value))
+            if or_stmt:
+                stmt = stmt.where(or_(*or_stmt))
+
         return stmt
 
     async def bulk_create(self, payload: list[dict], autocommit: bool = True):
