@@ -32,7 +32,7 @@ from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
-from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionUpdateSchema
+from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionsQueryParams, ReactionUpdateSchema
 from ord_app.service_api.services.exceptions import (
     ConflictError,
     EntityNotFoundError,
@@ -217,8 +217,11 @@ class ReactionsUseCase:
         reaction.validation = {"errors": errors, "warnings": warning}
         return reaction
 
-    async def paginate(self, dataset_id: int) -> Page[ReactionModel]:
-        return await paginate(self.db, self.reaction_repo.all_reactions_stmt(dataset_id))
+    async def paginate(self, dataset_id: int, is_valid_query: ReactionsQueryParams) -> Page[ReactionModel]:
+        return await paginate(
+            self.db,
+            self.reaction_repo.all_reactions_stmt(dataset_id, is_valid_query.model_dump(exclude_unset=True)),
+        )
 
     async def get(self, dataset_id: int, reaction_id: int):
         if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
