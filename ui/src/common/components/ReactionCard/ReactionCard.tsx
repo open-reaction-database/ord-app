@@ -17,9 +17,9 @@ import { Flex, Paper, Title } from '@mantine/core';
 import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { useMemo, useRef, type ReactNode } from 'react';
+import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from 'common/styling';
-import { ReactionPreview } from '../../ReactionPreview/ReactionPreview.tsx';
+import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface DescriptorsListProps {
@@ -58,11 +58,11 @@ interface ReactionCardProps {
   id: ReactionId;
   title: ReactNode;
   actions: ReactNode;
+  previewRef?: MutableRefObject<HTMLDivElement | null>;
 }
 
-export function ReactionCard({ id, title, actions }: Readonly<ReactionCardProps>) {
+export function ReactionCard({ id, title, actions, previewRef }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
-  const previewRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <Paper

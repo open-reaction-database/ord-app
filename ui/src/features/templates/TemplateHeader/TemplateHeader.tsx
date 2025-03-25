@@ -21,7 +21,7 @@ import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
 import { renameTemplate } from 'store/entities/templates/templates.thunks.ts';
 import classes from 'pages/TemplatePage/templatePage.module.scss';

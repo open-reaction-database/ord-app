@@ -20,7 +20,7 @@ import { useForm, yupResolver } from '@mantine/form';
 import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { ReactionPreview } from 'features/reactions/ReactionPreview/ReactionPreview.tsx';
+import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
 import type { EnumerationForm, EnumerationFormTransform, EnumerationSetupForm } from './enumerationSetup.types.ts';
 import { TemplateFileSelector } from './TemplateFileSelector/TemplateFileSelector.tsx';
