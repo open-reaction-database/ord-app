@@ -14,38 +14,26 @@
  * limitations under the License.
  */
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
-import { Divider, Flex } from '@mantine/core';
+import { useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
+import { ViewIcon } from 'common/icons';
 import classes from './reactionViewDeleteButtons.module.scss';
-import { ReactionEntityDelete } from '../../ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { onViewDeleteButtonsWrapperClick, useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
-import { useContext } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
+import { Button } from '@mantine/core';
 
-export function ReactionEditDeleteButtons({
-  entityName,
+export function ReactionViewButton({
   pathComponents,
   historyPathComponents,
 }: Readonly<ReactionViewDeleteButtonsProps>) {
-  const { reactionId } = useContext(reactionContext);
   const onEdit = useOnViewEdit({ pathComponents, historyPathComponents });
-
   return (
-    <Flex
-      onClick={onViewDeleteButtonsWrapperClick}
-      align="center"
-      className={classes.buttonsWrapper}
-    >
-      <EditButton onClick={onEdit} />
-      <Divider
-        className={classes.actionDivider}
-        orientation="vertical"
-      />
-      <ReactionEntityDelete
-        reactionId={reactionId}
-        entityName={entityName}
-        pathComponents={pathComponents}
-      />
-    </Flex>
+    <div className={classes.buttonsWrapper}>
+      <Button
+        variant="transparent"
+        classNames={{ root: classes.button, section: classes.buttonSection }}
+        onClick={onEdit}
+        leftSection={<ViewIcon />}
+      >
+        View
+      </Button>
+    </div>
   );
 }

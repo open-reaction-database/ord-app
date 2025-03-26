@@ -161,7 +161,6 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
             {reactionPathComponentsList.map((sidebarForm, index) => (
               <ReactionEntityForm
                 key={index}
-                reactionId={reactionId}
                 reactionPathComponents={sidebarForm}
                 sidebarInfo={sidebarInfos[index]}
                 isHidden={index !== reactionPathComponentsList.length - 1}

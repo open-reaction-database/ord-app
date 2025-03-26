@@ -13,8 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { MouseEvent } from 'react';
+import { useCallback, type MouseEvent } from 'react';
+import {
+  addReactionPathComponentToList,
+  setReactionPathComponentsList,
+} from 'store/features/reactionForm/reactionForm.actions.ts';
+import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 export const onViewDeleteButtonsWrapperClick = (event: MouseEvent) => {
   event.stopPropagation();
+};
+
+export const useOnViewEdit = ({
+  pathComponents,
+  historyPathComponents,
+}: Omit<ReactionViewDeleteButtonsProps, 'entityName'>) => {
+  const dispatch = useAppDispatch();
+  return useCallback(() => {
+    if (historyPathComponents) {
+      dispatch(setReactionPathComponentsList(historyPathComponents.concat([pathComponents])));
+    } else {
+      dispatch(addReactionPathComponentToList(pathComponents));
+    }
+  }, [dispatch, pathComponents, historyPathComponents]);
 };

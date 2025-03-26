@@ -21,14 +21,13 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { ReactionEntityBaseNode, reactionEntityToForm } from 'features/reactions/ReactionEntities';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import { getReactionEntityTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToTransform.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { reactionContext } from '../../reactions.context.ts';
 
 interface ReactionEntityFormProps {
-  reactionId: ReactionId;
   isHidden: boolean;
   reactionPathComponents: ReactionPathComponents;
   sidebarInfo: ReactionSidebarInfo;
@@ -37,13 +36,13 @@ interface ReactionEntityFormProps {
 }
 
 export function ReactionEntityForm({
-  reactionId,
   reactionPathComponents,
   sidebarInfo,
   isHidden,
   onFormClose,
   onSetFormDirty,
 }: Readonly<ReactionEntityFormProps>) {
+  const { reactionId, isViewOnly } = useContext(reactionContext);
   const dispatch = useAppDispatch();
 
   const contextValue = useMemo(
@@ -86,11 +85,13 @@ export function ReactionEntityForm({
 
   const onSubmit = useCallback(
     (values: object) => {
+      // Safeguard to prevent submitting template or view only reaction in case some field is editable
+      if (isViewOnly) return;
       formMethods.resetDirty();
       onSetFormDirty(reactionPathComponents, false);
       dispatch(addUpdateReactionField({ reactionId, pathComponents: reactionPathComponents, newValue: values }));
     },
-    [dispatch, formMethods, onSetFormDirty, reactionId, reactionPathComponents],
+    [dispatch, formMethods, isViewOnly, onSetFormDirty, reactionId, reactionPathComponents],
   );
 
   return (
@@ -126,12 +127,14 @@ export function ReactionEntityForm({
             >
               Close
             </Button>
-            <Button
-              type="submit"
-              color="primary"
-            >
-              Save
-            </Button>
+            {!isViewOnly && (
+              <Button
+                type="submit"
+                color="primary"
+              >
+                Save
+              </Button>
+            )}
           </Flex>
         </Form>
       )}

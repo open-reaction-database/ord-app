@@ -27,11 +27,8 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
-import type { ReactionsContext } from '../../features/reactions/reactions.types.ts';
-
-function EmptyComponent() {
-  return null;
-}
+import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 
 export function TemplatePage() {
   const dispatch = useAppDispatch();
@@ -58,7 +55,7 @@ export function TemplatePage() {
       reactionId: templateId,
       isTemplate: true,
       isViewOnly: true,
-      ViewDeleteButtonsComponent: EmptyComponent,
+      ViewDeleteButtonsComponent: ReactionViewButton,
     }),
     [templateId],
   );

@@ -18,8 +18,11 @@ import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedContro
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
+import { useContext } from 'react';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
+  const { isViewOnly } = useContext(reactionContext);
   const label = useReactionEntityLabel(node.wrapperConfig);
   const { getInputProps } = formMethods;
 
@@ -29,6 +32,7 @@ export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEnt
       options={node.options}
       label={label}
       {...getInputProps(node.name)}
+      disabled={isViewOnly}
     />
   ) : (
     <AppSegmentedControl
@@ -37,6 +41,7 @@ export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEnt
       label={label}
       fullWidth
       {...getInputProps(node.name)}
+      disabled={isViewOnly}
     />
   );
 }

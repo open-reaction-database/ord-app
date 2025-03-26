@@ -17,11 +17,14 @@ import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisi
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormValuePrecisionUnit } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
+import { useContext } from 'react';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 export function ReactionEntityVPU({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValuePrecisionUnit>>) {
+  const { isViewOnly } = useContext(reactionContext);
   const label = useReactionEntityLabel(node.wrapperConfig);
   return (
     <ValuePrecisionUnitControl
@@ -29,6 +32,7 @@ export function ReactionEntityVPU({
       select={node.select}
       label={label}
       {...getInputProps(node.name)}
+      disabled={isViewOnly}
     />
   );
 }

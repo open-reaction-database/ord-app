@@ -17,11 +17,14 @@ import { NumberInput, Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
+import { useContext } from 'react';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 export function ReactionEntityValue({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValue>>) {
+  const { isViewOnly } = useContext(reactionContext);
   const label = useReactionEntityLabel(node.wrapperConfig);
 
   const inputProps = { placeholder: 'Type', ...(node.inputConfig ?? {}) };
@@ -33,6 +36,7 @@ export function ReactionEntityValue({
         <Textarea
           {...props}
           {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     case 'number':
@@ -40,6 +44,7 @@ export function ReactionEntityValue({
         <NumberInput
           {...props}
           {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     case 'string':
@@ -47,6 +52,7 @@ export function ReactionEntityValue({
         <TextInput
           {...props}
           {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     default:

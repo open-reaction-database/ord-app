@@ -22,8 +22,9 @@ import {
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { Button, Flex } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 interface ReactionEntityAddButtonProps extends Required<Pick<ReactionFormList, 'addItem'>> {
   items: Array<unknown>;
@@ -51,6 +52,7 @@ function ReactionEntityAddButton({ items, addItem, nextIndex }: Readonly<Reactio
 
 export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
   const items = node.useSelectItems() ?? [];
+  const { isViewOnly } = useContext(reactionContext);
   const title = useReactionEntityLabel(node.title);
   const nextIndex = items.length;
   const { ItemDisplay } = node;
@@ -66,7 +68,7 @@ export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<Re
             />
           }
           rightSection={
-            node.addItem ? (
+            node.addItem && !isViewOnly ? (
               <ReactionEntityAddButton
                 addItem={node.addItem}
                 items={items}

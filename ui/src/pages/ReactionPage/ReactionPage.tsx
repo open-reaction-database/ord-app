@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
@@ -31,6 +31,7 @@ import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
 import type { ReactionsContext } from '../../features/reactions/reactions.types.ts';
+import { ReactionViewButton } from '../../features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -42,6 +43,11 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
+  const [isViewOnly, setIsViewOnly] = useState(false);
+
+  const toggleViewOnly = useCallback(() => {
+    setIsViewOnly(prev => !prev);
+  }, [setIsViewOnly]);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -62,10 +68,10 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
     (): ReactionsContext => ({
       reactionId,
       isTemplate: false,
-      isViewOnly: false,
-      ViewDeleteButtonsComponent: ReactionEditDeleteButtons,
+      isViewOnly: isViewOnly,
+      ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
     }),
-    [reactionId],
+    [reactionId, isViewOnly],
   );
 
   useEffect(
@@ -90,6 +96,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}
+              onViewOnlyToggle={toggleViewOnly}
             />
             <Paper
               radius="md"
