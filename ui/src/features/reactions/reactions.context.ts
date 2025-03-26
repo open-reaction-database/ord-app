@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Route, Switch } from 'wouter';
-import { TemplatesListPage } from '../../pages/TemplatesList/TemplatesList.page.tsx';
-import { TemplatePage } from 'pages/TemplatePage/TemplatePage.tsx';
+import { createContext, type FC } from 'react';
+import type { ReactionViewDeleteButtonsProps } from './ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
+import type { ReactionsContext } from './reactions.types.ts';
 
-export function TemplatesListRoute() {
-  return (
-    <Switch>
-      <Route path=":templateId">
-        <TemplatePage />
-      </Route>
-      <Route path="/">
-        <TemplatesListPage />
-      </Route>
-    </Switch>
-  );
-}
+const viewDeleteButtonsDefaultValue = null as unknown as FC<ReactionViewDeleteButtonsProps>;
+
+const defaultContextValue: ReactionsContext = {
+  reactionId: 0,
+  isTemplate: false,
+  isViewOnly: false,
+  ViewDeleteButtonsComponent: viewDeleteButtonsDefaultValue,
+};
+
+export const reactionContext = createContext<ReactionsContext>(defaultContextValue);

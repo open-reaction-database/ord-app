@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Flex, Title } from '@mantine/core';
-import { useCallback, useContext, useMemo } from 'react';
+import { Flex, Title } from '@mantine/core';
+import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { EditIcon } from 'common/icons';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { EntityListItemProps } from './entityListItem.types.ts';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 export function EntityListItem<T>({
   entityKey,
@@ -31,8 +28,8 @@ export function EntityListItem<T>({
   requiredFields,
   optionalFields,
 }: Readonly<EntityListItemProps<T>>) {
-  const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
     return [...pathComponents, entityField, entityKey];
   }, [entityField, entityKey, pathComponents]);
@@ -41,10 +38,6 @@ export function EntityListItem<T>({
     const humanFriendlyKey = typeof entityKey === 'string' ? entityKey : `${entityKey + 1}`;
     return typeof title === 'function' ? title(entity) : `${title} ${humanFriendlyKey}`;
   }, [title, entity, entityKey]);
-
-  const onEdit = useCallback(() => {
-    dispatch(addReactionPathComponentToList(itemPathComponents));
-  }, [itemPathComponents, dispatch]);
 
   return (
     <Flex
@@ -56,15 +49,7 @@ export function EntityListItem<T>({
         gap="xs"
       >
         <Title order={3}>{titleText}</Title>
-        <ActionIcon
-          variant="transparent"
-          color="primary"
-          onClick={onEdit}
-        >
-          <EditIcon />
-        </ActionIcon>
-        <ReactionEntityDelete
-          reactionId={reactionId}
+        <ViewDeleteButtonsComponent
           entityName={titleText}
           pathComponents={itemPathComponents}
         />

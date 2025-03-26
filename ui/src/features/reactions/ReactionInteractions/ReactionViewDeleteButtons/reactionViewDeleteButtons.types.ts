@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createContext } from 'react';
-import type { TemplatesContext } from './templates.types.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-export const templatesContext = createContext<TemplatesContext>({
-  isTemplate: false,
-});
+export interface ReactionViewDeleteButtonsProps {
+  entityName: string;
+  pathComponents: ReactionPathComponents;
+  historyPathComponents?: Array<ReactionPathComponents>;
+}

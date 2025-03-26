@@ -24,11 +24,13 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
+import type { ReactionsContext } from '../../features/reactions/reactions.types.ts';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -56,10 +58,12 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
     dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
-  const contextValue = useMemo(
-    () => ({
+  const reactionContextValue = useMemo(
+    (): ReactionsContext => ({
       reactionId,
-      pathComponents: [],
+      isTemplate: false,
+      isViewOnly: false,
+      ViewDeleteButtonsComponent: ReactionEditDeleteButtons,
     }),
     [reactionId],
   );
@@ -77,7 +81,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <reactionEntityContext.Provider value={contextValue}>
+      <reactionContext.Provider value={reactionContextValue}>
         {reaction && (
           <Flex
             direction="column"
@@ -96,7 +100,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>
         )}
-      </reactionEntityContext.Provider>
+      </reactionContext.Provider>
     </PageContainer>
   );
 }

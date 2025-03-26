@@ -26,6 +26,12 @@ import { getTemplate } from 'store/entities/templates/templates.thunks';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import type { ReactionsContext } from '../../features/reactions/reactions.types.ts';
+
+function EmptyComponent() {
+  return null;
+}
 
 export function TemplatePage() {
   const dispatch = useAppDispatch();
@@ -47,6 +53,16 @@ export function TemplatePage() {
     dispatch(getTemplate(parseInt(rawTemplateId)));
   }, [dispatch, rawTemplateId]);
 
+  const reactionContextValue = useMemo(
+    (): ReactionsContext => ({
+      reactionId: templateId,
+      isTemplate: true,
+      isViewOnly: true,
+      ViewDeleteButtonsComponent: EmptyComponent,
+    }),
+    [templateId],
+  );
+
   return (
     <PageContainer
       breadcrumbs={breadcrumbs}
@@ -59,22 +75,24 @@ export function TemplatePage() {
         </Badge>
       }
     >
-      {template && (
-        <Flex
-          direction="column"
-          gap="sm"
-          miw={50}
-        >
-          <TemplateHeader templateId={templateId} />
-          <Paper
-            radius="md"
-            p="lg"
+      <reactionContext.Provider value={reactionContextValue}>
+        {template && (
+          <Flex
+            direction="column"
+            gap="sm"
+            miw={50}
           >
-            <ReactionTabs reactionId={templateId} />
-          </Paper>
-          <ReactionDetailsSidebar reactionId={templateId} />
-        </Flex>
-      )}
+            <TemplateHeader templateId={templateId} />
+            <Paper
+              radius="md"
+              p="lg"
+            >
+              <ReactionTabs reactionId={templateId} />
+            </Paper>
+            <ReactionDetailsSidebar reactionId={templateId} />
+          </Flex>
+        )}
+      </reactionContext.Provider>
     </PageContainer>
   );
 }

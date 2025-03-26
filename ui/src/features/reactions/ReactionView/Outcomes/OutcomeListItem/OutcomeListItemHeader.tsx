@@ -15,20 +15,16 @@
  */
 import classes from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/outcomeListItem.module.scss';
 import { Accordion, Flex, Text } from '@mantine/core';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { FlaskIcon, TimeIcon } from 'common/icons';
 import clsx from 'clsx';
 import { typographyClasses } from 'common/styling';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { type MouseEvent, useContext } from 'react';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { useContext } from 'react';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
-import { templatesContext } from 'features/templates/templates.context';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 interface OutcomeListItemHeaderProps {
   reactionId: ReactionId;
@@ -36,33 +32,16 @@ interface OutcomeListItemHeaderProps {
   pathComponents: ReactionPathComponents;
 }
 
-const onActionClick = (event: MouseEvent) => {
-  event.stopPropagation();
-};
-
-export function OutcomeListItemHeader({ reactionId, outcome, pathComponents }: Readonly<OutcomeListItemHeaderProps>) {
-  const dispatch = useAppDispatch();
-  const { isTemplate } = useContext(templatesContext);
-  const onEditOutcome = () => {
-    dispatch(setReactionPathComponentsList([pathComponents]));
-  };
+export function OutcomeListItemHeader({ outcome, pathComponents }: Readonly<OutcomeListItemHeaderProps>) {
+  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
   return (
     <Accordion.Control
       classNames={{ label: classes.label }}
       icon={
-        !isTemplate && (
-          <Flex
-            onClick={onActionClick}
-            align="center"
-          >
-            <EditButton onClick={onEditOutcome} />
-            <ReactionEntityDelete
-              reactionId={reactionId}
-              entityName="Outcome"
-              pathComponents={pathComponents}
-            />
-          </Flex>
-        )
+        <ViewDeleteButtonsComponent
+          entityName="Outcome"
+          pathComponents={pathComponents}
+        />
       }
     >
       <Flex

@@ -17,7 +17,6 @@ import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
@@ -26,7 +25,7 @@ import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { templatesContext } from 'features/templates/templates.context';
+import { reactionContext } from '../../reactions.context.ts';
 
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
@@ -43,19 +42,24 @@ const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
 type ValueType = ReactionNotes[keyof ReactionNotes];
 type NotEmptyValueType = Exclude<ValueType, null | undefined>;
 
-export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
+const ENTITY_NAME = 'notes';
+
+export function Notes() {
   const dispatch = useAppDispatch();
-  const notes: ReactionNotes = useSelector(selectReactionPartByPath(reactionId, ['notes'])) || {};
-  const { isTemplate } = useContext(templatesContext);
+  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const notesOrNull = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
   const fields = useMemo((): Array<[string, string]> => {
+    const notes: ReactionNotes = notesOrNull || {};
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
       .filter(([, value]) => value && value !== ReactionBoolean.Unspecified) as Array<[string, NotEmptyValueType]>;
-  }, [notes]);
+  }, [notesOrNull]);
 
   const onEdit = () => {
-    dispatch(setReactionPathComponentsList([['notes']]));
+    dispatch(setReactionPathComponentsList([[ENTITY_NAME]]));
   };
+
+  const viewEditTitle = isViewOnly ? 'View' : 'Edit';
 
   return (
     <Flex
@@ -64,14 +68,12 @@ export function Notes({ reactionId }: Readonly<ReactionViewSectionProps>) {
     >
       <Flex justify="space-between">
         <Title order={2}>Notes</Title>
-        {!isTemplate && (
-          <Button
-            onClick={onEdit}
-            leftSection={<AddCircleIcon />}
-          >
-            Edit
-          </Button>
-        )}
+        <Button
+          onClick={onEdit}
+          leftSection={<AddCircleIcon />}
+        >
+          {viewEditTitle}
+        </Button>
       </Flex>
       <div className={classes.grid}>
         {fields.map(([label, value]) => (

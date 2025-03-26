@@ -21,6 +21,8 @@ import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 
 interface DescriptorsListProps {
   title: string;
@@ -63,48 +65,57 @@ interface ReactionCardProps {
 
 export function ReactionCard({ id, title, actions, previewRef }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
+  const contextValue = useMemo((): ReactionsContext => {
+    const isTemplate = typeof id === 'string';
+    return {
+      isTemplate,
+      reactionId: id,
+    } as ReactionsContext;
+  }, [id]);
 
   return (
-    <Paper
-      className={classes.container}
-      radius="sm"
-      p="lg"
-    >
-      <div className={classes.topContainer}>
-        <div className={classes.titleContainer}>
-          <Flex
-            align="center"
-            gap="4"
-          >
-            {title}
-          </Flex>
+    <reactionContext.Provider value={contextValue}>
+      <Paper
+        className={classes.container}
+        radius="sm"
+        p="lg"
+      >
+        <div className={classes.topContainer}>
+          <div className={classes.titleContainer}>
+            <Flex
+              align="center"
+              gap="4"
+            >
+              {title}
+            </Flex>
 
-          <DescriptorsList
-            title="Provenance"
-            items={reaction.summary.provenance}
-          />
-        </div>
-        <Flex
-          align="flex-start"
-          justify="flex-end"
-          className={classes.buttonContainer}
-        >
+            <DescriptorsList
+              title="Provenance"
+              items={reaction.summary.provenance}
+            />
+          </div>
           <Flex
-            align="center"
-            gap="sm"
+            align="flex-start"
+            justify="flex-end"
+            className={classes.buttonContainer}
           >
-            {actions}
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              {actions}
+            </Flex>
           </Flex>
-        </Flex>
-      </div>
-      <ReactionPreview
-        reaction={reaction}
-        ref={previewRef}
-      />
-      <DescriptorsList
-        title="Summary"
-        items={reaction.summary.summary}
-      />
-    </Paper>
+        </div>
+        <ReactionPreview
+          reaction={reaction}
+          ref={previewRef}
+        />
+        <DescriptorsList
+          title="Summary"
+          items={reaction.summary.summary}
+        />
+      </Paper>
+    </reactionContext.Provider>
   );
 }

@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 import { useContext } from 'react';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import classes from './componentsList.module.scss';
-import { Divider } from '@mantine/core';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ComponentDisplayRowProps } from './componentsList.types.ts';
-import { templatesContext } from 'features/templates/templates.context';
+import { reactionContext } from '../../reactions.context.ts';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
-  reactionId,
   component,
   componentPath,
   renderDetails,
   gridClassName,
 }: Readonly<ComponentDisplayRowProps<T>>) {
-  const dispatch = useAppDispatch();
   const previousEntityPath = componentPath.slice(0, 2);
-  const { isTemplate } = useContext(templatesContext);
-  const onEditComponent = () => {
-    dispatch(setReactionPathComponentsList([previousEntityPath, componentPath]));
-  };
+  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
 
   return (
     <ComponentDisplayRowCustomActions
@@ -45,20 +34,11 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
       renderDetails={renderDetails}
       gridClassName={gridClassName}
       actions={
-        !isTemplate && (
-          <>
-            <EditButton onClick={onEditComponent} />
-            <Divider
-              className={classes.actionDivider}
-              orientation="vertical"
-            />
-            <ReactionEntityDelete
-              reactionId={reactionId}
-              entityName="Component"
-              pathComponents={componentPath}
-            />
-          </>
-        )
+        <ViewDeleteButtonsComponent
+          entityName="Component"
+          pathComponents={componentPath}
+          historyPathComponents={[previousEntityPath]}
+        />
       }
     />
   );

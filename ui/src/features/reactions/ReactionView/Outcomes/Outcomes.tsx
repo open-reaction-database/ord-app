@@ -27,7 +27,7 @@ import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
 import { useMemo, useContext } from 'react';
-import { templatesContext } from 'features/templates/templates.context';
+import { reactionContext } from '../../reactions.context.ts';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
@@ -39,7 +39,7 @@ const ENTITY_NAME = 'outcomes';
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
   const onCreateNew = useCreate();
-  const { isTemplate } = useContext(templatesContext);
+  const { isViewOnly } = useContext(reactionContext);
   const handleCreate = () => {
     onCreateNew(outcomes.length, outcomes);
   };
@@ -56,7 +56,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           <Title order={2}>Outcomes</Title>
           <Counter amount={outcomes?.length} />
         </Flex>
-        {!isTemplate && (
+        {!isViewOnly && (
           <Button
             onClick={handleCreate}
             leftSection={<AddCircleIcon />}

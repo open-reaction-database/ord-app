@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface TemplatesContext {
-  isTemplate: boolean;
-}
+import type { MouseEvent } from 'react';
+
+export const onViewDeleteButtonsWrapperClick = (event: MouseEvent) => {
+  event.stopPropagation();
+};
