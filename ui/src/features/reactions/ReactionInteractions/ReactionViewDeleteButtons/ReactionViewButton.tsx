@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import { useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
+import { onViewDeleteButtonsWrapperClick, useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
 import { ViewIcon } from 'common/icons';
 import classes from './reactionViewDeleteButtons.module.scss';
 import { Button } from '@mantine/core';
@@ -25,7 +25,10 @@ export function ReactionViewButton({
 }: Readonly<ReactionViewDeleteButtonsProps>) {
   const onEdit = useOnViewEdit({ pathComponents, historyPathComponents });
   return (
-    <div className={classes.buttonsWrapper}>
+    <div
+      className={classes.buttonsWrapper}
+      onClick={onViewDeleteButtonsWrapperClick}
+    >
       <Button
         variant="transparent"
         classNames={{ root: classes.button, section: classes.buttonSection }}
