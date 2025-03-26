@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCallback } from 'react';
-import { Link, useParams } from 'wouter';
+import { useCallback, useMemo } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
-import { ReactionCard } from './ReactionCard/ReactionCard.tsx';
 import { Flex, Paper, Title, Loader } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
 import classes from './reactionsList.module.scss';
@@ -25,46 +23,12 @@ import {
   selectReactionsLoading,
   selectReactionsOrder,
   selectReactionsPagination,
-  selectReactionById,
 } from 'store/entities/reactions/reactions.selectors.ts';
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
-import { ReactionHeaderActions } from 'features/reactions/ReactionHeader/ReactionHeaderActions/ReactionHeaderActions.tsx';
-import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-
-interface ReactionTitleProps {
-  index: number;
-  id: number;
-}
-
-function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
-  const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
-  const datasetId = parseInt(rawDatasetId);
-  const reaction = useSelector(selectReactionById(id));
-  const copyToClipboardOptions: Array<CopyButtonOptions> = [
-    {
-      label: 'Copy Reaction Link',
-      value: `${window.location.href}/reactions/${id}`,
-    },
-    { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
-  ];
-  const linkToPage = `~/datasets/${datasetId}/reactions/${id}`;
-
-  return (
-    <>
-      <span className={classes.index}>{index}.</span>
-      <Link
-        className={classes.link}
-        to={linkToPage}
-      >
-        {reaction.pb_reaction_id}
-      </Link>
-      <CopyButton options={copyToClipboardOptions} />
-    </>
-  );
-}
+import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -87,6 +51,10 @@ export function ReactionList() {
     },
     [dispatch],
   );
+
+  const pageStartIndex = useMemo(() => {
+    return (pagination.page - 1) * pagination.size;
+  }, [pagination]);
 
   return (
     <>
@@ -131,16 +99,10 @@ export function ReactionList() {
       ) : (
         <>
           {reactionsIds.map((id, index) => (
-            <ReactionCard
+            <DatasetReactionCard
               key={id}
-              id={id}
-              actions={<ReactionHeaderActions reactionId={id} />}
-              title={
-                <ReactionTitle
-                  index={(pagination.page - 1) * pagination.size + index + 1}
-                  id={id}
-                />
-              }
+              reactionId={id}
+              index={pageStartIndex + index + 1}
             />
           ))}
           <Pagination

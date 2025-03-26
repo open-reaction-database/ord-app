@@ -27,6 +27,18 @@ class _ReactionValidation(BaseSchema):
     warnings: list[str] = Field(default_factory=list)
 
 
+class ReactionsQueryParams(BaseSchema):
+    is_valid: list[bool | None] | None = None
+
+    @field_validator("is_valid", mode="before")
+    def convert_str_to_bool(cls, v):
+        if isinstance(v, str):
+            return cls.parse_bool(v)
+        elif isinstance(v, list):
+            return [cls.parse_bool(v) for v in v]
+        return v
+
+
 def safe_molblock(product):
     try:
         return molblock_from_compound(product)

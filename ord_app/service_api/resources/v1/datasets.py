@@ -83,6 +83,20 @@ async def upload_dataset(
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
     return dataset
 
+@router.get(
+    "/datasets/{dataset_id}/download",
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
+)
+async def download_dataset(
+    dataset_id: int,
+    file_format: DownloadFileFormats,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+):
+    dataset, data = await use_case.download(dataset_id, file_format)
+    return Response(
+        data,
+        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'}
+    )
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountResponseSchema])
 async def get_user_datasets(
@@ -126,25 +140,6 @@ async def get_dataset(
     if dataset := await use_case.get(dataset_id):
         return dataset
     raise EntityNotFoundError("Dataset not found")
-
-
-@router.get(
-    "/datasets/{dataset_id}/download",
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
-)
-async def download_dataset(
-    dataset_id: int,
-    file_format: DownloadFileFormats,
-    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
-):
-    # NOTE(skearnes): See https://protobuf.dev/reference/protobuf/textformat-spec/#text-format-files for comments on
-    # preferred file extensions.
-    dataset, data = await use_case.download(dataset_id, file_format)
-
-    return Response(
-        data,
-        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'}
-    )
 
 
 @router.post(

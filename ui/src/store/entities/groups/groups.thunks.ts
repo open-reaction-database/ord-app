@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import axiosInstance from 'store/axiosInstance.ts';
-import type { Group, GroupMember } from './groups.types.ts';
+import type { Group, GroupMember, GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -25,35 +25,25 @@ import {
   updateGroupActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
-import { createThunk } from 'store/utils';
+import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
-  const group = (await axiosInstance.get<Group>(`/groups/${groupId}`)).data;
+  const group = (await axiosInstance.get<GroupItem>(`/groups/${groupId}`)).data;
   return getGroupActions.success(group);
 });
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
-  const groups = (await axiosInstance.get<Array<Group>>(`/groups`)).data;
+  const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;
   return getGroupListActions.success(groups);
 });
 
 export const createGroup = createThunk(createGroupActions, async (_d, _g, name) => {
-  const group = (await axiosInstance.post<Group>('/groups', { name })).data;
+  const group = (await axiosInstance.post<GroupItem>('/groups', { name })).data;
   return createGroupActions.success(group);
-});
-
-export const updateGroup = createThunk(updateGroupActions, async (_d, _g, updatedGroup) => {
-  const group = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
-
-  showNotification({
-    message: `${group.name} group changes have been successfully saved`,
-    variant: NotificationVariant.SUCCESS,
-  });
-  return updateGroupActions.success(group);
 });
 
 export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g, groupId) => {
@@ -61,18 +51,45 @@ export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g
   return getGroupMembersActions.success({ groupId, members });
 });
 
-export const updateGroupMembers = createThunk(updateGroupMembersActions, async (_d, getState, memberInfo) => {
-  const state = getState();
-  const groupId = selectEditingGroupId(state);
+export const updateGroup = createThunkWithExplicitResult(
+  updateGroupActions,
+  async (dispatch, getState, updatedGroup) => {
+    const updatedGroupData = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
+    const state = getState();
+    const groupId = Number(selectEditingGroupId(state));
+    const group = state.entities.groups.groupsById[groupId];
+    dispatch(updateGroupActions.success({ id: groupId, name: updatedGroupData.name, role: group.role }));
+    showNotification({
+      message: `${updatedGroupData.name} group changes have been successfully saved`,
+      variant: NotificationVariant.SUCCESS,
+    });
+  },
+);
 
-  const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
+export const updateGroupMembers = createThunkWithExplicitResult(
+  updateGroupMembersActions,
+  async (dispatch, getState, memberInfo) => {
+    const state = getState();
+    const groupId = selectEditingGroupId(state);
+    const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
+    dispatch(updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember }));
 
-  showNotification({
-    message: `${updatedMember.user.name}'s role has been successfully updated`,
-    variant: NotificationVariant.SUCCESS,
-  });
-  return updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember });
-});
+    showNotification({
+      message: `${updatedMember.user.name}'s role has been successfully updated`,
+      variant: NotificationVariant.SUCCESS,
+    });
+
+    if (state.entities.users.self?.id === updatedMember.user.id) {
+      const groupIdNumber = Number(groupId);
+      const updatedGroupItem = {
+        id: groupIdNumber,
+        name: state.entities.groups.groupsById[groupIdNumber].name,
+        role: updatedMember.role,
+      };
+      dispatch(updateGroupActions.success(updatedGroupItem));
+    }
+  },
+);
 
 export const removeGroupMembers = createThunk(removeGroupMembersActions, async (_d, getState, membersId) => {
   const state = getState();

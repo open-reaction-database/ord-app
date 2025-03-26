@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { createAction, PayloadActionCreator } from '@reduxjs/toolkit';
+import type { ActionCreatorWithPayload, createAction, PayloadActionCreator } from '@reduxjs/toolkit';
 
 type CreateAction = typeof createAction;
 
@@ -24,6 +24,10 @@ export interface AsyncAction<RequestPayload = void, SuccessPayload = void, Failu
   success: ReturnType<CreateActionKnownPayload<SuccessPayload>>;
   failure: ReturnType<CreateActionKnownPayload<FailurePayload>>;
 }
+
+// Valid any usage since we have no limitations on payload type and would like to get it
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ActionPayload<A extends ActionCreatorWithPayload<any>> = ReturnType<A>['payload'];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyAsyncAction = AsyncAction<any, any, any>;

@@ -13,3 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { createSelectorFactory } from '../../utils';
+
+const { buildSelector } = createSelectorFactory(state => state.features.enumerationSetup);
+
+export const selectIsEnumerationSetupOpened = buildSelector(state => state.isEnumerationSetupOpened);

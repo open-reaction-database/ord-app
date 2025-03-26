@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
+import { createSelector } from '@reduxjs/toolkit';
+import { selectReactions } from 'store/entities/reactions/reactions.selectors.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.templates);
 
 export const selectTemplatesOrder = buildSelector(state => state.templatesOrder);
+
+export const selectTemplates = createSelector([selectTemplatesOrder, selectReactions], (order, templates) => {
+  return order.map(id => templates[id] as ReactionTemplate);
+});

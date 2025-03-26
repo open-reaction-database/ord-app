@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { type JSX, useCallback } from 'react';
-import { downloadFile } from 'store/utils/downloadFile.thunks.ts';
+import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
 import { DownloadIcon } from 'common/icons';
@@ -32,7 +32,7 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
 
   const handleDatasetDownload = useCallback(
     (format: string) => {
-      dispatch(downloadFile(`${url}?file_format=${format}`));
+      dispatch(downloadFileFromUrl(`${url}?file_format=${format}`));
     },
     [dispatch, url],
   );

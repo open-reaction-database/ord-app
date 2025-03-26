@@ -15,11 +15,15 @@ import asyncio
 import sys
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI
+import asyncpg
+import psycopg.errors
+from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from loguru import logger
 from rdkit import RDLogger
+from sqlalchemy.exc import DataError, DBAPIError
+from starlette.responses import JSONResponse
 
 from ord_app.service_api.constants import AppEnvs
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
@@ -49,6 +53,38 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True}, lifespan=lifespan)
+
+
+@app.middleware("http")
+async def catch_errors(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except (DataError, DBAPIError) as err:
+        context_err = err.orig.__context__ or err.orig
+        if isinstance(context_err, asyncpg.UniqueViolationError):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"detail": "Object already exists."},
+            )
+        elif isinstance(context_err, asyncpg.DataError):
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"detail": "Data error."},
+            )
+
+        if isinstance(context_err, psycopg.errors.UniqueViolation):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"detail": "Unique constraint violation caught."},
+            )
+        elif isinstance(context_err, psycopg.errors.NumericValueOutOfRange):
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"detail": "Data error."},
+            )
+
+        raise err
+
 
 app.add_middleware(
     CORSMiddleware,

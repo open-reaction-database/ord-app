@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Select } from '@mantine/core';
-import { useSelector } from 'react-redux';
-import { selectOrderedGroupsList } from 'store/entities/groups/groups.selectors';
-import { useMemo } from 'react';
+import { combineReducers, createReducer } from '@reduxjs/toolkit';
+import { setEnumerationSetupOpenedAction } from './enumerationSetup.actions.ts';
+import { startEnumerationActions } from '../../entities/enumeration/enumeration.actions.ts';
 
-export function GroupSelector() {
-  const groupsList = useSelector(selectOrderedGroupsList);
-  const data = useMemo(() => {
-    return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
-  }, [groupsList]);
-  return (
-    <Select
-      data={data}
-      label="Group"
-      searchable
-      required
-    />
-  );
-}
+const isEnumerationSetupOpened = createReducer(false, builder => {
+  builder.addCase(setEnumerationSetupOpenedAction, (_, { payload }) => payload);
+  builder.addCase(startEnumerationActions, () => false);
+});
+
+export const enumerationSetupReducer = combineReducers({
+  isEnumerationSetupOpened,
+});

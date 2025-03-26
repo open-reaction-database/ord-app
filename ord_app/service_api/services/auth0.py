@@ -17,7 +17,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
 from starlette.concurrency import run_in_threadpool
 
-from ord_app.service_api.services.exceptions import UnauthenticatedError, UnauthorizedError
+from ord_app.service_api.services.exceptions import ForbiddenError, UnauthenticatedError
 from ord_app.service_api.settings import RuntimeSettings
 
 jwks_client = jwt.PyJWKClient(f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json")
@@ -50,10 +50,10 @@ async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, au
         signing_key = (await run_in_threadpool(jwks_client.get_signing_key_from_jwt, token.credentials)).key
     except jwt.exceptions.PyJWKClientError as error:
         logger.error(error)
-        raise UnauthorizedError(str(error)) from error
+        raise ForbiddenError(str(error)) from error
     except jwt.exceptions.DecodeError as error:
         logger.error(error)
-        raise UnauthorizedError(str(error)) from error
+        raise ForbiddenError(str(error)) from error
 
     try:
         payload = jwt.decode(
@@ -66,7 +66,7 @@ async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, au
         )
     except Exception as error:
         logger.error(error)
-        raise UnauthorizedError(str(error)) from error
+        raise ForbiddenError(str(error)) from error
 
     logger.debug(f"Token verified: {payload}")
 

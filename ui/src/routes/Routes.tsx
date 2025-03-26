@@ -18,6 +18,7 @@ import { DatasetsListRoute } from './DatasetsList/DatasetsList.route.tsx';
 import { TemplatesListRoute } from './TemplatesList/TemplatesList.route.tsx';
 import { useEffect } from 'react';
 import { getAllTemplates } from 'store/entities/templates/templates.thunks.ts';
+import { getGroupList } from 'store/entities/groups/groups.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 const defaultPath = '/datasets';
@@ -27,6 +28,7 @@ export function Routes() {
 
   useEffect(() => {
     dispatch(getAllTemplates());
+    dispatch(getGroupList());
   }, [dispatch]);
 
   return (

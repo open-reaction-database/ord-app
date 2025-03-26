@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
+import classes from 'common/components/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex } from '@mantine/core';
-import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
+import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo } from 'react';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
+import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';

@@ -19,6 +19,7 @@ import { usersReducer } from './users/users.reducer.ts';
 import { groupsReducer } from './groups/groups.reducer.ts';
 import { reactionsReducer } from './reactions/reactions.reducer.ts';
 import { templatesReducer } from './templates/templates.reducer.ts';
+import { enumerationReducer } from './enumeration/enumeration.reducer.ts';
 
 export const entitiesReducer = combineReducers({
   datasets: datasetsReducer,
@@ -26,4 +27,5 @@ export const entitiesReducer = combineReducers({
   groups: groupsReducer,
   reactions: reactionsReducer,
   templates: templatesReducer,
+  enumeration: enumerationReducer,
 });

@@ -17,10 +17,23 @@ import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import type { AppState } from '../configureAppStore.ts';
 import axiosInstance from '../axiosInstance.ts';
 
-export const downloadFile =
+export const downloadFile = (blob: Blob, fileName: string) => {
+  const link = document.createElement('a');
+
+  try {
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+
+    link.remove();
+  } finally {
+    URL.revokeObjectURL(link.href);
+  }
+};
+
+export const downloadFileFromUrl =
   (url: string): ThunkAction<Promise<void>, AppState, void, Action> =>
   async () => {
-    let fileUrl;
     try {
       const response = await axiosInstance.get(url, {
         responseType: 'blob',
@@ -29,35 +42,14 @@ export const downloadFile =
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
       const header = response.headers['content-disposition'];
       const fileName = header.replace(/^.*filename="(.*)"/, '$1');
-
-      const link = document.createElement('a');
-      fileUrl = URL.createObjectURL(blob);
-
-      link.href = fileUrl;
-      // We need content-disposition value to get filename from BE.
-      // Waiting to be exposed by CORS
-      link.setAttribute('download', fileName);
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      downloadFile(blob, fileName);
     } catch (error) {
       console.error(error);
-    } finally {
-      if (fileUrl) {
-        URL.revokeObjectURL(fileUrl);
-      }
     }
   };
 
 export function downloadAsJson<T>(object: T, filename: string) {
   const jsonString = JSON.stringify(object, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
-  const link = document.createElement('a');
-
-  link.href = URL.createObjectURL(blob);
-  link.download = filename || 'data.json';
-  link.click();
-
-  URL.revokeObjectURL(link.href);
+  downloadFile(blob, filename);
 }

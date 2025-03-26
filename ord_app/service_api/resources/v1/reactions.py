@@ -13,13 +13,18 @@
 # limitations under the License.
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, UploadFile, status
+from fastapi import APIRouter, Depends, Query, Response, UploadFile, status
 from fastapi_pagination import Page
 
 from ord_app.service_api.domain.auth import dataset_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
-from ord_app.service_api.schemas.reactions import ReactionCreateSchema, ReactionResponseSchema, ReactionUpdateSchema
+from ord_app.service_api.schemas.reactions import (
+    ReactionCreateSchema,
+    ReactionResponseSchema,
+    ReactionsQueryParams,
+    ReactionUpdateSchema,
+)
 from ord_app.service_api.services.pb_utils import validate_uploaded_pb_file
 
 router = APIRouter(tags=["reactions"], prefix="/datasets/{dataset_id}/reactions")
@@ -71,8 +76,9 @@ async def upload_reaction(
 async def reactions(
     dataset_id: int,
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
+    is_valid: Annotated[ReactionsQueryParams, Query()],
 ):
-    return await use_case.paginate(dataset_id)
+    return await use_case.paginate(dataset_id, is_valid)
 
 
 @router.get(

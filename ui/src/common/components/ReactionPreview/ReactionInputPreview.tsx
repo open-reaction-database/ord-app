@@ -18,10 +18,10 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { useMemo } from 'react';
-import classes from 'features/reactions/ReactionPreview/reactionPreview.module.scss';
+import classes from 'common/components/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex } from '@mantine/core';
-import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
-import { ComponentMetadata } from 'features/reactions/ReactionPreview/ComponentMetadata.tsx';
+import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
+import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 interface ReactionInputPreviewProps {
