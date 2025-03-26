@@ -26,7 +26,6 @@ image = awsx.ecr.Image(
 
 security_group = aws.ec2.SecurityGroup(
     "security_group",
-    vpc_id=backend.get_output("vpc_id"),
     egress=[
         aws.ec2.SecurityGroupEgressArgs(
             from_port=0,
@@ -36,6 +35,15 @@ security_group = aws.ec2.SecurityGroup(
             ipv6_cidr_blocks=["::/0"],
         )
     ],
+    ingress=[
+        aws.ec2.SecurityGroupIngressArgs(
+            from_port=8080,
+            to_port=8080,
+            protocol="tcp",
+            cidr_blocks=[aws.ec2.get_vpc(id=backend.get_output("vpc_id")).cidr_block],
+        )
+    ],
+    vpc_id=backend.get_output("vpc_id"),
 )
 
 cluster = aws.ecs.Cluster("cluster")
@@ -69,9 +77,7 @@ service = awsx.ecs.FargateService(
                     awsx.ecs.TaskDefinitionKeyValuePairArgs(
                         name="POSTGRES_HOST", value=backend.get_output("rds_endpoint")
                     ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="POSTGRES_USER", value="http://localhost:8000/service_api/api/v1"
-                    ),
+                    awsx.ecs.TaskDefinitionKeyValuePairArgs(name="POSTGRES_USER", value="ord"),
                     awsx.ecs.TaskDefinitionKeyValuePairArgs(
                         name="POSTGRES_PASSWORD",
                         value=aws.secretsmanager.get_secret_version(

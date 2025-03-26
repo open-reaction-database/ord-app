@@ -6,6 +6,8 @@ import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx
 
+from ord_interface.editor.py.serve import health_check
+
 backend = pulumi.StackReference("ord/backend/prod")
 
 
@@ -83,7 +85,12 @@ certificate_validation = aws.acm.CertificateValidation(
 )
 
 target_group = aws.lb.TargetGroup(
-    "target-group", port=8080, protocol="HTTP", target_type="ip", vpc_id=backend.get_output("vpc_id")
+    "target-group",
+    health_check=aws.lb.TargetGroupHealthCheckArgs(path="/editor/healthcheck"),
+    port=8080,
+    protocol="HTTP",
+    target_type="ip",
+    vpc_id=backend.get_output("vpc_id"),
 )
 load_balancer = awsx.lb.ApplicationLoadBalancer(
     "load-balancer",
