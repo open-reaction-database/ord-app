@@ -1,0 +1,83 @@
+"""An AWS Python Pulumi program."""
+
+import json
+
+import pulumi
+import pulumi_aws as aws
+
+backend = pulumi.StackReference("ord/backend/prod")
+
+
+current = aws.get_caller_identity()
+key = aws.kms.Key(
+    "key",
+    customer_master_key_spec="ECC_NIST_P256",
+    deletion_window_in_days=7,
+    key_usage="SIGN_VERIFY",
+    policy=json.dumps(
+        {
+            "Statement": [
+                {
+                    "Action": [
+                        "kms:DescribeKey",
+                        "kms:GetPublicKey",
+                        "kms:Sign",
+                        "kms:Verify",
+                    ],
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "dnssec-route53.amazonaws.com",
+                    },
+                    "Resource": "*",
+                    "Sid": "Allow Route 53 DNSSEC Service",
+                },
+                {
+                    "Action": "kms:*",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": f"arn:aws:iam::{current.account_id}:root",
+                    },
+                    "Resource": "*",
+                    "Sid": "Enable IAM User Permissions",
+                },
+            ],
+            "Version": "2012-10-17",
+        }
+    ),
+)
+zone = aws.route53.Zone("zone", name="open-reaction-database.com")
+key_signing_key = aws.route53.KeySigningKey(
+    "key_signing_key", hosted_zone_id=zone.id, key_management_service_arn=key.arn
+)
+hosted_zone_dns_sec = aws.route53.HostedZoneDnsSec(
+    "hosted_zone_dns_sec",
+    hosted_zone_id=key_signing_key.hosted_zone_id,
+    opts=pulumi.ResourceOptions(depends_on=[key_signing_key]),
+)
+
+records = []
+
+
+def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs]) -> None:
+    for i, value in enumerate(options):
+        records.append(
+            aws.route53.Record(
+                f"record-{i}",
+                allow_overwrite=True,
+                name=value.resource_record_name,
+                records=[value.resource_record_value],
+                ttl=300,
+                type=aws.route53.RecordType(value.resource_record_type),
+                zone_id=zone.zone_id,
+            )
+        )
+
+
+certificate = aws.acm.Certificate("certificate", domain_name="open-reaction-database.com", validation_method="DNS")
+certificate.domain_validation_options.apply(create_records)
+certificate_validation = aws.acm.CertificateValidation(
+    "certificate_validation",
+    certificate_arn=certificate.arn,
+    validation_record_fqdns=[record.fqdn for record in records],
+)
+# listener = aws.lb.Listener("listener", certificate_arn=certificate_validation.certificate_arn)

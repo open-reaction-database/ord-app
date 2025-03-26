@@ -52,11 +52,16 @@ cluster = aws.rds.Cluster(
     vpc_security_group_ids=[cluster_security_group.id],
 )
 
-rds_secret = aws.secretsmanager.Secret("rds_secret")
+rds_password_secret = aws.secretsmanager.Secret("rds_password")
 aws.secretsmanager.SecretVersion(
-    "rds_secret_version",
+    "rds_password_secret_version",
+    aws.secretsmanager.SecretVersionArgs(secret_id=rds_password_secret.id, secret_string=rds_password.result),
+)
+rds_dsn_secret = aws.secretsmanager.Secret("rds_dsn")
+aws.secretsmanager.SecretVersion(
+    "rds_dsn_secret_version",
     aws.secretsmanager.SecretVersionArgs(
-        secret_id=rds_secret.id,
+        secret_id=rds_dsn_secret.id,
         secret_string=pulumi.Output.format(
             "psycopg+postgresql://ord:{0}@{1}:5432/app", rds_password.result, cluster.endpoint
         ),
@@ -98,4 +103,6 @@ dev_security_group = aws.ec2.SecurityGroup(
 pulumi.export("vpc_id", vpc.vpc_id)
 pulumi.export("public_subnet_ids", vpc.public_subnet_ids)
 pulumi.export("private_subnet_ids", vpc.private_subnet_ids)
-pulumi.export("rds_secret_arn", rds_secret.arn)
+pulumi.export("rds_endpoint", cluster.endpoint)
+pulumi.export("rds_password_secret_arn", rds_password_secret.arn)
+pulumi.export("rds_dsn_secret_arn", rds_dsn_secret.arn)
