@@ -6,8 +6,6 @@ import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx
 
-from ord_interface.editor.py.serve import health_check
-
 backend = pulumi.StackReference("ord/backend/prod")
 
 
@@ -85,12 +83,7 @@ certificate_validation = aws.acm.CertificateValidation(
 )
 
 target_group = aws.lb.TargetGroup(
-    "target-group",
-    health_check=aws.lb.TargetGroupHealthCheckArgs(path="/editor/healthcheck"),
-    port=8080,
-    protocol="HTTP",
-    target_type="ip",
-    vpc_id=backend.get_output("vpc_id"),
+    "target-group", port=8080, protocol="HTTP", target_type="ip", vpc_id=backend.get_output("vpc_id")
 )
 load_balancer = awsx.lb.ApplicationLoadBalancer(
     "load-balancer",
@@ -115,6 +108,20 @@ load_balancer = awsx.lb.ApplicationLoadBalancer(
         ),
     ],
     subnet_ids=backend.get_output("public_subnet_ids"),
+)
+
+aws.route53.Record(
+    "alias",
+    aliases=[
+        aws.route53.RecordAliasArgs(
+            evaluate_target_health=False,
+            name=load_balancer.load_balancer.dns_name,
+            zone_id=load_balancer.load_balancer.zone_id,
+        )
+    ],
+    name="open-reaction-database.com",
+    type=aws.route53.RecordType.A,
+    zone_id=zone.zone_id,
 )
 
 pulumi.export("target_group_arn", target_group.arn)

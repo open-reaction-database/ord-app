@@ -54,6 +54,11 @@ service = awsx.ecs.FargateService(
     "service",
     awsx.ecs.FargateServiceArgs(
         cluster=cluster.arn,
+        load_balancers=[
+            aws.ecs.ServiceLoadBalancerArgs(
+                container_name="container", container_port=8080, target_group_arn=domain.get_output("target_group_arn")
+            )
+        ],
         network_configuration=aws.ecs.ServiceNetworkConfigurationArgs(
             subnets=backend.get_output("private_subnet_ids"),
             security_groups=[security_group.id],
@@ -65,13 +70,7 @@ service = awsx.ecs.FargateService(
                 cpu=4096,
                 memory=8192,
                 essential=True,
-                port_mappings=[
-                    awsx.ecs.TaskDefinitionPortMappingArgs(
-                        container_port=8080,
-                        host_port=8080,
-                        target_group=domain.get_output("target_group_arn"),
-                    )
-                ],
+                port_mappings=[awsx.ecs.TaskDefinitionPortMappingArgs(container_port=8080, host_port=8080)],
                 # TODO(skearnes): Use `secrets` as well; requires an updated execution role with secrets access.
                 environment=[
                     awsx.ecs.TaskDefinitionKeyValuePairArgs(
