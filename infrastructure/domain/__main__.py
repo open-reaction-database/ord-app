@@ -4,6 +4,7 @@ import json
 
 import pulumi
 import pulumi_aws as aws
+import pulumi_awsx as awsx
 
 backend = pulumi.StackReference("ord/backend/prod")
 
@@ -80,4 +81,33 @@ certificate_validation = aws.acm.CertificateValidation(
     certificate_arn=certificate.arn,
     validation_record_fqdns=[record.fqdn for record in records],
 )
-# listener = aws.lb.Listener("listener", certificate_arn=certificate_validation.certificate_arn)
+
+target_group = aws.lb.TargetGroup(
+    "target-group", port=8080, protocol="HTTP", target_type="ip", vpc_id=backend.get_output("vpc_id")
+)
+load_balancer = awsx.lb.ApplicationLoadBalancer(
+    "load-balancer",
+    listeners=[
+        awsx.lb.ListenerArgs(
+            default_actions=[
+                aws.lb.ListenerDefaultActionArgs(
+                    type="redirect",
+                    redirect=aws.lb.ListenerDefaultActionRedirectArgs(
+                        port="443", protocol="HTTPS", status_code="HTTP_301"
+                    ),
+                )
+            ],
+            port=80,
+            protocol="HTTP",
+        ),
+        awsx.lb.ListenerArgs(
+            certificate_arn=certificate_validation.certificate_arn,
+            default_actions=[aws.lb.ListenerDefaultActionArgs(type="forward", target_group_arn=target_group.arn)],
+            port=443,
+            protocol="HTTPS",
+        ),
+    ],
+    subnet_ids=backend.get_output("public_subnet_ids"),
+)
+
+pulumi.export("target_group_arn", target_group.arn)
