@@ -7,6 +7,7 @@ import pulumi_aws as aws
 import pulumi_awsx as awsx
 
 backend = pulumi.StackReference("ord/backend/prod")
+domain = pulumi.StackReference("ord/domain/prod")
 
 repository = awsx.ecr.Repository(
     "repository",
@@ -21,12 +22,6 @@ image = awsx.ecr.Image(
         dockerfile="../../../ord-interface/ord_interface/Dockerfile",
         platform="linux/amd64",
     ),
-)
-
-lb = awsx.lb.ApplicationLoadBalancer(
-    "lb",
-    default_target_group_port=8080,
-    subnet_ids=backend.get_output("public_subnet_ids"),
 )
 
 security_group = aws.ec2.SecurityGroup(
@@ -66,7 +61,7 @@ service = awsx.ecs.FargateService(
                     awsx.ecs.TaskDefinitionPortMappingArgs(
                         container_port=8080,
                         host_port=8080,
-                        target_group=lb.default_target_group,
+                        target_group=domain.get_output("target_group_arn"),
                     )
                 ],
                 # TODO(skearnes): Use `secrets` as well; requires an updated execution role with secrets access.
