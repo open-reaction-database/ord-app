@@ -36,16 +36,16 @@ export function ReactionEditDeleteButtons({
       align="center"
       className={classes.buttonsWrapper}
     >
-      <EditButton onClick={onEdit} />
-      <Divider
-        className={classes.actionDivider}
-        orientation="vertical"
-      />
       <ReactionEntityDelete
         reactionId={reactionId}
         entityName={entityName}
         pathComponents={pathComponents}
       />
+      <Divider
+        className={classes.actionDivider}
+        orientation="vertical"
+      />
+      <EditButton onClick={onEdit} />
     </Flex>
   );
 }
