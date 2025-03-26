@@ -91,6 +91,37 @@ cluster_instance = aws.rds.ClusterInstance(
     instance_class="db.serverless",
 )
 
+redis_security_group = aws.ec2.SecurityGroup(
+    "redis_security_group",
+    ingress=[
+        aws.ec2.SecurityGroupIngressArgs(
+            from_port=6379,
+            to_port=6379,
+            protocol="tcp",
+            cidr_blocks=[vpc.vpc.cidr_block],
+        )
+    ],
+    vpc_id=vpc.vpc_id,
+)
+redis = aws.elasticache.ServerlessCache(
+    "redis",
+    name="redis",
+    engine="redis",
+    cache_usage_limits={
+        "data_storage": {
+            "maximum": 10,
+            "unit": "GB",
+        },
+        "ecpu_per_seconds": [
+            {
+                "maximum": 5000,
+            }
+        ],
+    },
+    security_group_ids=[redis_security_group.id],
+    subnet_ids=vpc.private_subnet_ids,
+)
+
 dev_security_group = aws.ec2.SecurityGroup(
     "dev_security_group",
     egress=[
@@ -120,3 +151,4 @@ pulumi.export("private_subnet_ids", vpc.private_subnet_ids)
 pulumi.export("rds_endpoint", cluster.endpoint)
 pulumi.export("rds_password_secret_arn", rds_password_secret.arn)
 pulumi.export("rds_dsn_secret_arn", rds_dsn_secret.arn)
+pulumi.export("redis_endpoint", redis.endpoints.apply(lambda endpoints: endpoints[0]["address"]))
