@@ -15,9 +15,11 @@
  */
 import type { FC } from 'react';
 import type { ReactionViewDeleteButtonsProps } from './ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
+import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
 
 interface ReactionContextBase {
   ViewDeleteButtonsComponent: FC<ReactionViewDeleteButtonsProps>;
+  ValueLabelComponent: FC<ReactionValueLabelProps>;
 }
 
 interface TemplateReactionContext {

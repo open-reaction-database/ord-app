@@ -16,6 +16,7 @@
 import type { Optional } from '../reactions/reactionEntity/reactionEntity.types.ts';
 import type { CreateNewDatasetPayload } from '../datasets/datasets.types.ts';
 import type { ReactionTemplate } from '../reactions/reactions.types.ts';
+import type { Variable } from '../templates/templates.types.ts';
 
 export type TemplateCSVRow = Record<string, string | boolean | number>;
 
@@ -39,7 +40,9 @@ export interface SetupEnumeration extends EnumerationBase {
   templateId: string;
 }
 
-type TemplateInformation = Pick<ReactionTemplate, 'data' | 'variables'>;
+type TemplateInformation = Pick<ReactionTemplate, 'data'> & {
+  variables: Array<Variable>;
+};
 
 export type StartEnumeration = EnumerationBase & TemplateInformation;
 

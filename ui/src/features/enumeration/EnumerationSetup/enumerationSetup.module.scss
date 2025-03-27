@@ -78,3 +78,14 @@ $headerHeight: 64px;
     align-items: center;
   }
 }
+
+.templateLabelAnchor {
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  align-items: center;
+
+  & svg {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 import { useParams } from 'wouter';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import classes from './templatePage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
-import { getTemplate } from 'store/entities/templates/templates.thunks';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
-import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+import { TemplateReactionValueLabelWrapper } from 'features/reactions/ReactionInteractions/ReactionValueLabel/TemplateReactionValueLabel.tsx';
+import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 
 export function TemplatePage() {
-  const dispatch = useAppDispatch();
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
   const templateId = `template_${rawTemplateId}`;
   const template = useSelector(selectReactionById(templateId));
@@ -46,16 +44,13 @@ export function TemplatePage() {
     ];
   }, [templateId, template?.name]);
 
-  useEffect(() => {
-    dispatch(getTemplate(parseInt(rawTemplateId)));
-  }, [dispatch, rawTemplateId]);
-
   const reactionContextValue = useMemo(
     (): ReactionsContext => ({
       reactionId: templateId,
       isTemplate: true,
       isViewOnly: true,
-      ViewDeleteButtonsComponent: ReactionViewButton,
+      ViewDeleteButtonsComponent: ReactionSetVariablesButton,
+      ValueLabelComponent: TemplateReactionValueLabelWrapper,
     }),
     [templateId],
   );

@@ -15,18 +15,24 @@
  */
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormDate } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { useUncontrolled } from '@mantine/hooks';
 import { DateInput, type DateValue } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Input, TextInput } from '@mantine/core';
-import { useCallback, useState, type FocusEvent, useContext } from 'react';
+import { type FocusEvent, useCallback, useContext, useState } from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
 
 export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
-  const label = useReactionEntityLabel(node.wrapperConfig);
-  const { isViewOnly } = useContext(reactionContext);
+  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const label = (
+    <ValueLabelComponent
+      name={node.name}
+      type={VariableType.Date}
+      wrapperConfig={node.wrapperConfig}
+    />
+  );
 
   const [value, onChange] = useUncontrolled({
     ...formMethods.getInputProps(node.name),

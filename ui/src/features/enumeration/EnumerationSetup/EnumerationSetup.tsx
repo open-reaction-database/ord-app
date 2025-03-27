@@ -32,10 +32,15 @@ import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.ty
 
 interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
+  templateId?: string;
   onClose: () => void;
 }
 
-export function EnumerationSetup({ datasetId, onClose }: Readonly<CreateDatasetFromEnumerationProps>) {
+export function EnumerationSetup({
+  datasetId,
+  templateId: initialTemplateId,
+  onClose,
+}: Readonly<CreateDatasetFromEnumerationProps>) {
   const dispatch = useAppDispatch();
   const handleSubmit = useCallback(
     (data: SetupEnumeration) => {
@@ -51,7 +56,7 @@ export function EnumerationSetup({ datasetId, onClose }: Readonly<CreateDatasetF
         name: '',
         description: '',
       },
-      templateId: '',
+      templateId: initialTemplateId ?? '',
       csvFile: null,
       templateCSV: null,
       matching: [],
@@ -109,7 +114,10 @@ export function EnumerationSetup({ datasetId, onClose }: Readonly<CreateDatasetF
             />
           </Flex>
 
-          <TemplateFileSelector form={form} />
+          <TemplateFileSelector
+            form={form}
+            templateDisabled={!!initialTemplateId}
+          />
 
           <ReactionEntityBlockTitle leftSection={<Title order={3}>Reaction</Title>} />
           {template && <ReactionPreview reaction={template} />}

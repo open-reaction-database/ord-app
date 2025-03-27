@@ -17,9 +17,10 @@ import { Button } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { EnumerateIcon, DownloadIcon } from 'common/icons';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { downloadAsJson, downloadFile } from 'store/utils/downloadFile.thunks.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { useCallback } from 'react';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { downloadTemplateCsv, downloadTemplateInJSON } from 'store/entities/templates/templates.thunks.ts';
 
 interface TemplateHeaderActionsProps {
   templateId: string;
@@ -27,18 +28,18 @@ interface TemplateHeaderActionsProps {
 
 export function TemplateHeaderActions({ templateId }: Readonly<TemplateHeaderActionsProps>) {
   const template = useSelector(selectReactionById(templateId));
-  const { variables, name } = template;
+  const dispatch = useAppDispatch();
+  const { variables } = template;
+  const variablesList = Object.values(variables);
 
-  const onJsonDownload = () => {
-    downloadAsJson(template, `${name}.json`);
-  };
+  const onJsonDownload = useCallback(() => {
+    dispatch(downloadTemplateInJSON(templateId));
+  }, [dispatch, templateId]);
   const onCSVDownload = useCallback(() => {
-    const content = variables.map(variable => variable.name).join('; ');
-    const blob = new Blob([content], { type: 'text/csv' });
-    downloadFile(blob, `${name}.csv`);
-  }, [name, variables]);
+    dispatch(downloadTemplateCsv(templateId));
+  }, [dispatch, templateId]);
 
-  const isReadyForEnumeration = template.variables.length > 0;
+  const isReadyForEnumeration = variablesList.length > 0;
 
   return (
     <>

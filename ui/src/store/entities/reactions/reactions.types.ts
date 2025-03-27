@@ -77,7 +77,7 @@ export interface DatasetReaction extends BaseReaction {
 export interface ReactionTemplate extends BaseReaction {
   id: string;
   name: string;
-  variables: Array<Variable>;
+  variables: Record<string, Variable>;
 }
 
 export type ReactionOrTemplate = DatasetReaction | ReactionTemplate;

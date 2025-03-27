@@ -29,8 +29,9 @@ export const startEnumeration: ThunkCustomWrapper<SetupEnumeration> =
   ({ templateId, ...rest }) =>
   (dispatch, getState) => {
     const template = selectReactionById(templateId)(getState());
+    const variablesList = Object.values(template.variables);
 
-    dispatch(startEnumerationActions({ ...rest, data: template.data, variables: template.variables }));
+    dispatch(startEnumerationActions({ ...rest, data: template.data, variables: variablesList }));
     dispatch(enumerateBatchResult({ reactions: [], errors: [] }));
   };
 

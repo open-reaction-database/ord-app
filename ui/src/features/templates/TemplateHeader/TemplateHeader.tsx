@@ -33,7 +33,8 @@ interface TemplateHeaderProps {
 export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
   const dispatch = useAppDispatch();
   const template = useSelector(selectReactionById(templateId));
-  const isReadyForEnumeration = template?.variables.length > 0;
+  const variablesSize = Object.keys(template?.variables ?? {}).length;
+  const isReadyForEnumeration = variablesSize > 0;
   const [opened, { open, close }] = useDisclosure();
   const onTemplateNameChange = useCallback(
     async (_name: string) => {

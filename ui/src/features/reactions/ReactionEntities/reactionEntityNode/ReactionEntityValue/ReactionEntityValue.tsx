@@ -16,16 +16,34 @@
 import { NumberInput, Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+
+const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
+  switch (inputType) {
+    case 'number':
+      return VariableType.Number;
+    case 'string':
+    case 'textarea':
+      return VariableType.String;
+  }
+};
 
 export function ReactionEntityValue({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValue>>) {
-  const { isViewOnly } = useContext(reactionContext);
-  const label = useReactionEntityLabel(node.wrapperConfig);
+  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const type = getVariableType(node.inputType);
+
+  const label = (
+    <ValueLabelComponent
+      name={node.name}
+      type={type}
+      wrapperConfig={node.wrapperConfig}
+    />
+  );
 
   const inputProps = { placeholder: 'Type', ...(node.inputConfig ?? {}) };
   const props = { name: node.name, label, ...inputProps };

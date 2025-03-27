@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { TemplateCreator } from './templates.types.ts';
+import type { AddUpdateRemoveVariablePayload, TemplateCreator } from './templates.types.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 const { createAsyncAction } = createActionFactory('templates');
@@ -30,3 +30,7 @@ export const removeTemplateActions = createAsyncAction<string, string>('remove_t
 export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, ReactionTemplate>(
   'rename_template',
 );
+
+export const addUpdateVariableActions = createAsyncAction<AddUpdateRemoveVariablePayload, void>('addUpdateVariable');
+
+export const removeVariableActions = createAsyncAction<AddUpdateRemoveVariablePayload, void>('removeVariable');

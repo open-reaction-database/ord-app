@@ -19,8 +19,10 @@ import {
   getAllTemplatesActions,
   removeTemplateActions,
   renameTemplateActions,
+  addUpdateVariableActions,
+  removeVariableActions,
 } from './templates.actions.ts';
-import type { TemplateResponse } from './templates.types.ts';
+import type { TemplateResponse, Variable } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
 import {
@@ -36,16 +38,31 @@ import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import { ordTemplateVariablesToReaction, reactionTemplateVariablesToOrd } from './temlpates.converters.ts';
+import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
+import type { ThunkDispatch, Action } from '@reduxjs/toolkit';
+import type { AppState } from '../../configureAppStore.ts';
+import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
 
-const parseTemplate = ({ id, binpb, molblocks, variables, ...rest }: TemplateResponse): ReactionTemplate => {
+const getTemplateIdNumber = (templateId: string): number => parseInt(templateId.split('_')[1]);
+const getTemplateIdString = (templateId: number): string => `template_${templateId}`;
+
+const parseTemplate = ({
+  id,
+  binpb,
+  molblocks,
+  variables: rawVariables,
+  ...rest
+}: TemplateResponse): ReactionTemplate => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
+  const variablesParsed: Array<Variable> = JSON.parse(rawVariables);
 
   return {
-    id: `template_${id}`,
-    variables: JSON.parse(variables),
+    id: getTemplateIdString(id),
+    variables: ordTemplateVariablesToReaction(variablesParsed, appReaction),
     previews,
     data: appReaction,
     ...rest,
@@ -86,7 +103,7 @@ export const createTemplate = createThunkWithExplicitResult(
 );
 
 export const removeTemplate = createThunkWithExplicitResult(removeTemplateActions, async (dispatch, _s, templateId) => {
-  const entityId = parseInt(templateId.split('_')[1]);
+  const entityId = getTemplateIdNumber(templateId);
   await axiosInstance.delete(`/templates/${entityId}`);
   dispatch(removeTemplateActions.success(templateId));
   navigate(`/templates`);
@@ -101,10 +118,44 @@ export const renameTemplate = createThunk(renameTemplateActions, async (_d, getS
     binpb: binpb,
     variables: JSON.stringify(baseReaction.variables),
   };
-  const templateIdNumber = parseInt(templateId.split('_')[1]);
-  const result = await axiosInstance.patch<TemplateResponse>(`templates/${templateIdNumber}`, payload);
+  const entityId = getTemplateIdNumber(templateId);
+  const result = await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, payload);
   const template = parseTemplate(result.data);
   showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
 
   return renameTemplateActions.success(template);
 });
+
+const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> = templateId => async (_d, getState) => {
+  const { variables, data: reaction } = selectReactionById(templateId)(getState());
+  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+  const entityId = getTemplateIdNumber(templateId);
+  await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, { variables: JSON.stringify(variablesList) });
+  showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
+};
+
+export const addUpdateVariable = createThunk(addUpdateVariableActions, async (dispatch, _g, { templateId }) => {
+  await (dispatch as ThunkDispatch<AppState, never, Action>)(syncVariablesWithBackend(templateId));
+  return addUpdateVariableActions.success();
+});
+
+export const removeVariable = createThunk(removeVariableActions, async (dispatch, _g, { templateId }) => {
+  await (dispatch as ThunkDispatch<AppState, never, Action>)(syncVariablesWithBackend(templateId));
+  return removeVariableActions.success();
+});
+
+export const downloadTemplateCsv: ThunkCustomWrapper<string> = (templateId: string) => (_d, getState) => {
+  const { variables, data: reaction, name } = selectReactionById(templateId)(getState());
+  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+  const content = variablesList.map(variable => variable.name).join('; ');
+  const blob = new Blob([content], { type: 'text/csv' });
+  downloadFile(blob, `${name}.csv`);
+};
+
+export const downloadTemplateInJSON: ThunkCustomWrapper<string> = (templateId: string) => (_d, getState) => {
+  const { variables, data: reaction, name } = selectReactionById(templateId)(getState());
+  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+  const ordReaction = reactionToOrdReaction(reaction);
+  const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  downloadAsJson({ variables: variablesList, binpb }, `${name}.json`);
+};
