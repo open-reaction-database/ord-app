@@ -35,6 +35,8 @@ from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
+    DatasetEnumerateCreateSchema,
+    DatasetEnumerateExtendSchema,
     DatasetShareCreateSchema,
     DownloadFileFormats,
 )
@@ -54,6 +56,17 @@ class DatasetUseCases:
     ) -> DatasetModel:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
         return await self.dataset_repository.get(dataset.id)
+
+    async def enumerate(self, group_id, payload: DatasetEnumerateCreateSchema):
+        dataset_payload = {"name": payload.name, "description": payload.description}
+        dataset = await self.dataset_repository.create(group_id, self.current_user.id, dataset_payload)
+        await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
+        return dataset
+
+    async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema):
+        dataset = await self.dataset_repository.get(dataset_id)
+        await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
+        return dataset
 
     async def get(self, dataset_id: int) -> DatasetModel:
         dataset = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
