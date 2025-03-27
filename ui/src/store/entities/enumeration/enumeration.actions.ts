@@ -26,4 +26,4 @@ export const enumerateBatchActions = createAsyncAction<EnumerationBatchRequest, 
 
 export const interruptEnumerationAction = createAction<void>('interruptEnumeration');
 
-export const finishEnumerationAction = createAction<number>('finishEnumeration');
+export const finishEnumerationAction = createAction<number | null>('finishEnumeration');

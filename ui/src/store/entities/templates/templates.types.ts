@@ -19,7 +19,6 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 export enum VariableType {
   String = 'string',
   Number = 'number',
-  Boolean = 'boolean',
   Select = 'select',
   Date = 'date',
 }

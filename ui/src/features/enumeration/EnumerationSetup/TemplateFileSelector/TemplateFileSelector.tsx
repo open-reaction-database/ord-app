@@ -28,13 +28,27 @@ import type { VariableMatch } from 'store/entities/enumeration/enumeration.types
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
 import { DownloadIcon } from 'common/icons';
+import type { CastingContext } from 'csv-parse';
 
 interface TemplateFileSelectorProps {
   templateDisabled: boolean;
   form: EnumerationForm;
 }
 
-type ParseOptions = Parameters<typeof parse>[1];
+function cast(value: string, context: CastingContext): string | number | boolean {
+  if (context.header) {
+    return value;
+  }
+  const lowerCaseValue = value.toLowerCase();
+  if (['true', 'false'].includes(lowerCaseValue)) {
+    return lowerCaseValue === 'true';
+  }
+  const parsedValue = parseFloat(value);
+  if (!Number.isNaN(parsedValue)) {
+    return parsedValue;
+  }
+  return value;
+}
 
 export function TemplateFileSelector({ form, templateDisabled }: Readonly<TemplateFileSelectorProps>) {
   const dispatch = useAppDispatch();
@@ -105,12 +119,8 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
         const buffer = await file.arrayBuffer();
         const newValue = Buffer.from(buffer).toString();
         const delimiter = guessDelimiter(newValue);
-        const options: ParseOptions = {
-          cast: true,
-          delimiter,
-        };
-        const [headers] = parse(newValue, options);
-        const content = parse(newValue, { ...options, columns: true });
+        const [headers] = parse(newValue, { delimiter });
+        const content = parse(newValue, { delimiter, cast: cast, columns: true });
         form.setFieldValue('templateCSV', {
           headers,
           content,

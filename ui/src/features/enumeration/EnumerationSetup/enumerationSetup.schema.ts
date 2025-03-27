@@ -16,12 +16,7 @@
 import * as yup from 'yup';
 import { requiredTextField } from 'common/utils/requiredTextField.schema.ts';
 
-export const enumerationSetupSchema = yup.object({
-  dataset: yup.object({
-    groupId: yup.number().required().label('Group'),
-    name: requiredTextField('Name'),
-    description: requiredTextField('Description'),
-  }),
+export const enumerationSetupSchemaBase = yup.object({
   templateId: yup.string().required().label('Template'),
   csvFile: yup.mixed().required().label('CSV File'),
   matching: yup.array().of(
@@ -30,4 +25,16 @@ export const enumerationSetupSchema = yup.object({
       csvColumn: yup.string().required().label('CSV Column'),
     }),
   ),
+});
+
+export const enumerationSetupNewDatasetSchema = enumerationSetupSchemaBase.shape({
+  dataset: yup.object({
+    groupId: yup.number().required().label('Group'),
+    name: requiredTextField('Name'),
+    description: requiredTextField('Description'),
+  }),
+});
+
+export const enumerationSetupExistingDatasetSchema = enumerationSetupSchemaBase.shape({
+  dataset: yup.number().required(),
 });

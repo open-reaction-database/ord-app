@@ -19,9 +19,8 @@ import type { ActionPayload } from 'common/types';
 import { selectEnumerationProgress } from './enumeration.selectors.ts';
 import type { EnumerationProgress, SetupEnumeration } from './enumeration.types.ts';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
-import { ord } from 'ord-schema-protobufjs';
-import type { CreateDatasetBase } from '../datasets/datasets.types.ts';
-import { createDatasetFromFileOperation } from '../datasets/datasets.thunks.ts';
+import type { CreateDatasetBase, Dataset } from '../datasets/datasets.types.ts';
+import axiosInstance from '../../axiosInstance.ts';
 
 const BATCH_SIZE = 50;
 
@@ -70,10 +69,9 @@ export const enumerateBatchResult: ThunkCustomWrapper<ActionPayload<typeof enume
 
 const fakeDataset: CreateDatasetBase = { name: '', description: '' };
 
-function prepareDatasetFile(enumerationProgress: EnumerationProgress): File {
+function prepareDataset(enumerationProgress: EnumerationProgress): CreateDatasetBase & { reactions: Array<string> } {
   const { dataset, reactions } = enumerationProgress;
   const isNewDataset = typeof dataset === 'object';
-  const jsonReactions = reactions.map(binpb => ord.Reaction.decode(Buffer.from(binpb, 'base64')));
   const datasetForFile = isNewDataset
     ? {
         name: dataset.name,
@@ -81,27 +79,36 @@ function prepareDatasetFile(enumerationProgress: EnumerationProgress): File {
       }
     : fakeDataset;
 
-  const datasetWithReactions = JSON.stringify({
+  return {
     ...datasetForFile,
-    reactions: jsonReactions,
-  });
-  return new File([datasetWithReactions], 'dataset.json');
+    reactions,
+  };
 }
-
-//
 
 export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch, getState) => {
   const enumerationProgress = selectEnumerationProgress(getState());
   if (!enumerationProgress) {
     return;
   }
-  const { dataset } = enumerationProgress;
+  const { dataset, reactions } = enumerationProgress;
 
-  const file = prepareDatasetFile(enumerationProgress);
+  if (reactions.length === 0) {
+    dispatch(finishEnumerationAction(null));
+    return;
+  }
+
+  const datasetEnumeration = prepareDataset(enumerationProgress);
   const isNewDataset = typeof dataset === 'object';
 
   if (isNewDataset) {
-    const createdDataset = await createDatasetFromFileOperation(dataset.groupId, file);
+    const createdDataset = await axiosInstance.post<Dataset>(
+      `/groups/${dataset.groupId}/datasets/enumerate`,
+      datasetEnumeration,
+    );
     dispatch(finishEnumerationAction(createdDataset.data.id));
+  } else {
+    const datasetId = dataset;
+    await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
+    dispatch(finishEnumerationAction(datasetId));
   }
 };

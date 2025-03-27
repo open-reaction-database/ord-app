@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Modal, ScrollArea, Title } from '@mantine/core';
+import { Button, Flex, Modal, ScrollArea, Text, Title } from '@mantine/core';
 import type { EnumerationProgress } from 'store/entities/enumeration/enumeration.types.ts';
 import { useCallback } from 'react';
 import { useLocation } from 'wouter';
+import classes from './enumerationResult.module.scss';
 
 interface EnumerationResultProps {
   enumerationProgress: Required<EnumerationProgress>;
@@ -38,7 +39,7 @@ export function EnumerationResult({ enumerationProgress, onClose }: Readonly<Enu
       title="Enumeration Result"
     >
       <Flex direction="column">
-        <Title order={3}>Reactions created: {reactions.length}</Title>
+        <Title order={3}>{resultDatasetId ? `Reactions created: ${reactions.length}` : 'No reactions created'}</Title>
         {errors.length > 0 && (
           <>
             <Title order={3}>Failed to create lines:</Title>
@@ -46,7 +47,16 @@ export function EnumerationResult({ enumerationProgress, onClose }: Readonly<Enu
               h={200}
               scrollbars="y"
             >
-              {errors.map(error => error)}
+              {errors.map(error => (
+                <Flex
+                  key={error.line}
+                  className={classes.errorLine}
+                  gap="sm"
+                >
+                  <Text className={classes.lineText}>Line {error.line}:</Text>
+                  <Text>{error.message}</Text>
+                </Flex>
+              ))}
             </ScrollArea>
           </>
         )}
@@ -61,7 +71,7 @@ export function EnumerationResult({ enumerationProgress, onClose }: Readonly<Enu
           >
             Close
           </Button>
-          <Button onClick={onNavigate}>Go to dataset</Button>
+          {resultDatasetId && <Button onClick={onNavigate}>Go to dataset</Button>}
         </Flex>
       </Flex>
     </Modal>
