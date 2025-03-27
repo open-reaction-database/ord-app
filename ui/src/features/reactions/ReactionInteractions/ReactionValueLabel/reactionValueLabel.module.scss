@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-$badge-color: #3c78d8;
+$badge-color: var(--color-blue);
 $badge-color-hover-or-filled: #0048bb;
 $badge-color-filled-hover: #2970e3;
 $wrapper-height: 28px;
@@ -33,7 +33,7 @@ $wrapper-height: 28px;
 
   & > button.badge {
     height: 20px;
-    background-color: rgba($badge-color, 0.2);
+    background-color: color-mix(in srgb, $badge-color 20%, transparent);
     color: $badge-color;
     border-radius: 4px;
     padding: 0 4px;
