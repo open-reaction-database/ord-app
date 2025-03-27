@@ -20,7 +20,7 @@ import classes from './reactionValueLabel.module.scss';
 import clsx from 'clsx';
 
 export function DatasetReactionValueLabel({ wrapperConfig }: Readonly<ReactionValueLabelProps>) {
-  if (!wrapperConfig || !wrapperConfig.label) {
+  if (!wrapperConfig?.label) {
     return null;
   }
   const shouldDisplayWrapper = wrapperConfig.label || wrapperConfig.hint;

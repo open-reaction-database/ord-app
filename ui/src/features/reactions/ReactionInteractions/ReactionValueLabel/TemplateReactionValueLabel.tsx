@@ -119,7 +119,7 @@ function TemplateReactionValueLabel({ wrapperConfig, name, type }: Readonly<Reac
 }
 
 export function TemplateReactionValueLabelWrapper({ wrapperConfig, type, name }: Readonly<ReactionValueLabelProps>) {
-  if (!wrapperConfig || !wrapperConfig.label) {
+  if (!wrapperConfig?.label) {
     return null;
   }
   return (

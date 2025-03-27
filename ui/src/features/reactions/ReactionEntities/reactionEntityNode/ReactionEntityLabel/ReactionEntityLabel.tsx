@@ -23,7 +23,7 @@ interface ReactionEntityLabelProps {
 }
 
 export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLabelProps>) {
-  if (!wrapperConfig || !wrapperConfig.label) {
+  if (!wrapperConfig?.label) {
     return null;
   }
   const shouldDisplayWrapper = wrapperConfig.label || wrapperConfig.hint;
