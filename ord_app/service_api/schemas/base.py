@@ -16,6 +16,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 MAX_CRITICAL_FIELD_LENGTH = 512
+MAX_FIELD_LENGTH = 8192
 
 
 class BaseSchema(BaseModel):
