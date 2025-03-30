@@ -71,6 +71,11 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
     ...getInputProps('data'),
+    defaultValue: {
+      type: AppDataType.Text,
+      value: '',
+      format: null,
+    },
   });
   const name = formMethods.getValues()['name'];
 
@@ -86,6 +91,7 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
   );
 
   const onValueChange = (newValue: ChangeType) => {
+    if (!dataValue) return;
     if (typeof newValue === 'object' && newValue !== null && 'format' in newValue) {
       onChange({ type: dataValue.type, ...newValue });
     } else if (newValue !== null && typeof newValue === 'object') {
@@ -94,6 +100,8 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
       onChange({ type: dataValue.type, value: newValue });
     }
   };
+
+  if (!dataValue) return null;
 
   return (
     <>

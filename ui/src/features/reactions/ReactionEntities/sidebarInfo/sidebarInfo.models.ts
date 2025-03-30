@@ -181,6 +181,17 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     sidebarTitle: createReactionEntityTitle({ entityName: 'Analytical Data', hasDelete: true }),
     useInitialValues: buildUseInitialValues(value => value),
   },
+  {
+    pathComponents: ['observations'],
+    entityName: ReactionEntity.Observations,
+    label: 'Observations',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Observation',
+      hasDelete: true,
+      description: 'Observations are time-stamped comments, images, etc. that are recorded during the reaction',
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
   ...componentsSidebars,
 ];
 

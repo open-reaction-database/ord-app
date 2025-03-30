@@ -182,4 +182,5 @@ export enum ReactionEntity {
   Analyses = 'analyses',
   Products = 'products',
   Measurements = 'measurements',
+  Observations = 'observations',
 }
