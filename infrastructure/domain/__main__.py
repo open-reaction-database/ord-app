@@ -22,6 +22,7 @@ import pulumi_awsx as awsx
 
 backend = pulumi.StackReference("ord/backend/prod")
 
+DOMAIN = "open-reaction-database.org"
 
 current = aws.get_caller_identity()
 key = aws.kms.Key(
@@ -60,7 +61,7 @@ key = aws.kms.Key(
         }
     ),
 )
-zone = aws.route53.Zone("zone", name="open-reaction-database.com")
+zone = aws.route53.Zone("zone", name=DOMAIN)
 key_signing_key = aws.route53.KeySigningKey(
     "key_signing_key", hosted_zone_id=zone.id, key_management_service_arn=key.arn
 )
@@ -88,7 +89,9 @@ def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs])
         )
 
 
-certificate = aws.acm.Certificate("certificate", domain_name="open-reaction-database.com", validation_method="DNS")
+# NOTE(skearnes): If you have trouble with domain validation, make sure that the
+# hosted zone NS records match the name servers for the registered domain (or vice versa).
+certificate = aws.acm.Certificate("certificate", domain_name=DOMAIN, validation_method="DNS")
 certificate.domain_validation_options.apply(create_records)
 certificate_validation = aws.acm.CertificateValidation(
     "certificate_validation",
@@ -133,8 +136,28 @@ aws.route53.Record(
             zone_id=load_balancer.load_balancer.zone_id,
         )
     ],
-    name="open-reaction-database.com",
+    name=DOMAIN,
     type=aws.route53.RecordType.A,
+    zone_id=zone.zone_id,
+)
+
+# Google Workspace.
+aws.route53.Record(
+    "google_workspace_txt",
+    allow_overwrite=True,
+    name=DOMAIN,
+    records=["google-site-verification=QUbl7fR2jQq9scO7YnphfquwrZL0A90K8vfnJbo3hA4"],
+    ttl=300,
+    type=aws.route53.RecordType.TXT,
+    zone_id=zone.zone_id,
+)
+aws.route53.Record(
+    "google_workspace_mx",
+    allow_overwrite=True,
+    name=DOMAIN,
+    records=["1 smtp.google.com."],
+    ttl=300,
+    type=aws.route53.RecordType.MX,
     zone_id=zone.zone_id,
 )
 

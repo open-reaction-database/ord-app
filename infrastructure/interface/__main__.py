@@ -105,6 +105,7 @@ service = awsx.ecs.FargateService(
                     awsx.ecs.TaskDefinitionKeyValuePairArgs(
                         name="REDIS_HOST", value=backend.get_output("redis_endpoint")
                     ),
+                    awsx.ecs.TaskDefinitionKeyValuePairArgs(name="REDIS_SSL", value="1"),
                 ],
             ),
         ),
