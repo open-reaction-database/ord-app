@@ -25,10 +25,11 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-import type { ObservationWithTime } from './Observation.types';
 import { ord } from 'ord-schema-protobufjs';
 import { ordObservationToReactionObservation } from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
-import { ObservationListItem } from './ObservationListItems';
+import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
+import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
+import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
 
 export const ENTITY_FIELD = 'observations';
 
@@ -72,10 +73,26 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
         gap="sm"
       >
         {observations.map((observation, index) => (
-          <ObservationListItem
-            key={index}
-            observation={observation as ObservationWithTime}
-            index={index}
+          <EntityListItem
+            key={observation.id}
+            entityKey={index}
+            title="Observation"
+            entityField="observations"
+            entity={observation}
+            requiredFields={[
+              {
+                label: 'time',
+                render: ({ time }) => {
+                  return time && time.value ? renderValuePrecisionUnit(time) : '';
+                },
+              },
+              {
+                label: 'data',
+                render: ({ data }) => {
+                  return <AppDataDisplay appData={data} />;
+                },
+              },
+            ]}
           />
         ))}
       </Flex>

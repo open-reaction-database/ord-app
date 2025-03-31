@@ -21,6 +21,7 @@ import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes
 import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
+import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -44,10 +45,12 @@ export interface ReactionMolBlocks {
   outcomes: Array<{ products: Array<ReactionMolBlockProducts> }>;
 }
 
-export interface AppReaction extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes'> {
+export interface AppReaction
+  extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes' | 'observations'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
+  observations: Array<ReactionObservation>;
   notes: ReactionNotes;
 }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import { ord } from 'ord-schema-protobufjs';
 import { ordDataToReactionData, reactionDataToOrdData } from '../reactionData/reactionData.converters';
 import type { AppData } from '../reactionData/reactionData.types';
 import { ordTimeToReaction, reactionTimeToOrd, withId } from '../reactionEntity/reactionEntity.converters';
@@ -22,8 +22,8 @@ import type { ReactionTime } from '../reactionEntity/reactionEntity.types';
 export interface ReactionObservation {
   id: string;
   comment: string;
-  reactionTime: ReactionTime | null;
-  data?: AppData;
+  time: ReactionTime;
+  data: AppData;
   description?: string;
 }
 
@@ -31,20 +31,19 @@ export const ordObservationToReactionObservation = (observation: ord.IReactionOb
   const base: ReactionObservation = {
     id: '',
     comment: observation.comment ?? '',
-    reactionTime: ordTimeToReaction(observation.time),
+    time: ordTimeToReaction(observation.time),
+    data: observation?.image
+      ? ordDataToReactionData(observation.image, 'observation')
+      : ordDataToReactionData(ord.Data.toObject(new ord.Data()), 'observation'),
   };
 
-  const obsWithData = observation.image
-    ? { ...base, data: ordDataToReactionData(observation.image, 'observation_data') }
-    : base;
-
-  return withId(obsWithData);
+  return withId(base);
 };
 
 export const reactionObservationToOrdObservation = (observation: ReactionObservation): ord.IReactionObservation => {
   return {
     comment: observation.comment,
-    image: observation.data ? reactionDataToOrdData(observation.data) : undefined,
-    time: observation.reactionTime ? reactionTimeToOrd(observation.reactionTime) : undefined,
+    image: reactionDataToOrdData(observation.data),
+    time: reactionTimeToOrd(observation.time),
   };
 };

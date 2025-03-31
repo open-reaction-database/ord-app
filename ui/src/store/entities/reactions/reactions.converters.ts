@@ -32,6 +32,10 @@ import {
   reactionNotesToOrd,
 } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import {
+  ordObservationToReactionObservation,
+  reactionObservationToOrdObservation,
+} from './reactionObservation/reactionObservation.converter';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -39,6 +43,7 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
     inputs: ordInputsToReactionInputs(reaction.inputs),
     outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
     identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
+    observations: (reaction.observations || []).map(ordObservationToReactionObservation),
     notes: ordNotesToReaction(reaction.notes),
   };
 }
@@ -49,6 +54,7 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     inputs: reactionInputsToOrdInputs(reaction.inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
     identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
+    observations: reaction.observations.map(reactionObservationToOrdObservation),
     notes: reactionNotesToOrd(reaction.notes),
   };
 }
