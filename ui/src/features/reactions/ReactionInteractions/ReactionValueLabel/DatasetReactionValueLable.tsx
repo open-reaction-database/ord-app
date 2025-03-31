@@ -28,6 +28,7 @@ export function DatasetReactionValueLabel({ wrapperConfig }: Readonly<ReactionVa
     <Flex
       gap="xs"
       align="center"
+      className={classes.badgeWrapper}
     >
       <span>{wrapperConfig.label}</span>
       {wrapperConfig.children}

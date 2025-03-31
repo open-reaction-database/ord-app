@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 64px;
-  height: 41px;
-}
+import { createSelectorFactory } from '../../utils';
+
+const { buildSelector } = createSelectorFactory(state => state.features.variablesSidebar);
+
+export const selectIsVariablesSidebarOpened = buildSelector(state => state.isVariablesSidebarOpened);

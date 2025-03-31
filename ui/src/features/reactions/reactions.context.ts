@@ -27,6 +27,7 @@ const defaultContextValue: ReactionsContext = {
   isViewOnly: false,
   ViewDeleteButtonsComponent: viewDeleteButtonsDefaultValue,
   ValueLabelComponent: valueLabelDefaultValue,
+  ViewOnlyLabelComponent: valueLabelDefaultValue,
 };
 
 export const reactionContext = createContext<ReactionsContext>(defaultContextValue);

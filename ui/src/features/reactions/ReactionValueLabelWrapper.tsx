@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { FC } from 'react';
-import type { ReactionViewDeleteButtonsProps } from './ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
 import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
+import { useContext } from 'react';
+import { reactionContext } from './reactions.context.ts';
 
-interface ReactionContextBase {
-  ViewDeleteButtonsComponent: FC<ReactionViewDeleteButtonsProps>;
-  ValueLabelComponent: FC<ReactionValueLabelProps>;
-  ViewOnlyLabelComponent: FC<ReactionValueLabelProps>;
+export function ReactionValueLabelWrapper({ wrapperConfig, name, type }: Readonly<ReactionValueLabelProps>) {
+  const { isTemplate, ValueLabelComponent, ViewOnlyLabelComponent } = useContext(reactionContext);
+
+  return isTemplate && wrapperConfig?.cannotBeVariable ? (
+    <ViewOnlyLabelComponent
+      name={name}
+      wrapperConfig={wrapperConfig}
+      type={type}
+    />
+  ) : (
+    <ValueLabelComponent
+      name={name}
+      type={type}
+      wrapperConfig={wrapperConfig}
+    />
+  );
 }
-
-interface TemplateReactionContext {
-  isTemplate: true;
-  isViewOnly: true;
-  reactionId: string;
-}
-
-interface DatasetReactionContext {
-  isTemplate: false;
-  isViewOnly: boolean;
-  reactionId: number;
-}
-
-export type ReactionsContext = ReactionContextBase & (TemplateReactionContext | DatasetReactionContext);

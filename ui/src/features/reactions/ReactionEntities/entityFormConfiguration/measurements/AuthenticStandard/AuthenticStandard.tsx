@@ -29,13 +29,13 @@ import { AddCircleIcon, RemoveIcon } from 'common/icons';
 import classes from './authenticStandard.module.scss';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
+import { EditButton } from 'common/components/interactions/EditButton/EditButton.tsx';
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 

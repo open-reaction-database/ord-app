@@ -19,6 +19,7 @@ import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reac
 import { useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
   switch (inputType) {
@@ -34,11 +35,11 @@ export function ReactionEntityValue({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValue>>) {
-  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const { isViewOnly } = useContext(reactionContext);
   const type = getVariableType(node.inputType);
 
   const label = (
-    <ValueLabelComponent
+    <ReactionValueLabelWrapper
       name={node.name}
       type={type}
       wrapperConfig={node.wrapperConfig}

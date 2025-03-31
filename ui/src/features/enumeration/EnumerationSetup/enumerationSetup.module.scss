@@ -17,7 +17,7 @@
 $headerHeight: 64px;
 
 .content {
-  min-width: 928px;
+  min-width: var(--sidebar-width);
 }
 
 .header {

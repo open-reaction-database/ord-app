@@ -18,7 +18,7 @@ import { ActionIcon } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
 import classes from './reactionEntityDelete.module.scss';
 import { useDisclosure } from '@mantine/hooks';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { popReactionPathComponents } from 'store/features/reactionForm/reactionForm.actions.ts';

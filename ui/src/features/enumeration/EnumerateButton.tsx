@@ -15,7 +15,7 @@
  */
 import { ArticleIcon } from 'common/icons';
 import { colorToCssVariable } from 'common/styling/colors.ts';
-import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
+import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { EnumerationSetup } from './EnumerationSetup/EnumerationSetup.tsx';
 import { useSelector } from 'react-redux';
 import { selectIsEnumerationSetupOpened } from 'store/features/enumerationSetup/enumerationSetup.selectors.ts';

@@ -19,18 +19,19 @@ import type { ReactionFormValuePrecisionUnit } from 'features/reactions/Reaction
 import { useContext, useMemo } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntityVPU({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValuePrecisionUnit>>) {
-  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const { isViewOnly } = useContext(reactionContext);
   const name = useMemo(() => {
     return `${node.name}.value`;
   }, [node.name]);
 
   const label = (
-    <ValueLabelComponent
+    <ReactionValueLabelWrapper
       name={name}
       wrapperConfig={node.wrapperConfig}
       type={VariableType.Number}

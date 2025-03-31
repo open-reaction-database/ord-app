@@ -97,11 +97,23 @@ const componentsSidebars: Array<ReactionSidebarInfo> = [
     ...componentIdentifiersSidebarInfo,
   },
   {
+    pathComponents: ['molBlockIdentifiers', 'components', 'inputs'],
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
     pathComponents: ['identifiers', 'authenticStandard'],
     ...componentIdentifiersSidebarInfo,
   },
   {
+    pathComponents: ['molBlockIdentifiers', 'authenticStandard'],
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
     pathComponents: ['identifiers', 'products', 'outcomes'],
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
+    pathComponents: ['molBlockIdentifiers', 'products', 'outcomes'],
     ...componentIdentifiersSidebarInfo,
   },
   {
@@ -184,6 +196,6 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   ...componentsSidebars,
 ];
 
-const additionalEntityNames = ['features', 'data', 'authenticStandard'];
+const additionalEntityNames = ['features', 'authenticStandard', 'molBlockIdentifiers'];
 
 export const allowedEntityNames: Array<string> = [...Object.values(ReactionEntity), ...additionalEntityNames];

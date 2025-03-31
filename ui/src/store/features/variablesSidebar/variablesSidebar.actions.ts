@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 64px;
-  height: 41px;
-}
+import { createActionFactory } from '../../utils';
+
+const { createAction } = createActionFactory('variablesSidebar');
+
+export const setVariablesSidebarOpenedAction = createAction<boolean>('setOpened');

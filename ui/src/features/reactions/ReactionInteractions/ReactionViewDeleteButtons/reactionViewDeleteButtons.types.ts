@@ -17,6 +17,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 
 export interface ReactionViewDeleteButtonsProps {
   entityName: string;
+  onEdit?: () => void;
   pathComponents: ReactionPathComponents;
   historyPathComponents?: Array<ReactionPathComponents>;
 }

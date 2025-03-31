@@ -72,6 +72,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
       isViewOnly: isViewOnly,
       ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
       ValueLabelComponent: DatasetReactionValueLabel,
+      ViewOnlyLabelComponent: DatasetReactionValueLabel,
     }),
     [reactionId, isViewOnly],
   );

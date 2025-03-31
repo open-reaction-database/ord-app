@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
+import { EditButton } from 'common/components/interactions/EditButton/EditButton.tsx';
 import { Divider, Flex } from '@mantine/core';
 import classes from './reactionViewDeleteButtons.module.scss';
 import { ReactionEntityDelete } from '../../ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
@@ -26,9 +26,11 @@ export function ReactionEditDeleteButtons({
   entityName,
   pathComponents,
   historyPathComponents,
+  onEdit,
 }: Readonly<ReactionViewDeleteButtonsProps>) {
   const { reactionId } = useContext(reactionContext);
-  const onEdit = useOnViewEdit({ pathComponents, historyPathComponents });
+  const handleEdit = useOnViewEdit({ pathComponents, historyPathComponents });
+  const editCallback = onEdit ?? handleEdit;
 
   return (
     <Flex
@@ -45,7 +47,7 @@ export function ReactionEditDeleteButtons({
         className={classes.actionDivider}
         orientation="vertical"
       />
-      <EditButton onClick={onEdit} />
+      <EditButton onClick={editCallback} />
     </Flex>
   );
 }

@@ -22,9 +22,22 @@ import { Select } from '@mantine/core';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
 import { itemsById } from 'common/utils';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function MeasurementsBasedOn({ formMethods, name }: Readonly<ReactionFormCustomProps>) {
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
+
+  const label = (
+    <ReactionValueLabelWrapper
+      name={name}
+      type={VariableType.Select}
+      wrapperConfig={{ label: 'Based on', cannotBeVariable: true }}
+    />
+  );
+
   const outcomePath = pathComponents.slice(0, 2);
   const analysesPath = [...outcomePath, 'analyses'];
   const analyses: ReactionOutcome['analyses'] = useSelector(selectReactionPartByPath(reactionId, analysesPath));
@@ -51,7 +64,8 @@ export function MeasurementsBasedOn({ formMethods, name }: Readonly<ReactionForm
 
   return (
     <Select
-      label="Based on"
+      label={label}
+      disabled={isViewOnly}
       placeholder="Select analysis"
       value={value?.name ?? null}
       data={basedOnOptions}

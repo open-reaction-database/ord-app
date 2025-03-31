@@ -30,8 +30,9 @@ import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisi
 import { appAmountUnspecified, massUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
-import type { ChangeEvent } from 'react';
+import { useContext, type ChangeEvent } from 'react';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 
@@ -40,9 +41,14 @@ const massOptions = [appAmountUnspecified, ...massUnitNames];
 interface ControlProps<T extends ReactionMeasurementValue> {
   value: T['value'];
   onChange: (value: T['value']) => void;
+  disabled?: boolean;
 }
 
-function MeasurementValueControlNumber({ value, onChange }: Readonly<ControlProps<ReactionMeasurementValueNumber>>) {
+function MeasurementValueControlNumber({
+  value,
+  onChange,
+  disabled,
+}: Readonly<ControlProps<ReactionMeasurementValueNumber>>) {
   const handleChange = (field: keyof typeof value, updatedValue: number | null) => {
     onChange({
       ...value,
@@ -56,18 +62,24 @@ function MeasurementValueControlNumber({ value, onChange }: Readonly<ControlProp
         onChange={handleChange.bind(null, 'value')}
         value={value.value}
         placeholder="Value"
+        disabled={disabled}
       />
       <AppNumberInput
         onChange={handleChange.bind(null, 'precision')}
         value={value.precision}
         placeholder="Precision"
         leftSection="±"
+        disabled={disabled}
       />
     </InputGroup>
   );
 }
 
-function MeasurementValueControlMass({ value, onChange }: Readonly<ControlProps<ReactionMeasurementValueMass>>) {
+function MeasurementValueControlMass({
+  value,
+  onChange,
+  disabled,
+}: Readonly<ControlProps<ReactionMeasurementValueMass>>) {
   const handleChange = (value: ValuePrecisionUnit) => {
     onChange(value as ReactionAmount);
   };
@@ -78,11 +90,16 @@ function MeasurementValueControlMass({ value, onChange }: Readonly<ControlProps<
       onChange={handleChange}
       options={massOptions}
       select="native-inline"
+      disabled={disabled}
     />
   );
 }
 
-function MeasurementValueControlString({ value, onChange }: Readonly<ControlProps<ReactionMeasurementValueString>>) {
+function MeasurementValueControlString({
+  value,
+  onChange,
+  disabled,
+}: Readonly<ControlProps<ReactionMeasurementValueString>>) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
@@ -92,6 +109,7 @@ function MeasurementValueControlString({ value, onChange }: Readonly<ControlProp
       value={value}
       onChange={handleChange}
       placeholder="Type"
+      disabled={disabled}
     />
   );
 }
@@ -118,6 +136,7 @@ const defaultMeasurementValue: ReactionMeasurementValueNumber = {
 };
 
 export function MeasurementValueControl({ name, formMethods }: Readonly<ReactionFormCustomProps>) {
+  const { isViewOnly } = useContext(reactionContext);
   const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
   });
@@ -144,11 +163,13 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
         <Component
           value={controlValue}
           onChange={handleValueChange}
+          disabled={isViewOnly}
         />
         <AppSegmentedControl
           value={type}
           options={valueTypeOptions}
           onChange={handleTypeChange}
+          disabled={isViewOnly}
         />
       </div>
     </Input.Wrapper>

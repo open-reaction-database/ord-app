@@ -23,11 +23,12 @@ import { type FocusEvent, useCallback, useContext, useState } from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
-  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const { isViewOnly } = useContext(reactionContext);
   const label = (
-    <ValueLabelComponent
+    <ReactionValueLabelWrapper
       name={node.name}
       type={VariableType.Date}
       wrapperConfig={node.wrapperConfig}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Divider, Grid } from '@mantine/core';
-import { PaperButton } from 'common/components/PaperButton/PaperButton.tsx';
+import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { SearchIcon, StylusNoteIcon } from 'common/icons';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { useCallback, useContext, useState } from 'react';
@@ -38,6 +38,7 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import classes from './customIdentifiers.module.scss';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
 
@@ -63,7 +64,8 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 
 export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const component: ReactionInputComponent = useSelector(selectReactionPartByPath(reactionId, pathComponents));
   const [componentsEditorOpened, { open: openComponentsEditor, close: closeComponentsEditor }] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
@@ -116,26 +118,28 @@ export function CustomIdentifiers() {
       <div className={classes.previewWrapper}>
         <ReactionComponentPreview previewState={previewStates[component.id]} />
       </div>
-      <Grid>
-        <Grid.Col span={6}>
-          <PaperButton
-            title="Look up Name"
-            description="In open databases"
-            icon={<SearchIcon />}
-            color={colorToCssVariable['orange']}
-            onClick={openAddCustomIdentifier}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <PaperButton
-            title="Draw Component"
-            description="Via Ketcher"
-            icon={<StylusNoteIcon />}
-            color={colorToCssVariable['green']}
-            onClick={openComponentsEditor}
-          />
-        </Grid.Col>
-      </Grid>
+      {!isViewOnly && (
+        <Grid>
+          <Grid.Col span={6}>
+            <PaperButton
+              title="Look up Name"
+              description="In open databases"
+              icon={<SearchIcon />}
+              color={colorToCssVariable['orange']}
+              onClick={openAddCustomIdentifier}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <PaperButton
+              title="Draw Component"
+              description="Via Ketcher"
+              icon={<StylusNoteIcon />}
+              color={colorToCssVariable['green']}
+              onClick={openComponentsEditor}
+            />
+          </Grid.Col>
+        </Grid>
+      )}
       {identifiers.map((identifier, index) => (
         <MolblockIdentifier
           key={identifier.value}

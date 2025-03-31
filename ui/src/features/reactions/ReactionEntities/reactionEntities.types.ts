@@ -53,7 +53,9 @@ export interface ReactionFormGroup extends ReactionFormNodeBase {
 }
 
 export interface ReactionFormStandaloneField {
-  label: string;
+  label?: string;
+  cannotBeVariable?: boolean;
+  templateLabel?: string;
   hint?: string;
   children?: ReactNode;
 }
@@ -112,6 +114,7 @@ export interface ReactionFormBlock extends ReactionFormNodeBase {
 
 export interface ReactionFormData extends ReactionFormNodeBase {
   type: ReactionFormNodeType.data;
+  name: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

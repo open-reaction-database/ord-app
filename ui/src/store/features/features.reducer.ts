@@ -19,6 +19,7 @@ import { groupsSidebar } from './groups/groups.reducer.ts';
 import { reactionLookupReducer } from 'store/features/reactionLookup/reactionLookup.reducer.ts';
 import { errorPageReducer } from 'store/features/errorPage/errorPage.reducer.ts';
 import { enumerationSetupReducer } from './enumerationSetup/enumerationSetup.reducer.tsx';
+import { variablesSidebarReducer } from './variablesSidebar/variablesSidebar.reducer.ts';
 
 export const featuresReducer = combineReducers({
   groupsSidebar: groupsSidebar,
@@ -26,4 +27,5 @@ export const featuresReducer = combineReducers({
   reactionLookup: reactionLookupReducer,
   errorPage: errorPageReducer,
   enumerationSetup: enumerationSetupReducer,
+  variablesSidebar: variablesSidebarReducer,
 });

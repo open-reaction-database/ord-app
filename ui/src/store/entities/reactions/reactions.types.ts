@@ -22,6 +22,21 @@ import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reac
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 
+export enum ReactionNodeEntity {
+  Inputs = 'inputs',
+  Outcomes = 'outcomes',
+  Identifiers = 'identifiers',
+  Notes = 'notes',
+  Components = 'components',
+  CrudeComponents = 'crudeComponents',
+  ComponentPreparations = 'preparations',
+  Data = 'data',
+  ComponentIdentifiers = 'component_identifiers',
+  Analyses = 'analyses',
+  Products = 'products',
+  Measurements = 'measurements',
+}
+
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;
