@@ -25,7 +25,7 @@ import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
 import type { EnumerationForm, EnumerationFormTransform, EnumerationSetupForm } from './enumerationSetup.types.ts';
 import { TemplateFileSelector } from './TemplateFileSelector/TemplateFileSelector.tsx';
 import { useCallback } from 'react';
-import { enumerationSetupSchema } from './enumerationSetup.schema.ts';
+import { enumerationSetupExistingDatasetSchema, enumerationSetupNewDatasetSchema } from './enumerationSetup.schema.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { startEnumeration } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.types.ts';
@@ -48,6 +48,9 @@ export function EnumerationSetup({
     },
     [dispatch],
   );
+  const doesDatasetExist = !!datasetId;
+  const schema = doesDatasetExist ? enumerationSetupExistingDatasetSchema : enumerationSetupNewDatasetSchema;
+  const title = doesDatasetExist ? 'Enumerate into existing dataset' : 'Create Dataset from Reaction Enumeration';
 
   const form: EnumerationForm = useForm<EnumerationSetupForm, EnumerationFormTransform>({
     initialValues: {
@@ -72,7 +75,7 @@ export function EnumerationSetup({
                 groupId: parseInt(dataset.groupId ?? ''),
               },
       }) as SetupEnumeration,
-    validate: yupResolver(enumerationSetupSchema),
+    validate: yupResolver(schema),
   });
 
   const template = useSelector(selectReactionById(form.values.templateId));
@@ -82,7 +85,7 @@ export function EnumerationSetup({
       opened
       onClose={onClose}
       position="right"
-      title="Create Dataset from Reaction Enumeration"
+      title={title}
       classNames={{ content: classes.content, header: classes.header, title: classes.title, body: classes.body }}
     >
       <form
@@ -94,26 +97,27 @@ export function EnumerationSetup({
           gap="md"
           className={classes.formControls}
         >
-          <Flex
-            direction="column"
-            gap="sm"
-            className={classes.container}
-          >
-            <div className={classes.twoItemsRow}>
-              <GroupSelector {...form.getInputProps('dataset.groupId')} />
-              <TextInput
-                label="Dataset Name"
-                placeholder="Dataset Name"
-                {...form.getInputProps('dataset.name')}
+          {!doesDatasetExist && (
+            <Flex
+              direction="column"
+              gap="sm"
+              className={classes.container}
+            >
+              <div className={classes.twoItemsRow}>
+                <GroupSelector {...form.getInputProps('dataset.groupId')} />
+                <TextInput
+                  label="Dataset Name"
+                  placeholder="Dataset Name"
+                  {...form.getInputProps('dataset.name')}
+                />
+              </div>
+              <Textarea
+                label="Description"
+                placeholder="Description"
+                {...form.getInputProps('dataset.description')}
               />
-            </div>
-            <Textarea
-              label="Description"
-              placeholder="Description"
-              {...form.getInputProps('dataset.description')}
-            />
-          </Flex>
-
+            </Flex>
+          )}
           <TemplateFileSelector
             form={form}
             templateDisabled={!!initialTemplateId}

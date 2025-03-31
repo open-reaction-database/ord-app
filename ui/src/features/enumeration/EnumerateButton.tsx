@@ -55,13 +55,13 @@ export function EnumerateButton() {
         color={colorToCssVariable['orange']}
         onClick={openEnumerationSetup}
       />
-      {enumerationProgress && enumerationProgress.resultDatasetId && (
+      {enumerationProgress && enumerationProgress.finished && (
         <EnumerationResult
           enumerationProgress={enumerationProgress}
           onClose={onEnumerationCancel}
         />
       )}
-      {enumerationProgress && !enumerationProgress.resultDatasetId && (
+      {enumerationProgress && !enumerationProgress.finished && (
         <EnumerationProgressDisplay
           enumerationProgress={enumerationProgress}
           onClose={onEnumerationCancel}

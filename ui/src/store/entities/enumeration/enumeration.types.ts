@@ -51,12 +51,18 @@ export interface EnumerationBatchRequest extends TemplateInformation, Pick<Enume
   index: number;
 }
 
+export interface EnumerationError {
+  line: number;
+  message: string;
+}
+
 export interface EnumerationBatchResult {
   reactions: Array<string>;
-  errors: Array<number>;
+  errors: Array<EnumerationError>;
 }
 
 export interface EnumerationProgress extends StartEnumeration, EnumerationBatchResult {
   index: number;
+  finished: boolean;
   resultDatasetId: number | null;
 }
