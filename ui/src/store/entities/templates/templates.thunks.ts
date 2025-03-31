@@ -109,17 +109,9 @@ export const removeTemplate = createThunkWithExplicitResult(removeTemplateAction
   navigate(`/templates`);
 });
 
-export const renameTemplate = createThunk(renameTemplateActions, async (_d, getState, { templateId, name }) => {
-  const baseReaction = selectReactionById(templateId)(getState());
-  const ordReaction = reactionToOrdReaction(baseReaction.data);
-  const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
-  const payload = {
-    name: name,
-    binpb: binpb,
-    variables: JSON.stringify(baseReaction.variables),
-  };
+export const renameTemplate = createThunk(renameTemplateActions, async (_d, _g, { templateId, name }) => {
   const entityId = getTemplateIdNumber(templateId);
-  const result = await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, payload);
+  const result = await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, { name });
   const template = parseTemplate(result.data);
   showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
 

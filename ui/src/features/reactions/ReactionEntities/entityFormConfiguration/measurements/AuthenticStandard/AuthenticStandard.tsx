@@ -36,12 +36,14 @@ import {
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { EditButton } from 'common/components/interactions/EditButton/EditButton.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const currentPath = useMemo(() => {
     return pathComponents.concat(name);
   }, [pathComponents, name]);
