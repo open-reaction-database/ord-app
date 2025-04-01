@@ -17,16 +17,10 @@ import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities
 import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 import { reactionDataWithoutName } from './data/reactionDataWithoutName.models';
 
-export interface Test {
-  reactionTime?: { value: string };
-  comment?: string;
-  name: string;
-}
-
 export const reactionObservations: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.vpu,
-    name: 'reactionTime',
+    name: 'time',
     wrapperConfig: {
       label: 'Time',
     },
