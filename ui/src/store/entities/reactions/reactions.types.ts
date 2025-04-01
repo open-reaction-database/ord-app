@@ -30,7 +30,7 @@ export enum ReactionNodeEntity {
   Components = 'components',
   CrudeComponents = 'crudeComponents',
   ComponentPreparations = 'preparations',
-  Data = 'data',
+  Features = 'features',
   ComponentIdentifiers = 'component_identifiers',
   Analyses = 'analyses',
   Products = 'products',

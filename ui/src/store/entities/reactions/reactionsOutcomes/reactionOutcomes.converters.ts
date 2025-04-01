@@ -45,7 +45,7 @@ export const ordAnalysisToReactionAnalysis = (
   withIdName(
     {
       type: ordAnalysisTypeToReaction(type),
-      data: ordDataMapToReactionDataMap(data || {}),
+      analysisData: ordDataMapToReactionDataMap(data || {}),
       instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
       isOfIsolatedSpecies: ordBooleanToReaction(isOfIsolatedSpecies),
       ...rest,
@@ -55,14 +55,14 @@ export const ordAnalysisToReactionAnalysis = (
 
 const reactionAnalysisToOrdAnalysis = ({
   type,
-  data,
+  analysisData,
   instrumentLastCalibrated,
   isOfIsolatedSpecies,
   ...rest
 }: ReactionAnalysis): ord.IAnalysis =>
   withoutIdName({
     type: reactionAnalysisTypeToOrd(type),
-    data: reactionDataMapToOrdDataMap(data),
+    data: reactionDataMapToOrdDataMap(analysisData),
     instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
     isOfIsolatedSpecies: reactionBooleanToOrd(isOfIsolatedSpecies),
     ...rest,

@@ -146,6 +146,7 @@ export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntit
         onChange={onValueChange}
         value={dataValue}
         label={label}
+        disabled={isViewOnly}
       />
       {dataValue.type === AppDataType.Upload && (
         <TextInput

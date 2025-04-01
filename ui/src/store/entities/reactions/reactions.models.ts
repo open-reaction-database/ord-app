@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { ReactionNodeEntity } from './reactions.types.ts';
 
-export interface ReactionViewDeleteButtonsProps {
-  entityName: string;
-  onEdit?: () => void;
-  onRemove?: () => void;
-  pathComponents: ReactionPathComponents;
-  historyPathComponents?: Array<ReactionPathComponents>;
-}
+const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers'];
+
+export const allowedNodeEntityNames: Array<string> = [...Object.values(ReactionNodeEntity), ...additionalEntityNames];

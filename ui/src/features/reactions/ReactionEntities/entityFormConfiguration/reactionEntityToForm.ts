@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity, type ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import { type ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { reactionInputs } from './inputs/reactionInputs.model.tsx';
@@ -26,18 +26,19 @@ import { reactionAnalyses } from './outcomes/reactionAnalyses.models.ts';
 import { reactionProducts } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionProducts.model.ts';
 import { reactionMeasurements } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.model.ts';
 import { reactionCrudeComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionCrudeComponents.model.ts';
+import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
-export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode>> = {
-  [ReactionEntity.Inputs]: reactionInputs,
-  [ReactionEntity.Notes]: reactionNotes,
-  [ReactionEntity.Identifiers]: reactionIdentifiers,
-  [ReactionEntity.Components]: reactionComponents,
-  [ReactionEntity.ComponentPreparations]: reactionComponentsPreparations,
-  [ReactionEntity.Data]: reactionData,
-  [ReactionEntity.ComponentIdentifiers]: reactionComponentIdentifiers,
-  [ReactionEntity.Outcomes]: reactionOutcomes,
-  [ReactionEntity.Analyses]: reactionAnalyses,
-  [ReactionEntity.Products]: reactionProducts,
-  [ReactionEntity.Measurements]: reactionMeasurements,
-  [ReactionEntity.CrudeComponents]: reactionCrudeComponents,
+export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
+  [ReactionNodeEntity.Inputs]: reactionInputs,
+  [ReactionNodeEntity.Notes]: reactionNotes,
+  [ReactionNodeEntity.Identifiers]: reactionIdentifiers,
+  [ReactionNodeEntity.Components]: reactionComponents,
+  [ReactionNodeEntity.ComponentPreparations]: reactionComponentsPreparations,
+  [ReactionNodeEntity.Features]: reactionData,
+  [ReactionNodeEntity.ComponentIdentifiers]: reactionComponentIdentifiers,
+  [ReactionNodeEntity.Outcomes]: reactionOutcomes,
+  [ReactionNodeEntity.Analyses]: reactionAnalyses,
+  [ReactionNodeEntity.Products]: reactionProducts,
+  [ReactionNodeEntity.Measurements]: reactionMeasurements,
+  [ReactionNodeEntity.CrudeComponents]: reactionCrudeComponents,
 };

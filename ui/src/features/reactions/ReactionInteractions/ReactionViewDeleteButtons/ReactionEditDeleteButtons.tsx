@@ -27,6 +27,7 @@ export function ReactionEditDeleteButtons({
   pathComponents,
   historyPathComponents,
   onEdit,
+  onRemove,
 }: Readonly<ReactionViewDeleteButtonsProps>) {
   const { reactionId } = useContext(reactionContext);
   const handleEdit = useOnViewEdit({ pathComponents, historyPathComponents });
@@ -42,6 +43,7 @@ export function ReactionEditDeleteButtons({
         reactionId={reactionId}
         entityName={entityName}
         pathComponents={pathComponents}
+        onRemove={onRemove}
       />
       <Divider
         className={classes.actionDivider}

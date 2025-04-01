@@ -30,6 +30,7 @@ interface ReactionEntityDeleteProps {
   entityName: string;
   pathComponents: ReactionPathComponents;
   shouldCloseSidebar?: true;
+  onRemove?: () => void;
 }
 
 export function ReactionEntityDelete({
@@ -37,25 +38,30 @@ export function ReactionEntityDelete({
   entityName,
   pathComponents,
   shouldCloseSidebar,
+  onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const dispatch = useAppDispatch();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
-  const onRemove = useCallback(() => {
+  const handleRemove = useCallback(() => {
     if (shouldCloseSidebar) {
       dispatch(popReactionPathComponents());
     }
-    dispatch(deleteReactionField({ reactionId, pathComponents }));
+    if (onRemove) {
+      onRemove();
+    } else {
+      dispatch(deleteReactionField({ reactionId, pathComponents }));
+    }
     closeConfirmation();
-  }, [closeConfirmation, dispatch, pathComponents, reactionId, shouldCloseSidebar]);
+  }, [closeConfirmation, dispatch, onRemove, pathComponents, reactionId, shouldCloseSidebar]);
 
   return (
     <ConfirmPopover
       title={`Remove ${entityName}`}
       text={`Are you sure to remove this ${entityName}?`}
       opened={confirmationOpened}
-      onConfirm={onRemove}
+      onConfirm={handleRemove}
       onCancel={closeConfirmation}
       target={
         <ActionIcon

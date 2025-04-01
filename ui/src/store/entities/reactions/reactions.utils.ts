@@ -17,7 +17,7 @@
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 import type { AppReaction } from './reactions.types.ts';
-import { allowedEntityNames } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.models.ts';
+import { allowedNodeEntityNames } from './reactions.models.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
 
@@ -86,7 +86,6 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
 export function getDeepReactionPart(reaction: AppReaction, pathComponents: ReactionPathComponents): any {
   try {
     // If the path is incorrect we will get an error
-
     return pathComponents.reduce((reactionPart: any, key) => {
       return reactionPart[key];
     }, reaction);
@@ -106,7 +105,7 @@ export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponent
       result.push(pathComponents.slice(0, i + 1));
       continue;
     }
-    if (allowedEntityNames.includes(pathComponent as string)) {
+    if (allowedNodeEntityNames.includes(pathComponent as string)) {
       result.push(pathComponents.slice(0, i + 2));
       i++;
     }

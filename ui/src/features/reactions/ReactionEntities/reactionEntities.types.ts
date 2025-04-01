@@ -171,18 +171,3 @@ export interface ReactionEntityContext {
   pathComponents: ReactionPathComponents;
   reactionId: ReactionId;
 }
-
-export enum ReactionEntity {
-  Inputs = 'inputs',
-  Notes = 'notes',
-  Identifiers = 'identifiers',
-  Components = 'components',
-  CrudeComponents = 'crudeComponents',
-  ComponentPreparations = 'preparations',
-  Data = 'data',
-  ComponentIdentifiers = 'component_identifiers',
-  Outcomes = 'outcomes',
-  Analyses = 'analyses',
-  Products = 'products',
-  Measurements = 'measurements',
-}

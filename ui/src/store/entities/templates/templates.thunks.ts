@@ -139,7 +139,7 @@ export const removeVariable = createThunk(removeVariableActions, async (dispatch
 export const downloadTemplateCsv: ThunkCustomWrapper<string> = (templateId: string) => (_d, getState) => {
   const { variables, data: reaction, name } = selectReactionById(templateId)(getState());
   const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-  const content = variablesList.map(variable => variable.name).join('; ');
+  const content = variablesList.map(variable => variable.name).join(';');
   const blob = new Blob([content], { type: 'text/csv' });
   downloadFile(blob, `${name}.csv`);
 };
