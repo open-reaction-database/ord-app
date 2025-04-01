@@ -207,7 +207,7 @@ export const reactionMassSpecToOrd = ({
   ...rest
 }: ReactionMassSpec): ord.ProductMeasurement.IMassSpecMeasurementDetails => ({
   type: reactionMassSpecTypeToOrd(type),
-  eicMasses: eicMasses.length > 0 ? eicMasses : null,
+  eicMasses: eicMasses?.length > 0 ? eicMasses : null,
   ...rest,
 });
 
