@@ -36,7 +36,8 @@ export const reactionData: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.data,
-    name: 'data',
+    fieldName: 'data',
+    nameFieldName: 'name',
   },
   {
     type: ReactionFormNodeType.value,

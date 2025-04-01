@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import type { ord } from 'ord-schema-protobufjs';
 import { ordDataToReactionData, reactionDataToOrdData } from '../reactionData/reactionData.converters';
 import type { AppData } from '../reactionData/reactionData.types';
 import { ordTimeToReaction, reactionTimeToOrd, withId } from '../reactionEntity/reactionEntity.converters';
@@ -23,7 +23,7 @@ export interface ReactionObservation {
   id: string;
   comment: string;
   time: ReactionTime;
-  data: AppData;
+  image: AppData;
   description?: string;
 }
 
@@ -32,9 +32,7 @@ export const ordObservationToReactionObservation = (observation: ord.IReactionOb
     id: '',
     comment: observation.comment ?? '',
     time: ordTimeToReaction(observation.time),
-    data: observation?.image
-      ? ordDataToReactionData(observation.image, 'observation')
-      : ordDataToReactionData(ord.Data.toObject(new ord.Data()), 'observation'),
+    image: ordDataToReactionData(observation?.image, 'Observation'),
   };
 
   return withId(base);
@@ -43,7 +41,7 @@ export const ordObservationToReactionObservation = (observation: ord.IReactionOb
 export const reactionObservationToOrdObservation = (observation: ReactionObservation): ord.IReactionObservation => {
   return {
     comment: observation.comment,
-    image: reactionDataToOrdData(observation.data),
+    image: reactionDataToOrdData(observation.image),
     time: reactionTimeToOrd(observation.time),
   };
 };

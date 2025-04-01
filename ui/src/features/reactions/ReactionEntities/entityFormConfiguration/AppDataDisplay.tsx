@@ -23,13 +23,15 @@ interface AppDataDisplayProps {
 
 function AppDataFileDisplay({ appData }: Readonly<AppDataDisplayProps>) {
   const { fileName, href } = useFileNameHref(appData.name, appData.data as FileControlValue);
-  return (
+  return appData.data.value ? (
     <a
       download={fileName}
       href={href}
     >
       {fileName}
     </a>
+  ) : (
+    <span>No file</span>
   );
 }
 

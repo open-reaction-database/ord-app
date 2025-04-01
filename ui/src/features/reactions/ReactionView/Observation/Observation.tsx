@@ -81,23 +81,29 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
             entity={observation}
             requiredFields={[
               {
-                label: 'time',
+                label: 'Time',
                 render: ({ time }) => {
-                  return time && time.value ? renderValuePrecisionUnit(time) : '';
+                  return time?.value ? renderValuePrecisionUnit(time) : '';
                 },
               },
               {
-                label: 'data',
-                render: ({ data }) => {
-                  return <AppDataDisplay appData={data} />;
+                label: 'Data',
+                render: ({ image }) => {
+                  return <AppDataDisplay appData={image} />;
                 },
               },
             ]}
             optionalFields={[
               {
-                label: 'comment',
+                label: 'Comment',
                 render({ comment }) {
                   return comment;
+                },
+              },
+              {
+                label: 'Description',
+                render({ image }) {
+                  return image.description;
                 },
               },
             ]}

@@ -80,17 +80,19 @@ export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntit
   const { isViewOnly } = useContext(reactionContext);
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
-    ...getInputProps('data'),
+    ...getInputProps(node.fieldName),
   });
-  const name = formMethods.getValues()['name'];
+  const [name] = useUncontrolled<string>({
+    ...getInputProps(node.nameFieldName),
+  });
 
   const labelType = dataValue.type === AppDataType.Number ? VariableType.Number : VariableType.String;
 
   const label = (
     <ReactionValueLabelWrapper
-      name={`${node.name}.value`}
+      name={`${node.fieldName}.value`}
       type={labelType}
-      wrapperConfig={{ label: 'Data' }}
+      wrapperConfig={node.wrapperConfig ?? { label: 'Data' }}
     />
   );
 
@@ -98,7 +100,7 @@ export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntit
     <ReactionValueLabelWrapper
       type={VariableType.String}
       wrapperConfig={{ label: 'Type', cannotBeVariable: true }}
-      name={node.name}
+      name={node.fieldName}
     />
   );
 
@@ -106,7 +108,7 @@ export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntit
     <ReactionValueLabelWrapper
       type={VariableType.String}
       wrapperConfig={{ label: 'Format' }}
-      name={`${node.name}.format`}
+      name={`${node.fieldName}.format`}
     />
   );
 

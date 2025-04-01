@@ -15,7 +15,6 @@
  */
 import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
 import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
-import { reactionDataWithoutName } from './data/reactionDataWithoutName.models';
 
 export const reactionObservations: Array<ReactionFormNode> = [
   {
@@ -29,10 +28,22 @@ export const reactionObservations: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.value,
     name: 'comment',
-    inputType: 'textarea',
+    inputType: 'string',
     wrapperConfig: {
       label: 'Comment',
     },
   },
-  ...reactionDataWithoutName,
+  {
+    type: ReactionFormNodeType.data,
+    fieldName: 'image.data',
+    nameFieldName: 'image.name',
+  },
+  {
+    type: ReactionFormNodeType.value,
+    inputType: 'textarea',
+    name: 'image.description',
+    wrapperConfig: {
+      label: 'Description',
+    },
+  },
 ];

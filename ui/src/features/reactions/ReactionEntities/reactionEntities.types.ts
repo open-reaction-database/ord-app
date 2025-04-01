@@ -112,9 +112,10 @@ export interface ReactionFormBlock extends ReactionFormNodeBase {
   fields: Array<ReactionFormNode>;
 }
 
-export interface ReactionFormData extends ReactionFormNodeBase {
+export interface ReactionFormData extends ReactionFormNodeBase, ReactionFormField {
   type: ReactionFormNodeType.data;
-  name: string;
+  fieldName: string;
+  nameFieldName: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
