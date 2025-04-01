@@ -36,6 +36,11 @@ export interface TemplateCreator {
   name: string;
 }
 
+export interface ImportTemplatePayload {
+  name: string;
+  file: File;
+}
+
 export interface TemplateResponse {
   id: number;
   name: string;

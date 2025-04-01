@@ -21,6 +21,7 @@ import {
   renameTemplateActions,
   addUpdateVariableActions,
   removeVariableActions,
+  importTemplateFromFileActions,
 } from './templates.actions.ts';
 import type { TemplateResponse, Variable } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
@@ -151,3 +152,28 @@ export const downloadTemplateInJSON: ThunkCustomWrapper<string> = (templateId: s
   const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
   downloadAsJson({ variables: variablesList, binpb }, `${name}.json`);
 };
+
+export const importFromFile = createThunkWithExplicitResult(
+  importTemplateFromFileActions,
+  async (dispatch, _g, { name, file }) => {
+    try {
+      const fileContentString = Buffer.from(await file.arrayBuffer()).toString();
+      const { binpb, variables } = JSON.parse(fileContentString);
+      if (!Array.isArray(variables)) {
+        throw new Error('Incorrect variables schema');
+      }
+      const payload = {
+        name: name,
+        binpb: binpb,
+        variables: JSON.stringify(variables),
+      };
+      const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
+      const template = parseTemplate(templateData);
+      navigate(`/templates/${templateData.id}`);
+      dispatch(importTemplateFromFileActions.success(template));
+    } catch (e: unknown) {
+      console.error(e);
+      dispatch(importTemplateFromFileActions.failure('Incorrect template file provided'));
+    }
+  },
+);

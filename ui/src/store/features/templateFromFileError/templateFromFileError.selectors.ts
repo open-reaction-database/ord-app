@@ -13,31 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@use 'sass:string';
+import { createSelectorFactory } from '../../utils';
 
-$themeColors: (
-  'white': #ffffff,
-  'baseWhite': #fcfcfc,
-  'blue': #3c78d8,
-  'green': #15b097,
-  'orange': #eda145,
-  'hover': #ff8d00,
-  'black': #000000,
-  'primaryBackgroundActive': #2869d2,
-  'purple': #311b92,
-  'purple2': #3949ab,
-);
+const { buildSelector } = createSelectorFactory(state => state.features.templateFromFileError);
 
-:export {
-  @each $color, $value in $themeColors {
-    #{string.unquote($color)}: $value;
-  }
-}
-
-:global {
-  body {
-    @each $color, $value in $themeColors {
-      --color-#{string.unquote($color)}: #{$value};
-    }
-  }
-}
+export const selectTemplateFromFileError = buildSelector(state => state);

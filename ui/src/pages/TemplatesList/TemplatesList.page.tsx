@@ -26,6 +26,7 @@ import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { TemplatesTopActions } from './TemplatesTopActions/TemplatesTopActions.tsx';
 
 interface TemplateTitleProps {
   index: number;
@@ -59,44 +60,50 @@ export function TemplatesListPage() {
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <div className={classes.container}>
-        <EntitiesMenu />
-        <Flex
-          direction="column"
-          gap="sm"
-          className={classes.templates}
-        >
-          <Paper
-            radius="sm"
-            p="lg"
+      <Flex
+        direction="column"
+        gap="sm"
+      >
+        <TemplatesTopActions />
+        <div className={classes.container}>
+          <EntitiesMenu />
+          <Flex
+            direction="column"
+            gap="sm"
+            className={classes.templates}
           >
-            <Flex justify="space-between">
-              <Flex
-                align="center"
-                gap="sm"
-              >
-                <Title order={2}>Templates</Title>
-                <Counter amount={templatesOrder.length} />
+            <Paper
+              radius="sm"
+              p="lg"
+            >
+              <Flex justify="space-between">
+                <Flex
+                  align="center"
+                  gap="sm"
+                >
+                  <Title order={2}>Templates</Title>
+                  <Counter amount={templatesOrder.length} />
+                </Flex>
               </Flex>
-            </Flex>
-          </Paper>
-          <>
-            {templatesOrder.map((templateId, index) => (
-              <ReactionCard
-                key={templateId}
-                id={templateId}
-                actions={<TemplateHeaderActions templateId={templateId} />}
-                title={
-                  <TemplateTitle
-                    index={index + 1}
-                    templateId={templateId}
-                  />
-                }
-              />
-            ))}
-          </>
-        </Flex>
-      </div>
+            </Paper>
+            <>
+              {templatesOrder.map((templateId, index) => (
+                <ReactionCard
+                  key={templateId}
+                  id={templateId}
+                  actions={<TemplateHeaderActions templateId={templateId} />}
+                  title={
+                    <TemplateTitle
+                      index={index + 1}
+                      templateId={templateId}
+                    />
+                  }
+                />
+              ))}
+            </>
+          </Flex>
+        </div>
+      </Flex>
     </PageContainer>
   );
 }
