@@ -28,14 +28,12 @@ export function EnumerateButton() {
   }, [dispatch]);
 
   return (
-    <>
-      <PaperButton
-        title="Enumerate"
-        description="Create dataset from template"
-        icon={<ArticleIcon />}
-        color={colorToCssVariable['orange']}
-        onClick={openEnumerationSetup}
-      />
-    </>
+    <PaperButton
+      title="Enumerate"
+      description="Create dataset from template"
+      icon={<ArticleIcon />}
+      color={colorToCssVariable['orange']}
+      onClick={openEnumerationSetup}
+    />
   );
 }

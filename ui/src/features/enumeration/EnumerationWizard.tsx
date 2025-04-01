@@ -46,7 +46,7 @@ export function EnumerationWizard(setupProps: Readonly<Omit<CreateDatasetFromEnu
           {...setupProps}
         />
       )}
-      {enumerationProgress && enumerationProgress.finished && (
+      {enumerationProgress?.finished && (
         <EnumerationResult
           enumerationProgress={enumerationProgress}
           onClose={onEnumerationCancel}
