@@ -50,7 +50,7 @@ function getVariableValueOrError(variable: Variable, value: string | number | bo
   switch (variable.type) {
     case VariableType.String: {
       if (typeof value !== 'string') {
-        throw produceValueTypeError('string', variable);
+        return value.toString();
       }
       return value;
     }
