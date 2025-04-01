@@ -28,6 +28,8 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { TemplateReactionValueLabelWrapper } from 'features/reactions/ReactionInteractions/ReactionValueLabel/TemplateReactionValueLabel.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
+import { VariablesSidebar } from '../../features/templates/VariablesSidebar/VariablesSidebar.tsx';
+import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 
 export function TemplatePage() {
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
@@ -51,6 +53,7 @@ export function TemplatePage() {
       isViewOnly: true,
       ViewDeleteButtonsComponent: ReactionSetVariablesButton,
       ValueLabelComponent: TemplateReactionValueLabelWrapper,
+      ViewOnlyLabelComponent: DatasetReactionValueLabel,
     }),
     [templateId],
   );
@@ -82,6 +85,7 @@ export function TemplatePage() {
               <ReactionTabs reactionId={templateId} />
             </Paper>
             <ReactionDetailsSidebar reactionId={templateId} />
+            <VariablesSidebar templateId={templateId} />
           </Flex>
         )}
       </reactionContext.Provider>

@@ -23,6 +23,22 @@ import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/react
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
 
+export enum ReactionNodeEntity {
+  Inputs = 'inputs',
+  Outcomes = 'outcomes',
+  Identifiers = 'identifiers',
+  Notes = 'notes',
+  Components = 'components',
+  CrudeComponents = 'crudeComponents',
+  ComponentPreparations = 'preparations',
+  Features = 'features',
+  ComponentIdentifiers = 'component_identifiers',
+  Analyses = 'analyses',
+  Products = 'products',
+  Measurements = 'measurements',
+  Observations = 'observations',
+}
+
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;

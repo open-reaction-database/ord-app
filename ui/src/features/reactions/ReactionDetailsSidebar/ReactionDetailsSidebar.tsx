@@ -29,7 +29,7 @@ import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
-import { ConfirmationModal } from 'common/components/ConfirmationModal/ConfirmationModal.tsx';
+import { ConfirmationModal } from 'common/components/interactions/ConfirmationModal/ConfirmationModal.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 

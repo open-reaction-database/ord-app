@@ -17,7 +17,7 @@ import { Menu, Button } from '@mantine/core';
 import { CheckIcon, ChevronDownIcon, RemoveIcon } from 'common/icons';
 import { USER_ROLES } from 'common/types/roles.ts';
 import { useDisclosure } from '@mantine/hooks';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import classes from './RoleSelector.module.scss';
 
 interface RoleSelectorProps {

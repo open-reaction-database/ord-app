@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 64px;
-  height: 41px;
+.sidebar {
+  min-width: var(--sidebar-width);
 }

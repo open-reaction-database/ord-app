@@ -19,7 +19,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { Button } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { removeTemplate } from 'store/entities/templates/templates.thunks.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 

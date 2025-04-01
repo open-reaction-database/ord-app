@@ -99,12 +99,12 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
-    useSelectItems: buildUseSelectItemsListFromMap('data', compareNamedEntities),
+    useSelectItems: buildUseSelectItemsListFromMap('analysisData', compareNamedEntities),
     getKey: (item: AppData) => item.id,
     title: {
       label: 'Analytical Data',
     },
-    ItemDisplay: reactionDataDisplay('data'),
-    addItem: createReactionDataAddItem('data', 'Analytical Data'),
+    ItemDisplay: reactionDataDisplay('analysisData'),
+    addItem: createReactionDataAddItem('analysisData', 'Analytical Data'),
   },
 ];

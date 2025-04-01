@@ -23,7 +23,7 @@ import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/react
 import { textureDetails } from './reactionComponentsBase.model.tsx';
 
 const amountTypeOptionsWithoutVolume = amountTypeOptions.filter(
-  item => typeof item !== 'object' || item.group !== 'Moles',
+  item => typeof item !== 'object' || !('items' in item) || item.group !== 'Moles',
 );
 
 export const reactionCrudeComponents: Array<ReactionFormNode> = [

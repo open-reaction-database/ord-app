@@ -18,10 +18,13 @@ import type { ReactionFormData } from 'features/reactions/ReactionEntities/react
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
-import { type ChangeEvent, useCallback } from 'react';
+import { type ChangeEvent, type ReactNode, useCallback, useContext } from 'react';
 import { NumberInput, TextInput } from '@mantine/core';
 import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const options = Object.values(AppDataType);
 
@@ -31,27 +34,31 @@ type ChangeType = StringEvent | string | FileControlValue | number | null;
 
 interface ReactionEntityValueProps {
   name: string;
+  label: ReactNode;
   value: AppData['data'];
   onChange: (value: ChangeType) => void;
+  disabled?: boolean;
 }
 
-function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEntityValueProps>) {
+function ReactionEntityDataValue({ name, value, onChange, label, disabled }: Readonly<ReactionEntityValueProps>) {
   switch (value.type) {
     case AppDataType.Number:
       return (
         <NumberInput
-          label="Data"
+          label={label}
           value={value.value as number}
           onChange={onChange}
+          disabled={disabled}
         />
       );
     case AppDataType.Url:
     case AppDataType.Text:
       return (
         <TextInput
-          label="Data"
+          label={label}
           value={value.value as string}
           onChange={onChange}
+          disabled={disabled}
         />
       );
     case AppDataType.Upload:
@@ -60,6 +67,8 @@ function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEnt
           name={name}
           value={value as FileControlValue}
           onChange={onChange}
+          label={label}
+          disabled={disabled}
         />
       );
     default:
@@ -67,12 +76,39 @@ function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEnt
   }
 }
 
-export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
+export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
+  const { isViewOnly } = useContext(reactionContext);
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
     ...getInputProps('data'),
   });
   const name = formMethods.getValues()['name'];
+
+  const labelType = dataValue.type === AppDataType.Number ? VariableType.Number : VariableType.String;
+
+  const label = (
+    <ReactionValueLabelWrapper
+      name={`${node.name}.value`}
+      type={labelType}
+      wrapperConfig={{ label: 'Data' }}
+    />
+  );
+
+  const typeLabel = (
+    <ReactionValueLabelWrapper
+      type={VariableType.String}
+      wrapperConfig={{ label: 'Type', cannotBeVariable: true }}
+      name={node.name}
+    />
+  );
+
+  const formatLabel = (
+    <ReactionValueLabelWrapper
+      type={VariableType.String}
+      wrapperConfig={{ label: 'Format' }}
+      name={`${node.name}.format`}
+    />
+  );
 
   const onTypeChange = useCallback(
     (type: string) => {
@@ -102,17 +138,20 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
         fullWidth={false}
         onChange={onTypeChange}
         value={dataValue.type}
-        label="Type"
+        label={typeLabel}
+        disabled={isViewOnly}
       />
       <ReactionEntityDataValue
         name={name}
         onChange={onValueChange}
         value={dataValue}
+        label={label}
+        disabled={isViewOnly}
       />
       {dataValue.type === AppDataType.Upload && (
         <TextInput
           value={dataValue.format || ''}
-          label="Format"
+          label={formatLabel}
           disabled
         />
       )}

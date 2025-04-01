@@ -18,17 +18,25 @@ import {
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { compoundIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import type { SelectOptions } from 'common/types/selectOptions.ts';
 
-const typeOptionsWithoutMolBlock = compoundIdentifierTypeOptions.filter(item => item !== 'MOLBLOCK');
+const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(item => item !== 'MOLBLOCK');
+
+const typeOptions = typeOptionsWithoutMolBlock.concat({
+  label: 'MOLBLOCK',
+  value: 'MOLBLOCK',
+  disabled: true,
+});
 
 export const reactionComponentIdentifiers: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.select,
-    options: typeOptionsWithoutMolBlock,
+    options: typeOptions,
     name: 'type',
     selectType: 'dropdown',
     wrapperConfig: {
       label: 'Type',
+      cannotBeVariable: true,
     },
   },
   {

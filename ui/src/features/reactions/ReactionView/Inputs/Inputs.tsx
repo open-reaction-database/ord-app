@@ -16,7 +16,7 @@
 import { Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { AddCircleIcon, NoData } from 'common/icons';
-import classes from 'features/reactions/ReactionView/Inputs/inputs.module.scss';
+import classes from './inputs.module.scss';
 import { typographyClasses } from 'common/styling';
 import { useContext } from 'react';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';

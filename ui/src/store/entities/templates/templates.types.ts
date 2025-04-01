@@ -16,6 +16,7 @@
 import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
+// TODO add number array
 export enum VariableType {
   String = 'string',
   Number = 'number',

@@ -189,6 +189,9 @@ export const reactionInputs: Array<ReactionFormNode> = [
         name: 'flowRate',
         options: flowRateOptions,
         select: 'native',
+        wrapperConfig: {
+          templateLabel: 'Flow Rate',
+        },
       },
     ],
   },

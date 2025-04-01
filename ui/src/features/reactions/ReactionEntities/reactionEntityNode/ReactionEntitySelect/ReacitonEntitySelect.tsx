@@ -20,11 +20,12 @@ import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/rea
 import { useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
-  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const { isViewOnly } = useContext(reactionContext);
   const label = (
-    <ValueLabelComponent
+    <ReactionValueLabelWrapper
       name={node.name}
       wrapperConfig={node.wrapperConfig}
       type={VariableType.Select}

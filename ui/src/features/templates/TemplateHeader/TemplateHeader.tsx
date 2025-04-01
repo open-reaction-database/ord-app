@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionIcon, Badge, Flex, Paper, Title } from '@mantine/core';
+import { ActionIcon, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
-import { CheckCircleIcon, CrossCircleIcon, EditIcon } from 'common/icons';
+import { EditIcon } from 'common/icons';
 import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -24,7 +24,8 @@ import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
 import { renameTemplate } from 'store/entities/templates/templates.thunks.ts';
-import classes from 'pages/TemplatePage/templatePage.module.scss';
+import { ValidityButton } from 'common/components/interactions/ValidityButton/ValidityButton.tsx';
+import { setVariablesSidebarOpenedAction } from 'store/features/variablesSidebar/variablesSidebar.actions.ts';
 
 interface TemplateHeaderProps {
   templateId: string;
@@ -43,6 +44,12 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
     [dispatch, templateId],
   );
 
+  const onVariablesSidebarOpen = useCallback(() => {
+    if (isReadyForEnumeration) {
+      dispatch(setVariablesSidebarOpenedAction(true));
+    }
+  }, [isReadyForEnumeration, dispatch]);
+
   return (
     <Flex
       direction="column"
@@ -52,15 +59,13 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
         align="center"
         justify="space-between"
       >
-        <Badge
-          variant="outline"
-          size="lg"
-          radius="md"
-          leftSection={isReadyForEnumeration ? <CheckCircleIcon /> : <CrossCircleIcon />}
-          className={classes.enumerationBadge}
-        >
-          {isReadyForEnumeration ? 'Template is valid' : 'Not Ready for Enumeration: No Variables'}
-        </Badge>
+        <ValidityButton
+          validText="Template is valid"
+          invalidText="Not Ready for Enumeration: No Variables"
+          isValid={isReadyForEnumeration}
+          onClick={onVariablesSidebarOpen}
+          isNotClickable={!isReadyForEnumeration}
+        />
         <Flex align="center">
           <TemplateHeaderActions templateId={templateId} />
         </Flex>

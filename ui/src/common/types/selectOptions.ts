@@ -13,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export type SelectOption =
+
+export type SelectOptionWithoutGroup =
   | string
+  | {
+      label: string;
+      value: string;
+      disabled?: boolean;
+    };
+
+export type SelectOption =
+  | SelectOptionWithoutGroup
   | {
       group: string;
       items: Array<string>;

@@ -21,7 +21,6 @@ import { CloseIcon, EditIcon } from 'common/icons';
 import classes from './reactionValueLabel.module.scss';
 import { useSelector } from 'react-redux';
 import { selectTemplateVariableWrapper } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ReactionFormStandaloneField } from '../../ReactionEntities';
 import clsx from 'clsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateVariable, removeVariable } from 'store/entities/templates/templates.thunks.ts';
@@ -29,7 +28,7 @@ import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 
 type ReactionValueLabelPropsMandatoryLabel = Omit<ReactionValueLabelProps, 'wrapperConfig'> & {
-  wrapperConfig: Omit<ReactionFormStandaloneField, 'label'> & { label: string };
+  label: string;
 };
 
 const labelToVariableName = (label: string) => {
@@ -39,11 +38,10 @@ const labelToVariableName = (label: string) => {
     .join('');
 };
 
-function TemplateReactionValueLabel({ wrapperConfig, name, type }: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
+function TemplateReactionValueLabel({ label, name, type }: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
   const templateId = reactionId as string;
   const dispatch = useAppDispatch();
-  const { label } = wrapperConfig;
   const [variableNameValue, setVariableNameValue] = useState<string | null>(null);
 
   const fieldPathComponents = useMemo(() => {
@@ -119,12 +117,13 @@ function TemplateReactionValueLabel({ wrapperConfig, name, type }: Readonly<Reac
 }
 
 export function TemplateReactionValueLabelWrapper({ wrapperConfig, type, name }: Readonly<ReactionValueLabelProps>) {
-  if (!wrapperConfig?.label) {
+  const label = wrapperConfig?.label ?? wrapperConfig?.templateLabel;
+  if (!label) {
     return null;
   }
   return (
     <TemplateReactionValueLabel
-      wrapperConfig={wrapperConfig}
+      label={label}
       name={name}
       type={type}
     />

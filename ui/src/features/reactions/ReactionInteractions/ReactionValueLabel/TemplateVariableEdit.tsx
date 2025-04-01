@@ -63,8 +63,8 @@ export function TemplateVariableEdit({
   });
 
   const handleSubmit = async () => {
-    await field.validate();
-    if (field.error) {
+    const result = await field.validate();
+    if (result !== null) {
       return;
     }
     onSubmit(field.getValue());

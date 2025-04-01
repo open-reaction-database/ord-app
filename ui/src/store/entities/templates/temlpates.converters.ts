@@ -47,7 +47,12 @@ function replaceNameIdInVariablePath(
     updatedPath = updatedPath.concat([pathComponent]);
     if (mapKeys.includes(pathComponent as string)) {
       const nameId = variable.path[index + 1] as string;
-      const reactionPart: Record<string, WithIdName<unknown>> = getDeepReactionPart(reaction, updatedPath);
+      let reactionPart: Record<string, WithIdName<unknown>>;
+      if (replaceWith === 'id') {
+        reactionPart = getDeepReactionPart(reaction, updatedPath);
+      } else {
+        reactionPart = getDeepReactionPart(reaction, variable.path.slice(0, index + 1));
+      }
       if (replaceWith === 'id') {
         const entity = findEntityByName(nameId, reactionPart);
         updatedPath = updatedPath.concat([entity.id]);

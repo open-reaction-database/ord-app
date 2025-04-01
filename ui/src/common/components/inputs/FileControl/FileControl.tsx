@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
-import { useCallback } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import mime from 'mime/lite';
 import { Buffer } from 'buffer';
 import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
@@ -24,11 +24,13 @@ import type { FileControlValue } from './fileControl.types.ts';
 
 interface FileControlProps {
   name: string;
+  label: ReactNode;
+  disabled?: boolean;
   value: FileControlValue | null;
   onChange: (value: FileControlValue | null) => void;
 }
 
-export function FileControl({ name, value, onChange }: Readonly<FileControlProps>) {
+export function FileControl({ name, value, disabled, onChange, label }: Readonly<FileControlProps>) {
   const { fileName, href } = useFileNameHref(name, value);
 
   const handleChange = useCallback(
@@ -53,7 +55,7 @@ export function FileControl({ name, value, onChange }: Readonly<FileControlProps
 
   return (
     <Input.Wrapper
-      label="Data"
+      label={label}
       className={inputWrapperClasses.inputWrapper}
     >
       {value?.value ? (
@@ -68,12 +70,16 @@ export function FileControl({ name, value, onChange }: Readonly<FileControlProps
             onClick={handleRemoveFile}
             variant="transparent"
             color="red"
+            disabled={disabled}
           >
             <RemoveIcon />
           </ActionIcon>
         </Flex>
       ) : (
-        <FileInput onChange={handleChange} />
+        <FileInput
+          onChange={handleChange}
+          disabled={disabled}
+        />
       )}
     </Input.Wrapper>
   );

@@ -17,6 +17,7 @@
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 import type { AppReaction } from './reactions.types.ts';
+import { allowedNodeEntityNames } from './reactions.models.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
 
@@ -85,7 +86,6 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
 export function getDeepReactionPart(reaction: AppReaction, pathComponents: ReactionPathComponents): any {
   try {
     // If the path is incorrect we will get an error
-
     return pathComponents.reduce((reactionPart: any, key) => {
       return reactionPart[key];
     }, reaction);
@@ -93,4 +93,22 @@ export function getDeepReactionPart(reaction: AppReaction, pathComponents: React
     console.info(pathComponents, e);
     return null;
   }
+}
+
+const nodeEntitiesNamesWithoutCollection = ['authenticStandard', 'notes'];
+
+export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponents): Array<ReactionPathComponents> {
+  const result: Array<ReactionPathComponents> = [];
+  for (let i = 0; i < pathComponents.length; i++) {
+    const pathComponent = pathComponents[i];
+    if (nodeEntitiesNamesWithoutCollection.includes(pathComponent as string)) {
+      result.push(pathComponents.slice(0, i + 1));
+      continue;
+    }
+    if (allowedNodeEntityNames.includes(pathComponent as string)) {
+      result.push(pathComponents.slice(0, i + 2));
+      i++;
+    }
+  }
+  return result;
 }

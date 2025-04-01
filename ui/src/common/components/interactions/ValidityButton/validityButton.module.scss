@@ -13,7 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 64px;
-  height: 41px;
+.button {
+  height: auto;
+  padding: 4px 8px;
+  border-color: var(--color-border-2);
+  color: var(--color-text-primary);
+
+  .section {
+    width: 20px;
+    height: 20px;
+    margin-inline-end: var(--mantine-spacing-sm);
+  }
+
+  .label {
+    font-size: var(--mantine-font-size-md);
+    font-weight: 700;
+    line-height: 20px;
+  }
 }

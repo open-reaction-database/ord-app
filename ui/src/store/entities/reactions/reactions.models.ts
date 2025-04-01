@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 64px;
-  height: 41px;
-}
+import { ReactionNodeEntity } from './reactions.types.ts';
+
+const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers'];
+
+export const allowedNodeEntityNames: Array<string> = [...Object.values(ReactionNodeEntity), ...additionalEntityNames];
