@@ -93,6 +93,14 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
                 },
               },
             ]}
+            optionalFields={[
+              {
+                label: 'comment',
+                render({ comment }) {
+                  return comment;
+                },
+              },
+            ]}
           />
         ))}
       </Flex>
