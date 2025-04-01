@@ -16,14 +16,17 @@
 import { createContext, type FC } from 'react';
 import type { ReactionViewDeleteButtonsProps } from './ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
 import type { ReactionsContext } from './reactions.types.ts';
+import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
 
 const viewDeleteButtonsDefaultValue = null as unknown as FC<ReactionViewDeleteButtonsProps>;
+const valueLabelDefaultValue = null as unknown as FC<ReactionValueLabelProps>;
 
 const defaultContextValue: ReactionsContext = {
   reactionId: 0,
   isTemplate: false,
   isViewOnly: false,
   ViewDeleteButtonsComponent: viewDeleteButtonsDefaultValue,
+  ValueLabelComponent: valueLabelDefaultValue,
 };
 
 export const reactionContext = createContext<ReactionsContext>(defaultContextValue);

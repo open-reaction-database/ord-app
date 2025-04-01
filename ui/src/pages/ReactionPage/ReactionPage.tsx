@@ -30,8 +30,9 @@ import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
-import type { ReactionsContext } from '../../features/reactions/reactions.types.ts';
-import { ReactionViewButton } from '../../features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -70,6 +71,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
       isTemplate: false,
       isViewOnly: isViewOnly,
       ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
+      ValueLabelComponent: DatasetReactionValueLabel,
     }),
     [reactionId, isViewOnly],
   );

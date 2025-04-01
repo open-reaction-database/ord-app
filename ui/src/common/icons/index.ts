@@ -21,6 +21,7 @@ export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';
 export { default as ChevronDownFilledIcon } from './ChevronDownFilledIcon.svg?react';
 export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
+export { default as CloseIcon } from './CloseIcon.svg?react';
 export { default as CopyIcon } from './CopyIcon.svg?react';
 export { default as CopyImageIcon } from './CopyImageIcon.svg?react';
 export { default as CrossCircleIcon } from './CrossCircleIcon.svg?react';

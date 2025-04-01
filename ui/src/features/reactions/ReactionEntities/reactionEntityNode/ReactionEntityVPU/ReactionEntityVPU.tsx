@@ -16,16 +16,26 @@
 import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisionUnitControl/ValuePrecisionUnitControl.tsx';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormValuePrecisionUnit } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
 
 export function ReactionEntityVPU({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValuePrecisionUnit>>) {
-  const { isViewOnly } = useContext(reactionContext);
-  const label = useReactionEntityLabel(node.wrapperConfig);
+  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const name = useMemo(() => {
+    return `${node.name}.value`;
+  }, [node.name]);
+
+  const label = (
+    <ValueLabelComponent
+      name={name}
+      wrapperConfig={node.wrapperConfig}
+      type={VariableType.Number}
+    />
+  );
   return (
     <ValuePrecisionUnitControl
       options={node.options}

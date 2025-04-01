@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { Flex, Tooltip } from '@mantine/core';
 import { InfoCircleIcon } from 'common/icons';
-import classes from './reactionEntityLabel.module.scss';
+import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
+import classes from './reactionValueLabel.module.scss';
+import clsx from 'clsx';
 
-interface ReactionEntityLabelProps {
-  wrapperConfig?: ReactionFormStandaloneField;
-}
-
-export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLabelProps>) {
+export function DatasetReactionValueLabel({ wrapperConfig }: Readonly<ReactionValueLabelProps>) {
   if (!wrapperConfig?.label) {
     return null;
   }
@@ -39,7 +36,7 @@ export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLa
           label={wrapperConfig.hint}
           position="bottom-start"
         >
-          <InfoCircleIcon className={classes.icon} />
+          <InfoCircleIcon className={clsx(classes.icon, classes.info)} />
         </Tooltip>
       )}
     </Flex>

@@ -31,6 +31,7 @@ const enumerationProgress = createReducer<null | EnumerationProgress>(null, buil
     return {
       ...state,
       resultDatasetId: payload,
+      finished: true,
     };
   });
   builder.addCase(startEnumerationActions, (_, action) => ({
@@ -38,6 +39,7 @@ const enumerationProgress = createReducer<null | EnumerationProgress>(null, buil
     reactions: [],
     errors: [],
     index: 0,
+    finished: false,
     resultDatasetId: null,
   }));
   builder.addCase(enumerateBatchActions.success, (state, { payload }) => {

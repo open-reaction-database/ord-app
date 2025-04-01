@@ -15,37 +15,59 @@
  */
 import type { EnumerationForm } from '../enumerationSetup.types.ts';
 import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import { FileInput, Flex, Select, Title } from '@mantine/core';
+import { Anchor, FileInput, Flex, Select, Title } from '@mantine/core';
 import classes from '../enumerationSetup.module.scss';
 import { useSelector } from 'react-redux';
 import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type MouseEvent } from 'react';
 import { Buffer } from 'buffer';
 import { parse } from 'csv-parse/sync';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { guessDelimiter } from './templateFileSelector.utils.ts';
 import type { VariableMatch } from 'store/entities/enumeration/enumeration.types.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
+import { DownloadIcon } from 'common/icons';
+import type { CastingContext } from 'csv-parse';
 
 interface TemplateFileSelectorProps {
+  templateDisabled: boolean;
   form: EnumerationForm;
 }
 
-type ParseOptions = Parameters<typeof parse>[1];
+function cast(value: string, context: CastingContext): string | number | boolean {
+  if (context.header) {
+    return value;
+  }
+  const lowerCaseValue = value.toLowerCase();
+  if (['true', 'false'].includes(lowerCaseValue)) {
+    return lowerCaseValue === 'true';
+  }
+  const parsedValue = parseFloat(value);
+  if (!Number.isNaN(parsedValue)) {
+    return parsedValue;
+  }
+  return value;
+}
 
-export function TemplateFileSelector({ form }: Readonly<TemplateFileSelectorProps>) {
+export function TemplateFileSelector({ form, templateDisabled }: Readonly<TemplateFileSelectorProps>) {
+  const dispatch = useAppDispatch();
   const templates = useSelector(selectTemplates);
   const [isCsvFileParsing, setIsCsvFileParsing] = useState(false);
 
   const { templateId } = form.values;
 
   const templateOptions = useMemo(() => {
-    return templates.map(template => ({
-      label: template.name,
-      value: template.id,
-    }));
+    return templates
+      .filter(item => Object.keys(item.variables).length > 0)
+      .map(template => ({
+        label: template.name,
+        value: template.id,
+      }));
   }, [templates]);
   const template = useSelector(selectReactionById(templateId));
   const templateSelectProps = form.getInputProps('templateId');
+  const name = template?.name ?? '';
 
   const handleTemplateSelection = (templateId: string | null) => {
     form.setValues(prevState => ({
@@ -57,6 +79,38 @@ export function TemplateFileSelector({ form }: Readonly<TemplateFileSelectorProp
     }));
   };
 
+  const downloadTemplateAsCSV = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+      if (templateId) {
+        dispatch(downloadTemplateCsv(templateId));
+      }
+    },
+    [dispatch, templateId],
+  );
+
+  const templateLabel = useMemo(() => {
+    if (!templateId) {
+      return 'Template';
+    }
+    return (
+      <Flex
+        align="center"
+        gap="sm"
+      >
+        Template
+        <Anchor
+          onClick={downloadTemplateAsCSV}
+          className={classes.templateLabelAnchor}
+        >
+          <DownloadIcon />
+          {name}.csv
+        </Anchor>
+      </Flex>
+    );
+  }, [downloadTemplateAsCSV, name, templateId]);
+
   const handleFileSelection = async (file: File | null) => {
     form.setFieldValue('csvFile', file);
     setIsCsvFileParsing(true);
@@ -65,18 +119,14 @@ export function TemplateFileSelector({ form }: Readonly<TemplateFileSelectorProp
         const buffer = await file.arrayBuffer();
         const newValue = Buffer.from(buffer).toString();
         const delimiter = guessDelimiter(newValue);
-        const options: ParseOptions = {
-          cast: true,
-          delimiter,
-        };
-        const [headers] = parse(newValue, options);
-        const content = parse(newValue, { ...options, columns: true });
+        const [headers] = parse(newValue, { delimiter });
+        const content = parse(newValue, { delimiter, cast: cast, columns: true });
         form.setFieldValue('templateCSV', {
           headers,
           content,
         });
 
-        const matching: Array<VariableMatch> = template.variables.map((variable): VariableMatch => {
+        const matching: Array<VariableMatch> = Object.values(template.variables).map((variable): VariableMatch => {
           const csvColumn = headers.includes(variable.name) ? variable.name : null;
           return { variable: variable.name, csvColumn };
         });
@@ -99,12 +149,14 @@ export function TemplateFileSelector({ form }: Readonly<TemplateFileSelectorProp
       >
         <div className={classes.twoItemsRow}>
           <Select
-            label="Template"
+            label={templateLabel}
             placeholder="Select"
             data={templateOptions}
             searchable
             {...templateSelectProps}
+            disabled={templateDisabled}
             onChange={handleTemplateSelection}
+            nothingFoundMessage="No templates with variables in the system"
           />
           <FileInput
             label="CSV for Enumeration"
