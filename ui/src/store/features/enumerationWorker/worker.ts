@@ -21,7 +21,7 @@ import type {
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import { VariableType, type Variable } from 'store/entities/templates/templates.types.ts';
+import { type Variable, VariableType } from 'store/entities/templates/templates.types.ts';
 import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
@@ -35,7 +35,9 @@ import dayjs from 'dayjs';
 const produceValueTypeError = (type: string, variable: Variable) =>
   new Error(`Expected ${type} value for variable ${variable.name}`);
 
-function getDateOrError(value: string | number | boolean, variable: Variable): string {
+type ValueType = string | number | boolean;
+
+function getDateOrError(value: ValueType, variable: Variable): string {
   if (typeof value !== 'string') {
     throw produceValueTypeError('date', variable);
   }
@@ -46,11 +48,25 @@ function getDateOrError(value: string | number | boolean, variable: Variable): s
   return value;
 }
 
-function getVariableValueOrError(variable: Variable, value: string | number | boolean): string | number {
+function getNumberArrayOrError(value: ValueType, variable: Variable): Array<number> {
+  if (typeof value === 'number') {
+    return [value];
+  }
+  if (typeof value !== 'string') {
+    throw produceValueTypeError('number array', variable);
+  }
+  const values = value.split(',').map(item => parseFloat(item));
+  if (values.some(item => Number.isNaN(item))) {
+    throw produceValueTypeError('number array', variable);
+  }
+  return values;
+}
+
+function getVariableValueOrError(variable: Variable, value: ValueType): string | number | Array<number> {
   switch (variable.type) {
     case VariableType.String: {
       if (typeof value !== 'string') {
-        throw produceValueTypeError('string', variable);
+        return value.toString();
       }
       return value;
     }
@@ -71,6 +87,9 @@ function getVariableValueOrError(variable: Variable, value: string | number | bo
       return value;
     case VariableType.Date: {
       return getDateOrError(value, variable);
+    }
+    case VariableType.NumberArray: {
+      return getNumberArrayOrError(value, variable);
     }
   }
 }

@@ -21,6 +21,8 @@ import type { EnumerationProgress, SetupEnumeration } from './enumeration.types.
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import type { CreateDatasetBase, Dataset } from '../datasets/datasets.types.ts';
 import axiosInstance from '../../axiosInstance.ts';
+import { getDataset } from '../datasets/datasets.thunks.ts';
+import { getReactionsPage } from '../reactions/reactions.thunks.ts';
 
 const BATCH_SIZE = 50;
 
@@ -110,5 +112,7 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch
     const datasetId = dataset;
     await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
     dispatch(finishEnumerationAction(datasetId));
+    dispatch(getDataset(datasetId));
+    dispatch(getReactionsPage({ page: 1 }));
   }
 };

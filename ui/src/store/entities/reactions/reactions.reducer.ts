@@ -31,6 +31,7 @@ import {
   addUpdateVariableActions,
   removeVariableActions,
   createNewTemplateActions,
+  importTemplateFromFileActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
 import type { ReactionOrTemplate, AppReaction, DatasetReaction, ReactionTemplate } from './reactions.types.ts';
@@ -95,13 +96,6 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     const { [`template_${templateId}`]: _, ...rest } = state;
     return rest;
   });
-  builder.addCase(createNewTemplateActions.success, (state, action) => ({
-    ...state,
-    [getTemplateId(action.payload)]: {
-      ...action.payload,
-      data: linkReactionEntities(action.payload.data),
-    },
-  }));
   builder.addCase(getAllTemplatesActions.success, (state, action) => ({
     ...state,
     ...itemsById(
@@ -140,6 +134,16 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       },
     };
   });
+  builder.addMatcher(
+    isAnyOf(createNewTemplateActions.success, importTemplateFromFileActions.success),
+    (state, action) => ({
+      ...state,
+      [getTemplateId(action.payload)]: {
+        ...action.payload,
+        data: linkReactionEntities(action.payload.data),
+      },
+    }),
+  );
   builder.addMatcher(
     isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),
     (state, { payload }) => {

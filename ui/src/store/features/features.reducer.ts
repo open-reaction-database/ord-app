@@ -20,6 +20,7 @@ import { reactionLookupReducer } from 'store/features/reactionLookup/reactionLoo
 import { errorPageReducer } from 'store/features/errorPage/errorPage.reducer.ts';
 import { enumerationSetupReducer } from './enumerationSetup/enumerationSetup.reducer.tsx';
 import { variablesSidebarReducer } from './variablesSidebar/variablesSidebar.reducer.ts';
+import { templateFromFileErrorReducer } from './templateFromFileError/templateFromFileError.reducer.ts';
 
 export const featuresReducer = combineReducers({
   groupsSidebar: groupsSidebar,
@@ -28,4 +29,5 @@ export const featuresReducer = combineReducers({
   errorPage: errorPageReducer,
   enumerationSetup: enumerationSetupReducer,
   variablesSidebar: variablesSidebarReducer,
+  templateFromFileError: templateFromFileErrorReducer,
 });

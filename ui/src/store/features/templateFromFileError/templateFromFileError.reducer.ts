@@ -13,31 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@use 'sass:string';
+import { createReducer } from '@reduxjs/toolkit';
+import { importTemplateFromFileActions } from '../../entities/templates/templates.actions.ts';
 
-$themeColors: (
-  'white': #ffffff,
-  'baseWhite': #fcfcfc,
-  'blue': #3c78d8,
-  'green': #15b097,
-  'orange': #eda145,
-  'hover': #ff8d00,
-  'black': #000000,
-  'primaryBackgroundActive': #2869d2,
-  'purple': #311b92,
-  'purple2': #3949ab,
-);
-
-:export {
-  @each $color, $value in $themeColors {
-    #{string.unquote($color)}: $value;
-  }
-}
-
-:global {
-  body {
-    @each $color, $value in $themeColors {
-      --color-#{string.unquote($color)}: #{$value};
-    }
-  }
-}
+export const templateFromFileErrorReducer = createReducer<string | null>(null, builder => {
+  builder.addCase(importTemplateFromFileActions.failure, (_, action) => action.payload);
+  builder.addCase(importTemplateFromFileActions.request, () => null);
+});

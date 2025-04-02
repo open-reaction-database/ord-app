@@ -14,50 +14,38 @@
  * limitations under the License.
  */
 import { Grid } from '@mantine/core';
-import { AddCircleIcon, UploadProgressIcon } from 'common/icons';
-import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDataset.tsx';
-import { useDisclosure } from '@mantine/hooks';
-import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
+import { UploadProgressIcon } from 'common/icons';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
+import { useDisclosure } from '@mantine/hooks';
+import { ImportFromJSON } from 'features/templates/ImportFromJSON/ImportFromJSON.tsx';
 import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 
-export function DatasetsListTopActions() {
-  const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
-  const [createFromFileOpened, { open: openCreateFromFile, close: closeCreateFromFile }] = useDisclosure();
+export function TemplatesTopActions() {
+  const [isImportOpened, { open: openImport, close: closeImport }] = useDisclosure();
 
   return (
     <>
-      {createNewOpened && <CreateNewDataset onClose={closeCreateNew} />}
-      {createFromFileOpened && <CreateDatasetFromFile onClose={closeCreateFromFile} />}
       <Grid
         align="center"
         justify="space-between"
         className=""
       >
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           <PaperButton
-            title="New Dataset"
-            description="Create dataset from scratch"
-            color={colorToCssVariable['blue']}
-            icon={<AddCircleIcon />}
-            onClick={openCreateNew}
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <PaperButton
-            title="From File"
-            description="Create dataset from file"
-            color={colorToCssVariable['green']}
+            title="New Template"
+            description="Upload JSON file"
+            color={colorToCssVariable['purple2']}
             icon={<UploadProgressIcon />}
-            onClick={openCreateFromFile}
+            onClick={openImport}
           />
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           <EnumerateButton />
         </Grid.Col>
       </Grid>
+      {isImportOpened && <ImportFromJSON onClose={closeImport} />}
       <EnumerationWizard />
     </>
   );

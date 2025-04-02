@@ -18,6 +18,9 @@ import { rootReducer } from './rootReducer';
 import { isDev } from 'common/constants';
 import { previewsWorkerMiddleware } from 'store/features/previewsWorker/previewsWorkerMiddleware.ts';
 import { enumerationWorkerMiddleware } from 'store/features/enumerationWorker/enumerationWorkerMiddleware.ts';
+import { importTemplateFromFileActions } from './entities/templates/templates.actions.ts';
+import { createDatasetFromFileActions } from './entities/datasets/datasets.actions.ts';
+import { importReactionFromFileActions } from './entities/reactions/reactions.actions.ts';
 
 export function configureAppStore() {
   return configureStore({
@@ -26,7 +29,15 @@ export function configureAppStore() {
     // For some reason redux usage example not working correctly with types here
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     middleware: (getDefaultMiddleware): any =>
-      getDefaultMiddleware().concat([previewsWorkerMiddleware, enumerationWorkerMiddleware]),
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [
+            importTemplateFromFileActions.request.type,
+            createDatasetFromFileActions.request.type,
+            importReactionFromFileActions.request.type,
+          ],
+        },
+      }).concat([previewsWorkerMiddleware, enumerationWorkerMiddleware]),
   });
 }
 
