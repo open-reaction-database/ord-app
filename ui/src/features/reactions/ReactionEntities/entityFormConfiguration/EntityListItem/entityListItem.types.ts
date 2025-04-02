@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import type { ReactNode } from 'react';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 interface FieldConfiguration<T> {
   label: string;
@@ -26,7 +27,8 @@ export interface EntityListItemRuntimeProps<T> {
 }
 
 export interface EntityListItemStaticProps<T> {
-  entityField: string;
+  entityField: string | ReactionPathComponents;
+  historyPathComponents?: Array<ReactionPathComponents>;
   title: ((entity: T) => string) | string;
   requiredFields: Array<FieldConfiguration<T>>;
   optionalFields?: Array<FieldConfiguration<T>>;

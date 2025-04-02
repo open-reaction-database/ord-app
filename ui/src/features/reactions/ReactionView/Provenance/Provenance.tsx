@@ -19,13 +19,15 @@ import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/r
 import { useSelector } from 'react-redux';
 import { EditIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { useContext } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 import { reactionContext } from '../../reactions.context';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { formatDate } from 'common/utils';
-import { ordProvenanceToReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters';
+import { getDeepReactionPart } from 'store/entities/reactions/reactions.utils.ts';
+import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 
 const ENTITY_FIELD = 'provenance';
 
@@ -43,52 +45,37 @@ const PROVENANCE_FIELDS = {
     { label: 'Username', key: 'person.username' },
     { label: 'Experimenter name', key: 'person.name' },
   ],
-  recordModified: [
-    { label: 'Time', key: 'time.value', format: (value: string) => formatDate(value) },
-    { label: 'Person', key: 'person.email' },
-    { label: 'Details', key: 'details', multiline: true },
-  ],
 };
+
+interface Field {
+  label: string;
+  key: string;
+  format?: (value: string) => string;
+  multiline?: boolean;
+}
+
+const renderKeyValueSection = (fields: Array<Field>, data?: object | null) => (
+  <>
+    {fields.map(({ label, key, format, multiline }) => {
+      const value = getDeepReactionPart(data || {}, key.split('.'));
+      return (
+        <KeyValueDisplay
+          key={`${label}-${key}`}
+          label={label}
+          value={format ? format(value) : (value as ReactNode)}
+          multiline={multiline}
+        />
+      );
+    })}
+  </>
+);
 
 export function Provenance({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
-  const provenance = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  const convertedProvenance = ordProvenanceToReactionProvenance(provenance);
-  const { ViewDeleteButtonsComponent, isViewOnly } = useContext(reactionContext);
-  const recordModifications = convertedProvenance.recordModified || [];
+  const provenance: ReactionProvenance = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const { isViewOnly } = useContext(reactionContext);
 
   const onEdit = () => dispatch(setReactionPathComponentsList([[ENTITY_FIELD]]));
-
-  const getNestedValue = <T,>(obj: T, path: string): string =>
-    path
-      .split('.')
-      .reduce(
-        (acc: Record<string, unknown>, part) => acc?.[part] as Record<string, unknown>,
-        obj as Record<string, unknown>,
-      ) as unknown as string;
-
-  interface Field {
-    label: string;
-    key: string;
-    format?: (value: string) => string;
-    multiline?: boolean;
-  }
-
-  const renderKeyValueSection = (fields: Array<Field>, data: Record<string, unknown>) => (
-    <>
-      {fields.map(({ label, key, format, multiline }) => {
-        const value = getNestedValue(data, key);
-        return (
-          <KeyValueDisplay
-            key={`${label}-${key}`}
-            label={label}
-            value={format ? format(value) : (value as React.ReactNode)}
-            multiline={multiline}
-          />
-        );
-      })}
-    </>
-  );
 
   return (
     <Flex
@@ -129,39 +116,30 @@ export function Provenance({ reactionId }: ReactionViewSectionProps) {
         className={classes.mainInformation}
       >
         <span className={classes.provenanceLabel}>Experiment</span>
-        {renderKeyValueSection(
-          PROVENANCE_FIELDS.experimenter,
-          (convertedProvenance.experimenter as Record<string, unknown>) || {},
-        )}
+        {renderKeyValueSection(PROVENANCE_FIELDS.experimenter, provenance.experimenter)}
 
         <span className={classes.provenanceLabel}>Record Creation</span>
-        {renderKeyValueSection(
-          PROVENANCE_FIELDS.recordCreated,
-          (convertedProvenance.recordCreated as Record<string, unknown>) || {},
-        )}
+        {renderKeyValueSection(PROVENANCE_FIELDS.recordCreated, provenance.recordCreated)}
       </Flex>
 
       <Flex
         direction="column"
         gap="sm"
       >
-        {recordModifications.map((recordModification, index) => (
-          <div key={index}>
-            <Flex
-              align="center"
-              className={classes.recordModification}
-            >
-              <span className={classes.provenanceLabel}>Record Modification</span>
-              <ViewDeleteButtonsComponent
-                entityName="Record Modification"
-                pathComponents={['provenance', 'recordModified', index]}
-              />
-            </Flex>
-            {renderKeyValueSection(
-              PROVENANCE_FIELDS.recordModified,
-              (recordModification as Record<string, unknown>) || {},
-            )}
-          </div>
+        {provenance.recordModified.map((recordModification, index) => (
+          <EntityListItem
+            key={recordModification.id}
+            historyPathComponents={[[ENTITY_FIELD]]}
+            entityField={[ENTITY_FIELD, 'recordModified']}
+            title="Record Modification"
+            requiredFields={[
+              { label: 'Time', render: ({ time }) => (time ? formatDate(time) : '') },
+              { label: 'Person Email', render: ({ person }) => person.email },
+              { label: 'Details', render: ({ details }) => details },
+            ]}
+            entity={recordModification}
+            entityKey={index}
+          />
         ))}
       </Flex>
     </Flex>

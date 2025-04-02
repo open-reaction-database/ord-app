@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { ReactionDateTime } from './reactionEntity.types';
 import {
   type ReactionMassSpec,
   type OrdValuePrecisionUnit,
@@ -227,3 +228,9 @@ export const reactionCompoundIdentifierToOrd = ({
   type: reactionCompoundIdentifierTypeToOrd(type),
   ...rest,
 });
+
+export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): ReactionDateTime =>
+  dateTime?.value ?? null;
+
+export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
+  dateTime ? { value: dateTime } : null;

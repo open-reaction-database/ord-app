@@ -27,11 +27,13 @@ export function EntityListItem<T>({
   title,
   requiredFields,
   optionalFields,
+  historyPathComponents,
 }: Readonly<EntityListItemProps<T>>) {
   const { ViewDeleteButtonsComponent } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
-    return [...pathComponents, entityField, entityKey];
+    const basePathComponents = Array.isArray(entityField) ? entityField : [...pathComponents, entityField];
+    return basePathComponents.concat([entityKey]);
   }, [entityField, entityKey, pathComponents]);
 
   const titleText = useMemo(() => {
@@ -52,6 +54,7 @@ export function EntityListItem<T>({
         <ViewDeleteButtonsComponent
           entityName={titleText}
           pathComponents={itemPathComponents}
+          historyPathComponents={historyPathComponents}
         />
       </Flex>
       {requiredFields.map(({ label, render }) => (

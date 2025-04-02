@@ -24,9 +24,12 @@ import { createEntityListItemComponent } from 'features/reactions/ReactionEntiti
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { formatDate } from 'common/utils';
 import { UpdatePersonInfo, type UpdatePersonInfoProps } from './UpdatePersonInfo.tsx';
+import { ordRecordEventToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
+import type { ReactionRecordEvent } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 
-const createEmptyModification = (newIndex: number): [number, ord.IRecordEvent] => {
-  return [newIndex, ord.RecordEvent.toObject(new ord.RecordEvent())];
+const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
+  return [newIndex, ordRecordEventToReaction(ord.RecordEvent.toObject(new ord.RecordEvent()))];
 };
 
 function createUpdatePersonInfo(text: string): FC<Omit<UpdatePersonInfoProps, 'text'>> {
@@ -43,7 +46,7 @@ function createUpdatePersonInfo(text: string): FC<Omit<UpdatePersonInfoProps, 't
 export const reactionProvenance: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.wrapper,
-    grid: 2,
+    grid: 4,
     fields: [
       {
         type: ReactionFormNodeType.custom,
@@ -52,109 +55,93 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       },
     ],
   },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.name',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Experimenter name',
-        },
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.name',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Experimenter name',
       },
-      {
-        type: ReactionFormNodeType.date,
-        name: 'experiment.start',
-        wrapperConfig: {
-          label: 'Experiment start',
-        },
+    },
+    {
+      type: ReactionFormNodeType.date,
+      name: 'experiment.start',
+      wrapperConfig: {
+        label: 'Experiment start',
       },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 3,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.email',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'E-mail',
-        },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.email',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'E-mail',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.orcid',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'ORCID ID',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.orcid',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'ORCID ID',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.username',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Username',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.username',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Username',
       },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.organization',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Organization',
-        },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.organization',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Organization',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'city',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'City',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'city',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'City',
       },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 3,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experimenter.doi',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'DOI',
-        },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experimenter.doi',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'DOI',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experiment.patent',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Patent',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experiment.patent',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Patent',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'experiment.url',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Publication URL',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'experiment.url',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Publication URL',
       },
-    ],
-  },
+    },
+  ),
   {
     type: ReactionFormNodeType.block,
     title: {
@@ -163,7 +150,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.wrapper,
-        grid: 2,
+        grid: 4,
         fields: [
           {
             type: ReactionFormNodeType.custom,
@@ -172,65 +159,57 @@ export const reactionProvenance: Array<ReactionFormNode> = [
           },
         ],
       },
-      {
-        type: ReactionFormNodeType.wrapper,
-        grid: 3,
-        fields: [
-          {
-            type: ReactionFormNodeType.dateTime,
-            name: 'recordCreated.time.value',
-            wrapperConfig: {
-              label: 'Time',
-            },
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.dateTime,
+          name: 'recordCreated.time.value',
+          wrapperConfig: {
+            label: 'Time',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'recordCreated.person.email',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'E-mail',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'recordCreated.person.email',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'E-mail',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'recordCreated.person.organization',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'Organization',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'recordCreated.person.organization',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Organization',
           },
-        ],
-      },
-      {
-        type: ReactionFormNodeType.wrapper,
-        grid: 3,
-        fields: [
-          {
-            type: ReactionFormNodeType.value,
-            name: 'recordCreated.person.orcid',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'ORCID ID',
-            },
+        },
+      ),
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.value,
+          name: 'recordCreated.person.orcid',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'ORCID ID',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'rrecordCreated.person.username',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'Username',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'rrecordCreated.person.username',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Username',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'recordCreated.person.name',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'Name',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'recordCreated.person.name',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Name',
           },
-        ],
-      },
+        },
+      ),
       {
         type: ReactionFormNodeType.value,
         name: 'details',

@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionDateTime, WithId } from '../reactionEntity/reactionEntity.types.ts';
 
-export interface ReactionProvenance extends Omit<ord.IReactionProvenance, 'experimentStart'> {
-  id: string;
-  experimentStart: string;
+export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'details'>> {
+  time: ReactionDateTime;
+  person: ord.IPerson;
 }
 
-export interface RecordEvent extends ord.IRecordEvent {
+export interface ReactionProvenance
+  extends Omit<ord.IReactionProvenance, 'experimentStart' | 'recordModified' | 'experimenter' | 'recordCreated'> {
   id: string;
+  experimentStart: ReactionDateTime;
+  experimenter: ord.IPerson;
+  recordCreated: ReactionRecordEvent;
+  recordModified: Array<ReactionRecordEvent>;
 }

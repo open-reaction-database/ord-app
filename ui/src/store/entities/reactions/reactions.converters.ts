@@ -36,6 +36,10 @@ import {
   ordObservationToReactionObservation,
   reactionObservationToOrdObservation,
 } from './reactionObservation/reactionObservation.converter';
+import {
+  ordProvenanceToReactionProvenance,
+  reactionProvenanceToOrdProvenance,
+} from './reactionProvenance/reactionProvenance.converters.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -45,6 +49,7 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
     identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
     observations: (reaction.observations || []).map(ordObservationToReactionObservation),
     notes: ordNotesToReaction(reaction.notes),
+    provenance: ordProvenanceToReactionProvenance(reaction.provenance),
   };
 }
 
@@ -56,6 +61,7 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
     observations: reaction.observations.map(reactionObservationToOrdObservation),
     notes: reactionNotesToOrd(reaction.notes),
+    provenance: reactionProvenanceToOrdProvenance(reaction.provenance),
   };
 }
 

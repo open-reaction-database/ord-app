@@ -28,6 +28,7 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 
 type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
 
@@ -181,7 +182,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       hasDelete: false,
       description: 'Additional metadata about how this reaction was performed and originally reported',
     }),
-    useInitialValues: buildUseInitialValues((value: ord.IReactionProvenance) => value),
+    useInitialValues: buildUseInitialValues(({ recordModified: _, ...values }: ReactionProvenance) => values),
   },
   {
     pathComponents: ['recordModified', 'provenance'],
