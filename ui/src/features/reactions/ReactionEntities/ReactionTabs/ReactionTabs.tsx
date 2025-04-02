@@ -21,6 +21,7 @@ import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identif
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
 import { Observation } from 'features/reactions/ReactionView/Observation/Observation';
+import { Conditions } from 'features/reactions/ReactionView/Conditions/Conditions';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import classes from './reactionTabs.module.scss';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
@@ -36,7 +37,7 @@ const createEmptyComponent = (name: string) => () => name;
 const tabs: Array<ReactionTab> = [
   { name: 'inputs', required: true, Component: Inputs },
   { name: 'outcomes', required: true, Component: Outcomes },
-  { name: 'conditions', Component: createEmptyComponent('conditions') },
+  { name: 'conditions', Component: Conditions },
   { name: 'identifiers', Component: Identifiers },
   { name: 'setup', Component: createEmptyComponent('setup') },
   { name: 'notes', Component: Notes },

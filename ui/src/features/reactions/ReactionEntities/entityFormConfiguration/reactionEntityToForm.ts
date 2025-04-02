@@ -28,6 +28,7 @@ import { reactionMeasurements } from 'features/reactions/ReactionEntities/entity
 import { reactionCrudeComponents } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionCrudeComponents.model.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { reactionObservations } from './reactionObservations.model.tsx';
+import { reactionConditions } from './reactionConditions.model.tsx';
 
 export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
   [ReactionNodeEntity.Inputs]: reactionInputs,
@@ -43,4 +44,5 @@ export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionForm
   [ReactionNodeEntity.Measurements]: reactionMeasurements,
   [ReactionNodeEntity.CrudeComponents]: reactionCrudeComponents,
   [ReactionNodeEntity.Observations]: reactionObservations,
+  [ReactionNodeEntity.Conditions]: reactionConditions,
 };

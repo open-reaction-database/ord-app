@@ -204,5 +204,15 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     }),
     useInitialValues: buildUseInitialValues(value => value),
   },
+  {
+    pathComponents: ['conditions'],
+    entityName: ReactionNodeEntity.Conditions,
+    label: 'Conditions',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Conditions',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
   ...componentsSidebars,
 ];

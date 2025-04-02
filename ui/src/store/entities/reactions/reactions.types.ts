@@ -22,6 +22,7 @@ import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reac
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
+import type { ReactionConditions } from './reactionConditions/reactionConditions.converter.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
@@ -37,6 +38,7 @@ export enum ReactionNodeEntity {
   Products = 'products',
   Measurements = 'measurements',
   Observations = 'observations',
+  Conditions = 'conditions',
 }
 
 export interface ReactionSummary {
@@ -62,11 +64,12 @@ export interface ReactionMolBlocks {
 }
 
 export interface AppReaction
-  extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes' | 'observations'> {
+  extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes' | 'observations' | 'conditions'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
   observations: Array<ReactionObservation>;
+  conditions: Array<ReactionConditions>;
   notes: ReactionNotes;
 }
 
