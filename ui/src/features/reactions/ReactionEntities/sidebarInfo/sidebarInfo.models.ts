@@ -161,6 +161,24 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(value => value),
   },
   {
+    pathComponents: ['provenance'],
+    entityName: ReactionEntity.Provenance,
+    label: 'Provenance',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Provenance',
+      hasDelete: false,
+      description: 'Additional metadata about how this reaction was performed and originally reported',
+    }),
+    useInitialValues: buildUseInitialValues((value: ord.IReactionProvenance) => value),
+  },
+  {
+    pathComponents: ['recordModified', 'provenance'],
+    entityName: ReactionEntity.RecordModified,
+    label: 'Record Modified',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Record Modified', hasDelete: true }),
+    useInitialValues: buildUseInitialValues((value: ord.IRecordEvent) => value),
+  },
+  {
     pathComponents: ['outcomes'],
     entityName: ReactionEntity.Outcomes,
     label: 'Outcomes',

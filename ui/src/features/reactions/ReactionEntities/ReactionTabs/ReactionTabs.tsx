@@ -20,6 +20,7 @@ import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
 import { Outcomes } from 'features/reactions/ReactionView/Outcomes/Outcomes.tsx';
+import { Provenance } from 'features/reactions/ReactionView/Provenance/Provenance.tsx';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import classes from './reactionTabs.module.scss';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
@@ -41,7 +42,7 @@ const tabs: Array<ReactionTab> = [
   { name: 'notes', Component: Notes },
   { name: 'observations', Component: createEmptyComponent('observations') },
   { name: 'workups', Component: createEmptyComponent('workups') },
-  { name: 'provenance', required: true, Component: createEmptyComponent('provenance') },
+  { name: 'provenance', required: true, Component: Provenance },
 ];
 
 interface TemplateTabsProps {

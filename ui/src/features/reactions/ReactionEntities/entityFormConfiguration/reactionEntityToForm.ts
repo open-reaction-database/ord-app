@@ -18,6 +18,8 @@ import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { reactionInputs } from './inputs/reactionInputs.model.tsx';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
+import { reactionProvenance } from './provenance/reactionProvenance.models.ts';
+import { recordModified } from './provenance/recordModified.models.ts';
 import { reactionComponents } from './components/reactionComponents.model.tsx';
 import { reactionComponentsPreparations } from './components/preparations/reactionComponentsPreparations.model.ts';
 import { reactionComponentIdentifiers } from './componentIdentifier/reactionComponentIdentifiers.model.ts';
@@ -40,4 +42,6 @@ export const reactionEntityToForm: Record<ReactionEntity, Array<ReactionFormNode
   [ReactionEntity.Products]: reactionProducts,
   [ReactionEntity.Measurements]: reactionMeasurements,
   [ReactionEntity.CrudeComponents]: reactionCrudeComponents,
+  [ReactionEntity.Provenance]: reactionProvenance,
+  [ReactionEntity.RecordModified]: recordModified,
 };
