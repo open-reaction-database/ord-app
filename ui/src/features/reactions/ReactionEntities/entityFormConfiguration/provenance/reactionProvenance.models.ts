@@ -22,8 +22,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { formatDate } from 'common/utils';
-
-import { ItsMeButton } from './itsMeButton.tsx';
+import { ItsMeButton } from './ItsMeButton.tsx';
 
 const createEmptyModification = (newIndex: number): [number, ord.IRecordEvent] => {
   return [newIndex, ord.RecordEvent.toObject(new ord.RecordEvent())];
