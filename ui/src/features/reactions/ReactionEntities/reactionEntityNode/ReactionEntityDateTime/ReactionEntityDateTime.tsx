@@ -15,22 +15,68 @@
  */
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormDateTime } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { useUncontrolled } from '@mantine/hooks';
 import { type DateValue, DateTimePicker } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
-import { Input, TextInput } from '@mantine/core';
-import { useCallback, useState, type FocusEvent, useContext } from 'react';
+import { Anchor, Flex, Input, TextInput } from '@mantine/core';
+import { useCallback, useState, type FocusEvent, type MouseEvent, useContext } from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import classes from './reactionEntityDateTime.module.scss';
+
+const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
+interface ReactionEntityDateTimeLabelProps extends Omit<ReactionEntityNodeProps<ReactionFormDateTime>, 'formMethods'> {
+  onChange: (value: string) => void;
+}
+
+function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntityDateTimeLabelProps>) {
+  const { isViewOnly } = useContext(reactionContext);
+  const baseLabel = (
+    <ReactionValueLabelWrapper
+      wrapperConfig={node.wrapperConfig}
+      name={node.name}
+      type={VariableType.Date}
+    />
+  );
+  const handleNowClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+      onChange(dayjs().format(TIME_FORMAT));
+    },
+    [onChange],
+  );
+
+  return isViewOnly ? (
+    baseLabel
+  ) : (
+    <Flex
+      align="center"
+      justify="space-between"
+      gap="xs"
+    >
+      {baseLabel}
+      <Anchor onClick={handleNowClick}>Now</Anchor>
+    </Flex>
+  );
+}
 
 export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDateTime>>) {
-  const label = useReactionEntityLabel(node.wrapperConfig);
   const { isViewOnly } = useContext(reactionContext);
 
-  const [value, onChange] = useUncontrolled({
+  const [value, onChange] = useUncontrolled<string>({
     ...formMethods.getInputProps(node.name),
   });
+
+  const label = (
+    <ReactionEntityDateTimeLabel
+      node={node}
+      onChange={onChange}
+    />
+  );
 
   const dateValue = dayjs(value);
 
@@ -40,7 +86,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
 
   const handleDateChange = useCallback(
     (date: DateValue) => {
-      const updatedValue = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+      const updatedValue = dayjs(date).format(TIME_FORMAT);
       onChange(updatedValue);
     },
     [onChange],
@@ -50,7 +96,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
     const target = event.target as HTMLInputElement;
     const updatedDate = dayjs(target.value);
     if (updatedDate.isValid()) {
-      onChange(updatedDate.format('YYYY-MM-DD HH:mm:ss'));
+      onChange(updatedDate.format(TIME_FORMAT));
       setIsDateValid(true);
     }
   };
@@ -63,9 +109,13 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
       onChange={handleDateChange}
       label={label}
       disabled={isViewOnly}
+      classNames={{ label: classes.label }}
     />
   ) : (
-    <Input.Wrapper label={label}>
+    <Input.Wrapper
+      label={label}
+      classNames={{ label: classes.label }}
+    >
       <InputGroup>
         <TextInput
           value={value}

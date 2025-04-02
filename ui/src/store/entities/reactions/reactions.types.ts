@@ -63,8 +63,7 @@ export interface ReactionMolBlocks {
   outcomes: Array<{ products: Array<ReactionMolBlockProducts> }>;
 }
 
-export interface AppReaction
-  extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes' | 'observations'> {
+export interface AppReaction extends Pick<ord.IReaction, 'provenance'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;

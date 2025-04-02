@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { FC } from 'react';
 import {
   ReactionFormNodeType,
   type ReactionFormNode,
@@ -22,11 +23,22 @@ import { ord } from 'ord-schema-protobufjs';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { formatDate } from 'common/utils';
-import { ItsMeButton } from './ItsMeButton.tsx';
+import { UpdatePersonInfo, type UpdatePersonInfoProps } from './UpdatePersonInfo.tsx';
 
 const createEmptyModification = (newIndex: number): [number, ord.IRecordEvent] => {
   return [newIndex, ord.RecordEvent.toObject(new ord.RecordEvent())];
 };
+
+function createUpdatePersonInfo(text: string): FC<Omit<UpdatePersonInfoProps, 'text'>> {
+  return function UpdatePersonInfoWithText(props) {
+    return (
+      <UpdatePersonInfo
+        {...props}
+        text={text}
+      />
+    );
+  };
+}
 
 export const reactionProvenance: Array<ReactionFormNode> = [
   {
@@ -35,8 +47,8 @@ export const reactionProvenance: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.custom,
-        name: 'I am experimenter',
-        Component: ItsMeButton,
+        name: 'experimenter',
+        Component: createUpdatePersonInfo('I am experimenter'),
       },
     ],
   },
@@ -53,7 +65,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
         },
       },
       {
-        type: ReactionFormNodeType.dateTime,
+        type: ReactionFormNodeType.date,
         name: 'experiment.start',
         wrapperConfig: {
           label: 'Experiment start',
@@ -75,7 +87,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       },
       {
         type: ReactionFormNodeType.value,
-        name: 'experimenter.orchidId',
+        name: 'experimenter.orcid',
         inputType: 'string',
         wrapperConfig: {
           label: 'ORCID ID',
@@ -155,8 +167,8 @@ export const reactionProvenance: Array<ReactionFormNode> = [
         fields: [
           {
             type: ReactionFormNodeType.custom,
-            name: 'I am contributor',
-            Component: ItsMeButton,
+            name: 'recordCreated.person',
+            Component: createUpdatePersonInfo('I am contributor'),
           },
         ],
       },
@@ -195,7 +207,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
         fields: [
           {
             type: ReactionFormNodeType.value,
-            name: 'recordCreated.person.orchidId',
+            name: 'recordCreated.person.orcid',
             inputType: 'string',
             wrapperConfig: {
               label: 'ORCID ID',

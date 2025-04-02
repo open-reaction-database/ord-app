@@ -17,37 +17,60 @@ import {
   ReactionFormNodeType,
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 
 export const recordModified: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.dateTime,
-    name: 'time',
-    wrapperConfig: {
-      label: 'Time',
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.dateTime,
+      name: 'time',
+      wrapperConfig: {
+        label: 'Time',
+      },
     },
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'person.username',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Person name',
-        },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'person.username',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Username',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'person.email',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Person e-mail',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'person.name',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Name',
       },
-    ],
-  },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'person.email',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Email',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'person.orcid',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Name',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'person.organization',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Organization',
+      },
+    },
+  ),
   {
     type: ReactionFormNodeType.value,
     name: 'details',

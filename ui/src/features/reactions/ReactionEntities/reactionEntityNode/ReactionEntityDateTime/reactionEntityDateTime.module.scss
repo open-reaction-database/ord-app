@@ -13,26 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button } from '@mantine/core';
-import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useSelector } from 'react-redux';
-import { selectSelf } from 'store/entities/users/users.selectors.ts';
-
-export const ItsMeButton: React.FC<ReactionFormCustomProps> = ({ name }) => {
-  const user = useSelector(selectSelf);
-  const updateFields = () => {
-    if (user) {
-      // TODO: Implement fields update logic
-    }
-  };
-
-  return (
-    <Button
-      onClick={updateFields}
-      w={160}
-      mt={5}
-    >
-      {name}
-    </Button>
-  );
-};
+.label {
+  width: 100%;
+}
