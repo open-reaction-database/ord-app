@@ -16,12 +16,24 @@
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { TagsInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function MeasurementMasses({ name, formMethods }: Readonly<ReactionFormCustomProps>) {
+  const { isViewOnly } = useContext(reactionContext);
   const [values, onChange] = useUncontrolled<Array<number>>({
     ...formMethods.getInputProps(name),
   });
+
+  const label = (
+    <ReactionValueLabelWrapper
+      name={name}
+      type={VariableType.String}
+      wrapperConfig={{ label: 'EIC Masses' }}
+    />
+  );
 
   const handleChange = (value: Array<string | number>) => {
     const numericValues = value
@@ -36,7 +48,8 @@ export function MeasurementMasses({ name, formMethods }: Readonly<ReactionFormCu
 
   return (
     <TagsInput
-      label="EIC Masses"
+      label={label}
+      disabled={isViewOnly}
       placeholder="Type to add unique"
       description="Only numbers are allowed."
       value={stringValues}

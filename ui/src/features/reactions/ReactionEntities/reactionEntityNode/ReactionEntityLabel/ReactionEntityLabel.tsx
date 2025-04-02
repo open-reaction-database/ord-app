@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ActionIcon, Flex, Tooltip } from '@mantine/core';
+import { Flex, Tooltip } from '@mantine/core';
 import { InfoCircleIcon } from 'common/icons';
+import classes from './reactionEntityLabel.module.scss';
 
 interface ReactionEntityLabelProps {
-  wrapperConfig: ReactionFormStandaloneField;
+  wrapperConfig?: ReactionFormStandaloneField;
 }
 
 export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLabelProps>) {
+  if (!wrapperConfig?.label) {
+    return null;
+  }
   const shouldDisplayWrapper = wrapperConfig.label || wrapperConfig.hint;
-  // Todo remove action icon from render with React 19
   return shouldDisplayWrapper ? (
     <Flex
       gap="xs"
@@ -36,13 +39,7 @@ export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLa
           label={wrapperConfig.hint}
           position="bottom-start"
         >
-          <ActionIcon
-            variant="transparent"
-            color="gray"
-            size="xs"
-          >
-            <InfoCircleIcon />
-          </ActionIcon>
+          <InfoCircleIcon className={classes.icon} />
         </Tooltip>
       )}
     </Flex>

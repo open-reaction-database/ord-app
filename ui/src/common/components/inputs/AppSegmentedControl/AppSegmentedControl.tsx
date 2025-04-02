@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SelectOptions } from 'common/types/selectOptions';
+import type { SelectOptions, SelectOptionWithoutGroup } from 'common/types/selectOptions';
 import { Input, SegmentedControl, type SegmentedControlProps } from '@mantine/core';
 import { useMemo, type ReactNode } from 'react';
 import { inputWrapperClasses } from 'common/components/display/InputWrapper';
@@ -32,8 +32,8 @@ export function AppSegmentedControl({
   ...rest
 }: Readonly<AppSegmentedControlProps>) {
   const data = useMemo(() => {
-    return options.reduce((acc: Array<string>, option) => {
-      if (typeof option === 'object') {
+    return options.reduce((acc: Array<SelectOptionWithoutGroup>, option) => {
+      if (typeof option === 'object' && 'items' in option) {
         return acc.concat(option.items);
       }
       return acc.concat(option);

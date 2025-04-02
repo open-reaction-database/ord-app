@@ -26,6 +26,10 @@ export const enumerationWorkerMiddleware: Middleware<
 > = api => {
   const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
 
+  worker.onerror = function (err) {
+    console.info('Error in WebWorker', err);
+  };
+
   worker.onmessage = event => {
     const enumerationBatch: EnumerationBatchResult = event.data;
 

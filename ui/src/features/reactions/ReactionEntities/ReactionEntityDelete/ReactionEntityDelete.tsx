@@ -18,7 +18,7 @@ import { ActionIcon } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
 import classes from './reactionEntityDelete.module.scss';
 import { useDisclosure } from '@mantine/hooks';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { popReactionPathComponents } from 'store/features/reactionForm/reactionForm.actions.ts';
@@ -30,6 +30,7 @@ interface ReactionEntityDeleteProps {
   entityName: string;
   pathComponents: ReactionPathComponents;
   shouldCloseSidebar?: true;
+  onRemove?: () => void;
 }
 
 export function ReactionEntityDelete({
@@ -37,25 +38,30 @@ export function ReactionEntityDelete({
   entityName,
   pathComponents,
   shouldCloseSidebar,
+  onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const dispatch = useAppDispatch();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
-  const onRemove = useCallback(() => {
+  const handleRemove = useCallback(() => {
     if (shouldCloseSidebar) {
       dispatch(popReactionPathComponents());
     }
-    dispatch(deleteReactionField({ reactionId, pathComponents }));
+    if (onRemove) {
+      onRemove();
+    } else {
+      dispatch(deleteReactionField({ reactionId, pathComponents }));
+    }
     closeConfirmation();
-  }, [closeConfirmation, dispatch, pathComponents, reactionId, shouldCloseSidebar]);
+  }, [closeConfirmation, dispatch, onRemove, pathComponents, reactionId, shouldCloseSidebar]);
 
   return (
     <ConfirmPopover
       title={`Remove ${entityName}`}
       text={`Are you sure to remove this ${entityName}?`}
       opened={confirmationOpened}
-      onConfirm={onRemove}
+      onConfirm={handleRemove}
       onCancel={closeConfirmation}
       target={
         <ActionIcon

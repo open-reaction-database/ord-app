@@ -18,6 +18,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { DatasetReaction, ReactionTemplate, ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { getDeepReactionPart } from './reactions.utils.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 
@@ -41,28 +42,16 @@ export const selectIsReactionCreating = buildSelector(state => state.isReactionC
 
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
-export const selectReactionComponents = (id: ReactionId, input: string) =>
-  buildSelector(state => state.reactionsById[id].data?.inputs[input]?.components || []);
-
 export const selectReactionPartByPath =
   (reactionId: ReactionId, pathComponents: ReactionPathComponents) => (state: AppState) => {
     const reaction = selectReactionById(reactionId)(state);
     if (!reaction) {
       return null;
     }
-    try {
-      // If the path is incorrect we will get an error
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return pathComponents.reduce((reactionPart: any, key) => {
-        return reactionPart[key];
-      }, reaction?.data);
-    } catch (e) {
-      console.info(pathComponents, e);
-      return null;
-    }
+    return getDeepReactionPart(reaction?.data, pathComponents);
   };
 
-export const selectReactionId = (_state: unknown, id: ReactionId) => id;
+const selectReactionId = (_state: unknown, id: ReactionId) => id;
 
 export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
   const inputsMap = reactions[id]?.data?.inputs || {};
@@ -74,3 +63,22 @@ export const selectOrderedInputs = createSelector([selectReactions, selectReacti
 });
 
 export const selectOrderedInputsWrapper = (id: ReactionId) => (state: AppState) => selectOrderedInputs(state, id);
+
+const selectVariableName = (_state: unknown, _id: unknown, variableName: string) => variableName;
+
+export const selectTemplateVariables = createSelector([selectReactions, selectReactionId], (reactions, id) => {
+  const reaction = reactions[id] as ReactionTemplate;
+  return reaction.variables;
+});
+
+export const selectTemplateVariablesWrapper = (id: string) => (state: AppState) => selectTemplateVariables(state, id);
+
+export const selectTemplateVariable = createSelector(
+  [selectTemplateVariables, selectVariableName],
+  (templateVariables, variableName) => {
+    return templateVariables[variableName];
+  },
+);
+
+export const selectTemplateVariableWrapper = (id: string, variableName: string) => (state: AppState) =>
+  selectTemplateVariable(state, id, variableName);

@@ -23,6 +23,8 @@ from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
+    DatasetEnumerateCreateSchema,
+    DatasetEnumerateExtendSchema,
     DatasetResponseSchema,
     DatasetSharableResponseSchema,
     DatasetShareCreateSchema,
@@ -82,6 +84,42 @@ async def upload_dataset(
     dataset = await use_case.upload(group_id, file_data, kind)
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
     return dataset
+
+
+@router.post(
+    "/groups/{group_id}/datasets/enumerate",
+    response_model=DatasetResponseSchema,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(group_authorization(("admin", "editor")))],
+)
+async def enumerate_dataset(
+    group_id: int,
+    payload: DatasetEnumerateCreateSchema,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    background_tasks: BackgroundTasks
+):
+    dataset = await use_case.enumerate(group_id, payload)
+    background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
+    return dataset
+
+
+@router.post(
+    "/datasets/{dataset_id}/enumerate/extend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
+)
+async def extend_enumerate_dataset(
+    dataset_id: int,
+    payload: DatasetEnumerateExtendSchema,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    background_tasks: BackgroundTasks
+):
+    dataset = await use_case.extend_enumerate(dataset_id, payload)
+    background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
+    return dataset
+
 
 @router.get(
     "/datasets/{dataset_id}/download",

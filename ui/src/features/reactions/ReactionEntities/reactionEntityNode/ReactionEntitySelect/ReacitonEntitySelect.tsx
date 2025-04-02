@@ -17,13 +17,20 @@ import { AppNativeSelect } from 'common/components/inputs/AppNativeSelect/AppNat
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
   const { isViewOnly } = useContext(reactionContext);
-  const label = useReactionEntityLabel(node.wrapperConfig);
+  const label = (
+    <ReactionValueLabelWrapper
+      name={node.name}
+      wrapperConfig={node.wrapperConfig}
+      type={VariableType.Select}
+    />
+  );
   const { getInputProps } = formMethods;
 
   return node.selectType === 'dropdown' ? (

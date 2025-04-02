@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionEntity } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { measurementTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.transform.ts';
+import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
 type Transform<T> = (values: T) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const reactionEntityToTransform: Record<string, Transform<any>> = {
-  [ReactionEntity.Measurements]: measurementTransform,
+  [ReactionNodeEntity.Measurements]: measurementTransform,
 };
 
 const defaultTransform = (values: unknown) => values;
 
-export const getReactionEntityTransform = <T extends object>(entity: ReactionEntity): Transform<T> => {
+export const getReactionEntityTransform = <T extends object>(entity: ReactionNodeEntity): Transform<T> => {
   return reactionEntityToTransform[entity] ?? defaultTransform;
 };

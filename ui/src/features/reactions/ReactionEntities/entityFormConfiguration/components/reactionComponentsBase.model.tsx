@@ -62,6 +62,12 @@ export const identifiersList: ReactionFormNode = {
         render: item => item.value,
       },
     ],
+    optionalFields: [
+      {
+        label: 'Details',
+        render: item => item.details,
+      },
+    ],
   }),
   addItem: {
     label: 'Identifier',

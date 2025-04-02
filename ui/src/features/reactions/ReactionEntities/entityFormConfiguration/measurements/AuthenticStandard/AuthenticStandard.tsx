@@ -20,28 +20,26 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ActionIcon, Button, Flex, Title } from '@mantine/core';
+import { Button, Flex, Title } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { AddCircleIcon, RemoveIcon } from 'common/icons';
+import { AddCircleIcon } from 'common/icons';
 import classes from './authenticStandard.module.scss';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
-import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
-import { useDisclosure } from '@mantine/hooks';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const currentPath = useMemo(() => {
     return pathComponents.concat(name);
   }, [pathComponents, name]);
@@ -49,49 +47,27 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
     selectReactionPartByPath(reactionId, currentPath),
   );
 
-  const [opened, { open, close }] = useDisclosure();
-
-  const onEdit = useCallback(() => {
-    dispatch(addReactionPathComponentToList(currentPath));
-  }, [currentPath, dispatch]);
-
-  const onDelete = useCallback(() => {
+  const onRemove = useCallback(() => {
     dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: null }));
-    close();
-  }, [close, currentPath, dispatch, reactionId]);
+  }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
     const authenticStandard = ordInputComponentToReaction(ord.Compound.toObject(new ord.Compound()));
     dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: authenticStandard }));
   }, [currentPath, dispatch, reactionId]);
 
-  return (
+  return !!authenticStandard || !isViewOnly ? (
     <ReactionEntityBlock
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={<Title order={4}>Authentic Standard</Title>}
           rightSection={
             authenticStandard ? (
-              <>
-                <EditButton onClick={onEdit} />
-                <ConfirmPopover
-                  opened={opened}
-                  target={
-                    <ActionIcon
-                      variant="transparent"
-                      className={classes.icon}
-                      color="red"
-                      onClick={open}
-                    >
-                      <RemoveIcon />
-                    </ActionIcon>
-                  }
-                  title="Remove authentic standard?"
-                  text="Are you sure to remove this Authentic standard?"
-                  onConfirm={onDelete}
-                  onCancel={close}
-                />
-              </>
+              <ViewDeleteButtonsComponent
+                entityName="Authentic standard"
+                pathComponents={currentPath}
+                onRemove={onRemove}
+              />
             ) : (
               <Button
                 classNames={{ root: classes.createButton, section: classes.icon }}
@@ -116,5 +92,5 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
         )}
       </Flex>
     </ReactionEntityBlock>
-  );
+  ) : null;
 }

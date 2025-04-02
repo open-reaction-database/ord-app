@@ -17,7 +17,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from './rootReducer';
 import { isDev } from 'common/constants';
 import { previewsWorkerMiddleware } from 'store/features/previewsWorker/previewsWorkerMiddleware.ts';
-import { enumerationWorkerMiddleware } from './features/enumerationWorker/enumerationWorkerMiddleware.ts';
+import { enumerationWorkerMiddleware } from 'store/features/enumerationWorker/enumerationWorkerMiddleware.ts';
 
 export function configureAppStore() {
   return configureStore({

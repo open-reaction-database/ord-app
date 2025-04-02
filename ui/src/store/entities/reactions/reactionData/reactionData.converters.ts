@@ -17,8 +17,10 @@ import { ord } from 'ord-schema-protobufjs';
 import { AppDataType, type AppData } from './reactionData.types.ts';
 import { Buffer } from 'buffer';
 import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
-export function ordDataToReactionData({ description, format, ...data }: ord.IData, name: string): AppData {
+export function ordDataToReactionData(dataWrapper: OrdOptional<ord.IData>, name: string): AppData {
+  const { description, format, ...data } = dataWrapper || {};
   let type: AppData['data']['type'];
   let value: AppData['data']['value'];
 

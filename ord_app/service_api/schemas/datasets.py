@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from base64 import b64decode
 from datetime import datetime
 from typing import Any, Literal, Optional
 from uuid import uuid4
@@ -18,7 +19,7 @@ from uuid import uuid4
 from pydantic import Field, constr, field_validator, model_validator
 from sqlalchemy import Row
 
-from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
+from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH, BaseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
 DownloadFileFormats = Literal["binpb", "json", "txtpb"]
@@ -77,13 +78,31 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
 
 class DatasetCreateSchema(BaseSchema):
     name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
-    description: constr(max_length=8192) | None = ""
+    description: constr(max_length=MAX_FIELD_LENGTH) | None = ""
 
     @field_validator("name", mode="before")
     def set_name_default(cls, value: str | None) -> str:
         if value := (value or "").strip():
             return value
         return uuid4().hex
+
+
+class DatasetEnumerateCreateSchema(BaseSchema):
+    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
+    description: constr(max_length=MAX_FIELD_LENGTH) | None = ""
+    reactions: list[bytes]
+
+    @field_validator("reactions", mode="before")
+    def load_reactions(cls, raw):
+        return map(b64decode, raw)
+
+
+class DatasetEnumerateExtendSchema(BaseSchema):
+    reactions: list[bytes]
+
+    @field_validator("reactions", mode="before")
+    def load_reactions(cls, raw):
+        return map(b64decode, raw)
 
 
 class DatasetShareSchema(BaseSchema):

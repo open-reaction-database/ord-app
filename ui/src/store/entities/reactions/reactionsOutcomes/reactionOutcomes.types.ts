@@ -27,7 +27,7 @@ import type { ReactionProduct } from 'store/entities/reactions/reactionComponent
 export interface ReactionAnalysis
   extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated' | 'type' | 'isOfIsolatedSpecies'>> {
   type: ReactionAnalysisType;
-  data: Record<string, AppData>;
+  analysisData: Record<string, AppData>;
   instrumentLastCalibrated: string | null;
   isOfIsolatedSpecies: ReactionBoolean;
 }
