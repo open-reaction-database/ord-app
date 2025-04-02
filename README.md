@@ -58,12 +58,12 @@ _Note: the database must be on the same network as docker or docker must connect
    docker run \
    --network ord_network \
    -e VITE_API_ENDPOINT="http://localhost:8000/service_api/api/v1" \
-   -e VITE_AUTH0_DOMAIN="dev-z4acb31kcl4prqtw.us.auth0.com" \
-   -e VITE_AUTH0_CLIENT_ID="6iGbDSlSANtgqktlxmERNKUUM8zx89TR" \
-   -e VITE_AUTH0_AUDIENCE="https://dev-z4acb31kcl4prqtw.us.auth0.com/api/v2/" \
-   -e VITE_AUTH0_ISSUER="https://dev-z4acb31kcl4prqtw.us.auth0.com/" \
-   -e PG_DSN="postgresql+psycopg://ord@db:5400/ord"
-   --rm -p 5173:80 -p 8000:8000 ord
+   -e VITE_AUTH0_DOMAIN="..." \
+   -e VITE_AUTH0_CLIENT_ID="..." \
+   -e VITE_AUTH0_AUDIENCE="..." \
+   -e VITE_AUTH0_ISSUER="..." \
+   -e PG_DSN="postgresql+asyncpg://ord@db:5432/ord"
+   --rm -p 5173:5173 -p 8000:8000 ord
    ```
 
 Envs for backend:

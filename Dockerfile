@@ -1,17 +1,16 @@
-# Copyright 2020 Open Reaction Database Project Authors
+# Copyright 2024 Open Reaction Database Project Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -33,7 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libxrender1 \
     libxext6 \
-    git && \
+    git \
+    ntpdate && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir poetry
@@ -45,10 +45,13 @@ COPY pyproject.toml .
 COPY tox.ini .
 COPY ord_app/ ./ord_app
 
-RUN pip install --no-cache-dir poetry &&  \
-    poetry config virtualenvs.create false &&  \
+RUN pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
     poetry install --with dev --no-root --no-interaction --no-ansi
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["poetry", "run", "uvicorn", "ord_app.service_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]

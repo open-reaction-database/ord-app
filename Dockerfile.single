@@ -55,7 +55,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     nginx \
-    supervisor && \
+    supervisor \
+    ntpdate && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
@@ -77,19 +78,19 @@ COPY --from=react-build /app/dist /var/www/html
 # Copy Nginx config file
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# change user
-RUN chown -R appuser:appgroup /app /var/www/html /etc/nginx || ls -lah /app
-
 RUN mkdir -p /var/lib/nginx /var/tmp/nginx /var/log/nginx && \
     chown -R appuser:appgroup /var/lib/nginx /var/tmp/nginx /var/log/nginx /run
-
-USER appuser
-
-# Expose both FastAPI and Nginx ports
-EXPOSE 8000 80
 
 # Copy Supervisor config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Command to start both FastAPI and Nginx
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+RUN chown -R appuser:appgroup /app /var/www/html /etc/nginx || ls -lah /app
+RUN chown -R appuser:appgroup /etc/supervisor /var/log/supervisor
+
+COPY entrypoint_single.sh ./
+RUN chmod +x ./entrypoint_single.sh
+
+# Expose both FastAPI and Nginx ports
+EXPOSE 8000 80
+
+ENTRYPOINT ["sh", "./entrypoint_single.sh"]
