@@ -114,7 +114,7 @@ export interface ReactionFormObjectInitializer extends ReactionFormNodeBase {
 
 export interface ReactionFormBlock extends ReactionFormNodeBase {
   type: ReactionFormNodeType.block;
-  title: ReactionFormTitle;
+  title?: ReactionFormTitle;
   fields: Array<ReactionFormNode>;
 }
 

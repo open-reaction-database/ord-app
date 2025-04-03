@@ -47,6 +47,10 @@ export const { options: temperatureOptions, byValue: temperatureTypeByValue } = 
   ord.Temperature.TemperatureUnit,
 );
 
+export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } = generateOptionsAndByValue(
+  ord.StirringConditions.StirringRate.StirringRateType,
+);
+
 export const { options: textureTypeOptions, byValue: textureTypeByValue } = generateOptionsAndByValue(
   ord.Texture.TextureType,
 );

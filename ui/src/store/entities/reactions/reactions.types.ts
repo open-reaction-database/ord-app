@@ -21,6 +21,7 @@ import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reac
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
+import type { ReactionConditions } from './reactionConditions/reactionConditions.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -40,6 +41,7 @@ export enum ReactionNodeEntity {
   Observations = 'observations',
   Provenance = 'provenance',
   RecordModified = 'recordModified',
+  Conditions = 'conditions',
 }
 
 export interface ReactionSummary {
@@ -69,6 +71,7 @@ export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
   observations: Array<ReactionObservation>;
+  conditions: ReactionConditions;
   notes: ReactionNotes;
   provenance: ReactionProvenance;
 }
