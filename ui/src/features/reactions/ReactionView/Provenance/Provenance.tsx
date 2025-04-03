@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Title } from '@mantine/core';
+import { Flex, Title } from '@mantine/core';
 import classes from './provenance.module.scss';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types';
 import { useSelector } from 'react-redux';
-import { EditIcon } from 'common/icons';
-import { useAppDispatch } from 'store/useAppDispatch';
-import { useContext } from 'react';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
-import { reactionContext } from '../../reactions.context';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { formatDate } from 'common/utils';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
+import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
+import { useContext } from 'react';
+import { reactionContext } from '../../reactions.context.ts';
 
 const ENTITY_FIELD = 'provenance';
 
-export function Provenance({ reactionId }: ReactionViewSectionProps) {
-  const dispatch = useAppDispatch();
+export function Provenance() {
+  const { reactionId } = useContext(reactionContext);
   const provenance: ReactionProvenance = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  const { isViewOnly } = useContext(reactionContext);
-
-  const onEdit = () => dispatch(setReactionPathComponentsList([[ENTITY_FIELD]]));
 
   return (
     <Flex
@@ -52,19 +46,7 @@ export function Provenance({ reactionId }: ReactionViewSectionProps) {
         >
           <Title order={2}>Provenance</Title>
         </Flex>
-        {!isViewOnly && (
-          <Button
-            onClick={onEdit}
-            leftSection={
-              <EditIcon
-                width={16}
-                height={16}
-              />
-            }
-          >
-            Edit
-          </Button>
-        )}
+        <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>
       <span className={classes.text}>
         Additional metadata about how this reaction was performed and originally reported

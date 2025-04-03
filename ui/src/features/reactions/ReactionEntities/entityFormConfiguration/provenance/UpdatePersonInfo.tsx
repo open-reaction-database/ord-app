@@ -18,13 +18,14 @@ import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntitie
 import { useSelector } from 'react-redux';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';
 import type { ord } from 'ord-schema-protobufjs';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
 } from 'store/entities/reactions/reactions.utils.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 export interface UpdatePersonInfoProps extends ReactionFormCustomProps {
   text: string;
@@ -37,6 +38,7 @@ const keys: Array<[keyof ord.IPerson, keyof User]> = [
 ];
 
 export function UpdatePersonInfo({ name, formMethods, text }: Readonly<UpdatePersonInfoProps>) {
+  const { isViewOnly } = useContext(reactionContext);
   const user = useSelector(selectSelf)!;
   const { setValues } = formMethods;
 
@@ -51,5 +53,5 @@ export function UpdatePersonInfo({ name, formMethods, text }: Readonly<UpdatePer
     );
   }, [user, name, setValues]);
 
-  return <Button onClick={updateFields}>{text}</Button>;
+  return !isViewOnly ? <Button onClick={updateFields}>{text}</Button> : null;
 }

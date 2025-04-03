@@ -26,6 +26,7 @@ import {
   getAllTemplatesActions,
   createNewTemplateActions,
   importTemplateFromFileActions,
+  renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
@@ -36,6 +37,7 @@ const singleReactionActionsMatcher = isAnyOf(
   deleteReactionFieldActions.success,
   createNewTemplateActions.success,
   importTemplateFromFileActions.success,
+  renameTemplateActions.success,
 );
 
 const multipleReactionsActionsMatcher = isAnyOf(
