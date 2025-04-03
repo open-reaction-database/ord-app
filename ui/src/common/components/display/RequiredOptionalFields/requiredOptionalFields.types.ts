@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 import type { ReactNode } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { RequiredOptionalFieldsProps } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
 
-interface FieldConfiguration<T> {
+export interface FieldConfiguration<T> {
   label: string;
   render: (entity: T) => ReactNode;
+  multiline?: false;
 }
 
-export interface EntityListItemRuntimeProps<T> extends Pick<RequiredOptionalFieldsProps<T>, 'entity'> {
-  entityKey: string | number;
-}
-
-export interface EntityListItemStaticProps<T>
-  extends Pick<RequiredOptionalFieldsProps<T>, 'requiredFields' | 'optionalFields'> {
-  entityField: string | ReactionPathComponents;
-  historyPathComponents?: Array<ReactionPathComponents>;
-  title: ((entity: T) => string) | string;
+export interface RequiredOptionalFieldsProps<T> {
+  entity: T;
   requiredFields: Array<FieldConfiguration<T>>;
   optionalFields?: Array<FieldConfiguration<T>>;
 }
-
-export type EntityListItemProps<T> = EntityListItemStaticProps<T> & EntityListItemRuntimeProps<T>;

@@ -196,7 +196,6 @@ async function updateReaction(reactionId: ReactionId, getState: () => AppState):
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);
-  console.info(ordReaction.provenance);
   const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
   const {
     binpb: _,

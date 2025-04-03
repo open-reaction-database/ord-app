@@ -17,8 +17,8 @@ import { Flex, Title } from '@mantine/core';
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { EntityListItemProps } from './entityListItem.types.ts';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
 
 export function EntityListItem<T>({
   entityKey,
@@ -57,25 +57,11 @@ export function EntityListItem<T>({
           historyPathComponents={historyPathComponents}
         />
       </Flex>
-      {requiredFields.map(({ label, render }) => (
-        <KeyValueDisplay
-          key={label}
-          label={label}
-          value={render(entity)}
-          multiline
-        />
-      ))}
-      {optionalFields?.map(({ label, render }) => {
-        const value = render(entity);
-        return value ? (
-          <KeyValueDisplay
-            key={label}
-            label={label}
-            value={render(entity)}
-            multiline
-          />
-        ) : null;
-      })}
+      <RequiredOptionalFields
+        requiredFields={requiredFields}
+        optionalFields={optionalFields}
+        entity={entity}
+      />
     </Flex>
   );
 }

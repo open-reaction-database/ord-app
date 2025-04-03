@@ -19,56 +19,16 @@ import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/r
 import { useSelector } from 'react-redux';
 import { EditIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch';
-import { useContext, type ReactNode } from 'react';
+import { useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 import { reactionContext } from '../../reactions.context';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { formatDate } from 'common/utils';
-import { getDeepReactionPart } from 'store/entities/reactions/reactions.utils.ts';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
+import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
 
 const ENTITY_FIELD = 'provenance';
-
-const PROVENANCE_FIELDS = {
-  experimenter: [
-    { label: 'Experimenter name', key: 'name' },
-    { label: 'E-mail', key: 'email' },
-    { label: 'ORCID ID', key: 'orcid' },
-    { label: 'Username', key: 'username' },
-  ],
-  recordCreated: [
-    { label: 'Time', key: 'time.value', format: (value: string) => formatDate(value) },
-    { label: 'E-mail', key: 'person.email' },
-    { label: 'ORCID ID', key: 'person.orcid' },
-    { label: 'Username', key: 'person.username' },
-    { label: 'Experimenter name', key: 'person.name' },
-  ],
-};
-
-interface Field {
-  label: string;
-  key: string;
-  format?: (value: string) => string;
-  multiline?: boolean;
-}
-
-const renderKeyValueSection = (fields: Array<Field>, data?: object | null) => (
-  <>
-    {fields.map(({ label, key, format, multiline }) => {
-      const value = getDeepReactionPart(data || {}, key.split('.'));
-      return (
-        <KeyValueDisplay
-          key={`${label}-${key}`}
-          label={label}
-          value={format ? format(value) : (value as ReactNode)}
-          multiline={multiline}
-        />
-      );
-    })}
-  </>
-);
 
 export function Provenance({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
@@ -116,10 +76,27 @@ export function Provenance({ reactionId }: ReactionViewSectionProps) {
         className={classes.mainInformation}
       >
         <span className={classes.provenanceLabel}>Experiment</span>
-        {renderKeyValueSection(PROVENANCE_FIELDS.experimenter, provenance.experimenter)}
+        <RequiredOptionalFields
+          entity={provenance.experimenter}
+          requiredFields={[
+            { label: 'Experimenter name', render: experimenter => experimenter.name },
+            { label: 'E-mail', render: experimenter => experimenter.email },
+            { label: 'ORCID ID', render: experimenter => experimenter.orcid },
+            { label: 'Username', render: experimenter => experimenter.username },
+          ]}
+        />
 
         <span className={classes.provenanceLabel}>Record Creation</span>
-        {renderKeyValueSection(PROVENANCE_FIELDS.recordCreated, provenance.recordCreated)}
+        <RequiredOptionalFields
+          entity={provenance.recordCreated}
+          requiredFields={[
+            { label: 'Time', render: ({ time }) => (time ? formatDate(time) : '') },
+            { label: 'E-mail', render: ({ person }) => person.email },
+            { label: 'ORCID ID', render: ({ person }) => person.orcid },
+            { label: 'Username', render: ({ person }) => person.username },
+            { label: 'Experimenter name', render: ({ person }) => person.name },
+          ]}
+        />
       </Flex>
 
       <Flex
