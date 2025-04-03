@@ -43,6 +43,9 @@ function cast(value: string, context: CastingContext): string | number | boolean
   if (['true', 'false'].includes(lowerCaseValue)) {
     return lowerCaseValue === 'true';
   }
+  if (value.includes(',')) {
+    return value;
+  }
   const parsedValue = parseFloat(value);
   if (!Number.isNaN(parsedValue)) {
     return parsedValue;

@@ -29,6 +29,7 @@ import {
   type ReactionTypeDetails,
   type ReactionIdentifier,
   type ReactionCompoundIdentifier,
+  type ReactionDateTime,
   ReactionBoolean,
 } from './reactionEntity.types';
 import {
@@ -227,3 +228,9 @@ export const reactionCompoundIdentifierToOrd = ({
   type: reactionCompoundIdentifierTypeToOrd(type),
   ...rest,
 });
+
+export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): ReactionDateTime =>
+  dateTime?.value ?? null;
+
+export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
+  dateTime ? { value: dateTime } : null;

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
@@ -22,6 +21,8 @@ import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reac
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
+import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
+import type { ord } from 'ord-schema-protobufjs';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
@@ -37,6 +38,8 @@ export enum ReactionNodeEntity {
   Products = 'products',
   Measurements = 'measurements',
   Observations = 'observations',
+  Provenance = 'provenance',
+  RecordModified = 'recordModified',
 }
 
 export interface ReactionSummary {
@@ -61,13 +64,13 @@ export interface ReactionMolBlocks {
   outcomes: Array<{ products: Array<ReactionMolBlockProducts> }>;
 }
 
-export interface AppReaction
-  extends Omit<ord.IReaction, 'inputs' | 'outcomes' | 'identifiers' | 'notes' | 'observations'> {
+export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
   observations: Array<ReactionObservation>;
   notes: ReactionNotes;
+  provenance: ReactionProvenance;
 }
 
 export interface ReactionResponse {

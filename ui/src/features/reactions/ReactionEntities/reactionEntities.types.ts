@@ -32,6 +32,7 @@ export enum ReactionFormNodeType {
   list = 'list',
   data = 'data',
   date = 'date',
+  dateTime = 'dateTime',
   custom = 'custom',
   empty = 'empty',
 }
@@ -97,6 +98,11 @@ export interface ReactionFormValuePrecisionUnit extends ReactionFormField, React
 
 export interface ReactionFormDate extends ReactionFormNodeBase, ReactionFormField {
   type: ReactionFormNodeType.date;
+  name: string;
+}
+
+export interface ReactionFormDateTime extends ReactionFormNodeBase, ReactionFormField {
+  type: ReactionFormNodeType.dateTime;
   name: string;
 }
 
@@ -166,7 +172,8 @@ export type ReactionFormNode =
   | ReactionFormData
   | ReactionFormDate
   | ReactionFormEmpty
-  | ReactionFormCustom;
+  | ReactionFormCustom
+  | ReactionFormDateTime;
 
 export interface ReactionEntityContext {
   pathComponents: ReactionPathComponents;

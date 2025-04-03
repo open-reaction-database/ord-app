@@ -18,7 +18,8 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { useMemo } from 'react';
-import { Flex, Text } from '@mantine/core';
+import { Flex, Text, Tooltip } from '@mantine/core';
+import classes from './reactionPreview.module.scss';
 
 interface ComponentMetadataProps {
   component: ReactionInputComponent | ReactionProduct;
@@ -33,8 +34,18 @@ export function ComponentMetadata({ component }: Readonly<ComponentMetadataProps
     <Flex
       direction="column"
       justify="flex-end"
+      className={classes.componentsMetadata}
     >
-      {name?.value && <Text size="xs">{name.value}</Text>}
+      {name?.value && (
+        <Tooltip label={name.value}>
+          <Text
+            size="xs"
+            className={classes.name}
+          >
+            {name.value}
+          </Text>
+        </Tooltip>
+      )}
       {'amount' in component && component?.amount && (
         <Text size="xs">
           {component.amount.value} {component.amount.units}

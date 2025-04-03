@@ -16,7 +16,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
-import type { AppReaction } from './reactions.types.ts';
 import { allowedNodeEntityNames } from './reactions.models.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
@@ -83,14 +82,13 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
   }
 }
 
-export function getDeepReactionPart(reaction: AppReaction, pathComponents: ReactionPathComponents): any {
+export function getDeepReactionPart(reaction: any, pathComponents: ReactionPathComponents): any {
   try {
     // If the path is incorrect we will get an error
     return pathComponents.reduce((reactionPart: any, key) => {
       return reactionPart[key];
     }, reaction);
-  } catch (e) {
-    console.info(pathComponents, e);
+  } catch (_e) {
     return null;
   }
 }

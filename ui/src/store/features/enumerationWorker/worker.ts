@@ -84,7 +84,8 @@ function getVariableValueOrError(variable: Variable, value: ValueType): string |
       if (typeof value !== 'string') {
         throw produceValueTypeError('string option', variable);
       }
-      return value;
+      // All select options should be upper cases
+      return value.toUpperCase();
     case VariableType.Date: {
       return getDateOrError(value, variable);
     }
