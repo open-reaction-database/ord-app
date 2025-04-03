@@ -67,7 +67,10 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           isNotClickable={!isReadyForEnumeration}
         />
         <Flex align="center">
-          <TemplateHeaderActions templateId={templateId} />
+          <TemplateHeaderActions
+            templateId={templateId}
+            showEnumeration={true}
+          />
         </Flex>
       </Flex>
       <Paper

@@ -16,12 +16,12 @@
 import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
-// TODO add number array
 export enum VariableType {
   String = 'string',
   Number = 'number',
   Select = 'select',
   Date = 'date',
+  NumberArray = 'numberArray',
 }
 
 export interface Variable {
@@ -34,6 +34,11 @@ export interface Variable {
 export interface TemplateCreator {
   reactionId: number;
   name: string;
+}
+
+export interface ImportTemplatePayload {
+  name: string;
+  file: File;
 }
 
 export interface TemplateResponse {

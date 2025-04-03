@@ -31,7 +31,6 @@ export function GroupSelector({ ...rest }: Readonly<GroupSelectorProps>) {
       label="Group"
       placeholder="Select a group"
       searchable
-      required
       {...rest}
     />
   );

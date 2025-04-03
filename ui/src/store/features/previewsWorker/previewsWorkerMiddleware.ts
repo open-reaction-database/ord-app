@@ -22,7 +22,12 @@ import {
   getReactionPageActions,
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
-import { getAllTemplatesActions, createNewTemplateActions } from 'store/entities/templates/templates.actions.ts';
+import {
+  getAllTemplatesActions,
+  createNewTemplateActions,
+  importTemplateFromFileActions,
+  renameTemplateActions,
+} from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
@@ -31,6 +36,8 @@ const singleReactionActionsMatcher = isAnyOf(
   addUpdateReactionFieldActions.success,
   deleteReactionFieldActions.success,
   createNewTemplateActions.success,
+  importTemplateFromFileActions.success,
+  renameTemplateActions.success,
 );
 
 const multipleReactionsActionsMatcher = isAnyOf(

@@ -21,6 +21,7 @@ import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/C
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
+import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 
 export function DatasetsListTopActions() {
   const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
@@ -57,6 +58,7 @@ export function DatasetsListTopActions() {
           <EnumerateButton />
         </Grid.Col>
       </Grid>
+      <EnumerationWizard />
     </>
   );
 }

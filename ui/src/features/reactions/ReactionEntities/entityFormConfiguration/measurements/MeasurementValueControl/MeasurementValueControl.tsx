@@ -141,7 +141,6 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
     ...formMethods.getInputProps(name),
   });
   const { value, type } = measurementValue ?? defaultMeasurementValue;
-
   const Component = typeToComponent[type];
 
   const handleValueChange = (newValue: ReactionMeasurementValue['value']) => {

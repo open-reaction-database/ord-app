@@ -16,57 +16,24 @@
 import { ArticleIcon } from 'common/icons';
 import { colorToCssVariable } from 'common/styling/colors.ts';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
-import { EnumerationSetup } from './EnumerationSetup/EnumerationSetup.tsx';
-import { useSelector } from 'react-redux';
-import { selectIsEnumerationSetupOpened } from 'store/features/enumerationSetup/enumerationSetup.selectors.ts';
 import { useCallback } from 'react';
 import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { selectEnumerationProgress } from 'store/entities/enumeration/enumeration.selectors.ts';
-import { EnumerationProgressDisplay } from './EnumerationProgress/EnumerationProgress.tsx';
-import { interruptEnumerationAction } from '../../store/entities/enumeration/enumeration.actions.ts';
-import { EnumerationResult } from './EnumerationResult/EnumerationResult.tsx';
 
 export function EnumerateButton() {
   const dispatch = useAppDispatch();
-  const enumerationProgress = useSelector(selectEnumerationProgress);
-
-  const onEnumerationCancel = useCallback(() => {
-    dispatch(interruptEnumerationAction());
-  }, [dispatch]);
 
   const openEnumerationSetup = useCallback(() => {
     dispatch(setEnumerationSetupOpenedAction(true));
   }, [dispatch]);
 
-  const closeEnumerationSetup = useCallback(() => {
-    dispatch(setEnumerationSetupOpenedAction(false));
-  }, [dispatch]);
-
-  const isSetupOpened = useSelector(selectIsEnumerationSetupOpened);
-
   return (
-    <>
-      {isSetupOpened && <EnumerationSetup onClose={closeEnumerationSetup} />}
-      <PaperButton
-        title="Enumerate"
-        description="Create dataset from template"
-        icon={<ArticleIcon />}
-        color={colorToCssVariable['orange']}
-        onClick={openEnumerationSetup}
-      />
-      {enumerationProgress && enumerationProgress.finished && (
-        <EnumerationResult
-          enumerationProgress={enumerationProgress}
-          onClose={onEnumerationCancel}
-        />
-      )}
-      {enumerationProgress && !enumerationProgress.finished && (
-        <EnumerationProgressDisplay
-          enumerationProgress={enumerationProgress}
-          onClose={onEnumerationCancel}
-        />
-      )}
-    </>
+    <PaperButton
+      title="Enumerate"
+      description="Create dataset from template"
+      icon={<ArticleIcon />}
+      color={colorToCssVariable['orange']}
+      onClick={openEnumerationSetup}
+    />
   );
 }

@@ -30,7 +30,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { startEnumeration } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.types.ts';
 
-interface CreateDatasetFromEnumerationProps {
+export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
   templateId?: string;
   onClose: () => void;
@@ -50,7 +50,11 @@ export function EnumerationSetup({
   );
   const doesDatasetExist = !!datasetId;
   const schema = doesDatasetExist ? enumerationSetupExistingDatasetSchema : enumerationSetupNewDatasetSchema;
-  const title = doesDatasetExist ? 'Enumerate into existing dataset' : 'Create Dataset from Reaction Enumeration';
+  const title = doesDatasetExist
+    ? 'Update Dataset from Reaction Enumeration'
+    : 'Create Dataset from Reaction Enumeration';
+
+  const saveText = doesDatasetExist ? 'Update' : 'Create';
 
   const form: EnumerationForm = useForm<EnumerationSetupForm, EnumerationFormTransform>({
     initialValues: {
@@ -143,7 +147,7 @@ export function EnumerationSetup({
             type="submit"
             color="primary"
           >
-            Create
+            {saveText}
           </Button>
         </Flex>
       </form>

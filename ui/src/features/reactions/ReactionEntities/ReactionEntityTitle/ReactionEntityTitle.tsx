@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionEntityTitleConstructorProps, ReactionEntityTitleProps } from './reactionEntityTitle.types.ts';
-import { Flex, Title, Text } from '@mantine/core';
+import { Flex, Text, Title } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 
 export function ReactionEntityTitle({
@@ -47,13 +47,3 @@ export function ReactionEntityTitle({
     </Flex>
   );
 }
-
-export const createReactionEntityTitle = (constructorProps: ReactionEntityTitleConstructorProps) =>
-  function ReactionEntityTitleWithProps(props: ReactionEntityTitleProps) {
-    return (
-      <ReactionEntityTitle
-        {...props}
-        {...constructorProps}
-      />
-    );
-  };

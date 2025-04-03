@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/ReactionEntityTitle/ReactionEntityTitle.tsx';
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
 import type { ord } from 'ord-schema-protobufjs';
@@ -28,6 +27,8 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
 
 type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
 
@@ -171,6 +172,24 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       description: 'Reaction identifiers define descriptions of the overall reaction',
     }),
     useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
+    pathComponents: ['provenance'],
+    entityName: ReactionNodeEntity.Provenance,
+    label: 'Provenance',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Provenance',
+      hasDelete: false,
+      description: 'Additional metadata about how this reaction was performed and originally reported',
+    }),
+    useInitialValues: buildUseInitialValues(({ recordModified: _, ...values }: ReactionProvenance) => values),
+  },
+  {
+    pathComponents: ['recordModified', 'provenance'],
+    entityName: ReactionNodeEntity.RecordModified,
+    label: 'Record Modified',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Record Modified', hasDelete: true }),
+    useInitialValues: buildUseInitialValues((value: ord.IRecordEvent) => value),
   },
   {
     pathComponents: ['outcomes'],

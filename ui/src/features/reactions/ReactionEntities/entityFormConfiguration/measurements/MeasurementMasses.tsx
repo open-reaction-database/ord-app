@@ -30,7 +30,7 @@ export function MeasurementMasses({ name, formMethods }: Readonly<ReactionFormCu
   const label = (
     <ReactionValueLabelWrapper
       name={name}
-      type={VariableType.String}
+      type={VariableType.NumberArray}
       wrapperConfig={{ label: 'EIC Masses' }}
     />
   );

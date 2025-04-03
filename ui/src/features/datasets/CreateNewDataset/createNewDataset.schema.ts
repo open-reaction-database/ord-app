@@ -19,7 +19,7 @@ import * as yup from 'yup';
 export const createNewDatasetSchema = yup.object({
   name: requiredTextField('Dataset name'),
   description: requiredTextField('Description'),
-  groupId: yup.string().required(),
+  groupId: yup.string().required().label('Group'),
 });
 
 export type CreateNewDatasetFormValues = yup.InferType<typeof createNewDatasetSchema>;

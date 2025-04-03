@@ -20,6 +20,7 @@ import { useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
+import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
 
 const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
   switch (inputType) {
@@ -46,23 +47,26 @@ export function ReactionEntityValue({
     />
   );
 
-  const inputProps = { placeholder: 'Type', ...(node.inputConfig ?? {}) };
-  const props = { name: node.name, label, ...inputProps };
+  const { value, onChange, defaultValue, ...inputProps } = getInputProps(node.name);
+  const [valueControlled, onControlledChange] = useAppUncontrolled({ value, defaultValue, onChange });
+
+  const props = {
+    name: node.name,
+    label,
+    placeholder: 'Type',
+    ...inputProps,
+    value: valueControlled,
+    onChange: onControlledChange,
+    ...(node.inputConfig ?? {}),
+  };
 
   switch (node.inputType) {
     case 'textarea':
-      return (
-        <Textarea
-          {...props}
-          {...getInputProps(node.name)}
-          disabled={isViewOnly}
-        />
-      );
+      return <Textarea {...props} />;
     case 'number':
       return (
         <NumberInput
           {...props}
-          {...getInputProps(node.name)}
           disabled={isViewOnly}
         />
       );
@@ -70,7 +74,6 @@ export function ReactionEntityValue({
       return (
         <TextInput
           {...props}
-          {...getInputProps(node.name)}
           disabled={isViewOnly}
         />
       );
