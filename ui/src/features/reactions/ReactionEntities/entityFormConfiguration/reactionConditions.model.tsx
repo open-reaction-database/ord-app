@@ -14,57 +14,50 @@
  * limitations under the License.
  */
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid';
-import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
+import { type ReactionFormNode, ReactionFormNodeType } from '../reactionEntities.types';
 import { booleanOptions } from './booleanOptions';
 import {
   reactionIdentifierTypeOptions,
   stirringRateOptions,
   temperatureOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
-import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models';
 
 export const reactionConditions: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.select,
-    name: 'reflux',
-    selectType: 'segmented',
-    options: booleanOptions,
-    wrapperConfig: {
-      label: 'Reflux',
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.select,
+      name: 'reflux',
+      selectType: 'segmented',
+      options: booleanOptions,
+      wrapperConfig: {
+        label: 'Reflux',
+      },
     },
-  },
-  {
-    type: ReactionFormNodeType.value,
-    name: 'ph',
-    inputType: 'number',
-    wrapperConfig: {
-      label: 'pH',
+    {
+      type: ReactionFormNodeType.value,
+      name: 'ph',
+      inputType: 'number',
+      wrapperConfig: {
+        label: 'pH',
+      },
     },
-  },
-  {
-    type: ReactionFormNodeType.select,
-    name: 'conditionsAreDynamic',
-    selectType: 'segmented',
-    options: booleanOptions,
-    wrapperConfig: {
-      label: 'Dinamic Conditions',
+    {
+      type: ReactionFormNodeType.select,
+      name: 'conditionsAreDynamic',
+      selectType: 'segmented',
+      options: booleanOptions,
+      wrapperConfig: {
+        label: 'Dinamic Conditions',
+      },
     },
-  },
-  {
-    type: ReactionFormNodeType.vpu,
-    name: 'amount',
-    options: amountTypeOptions,
-    wrapperConfig: {
-      label: 'Amount',
-    },
-    select: 'native-inline',
-  },
+  ),
   {
     type: ReactionFormNodeType.value,
     name: 'details',
-    inputType: 'string',
+    inputType: 'textarea',
     wrapperConfig: {
       label: 'Details',
+      hint: 'Elaboration on the aspects of the reaction conditions that cannot be captured by this schema in a structured format.',
     },
   },
   {
@@ -73,7 +66,26 @@ export const reactionConditions: Array<ReactionFormNode> = [
       label: 'Temperature',
     },
     fields: [
-      wrapInputsWithGrid({
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'control',
+          selectType: 'dropdown',
+          options: reactionIdentifierTypeOptions,
+          wrapperConfig: {
+            label: 'Control',
+          },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Details',
+          },
+        },
+      ),
+      {
         type: ReactionFormNodeType.vpu,
         name: 'temperature',
         wrapperConfig: {
@@ -81,66 +93,67 @@ export const reactionConditions: Array<ReactionFormNode> = [
           hint: 'Addition temperature specifies if the reaction input was heated or cooled prior to addition',
         },
         options: temperatureOptions,
-      }),
+      },
     ],
   },
   {
-    type: ReactionFormNodeType.select,
-    name: 'control',
-    selectType: 'dropdown',
-    options: reactionIdentifierTypeOptions,
-    wrapperConfig: {
-      label: 'Control',
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Temperature',
     },
-  },
-  {
-    type: ReactionFormNodeType.value,
-    name: 'details',
-    inputType: 'string',
-    wrapperConfig: {
-      label: 'Details',
-    },
-  },
-  {
-    type: ReactionFormNodeType.select,
-    name: 'method',
-    selectType: 'dropdown',
-    options: reactionIdentifierTypeOptions,
-    wrapperConfig: {
-      label: 'Method',
-    },
-  },
-  {
-    type: ReactionFormNodeType.value,
-    name: 'details',
-    inputType: 'string',
-    wrapperConfig: {
-      label: 'Details',
-    },
-  },
-  {
-    type: ReactionFormNodeType.select,
-    name: 'rate',
-    selectType: 'segmented',
-    options: stirringRateOptions,
-    wrapperConfig: {
-      label: 'Rate',
-    },
-  },
-  {
-    type: ReactionFormNodeType.value,
-    name: 'details',
-    inputType: 'string',
-    wrapperConfig: {
-      label: 'Details',
-    },
-  },
-  {
-    type: ReactionFormNodeType.value,
-    name: 'rpm',
-    inputType: 'string',
-    wrapperConfig: {
-      label: 'RpM',
-    },
+    fields: [
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'method',
+          selectType: 'dropdown',
+          options: reactionIdentifierTypeOptions,
+          wrapperConfig: {
+            label: 'Method',
+          },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Details',
+          },
+        },
+      ),
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'rate',
+          selectType: 'segmented',
+          options: stirringRateOptions,
+          wrapperConfig: {
+            label: 'Rate',
+          },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Details',
+          },
+        },
+      ),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.value,
+            name: 'rpm',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'RpM',
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
