@@ -20,6 +20,7 @@ import { AddCircleIcon, EditIcon, ViewIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import classes from './openSingleEntityButton.module.scss';
 
 interface OpenSingleEntityButtonProps {
   pathComponents: ReactionPathComponents;
@@ -51,6 +52,7 @@ export function OpenSingleEntityButton({ pathComponents }: Readonly<OpenSingleEn
     <Button
       onClick={onOpen}
       leftSection={icon}
+      classNames={{ section: classes.icon }}
     >
       {text}
     </Button>
