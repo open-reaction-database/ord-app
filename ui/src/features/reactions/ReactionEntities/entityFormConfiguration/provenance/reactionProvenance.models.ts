@@ -13,98 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { FC } from 'react';
 import {
-  ReactionFormNodeType,
   type ReactionFormNode,
+  ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { formatDate } from 'common/utils';
-import { UpdatePersonInfo, type UpdatePersonInfoProps } from './UpdatePersonInfo.tsx';
 import { ordRecordEventToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
 import type { ReactionRecordEvent } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
+import { createReactionPerson, createUpdatePersonInfoRow } from './reactionPerson.models.tsx';
 
 const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
   return [newIndex, ordRecordEventToReaction(ord.RecordEvent.toObject(new ord.RecordEvent()))];
 };
 
-function createUpdatePersonInfo(text: string): FC<Omit<UpdatePersonInfoProps, 'text'>> {
-  return function UpdatePersonInfoWithText(props) {
-    return (
-      <UpdatePersonInfo
-        {...props}
-        text={text}
-      />
-    );
-  };
-}
-
 export const reactionProvenance: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 4,
-    fields: [
-      {
-        type: ReactionFormNodeType.custom,
-        name: 'experimenter',
-        Component: createUpdatePersonInfo('I am experimenter'),
-      },
-    ],
-  },
+  createUpdatePersonInfoRow('experimenter', 'I am experimenter'),
+  ...createReactionPerson('experimenter'),
   wrapInputsWithGrid(
-    {
-      type: ReactionFormNodeType.value,
-      name: 'experimenter.name',
-      inputType: 'string',
-      wrapperConfig: {
-        label: 'Experimenter name',
-      },
-    },
     {
       type: ReactionFormNodeType.date,
       name: 'experiment.start',
       wrapperConfig: {
         label: 'Experiment start',
-      },
-    },
-  ),
-  wrapInputsWithGrid(
-    {
-      type: ReactionFormNodeType.value,
-      name: 'experimenter.email',
-      inputType: 'string',
-      wrapperConfig: {
-        label: 'E-mail',
-      },
-    },
-    {
-      type: ReactionFormNodeType.value,
-      name: 'experimenter.orcid',
-      inputType: 'string',
-      wrapperConfig: {
-        label: 'ORCID ID',
-      },
-    },
-    {
-      type: ReactionFormNodeType.value,
-      name: 'experimenter.username',
-      inputType: 'string',
-      wrapperConfig: {
-        label: 'Username',
-      },
-    },
-  ),
-  wrapInputsWithGrid(
-    {
-      type: ReactionFormNodeType.value,
-      name: 'experimenter.organization',
-      inputType: 'string',
-      wrapperConfig: {
-        label: 'Organization',
       },
     },
     {
@@ -148,68 +83,21 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       label: 'Record Creation',
     },
     fields: [
+      createUpdatePersonInfoRow('recordCreated.person', 'I am contributor'),
       {
         type: ReactionFormNodeType.wrapper,
-        grid: 4,
+        grid: 2,
         fields: [
           {
-            type: ReactionFormNodeType.custom,
-            name: 'recordCreated.person',
-            Component: createUpdatePersonInfo('I am contributor'),
+            type: ReactionFormNodeType.dateTime,
+            name: 'recordCreated.time.value',
+            wrapperConfig: {
+              label: 'Time',
+            },
           },
         ],
       },
-      wrapInputsWithGrid(
-        {
-          type: ReactionFormNodeType.dateTime,
-          name: 'recordCreated.time.value',
-          wrapperConfig: {
-            label: 'Time',
-          },
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'recordCreated.person.email',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'E-mail',
-          },
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'recordCreated.person.organization',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'Organization',
-          },
-        },
-      ),
-      wrapInputsWithGrid(
-        {
-          type: ReactionFormNodeType.value,
-          name: 'recordCreated.person.orcid',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'ORCID ID',
-          },
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'rrecordCreated.person.username',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'Username',
-          },
-        },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'recordCreated.person.name',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'Name',
-          },
-        },
-      ),
+      ...createReactionPerson('recordCreated.person'),
       {
         type: ReactionFormNodeType.value,
         name: 'details',
