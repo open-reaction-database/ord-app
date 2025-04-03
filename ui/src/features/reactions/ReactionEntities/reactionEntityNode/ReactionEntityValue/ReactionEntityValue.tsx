@@ -62,7 +62,12 @@ export function ReactionEntityValue({
 
   switch (node.inputType) {
     case 'textarea':
-      return <Textarea {...props} />;
+      return (
+        <Textarea
+          {...props}
+          disabled={isViewOnly}
+        />
+      );
     case 'number':
       return (
         <NumberInput
