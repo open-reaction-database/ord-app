@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionDateTime } from './reactionEntity.types';
 import {
   type ReactionMassSpec,
   type OrdValuePrecisionUnit,
@@ -30,6 +29,7 @@ import {
   type ReactionTypeDetails,
   type ReactionIdentifier,
   type ReactionCompoundIdentifier,
+  type ReactionDateTime,
   ReactionBoolean,
 } from './reactionEntity.types';
 import {
