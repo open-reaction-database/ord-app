@@ -91,3 +91,13 @@
     font-weight: 400;
   }
 }
+
+.componentsMetadata {
+  overflow: hidden;
+
+  .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
