@@ -69,7 +69,7 @@ export interface AppReaction
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
   observations: Array<ReactionObservation>;
-  conditions: Array<ReactionConditions>;
+  conditions: ReactionConditions;
   notes: ReactionNotes;
 }
 

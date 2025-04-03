@@ -13,34 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import { withId } from '../reactionEntity/reactionEntity.converters';
+import { ord } from 'ord-schema-protobufjs';
+import {
+  ordBooleanToReaction,
+  ordTemperatureToReaction,
+  reactionBooleanToOrd,
+  reactionTemperatureToOrd,
+  withId,
+} from '../reactionEntity/reactionEntity.converters';
+import type { OrdOptional, ReactionBoolean, ReactionTemperature } from '../reactionEntity/reactionEntity.types';
 
-export interface ReactionConditions {
+export interface ReactionConditions
+  extends Omit<ord.IReactionConditions, 'reflux' | 'conditionsAreDynamic' | 'temperature'> {
   id: string;
-  details: string | null;
-  ph: number | null;
+  reflux: ReactionBoolean;
+  conditionsAreDynamic: ReactionBoolean;
+  temperature: ReactionTemperature;
 }
 
 export const ordConditionsToReactionConditions = (
-  conditions: ord.IReactionConditions | null | undefined,
-): Array<ReactionConditions> => {
-  if (!conditions) return [];
-  const base: ReactionConditions = {
-    id: '',
-    details: conditions.details ?? '',
-    ph: conditions.ph ?? 0,
-  };
-  return [withId(base)];
+  conditions: OrdOptional<ord.IReactionConditions>,
+): ReactionConditions => {
+  const { conditionsAreDynamic, reflux, temperature, ...rest } =
+    conditions ?? ord.ReactionConditions.toObject(new ord.ReactionConditions());
+  return withId({
+    reflux: ordBooleanToReaction(reflux),
+    conditionsAreDynamic: ordBooleanToReaction(conditionsAreDynamic),
+    temperature: temperature?.setpoint
+      ? ordTemperatureToReaction(temperature.setpoint)
+      : ordTemperatureToReaction(null),
+    ...rest,
+  });
 };
 
-export const reactionConditionsToOrdConditions = (
-  conditions: Array<ReactionConditions>,
-): ord.IReactionConditions | undefined => {
-  if (conditions.length === 0) return undefined;
-  const condition = conditions[0];
+export const reactionConditionsToOrdConditions = (conditions: ReactionConditions): ord.IReactionConditions => {
   return {
-    details: condition.details,
-    ph: condition.ph,
+    details: conditions.details,
+    ph: conditions.ph,
+    reflux: reactionBooleanToOrd(conditions.reflux),
+    conditionsAreDynamic: reactionBooleanToOrd(conditions.conditionsAreDynamic),
+    temperature: {
+      setpoint: reactionTemperatureToOrd(conditions.temperature),
+    },
   };
 };

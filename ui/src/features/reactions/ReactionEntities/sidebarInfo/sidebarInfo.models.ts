@@ -212,7 +212,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Conditions',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues(value => value),
+    useInitialValues: buildUseInitialValues((value: ord.IReactionConditions) => value),
   },
   ...componentsSidebars,
 ];

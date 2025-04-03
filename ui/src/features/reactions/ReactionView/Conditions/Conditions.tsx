@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 import { Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/display/Counter/Counter';
 import { AddCircleIcon } from 'common/icons';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { reactionContext } from 'features/reactions/reactions.context';
-import { ord } from 'ord-schema-protobufjs';
-import { useCallback, useContext } from 'react';
+import { useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { ordConditionsToReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.converter';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks';
+import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.converter';
+import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionViewSectionProps } from '../reactionView.types';
-import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
+import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 
 export const ENTITY_FIELD = 'conditions';
 
 export function Conditions({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
-  const conditions = reaction.data.conditions || [];
-
-  const onConditionsCreate = useCallback(() => {
-    const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, conditions.length];
-    const newConditions = ordConditionsToReactionConditions(new ord.ReactionConditions());
-
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newConditions }));
-    dispatch(setReactionPathComponentsList([newIdentifierPath]));
-  }, [reactionId, conditions.length, dispatch]);
+  const conditions: ReactionConditions = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  console.log(conditions.temperature);
 
   const { isViewOnly } = useContext(reactionContext);
+
+  const onEdit = () => dispatch(setReactionPathComponentsList([[ENTITY_FIELD]]));
 
   return (
     <Flex direction="column">
@@ -54,11 +44,10 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <Title order={2}>Conditions</Title>
-          <Counter amount={conditions.length} />
         </Flex>
         {!isViewOnly && (
           <Button
-            onClick={onConditionsCreate}
+            onClick={onEdit}
             leftSection={<AddCircleIcon />}
           >
             Conditions
@@ -69,23 +58,14 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
         direction="column"
         gap="sm"
       >
-        {conditions.map((condition, index) => (
-          <EntityListItem
-            key={condition.id}
-            entityKey={index}
-            entityField="condition"
-            title="Conditions"
-            requiredFields={[
-              {
-                label: 'Details',
-                render({ details }) {
-                  return details;
-                },
-              },
-            ]}
-            entity={condition}
-          />
-        ))}
+        <div>
+          <div>Details: {conditions.details}</div>
+          <div>Reflux: {conditions.reflux}</div>
+          <div>pH: {conditions.ph}</div>
+          <div>
+            Temperature: {conditions.temperature?.value ? renderValuePrecisionUnit(conditions.temperature) : ''}
+          </div>
+        </div>
       </Flex>
     </Flex>
   );
