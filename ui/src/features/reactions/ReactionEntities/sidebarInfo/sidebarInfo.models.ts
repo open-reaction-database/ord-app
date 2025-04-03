@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createReactionEntityTitle } from 'features/reactions/ReactionEntities/ReactionEntityTitle/ReactionEntityTitle.tsx';
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
 import type { ord } from 'ord-schema-protobufjs';
@@ -29,6 +28,7 @@ import type {
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
 
 type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
 

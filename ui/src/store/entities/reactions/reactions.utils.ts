@@ -88,7 +88,7 @@ export function getDeepReactionPart(reaction: any, pathComponents: ReactionPathC
     return pathComponents.reduce((reactionPart: any, key) => {
       return reactionPart[key];
     }, reaction);
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 }
