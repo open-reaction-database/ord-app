@@ -30,7 +30,6 @@ import {
   massSpecTypeByValue,
   compoundIdentifierTypeByValue,
   pressureByValue,
-  pressureValueByType,
   atmosphereTypeByValue,
   temperatureControlTypeByValue,
 } from './reactionEntityTypes.models.ts';
@@ -100,7 +99,7 @@ export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: 
     ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
   );
 export const { ordEntityToEntity: ordPressureTypeToReaction, entityToOrdEntity: reactionPressureTypeToOrd } =
-  generateEntityTypeToFromOrd(pressureByValue, pressureValueByType);
+  generateEntityTypeToFromOrd(pressureByValue, ord.Pressure.PressureUnit);
 
 export const {
   ordEntityToEntity: ordCompoundIdentifierTypeToReaction,

@@ -55,8 +55,6 @@ export const { options: pressureOption, byValue: pressureByValue } = generateOpt
   ord.Pressure.PressureUnit,
 );
 
-export const pressureValueByType = reversePrimitiveRecord(pressureByValue);
-
 export const { options: atmosphereTypeOptions, byValue: atmosphereTypeByValue } = generateOptionsAndByValue(
   ord.PressureConditions.Atmosphere.AtmosphereType,
 );
