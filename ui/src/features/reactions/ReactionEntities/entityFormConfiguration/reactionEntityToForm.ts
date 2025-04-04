@@ -16,7 +16,7 @@
 import { type ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
-import { reactionInputs } from './inputs/reactionInputs.model.tsx';
+import { reactionInputs, reactionInputWithoutName } from './inputs/reactionInputs.model.tsx';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
 import { reactionProvenance } from './provenance/reactionProvenance.models.ts';
 import { recordModified } from './provenance/recordModified.models.ts';
@@ -31,9 +31,11 @@ import { reactionCrudeComponents } from 'features/reactions/ReactionEntities/ent
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { reactionObservations } from './reactionObservations.model.tsx';
 import { reactionConditions } from './reactionConditions.model.tsx';
+import { reactionWorkups } from './workups/reactionWorkups.models.ts';
 
 export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
   [ReactionNodeEntity.Inputs]: reactionInputs,
+  [ReactionNodeEntity.Input]: reactionInputWithoutName,
   [ReactionNodeEntity.Notes]: reactionNotes,
   [ReactionNodeEntity.Identifiers]: reactionIdentifiers,
   [ReactionNodeEntity.Components]: reactionComponents,
@@ -49,4 +51,5 @@ export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionForm
   [ReactionNodeEntity.Provenance]: reactionProvenance,
   [ReactionNodeEntity.RecordModified]: recordModified,
   [ReactionNodeEntity.Conditions]: reactionConditions,
+  [ReactionNodeEntity.Workups]: reactionWorkups,
 };

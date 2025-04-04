@@ -80,3 +80,7 @@ export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = ge
 
 export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
   generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const { options: workupTypeOptions, byValue: workupTypeByValue } = generateOptionsAndByValue(
+  ord.ReactionWorkup.ReactionWorkupType,
+);

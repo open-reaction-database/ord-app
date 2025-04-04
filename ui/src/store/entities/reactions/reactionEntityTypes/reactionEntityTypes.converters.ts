@@ -29,6 +29,7 @@ import {
   waveLengthTypeByValue,
   massSpecTypeByValue,
   compoundIdentifierTypeByValue,
+  workupTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -100,3 +101,6 @@ export const {
   ordEntityToEntity: ordCompoundIdentifierTypeToReaction,
   entityToOrdEntity: reactionCompoundIdentifierTypeToOrd,
 } = generateEntityTypeToFromOrd(compoundIdentifierTypeByValue, ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const { ordEntityToEntity: ordWorkupTypeToReaction, entityToOrdEntity: reactionWorkupTypeToOrd } =
+  generateEntityTypeToFromOrd(workupTypeByValue, ord.ReactionWorkup.ReactionWorkupType);

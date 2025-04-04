@@ -44,6 +44,7 @@ import {
   ordConditionsToReactionConditions,
   reactionConditionsToOrdConditions,
 } from './reactionConditions/reactionConditions.converter';
+import { ordWorkupToReaction, reactionWorkupToOrd } from './reactionWorkups/reactionWorkups.converters.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -55,6 +56,7 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
     conditions: ordConditionsToReactionConditions(reaction.conditions),
     notes: ordNotesToReaction(reaction.notes),
     provenance: ordProvenanceToReactionProvenance(reaction.provenance),
+    workups: (reaction.workups || []).map(ordWorkupToReaction),
   };
 }
 
@@ -68,6 +70,7 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     conditions: reactionConditionsToOrdConditions(reaction.conditions),
     notes: reactionNotesToOrd(reaction.notes),
     provenance: reactionProvenanceToOrdProvenance(reaction.provenance),
+    workups: reaction.workups.map(reactionWorkupToOrd),
   };
 }
 

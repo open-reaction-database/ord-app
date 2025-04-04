@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionInput, ReactionCrudeComponent } from './reactionInputs.types.ts';
+import type { ReactionInput, ReactionCrudeComponent, ReactionInputWithoutName } from './reactionInputs.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordAdditionDeviceToReaction,
@@ -32,8 +32,7 @@ import {
   reactionTextureToOrd,
   reactionTimeToOrd,
   withId,
-  withIdName,
-  withoutIdName,
+  withoutId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   ordInputComponentToReaction,
@@ -76,7 +75,7 @@ export function reactionCrudeComponentToOrd({
   };
 }
 
-export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): ReactionInput {
+export function ordInputToReactionInputWithoutName(ordInput: ord.IReactionInput): ReactionInputWithoutName {
   const {
     components,
     additionDuration,
@@ -89,24 +88,21 @@ export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: str
     additionOrder,
     crudeComponents,
   } = ordInput;
-  return withIdName(
-    {
-      components: (components || []).map(ordInputComponentToReaction),
-      crudeComponents: (crudeComponents || []).map(ordCrudeComponentToReaction),
-      additionOrder,
-      additionSpeed: ordAdditionSpeedToReaction(additionSpeed),
-      additionDuration: ordTimeToReaction(additionDuration),
-      flowRate: ordFlowRateToReaction(flowRate),
-      additionDevice: ordAdditionDeviceToReaction(additionDevice),
-      additionTime: ordTimeToReaction(additionTime),
-      additionTemperature: ordTemperatureToReaction(additionTemperature),
-      texture: ordTextureToReaction(texture),
-    },
-    name,
-  );
+  return withId({
+    components: (components || []).map(ordInputComponentToReaction),
+    crudeComponents: (crudeComponents || []).map(ordCrudeComponentToReaction),
+    additionOrder,
+    additionSpeed: ordAdditionSpeedToReaction(additionSpeed),
+    additionDuration: ordTimeToReaction(additionDuration),
+    flowRate: ordFlowRateToReaction(flowRate),
+    additionDevice: ordAdditionDeviceToReaction(additionDevice),
+    additionTime: ordTimeToReaction(additionTime),
+    additionTemperature: ordTemperatureToReaction(additionTemperature),
+    texture: ordTextureToReaction(texture),
+  });
 }
 
-export function reactionInputToOrdInput(appInput: ReactionInput): ord.IReactionInput {
+export function reactionInputWithoutNameToOrd(input: ReactionInputWithoutName): ord.IReactionInput {
   const {
     components,
     crudeComponents,
@@ -118,7 +114,7 @@ export function reactionInputToOrdInput(appInput: ReactionInput): ord.IReactionI
     additionTime,
     additionTemperature,
     texture,
-  } = withoutIdName(appInput);
+  } = withoutId(input);
   return {
     components: components.map(reactionInputComponentToOrd),
     crudeComponents: crudeComponents.map(reactionCrudeComponentToOrd),
@@ -131,6 +127,17 @@ export function reactionInputToOrdInput(appInput: ReactionInput): ord.IReactionI
     additionTemperature: reactionTemperatureToOrd(additionTemperature),
     texture: reactionTextureToOrd(texture),
   };
+}
+
+export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): ReactionInput {
+  return {
+    name,
+    ...ordInputToReactionInputWithoutName(ordInput),
+  };
+}
+
+export function reactionInputToOrdInput({ name: _, ...input }: ReactionInput): ord.IReactionInput {
+  return reactionInputWithoutNameToOrd(input);
 }
 
 export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): AppReaction['inputs'] {

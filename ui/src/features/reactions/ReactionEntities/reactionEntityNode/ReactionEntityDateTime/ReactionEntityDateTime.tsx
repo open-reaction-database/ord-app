@@ -19,12 +19,13 @@ import { useUncontrolled } from '@mantine/hooks';
 import { type DateValue, DateTimePicker } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Anchor, Flex, Input, TextInput } from '@mantine/core';
-import { useCallback, useState, type FocusEvent, type MouseEvent, useContext } from 'react';
+import { useCallback, useState, type FocusEvent, type MouseEvent, useContext, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import classes from './reactionEntityDateTime.module.scss';
+import { getDate } from 'common/utils';
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
@@ -45,7 +46,7 @@ function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntity
     (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
-      onChange(dayjs().format(TIME_FORMAT));
+      onChange(dayjs.utc().format(TIME_FORMAT));
     },
     [onChange],
   );
@@ -78,7 +79,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
     />
   );
 
-  const dateValue = dayjs(value);
+  const dateValue = useMemo(() => getDate(value), [value]);
 
   const [isDateValid, setIsDateValid] = useState(dateValue.isValid() || value === null);
 

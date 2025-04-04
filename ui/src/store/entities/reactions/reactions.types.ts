@@ -24,9 +24,11 @@ import type { ReactionObservation } from './reactionObservation/reactionObservat
 import type { ReactionConditions } from './reactionConditions/reactionConditions.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
+  Input = 'input',
   Outcomes = 'outcomes',
   Identifiers = 'identifiers',
   Notes = 'notes',
@@ -42,6 +44,7 @@ export enum ReactionNodeEntity {
   Provenance = 'provenance',
   RecordModified = 'recordModified',
   Conditions = 'conditions',
+  Workups = 'workups',
 }
 
 export interface ReactionSummary {
@@ -74,6 +77,7 @@ export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   conditions: ReactionConditions;
   notes: ReactionNotes;
   provenance: ReactionProvenance;
+  workups: Array<ReactionWorkup>;
 }
 
 export interface ReactionResponse {

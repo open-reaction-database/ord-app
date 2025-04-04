@@ -45,3 +45,5 @@ export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
 
 export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+
+export type WorkupType = keyof typeof ord.ReactionWorkup.ReactionWorkupType;

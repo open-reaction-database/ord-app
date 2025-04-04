@@ -39,21 +39,7 @@ const createEmptyCrudeComponent = buildUseCreate('crudeComponents', index => {
   return [index, newCrudeComponent];
 });
 
-export const reactionInputs: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'name',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Input name',
-        },
-      },
-    ],
-  },
+export const reactionInputWithoutName: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.custom,
     name: 'components',
@@ -195,4 +181,22 @@ export const reactionInputs: Array<ReactionFormNode> = [
       },
     ],
   },
+];
+
+export const reactionInputs: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    fields: [
+      {
+        type: ReactionFormNodeType.value,
+        name: 'name',
+        inputType: 'string',
+        wrapperConfig: {
+          label: 'Input name',
+        },
+      },
+    ],
+  },
+  ...reactionInputWithoutName,
 ];

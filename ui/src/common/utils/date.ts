@@ -21,8 +21,12 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
+const userTimezone = dayjs.tz.guess();
+
+export function getDate(inputDate: string): dayjs.Dayjs {
+  return dayjs.utc(inputDate).tz(userTimezone);
+}
 
 export function formatDate(inputDate: string) {
-  const timezone = dayjs.tz.guess();
-  return dayjs.utc(inputDate).tz(timezone).format(TZ_FORMAT);
+  return getDate(inputDate).format(TZ_FORMAT);
 }
