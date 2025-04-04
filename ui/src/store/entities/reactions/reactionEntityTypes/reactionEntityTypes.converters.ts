@@ -29,6 +29,10 @@ import {
   waveLengthTypeByValue,
   massSpecTypeByValue,
   compoundIdentifierTypeByValue,
+  pressureByValue,
+  pressureValueByType,
+  atmosphereTypeByValue,
+  temperatureControlTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -95,8 +99,21 @@ export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: 
     massSpecTypeByValue,
     ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
   );
+export const { ordEntityToEntity: ordPressureTypeToReaction, entityToOrdEntity: reactionPressureTypeToOrd } =
+  generateEntityTypeToFromOrd(pressureByValue, pressureValueByType);
 
 export const {
   ordEntityToEntity: ordCompoundIdentifierTypeToReaction,
   entityToOrdEntity: reactionCompoundIdentifierTypeToOrd,
 } = generateEntityTypeToFromOrd(compoundIdentifierTypeByValue, ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const { ordEntityToEntity: ordAtmosphereTypeToReaction, entityToOrdEntity: reactionAtmosphereTypeToOrd } =
+  generateEntityTypeToFromOrd(atmosphereTypeByValue, ord.PressureConditions.Atmosphere.AtmosphereType);
+
+export const {
+  ordEntityToEntity: ordTemperatureControlTypeToReaction,
+  entityToOrdEntity: reactionTemperatureControlTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  temperatureControlTypeByValue,
+  ord.TemperatureConditions.TemperatureControl.TemperatureControlType,
+);

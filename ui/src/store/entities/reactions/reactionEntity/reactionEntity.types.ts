@@ -19,6 +19,7 @@ import type {
   ReactionFlowRateType,
   ReactionIdentifierType,
   ReactionMassSpecType,
+  ReactionPressureType,
   ReactionSelectivityType,
   ReactionSpeedType,
   ReactionTemperatureType,
@@ -84,6 +85,8 @@ export type ReactionFlowRate = ReactionValuePrecisionUnit<ReactionFlowRateType>;
 export type ReactionAdditionDevice = ReactionTypeDetails<ReactionAdditionDeviceType>;
 
 export type ReactionTemperature = ReactionValuePrecisionUnit<ReactionTemperatureType>;
+
+export type ReactionPressure = ReactionValuePrecisionUnit<ReactionPressureType>;
 
 export type ReactionTexture = ReactionTypeDetails<ReactionTextureType>;
 

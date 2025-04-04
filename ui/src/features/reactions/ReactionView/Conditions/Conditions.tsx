@@ -24,13 +24,14 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionViewSectionProps } from '../reactionView.types';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
+import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
+import classes from './conditions.module.scss';
 
 export const ENTITY_FIELD = 'conditions';
 
 export function Conditions({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const conditions: ReactionConditions = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  console.log(conditions.temperature);
 
   const { isViewOnly } = useContext(reactionContext);
 
@@ -58,14 +59,34 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
         direction="column"
         gap="sm"
       >
-        <div>
-          <div>Details: {conditions.details}</div>
-          <div>Reflux: {conditions.reflux}</div>
-          <div>pH: {conditions.ph}</div>
-          <div>
-            Temperature: {conditions.temperature?.value ? renderValuePrecisionUnit(conditions.temperature) : ''}
-          </div>
-        </div>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            { label: 'Reflux', render: conditions => conditions.reflux },
+            { label: 'pH', render: conditions => conditions.ph },
+            { label: 'Dynamic conditions:', render: conditions => conditions.conditionsAreDynamic },
+          ]}
+        />
+        <span className={classes.conditionsLabel}>Temperature</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            {
+              label: 'Setpoint:',
+              render: conditions => renderValuePrecisionUnit(conditions.temperature),
+            },
+          ]}
+        />
+        <span className={classes.conditionsLabel}>Pressure</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            {
+              label: 'Setpoint',
+              render: conditions => renderValuePrecisionUnit(conditions.pressure),
+            },
+          ]}
+        />
       </Flex>
     </Flex>
   );

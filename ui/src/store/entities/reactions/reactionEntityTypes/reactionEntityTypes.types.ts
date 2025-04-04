@@ -29,6 +29,11 @@ export type ReactionFlowRateType = keyof typeof ord.FlowRate.FlowRateUnit;
 
 export type ReactionTemperatureType = keyof typeof ord.Temperature.TemperatureUnit;
 
+export type ReactionTemperatureControlType =
+  keyof typeof ord.TemperatureConditions.TemperatureControl.TemperatureControlType;
+
+export type ReactionPressureType = keyof typeof ord.Pressure.PressureUnit;
+
 export type ReactionTextureType = keyof typeof ord.Texture.TextureType;
 
 export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
@@ -45,3 +50,5 @@ export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
 
 export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+
+export type ReactionAtmosphereType = keyof typeof ord.PressureConditions.Atmosphere.AtmosphereType;

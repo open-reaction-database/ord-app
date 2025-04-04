@@ -17,31 +17,58 @@ import { ord } from 'ord-schema-protobufjs';
 import {
   ordBooleanToReaction,
   ordTemperatureToReaction,
+  ordPressureToReaction,
   reactionBooleanToOrd,
   reactionTemperatureToOrd,
+  reactionPressureToOrd,
   withId,
 } from '../reactionEntity/reactionEntity.converters';
-import type { OrdOptional, ReactionBoolean, ReactionTemperature } from '../reactionEntity/reactionEntity.types';
+import type {
+  OrdOptional,
+  ReactionBoolean,
+  ReactionTemperature,
+  ReactionPressure,
+} from '../reactionEntity/reactionEntity.types';
+import {
+  ordAtmosphereTypeToReaction,
+  reactionAtmosphereTypeToOrd,
+  ordTemperatureControlTypeToReaction,
+  reactionTemperatureControlTypeToOrd,
+} from '../reactionEntityTypes/reactionEntityTypes.converters';
+import type {
+  ReactionAtmosphereType,
+  ReactionTemperatureControlType,
+} from '../reactionEntityTypes/reactionEntityTypes.types';
 
 export interface ReactionConditions
-  extends Omit<ord.IReactionConditions, 'reflux' | 'conditionsAreDynamic' | 'temperature'> {
+  extends Omit<ord.IReactionConditions, 'reflux' | 'conditionsAreDynamic' | 'temperature' | 'pressure'> {
   id: string;
   reflux: ReactionBoolean;
   conditionsAreDynamic: ReactionBoolean;
   temperature: ReactionTemperature;
+  temperatureControl: ReactionTemperatureControlType;
+  temperatureDetails: string | null;
+  pressure: ReactionPressure;
+  atmosphere: ReactionAtmosphereType;
 }
+
+const convertTemperature = (temperature: ord.ITemperatureConditions | null | undefined) => ({
+  temperature: temperature?.setpoint ? ordTemperatureToReaction(temperature.setpoint) : ordTemperatureToReaction(null),
+  temperatureControl: ordTemperatureControlTypeToReaction(temperature?.control?.type),
+  temperatureDetails: temperature?.control?.details ?? null,
+});
 
 export const ordConditionsToReactionConditions = (
   conditions: OrdOptional<ord.IReactionConditions>,
 ): ReactionConditions => {
-  const { conditionsAreDynamic, reflux, temperature, ...rest } =
+  const { conditionsAreDynamic, reflux, temperature, pressure, ...rest } =
     conditions ?? ord.ReactionConditions.toObject(new ord.ReactionConditions());
   return withId({
     reflux: ordBooleanToReaction(reflux),
     conditionsAreDynamic: ordBooleanToReaction(conditionsAreDynamic),
-    temperature: temperature?.setpoint
-      ? ordTemperatureToReaction(temperature.setpoint)
-      : ordTemperatureToReaction(null),
+    ...convertTemperature(temperature),
+    pressure: ordPressureToReaction(pressure?.setpoint),
+    atmosphere: ordAtmosphereTypeToReaction(pressure?.atmosphere?.type),
     ...rest,
   });
 };
@@ -54,6 +81,16 @@ export const reactionConditionsToOrdConditions = (conditions: ReactionConditions
     conditionsAreDynamic: reactionBooleanToOrd(conditions.conditionsAreDynamic),
     temperature: {
       setpoint: reactionTemperatureToOrd(conditions.temperature),
+      control: {
+        type: reactionTemperatureControlTypeToOrd(conditions.temperatureControl),
+        details: conditions.temperatureDetails,
+      },
+    },
+    pressure: {
+      setpoint: reactionPressureToOrd(conditions.pressure),
+      atmosphere: {
+        type: reactionAtmosphereTypeToOrd(conditions.atmosphere),
+      },
     },
   };
 };

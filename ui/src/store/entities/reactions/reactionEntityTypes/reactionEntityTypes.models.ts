@@ -51,6 +51,19 @@ export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } 
   ord.StirringConditions.StirringRate.StirringRateType,
 );
 
+export const { options: pressureOption, byValue: pressureByValue } = generateOptionsAndByValue(
+  ord.Pressure.PressureUnit,
+);
+
+export const pressureValueByType = reversePrimitiveRecord(pressureByValue);
+
+export const { options: atmosphereTypeOptions, byValue: atmosphereTypeByValue } = generateOptionsAndByValue(
+  ord.PressureConditions.Atmosphere.AtmosphereType,
+);
+
+export const { options: temperatureControlTypeOptions, byValue: temperatureControlTypeByValue } =
+  generateOptionsAndByValue(ord.TemperatureConditions.TemperatureControl.TemperatureControlType);
+
 export const { options: textureTypeOptions, byValue: textureTypeByValue } = generateOptionsAndByValue(
   ord.Texture.TextureType,
 );

@@ -17,9 +17,12 @@ import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid
 import { type ReactionFormNode, ReactionFormNodeType } from '../reactionEntities.types';
 import { booleanOptions } from './booleanOptions';
 import {
+  pressureOption,
   reactionIdentifierTypeOptions,
   stirringRateOptions,
   temperatureOptions,
+  atmosphereTypeOptions,
+  temperatureControlTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
 export const reactionConditions: Array<ReactionFormNode> = [
@@ -69,16 +72,16 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid(
         {
           type: ReactionFormNodeType.select,
-          name: 'control',
+          name: 'temperatureControl',
           selectType: 'dropdown',
-          options: reactionIdentifierTypeOptions,
+          options: temperatureControlTypeOptions,
           wrapperConfig: {
             label: 'Control',
           },
         },
         {
           type: ReactionFormNodeType.value,
-          name: 'details',
+          name: 'temperatureDetails',
           inputType: 'string',
           wrapperConfig: {
             label: 'Details',
@@ -99,7 +102,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.block,
     title: {
-      label: 'Temperature',
+      label: 'Stirring',
     },
     fields: [
       wrapInputsWithGrid(
@@ -114,7 +117,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         },
         {
           type: ReactionFormNodeType.value,
-          name: 'details',
+          name: 'stirringDetails',
           inputType: 'string',
           wrapperConfig: {
             label: 'Details',
@@ -154,6 +157,303 @@ export const reactionConditions: Array<ReactionFormNode> = [
           },
         ],
       },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Pressure',
+    },
+    fields: [
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'pressureControl',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Control',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'pressureDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'pressure',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Pressure',
+        },
+        select: 'native-inline',
+      }),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'atmosphere',
+            selectType: 'dropdown',
+            options: atmosphereTypeOptions,
+            wrapperConfig: {
+              label: 'Atmosphere',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'details',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Illumination',
+    },
+    fields: [
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'illuminationType',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Type',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'illuminationDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'wavelength',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Wavelength',
+        },
+        select: 'native-inline',
+      }),
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'distance',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Distance',
+        },
+        select: 'native-inline',
+      }),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.value,
+            name: 'color',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Color',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Electrochemistry',
+    },
+    fields: [
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'ElectrochemistryType',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Type',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'ElectrochemistryDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'current',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Current',
+        },
+        select: 'native-inline',
+      }),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.value,
+            name: 'anode',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Anode',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'cathode',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Cathode',
+            },
+          },
+        ],
+      },
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'separation',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Separation',
+        },
+        select: 'native-inline',
+      }),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'cell',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Cell',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'SeparationDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.block,
+    title: {
+      label: 'Flow',
+    },
+    fields: [
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'FlowType',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Type',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'FlowDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.value,
+            name: 'pump',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Pump',
+            },
+          },
+        ],
+      },
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.select,
+            name: 'tubing',
+            selectType: 'dropdown',
+            options: reactionIdentifierTypeOptions,
+            wrapperConfig: {
+              label: 'Tubing',
+            },
+          },
+          {
+            type: ReactionFormNodeType.value,
+            name: 'TubingDetails',
+            inputType: 'string',
+            wrapperConfig: {
+              label: 'Details',
+            },
+          },
+        ],
+      },
+      wrapInputsWithGrid({
+        type: ReactionFormNodeType.vpu,
+        name: 'diameter',
+        options: pressureOption,
+        wrapperConfig: {
+          label: 'Diameter',
+        },
+        select: 'native-inline',
+      }),
     ],
   },
 ];

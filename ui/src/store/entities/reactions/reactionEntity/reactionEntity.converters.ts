@@ -38,6 +38,7 @@ import {
   ordCompoundIdentifierTypeToReaction,
   ordFlowRateTypeToReaction,
   ordMassSpecTypeToReaction,
+  ordPressureTypeToReaction,
   ordReactionIdentifierTypeToReaction,
   ordSelectivityTypeToReaction,
   ordTemperatureTypeToReaction,
@@ -50,6 +51,7 @@ import {
   reactionFlowRateTypeToOrd,
   reactionIdentifierTypeToOrd,
   reactionMassSpecTypeToOrd,
+  reactionPressureTypeToOrd,
   reactionSelectivityTypeToOrd,
   reactionTemperatureTypeToOrd,
   reactionTextureTypeToOrd,
@@ -158,6 +160,11 @@ export const { fromOrd: ordFlowRateToReaction, toOrd: reactionFlowRateToOrd } = 
 
 export const { fromOrd: ordTemperatureToReaction, toOrd: reactionTemperatureToOrd } =
   generateValuePrecisionUnitConverter(ordTemperatureTypeToReaction, reactionTemperatureTypeToOrd);
+
+export const { fromOrd: ordPressureToReaction, toOrd: reactionPressureToOrd } = generateValuePrecisionUnitConverter(
+  ordPressureTypeToReaction,
+  reactionPressureTypeToOrd,
+);
 
 export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } = generateTypeDetailsConverter(
   ordTextureTypeToReaction,
