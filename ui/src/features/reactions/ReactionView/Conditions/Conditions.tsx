@@ -30,7 +30,6 @@ export const ENTITY_FIELD = 'conditions';
 export function Conditions({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const conditions: ReactionConditions = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  console.log(conditions.temperature);
 
   const { isViewOnly } = useContext(reactionContext);
 
