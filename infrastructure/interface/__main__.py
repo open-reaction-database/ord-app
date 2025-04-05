@@ -23,6 +23,48 @@ import pulumi_awsx as awsx
 backend = pulumi.StackReference("ord/backend/prod")
 domain = pulumi.StackReference("ord/domain/prod")
 
+target_group = aws.lb.TargetGroup(
+    "target-group", port=8080, protocol="HTTP", target_type="ip", vpc_id=backend.get_output("vpc_id")
+)
+load_balancer = awsx.lb.ApplicationLoadBalancer(
+    "load-balancer",
+    listeners=[
+        awsx.lb.ListenerArgs(
+            default_actions=[
+                aws.lb.ListenerDefaultActionArgs(
+                    type="redirect",
+                    redirect=aws.lb.ListenerDefaultActionRedirectArgs(
+                        port="443", protocol="HTTPS", status_code="HTTP_301"
+                    ),
+                )
+            ],
+            port=80,
+            protocol="HTTP",
+        ),
+        awsx.lb.ListenerArgs(
+            certificate_arn=domain.get_output("certificate_arn"),
+            default_actions=[aws.lb.ListenerDefaultActionArgs(type="forward", target_group_arn=target_group.arn)],
+            port=443,
+            protocol="HTTPS",
+        ),
+    ],
+    subnet_ids=backend.get_output("public_subnet_ids"),
+)
+
+aws.route53.Record(
+    "alias",
+    aliases=[
+        aws.route53.RecordAliasArgs(
+            evaluate_target_health=False,
+            name=load_balancer.load_balancer.dns_name,
+            zone_id=load_balancer.load_balancer.zone_id,
+        )
+    ],
+    name=domain.get_output("domain_name"),
+    type=aws.route53.RecordType.A,
+    zone_id=domain.get_output("zone_id"),
+)
+
 repository = awsx.ecr.Repository(
     "repository",
     awsx.ecr.RepositoryArgs(force_delete=True),
@@ -70,7 +112,7 @@ service = awsx.ecs.FargateService(
         cluster=cluster.arn,
         load_balancers=[
             aws.ecs.ServiceLoadBalancerArgs(
-                container_name="container", container_port=8080, target_group_arn=domain.get_output("target_group_arn")
+                container_name="container", container_port=8080, target_group_arn=target_group.arn
             )
         ],
         network_configuration=aws.ecs.ServiceNetworkConfigurationArgs(
