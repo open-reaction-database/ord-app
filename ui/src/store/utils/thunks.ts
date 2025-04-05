@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AnyAsyncAction } from 'common/types';
-import type { ThunkWrapper, AppThunk, AppVoidThunk } from 'common/types/store/thunk.ts';
+import type { AnyAsyncAction, AsyncAction } from 'common/types';
+import type { ThunkWrapper, AppThunk, AppVoidThunk, ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 
 export function createThunk<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
@@ -50,4 +50,8 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       }
     };
   };
+}
+
+export function createCustomThunk(appThunk: AppVoidThunk<AsyncAction>): ThunkCustomWrapper<void> {
+  return () => appThunk;
 }

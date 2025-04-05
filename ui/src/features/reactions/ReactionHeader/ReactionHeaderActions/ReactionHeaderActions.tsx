@@ -15,7 +15,7 @@
  */
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useCallback, useRef } from 'react';
+import { useCallback, type MutableRefObject } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'wouter';
 import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
@@ -24,18 +24,18 @@ import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { fileDownloadOptions } from 'common/constants.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { copyPreviewAsImage } from 'features/reactions/ReactionPreview/reactionPreview.utils.ts';
+import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 
 interface ReactionHeaderActionsProps {
   reactionId: number;
+  previewRef: MutableRefObject<HTMLDivElement | null>;
 }
 
-export function ReactionHeaderActions({ reactionId }: Readonly<ReactionHeaderActionsProps>) {
+export function ReactionHeaderActions({ reactionId, previewRef }: Readonly<ReactionHeaderActionsProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
   const datasetId = parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(reactionId));
-  const previewRef = useRef<HTMLDivElement | null>(null);
   const onPreviewSave = useCallback(() => {
     copyPreviewAsImage(previewRef.current);
   }, [previewRef]);

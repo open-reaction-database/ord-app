@@ -17,41 +17,64 @@ import { Button } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { EnumerateIcon, DownloadIcon } from 'common/icons';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { downloadAsJson } from 'store/utils/downloadFile.thunks.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import { useCallback } from 'react';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { downloadTemplateCsv, downloadTemplateInJSON } from 'store/entities/templates/templates.thunks.ts';
+import { EnumerationWizard } from '../../enumeration/EnumerationWizard.tsx';
+import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';
 
 interface TemplateHeaderActionsProps {
   templateId: string;
+  showEnumeration?: boolean;
 }
 
-export function TemplateHeaderActions({ templateId }: Readonly<TemplateHeaderActionsProps>) {
+export function TemplateHeaderActions({ templateId, showEnumeration }: Readonly<TemplateHeaderActionsProps>) {
   const template = useSelector(selectReactionById(templateId));
-  const downloadAsJsonHandle = () => {
-    downloadAsJson(template, `${template.data.reactionId}.json`);
-  };
-  const isReadyForEnumeration = template.variables.length > 0;
+  const dispatch = useAppDispatch();
+  const { variables } = template;
+  const variablesList = Object.values(variables);
+  const openEnumerationSetup = useCallback(() => {
+    dispatch(setEnumerationSetupOpenedAction(true));
+  }, [dispatch]);
+
+  const onJsonDownload = useCallback(() => {
+    dispatch(downloadTemplateInJSON(templateId));
+  }, [dispatch, templateId]);
+  const onCSVDownload = useCallback(() => {
+    dispatch(downloadTemplateCsv(templateId));
+  }, [dispatch, templateId]);
+
+  const isReadyForEnumeration = variablesList.length > 0;
 
   return (
     <>
       <RemoveReaction reactionId={templateId} />
-      <Button
-        variant="transparent"
-        leftSection={<EnumerateIcon />}
-        disabled={!isReadyForEnumeration}
-      >
-        Enumerate
-      </Button>
+      {showEnumeration && (
+        <>
+          <Button
+            variant="transparent"
+            leftSection={<EnumerateIcon />}
+            disabled={!isReadyForEnumeration}
+            onClick={openEnumerationSetup}
+          >
+            Enumerate
+          </Button>
+          <EnumerationWizard templateId={templateId} />
+        </>
+      )}
       <Button
         leftSection={<DownloadIcon />}
         variant="transparent"
         disabled={!isReadyForEnumeration}
+        onClick={onCSVDownload}
       >
         Download Variables in CSV
       </Button>
       <Button
         leftSection={<DownloadIcon />}
         variant="transparent"
-        onClick={downloadAsJsonHandle}
+        onClick={onJsonDownload}
       >
         Download Template in JSON
       </Button>

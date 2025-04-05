@@ -16,37 +16,70 @@
 import { NumberInput, Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
+import { useContext } from 'react';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
+import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
+
+const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
+  switch (inputType) {
+    case 'number':
+      return VariableType.Number;
+    case 'string':
+    case 'textarea':
+      return VariableType.String;
+  }
+};
 
 export function ReactionEntityValue({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValue>>) {
-  const label = useReactionEntityLabel(node.wrapperConfig);
+  const { isViewOnly } = useContext(reactionContext);
+  const type = getVariableType(node.inputType);
 
-  const inputProps = { placeholder: 'Type', ...(node.inputConfig ?? {}) };
-  const props = { name: node.name, label, ...inputProps };
+  const label = (
+    <ReactionValueLabelWrapper
+      name={node.name}
+      type={type}
+      wrapperConfig={node.wrapperConfig}
+    />
+  );
+
+  const { value, onChange, defaultValue, ...inputProps } = getInputProps(node.name);
+  const [valueControlled, onControlledChange] = useAppUncontrolled({ value, defaultValue, onChange });
+
+  const props = {
+    name: node.name,
+    label,
+    placeholder: 'Type',
+    ...inputProps,
+    value: valueControlled,
+    onChange: onControlledChange,
+    ...(node.inputConfig ?? {}),
+  };
 
   switch (node.inputType) {
     case 'textarea':
       return (
         <Textarea
           {...props}
-          {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     case 'number':
       return (
         <NumberInput
           {...props}
-          {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     case 'string':
       return (
         <TextInput
           {...props}
-          {...getInputProps(node.name)}
+          disabled={isViewOnly}
         />
       );
     default:

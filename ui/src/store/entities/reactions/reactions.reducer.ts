@@ -25,10 +25,13 @@ import {
   removeReactionActions,
 } from './reactions.actions.ts';
 import {
-  getTemplateActions,
   getAllTemplatesActions,
   removeTemplateActions,
   renameTemplateActions,
+  addUpdateVariableActions,
+  removeVariableActions,
+  createNewTemplateActions,
+  importTemplateFromFileActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
 import type { ReactionOrTemplate, AppReaction, DatasetReaction, ReactionTemplate } from './reactions.types.ts';
@@ -41,10 +44,13 @@ import {
 } from './reactions.utils.ts';
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
 import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
+import type { Variable } from '../templates/templates.types.ts';
 
 const getReactionId = (reaction: DatasetReaction) => reaction.id;
 
 const getTemplateId = (template: ReactionTemplate) => template.id;
+
+const getVariableId = (variable: Variable) => variable.path.join('.');
 
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
@@ -90,13 +96,6 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     const { [`template_${templateId}`]: _, ...rest } = state;
     return rest;
   });
-  builder.addCase(getTemplateActions.success, (state, action) => ({
-    ...state,
-    [getTemplateId(action.payload)]: {
-      ...action.payload,
-      data: linkReactionEntities(action.payload.data),
-    },
-  }));
   builder.addCase(getAllTemplatesActions.success, (state, action) => ({
     ...state,
     ...itemsById(
@@ -110,6 +109,41 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       [action.payload.id]: action.payload,
     };
   });
+  builder.addCase(addUpdateVariableActions.request, (state, { payload: { templateId, variable } }) => {
+    const template = state[templateId] as ReactionTemplate;
+    return {
+      ...state,
+      [templateId]: {
+        ...template,
+        variables: {
+          ...template.variables,
+          [getVariableId(variable)]: variable,
+        },
+      },
+    };
+  });
+  builder.addCase(removeVariableActions.request, (state, { payload: { templateId, variable } }) => {
+    const template = state[templateId] as ReactionTemplate;
+    const { [getVariableId(variable)]: _, ...variables } = template.variables;
+
+    return {
+      ...state,
+      [templateId]: {
+        ...template,
+        variables,
+      },
+    };
+  });
+  builder.addMatcher(
+    isAnyOf(createNewTemplateActions.success, importTemplateFromFileActions.success),
+    (state, action) => ({
+      ...state,
+      [getTemplateId(action.payload)]: {
+        ...action.payload,
+        data: linkReactionEntities(action.payload.data),
+      },
+    }),
+  );
   builder.addMatcher(
     isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),
     (state, { payload }) => {

@@ -21,11 +21,18 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { AddCircleIcon, ChevronDownIcon } from 'common/icons';
 import { CreateReactionFromFile } from './CreateReactionFromFile/CreateReactionFromFile.tsx';
 import classes from './createReactionMenu.module.scss';
+import { useSelector } from 'react-redux';
+import { selectActiveDatasetId } from 'store/entities/reactions/reactions.selectors.ts';
+import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';
+import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 
 export function CreateReactionMenu() {
   const dispatch = useAppDispatch();
   const [importFromFileOpened, { open: openImportFromFile, close: closeImportFromFile }] = useDisclosure(false);
-
+  const datasetId = useSelector(selectActiveDatasetId);
+  const openEnumerationSetup = useCallback(() => {
+    dispatch(setEnumerationSetupOpenedAction(true));
+  }, [dispatch]);
   const handleReactionCreate = useCallback(() => dispatch(createEmptyReaction()), [dispatch]);
 
   return (
@@ -49,10 +56,12 @@ export function CreateReactionMenu() {
         <Menu.Dropdown>
           <Menu.Item onClick={handleReactionCreate}>From Scratch</Menu.Item>
           <Menu.Item onClick={openImportFromFile}>From File</Menu.Item>
+          <Menu.Item onClick={openEnumerationSetup}>From Enumeration</Menu.Item>
         </Menu.Dropdown>
       </Menu>
 
       {importFromFileOpened && <CreateReactionFromFile onClose={closeImportFromFile} />}
+      <EnumerationWizard datasetId={datasetId} />
     </>
   );
 }

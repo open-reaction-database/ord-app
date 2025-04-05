@@ -15,14 +15,18 @@
  */
 import type { ReactionMeasurement } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import {
+  massSpecCompatibleTypes,
   retentionTimeCompatibleTypes,
   selectivityCompatibleTypes,
-  waveLengthCompatibleTypes,
-  massSpecCompatibleTypes,
   valueCompatibleTypes,
+  waveLengthCompatibleTypes,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.constants.ts';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export const measurementTransform = (measurement: ReactionMeasurement): ReactionMeasurement => {
+  const authenticStandard: Partial<ReactionMeasurement> =
+    measurement.usesAuthenticStandard === ReactionBoolean.True ? {} : { authenticStandard: null };
+
   return {
     ...measurement,
     retentionTime: retentionTimeCompatibleTypes.includes(measurement.type) ? measurement.retentionTime : null,
@@ -30,6 +34,6 @@ export const measurementTransform = (measurement: ReactionMeasurement): Reaction
     waveLength: waveLengthCompatibleTypes.includes(measurement.type) ? measurement.waveLength : null,
     massSpecDetails: massSpecCompatibleTypes.includes(measurement.type) ? measurement.massSpecDetails : null,
     value: valueCompatibleTypes.includes(measurement.type) ? measurement.value : null,
-    authenticStandard: measurement.usesAuthenticStandard ? measurement.authenticStandard : null,
+    ...authenticStandard,
   };
 };

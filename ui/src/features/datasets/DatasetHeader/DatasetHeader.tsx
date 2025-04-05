@@ -29,7 +29,7 @@ import { selectIsDatasetOpened } from 'store/entities/datasets/datasets.selector
 import { setDatasetEditOpenedAction } from 'store/entities/datasets/datasets.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { domain, fileDownloadOptions } from 'common/constants.ts';
-import { ConfirmPopover } from 'common/components/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';

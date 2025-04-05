@@ -18,7 +18,7 @@ import type { ReactionComponentBase } from 'store/entities/reactions/reactionCom
 import { Flex } from '@mantine/core';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
-import { ReactionComponentPreview } from 'features/reactions/ReactionPreview/ReactionComponentPreview.tsx';
+import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { useSelector } from 'react-redux';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';

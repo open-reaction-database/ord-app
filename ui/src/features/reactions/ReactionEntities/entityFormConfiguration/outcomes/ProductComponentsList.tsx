@@ -31,6 +31,7 @@ import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityF
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 const ENTITY_FIELD = 'products';
 
@@ -40,7 +41,8 @@ const renderDetails = (_: ReactionProduct) => '';
 
 export function ProductsComponentsList() {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData() as Array<ReactionProduct>;
   const length = components.length;
 
@@ -62,13 +64,15 @@ export function ProductsComponentsList() {
             />
           }
           rightSection={
-            <Button
-              variant="transparent"
-              leftSection={<AddCircleIcon />}
-              onClick={onCreateComponent}
-            >
-              Product
-            </Button>
+            !isViewOnly && (
+              <Button
+                variant="transparent"
+                leftSection={<AddCircleIcon />}
+                onClick={onCreateComponent}
+              >
+                Product
+              </Button>
+            )
           }
         />
       }

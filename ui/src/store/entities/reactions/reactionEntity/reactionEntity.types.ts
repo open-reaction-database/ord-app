@@ -105,3 +105,5 @@ export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementD
 export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIdentifier, 'type'>> {
   type: CompoundIdentifierType;
 }
+
+export type ReactionDateTime = string | null;

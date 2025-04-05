@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import { ActionIcon, Flex } from '@mantine/core';
+import { Flex } from '@mantine/core';
 import classes from './molblockIdentifier.module.scss';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
-import { EditIcon } from 'common/icons';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 interface MolblockIdentifierProps {
   index: number;
@@ -31,7 +30,8 @@ interface MolblockIdentifierProps {
 }
 
 export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Readonly<MolblockIdentifierProps>) {
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   return (
     <Flex
       key={identifier.value}
@@ -63,16 +63,10 @@ export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Reado
           />
         </Flex>
         <Flex>
-          <ActionIcon
-            variant="transparent"
-            onClick={() => onEdit(index)}
-          >
-            <EditIcon />
-          </ActionIcon>
-          <ReactionEntityDelete
-            reactionId={reactionId}
+          <ViewDeleteButtonsComponent
             entityName="Identifier"
             pathComponents={[...pathComponents, 'molBlockIdentifiers', itemKey]}
+            onEdit={() => onEdit(index)}
           />
         </Flex>
       </Flex>

@@ -17,103 +17,58 @@ import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntitie
 import type { ReactionFormData } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import mime from 'mime/lite';
 import { useUncontrolled } from '@mantine/hooks';
-import { type ChangeEvent, useCallback } from 'react';
-import { ActionIcon, FileInput, Flex, Input, NumberInput, TextInput } from '@mantine/core';
-import { Buffer } from 'buffer';
-import { RemoveIcon } from 'common/icons';
-import { inputWrapperClasses } from 'common/components/display/InputWrapper';
-import { useFileNameHref } from 'features/reactions/ReactionEntities/useFileNameHref.ts';
+import { type ChangeEvent, type ReactNode, useCallback, useContext } from 'react';
+import { NumberInput, TextInput } from '@mantine/core';
+import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
+import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const options = Object.values(AppDataType);
 
 type StringEvent = ChangeEvent<HTMLInputElement>;
 
-type ChangeType = StringEvent | string | [string, string] | number | null;
+type ChangeType = StringEvent | string | FileControlValue | number | null;
 
 interface ReactionEntityValueProps {
-  readonly name: string;
-  readonly value: AppData['data'];
-  readonly onChange: (value: ChangeType) => void;
+  name: string;
+  label: ReactNode;
+  value: AppData['data'];
+  onChange: (value: ChangeType) => void;
+  disabled?: boolean;
 }
 
-function ReactionEntityDataFile({ value, name, onChange }: ReactionEntityValueProps) {
-  const { fileName, href } = useFileNameHref(name, value);
-
-  const handleChange = useCallback(
-    (file: File | null) => {
-      if (file) {
-        const fileParts = file.name.split('.');
-        const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
-        file.arrayBuffer().then(buffer => {
-          const extensionFromBlob = mime.getExtension(file.type);
-          const extension = extensionFromFile ?? extensionFromBlob ?? 'txt';
-          const stringContent = Buffer.from(buffer).toString('base64');
-          onChange([stringContent, extension]);
-        });
-      }
-    },
-    [onChange],
-  );
-
-  const handleRemoveFile = useCallback(() => {
-    onChange(null);
-  }, [onChange]);
-
-  return (
-    <Input.Wrapper
-      label="Data"
-      className={inputWrapperClasses.inputWrapper}
-    >
-      {value.value ? (
-        <Flex gap="xs">
-          <a
-            download={fileName}
-            href={href}
-          >
-            {fileName}
-          </a>
-          <ActionIcon
-            onClick={handleRemoveFile}
-            variant="transparent"
-            color="red"
-          >
-            <RemoveIcon />
-          </ActionIcon>
-        </Flex>
-      ) : (
-        <FileInput onChange={handleChange} />
-      )}
-    </Input.Wrapper>
-  );
-}
-
-function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEntityValueProps>) {
+function ReactionEntityDataValue({ name, value, onChange, label, disabled }: Readonly<ReactionEntityValueProps>) {
   switch (value.type) {
     case AppDataType.Number:
       return (
         <NumberInput
-          label="Data"
+          label={label}
           value={value.value as number}
           onChange={onChange}
+          disabled={disabled}
         />
       );
     case AppDataType.Url:
     case AppDataType.Text:
       return (
         <TextInput
-          label="Data"
+          label={label}
           value={value.value as string}
           onChange={onChange}
+          disabled={disabled}
         />
       );
     case AppDataType.Upload:
       return (
-        <ReactionEntityDataFile
+        <FileControl
           name={name}
-          value={value}
+          value={value as FileControlValue}
           onChange={onChange}
+          label={label}
+          disabled={disabled}
         />
       );
     default:
@@ -121,12 +76,41 @@ function ReactionEntityDataValue({ name, value, onChange }: Readonly<ReactionEnt
   }
 }
 
-export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
+export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
+  const { isViewOnly } = useContext(reactionContext);
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
-    ...getInputProps('data'),
+    ...getInputProps(node.fieldName),
   });
-  const name = formMethods.getValues()['name'];
+  const [name] = useUncontrolled<string>({
+    ...getInputProps(node.nameFieldName),
+  });
+
+  const labelType = dataValue.type === AppDataType.Number ? VariableType.Number : VariableType.String;
+
+  const label = (
+    <ReactionValueLabelWrapper
+      name={`${node.fieldName}.value`}
+      type={labelType}
+      wrapperConfig={node.wrapperConfig ?? { label: 'Data' }}
+    />
+  );
+
+  const typeLabel = (
+    <ReactionValueLabelWrapper
+      type={VariableType.String}
+      wrapperConfig={{ label: 'Type', cannotBeVariable: true }}
+      name={node.fieldName}
+    />
+  );
+
+  const formatLabel = (
+    <ReactionValueLabelWrapper
+      type={VariableType.String}
+      wrapperConfig={{ label: 'Format' }}
+      name={`${node.fieldName}.format`}
+    />
+  );
 
   const onTypeChange = useCallback(
     (type: string) => {
@@ -140,9 +124,8 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
   );
 
   const onValueChange = (newValue: ChangeType) => {
-    if (Array.isArray(newValue)) {
-      const [fileContent, fileExtension] = newValue;
-      onChange({ type: dataValue.type, value: fileContent, format: fileExtension });
+    if (typeof newValue === 'object' && newValue !== null && 'format' in newValue) {
+      onChange({ type: dataValue.type, ...newValue });
     } else if (newValue !== null && typeof newValue === 'object') {
       onChange({ type: dataValue.type, value: newValue.target.value });
     } else {
@@ -157,17 +140,20 @@ export function ReactionEntityData({ formMethods }: Readonly<ReactionEntityNodeP
         fullWidth={false}
         onChange={onTypeChange}
         value={dataValue.type}
-        label="Type"
+        label={typeLabel}
+        disabled={isViewOnly}
       />
       <ReactionEntityDataValue
         name={name}
         onChange={onValueChange}
         value={dataValue}
+        label={label}
+        disabled={isViewOnly}
       />
       {dataValue.type === AppDataType.Upload && (
         <TextInput
           value={dataValue.format || ''}
-          label="Format"
+          label={formatLabel}
           disabled
         />
       )}

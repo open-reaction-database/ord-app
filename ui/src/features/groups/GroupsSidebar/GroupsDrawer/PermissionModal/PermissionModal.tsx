@@ -78,7 +78,7 @@ export function PermissionsModal({ opened, onClose }: Readonly<PermissionsModalP
               permissionsList[index + 1] && row.category !== permissionsList[index + 1].category;
 
             return (
-              <React.Fragment key={row.feature}>
+              <React.Fragment key={`${row.category}_${row.feature}`}>
                 {isRowWithHeader && (
                   <Table.Tr className={classes.category}>
                     <Table.Td colSpan={4}>{row.category}</Table.Td>

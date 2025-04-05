@@ -18,6 +18,7 @@ import { reactionEntityContext } from 'features/reactions/ReactionEntities/react
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { reactionContext } from '../../reactions.context.ts';
 
 export const buildUseCreate = <T = unknown>(
   entityName: string,
@@ -26,7 +27,8 @@ export const buildUseCreate = <T = unknown>(
 ) =>
   function useCreate() {
     const dispatch = useAppDispatch();
-    const { reactionId, pathComponents } = useContext(reactionEntityContext);
+    const { reactionId } = useContext(reactionContext);
+    const { pathComponents } = useContext(reactionEntityContext);
 
     return useCallback(
       (newIndex: number, entitiesList: Array<T>, creationInfo?: Partial<T>) => {

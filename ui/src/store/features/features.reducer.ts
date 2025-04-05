@@ -18,10 +18,16 @@ import { reactionFormReducer } from './reactionForm/reactionForm.reducer.ts';
 import { groupsSidebar } from './groups/groups.reducer.ts';
 import { reactionLookupReducer } from 'store/features/reactionLookup/reactionLookup.reducer.ts';
 import { errorPageReducer } from 'store/features/errorPage/errorPage.reducer.ts';
+import { enumerationSetupReducer } from './enumerationSetup/enumerationSetup.reducer.tsx';
+import { variablesSidebarReducer } from './variablesSidebar/variablesSidebar.reducer.ts';
+import { templateFromFileErrorReducer } from './templateFromFileError/templateFromFileError.reducer.ts';
 
 export const featuresReducer = combineReducers({
   groupsSidebar: groupsSidebar,
   reactionForm: reactionFormReducer,
   reactionLookup: reactionLookupReducer,
   errorPage: errorPageReducer,
+  enumerationSetup: enumerationSetupReducer,
+  variablesSidebar: variablesSidebarReducer,
+  templateFromFileError: templateFromFileErrorReducer,
 });

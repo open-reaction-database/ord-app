@@ -80,6 +80,16 @@ export const theme = createTheme({
         withBorder: true,
       },
     },
+    Tooltip: {
+      styles: {
+        tooltip: {
+          wordBreak: 'break-all',
+          maxWidth: '60dvw',
+          overflow: 'hidden',
+          textWrap: 'auto',
+        },
+      },
+    },
     Modal: {
       styles: {
         title: {

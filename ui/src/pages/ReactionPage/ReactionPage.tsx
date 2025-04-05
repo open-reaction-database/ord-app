@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
@@ -24,11 +24,15 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
+import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -40,6 +44,11 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
+  const [isViewOnly, setIsViewOnly] = useState(false);
+
+  const toggleViewOnly = useCallback(() => {
+    setIsViewOnly(prev => !prev);
+  }, [setIsViewOnly]);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -56,12 +65,16 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
     dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
-  const contextValue = useMemo(
-    () => ({
+  const reactionContextValue = useMemo(
+    (): ReactionsContext => ({
       reactionId,
-      pathComponents: [],
+      isTemplate: false,
+      isViewOnly: isViewOnly,
+      ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
+      ValueLabelComponent: DatasetReactionValueLabel,
+      ViewOnlyLabelComponent: DatasetReactionValueLabel,
     }),
-    [reactionId],
+    [reactionId, isViewOnly],
   );
 
   useEffect(
@@ -77,7 +90,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <reactionEntityContext.Provider value={contextValue}>
+      <reactionContext.Provider value={reactionContextValue}>
         {reaction && (
           <Flex
             direction="column"
@@ -86,6 +99,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}
+              onViewOnlyToggle={toggleViewOnly}
             />
             <Paper
               radius="md"
@@ -96,7 +110,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>
         )}
-      </reactionEntityContext.Provider>
+      </reactionContext.Provider>
     </PageContainer>
   );
 }

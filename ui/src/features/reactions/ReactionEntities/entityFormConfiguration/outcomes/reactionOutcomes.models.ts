@@ -68,6 +68,9 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
               inputConfig: {
                 placeholder: 'Value',
               },
+              wrapperConfig: {
+                templateLabel: 'Value',
+              },
             },
             {
               type: ReactionFormNodeType.value,
@@ -76,6 +79,9 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
               inputConfig: {
                 leftSection: '±',
                 placeholder: 'Precision',
+              },
+              wrapperConfig: {
+                templateLabel: 'Precision',
               },
             },
           ],

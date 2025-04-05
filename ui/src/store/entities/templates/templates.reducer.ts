@@ -19,21 +19,25 @@ import {
   createNewTemplateActions,
   getAllTemplatesActions,
   removeTemplateActions,
+  importTemplateFromFileActions,
 } from './templates.actions.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const templatesOrder = createReducer<Array<string>>([], builder => {
-  builder.addCase(getAllTemplatesActions.success, (state, action) => {
-    return [...state, ...action.payload.map(getTemplateId)];
-  });
-  builder.addCase(createNewTemplateActions.success, (state, action) => {
-    return [getTemplateId(action.payload), ...state];
+  builder.addCase(getAllTemplatesActions.success, (_, action) => {
+    return action.payload.map(getTemplateId);
   });
   builder.addCase(removeTemplateActions.success, (state, action) => {
     return state.filter(id => id !== action.payload);
   });
+  builder.addMatcher(
+    isAnyOf(createNewTemplateActions.success, importTemplateFromFileActions.success),
+    (state, action) => {
+      return [getTemplateId(action.payload), ...state];
+    },
+  );
 });
 
 const isTemplateCreating = createReducer<boolean>(false, builder => {

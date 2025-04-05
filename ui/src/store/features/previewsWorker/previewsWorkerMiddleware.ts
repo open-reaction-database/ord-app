@@ -17,18 +17,27 @@ import { isAnyOf, type Middleware } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import {
   addUpdateReactionFieldActions,
+  deleteReactionFieldActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
-import { getTemplateActions, getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
+import {
+  getAllTemplatesActions,
+  createNewTemplateActions,
+  importTemplateFromFileActions,
+  renameTemplateActions,
+} from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
 const singleReactionActionsMatcher = isAnyOf(
   getReactionActions.success,
   addUpdateReactionFieldActions.success,
-  getTemplateActions.success,
+  deleteReactionFieldActions.success,
+  createNewTemplateActions.success,
+  importTemplateFromFileActions.success,
+  renameTemplateActions.success,
 );
 
 const multipleReactionsActionsMatcher = isAnyOf(

@@ -69,13 +69,16 @@ export const createEmptyDataset = createThunkWithExplicitResult(
   },
 );
 
+export async function createDatasetFromFileOperation(groupId: number, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets/upload`, formData);
+}
+
 export const createDatasetFromFile = createThunkWithExplicitResult(
   createDatasetFromFileActions,
   async (dispatch, _g, { groupId, file }) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets/upload`, formData)).data;
+    const dataset = (await createDatasetFromFileOperation(groupId, file)).data;
     dispatch(createDatasetFromFileActions.success(dataset));
     navigate(`/datasets/${dataset.id}`);
   },

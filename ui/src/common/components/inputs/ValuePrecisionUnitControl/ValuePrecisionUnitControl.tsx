@@ -33,6 +33,7 @@ interface ValuePrecisionUnitControlProps {
   onChange: (value: ValuePrecisionUnit) => void;
   options: SelectOptions;
   select?: 'native' | 'native-inline' | 'segmented';
+  disabled?: boolean;
 }
 
 const useValuePrecisionUnitsUncontrolledValues = ({
@@ -58,6 +59,7 @@ export function ValuePrecisionUnitControl({
   options,
   label,
   select = 'segmented',
+  disabled,
   ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
@@ -77,18 +79,21 @@ export function ValuePrecisionUnitControl({
             value={uncontrolledValue.value}
             onChange={(value: Optional<number>) => handleChange('value', value)}
             placeholder="Value"
+            disabled={disabled}
           />
           <AppNumberInput
             value={uncontrolledValue.precision}
             onChange={(value: Optional<number>) => handleChange('precision', value)}
             leftSection="±"
             placeholder="Precision"
+            disabled={disabled}
           />
           {select === 'native-inline' && (
             <AppNativeSelect
               value={uncontrolledValue.units}
               options={options}
               onChange={unitOnChange}
+              disabled={disabled}
             />
           )}
         </InputGroup>
@@ -97,6 +102,7 @@ export function ValuePrecisionUnitControl({
             value={uncontrolledValue.units}
             options={options}
             onChange={unitOnChange}
+            disabled={disabled}
           />
         )}
         {select === 'segmented' && (
@@ -105,6 +111,7 @@ export function ValuePrecisionUnitControl({
             options={options}
             onChange={unitOnChange}
             fullWidth
+            disabled={disabled}
           />
         )}
       </div>

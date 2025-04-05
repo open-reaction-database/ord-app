@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import { Accordion, Divider, Flex, Text } from '@mantine/core';
-import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { useCallback, useContext, type MouseEvent } from 'react';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { Accordion, Text } from '@mantine/core';
+import { useContext } from 'react';
 import classes from './inputsComponentsList.module.scss';
 import clsx from 'clsx';
-import { EditButton } from 'common/components/EditButton/EditButton.tsx';
-import { ComponentDisplayRow } from '../../ComponentsList/ComponentDisplayRow';
+import { ComponentDisplayRow } from '../../ComponentsList';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
-import { templatesContext } from 'features/templates/templates.context';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 interface InputsComponentsListProps {
-  reactionId: ReactionId;
   inputs: Array<ReactionInput>;
 }
 
@@ -43,21 +37,9 @@ const headers = [
 
 const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
 
-const onActionClick = (event: MouseEvent) => {
-  event.stopPropagation();
-};
-
-export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComponentsListProps>) {
-  const dispatch = useAppDispatch();
-  const onEditInput = useCallback(
-    (id: string) => {
-      dispatch(setReactionPathComponentsList([['inputs', id]]));
-    },
-    [dispatch],
-  );
-  const { isTemplate } = useContext(templatesContext);
-
+export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListProps>) {
   const ids = inputs.map(input => input.id);
+  const { reactionId, ViewDeleteButtonsComponent } = useContext(reactionContext);
 
   return (
     <>
@@ -85,23 +67,10 @@ export function InputsComponentsList({ reactionId, inputs }: Readonly<InputsComp
           >
             <Accordion.Control
               icon={
-                !isTemplate && (
-                  <Flex
-                    onClick={onActionClick}
-                    align="center"
-                  >
-                    <EditButton onClick={() => onEditInput(input.id)} />
-                    <Divider
-                      className={classes.actionDivider}
-                      orientation="vertical"
-                    />
-                    <ReactionEntityDelete
-                      reactionId={reactionId}
-                      entityName="Input"
-                      pathComponents={['inputs', input.id]}
-                    />
-                  </Flex>
-                )
+                <ViewDeleteButtonsComponent
+                  pathComponents={['inputs', input.id]}
+                  entityName="Input"
+                />
               }
             >
               {input.name}

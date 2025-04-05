@@ -31,6 +31,7 @@ import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityF
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
+import { reactionContext } from 'features/reactions/reactions.context.ts';
 
 const useSelectData = buildUseSelectItems('components');
 
@@ -38,7 +39,8 @@ const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ??
 
 export function InputsComponentList() {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData() as Array<ReactionInputComponent>;
   const length = components.length;
 
@@ -60,13 +62,15 @@ export function InputsComponentList() {
             />
           }
           rightSection={
-            <Button
-              variant="transparent"
-              leftSection={<AddCircleIcon />}
-              onClick={onCreateComponent}
-            >
-              Add component
-            </Button>
+            !isViewOnly && (
+              <Button
+                variant="transparent"
+                leftSection={<AddCircleIcon />}
+                onClick={onCreateComponent}
+              >
+                Add component
+              </Button>
+            )
           }
         />
       }

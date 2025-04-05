@@ -15,11 +15,13 @@
  */
 export { default as AddCircleIcon } from './AddCircleIcon.svg?react';
 export { default as AlertCircleIcon } from './AlertCircleIcon.svg?react';
+export { default as ArticleIcon } from './ArticleIcon.svg?react';
 export { default as CheckCircleIcon } from './CheckCircleIcon.svg?react';
 export { default as CheckIcon } from './CheckIcon.svg?react';
 export { default as CheckListIcon } from './CheckListIcon.svg?react';
 export { default as ChevronDownFilledIcon } from './ChevronDownFilledIcon.svg?react';
 export { default as ChevronDownIcon } from './ChevronDownIcon.svg?react';
+export { default as CloseIcon } from './CloseIcon.svg?react';
 export { default as CopyIcon } from './CopyIcon.svg?react';
 export { default as CopyImageIcon } from './CopyImageIcon.svg?react';
 export { default as CrossCircleIcon } from './CrossCircleIcon.svg?react';
@@ -47,3 +49,4 @@ export { default as EnumerateIcon } from './EnumerateIcon.svg?react';
 export { default as WarningIcon } from './WarningIcon.svg?react';
 export { default as DatasetsIcon } from './DatasetsIcon.svg?react';
 export { default as TemplatesIcon } from './TemplatesIcon.svg?react';
+export { default as ViewIcon } from './ViewIcon.svg?react';

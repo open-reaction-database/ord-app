@@ -29,7 +29,7 @@ defaults:
     working-directory: ./ui
 
 jobs:
-  lint_ui:
+  lint_and_build_ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,7 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run lint:check
+      - run: npm run build
 
   test_ui:
     runs-on: ubuntu-latest

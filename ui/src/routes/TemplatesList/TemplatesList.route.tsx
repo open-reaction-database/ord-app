@@ -16,27 +16,16 @@
 import { Route, Switch } from 'wouter';
 import { TemplatesListPage } from '../../pages/TemplatesList/TemplatesList.page.tsx';
 import { TemplatePage } from 'pages/TemplatePage/TemplatePage.tsx';
-import { templatesContext } from 'features/templates/templates.context.ts';
-import { useMemo } from 'react';
 
 export function TemplatesListRoute() {
-  const contextValue = useMemo(
-    () => ({
-      isTemplate: true,
-    }),
-    [],
-  );
-
   return (
     <Switch>
-      <templatesContext.Provider value={contextValue}>
-        <Route path=":templateId">
-          <TemplatePage />
-        </Route>
-        <Route path="/">
-          <TemplatesListPage />
-        </Route>
-      </templatesContext.Provider>
+      <Route path=":templateId">
+        <TemplatePage />
+      </Route>
+      <Route path="/">
+        <TemplatesListPage />
+      </Route>
     </Switch>
   );
 }

@@ -16,15 +16,29 @@
 import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 
+export enum VariableType {
+  String = 'string',
+  Number = 'number',
+  Select = 'select',
+  Date = 'date',
+  NumberArray = 'numberArray',
+}
+
 export interface Variable {
-  id: string;
   name: string;
-  pathComponents: ReactionPathComponents;
+  field: string;
+  type: VariableType;
+  path: ReactionPathComponents;
 }
 
 export interface TemplateCreator {
   reactionId: number;
   name: string;
+}
+
+export interface ImportTemplatePayload {
+  name: string;
+  file: File;
 }
 
 export interface TemplateResponse {
@@ -39,4 +53,9 @@ export interface TemplateResponse {
 export interface SaveAsTemplatePayload {
   reaction: string;
   name: string;
+}
+
+export interface AddUpdateRemoveVariablePayload {
+  variable: Variable;
+  templateId: string;
 }
