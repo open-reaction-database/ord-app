@@ -52,3 +52,18 @@ export type ReactionMassSpecType =
 export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
 
 export type ReactionAtmosphereType = keyof typeof ord.PressureConditions.Atmosphere.AtmosphereType;
+
+export type ReactionStirringMethodType = keyof typeof ord.StirringConditions.StirringMethodType;
+
+export type ReactionIlluminationType = keyof typeof ord.IlluminationConditions.IlluminationType;
+
+export type ReactionStirringRateType = keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
+
+export type ReactionElectrochemistryType = keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
+
+export type ReactionElectrochemistryCellType =
+  keyof typeof ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType;
+
+export type ReactionFlowType = keyof typeof ord.FlowConditions.FlowType;
+
+export type ReactionTubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;

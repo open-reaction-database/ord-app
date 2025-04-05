@@ -32,6 +32,13 @@ import {
   pressureByValue,
   atmosphereTypeByValue,
   temperatureControlTypeByValue,
+  stirringMethodTypeByValue,
+  illuminationTypeByValue,
+  stirringRateTypeByValue,
+  electrochemistryTypeByValue,
+  electrochemistryCellTypeByValue,
+  flowTypeByValue,
+  tubingTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -116,3 +123,33 @@ export const {
   temperatureControlTypeByValue,
   ord.TemperatureConditions.TemperatureControl.TemperatureControlType,
 );
+
+export const {
+  ordEntityToEntity: ordStirringMethodTypeToReaction,
+  entityToOrdEntity: reactionStirringMethodTypeToOrd,
+} = generateEntityTypeToFromOrd(stirringMethodTypeByValue, ord.StirringConditions.StirringMethodType);
+
+export const { ordEntityToEntity: ordIlluminationTypeToReaction, entityToOrdEntity: reactionIlluminationTypeToOrd } =
+  generateEntityTypeToFromOrd(illuminationTypeByValue, ord.IlluminationConditions.IlluminationType);
+
+export const { ordEntityToEntity: ordStirringRateTypeToReaction, entityToOrdEntity: reactionStirringRateTypeToOrd } =
+  generateEntityTypeToFromOrd(stirringRateTypeByValue, ord.StirringConditions.StirringRate.StirringRateType);
+
+export const {
+  ordEntityToEntity: ordElectrochemistryTypeToReaction,
+  entityToOrdEntity: reactionElectrochemistryTypeToOrd,
+} = generateEntityTypeToFromOrd(electrochemistryTypeByValue, ord.ElectrochemistryConditions.ElectrochemistryType);
+
+export const {
+  ordEntityToEntity: ordElectrochemistryCellTypeToReaction,
+  entityToOrdEntity: reactionElectrochemistryCellTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  electrochemistryCellTypeByValue,
+  ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType,
+);
+
+export const { ordEntityToEntity: ordFlowTypeToReaction, entityToOrdEntity: reactionFlowTypeToOrd } =
+  generateEntityTypeToFromOrd(flowTypeByValue, ord.FlowConditions.FlowType);
+
+export const { ordEntityToEntity: ordTubingTypeToReaction, entityToOrdEntity: reactionTubingTypeToOrd } =
+  generateEntityTypeToFromOrd(tubingTypeByValue, ord.FlowConditions.Tubing.TubingType);

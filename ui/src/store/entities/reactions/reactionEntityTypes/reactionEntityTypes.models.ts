@@ -91,3 +91,34 @@ export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = ge
 
 export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
   generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const { options: stirringMethodTypeOptions, byValue: stirringMethodTypeByValue } = generateOptionsAndByValue(
+  ord.StirringConditions.StirringMethodType,
+);
+
+export const { options: illuminationTypeOptions, byValue: illuminationTypeByValue } = generateOptionsAndByValue(
+  ord.IlluminationConditions.IlluminationType,
+);
+
+export const { options: lengthTypeOptions, byValue: lengthTypeByValue } = generateOptionsAndByValue(
+  ord.Length.LengthUnit,
+);
+
+export const { options: electrochemistryTypeOptions, byValue: electrochemistryTypeByValue } = generateOptionsAndByValue(
+  ord.ElectrochemistryConditions.ElectrochemistryType,
+);
+
+export const { options: currentTypeOptions, byValue: currentTypeByValue } = generateOptionsAndByValue(
+  ord.Current.CurrentUnit,
+);
+
+export const { options: electrochemistryCellTypeOptions, byValue: electrochemistryCellTypeByValue } =
+  generateOptionsAndByValue(ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType);
+
+export const { options: flowTypeOptions, byValue: flowTypeByValue } = generateOptionsAndByValue(
+  ord.FlowConditions.FlowType,
+);
+
+export const { options: tubingTypeOptions, byValue: tubingTypeByValue } = generateOptionsAndByValue(
+  ord.FlowConditions.Tubing.TubingType,
+);

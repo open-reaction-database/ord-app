@@ -23,6 +23,15 @@ import {
   temperatureOptions,
   atmosphereTypeOptions,
   temperatureControlTypeOptions,
+  stirringMethodTypeOptions,
+  illuminationTypeOptions,
+  waveLengthTypeOptions,
+  lengthTypeOptions,
+  electrochemistryTypeOptions,
+  currentTypeOptions,
+  electrochemistryCellTypeOptions,
+  flowTypeOptions,
+  tubingTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
 export const reactionConditions: Array<ReactionFormNode> = [
@@ -51,12 +60,13 @@ export const reactionConditions: Array<ReactionFormNode> = [
       options: booleanOptions,
       wrapperConfig: {
         label: 'Dinamic Conditions',
+        hint: 'Whether the reaction conditions cannot be fully described by the fields in this schema/form.',
       },
     },
   ),
   {
     type: ReactionFormNodeType.value,
-    name: 'details',
+    name: 'generalDetails',
     inputType: 'textarea',
     wrapperConfig: {
       label: 'Details',
@@ -108,9 +118,9 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid(
         {
           type: ReactionFormNodeType.select,
-          name: 'method',
+          name: 'stirringMethod',
           selectType: 'dropdown',
-          options: reactionIdentifierTypeOptions,
+          options: stirringMethodTypeOptions,
           wrapperConfig: {
             label: 'Method',
           },
@@ -136,7 +146,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         },
         {
           type: ReactionFormNodeType.value,
-          name: 'details',
+          name: 'rateDetails',
           inputType: 'string',
           wrapperConfig: {
             label: 'Details',
@@ -180,7 +190,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'pressureDetails',
+            name: 'pressureControlDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',
@@ -212,7 +222,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'details',
+            name: 'atmosphereDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',
@@ -236,7 +246,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'illuminationType',
             selectType: 'dropdown',
-            options: reactionIdentifierTypeOptions,
+            options: illuminationTypeOptions,
             wrapperConfig: {
               label: 'Type',
             },
@@ -253,8 +263,8 @@ export const reactionConditions: Array<ReactionFormNode> = [
       },
       wrapInputsWithGrid({
         type: ReactionFormNodeType.vpu,
-        name: 'wavelength',
-        options: pressureOption,
+        name: 'peakWavelength',
+        options: waveLengthTypeOptions,
         wrapperConfig: {
           label: 'Wavelength',
         },
@@ -262,8 +272,8 @@ export const reactionConditions: Array<ReactionFormNode> = [
       }),
       wrapInputsWithGrid({
         type: ReactionFormNodeType.vpu,
-        name: 'distance',
-        options: pressureOption,
+        name: 'distanceToVessel',
+        options: lengthTypeOptions,
         wrapperConfig: {
           label: 'Distance',
         },
@@ -299,7 +309,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'ElectrochemistryType',
             selectType: 'dropdown',
-            options: reactionIdentifierTypeOptions,
+            options: electrochemistryTypeOptions,
             wrapperConfig: {
               label: 'Type',
             },
@@ -317,7 +327,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid({
         type: ReactionFormNodeType.vpu,
         name: 'current',
-        options: pressureOption,
+        options: currentTypeOptions,
         wrapperConfig: {
           label: 'Current',
         },
@@ -348,7 +358,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid({
         type: ReactionFormNodeType.vpu,
         name: 'separation',
-        options: pressureOption,
+        options: lengthTypeOptions,
         wrapperConfig: {
           label: 'Separation',
         },
@@ -362,14 +372,14 @@ export const reactionConditions: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'cell',
             selectType: 'dropdown',
-            options: reactionIdentifierTypeOptions,
+            options: electrochemistryCellTypeOptions,
             wrapperConfig: {
               label: 'Cell',
             },
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'SeparationDetails',
+            name: 'separationDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',
@@ -393,14 +403,14 @@ export const reactionConditions: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'FlowType',
             selectType: 'dropdown',
-            options: reactionIdentifierTypeOptions,
+            options: flowTypeOptions,
             wrapperConfig: {
               label: 'Type',
             },
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'FlowDetails',
+            name: 'flowDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',
@@ -414,7 +424,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         fields: [
           {
             type: ReactionFormNodeType.value,
-            name: 'pump',
+            name: 'pumpType',
             inputType: 'string',
             wrapperConfig: {
               label: 'Pump',
@@ -430,14 +440,14 @@ export const reactionConditions: Array<ReactionFormNode> = [
             type: ReactionFormNodeType.select,
             name: 'tubing',
             selectType: 'dropdown',
-            options: reactionIdentifierTypeOptions,
+            options: tubingTypeOptions,
             wrapperConfig: {
               label: 'Tubing',
             },
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'TubingDetails',
+            name: 'tubingDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',
@@ -448,7 +458,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid({
         type: ReactionFormNodeType.vpu,
         name: 'diameter',
-        options: pressureOption,
+        options: lengthTypeOptions,
         wrapperConfig: {
           label: 'Diameter',
         },

@@ -36,6 +36,7 @@ import {
   ordAdditionDeviceTypeToReaction,
   ordAdditionSpeedTypeToReaction,
   ordCompoundIdentifierTypeToReaction,
+  ordElectrochemistryTypeToReaction,
   ordFlowRateTypeToReaction,
   ordMassSpecTypeToReaction,
   ordPressureTypeToReaction,
@@ -59,6 +60,7 @@ import {
   reactionWaveLengthTypeToOrd,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -241,3 +243,9 @@ export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): Rea
 
 export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
   dateTime ? { value: dateTime } : null;
+
+export const convertElectrochemistryType = (type: number | null | undefined): ReactionElectrochemistryType => {
+  return type !== undefined && type !== null
+    ? ordElectrochemistryTypeToReaction(type)
+    : ordElectrochemistryTypeToReaction(0);
+};
