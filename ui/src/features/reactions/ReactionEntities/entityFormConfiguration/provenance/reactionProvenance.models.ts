@@ -37,7 +37,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
   wrapInputsWithGrid(
     {
       type: ReactionFormNodeType.date,
-      name: 'experiment.start',
+      name: 'experimentStart',
       wrapperConfig: {
         label: 'Experiment start',
       },
@@ -54,7 +54,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
   wrapInputsWithGrid(
     {
       type: ReactionFormNodeType.value,
-      name: 'experimenter.doi',
+      name: 'doi',
       inputType: 'string',
       wrapperConfig: {
         label: 'DOI',
@@ -62,7 +62,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
     },
     {
       type: ReactionFormNodeType.value,
-      name: 'experiment.patent',
+      name: 'patent',
       inputType: 'string',
       wrapperConfig: {
         label: 'Patent',
@@ -70,7 +70,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
     },
     {
       type: ReactionFormNodeType.value,
-      name: 'experiment.url',
+      name: 'publicationUrl',
       inputType: 'string',
       wrapperConfig: {
         label: 'Publication URL',
@@ -90,7 +90,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
         fields: [
           {
             type: ReactionFormNodeType.dateTime,
-            name: 'recordCreated.time.value',
+            name: 'recordCreated.time',
             wrapperConfig: {
               label: 'Time',
             },
