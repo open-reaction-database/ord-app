@@ -21,9 +21,9 @@ import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reac
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
-import type { ReactionConditions } from './reactionConditions/reactionConditions.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionConditions } from './reactionConditions/reactionConditions.types.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
