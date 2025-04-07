@@ -36,27 +36,35 @@ import {
   ordAdditionDeviceTypeToReaction,
   ordAdditionSpeedTypeToReaction,
   ordCompoundIdentifierTypeToReaction,
+  ordElectrochemistryTypeToReaction,
   ordFlowRateTypeToReaction,
   ordMassSpecTypeToReaction,
+  ordPressureTypeToReaction,
   ordReactionIdentifierTypeToReaction,
   ordSelectivityTypeToReaction,
   ordTemperatureTypeToReaction,
   ordTextureTypeToReaction,
   ordTimeTypeToReaction,
   ordWaveLengthTypeToReaction,
+  ordLengthTypeToReaction,
+  ordCurrentTypeToReaction,
   reactionAdditionDeviceTypeToOrd,
   reactionAdditionSpeedTypeToOrd,
   reactionCompoundIdentifierTypeToOrd,
   reactionFlowRateTypeToOrd,
   reactionIdentifierTypeToOrd,
   reactionMassSpecTypeToOrd,
+  reactionPressureTypeToOrd,
   reactionSelectivityTypeToOrd,
   reactionTemperatureTypeToOrd,
   reactionTextureTypeToOrd,
   reactionTimeTypeToOrd,
   reactionWaveLengthTypeToOrd,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
+  reactionLengthTypeToOrd,
+  reactionCurrentTypeToOrd,
+} from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -159,6 +167,11 @@ export const { fromOrd: ordFlowRateToReaction, toOrd: reactionFlowRateToOrd } = 
 export const { fromOrd: ordTemperatureToReaction, toOrd: reactionTemperatureToOrd } =
   generateValuePrecisionUnitConverter(ordTemperatureTypeToReaction, reactionTemperatureTypeToOrd);
 
+export const { fromOrd: ordPressureToReaction, toOrd: reactionPressureToOrd } = generateValuePrecisionUnitConverter(
+  ordPressureTypeToReaction,
+  reactionPressureTypeToOrd,
+);
+
 export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } = generateTypeDetailsConverter(
   ordTextureTypeToReaction,
   reactionTextureTypeToOrd,
@@ -172,6 +185,16 @@ export const { fromOrd: ordSelectivityToReaction, toOrd: reactionSelectivityToOr
 export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd } = generateValuePrecisionUnitConverter(
   ordWaveLengthTypeToReaction,
   reactionWaveLengthTypeToOrd,
+);
+
+export const { fromOrd: ordDistanceToReaction, toOrd: reactionDistanceToOrd } = generateValuePrecisionUnitConverter(
+  ordLengthTypeToReaction,
+  reactionLengthTypeToOrd,
+);
+
+export const { fromOrd: ordCurrentToReaction, toOrd: reactionCurrentToOrd } = generateValuePrecisionUnitConverter(
+  ordCurrentTypeToReaction,
+  reactionCurrentTypeToOrd,
 );
 
 export const ordReactionIdentifierToReaction = ({
@@ -234,3 +257,11 @@ export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): Rea
 
 export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
   dateTime ? { value: dateTime } : null;
+
+export const convertElectrochemistryTypeToOrd = (
+  type: ord.ElectrochemistryConditions.ElectrochemistryType | undefined | null,
+): ReactionElectrochemistryType => {
+  return type !== undefined && type !== null
+    ? ordElectrochemistryTypeToReaction(type)
+    : ordElectrochemistryTypeToReaction(0);
+};

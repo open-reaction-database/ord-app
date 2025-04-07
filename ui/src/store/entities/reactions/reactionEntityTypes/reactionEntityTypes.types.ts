@@ -29,6 +29,11 @@ export type ReactionFlowRateType = keyof typeof ord.FlowRate.FlowRateUnit;
 
 export type ReactionTemperatureType = keyof typeof ord.Temperature.TemperatureUnit;
 
+export type ReactionTemperatureControlType =
+  keyof typeof ord.TemperatureConditions.TemperatureControl.TemperatureControlType;
+
+export type ReactionPressureType = keyof typeof ord.Pressure.PressureUnit;
+
 export type ReactionTextureType = keyof typeof ord.Texture.TextureType;
 
 export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
@@ -41,7 +46,28 @@ export type ReactionSelectivityType = keyof typeof ord.ProductMeasurement.Select
 
 export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
 
+export type ReactionLengthType = keyof typeof ord.Length.LengthUnit;
+
+export type ReactionCurrentType = keyof typeof ord.Current.CurrentUnit;
+
 export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
 
 export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+
+export type ReactionAtmosphereType = keyof typeof ord.PressureConditions.Atmosphere.AtmosphereType;
+
+export type ReactionStirringMethodType = keyof typeof ord.StirringConditions.StirringMethodType;
+
+export type ReactionIlluminationType = keyof typeof ord.IlluminationConditions.IlluminationType;
+
+export type ReactionStirringRateType = keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
+
+export type ReactionElectrochemistryType = keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
+
+export type ReactionElectrochemistryCellType =
+  keyof typeof ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType;
+
+export type ReactionFlowType = keyof typeof ord.FlowConditions.FlowType;
+
+export type ReactionTubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;
