@@ -258,7 +258,9 @@ export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): Rea
 export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
   dateTime ? { value: dateTime } : null;
 
-export const convertElectrochemistryType = (type: number | null | undefined): ReactionElectrochemistryType => {
+export const convertElectrochemistryTypeToOrd = (
+  type: ord.ElectrochemistryConditions.ElectrochemistryType | undefined | null,
+): ReactionElectrochemistryType => {
   return type !== undefined && type !== null
     ? ordElectrochemistryTypeToReaction(type)
     : ordElectrochemistryTypeToReaction(0);

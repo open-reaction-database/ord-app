@@ -26,9 +26,9 @@ import {
   reactionWaveLengthToOrd,
   ordDistanceToReaction,
   reactionDistanceToOrd,
-  convertElectrochemistryType,
   reactionCurrentToOrd,
   ordCurrentToReaction,
+  convertElectrochemistryTypeToOrd,
 } from '../reactionEntity/reactionEntity.converters';
 import {
   ordAtmosphereTypeToReaction,
@@ -83,7 +83,7 @@ const ordElectrochemistryConditionsToAppElectrochemistryConditions = (
   const { type: cellType, details: separationDetails } = cell ?? {};
 
   return {
-    electrochemistryType: convertElectrochemistryType(type),
+    electrochemistryType: convertElectrochemistryTypeToOrd(type),
     electrochemistryDetails: details,
     current: ordCurrentToReaction(current),
     anode: anodeMaterial,
