@@ -24,7 +24,11 @@ import {
   withId,
   ordWaveLengthToReaction,
   reactionWaveLengthToOrd,
+  ordDistanceToReaction,
+  reactionDistanceToOrd,
   convertElectrochemistryType,
+  reactionCurrentToOrd,
+  ordCurrentToReaction,
 } from '../reactionEntity/reactionEntity.converters';
 import {
   ordAtmosphereTypeToReaction,
@@ -47,82 +51,83 @@ import {
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ReactionConditions } from './reactionConditions.types';
 
-const convertDetails = (details?: string | null): string | null => details ?? null;
-
-const convertStirring = (stirring?: ord.IStirringConditions | null) => {
+const ordStirringConditionsToAppStirringConditions = (stirring?: ord.IStirringConditions | null) => {
   const { type, details, rate } = stirring ?? {};
   const { type: rateType, details: rateDetails, rpm } = rate ?? {};
 
   return {
     stirringMethod: ordStirringMethodTypeToReaction(type),
-    stirringDetails: convertDetails(details),
+    stirringDetails: details,
     rate: ordStirringRateTypeToReaction(rateType),
-    rateDetails: convertDetails(rateDetails),
-    rpm: rpm?.toString() ?? '',
+    rateDetails: rateDetails,
+    rpm: rpm?.toString(),
   };
 };
 
-const convertIllumination = (illumination?: ord.IIlluminationConditions | null) => {
+const ordIlluminationConditionsToAppIlluminationConditions = (illumination?: ord.IIlluminationConditions | null) => {
   const { type, details, peakWavelength, color, distanceToVessel } = illumination ?? {};
 
   return {
     illuminationType: ordIlluminationTypeToReaction(type),
-    illuminationDetails: convertDetails(details),
-    peakWavelength: ordWaveLengthToReaction(peakWavelength ?? null),
-    color: convertDetails(color),
-    distanceToVessel: ordWaveLengthToReaction(distanceToVessel ?? null),
+    illuminationDetails: details,
+    peakWavelength: ordWaveLengthToReaction(peakWavelength),
+    color: color,
+    distanceToVessel: ordDistanceToReaction(distanceToVessel),
   };
 };
 
-const convertElectrochemistry = (electrochemistry?: ord.IElectrochemistryConditions | null) => {
+const ordElectrochemistryConditionsToAppElectrochemistryConditions = (
+  electrochemistry?: ord.IElectrochemistryConditions | null,
+) => {
   const { type, details, current, anodeMaterial, cathodeMaterial, electrodeSeparation, cell } = electrochemistry ?? {};
   const { type: cellType, details: separationDetails } = cell ?? {};
 
   return {
     electrochemistryType: convertElectrochemistryType(type),
-    electrochemistryDetails: convertDetails(details),
-    current: ordWaveLengthToReaction(current ?? null),
-    anode: convertDetails(anodeMaterial),
-    cathode: convertDetails(cathodeMaterial),
-    separation: ordWaveLengthToReaction(electrodeSeparation ?? null),
+    electrochemistryDetails: details,
+    current: ordCurrentToReaction(current),
+    anode: anodeMaterial,
+    cathode: cathodeMaterial,
+    separation: ordDistanceToReaction(electrodeSeparation),
     cell: ordElectrochemistryCellTypeToReaction(cellType),
-    separationDetails: convertDetails(separationDetails),
+    separationDetails: separationDetails,
   };
 };
 
-const convertFlow = (flow?: ord.IFlowConditions | null) => {
+const ordFlowConditionsToAppFlowConditions = (flow?: ord.IFlowConditions | null) => {
   const { type, details, pumpType, tubing } = flow ?? {};
   const { type: tubingType, details: tubingDetails, diameter } = tubing ?? {};
 
   return {
     flowType: ordFlowTypeToReaction(type),
-    flowDetails: convertDetails(details),
-    pumpType: convertDetails(pumpType),
+    flowDetails: details,
+    pumpType: pumpType,
     tubing: ordTubingTypeToReaction(tubingType),
-    tubingDetails: convertDetails(tubingDetails),
-    diameter: ordWaveLengthToReaction(diameter ?? null),
+    tubingDetails: tubingDetails,
+    diameter: ordDistanceToReaction(diameter),
   };
 };
 
-const convertTemperature = (temperature?: ord.ITemperatureConditions | null) => {
+const ordTemperatureConditionsToAppTemperatureConditions = (temperature?: ord.ITemperatureConditions | null) => {
   const { setpoint, control } = temperature ?? {};
   const { type: temperatureControlType, details: temperatureControlDetails } = control ?? {};
   return {
-    temperature: ordTemperatureToReaction(setpoint ?? null),
+    temperature: ordTemperatureToReaction(setpoint),
     temperatureControl: ordTemperatureControlTypeToReaction(temperatureControlType),
-    temperatureDetails: convertDetails(temperatureControlDetails),
+    temperatureDetails: temperatureControlDetails,
   };
 };
 
-const convertPressure = (pressure?: ord.IPressureConditions | null) => {
-  const { setpoint, atmosphere, control: pressureControl } = pressure ?? {};
+const ordPressureConditionsToAppPressureConditions = (pressure?: ord.IPressureConditions | null) => {
+  const { setpoint, atmosphere, control } = pressure ?? {};
   const { type: atmosphereType, details: atmosphereDetails } = atmosphere ?? {};
-  const { details: pressureControlDetails } = pressureControl ?? {};
+  const { type: pressureControlType, details: pressureControlDetails } = control ?? {};
   return {
     pressure: ordPressureToReaction(setpoint),
     atmosphere: ordAtmosphereTypeToReaction(atmosphereType),
-    atmosphereDetails: convertDetails(atmosphereDetails),
-    pressureControlDetails: pressureControlDetails ?? '',
+    atmosphereDetails: atmosphereDetails,
+    pressureControl: ordAtmosphereTypeToReaction(pressureControlType),
+    pressureControlDetails: pressureControlDetails,
   };
 };
 
@@ -139,14 +144,14 @@ const reactionPressureWithAtmosphereToOrd = (conditions: ReactionConditions) => 
   };
 };
 
-const reactionElectrochemistryToOrd = (conditions: ReactionConditions) => {
+export const reactionElectrochemistryToOrd = (conditions: ReactionConditions) => {
   return {
     type: reactionElectrochemistryTypeToOrd(conditions.electrochemistryType),
     details: conditions.electrochemistryDetails,
-    current: reactionWaveLengthToOrd(conditions.current),
+    current: reactionCurrentToOrd(conditions.current),
     anodeMaterial: conditions.anode,
     cathodeMaterial: conditions.cathode,
-    electrodeSeparation: reactionWaveLengthToOrd(conditions.separation),
+    electrodeSeparation: reactionDistanceToOrd(conditions.separation),
     cell: {
       type: reactionElectrochemistryCellTypeToOrd(conditions.cell),
       details: conditions.separationDetails,
@@ -154,7 +159,7 @@ const reactionElectrochemistryToOrd = (conditions: ReactionConditions) => {
   };
 };
 
-const reactionFlowToOrd = (conditions: ReactionConditions) => {
+export const reactionFlowToOrd = (conditions: ReactionConditions) => {
   return {
     type: reactionFlowTypeToOrd(conditions.flowType),
     details: conditions.flowDetails,
@@ -162,8 +167,40 @@ const reactionFlowToOrd = (conditions: ReactionConditions) => {
     tubing: {
       type: reactionTubingTypeToOrd(conditions.tubing),
       details: conditions.tubingDetails,
-      diameter: reactionWaveLengthToOrd(conditions.diameter),
+      diameter: reactionDistanceToOrd(conditions.diameter),
     },
+  };
+};
+
+export const appTemperatureConditionsToOrdTemperatureConditions = (conditions: ReactionConditions) => {
+  return {
+    setpoint: reactionTemperatureToOrd(conditions.temperature),
+    control: {
+      type: reactionTemperatureControlTypeToOrd(conditions.temperatureControl),
+      details: conditions.temperatureDetails,
+    },
+  };
+};
+
+export const reactionStittingToOrdStirring = (conditions: ReactionConditions) => {
+  return {
+    type: reactionStirringMethodTypeToOrd(conditions.stirringMethod),
+    details: conditions.stirringDetails,
+    rate: {
+      type: reactionStirringRateTypeToOrd(conditions.rate),
+      details: conditions.rateDetails,
+      rpm: conditions.rpm ? Number(conditions.rpm) : undefined,
+    },
+  };
+};
+
+export const reactionIlluminationToOrdIllumination = (conditions: ReactionConditions) => {
+  return {
+    type: reactionIlluminationTypeToOrd(conditions.illuminationType),
+    details: conditions.illuminationDetails,
+    peakWavelength: reactionWaveLengthToOrd(conditions.peakWavelength),
+    color: conditions.color,
+    distanceToVessel: reactionDistanceToOrd(conditions.distanceToVessel),
   };
 };
 
@@ -182,16 +219,16 @@ export const ordConditionsToReactionConditions = (conditions?: ord.IReactionCond
   } = conditions ?? ord.ReactionConditions.toObject(new ord.ReactionConditions());
 
   return withId({
-    generalDetails: details ?? null,
+    generalDetails: details,
     reflux: ordBooleanToReaction(reflux),
     conditionsAreDynamic: ordBooleanToReaction(conditionsAreDynamic),
 
-    ...convertTemperature(temperature),
-    ...convertPressure(pressure),
-    ...convertStirring(stirring),
-    ...convertIllumination(illumination),
-    ...convertElectrochemistry(electrochemistry),
-    ...convertFlow(flow),
+    ...ordTemperatureConditionsToAppTemperatureConditions(temperature),
+    ...ordPressureConditionsToAppPressureConditions(pressure),
+    ...ordStirringConditionsToAppStirringConditions(stirring),
+    ...ordIlluminationConditionsToAppIlluminationConditions(illumination),
+    ...ordElectrochemistryConditionsToAppElectrochemistryConditions(electrochemistry),
+    ...ordFlowConditionsToAppFlowConditions(flow),
 
     ...restProps,
   });
@@ -203,30 +240,10 @@ export const reactionConditionsToOrdConditions = (conditions: ReactionConditions
     ph: conditions.ph,
     reflux: reactionBooleanToOrd(conditions.reflux),
     conditionsAreDynamic: reactionBooleanToOrd(conditions.conditionsAreDynamic),
-    temperature: {
-      setpoint: reactionTemperatureToOrd(conditions.temperature),
-      control: {
-        type: reactionTemperatureControlTypeToOrd(conditions.temperatureControl),
-        details: conditions.temperatureDetails,
-      },
-    },
+    temperature: appTemperatureConditionsToOrdTemperatureConditions(conditions),
     pressure: reactionPressureWithAtmosphereToOrd(conditions),
-    stirring: {
-      type: reactionStirringMethodTypeToOrd(conditions.stirringMethod),
-      details: conditions.stirringDetails,
-      rate: {
-        type: reactionStirringRateTypeToOrd(conditions.rate),
-        details: conditions.rateDetails,
-        rpm: conditions.rpm && conditions.rpm !== '' ? Number(conditions.rpm) : undefined,
-      },
-    },
-    illumination: {
-      type: reactionIlluminationTypeToOrd(conditions.illuminationType),
-      details: conditions.illuminationDetails,
-      peakWavelength: reactionWaveLengthToOrd(conditions.peakWavelength),
-      color: conditions.color,
-      distanceToVessel: reactionWaveLengthToOrd(conditions.distanceToVessel),
-    },
+    stirring: reactionStittingToOrdStirring(conditions),
+    illumination: reactionIlluminationToOrdIllumination(conditions),
     electrochemistry: reactionElectrochemistryToOrd(conditions),
     flow: reactionFlowToOrd(conditions),
   };

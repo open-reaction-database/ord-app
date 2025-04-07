@@ -46,6 +46,8 @@ import {
   ordTextureTypeToReaction,
   ordTimeTypeToReaction,
   ordWaveLengthTypeToReaction,
+  ordLengthTypeToReaction,
+  ordCurrentTypeToReaction,
   reactionAdditionDeviceTypeToOrd,
   reactionAdditionSpeedTypeToOrd,
   reactionCompoundIdentifierTypeToOrd,
@@ -58,7 +60,9 @@ import {
   reactionTextureTypeToOrd,
   reactionTimeTypeToOrd,
   reactionWaveLengthTypeToOrd,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
+  reactionLengthTypeToOrd,
+  reactionCurrentTypeToOrd,
+} from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
 
@@ -181,6 +185,16 @@ export const { fromOrd: ordSelectivityToReaction, toOrd: reactionSelectivityToOr
 export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd } = generateValuePrecisionUnitConverter(
   ordWaveLengthTypeToReaction,
   reactionWaveLengthTypeToOrd,
+);
+
+export const { fromOrd: ordDistanceToReaction, toOrd: reactionDistanceToOrd } = generateValuePrecisionUnitConverter(
+  ordLengthTypeToReaction,
+  reactionLengthTypeToOrd,
+);
+
+export const { fromOrd: ordCurrentToReaction, toOrd: reactionCurrentToOrd } = generateValuePrecisionUnitConverter(
+  ordCurrentTypeToReaction,
+  reactionCurrentTypeToOrd,
 );
 
 export const ordReactionIdentifierToReaction = ({

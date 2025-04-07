@@ -26,6 +26,8 @@ import type {
   ReactionTextureType,
   ReactionTimeType,
   ReactionWaveLengthType,
+  ReactionLengthType,
+  ReactionCurrentType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -99,6 +101,10 @@ export type ReactionIdentifier = WithId<{
 export type ReactionSelectivity = ReactionTypeDetails<ReactionSelectivityType>;
 
 export type ReactionWaveLength = ReactionValuePrecisionUnit<ReactionWaveLengthType>;
+
+export type ReactionLength = ReactionValuePrecisionUnit<ReactionLengthType>;
+
+export type ReactionCurrent = ReactionValuePrecisionUnit<ReactionCurrentType>;
 
 export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementDetails, 'type' | 'eicMasses'> & {
   type: ReactionMassSpecType;

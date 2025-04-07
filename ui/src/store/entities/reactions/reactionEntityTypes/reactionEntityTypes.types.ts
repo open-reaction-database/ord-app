@@ -46,6 +46,10 @@ export type ReactionSelectivityType = keyof typeof ord.ProductMeasurement.Select
 
 export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
 
+export type ReactionLengthType = keyof typeof ord.Length.LengthUnit;
+
+export type ReactionCurrentType = keyof typeof ord.Current.CurrentUnit;
+
 export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
 

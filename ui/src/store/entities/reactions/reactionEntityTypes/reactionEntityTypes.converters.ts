@@ -39,6 +39,8 @@ import {
   electrochemistryCellTypeByValue,
   flowTypeByValue,
   tubingTypeByValue,
+  lengthTypeByValue,
+  currentTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -100,6 +102,9 @@ export const { ordEntityToEntity: ordSelectivityTypeToReaction, entityToOrdEntit
 export const { ordEntityToEntity: ordWaveLengthTypeToReaction, entityToOrdEntity: reactionWaveLengthTypeToOrd } =
   generateEntityTypeToFromOrd(waveLengthTypeByValue, ord.Wavelength.WavelengthUnit);
 
+export const { ordEntityToEntity: ordLengthTypeToReaction, entityToOrdEntity: reactionLengthTypeToOrd } =
+  generateEntityTypeToFromOrd(lengthTypeByValue, ord.Length.LengthUnit);
+
 export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: reactionMassSpecTypeToOrd } =
   generateEntityTypeToFromOrd(
     massSpecTypeByValue,
@@ -153,3 +158,6 @@ export const { ordEntityToEntity: ordFlowTypeToReaction, entityToOrdEntity: reac
 
 export const { ordEntityToEntity: ordTubingTypeToReaction, entityToOrdEntity: reactionTubingTypeToOrd } =
   generateEntityTypeToFromOrd(tubingTypeByValue, ord.FlowConditions.Tubing.TubingType);
+
+export const { ordEntityToEntity: ordCurrentTypeToReaction, entityToOrdEntity: reactionCurrentTypeToOrd } =
+  generateEntityTypeToFromOrd(currentTypeByValue, ord.Current.CurrentUnit);

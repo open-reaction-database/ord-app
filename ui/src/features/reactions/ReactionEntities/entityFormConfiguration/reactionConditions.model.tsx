@@ -307,7 +307,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         fields: [
           {
             type: ReactionFormNodeType.select,
-            name: 'ElectrochemistryType',
+            name: 'electrochemistryType',
             selectType: 'dropdown',
             options: electrochemistryTypeOptions,
             wrapperConfig: {
@@ -316,7 +316,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
           },
           {
             type: ReactionFormNodeType.value,
-            name: 'ElectrochemistryDetails',
+            name: 'electrochemistryDetails',
             inputType: 'string',
             wrapperConfig: {
               label: 'Details',

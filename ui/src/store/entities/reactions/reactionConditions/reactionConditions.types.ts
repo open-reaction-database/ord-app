@@ -19,6 +19,9 @@ import type {
   ReactionTemperature,
   ReactionPressure,
   ReactionWaveLength,
+  ReactionLength,
+  OrdOptional,
+  ReactionCurrent,
 } from '../reactionEntity/reactionEntity.types';
 import type {
   ReactionTemperatureControlType,
@@ -32,54 +35,74 @@ import type {
   ReactionTubingType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 
+interface BaseReactionCondition {
+  generalDetails: OrdOptional<string>;
+  id: string;
+  reflux: ReactionBoolean;
+  conditionsAreDynamic: ReactionBoolean;
+}
+
 export interface ReactionTemperatureCondition {
   temperature: ReactionTemperature;
   temperatureControl: ReactionTemperatureControlType;
-  temperatureDetails: string | null;
+  temperatureDetails: OrdOptional<string>;
 }
 
 export interface ReactionPressureCondition {
   pressure: ReactionPressure;
   pressureControlDetails: string;
   atmosphere: ReactionAtmosphereType;
-  atmosphereDetails: string | null;
+  atmosphereDetails: OrdOptional<string>;
 }
 
 export interface ReactionStirringCondition {
   stirringMethod: ReactionStirringMethodType;
-  stirringDetails: string | null;
+  stirringDetails: OrdOptional<string>;
   rate: ReactionStirringRateType;
-  rateDetails: string | null;
-  rpm: string;
+  rateDetails: OrdOptional<string>;
+  rpm: OrdOptional<string>;
 }
 
 export interface ReactionIlluminationCondition {
   illuminationType: ReactionIlluminationType;
-  illuminationDetails: string | null;
+  illuminationDetails: OrdOptional<string>;
   peakWavelength: ReactionWaveLength;
-  color: string | null;
-  distanceToVessel: ReactionWaveLength;
+  color: OrdOptional<string>;
+  distanceToVessel: ReactionLength;
 }
 
 export interface ReactionElectrochemistryCondition {
   electrochemistryType: ReactionElectrochemistryType;
-  electrochemistryDetails: string | null;
-  current: ReactionWaveLength;
-  anode: string | null;
-  cathode: string | null;
-  separation: ReactionWaveLength;
+  electrochemistryDetails: OrdOptional<string>;
+  current: ReactionCurrent;
+  anode: OrdOptional<string>;
+  cathode: OrdOptional<string>;
+  separation: ReactionLength;
   cell: ReactionElectrochemistryCellType;
-  separationDetails: string | null;
+  separationDetails: OrdOptional<string>;
 }
 
 export interface ReactionFlowCondition {
   flowType: ReactionFlowType;
-  flowDetails: string | null;
-  pumpType: string | null;
+  flowDetails: OrdOptional<string>;
+  pumpType: OrdOptional<string>;
   tubing: ReactionTubingType;
-  tubingDetails: string | null;
-  diameter: ReactionWaveLength;
+  tubingDetails: OrdOptional<string>;
+  diameter: ReactionLength;
 }
+
+type DetailsFields = {
+  temperatureDetails: OrdOptional<string>;
+  pressureControlDetails: OrdOptional<string>;
+  atmosphereDetails: OrdOptional<string>;
+  stirringDetails: OrdOptional<string>;
+  rateDetails: OrdOptional<string>;
+  illuminationDetails: OrdOptional<string>;
+  electrochemistryDetails: OrdOptional<string>;
+  separationDetails: OrdOptional<string>;
+  flowDetails: OrdOptional<string>;
+  tubingDetails: OrdOptional<string>;
+};
 
 export type ReactionConditions = Omit<
   ord.IReactionConditions,
@@ -91,14 +114,16 @@ export type ReactionConditions = Omit<
   | 'illumination'
   | 'electrochemistry'
   | 'flow'
-> & {
-  id: string;
-  generalDetails: string | null;
-  reflux: ReactionBoolean;
-  conditionsAreDynamic: ReactionBoolean;
-} & ReactionTemperatureCondition &
-  ReactionPressureCondition &
-  ReactionStirringCondition &
-  ReactionIlluminationCondition &
-  ReactionElectrochemistryCondition &
-  ReactionFlowCondition;
+  | 'details'
+> &
+  BaseReactionCondition &
+  Pick<ReactionTemperatureCondition, 'temperature' | 'temperatureControl'> &
+  Pick<ReactionPressureCondition, 'pressure' | 'atmosphere'> &
+  Pick<ReactionStirringCondition, 'stirringMethod' | 'rate' | 'rpm'> &
+  Pick<ReactionIlluminationCondition, 'illuminationType' | 'peakWavelength' | 'color' | 'distanceToVessel'> &
+  Pick<
+    ReactionElectrochemistryCondition,
+    'electrochemistryType' | 'current' | 'anode' | 'cathode' | 'separation' | 'cell'
+  > &
+  Pick<ReactionFlowCondition, 'flowType' | 'pumpType' | 'tubing' | 'diameter'> &
+  DetailsFields;
