@@ -27,13 +27,14 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
+import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
 
 const ENTITY_FIELD = 'workups';
 
 export function Workups() {
   const dispatch = useAppDispatch();
   const { isViewOnly, reactionId } = useContext(reactionContext);
-  const workups: Array<unknown> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const workups: Array<ReactionWorkup> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
 
   const onWorkupCreate = () => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, workups.length];
@@ -75,7 +76,7 @@ export function Workups() {
       >
         {workups.map((workup, index) => (
           <EntityListItem
-            key={index}
+            key={workup.id}
             entityField={ENTITY_FIELD}
             title="Workup"
             requiredFields={[]}
