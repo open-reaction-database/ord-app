@@ -77,7 +77,7 @@ aws.secretsmanager.SecretVersion(
     aws.secretsmanager.SecretVersionArgs(
         secret_id=rds_dsn_secret.id,
         secret_string=pulumi.Output.format(
-            "psycopg+postgresql://ord:{0}@{1}:5432/app", rds_password.result, cluster.endpoint
+            "postgresql+psycopg://ord:{0}@{1}:5432/app", rds_password.result, cluster.endpoint
         ),
     ),
 )

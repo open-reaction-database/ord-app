@@ -90,7 +90,7 @@ def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs])
 
 # NOTE(skearnes): If you have trouble with domain validation, make sure that the
 # hosted zone NS records match the name servers for the registered domain (or vice versa).
-certificate = aws.acm.Certificate("certificate", domain_name=DOMAIN, validation_method="DNS")
+certificate = aws.acm.Certificate("certificate", domain_name=f"*.{DOMAIN}", validation_method="DNS")
 certificate.domain_validation_options.apply(create_records)
 certificate_validation = aws.acm.CertificateValidation(
     "certificate_validation",
