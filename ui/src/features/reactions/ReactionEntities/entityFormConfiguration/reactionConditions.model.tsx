@@ -405,7 +405,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid(
         {
           type: ReactionFormNodeType.value,
-          name: 'electrochemistry.anode',
+          name: 'electrochemistry.anodeMaterial',
           inputType: 'string',
           wrapperConfig: {
             label: 'Anode',
@@ -413,7 +413,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         },
         {
           type: ReactionFormNodeType.value,
-          name: 'electrochemistry.cathode',
+          name: 'electrochemistry.cathodeMaterial',
           inputType: 'string',
           wrapperConfig: {
             label: 'Cathode',
