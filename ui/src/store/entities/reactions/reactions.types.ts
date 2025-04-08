@@ -24,11 +24,13 @@ import type { ReactionObservation } from './reactionObservation/reactionObservat
 import type { ReactionConditions } from './reactionConditions/reactionConditions.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionSetup } from './reactionSetup/reactionSetup.converter.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
   Outcomes = 'outcomes',
   Identifiers = 'identifiers',
+  Setup = 'setup',
   Notes = 'notes',
   Components = 'components',
   CrudeComponents = 'crudeComponents',
@@ -70,6 +72,7 @@ export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
+  setup: ReactionSetup;
   observations: Array<ReactionObservation>;
   conditions: ReactionConditions;
   notes: ReactionNotes;

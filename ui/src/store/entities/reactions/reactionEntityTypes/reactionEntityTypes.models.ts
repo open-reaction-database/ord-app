@@ -80,3 +80,19 @@ export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = ge
 
 export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
   generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const { options: vesselTypeOptions, byValue: vesselTypeByValue } = generateOptionsAndByValue(
+  ord.Vessel.VesselType,
+);
+
+export const { options: vesselMaterialTypeOptions, byValue: vesselMaterialTypeByValue } = generateOptionsAndByValue(
+  ord.VesselMaterial.VesselMaterialType,
+);
+
+export const { options: volumeTypeOptions, byValue: volumeTypeByValue } = generateOptionsAndByValue(
+  ord.Volume.VolumeUnit,
+);
+
+export const { options: environmentTypeOptions, byValue: environmentTypeByValue } = generateOptionsAndByValue(
+  ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
+);

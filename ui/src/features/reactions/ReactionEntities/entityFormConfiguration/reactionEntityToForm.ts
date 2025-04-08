@@ -31,11 +31,13 @@ import { reactionCrudeComponents } from 'features/reactions/ReactionEntities/ent
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { reactionObservations } from './reactionObservations.model.tsx';
 import { reactionConditions } from './reactionConditions.model.tsx';
+import { reactionSetup } from './setup/reactionSetup.model.ts';
 
 export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
   [ReactionNodeEntity.Inputs]: reactionInputs,
   [ReactionNodeEntity.Notes]: reactionNotes,
   [ReactionNodeEntity.Identifiers]: reactionIdentifiers,
+  [ReactionNodeEntity.Setup]: reactionSetup,
   [ReactionNodeEntity.Components]: reactionComponents,
   [ReactionNodeEntity.ComponentPreparations]: reactionComponentsPreparations,
   [ReactionNodeEntity.Features]: reactionData,

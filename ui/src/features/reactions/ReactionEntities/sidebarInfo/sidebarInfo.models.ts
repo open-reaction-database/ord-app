@@ -224,6 +224,16 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(value => value),
   },
   {
+    pathComponents: ['setup'],
+    entityName: ReactionNodeEntity.Setup,
+    label: 'Setup',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Setup',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
     pathComponents: ['conditions'],
     entityName: ReactionNodeEntity.Conditions,
     label: 'Conditions',
