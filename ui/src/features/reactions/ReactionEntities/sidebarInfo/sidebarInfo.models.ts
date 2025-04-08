@@ -261,10 +261,14 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Conditions',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues(({ temperature, ...rest }: ReactionConditions) => ({
-      ...rest,
-      temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
-    })),
+    useInitialValues: buildUseInitialValues(
+      ({ temperature, electrochemistry, pressure, ...rest }: ReactionConditions) => ({
+        ...rest,
+        temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
+        electrochemistry: withoutMeasurements(electrochemistry, 'electrochemistryMeasurements'),
+        pressure: withoutMeasurements(pressure, 'pressureMeasurements'),
+      }),
+    ),
   },
   {
     pathComponents: ['temperatureMeasurements'],
@@ -306,7 +310,10 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
         'Workup steps refer to any additions, purifications, or other operations after the ‘reaction’ stage prior to analysis',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues(({ input: _, ...rest }: ReactionWorkup) => rest),
+    useInitialValues: buildUseInitialValues(({ input: _, temperature, ...rest }: ReactionWorkup) => ({
+      ...rest,
+      temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
+    })),
   },
   ...componentsSidebars,
 ];
