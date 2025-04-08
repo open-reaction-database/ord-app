@@ -20,19 +20,51 @@ import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { Text } from '@mantine/core';
 import type { ReactNode } from 'react';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
-interface ComponentsListProps<T extends ReactionComponentBase> {
-  reactionId: ReactionId;
+interface ComponentsListHeaderProps {
+  detailsHeader: string;
+}
+
+interface ComponentsListProps<T extends ReactionComponentBase> extends ComponentsListHeaderProps {
   rootPathComponents: ReactionPathComponents;
   components: Array<T>;
-  detailsHeader: string;
   entityName: string;
   renderDetails: (component: T) => ReactNode;
 }
 
+export function ComponentsListHeader({ detailsHeader }: Readonly<ComponentsListHeaderProps>) {
+  return (
+    <div className={clsx(classes.grid, classes.row)}>
+      <Text
+        size="md"
+        className={clsx(classes.text, classes.identifiers)}
+      >
+        Identifiers
+      </Text>
+      <Text
+        size="md"
+        className={clsx(classes.text, classes.preview)}
+      >
+        Preview
+      </Text>
+      <Text
+        size="md"
+        className={clsx(classes.text, classes.role)}
+      >
+        Role
+      </Text>
+      <Text
+        size="md"
+        className={clsx(classes.text, classes.details)}
+      >
+        {detailsHeader}
+      </Text>
+      <div className={classes.actions}></div>
+    </div>
+  );
+}
+
 export function ComponentsList<T extends ReactionComponentBase>({
-  reactionId,
   rootPathComponents,
   components,
   detailsHeader,
@@ -41,37 +73,10 @@ export function ComponentsList<T extends ReactionComponentBase>({
 }: Readonly<ComponentsListProps<T>>) {
   return (
     <>
-      <div className={clsx(classes.grid, classes.row)}>
-        <Text
-          size="md"
-          className={clsx(classes.text, classes.identifiers)}
-        >
-          Identifiers
-        </Text>
-        <Text
-          size="md"
-          className={clsx(classes.text, classes.preview)}
-        >
-          Preview
-        </Text>
-        <Text
-          size="md"
-          className={clsx(classes.text, classes.role)}
-        >
-          Role
-        </Text>
-        <Text
-          size="md"
-          className={clsx(classes.text, classes.details)}
-        >
-          {detailsHeader}
-        </Text>
-        <div className={classes.actions}></div>
-      </div>
+      <ComponentsListHeader detailsHeader={detailsHeader} />
       {components.map((component, index) => (
         <ComponentDisplayRow
           key={component.id}
-          reactionId={reactionId}
           componentPath={[...rootPathComponents, entityName, index]}
           renderDetails={renderDetails}
           component={component}

@@ -79,7 +79,6 @@ export function ProductsComponentsList() {
     >
       {components.length > 0 ? (
         <ComponentsList
-          reactionId={reactionId}
           components={components}
           rootPathComponents={pathComponents}
           detailsHeader="Measurements"

@@ -26,6 +26,7 @@ import { Provenance } from 'features/reactions/ReactionView/Provenance/Provenanc
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import classes from './reactionTabs.module.scss';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { Workups } from 'features/reactions/ReactionView/Workups/Workups.tsx';
 import { Setup } from 'features/reactions/ReactionView/Setup/Setup';
 
 interface ReactionTab {
@@ -33,8 +34,6 @@ interface ReactionTab {
   required?: true;
   Component: FC<ReactionViewSectionProps>;
 }
-
-const createEmptyComponent = (name: string) => () => name;
 
 const tabs: Array<ReactionTab> = [
   { name: 'inputs', required: true, Component: Inputs },
@@ -44,7 +43,7 @@ const tabs: Array<ReactionTab> = [
   { name: 'setup', Component: Setup },
   { name: 'notes', Component: Notes },
   { name: 'observations', Component: Observation },
-  { name: 'workups', Component: createEmptyComponent('workups') },
+  { name: 'workups', Component: Workups },
   { name: 'provenance', required: true, Component: Provenance },
 ];
 

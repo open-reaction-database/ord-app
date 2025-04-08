@@ -29,6 +29,13 @@ import type {
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
+import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
+import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
+
+const withoutMeasurements = <T extends object>(object: T, name: keyof T): Omit<T, typeof name> => {
+  const { [name]: _, ...rest } = object;
+  return rest;
+};
 
 type SidebarInfoPathLess = Omit<ReactionSidebarInfo, 'pathComponents'>;
 
@@ -38,6 +45,16 @@ const componentSidebarInfo: Omit<SidebarInfoPathLess, 'label' | 'sidebarTitle'> 
     ({ identifiers: _i, molBlockIdentifiers: _m, features: _f, preparations: _p, ...rest }: ReactionInputComponent) =>
       rest,
   ),
+};
+
+const inputSidebarInfo: Omit<SidebarInfoPathLess, 'entityName'> = {
+  label: 'Input',
+  sidebarTitle: createReactionEntityTitle({
+    entityName: 'Input',
+    hasDelete: true,
+    description: 'Reaction inputs include every chemical added to the reaction vessel',
+  }),
+  useInitialValues: buildUseInitialValues(({ components: _, ...rest }: ReactionInput) => rest),
 };
 
 const featureSidebarInfo: SidebarInfoPathLess = {
@@ -62,6 +79,12 @@ const componentIdentifiersSidebarInfo: SidebarInfoPathLess = {
 };
 
 const componentsSidebars: Array<ReactionSidebarInfo> = [
+  {
+    pathComponents: ['components', 'input'],
+    label: 'Component',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Component', hasDelete: true }),
+    ...componentSidebarInfo,
+  },
   {
     pathComponents: ['components', 'inputs'],
     label: 'Component',
@@ -118,6 +141,14 @@ const componentsSidebars: Array<ReactionSidebarInfo> = [
     ...componentIdentifiersSidebarInfo,
   },
   {
+    pathComponents: ['identifiers', 'components', 'input'],
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
+    pathComponents: ['molBlockIdentifiers', 'components', 'input'],
+    ...componentIdentifiersSidebarInfo,
+  },
+  {
     pathComponents: ['preparations', 'components', 'inputs'],
     ...preparationsSidebarInfo,
   },
@@ -154,13 +185,12 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
   {
     pathComponents: ['inputs'],
     entityName: ReactionNodeEntity.Inputs,
-    label: 'Input',
-    sidebarTitle: createReactionEntityTitle({
-      entityName: 'Input',
-      hasDelete: true,
-      description: 'Reaction inputs include every chemical added to the reaction vessel',
-    }),
-    useInitialValues: buildUseInitialValues(({ components: _, ...rest }: ReactionInput) => rest),
+    ...inputSidebarInfo,
+  },
+  {
+    pathComponents: ['input'],
+    entityName: ReactionNodeEntity.Input,
+    ...inputSidebarInfo,
   },
   {
     pathComponents: ['identifiers'],
@@ -241,7 +271,59 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Conditions',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues((value: ord.IReactionConditions) => value),
+    useInitialValues: buildUseInitialValues(
+      ({ temperature, electrochemistry, pressure, ...rest }: ReactionConditions) => ({
+        ...rest,
+        temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
+        electrochemistry: withoutMeasurements(electrochemistry, 'electrochemistryMeasurements'),
+        pressure: withoutMeasurements(pressure, 'pressureMeasurements'),
+      }),
+    ),
+  },
+  {
+    pathComponents: ['temperatureMeasurements'],
+    entityName: ReactionNodeEntity.TemperatureMeasurements,
+    label: 'Temperature Measurement',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Temperature Measurement',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(values => values),
+  },
+  {
+    pathComponents: ['electrochemistryMeasurements'],
+    entityName: ReactionNodeEntity.ElectrochemistryMeasurements,
+    label: 'Electrochemistry Measurement',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Electrochemistry Measurement',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(values => values),
+  },
+  {
+    pathComponents: ['pressureMeasurements'],
+    entityName: ReactionNodeEntity.PressureMeasurements,
+    label: 'Pressure Measurement',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Pressure Measurement',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(values => values),
+  },
+  {
+    pathComponents: ['workups'],
+    entityName: ReactionNodeEntity.Workups,
+    label: 'Workups',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Workups',
+      description:
+        'Workup steps refer to any additions, purifications, or other operations after the ‘reaction’ stage prior to analysis',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(({ input: _, temperature, ...rest }: ReactionWorkup) => ({
+      ...rest,
+      temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
+    })),
   },
   ...componentsSidebars,
 ];

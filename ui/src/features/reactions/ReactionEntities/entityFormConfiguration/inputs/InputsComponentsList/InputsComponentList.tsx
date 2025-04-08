@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Text } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
-import { AddCircleIcon, EmptyIcon } from 'common/icons';
+import { AddCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
@@ -25,13 +25,13 @@ import {
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { typographyClasses } from 'common/styling';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 
 const useSelectData = buildUseSelectItems('components');
 
@@ -75,25 +75,15 @@ export function InputsComponentList() {
         />
       }
     >
-      {components.length > 0 ? (
+      <ComponentsListOrEmpty componentsAmount={components.length}>
         <ComponentsList
-          reactionId={reactionId}
           components={components}
           rootPathComponents={pathComponents}
           detailsHeader="Amount"
           entityName="components"
           renderDetails={renderDetails}
         />
-      ) : (
-        <Flex
-          direction="column"
-          align="center"
-          gap="8"
-        >
-          <EmptyIcon />
-          <Text className={typographyClasses.secondary1}>There are no Components yet</Text>
-        </Flex>
-      )}
+      </ComponentsListOrEmpty>
     </ReactionEntityBlock>
   );
 }

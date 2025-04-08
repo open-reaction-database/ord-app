@@ -29,6 +29,11 @@ export type ReactionFlowRateType = keyof typeof ord.FlowRate.FlowRateUnit;
 
 export type ReactionTemperatureType = keyof typeof ord.Temperature.TemperatureUnit;
 
+export type ReactionTemperatureControlType =
+  keyof typeof ord.TemperatureConditions.TemperatureControl.TemperatureControlType;
+
+export type ReactionPressureType = keyof typeof ord.Pressure.PressureUnit;
+
 export type ReactionTextureType = keyof typeof ord.Texture.TextureType;
 
 export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
@@ -41,7 +46,39 @@ export type ReactionSelectivityType = keyof typeof ord.ProductMeasurement.Select
 
 export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
 
+export type ReactionLengthType = keyof typeof ord.Length.LengthUnit;
+
+export type ReactionCurrentType = keyof typeof ord.Current.CurrentUnit;
+
 export type ReactionMassSpecType =
   keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
 
 export type CompoundIdentifierType = keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+
+export type ReactionAtmosphereType = keyof typeof ord.PressureConditions.Atmosphere.AtmosphereType;
+
+export type ReactionStirringMethodType = keyof typeof ord.StirringConditions.StirringMethodType;
+
+export type ReactionIlluminationType = keyof typeof ord.IlluminationConditions.IlluminationType;
+
+export type StirringRateType = keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
+
+export type ElectrochemistryType = keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
+
+export type ElectrochemistryCellType =
+  keyof typeof ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType;
+
+export type ReactionFlowType = keyof typeof ord.FlowConditions.FlowType;
+
+export type TubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;
+
+export type WorkupType = keyof typeof ord.ReactionWorkup.ReactionWorkupType;
+
+export type PressureControlType = keyof typeof ord.PressureConditions.PressureControl.PressureControlType;
+
+export type VoltageUnit = keyof typeof ord.Voltage.VoltageUnit;
+
+export type TemperatureMeasurementType =
+  keyof typeof ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType;
+
+export type PressureMeasurementType = keyof typeof ord.PressureConditions.PressureMeasurement.PressureMeasurementType;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Switch, ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
@@ -37,10 +37,9 @@ import { reactionContext } from '../reactions.context.ts';
 interface ReactionHeaderProps {
   datasetId: number;
   reactionId: number;
-  onViewOnlyToggle: () => void;
 }
 
-export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Readonly<ReactionHeaderProps>) {
+export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
   const [location] = useLocation();
   const { base } = useRouter();
   const dispatch = useAppDispatch();
@@ -81,10 +80,6 @@ export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Read
           gap="sm"
         >
           {!isViewOnly && <RemoveReaction reactionId={reactionId} />}
-          <Switch
-            checked={isViewOnly}
-            onChange={() => onViewOnlyToggle()}
-          />
           <Button
             variant="transparent"
             leftSection={<CheckListIcon />}

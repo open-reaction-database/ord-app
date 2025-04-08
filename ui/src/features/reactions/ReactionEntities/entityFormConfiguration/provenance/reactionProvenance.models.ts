@@ -100,7 +100,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       ...createReactionPerson('recordCreated.person'),
       {
         type: ReactionFormNodeType.value,
-        name: 'details',
+        name: 'recordCreated.details',
         inputType: 'textarea',
         wrapperConfig: {
           label: 'Details',
@@ -115,13 +115,13 @@ export const reactionProvenance: Array<ReactionFormNode> = [
     },
     getKey: (_, id) => id,
     useSelectItems: buildUseSelectItems('recordModified'),
-    ItemDisplay: createEntityListItemComponent<ord.IRecordEvent>({
+    ItemDisplay: createEntityListItemComponent<ReactionRecordEvent>({
       entityField: 'recordModified',
       title: 'Record Modification',
       requiredFields: [
         {
           label: 'Time',
-          render: item => formatDate(item.time?.value as string),
+          render: item => (item.time ? formatDate(item.time) : ''),
         },
         {
           label: 'Person e-mail',

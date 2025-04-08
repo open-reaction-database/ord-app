@@ -13,18 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactNode } from 'react';
+import { EmptyIcon } from 'common/icons';
+import { Flex, Text } from '@mantine/core';
+import { typographyClasses } from 'common/styling';
 
-export interface ComponentsDisplayRowCustomActions<T extends ReactionComponentBase> {
-  component: T;
-  renderDetails: (component: T) => ReactNode;
-  gridClassName?: string;
-  actions: ReactNode;
+interface ComponentsListOrEmptyProps {
+  children: ReactNode;
+  componentsAmount: number;
 }
 
-export interface ComponentDisplayRowProps<T extends ReactionComponentBase>
-  extends Omit<ComponentsDisplayRowCustomActions<T>, 'actions'> {
-  componentPath: ReactionPathComponents;
+export function ComponentsListOrEmpty({ children, componentsAmount }: Readonly<ComponentsListOrEmptyProps>) {
+  return componentsAmount > 0 ? (
+    children
+  ) : (
+    <Flex
+      direction="column"
+      align="center"
+      gap="8"
+    >
+      <EmptyIcon />
+      <Text className={typographyClasses.secondary1}>There are no Components yet</Text>
+    </Flex>
+  );
 }

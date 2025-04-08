@@ -19,12 +19,22 @@ import type {
   ReactionFlowRateType,
   ReactionIdentifierType,
   ReactionMassSpecType,
+  ReactionPressureType,
   ReactionSelectivityType,
   ReactionSpeedType,
   ReactionTemperatureType,
   ReactionTextureType,
   ReactionTimeType,
   ReactionWaveLengthType,
+  ReactionLengthType,
+  ReactionCurrentType,
+  ReactionTemperatureControlType,
+  PressureControlType,
+  ReactionAtmosphereType,
+  StirringRateType,
+  VoltageUnit,
+  ElectrochemistryCellType,
+  TubingType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -85,6 +95,8 @@ export type ReactionAdditionDevice = ReactionTypeDetails<ReactionAdditionDeviceT
 
 export type ReactionTemperature = ReactionValuePrecisionUnit<ReactionTemperatureType>;
 
+export type ReactionPressure = ReactionValuePrecisionUnit<ReactionPressureType>;
+
 export type ReactionTexture = ReactionTypeDetails<ReactionTextureType>;
 
 export type ReactionIdentifier = WithId<{
@@ -97,6 +109,10 @@ export type ReactionSelectivity = ReactionTypeDetails<ReactionSelectivityType>;
 
 export type ReactionWaveLength = ReactionValuePrecisionUnit<ReactionWaveLengthType>;
 
+export type ReactionLength = ReactionValuePrecisionUnit<ReactionLengthType>;
+
+export type ReactionCurrent = ReactionValuePrecisionUnit<ReactionCurrentType>;
+
 export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementDetails, 'type' | 'eicMasses'> & {
   type: ReactionMassSpecType;
   eicMasses: Array<number>;
@@ -107,3 +123,22 @@ export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIde
 }
 
 export type ReactionDateTime = string | null;
+
+export type TemperatureControl = ReactionTypeDetails<ReactionTemperatureControlType>;
+
+export type PressureControl = ReactionTypeDetails<PressureControlType>;
+
+export type ReactionAtmosphere = ReactionTypeDetails<ReactionAtmosphereType>;
+
+export interface StirringRate extends Pick<ord.StirringConditions.IStirringRate, 'details' | 'rpm'> {
+  type: StirringRateType;
+}
+
+export type Voltage = ReactionValuePrecisionUnit<VoltageUnit>;
+
+export type ElectrochemistryCell = ReactionTypeDetails<ElectrochemistryCellType>;
+
+export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
+  type: TubingType;
+  diameter: ReactionLength;
+}

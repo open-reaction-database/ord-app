@@ -22,6 +22,7 @@ import { ComponentDisplayRow } from '../../ComponentsList';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 
 interface InputsComponentsListProps {
   inputs: Array<ReactionInput>;
@@ -39,7 +40,7 @@ const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ??
 
 export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListProps>) {
   const ids = inputs.map(input => input.id);
-  const { reactionId, ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
 
   return (
     <>
@@ -76,16 +77,17 @@ export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListPr
               {input.name}
             </Accordion.Control>
             <Accordion.Panel>
-              {input.components.map((component, index) => (
-                <ComponentDisplayRow
-                  key={component.id}
-                  reactionId={reactionId}
-                  component={component}
-                  renderDetails={renderDetails}
-                  componentPath={['inputs', input.id, 'components', index]}
-                  gridClassName={clsx(classes.grid, classes.row)}
-                />
-              ))}
+              <ComponentsListOrEmpty componentsAmount={input.components.length}>
+                {input.components.map((component, index) => (
+                  <ComponentDisplayRow
+                    key={component.id}
+                    component={component}
+                    renderDetails={renderDetails}
+                    componentPath={['inputs', input.id, 'components', index]}
+                    gridClassName={clsx(classes.grid, classes.row)}
+                  />
+                ))}
+              </ComponentsListOrEmpty>
             </Accordion.Panel>
           </Accordion.Item>
         ))}

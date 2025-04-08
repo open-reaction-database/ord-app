@@ -13,5 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './date.ts';
-export * from './itemsById.ts';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
+const userTimezone = dayjs.tz.guess();
+
+export function getDate(inputDate: string): dayjs.Dayjs {
+  return dayjs.utc(inputDate).tz(userTimezone);
+}
+
+export function formatDate(inputDate: string) {
+  return getDate(inputDate).format(TZ_FORMAT);
+}

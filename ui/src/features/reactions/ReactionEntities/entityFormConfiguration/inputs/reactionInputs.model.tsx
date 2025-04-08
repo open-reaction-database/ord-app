@@ -24,7 +24,7 @@ import {
   additionSpeedTypeOptions,
   flowRateOptions,
   temperatureOptions,
-  timeTypeOptions,
+  timeUnitOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
@@ -39,21 +39,7 @@ const createEmptyCrudeComponent = buildUseCreate('crudeComponents', index => {
   return [index, newCrudeComponent];
 });
 
-export const reactionInputs: Array<ReactionFormNode> = [
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.value,
-        name: 'name',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Input name',
-        },
-      },
-    ],
-  },
+export const reactionInputWithoutName: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.custom,
     name: 'components',
@@ -155,7 +141,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
           label: 'Time',
           hint: 'Addition time is relative to when the first input was added',
         },
-        options: timeTypeOptions,
+        options: timeUnitOptions,
       },
       {
         type: ReactionFormNodeType.vpu,
@@ -164,7 +150,7 @@ export const reactionInputs: Array<ReactionFormNode> = [
           label: 'Duration',
           hint: 'Addition duration quantifies how long it took to add the input',
         },
-        options: timeTypeOptions,
+        options: timeUnitOptions,
       },
       {
         type: ReactionFormNodeType.vpu,
@@ -195,4 +181,22 @@ export const reactionInputs: Array<ReactionFormNode> = [
       },
     ],
   },
+];
+
+export const reactionInputs: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    fields: [
+      {
+        type: ReactionFormNodeType.value,
+        name: 'name',
+        inputType: 'string',
+        wrapperConfig: {
+          label: 'Input name',
+        },
+      },
+    ],
+  },
+  ...reactionInputWithoutName,
 ];

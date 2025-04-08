@@ -149,6 +149,7 @@ export const getReactionsPage = createThunk(getReactionPageActions, async (_d, g
   return getReactionPageActions.success(parseReactionList(result.data));
 });
 
+// TODO only update metadata when reaction is already in the store
 export const getReaction = createThunk(getReactionActions, async (dispatch, getState, { reactionId }) => {
   try {
     const state = getState();

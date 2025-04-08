@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
-
-export function formatDate(inputDate: string) {
-  const timezone = dayjs.tz.guess();
-  return dayjs.utc(inputDate).tz(timezone).format(TZ_FORMAT);
+.conditionsLabel {
+  color: var(--mantine-color-primary);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  line-height: 20px;
+  margin-top: var(--mantine-spacing-sm);
 }

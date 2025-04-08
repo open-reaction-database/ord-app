@@ -47,6 +47,8 @@ export interface ReactionInput extends WithIdName<Pick<ord.IReactionInput, 'addi
   texture: ReactionTexture;
 }
 
+export type ReactionInputWithoutName = Omit<ReactionInput, 'name'>;
+
 export interface AppAmountUnitUnspecified {
   UNSPECIFIED: number;
 }
