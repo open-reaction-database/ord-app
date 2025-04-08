@@ -40,7 +40,7 @@ load_balancer = awsx.lb.ApplicationLoadBalancer(
             protocol="HTTP",
         ),
         awsx.lb.ListenerArgs(
-            certificate_arn=domain.get_output("certificate_arn"),
+            certificate_arn=domain.get_output("wildcard_certificate_arn"),
             default_actions=[aws.lb.ListenerDefaultActionArgs(type="forward", target_group_arn=target_group.arn)],
             port=443,
             protocol="HTTPS",

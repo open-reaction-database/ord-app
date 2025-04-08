@@ -15,6 +15,7 @@
 """An AWS Python Pulumi program."""
 
 import json
+from functools import partial
 
 import pulumi
 import pulumi_aws as aws
@@ -71,31 +72,45 @@ hosted_zone_dns_sec = aws.route53.HostedZoneDnsSec(
 )
 
 records = []
+wildcard_records = []
 
 
-def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs]) -> None:
+def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs], wildcard: bool) -> None:
     for i, value in enumerate(options):
-        records.append(
-            aws.route53.Record(
-                f"record-{i}",
-                allow_overwrite=True,
-                name=value.resource_record_name,
-                records=[value.resource_record_value],
-                ttl=300,
-                type=aws.route53.RecordType(value.resource_record_type),
-                zone_id=zone.zone_id,
-            )
+        if wildcard:
+            name = f"wildcard-record-{i}"
+        else:
+            name = f"record-{i}"
+        record = aws.route53.Record(
+            name,
+            allow_overwrite=True,
+            name=value.resource_record_name,
+            records=[value.resource_record_value],
+            ttl=300,
+            type=aws.route53.RecordType(value.resource_record_type),
+            zone_id=zone.zone_id,
         )
+        if wildcard:
+            wildcard_records.append(record)
+        else:
+            records.append(record)
 
 
 # NOTE(skearnes): If you have trouble with domain validation, make sure that the
 # hosted zone NS records match the name servers for the registered domain (or vice versa).
-certificate = aws.acm.Certificate("certificate", domain_name=f"*.{DOMAIN}", validation_method="DNS")
-certificate.domain_validation_options.apply(create_records)
+certificate = aws.acm.Certificate("certificate", domain_name=DOMAIN, validation_method="DNS")
+certificate.domain_validation_options.apply(partial(create_records, wildcard=False))
 certificate_validation = aws.acm.CertificateValidation(
     "certificate_validation",
     certificate_arn=certificate.arn,
     validation_record_fqdns=[record.fqdn for record in records],
+)
+wildcard_certificate = aws.acm.Certificate("wildcard_certificate", domain_name=f"*.{DOMAIN}", validation_method="DNS")
+wildcard_certificate.domain_validation_options.apply(partial(create_records, wildcard=True))
+wildcard_certificate_validation = aws.acm.CertificateValidation(
+    "wildcard_certificate_validation",
+    certificate_arn=wildcard_certificate.arn,
+    validation_record_fqdns=[record.fqdn for record in wildcard_records],
 )
 
 # Google Workspace.
@@ -119,5 +134,6 @@ aws.route53.Record(
 )
 
 pulumi.export("certificate_arn", certificate_validation.certificate_arn)
+pulumi.export("wildcard_certificate_arn", wildcard_certificate_validation.certificate_arn)
 pulumi.export("domain_name", DOMAIN)
 pulumi.export("zone_id", zone.zone_id)
