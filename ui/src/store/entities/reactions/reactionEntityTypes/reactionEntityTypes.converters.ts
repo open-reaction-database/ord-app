@@ -29,6 +29,18 @@ import {
   waveLengthTypeByValue,
   massSpecTypeByValue,
   compoundIdentifierTypeByValue,
+  pressureByValue,
+  atmosphereTypeByValue,
+  temperatureControlTypeByValue,
+  stirringMethodTypeByValue,
+  illuminationTypeByValue,
+  stirringRateTypeByValue,
+  electrochemistryTypeByValue,
+  electrochemistryCellTypeByValue,
+  flowTypeByValue,
+  tubingTypeByValue,
+  lengthTypeByValue,
+  currentTypeByValue,
   workupTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
@@ -91,11 +103,16 @@ export const { ordEntityToEntity: ordSelectivityTypeToReaction, entityToOrdEntit
 export const { ordEntityToEntity: ordWaveLengthTypeToReaction, entityToOrdEntity: reactionWaveLengthTypeToOrd } =
   generateEntityTypeToFromOrd(waveLengthTypeByValue, ord.Wavelength.WavelengthUnit);
 
+export const { ordEntityToEntity: ordLengthTypeToReaction, entityToOrdEntity: reactionLengthTypeToOrd } =
+  generateEntityTypeToFromOrd(lengthTypeByValue, ord.Length.LengthUnit);
+
 export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: reactionMassSpecTypeToOrd } =
   generateEntityTypeToFromOrd(
     massSpecTypeByValue,
     ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
   );
+export const { ordEntityToEntity: ordPressureTypeToReaction, entityToOrdEntity: reactionPressureTypeToOrd } =
+  generateEntityTypeToFromOrd(pressureByValue, ord.Pressure.PressureUnit);
 
 export const {
   ordEntityToEntity: ordCompoundIdentifierTypeToReaction,
@@ -104,3 +121,47 @@ export const {
 
 export const { ordEntityToEntity: ordWorkupTypeToReaction, entityToOrdEntity: reactionWorkupTypeToOrd } =
   generateEntityTypeToFromOrd(workupTypeByValue, ord.ReactionWorkup.ReactionWorkupType);
+
+export const { ordEntityToEntity: ordAtmosphereTypeToReaction, entityToOrdEntity: reactionAtmosphereTypeToOrd } =
+  generateEntityTypeToFromOrd(atmosphereTypeByValue, ord.PressureConditions.Atmosphere.AtmosphereType);
+
+export const {
+  ordEntityToEntity: ordTemperatureControlTypeToReaction,
+  entityToOrdEntity: reactionTemperatureControlTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  temperatureControlTypeByValue,
+  ord.TemperatureConditions.TemperatureControl.TemperatureControlType,
+);
+
+export const {
+  ordEntityToEntity: ordStirringMethodTypeToReaction,
+  entityToOrdEntity: reactionStirringMethodTypeToOrd,
+} = generateEntityTypeToFromOrd(stirringMethodTypeByValue, ord.StirringConditions.StirringMethodType);
+
+export const { ordEntityToEntity: ordIlluminationTypeToReaction, entityToOrdEntity: reactionIlluminationTypeToOrd } =
+  generateEntityTypeToFromOrd(illuminationTypeByValue, ord.IlluminationConditions.IlluminationType);
+
+export const { ordEntityToEntity: ordStirringRateTypeToReaction, entityToOrdEntity: reactionStirringRateTypeToOrd } =
+  generateEntityTypeToFromOrd(stirringRateTypeByValue, ord.StirringConditions.StirringRate.StirringRateType);
+
+export const {
+  ordEntityToEntity: ordElectrochemistryTypeToReaction,
+  entityToOrdEntity: reactionElectrochemistryTypeToOrd,
+} = generateEntityTypeToFromOrd(electrochemistryTypeByValue, ord.ElectrochemistryConditions.ElectrochemistryType);
+
+export const {
+  ordEntityToEntity: ordElectrochemistryCellTypeToReaction,
+  entityToOrdEntity: reactionElectrochemistryCellTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  electrochemistryCellTypeByValue,
+  ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType,
+);
+
+export const { ordEntityToEntity: ordFlowTypeToReaction, entityToOrdEntity: reactionFlowTypeToOrd } =
+  generateEntityTypeToFromOrd(flowTypeByValue, ord.FlowConditions.FlowType);
+
+export const { ordEntityToEntity: ordTubingTypeToReaction, entityToOrdEntity: reactionTubingTypeToOrd } =
+  generateEntityTypeToFromOrd(tubingTypeByValue, ord.FlowConditions.Tubing.TubingType);
+
+export const { ordEntityToEntity: ordCurrentTypeToReaction, entityToOrdEntity: reactionCurrentTypeToOrd } =
+  generateEntityTypeToFromOrd(currentTypeByValue, ord.Current.CurrentUnit);
