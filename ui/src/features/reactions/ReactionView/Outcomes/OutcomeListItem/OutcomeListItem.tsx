@@ -142,7 +142,6 @@ export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<
         {outcome.products.map((product, productIndex) => (
           <ComponentDisplayRow
             key={product.id}
-            reactionId={reactionId}
             component={product}
             renderDetails={renderDetails}
             componentPath={outcomePathComponents.concat(['products', productIndex])}
