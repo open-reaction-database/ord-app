@@ -21,7 +21,7 @@ import {
   reactionVesselTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 
-export const ordSetupToReactionSetup = (setup: ord.IReactionSetup): ReactionSetup => {
+export const ordSetupToReactionSetup = (setup: ord.IReactionSetup | null | undefined): ReactionSetup => {
   const base = {
     id: '',
     vessel: ordVesselTypeToReaction(setup?.vessel?.type),
