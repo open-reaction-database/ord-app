@@ -29,7 +29,7 @@ export const { options: preparationTypeOptions, byValue: preparationTypeByValue 
   ord.CompoundPreparation.CompoundPreparationType,
 );
 
-export const { options: timeTypeOptions, byValue: timeTypeByValue } = generateOptionsAndByValue(ord.Time.TimeUnit);
+export const { options: timeUnitOptions, byValue: timeUnitByValue } = generateOptionsAndByValue(ord.Time.TimeUnit);
 
 export const { options: additionDeviceTypeOptions, byValue: reactionAdditionDeviceByValue } = generateOptionsAndByValue(
   ord.ReactionInput.AdditionDevice.AdditionDeviceType,
@@ -51,7 +51,7 @@ export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } 
   ord.StirringConditions.StirringRate.StirringRateType,
 );
 
-export const { options: pressureOption, byValue: pressureByValue } = generateOptionsAndByValue(
+export const { options: pressureUnitOptions, byValue: pressureByValue } = generateOptionsAndByValue(
   ord.Pressure.PressureUnit,
 );
 
@@ -126,3 +126,17 @@ export const { options: tubingTypeOptions, byValue: tubingTypeByValue } = genera
 export const { options: workupTypeOptions, byValue: workupTypeByValue } = generateOptionsAndByValue(
   ord.ReactionWorkup.ReactionWorkupType,
 );
+
+export const { options: temperatureMeasurementTypeOptions, byValue: temperatureMeasurementTypeByValue } =
+  generateOptionsAndByValue(ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType);
+
+export const { options: pressureControlTypeOptions, byValue: pressureControlTypeByValue } = generateOptionsAndByValue(
+  ord.PressureConditions.PressureControl.PressureControlType,
+);
+
+export const { options: voltageUnitOptions, byValue: voltageUnitByValue } = generateOptionsAndByValue(
+  ord.Voltage.VoltageUnit,
+);
+
+export const { options: pressureMeasurementTypeOptions, byValue: pressureMeasurementTypeByValue } =
+  generateOptionsAndByValue(ord.PressureConditions.PressureMeasurement.PressureMeasurementType);

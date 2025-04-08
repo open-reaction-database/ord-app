@@ -30,6 +30,8 @@ import {
   type ReactionIdentifier,
   type ReactionCompoundIdentifier,
   type ReactionDateTime,
+  type Tubing,
+  type StirringRate,
   ReactionBoolean,
 } from './reactionEntity.types';
 import {
@@ -62,9 +64,23 @@ import {
   reactionWaveLengthTypeToOrd,
   reactionLengthTypeToOrd,
   reactionCurrentTypeToOrd,
+  ordTemperatureControlTypeToReaction,
+  reactionTemperatureControlTypeToOrd,
+  ordPressureControlTypeToReaction,
+  reactionPressureControlTypeToOrd,
+  ordAtmosphereTypeToReaction,
+  reactionAtmosphereTypeToOrd,
+  ordStirringRateTypeToReaction,
+  reactionStirringRateTypeToOrd,
+  ordVoltageUnitToReaction,
+  reactionVoltageUnitToOrd,
+  ordElectrochemistryCellTypeToReaction,
+  reactionElectrochemistryCellTypeToOrd,
+  ordTubingTypeToReaction,
+  reactionTubingTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
+import type { ElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -187,7 +203,7 @@ export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd 
   reactionWaveLengthTypeToOrd,
 );
 
-export const { fromOrd: ordDistanceToReaction, toOrd: reactionDistanceToOrd } = generateValuePrecisionUnitConverter(
+export const { fromOrd: ordLengthToReaction, toOrd: reactionLengthToOrd } = generateValuePrecisionUnitConverter(
   ordLengthTypeToReaction,
   reactionLengthTypeToOrd,
 );
@@ -196,6 +212,25 @@ export const { fromOrd: ordCurrentToReaction, toOrd: reactionCurrentToOrd } = ge
   ordCurrentTypeToReaction,
   reactionCurrentTypeToOrd,
 );
+
+export const { fromOrd: ordTemperatureControlToReaction, toOrd: reactionTemperatureControlToOrd } =
+  generateTypeDetailsConverter(ordTemperatureControlTypeToReaction, reactionTemperatureControlTypeToOrd);
+
+export const { fromOrd: ordPressureControlToReaction, toOrd: reactionPressureControlToOrd } =
+  generateTypeDetailsConverter(ordPressureControlTypeToReaction, reactionPressureControlTypeToOrd);
+
+export const { fromOrd: ordAtmosphereToReaction, toOrd: reactionAtmosphereToOrd } = generateTypeDetailsConverter(
+  ordAtmosphereTypeToReaction,
+  reactionAtmosphereTypeToOrd,
+);
+
+export const { fromOrd: ordVoltageToReaction, toOrd: reactionVoltageToOrd } = generateValuePrecisionUnitConverter(
+  ordVoltageUnitToReaction,
+  reactionVoltageUnitToOrd,
+);
+
+export const { fromOrd: ordElectrochemistryCellToReaction, toOrd: reactionElectrochemistryCellToOrd } =
+  generateTypeDetailsConverter(ordElectrochemistryCellTypeToReaction, reactionElectrochemistryCellTypeToOrd);
 
 export const ordReactionIdentifierToReaction = ({
   type,
@@ -258,9 +293,57 @@ export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): Rea
 export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
   dateTime ? { value: dateTime } : null;
 
+export const ordTubingToReaction = (tubing: OrdOptional<ord.FlowConditions.ITubing>): Tubing => {
+  const { type, details, diameter } = tubing || {};
+  return {
+    type: ordTubingTypeToReaction(type),
+    details,
+    diameter: ordLengthToReaction(diameter),
+  };
+};
+
+export const reactionTubingToOrd = ({ type, details, diameter }: Tubing): Optional<ord.FlowConditions.ITubing> => {
+  const diameterOrd = reactionLengthToOrd(diameter);
+  const typeOrd = reactionTubingTypeToOrd(type);
+
+  return diameterOrd || typeOrd !== 0 || details
+    ? {
+        type: typeOrd,
+        details,
+        diameter: diameterOrd,
+      }
+    : null;
+};
+
+export const ordStirringRateToReaction = (
+  stirringRate: OrdOptional<ord.StirringConditions.IStirringRate>,
+): StirringRate => {
+  const { type, details, rpm } = stirringRate || {};
+  return {
+    type: ordStirringRateTypeToReaction(type),
+    details,
+    rpm,
+  };
+};
+
+export const reactionStirringRateToOrd = ({
+  type,
+  details,
+  rpm,
+}: StirringRate): Optional<ord.StirringConditions.IStirringRate> => {
+  const ordType = reactionStirringRateTypeToOrd(type);
+  return ordType !== 0 || details || rpm
+    ? {
+        type: ordType,
+        details,
+        rpm,
+      }
+    : null;
+};
+
 export const convertElectrochemistryTypeToOrd = (
   type: ord.ElectrochemistryConditions.ElectrochemistryType | undefined | null,
-): ReactionElectrochemistryType => {
+): ElectrochemistryType => {
   return type !== undefined && type !== null
     ? ordElectrochemistryTypeToReaction(type)
     : ordElectrochemistryTypeToReaction(0);

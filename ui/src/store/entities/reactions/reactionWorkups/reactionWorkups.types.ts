@@ -18,11 +18,17 @@ import type { Optional, ReactionBoolean, ReactionTime, WithId } from '../reactio
 import type { WorkupType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ReactionInputWithoutName } from '../reactionsInputs/reactionInputs.types.ts';
 import type { ReactionAmount } from '../reactionAmount/reactionAmount.types.ts';
+import type {
+  ReactionStirringCondition,
+  ReactionTemperatureCondition,
+} from '../reactionConditions/reactionConditions.types.ts';
 
 export interface ReactionWorkup extends WithId<Pick<ord.IReactionWorkup, 'details' | 'keepPhase' | 'targetPh'>> {
   type: WorkupType;
   duration: ReactionTime;
   input: Optional<ReactionInputWithoutName>;
   amount: ReactionAmount;
+  temperature: ReactionTemperatureCondition;
+  stirring: ReactionStirringCondition;
   isAutomated: ReactionBoolean;
 }

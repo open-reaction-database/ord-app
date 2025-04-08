@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
-import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types.ts';
+import {
+  currentTypeOptions,
+  timeUnitOptions,
+  voltageUnitOptions,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
-export const reactionObservations: Array<ReactionFormNode> = [
+export const reactionElectrochemistryMeasurements: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.vpu,
     name: 'time',
+    select: 'native',
+    options: timeUnitOptions,
     wrapperConfig: {
       label: 'Time',
     },
-    options: timeUnitOptions,
   },
   {
-    type: ReactionFormNodeType.value,
-    name: 'comment',
-    inputType: 'string',
+    type: ReactionFormNodeType.vpu,
+    name: 'current',
+    select: 'native',
+    options: currentTypeOptions,
     wrapperConfig: {
-      label: 'Comment',
+      label: 'Current',
     },
   },
   {
-    type: ReactionFormNodeType.data,
-    fieldName: 'image.data',
-    nameFieldName: 'image.name',
-  },
-  {
-    type: ReactionFormNodeType.value,
-    inputType: 'textarea',
-    name: 'image.description',
+    type: ReactionFormNodeType.vpu,
+    name: 'voltage',
+    select: 'native',
+    options: voltageUnitOptions,
     wrapperConfig: {
-      label: 'Description',
+      label: 'Voltage',
     },
   },
 ];

@@ -72,8 +72,8 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           entity={conditions}
           requiredFields={[
             {
-              label: 'Setpoint:',
-              render: conditions => renderValuePrecisionUnit(conditions.temperature),
+              label: 'Setpoint',
+              render: ({ temperature }) => renderValuePrecisionUnit(temperature.setpoint),
             },
           ]}
         />
@@ -83,7 +83,7 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             {
               label: 'Setpoint',
-              render: conditions => renderValuePrecisionUnit(conditions.pressure),
+              render: ({ pressure }) => renderValuePrecisionUnit(pressure.setpoint),
             },
           ]}
         />

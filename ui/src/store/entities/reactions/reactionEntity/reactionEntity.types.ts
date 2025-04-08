@@ -28,6 +28,13 @@ import type {
   ReactionWaveLengthType,
   ReactionLengthType,
   ReactionCurrentType,
+  ReactionTemperatureControlType,
+  PressureControlType,
+  ReactionAtmosphereType,
+  StirringRateType,
+  VoltageUnit,
+  ElectrochemistryCellType,
+  TubingType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -116,3 +123,22 @@ export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIde
 }
 
 export type ReactionDateTime = string | null;
+
+export type TemperatureControl = ReactionTypeDetails<ReactionTemperatureControlType>;
+
+export type PressureControl = ReactionTypeDetails<PressureControlType>;
+
+export type ReactionAtmosphere = ReactionTypeDetails<ReactionAtmosphereType>;
+
+export interface StirringRate extends Pick<ord.StirringConditions.IStirringRate, 'details' | 'rpm'> {
+  type: StirringRateType;
+}
+
+export type Voltage = ReactionValuePrecisionUnit<VoltageUnit>;
+
+export type ElectrochemistryCell = ReactionTypeDetails<ElectrochemistryCellType>;
+
+export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
+  type: TubingType;
+  diameter: ReactionLength;
+}

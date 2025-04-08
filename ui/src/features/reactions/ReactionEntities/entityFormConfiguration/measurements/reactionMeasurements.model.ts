@@ -22,7 +22,7 @@ import {
   massSpecTypeOptions,
   measurementsTypeOptions,
   selectivityTypeOptions,
-  timeTypeOptions,
+  timeUnitOptions,
   waveLengthTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
@@ -126,7 +126,7 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
       label: 'Retention time',
     },
     select: 'segmented',
-    options: timeTypeOptions,
+    options: timeUnitOptions,
     condition: createCondition(retentionTimeCompatibleTypes),
   },
 

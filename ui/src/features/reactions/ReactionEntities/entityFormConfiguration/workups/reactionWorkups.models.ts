@@ -15,13 +15,14 @@
  */
 import { type ReactionFormNode, ReactionFormNodeType } from '../../reactionEntities.types.ts';
 import {
-  timeTypeOptions,
+  timeUnitOptions,
   workupTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { booleanOptions } from '../booleanOptions.ts';
 import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import { WorkupInput } from './WorkupInput.tsx';
+import { reactionStirringCondition, reactionTemperatureCondition } from '../reactionConditions.model.tsx';
 
 export const reactionWorkups: Array<ReactionFormNode> = [
   {
@@ -54,7 +55,7 @@ export const reactionWorkups: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.vpu,
     name: 'duration',
-    options: timeTypeOptions,
+    options: timeUnitOptions,
     wrapperConfig: {
       label: 'Duration',
     },
@@ -96,4 +97,6 @@ export const reactionWorkups: Array<ReactionFormNode> = [
     name: 'input',
     Component: WorkupInput,
   },
+  reactionTemperatureCondition,
+  reactionStirringCondition,
 ];

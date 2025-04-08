@@ -17,11 +17,14 @@ import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-export const buildUseSelectItems = (entityName: string) =>
+export const buildUseSelectItems = (entityPath: ReactionPathComponents | string) =>
   function useSelectItems() {
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
-    return useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+    const entityPathComponents: ReactionPathComponents = typeof entityPath === 'string' ? [entityPath] : entityPath;
+
+    return useSelector(selectReactionPartByPath(reactionId, pathComponents.concat(entityPathComponents)));
   };
 
 export const buildUseSelectItemsListFromMap = <T>(entityName: string, compareFn: (a: T, b: T) => number) =>

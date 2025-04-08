@@ -61,15 +61,24 @@ export type ReactionStirringMethodType = keyof typeof ord.StirringConditions.Sti
 
 export type ReactionIlluminationType = keyof typeof ord.IlluminationConditions.IlluminationType;
 
-export type ReactionStirringRateType = keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
+export type StirringRateType = keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
 
-export type ReactionElectrochemistryType = keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
+export type ElectrochemistryType = keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
 
-export type ReactionElectrochemistryCellType =
+export type ElectrochemistryCellType =
   keyof typeof ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType;
 
 export type ReactionFlowType = keyof typeof ord.FlowConditions.FlowType;
 
-export type ReactionTubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;
+export type TubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;
 
 export type WorkupType = keyof typeof ord.ReactionWorkup.ReactionWorkupType;
+
+export type PressureControlType = keyof typeof ord.PressureConditions.PressureControl.PressureControlType;
+
+export type VoltageUnit = keyof typeof ord.Voltage.VoltageUnit;
+
+export type TemperatureMeasurementType =
+  keyof typeof ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType;
+
+export type PressureMeasurementType = keyof typeof ord.PressureConditions.PressureMeasurement.PressureMeasurementType;

@@ -20,110 +20,91 @@ import type {
   ReactionPressure,
   ReactionWaveLength,
   ReactionLength,
-  OrdOptional,
   ReactionCurrent,
+  WithId,
+  TemperatureControl,
+  PressureControl,
+  ReactionAtmosphere,
+  StirringRate,
+  Voltage,
+  ElectrochemistryCell,
+  Tubing,
+  ReactionTime,
 } from '../reactionEntity/reactionEntity.types';
 import type {
-  ReactionTemperatureControlType,
-  ReactionAtmosphereType,
   ReactionStirringMethodType,
-  ReactionStirringRateType,
   ReactionIlluminationType,
-  ReactionElectrochemistryType,
-  ReactionElectrochemistryCellType,
+  ElectrochemistryType,
   ReactionFlowType,
-  ReactionTubingType,
+  TemperatureMeasurementType,
+  PressureMeasurementType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 
-interface BaseReactionCondition {
-  generalDetails: OrdOptional<string>;
-  id: string;
-  reflux: ReactionBoolean;
-  conditionsAreDynamic: ReactionBoolean;
+export interface TemperatureMeasurement
+  extends WithId<Pick<ord.TemperatureConditions.ITemperatureMeasurement, 'details'>> {
+  type: TemperatureMeasurementType;
+  time: ReactionTime;
+  temperature: ReactionTemperature;
+}
+
+export interface PressureMeasurement extends WithId<Pick<ord.PressureConditions.IPressureMeasurement, 'details'>> {
+  type: PressureMeasurementType;
+  time: ReactionTime;
+  pressure: ReactionPressure;
+}
+
+export interface ElectrochemistryMeasurement extends WithId<object> {
+  time: ReactionTime;
+  current: ReactionCurrent;
+  voltage: Voltage;
 }
 
 export interface ReactionTemperatureCondition {
-  temperature: ReactionTemperature;
-  temperatureControl: ReactionTemperatureControlType;
-  temperatureDetails: OrdOptional<string>;
+  control: TemperatureControl;
+  setpoint: ReactionTemperature;
+  temperatureMeasurements: Array<TemperatureMeasurement>;
 }
 
 export interface ReactionPressureCondition {
-  pressure: ReactionPressure;
-  pressureControlDetails: string;
-  atmosphere: ReactionAtmosphereType;
-  atmosphereDetails: OrdOptional<string>;
+  control: PressureControl;
+  setpoint: ReactionPressure;
+  atmosphere: ReactionAtmosphere;
+  pressureMeasurements: Array<PressureMeasurement>;
 }
 
-export interface ReactionStirringCondition {
-  stirringMethod: ReactionStirringMethodType;
-  stirringDetails: OrdOptional<string>;
-  rate: ReactionStirringRateType;
-  rateDetails: OrdOptional<string>;
-  rpm: OrdOptional<string>;
+export interface ReactionStirringCondition extends Pick<ord.IStirringConditions, 'details'> {
+  type: ReactionStirringMethodType;
+  rate: StirringRate;
 }
 
-export interface ReactionIlluminationCondition {
-  illuminationType: ReactionIlluminationType;
-  illuminationDetails: OrdOptional<string>;
+export interface ReactionIlluminationCondition extends Pick<ord.IIlluminationConditions, 'details' | 'color'> {
+  type: ReactionIlluminationType;
   peakWavelength: ReactionWaveLength;
-  color: OrdOptional<string>;
   distanceToVessel: ReactionLength;
 }
 
-export interface ReactionElectrochemistryCondition {
-  electrochemistryType: ReactionElectrochemistryType;
-  electrochemistryDetails: OrdOptional<string>;
+export interface ReactionElectrochemistryCondition
+  extends Pick<ord.IElectrochemistryConditions, 'details' | 'anodeMaterial' | 'cathodeMaterial'> {
+  type: ElectrochemistryType;
   current: ReactionCurrent;
-  anode: OrdOptional<string>;
-  cathode: OrdOptional<string>;
-  separation: ReactionLength;
-  cell: ReactionElectrochemistryCellType;
-  separationDetails: OrdOptional<string>;
+  voltage: Voltage;
+  electrodeSeparation: ReactionLength;
+  cell: ElectrochemistryCell;
+  electrochemistryMeasurements: Array<ElectrochemistryMeasurement>;
 }
 
-export interface ReactionFlowCondition {
-  flowType: ReactionFlowType;
-  flowDetails: OrdOptional<string>;
-  pumpType: OrdOptional<string>;
-  tubing: ReactionTubingType;
-  tubingDetails: OrdOptional<string>;
-  diameter: ReactionLength;
+export interface ReactionFlowCondition extends Pick<ord.IFlowConditions, 'details' | 'pumpType'> {
+  type: ReactionFlowType;
+  tubing: Tubing;
 }
 
-type DetailsFields = {
-  temperatureDetails: OrdOptional<string>;
-  pressureControlDetails: OrdOptional<string>;
-  atmosphereDetails: OrdOptional<string>;
-  stirringDetails: OrdOptional<string>;
-  rateDetails: OrdOptional<string>;
-  illuminationDetails: OrdOptional<string>;
-  electrochemistryDetails: OrdOptional<string>;
-  separationDetails: OrdOptional<string>;
-  flowDetails: OrdOptional<string>;
-  tubingDetails: OrdOptional<string>;
-};
-
-export type ReactionConditions = Omit<
-  ord.IReactionConditions,
-  | 'reflux'
-  | 'conditionsAreDynamic'
-  | 'temperature'
-  | 'pressure'
-  | 'stirring'
-  | 'illumination'
-  | 'electrochemistry'
-  | 'flow'
-  | 'details'
-> &
-  BaseReactionCondition &
-  Pick<ReactionTemperatureCondition, 'temperature' | 'temperatureControl'> &
-  Pick<ReactionPressureCondition, 'pressure' | 'atmosphere'> &
-  Pick<ReactionStirringCondition, 'stirringMethod' | 'rate' | 'rpm'> &
-  Pick<ReactionIlluminationCondition, 'illuminationType' | 'peakWavelength' | 'color' | 'distanceToVessel'> &
-  Pick<
-    ReactionElectrochemistryCondition,
-    'electrochemistryType' | 'current' | 'anode' | 'cathode' | 'separation' | 'cell'
-  > &
-  Pick<ReactionFlowCondition, 'flowType' | 'pumpType' | 'tubing' | 'diameter'> &
-  DetailsFields;
+export interface ReactionConditions extends WithId<Pick<ord.IReactionConditions, 'details' | 'ph'>> {
+  temperature: ReactionTemperatureCondition;
+  pressure: ReactionPressureCondition;
+  stirring: ReactionStirringCondition;
+  illumination: ReactionIlluminationCondition;
+  electrochemistry: ReactionElectrochemistryCondition;
+  flow: ReactionFlowCondition;
+  reflux: ReactionBoolean;
+  conditionsAreDynamic: ReactionBoolean;
+}

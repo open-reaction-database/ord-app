@@ -13,37 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
-import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+import { type ReactionFormNode, ReactionFormNodeType } from '../../reactionEntities.types.ts';
+import {
+  pressureMeasurementTypeOptions,
+  pressureUnitOptions,
+  timeUnitOptions,
+} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
-export const reactionObservations: Array<ReactionFormNode> = [
+export const reactionPressureMeasurements: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.select,
+    name: 'type',
+    options: pressureMeasurementTypeOptions,
+    selectType: 'dropdown',
+    wrapperConfig: {
+      label: 'Type',
+    },
+  },
   {
     type: ReactionFormNodeType.vpu,
     name: 'time',
+    select: 'native',
+    options: timeUnitOptions,
     wrapperConfig: {
       label: 'Time',
     },
-    options: timeUnitOptions,
   },
   {
-    type: ReactionFormNodeType.value,
-    name: 'comment',
-    inputType: 'string',
+    type: ReactionFormNodeType.vpu,
+    name: 'pressure',
+    select: 'native',
+    options: pressureUnitOptions,
     wrapperConfig: {
-      label: 'Comment',
+      label: 'Pressure',
     },
   },
   {
-    type: ReactionFormNodeType.data,
-    fieldName: 'image.data',
-    nameFieldName: 'image.name',
-  },
-  {
     type: ReactionFormNodeType.value,
+    name: 'details',
     inputType: 'textarea',
-    name: 'image.description',
     wrapperConfig: {
-      label: 'Description',
+      label: 'Details',
     },
   },
 ];

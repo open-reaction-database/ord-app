@@ -24,7 +24,7 @@ import {
   additionSpeedTypeOptions,
   flowRateOptions,
   temperatureOptions,
-  timeTypeOptions,
+  timeUnitOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
@@ -141,7 +141,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
           label: 'Time',
           hint: 'Addition time is relative to when the first input was added',
         },
-        options: timeTypeOptions,
+        options: timeUnitOptions,
       },
       {
         type: ReactionFormNodeType.vpu,
@@ -150,7 +150,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
           label: 'Duration',
           hint: 'Addition duration quantifies how long it took to add the input',
         },
-        options: timeTypeOptions,
+        options: timeUnitOptions,
       },
       {
         type: ReactionFormNodeType.vpu,

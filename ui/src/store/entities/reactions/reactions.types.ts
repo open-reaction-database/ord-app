@@ -44,6 +44,9 @@ export enum ReactionNodeEntity {
   Provenance = 'provenance',
   RecordModified = 'recordModified',
   Conditions = 'conditions',
+  TemperatureMeasurements = 'temperatureMeasurements',
+  ElectrochemistryMeasurements = 'electrochemistryMeasurements',
+  PressureMeasurements = 'pressureMeasurements',
   Workups = 'workups',
 }
 

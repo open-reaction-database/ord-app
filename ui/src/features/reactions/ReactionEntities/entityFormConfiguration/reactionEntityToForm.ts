@@ -32,6 +32,9 @@ import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts'
 import { reactionObservations } from './reactionObservations.model.tsx';
 import { reactionConditions } from './reactionConditions.model.tsx';
 import { reactionWorkups } from './workups/reactionWorkups.models.ts';
+import { reactionTemperatureMeasurements } from './conditionsMeasurements/reactionTemperatureMeasurements.models.ts';
+import { reactionElectrochemistryMeasurements } from './conditionsMeasurements/reactionElectrochemistryMeasurements.ts';
+import { reactionPressureMeasurements } from './conditionsMeasurements/reactionPressureMeasurements.model.ts';
 
 export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
   [ReactionNodeEntity.Inputs]: reactionInputs,
@@ -52,4 +55,7 @@ export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionForm
   [ReactionNodeEntity.RecordModified]: recordModified,
   [ReactionNodeEntity.Conditions]: reactionConditions,
   [ReactionNodeEntity.Workups]: reactionWorkups,
+  [ReactionNodeEntity.TemperatureMeasurements]: reactionTemperatureMeasurements,
+  [ReactionNodeEntity.ElectrochemistryMeasurements]: reactionElectrochemistryMeasurements,
+  [ReactionNodeEntity.PressureMeasurements]: reactionPressureMeasurements,
 };

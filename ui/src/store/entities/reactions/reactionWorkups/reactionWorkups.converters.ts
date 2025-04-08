@@ -32,12 +32,20 @@ import {
   ordInputToReactionInputWithoutName,
   reactionInputWithoutNameToOrd,
 } from '../reactionsInputs/reactionsInputs.converters.ts';
+import {
+  ordStirringConditionToReaction,
+  ordTemperatureConditionToReaction,
+  reactionStirringConditionToOrd,
+  reactionTemperatureConditionToOrd,
+} from '../reactionConditions/reactionConditions.converter.ts';
 
 export const ordWorkupToReaction = ({
   type,
   duration,
   amount,
   input,
+  temperature,
+  stirring,
   isAutomated,
   ...workup
 }: ord.IReactionWorkup): ReactionWorkup =>
@@ -46,6 +54,8 @@ export const ordWorkupToReaction = ({
     duration: ordTimeToReaction(duration),
     amount: ordAmountToReaction(amount),
     input: input ? ordInputToReactionInputWithoutName(input) : null,
+    temperature: ordTemperatureConditionToReaction(temperature),
+    stirring: ordStirringConditionToReaction(stirring),
     isAutomated: ordBooleanToReaction(isAutomated),
     ...workup,
   });
@@ -55,6 +65,8 @@ export const reactionWorkupToOrd = ({
   duration,
   amount,
   input,
+  temperature,
+  stirring,
   isAutomated,
   ...workup
 }: ReactionWorkup): ord.IReactionWorkup =>
@@ -63,6 +75,8 @@ export const reactionWorkupToOrd = ({
     duration: reactionTimeToOrd(duration),
     amount: reactionAmountToOrd(amount),
     input: input ? reactionInputWithoutNameToOrd(input) : null,
+    temperature: reactionTemperatureConditionToOrd(temperature),
+    stirring: reactionStirringConditionToOrd(stirring),
     isAutomated: reactionBooleanToOrd(isAutomated),
     ...workup,
   });

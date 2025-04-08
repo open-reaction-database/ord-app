@@ -60,7 +60,7 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
     {
       type: ReactionFormNodeType.value,
       name: 'chmoId',
-      inputType: 'string',
+      inputType: 'number',
       wrapperConfig: {
         label: 'Chmo ID',
       },
