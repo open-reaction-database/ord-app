@@ -203,7 +203,7 @@ function ordComponentBaseToReaction({
   identifiers,
   features,
 }: OrdComponentBase): ReactionComponentBase {
-  const reactionIdentifiers = (identifiers || []).map(ordCompoundIdentifierToReaction);
+  const reactionIdentifiers = (identifiers ?? []).map(ordCompoundIdentifierToReaction);
 
   const { nonMolBlockIdentifiers, molBlockIdentifiers } = reactionIdentifiers.reduce(
     ({ nonMolBlockIdentifiers, molBlockIdentifiers }, item) => {
@@ -221,7 +221,7 @@ function ordComponentBaseToReaction({
     texture: ordTextureToReaction(texture),
     identifiers: nonMolBlockIdentifiers,
     molBlockIdentifiers: molBlockIdentifiers,
-    features: ordDataMapToReactionDataMap(features || {}),
+    features: ordDataMapToReactionDataMap(features ?? {}),
   });
 }
 
@@ -248,7 +248,7 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
     ...ordComponentBaseToReaction(inputComponent),
     isLimiting: ordBooleanToReaction(isLimiting),
     source,
-    preparations: (preparations || []).map(ordPreparationToReactionPreparation),
+    preparations: (preparations ?? []).map(ordPreparationToReactionPreparation),
     amount: ordAmountToReaction(amount),
   };
 }
@@ -272,7 +272,7 @@ export function ordProductToReaction(product: ord.IProductCompound): ReactionPro
     ...ordComponentBaseToReaction(product),
     isDesiredProduct: ordBooleanToReaction(isDesiredProduct),
     isolatedColor,
-    measurements: (measurements || []).map(ordMeasurementToReaction),
+    measurements: (measurements ?? []).map(ordMeasurementToReaction),
   };
 }
 

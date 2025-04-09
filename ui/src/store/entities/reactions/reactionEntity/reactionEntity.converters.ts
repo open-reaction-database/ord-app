@@ -303,7 +303,7 @@ export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.
   dateTime ? { value: dateTime } : null;
 
 export const ordTubingToReaction = (tubing: OrdOptional<ord.FlowConditions.ITubing>): Tubing => {
-  const { type, details, diameter } = tubing || {};
+  const { type, details, diameter } = tubing ?? {};
   return {
     type: ordTubingTypeToReaction(type),
     details,
@@ -327,7 +327,7 @@ export const reactionTubingToOrd = ({ type, details, diameter }: Tubing): Option
 export const ordStirringRateToReaction = (
   stirringRate: OrdOptional<ord.StirringConditions.IStirringRate>,
 ): StirringRate => {
-  const { type, details, rpm } = stirringRate || {};
+  const { type, details, rpm } = stirringRate ?? {};
   return {
     type: ordStirringRateTypeToReaction(type),
     details,

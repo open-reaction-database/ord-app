@@ -41,7 +41,7 @@ const amountOptions: Array<['moles' | 'mass' | 'volume', Record<number, Reaction
 ];
 
 export function ordAmountToReaction(ordAmount?: ord.IAmount | null): ReactionAmount {
-  const requiredOrdAmount = ordAmount || ({} as ord.IAmount);
+  const requiredOrdAmount = ordAmount ?? ({} as ord.IAmount);
   const volumeIncludesSolutes = ordBooleanToReaction(requiredOrdAmount.volumeIncludesSolutes);
 
   const result = amountOptions.reduce((acc: ReactionAmount | null, [key, unitsByValue]) => {
