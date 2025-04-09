@@ -115,8 +115,8 @@ export function CustomIdentifiers() {
         <Grid>
           <Grid.Col span={6}>
             <PaperButton
-              title="Look up Name"
-              description="In open databases"
+              title="Add Identifier"
+              description="Via Look up Name"
               icon={<SearchIcon />}
               color={colorToCssVariable['orange']}
               onClick={openAddCustomIdentifier}
@@ -124,7 +124,7 @@ export function CustomIdentifiers() {
           </Grid.Col>
           <Grid.Col span={6}>
             <PaperButton
-              title="Draw Component"
+              title="Add Molblock Identifier"
               description="Via Ketcher"
               icon={<StylusNoteIcon />}
               color={colorToCssVariable['green']}

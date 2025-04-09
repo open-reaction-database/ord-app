@@ -30,7 +30,10 @@ import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts'
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
-import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
+import type {
+  ReactionConditions,
+  ReactionTemperatureCondition,
+} from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
 
 const withoutMeasurements = <T extends object>(object: T, name: keyof T): Omit<T, typeof name> => {
   const { [name]: _, ...rest } = object;
@@ -310,10 +313,14 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
         'Workup steps refer to any additions, purifications, or other operations after the ‘reaction’ stage prior to analysis',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues(({ input: _, temperature, ...rest }: ReactionWorkup) => ({
-      ...rest,
-      temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
-    })),
+    useInitialValues: buildUseInitialValues(
+      ({ input: _, temperature, ...rest }: ReactionWorkup): Partial<ReactionWorkup> => ({
+        ...rest,
+        temperature: temperature
+          ? (withoutMeasurements(temperature, 'temperatureMeasurements') as ReactionTemperatureCondition)
+          : temperature,
+      }),
+    ),
   },
   ...componentsSidebars,
 ];
