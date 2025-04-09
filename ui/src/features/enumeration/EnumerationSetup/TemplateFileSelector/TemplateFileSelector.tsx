@@ -29,6 +29,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
 import { DownloadIcon } from 'common/icons';
 import type { CastingContext } from 'csv-parse';
+import { NUMBER_REGEX } from 'common/constants.ts';
 
 interface TemplateFileSelectorProps {
   templateDisabled: boolean;
@@ -43,13 +44,13 @@ function cast(value: string, context: CastingContext): string | number | boolean
   if (['true', 'false'].includes(lowerCaseValue)) {
     return lowerCaseValue === 'true';
   }
-  if (value.includes(',')) {
-    return value;
+  if (NUMBER_REGEX.test(value)) {
+    const parsedValue = parseFloat(value);
+    if (!Number.isNaN(parsedValue)) {
+      return parsedValue;
+    }
   }
-  const parsedValue = parseFloat(value);
-  if (!Number.isNaN(parsedValue)) {
-    return parsedValue;
-  }
+
   return value;
 }
 
@@ -124,6 +125,7 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
         const delimiter = guessDelimiter(newValue);
         const [headers] = parse(newValue, { delimiter });
         const content = parse(newValue, { delimiter, cast: cast, columns: true });
+        console.info(content);
         form.setFieldValue('templateCSV', {
           headers,
           content,

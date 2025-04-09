@@ -21,7 +21,7 @@ import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon, EditIcon }
 import { useCallback, useContext, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation, useRouter } from 'wouter';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
+import { fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
@@ -33,6 +33,7 @@ import { ReactionValidationResult } from 'features/reactions/ReactionHeader/Reac
 import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
 import classes from 'common/components/ReactionCard/reactionCard.module.scss';
 import { reactionContext } from '../reactions.context.ts';
+import { domain } from 'common/configuration.constants.ts';
 
 interface ReactionHeaderProps {
   datasetId: number;
