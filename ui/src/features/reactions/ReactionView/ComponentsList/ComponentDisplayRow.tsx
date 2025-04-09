@@ -24,8 +24,8 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
   componentPath,
   renderDetails,
   gridClassName,
+  historyPathComponents,
 }: Readonly<ComponentDisplayRowProps<T>>) {
-  const previousEntityPath = componentPath.slice(0, 2);
   const { ViewDeleteButtonsComponent } = useContext(reactionContext);
 
   return (
@@ -37,7 +37,7 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
         <ViewDeleteButtonsComponent
           entityName="Component"
           pathComponents={componentPath}
-          historyPathComponents={[previousEntityPath]}
+          historyPathComponents={historyPathComponents}
         />
       }
     />

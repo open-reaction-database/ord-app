@@ -23,6 +23,11 @@ import { booleanOptions } from '../booleanOptions.ts';
 import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import { WorkupInput } from './WorkupInput.tsx';
 import { reactionStirringCondition, reactionTemperatureCondition } from '../reactionConditions.model.tsx';
+import { createConditionFactory } from '../../reactionEntities.utils.ts';
+import type { WorkupType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
+
+const createCondition = createConditionFactory<WorkupType>();
 
 export const reactionWorkups: Array<ReactionFormNode> = [
   {
@@ -42,6 +47,7 @@ export const reactionWorkups: Array<ReactionFormNode> = [
       wrapperConfig: {
         label: 'Keep phase',
       },
+      condition: createCondition(WorkupConstants.keepPhaseCompatibleTypes),
     },
     {
       type: ReactionFormNodeType.value,
@@ -50,6 +56,7 @@ export const reactionWorkups: Array<ReactionFormNode> = [
       wrapperConfig: {
         label: 'Target PH',
       },
+      condition: createCondition(WorkupConstants.targetPhCompatibleTypes),
     },
   ),
   {
@@ -59,6 +66,7 @@ export const reactionWorkups: Array<ReactionFormNode> = [
     wrapperConfig: {
       label: 'Duration',
     },
+    condition: createCondition(WorkupConstants.durationCompatibleTypes),
   },
   {
     type: ReactionFormNodeType.wrapper,
@@ -91,12 +99,14 @@ export const reactionWorkups: Array<ReactionFormNode> = [
     wrapperConfig: {
       label: 'Aliquot amount',
     },
+    condition: createCondition(WorkupConstants.aliquotCompatibleTypes),
   },
   {
     type: ReactionFormNodeType.custom,
     name: 'input',
     Component: WorkupInput,
+    condition: createCondition(WorkupConstants.inputCompatibleTypes),
   },
-  reactionTemperatureCondition,
-  reactionStirringCondition,
+  { ...reactionTemperatureCondition, condition: createCondition(WorkupConstants.temperatureCompatibleTypes) },
+  { ...reactionStirringCondition, condition: createCondition(WorkupConstants.stirringCompatibleTypes) },
 ];

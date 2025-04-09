@@ -27,6 +27,7 @@ interface ComponentsListHeaderProps {
 
 interface ComponentsListProps<T extends ReactionComponentBase> extends ComponentsListHeaderProps {
   rootPathComponents: ReactionPathComponents;
+  onlyOpenOneSidebar?: boolean;
   components: Array<T>;
   entityName: string;
   renderDetails: (component: T) => ReactNode;
@@ -70,6 +71,7 @@ export function ComponentsList<T extends ReactionComponentBase>({
   detailsHeader,
   renderDetails,
   entityName,
+  onlyOpenOneSidebar,
 }: Readonly<ComponentsListProps<T>>) {
   return (
     <>
@@ -78,6 +80,7 @@ export function ComponentsList<T extends ReactionComponentBase>({
         <ComponentDisplayRow
           key={component.id}
           componentPath={[...rootPathComponents, entityName, index]}
+          historyPathComponents={onlyOpenOneSidebar ? undefined : [rootPathComponents]}
           renderDetails={renderDetails}
           component={component}
         />

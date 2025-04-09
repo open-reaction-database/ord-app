@@ -73,7 +73,9 @@ export function reactionAmountToOrd(amount: ReactionAmount): ord.IAmount | null 
   if (amount.units === appAmountUnspecified) {
     return null;
   }
-  const volumeIncludesSolutes = reactionBooleanToOrd(amount.volumeIncludesSolutes);
+  const volumeIncludesSolutes = volumeUnitNames.includes(amount.units)
+    ? reactionBooleanToOrd(amount.volumeIncludesSolutes)
+    : null;
   const ordAmountValue = {
     value: amount.value,
     precision: amount.precision,

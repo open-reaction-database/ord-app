@@ -62,6 +62,7 @@ import type {
   Optional,
   ReactionCompoundIdentifier,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { measurementTransform } from '../reactionsMeasurement/reactionMeasurements.transform.ts';
 
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
 
@@ -164,33 +165,37 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
   });
 };
 
-const reactionMeasurementToOrd = ({
-  type,
-  details,
-  value,
-  analysis,
-  isNormalized,
-  usesInternalStandard,
-  usesAuthenticStandard,
-  retentionTime,
-  selectivity,
-  waveLength,
-  massSpecDetails,
-  authenticStandard,
-}: ReactionMeasurement): ord.IProductMeasurement => ({
-  type: reactionMeasurementTypeToOrd(type),
-  details,
-  analysisKey: analysis?.name,
-  isNormalized: reactionBooleanToOrd(isNormalized),
-  usesInternalStandard: reactionBooleanToOrd(usesInternalStandard),
-  usesAuthenticStandard: reactionBooleanToOrd(usesAuthenticStandard),
-  retentionTime: retentionTime ? reactionTimeToOrd(retentionTime) : null,
-  selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : null,
-  wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : null,
-  massSpecDetails: massSpecDetails ? reactionMassSpecToOrd(massSpecDetails) : null,
-  authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
-  ...(value ? reactionMeasurementValueToOrd(value) : {}),
-});
+const reactionMeasurementToOrd = (measurement: ReactionMeasurement): ord.IProductMeasurement => {
+  const {
+    type,
+    details,
+    value,
+    analysis,
+    isNormalized,
+    usesInternalStandard,
+    usesAuthenticStandard,
+    retentionTime,
+    selectivity,
+    waveLength,
+    massSpecDetails,
+    authenticStandard,
+  } = measurementTransform(measurement);
+
+  return {
+    type: reactionMeasurementTypeToOrd(type),
+    details,
+    analysisKey: analysis?.name,
+    isNormalized: reactionBooleanToOrd(isNormalized),
+    usesInternalStandard: reactionBooleanToOrd(usesInternalStandard),
+    usesAuthenticStandard: reactionBooleanToOrd(usesAuthenticStandard),
+    retentionTime: retentionTime ? reactionTimeToOrd(retentionTime) : null,
+    selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : null,
+    wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : null,
+    massSpecDetails: massSpecDetails ? reactionMassSpecToOrd(massSpecDetails) : null,
+    authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
+    ...(value ? reactionMeasurementValueToOrd(value) : {}),
+  };
+};
 
 function ordComponentBaseToReaction({
   reactionRole,
@@ -249,10 +254,12 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
 }
 
 export function reactionInputComponentToOrd(inputComponent: ReactionInputComponent): ord.ICompound {
-  const { amount, preparations, isLimiting, source } = inputComponent;
+  const { amount, preparations, source } = inputComponent;
+  const isLimiting =
+    inputComponent.reactionRole === 'REACTANT' ? reactionBooleanToOrd(inputComponent.isLimiting) : null;
   return {
     ...reactionComponentBaseToOrd(inputComponent),
-    isLimiting: reactionBooleanToOrd(isLimiting),
+    isLimiting,
     source,
     preparations: preparations.map(reactionPreparationToOrdPreparation),
     amount: reactionAmountToOrd(amount),

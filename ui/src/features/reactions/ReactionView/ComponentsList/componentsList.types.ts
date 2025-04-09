@@ -27,4 +27,5 @@ export interface ComponentsDisplayRowCustomActions<T extends ReactionComponentBa
 export interface ComponentDisplayRowProps<T extends ReactionComponentBase>
   extends Omit<ComponentsDisplayRowCustomActions<T>, 'actions'> {
   componentPath: ReactionPathComponents;
+  historyPathComponents?: Array<ReactionPathComponents>;
 }

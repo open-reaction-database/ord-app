@@ -15,27 +15,29 @@
  */
 import type { ReactionMeasurementType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 
-export const retentionTimeCompatibleTypes: Array<ReactionMeasurementType> = [
-  'CUSTOM',
-  'IDENTITY',
-  'AREA',
-  'COUNTS',
-  'INTENSITY',
-];
+export namespace MeasurementConstants {
+  export const retentionTimeCompatibleTypes: Array<ReactionMeasurementType> = [
+    'CUSTOM',
+    'IDENTITY',
+    'AREA',
+    'COUNTS',
+    'INTENSITY',
+  ];
 
-export const selectivityCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'SELECTIVITY'];
+  export const selectivityCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'SELECTIVITY'];
 
-export const waveLengthCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'PURITY', 'AREA', 'INTENSITY'];
+  export const waveLengthCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'PURITY', 'AREA', 'INTENSITY'];
 
-export const massSpecCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'AREA', 'COUNTS', 'INTENSITY'];
+  export const massSpecCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'AREA', 'COUNTS', 'INTENSITY'];
 
-export const valueCompatibleTypes: Array<ReactionMeasurementType> = [
-  'CUSTOM',
-  'YIELD',
-  'SELECTIVITY',
-  'PURITY',
-  'AREA',
-  'COUNTS',
-  'INTENSITY',
-  'AMOUNT',
-];
+  export const valueCompatibleTypes: Array<ReactionMeasurementType> = [
+    'CUSTOM',
+    'YIELD',
+    'SELECTIVITY',
+    'PURITY',
+    'AREA',
+    'COUNTS',
+    'INTENSITY',
+    'AMOUNT',
+  ];
+}

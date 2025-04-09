@@ -145,6 +145,7 @@ export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<
             component={product}
             renderDetails={renderDetails}
             componentPath={outcomePathComponents.concat(['products', productIndex])}
+            historyPathComponents={[outcomePathComponents]}
           />
         ))}
       </Accordion.Panel>

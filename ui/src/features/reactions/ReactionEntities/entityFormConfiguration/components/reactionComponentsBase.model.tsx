@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import {
-  ReactionFormNodeType,
   type ReactionFormNode,
+  ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import {
   buildUseSelectItems,
@@ -35,6 +35,13 @@ import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reacti
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { textureTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { ComponentPreview } from './ComponentPreview/ComponentPreview.tsx';
+
+export const componentPreview: ReactionFormNode = {
+  type: ReactionFormNodeType.custom,
+  name: '',
+  Component: ComponentPreview,
+};
 
 export const molBlockIdentifiers: ReactionFormNode = {
   type: ReactionFormNodeType.custom,

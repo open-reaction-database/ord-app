@@ -137,7 +137,12 @@ const generateValuePrecisionUnitConverter = <T extends string>(
       units: typeFromOrd(units),
     };
   },
-  toOrd: ({ units, ...rest }: ReactionValuePrecisionUnit<T>): Optional<OrdValuePrecisionUnit> => {
+  toOrd: (vpu: Optional<ReactionValuePrecisionUnit<T>>): Optional<OrdValuePrecisionUnit> => {
+    if (!vpu) {
+      return null;
+    }
+    const { units, ...rest } = vpu;
+
     const unitsOrd = typeToOrd(units);
     const isDefault = unitsOrd === 0 && Object.values(rest).every(value => value === null);
     return isDefault ? null : { units: unitsOrd, ...rest };
@@ -155,7 +160,11 @@ const generateTypeDetailsConverter = <T extends string>(
       details: details ?? null,
     };
   },
-  toOrd: ({ type, details }: ReactionTypeDetails<T>): Optional<OrdTypeDetails> => {
+  toOrd: (typeDetails: Optional<ReactionTypeDetails<T>>): Optional<OrdTypeDetails> => {
+    if (!typeDetails) {
+      return null;
+    }
+    const { type, details } = typeDetails;
     const typeOrd = typeToOrd(type);
     const isDefault = typeOrd === 0 && (details === null || details === '');
     return isDefault ? null : { type: typeOrd, details: details };

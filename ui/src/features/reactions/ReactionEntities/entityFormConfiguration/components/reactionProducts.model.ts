@@ -24,6 +24,7 @@ import {
 import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 import {
+  componentPreview,
   featuresList,
   identifiersList,
   molBlockIdentifiers,
@@ -37,6 +38,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { ordMeasurementToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export const reactionProducts: Array<ReactionFormNode> = [
+  componentPreview,
   {
     type: ReactionFormNodeType.wrapper,
     grid: 2,

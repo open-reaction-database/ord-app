@@ -15,7 +15,7 @@
  */
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
-import { Button, Flex, Title } from '@mantine/core';
+import { Accordion, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
@@ -25,15 +25,50 @@ import { ord } from 'ord-schema-protobufjs';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
+import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
+import type { FieldConfiguration } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit.ts';
+import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
+import { InputComponentsListItem } from '../Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
 
 const ENTITY_FIELD = 'workups';
 
+const workupRequiredFields: Array<FieldConfiguration<ReactionWorkup>> = [{ label: 'Type', render: item => item.type }];
+
+const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
+  {
+    label: 'Keep Phase',
+    render: item => (WorkupConstants.keepPhaseCompatibleTypes.includes(item.type) ? item.keepPhase : ''),
+  },
+  {
+    label: 'Target PH',
+    render: item => (WorkupConstants.targetPhCompatibleTypes.includes(item.type) ? item.targetPh : ''),
+  },
+
+  {
+    label: 'Duration',
+    render: item =>
+      WorkupConstants.durationCompatibleTypes.includes(item.type) && item.duration
+        ? renderValuePrecisionUnit(item.duration)
+        : '',
+  },
+  { label: 'Automated', render: item => (item.isAutomated === ReactionBoolean.Unspecified ? '' : item.isAutomated) },
+  { label: 'Details', render: item => item.details },
+  {
+    label: 'Aliqout Amount',
+    render: item =>
+      WorkupConstants.aliquotCompatibleTypes.includes(item.type) && item.amount
+        ? renderValuePrecisionUnit(item.amount)
+        : '',
+  },
+];
+
 export function Workups() {
   const dispatch = useAppDispatch();
-  const { isViewOnly, reactionId } = useContext(reactionContext);
+  const { isViewOnly, reactionId, ViewDeleteButtonsComponent } = useContext(reactionContext);
   const workups: Array<ReactionWorkup> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
 
   const onWorkupCreate = () => {
@@ -75,14 +110,38 @@ export function Workups() {
         gap="sm"
       >
         {workups.map((workup, index) => (
-          <EntityListItem
+          <Flex
+            direction="column"
             key={workup.id}
-            entityField={ENTITY_FIELD}
-            title="Workup"
-            requiredFields={[]}
-            entityKey={index}
-            entity={workup}
-          />
+          >
+            <Flex align="center">
+              <Title order={3}>Workup {index + 1}</Title>
+              <ViewDeleteButtonsComponent
+                entityName="Workup"
+                pathComponents={[ENTITY_FIELD, index]}
+              />
+            </Flex>
+            <RequiredOptionalFields
+              entity={workup}
+              requiredFields={workupRequiredFields}
+              optionalFields={workupOptionalFields}
+            />
+            {WorkupConstants.inputCompatibleTypes.includes(workup.type) && workup.input && (
+              <Accordion
+                variant="separated"
+                chevronPosition="left"
+                multiple={true}
+                defaultValue={[workup.input.id]}
+              >
+                <InputComponentsListItem
+                  input={workup.input}
+                  name="Input"
+                  pathComponents={[ENTITY_FIELD, index, 'input']}
+                  historyPathComponents={[[ENTITY_FIELD, index]]}
+                />
+              </Accordion>
+            )}
+          </Flex>
         ))}
       </Flex>
     </Flex>
