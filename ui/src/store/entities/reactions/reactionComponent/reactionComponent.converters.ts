@@ -30,7 +30,6 @@ import {
   reactionTimeToOrd,
   reactionWaveLengthToOrd,
   withId,
-  withoutId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   ordMeasurementTypeToReaction,
@@ -78,12 +77,14 @@ const ordPreparationToReactionPreparation = ({
 
 const reactionPreparationToOrdPreparation = ({
   type,
-  ...rest
+  details,
+  reactionId,
 }: ReactionComponentPreparation): ord.ICompoundPreparation => {
-  return withoutId({
+  return {
     type: reactionPreparationTypeToOrd(type),
-    ...rest,
-  });
+    details,
+    reactionId: type === 'SYNTHESIZED' ? reactionId : null,
+  };
 };
 
 const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Optional<ReactionMeasurementValue> => {
