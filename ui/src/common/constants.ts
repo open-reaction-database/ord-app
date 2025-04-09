@@ -30,4 +30,4 @@ export const DATE_FORMAT = 'YYYY-MM-DD';
 
 export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-export const NUMBER_REGEX = /^[0-9]+(?:[.,][0-9]+)?$/;
+export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
