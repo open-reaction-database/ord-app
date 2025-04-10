@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+@use 'sass:math';
+
+$arrow-height: 24px;
+$arrow-width: 120px;
+$wrapper-height: 240px;
+$line-clamp: 4;
+
 .wrapper {
   display: flex;
   gap: var(--mantine-spacing-sm);
   overflow: auto hidden;
   align-items: center;
   padding-bottom: var(--mantine-spacing-md);
-  min-height: 240px;
+  min-height: $wrapper-height;
 }
 
 .inputCard {
@@ -65,9 +73,26 @@
   margin-top: 16px;
 }
 
+.arrowWrapper {
+  position: relative;
+  width: $arrow-width;
+  height: $wrapper-height;
+}
+
+.arrowText {
+  position: absolute;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: $line-clamp;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: $line-clamp;
+  bottom: math.div($wrapper-height + $arrow-height, 2);
+}
+
 .arrow {
-  font-size: 24px;
-  line-height: 32px;
+  height: $arrow-height;
+  width: $arrow-width;
   color: #090a0b;
 }
 
@@ -100,4 +125,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
+
+.emptyPreviewWrapper {
+  width: 100%;
+}
+
+.emptyPreviewIcon {
+  height: 80px;
+  width: 48px;
 }

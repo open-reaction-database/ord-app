@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { measurementTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.transform.ts';
+import { measurementTransform } from 'store/entities/reactions/reactionsMeasurement/reactionMeasurements.transform.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
 type Transform<T> = (values: T) => T;

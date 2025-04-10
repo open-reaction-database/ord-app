@@ -25,7 +25,13 @@ import { createEntityListItemComponent } from 'features/reactions/ReactionEntiti
 import { booleanOptions } from '../booleanOptions.ts';
 import { reactionAmounts } from 'features/reactions/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
 import { reactionRoleOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
-import { featuresList, identifiersList, molBlockIdentifiers, textureDetails } from './reactionComponentsBase.model.tsx';
+import {
+  componentPreview,
+  featuresList,
+  identifiersList,
+  molBlockIdentifiers,
+  textureDetails,
+} from './reactionComponentsBase.model.tsx';
 import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 
 const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
@@ -33,6 +39,7 @@ const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] 
 };
 
 export const reactionComponents: Array<ReactionFormNode> = [
+  componentPreview,
   {
     type: ReactionFormNodeType.wrapper,
     grid: 2,

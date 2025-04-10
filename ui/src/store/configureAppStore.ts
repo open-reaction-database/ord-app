@@ -15,12 +15,12 @@
  */
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from './rootReducer';
-import { isDev } from 'common/constants';
 import { previewsWorkerMiddleware } from 'store/features/previewsWorker/previewsWorkerMiddleware.ts';
 import { enumerationWorkerMiddleware } from 'store/features/enumerationWorker/enumerationWorkerMiddleware.ts';
 import { importTemplateFromFileActions } from './entities/templates/templates.actions.ts';
 import { createDatasetFromFileActions } from './entities/datasets/datasets.actions.ts';
 import { importReactionFromFileActions } from './entities/reactions/reactions.actions.ts';
+import { isDev } from '../common/configuration.constants.ts';
 
 export function configureAppStore() {
   return configureStore({

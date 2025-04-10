@@ -32,7 +32,9 @@ export function EntityListItem<T>({
   const { ViewDeleteButtonsComponent } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
-    const basePathComponents = Array.isArray(entityField) ? entityField : [...pathComponents, entityField];
+    const basePathComponents = Array.isArray(entityField)
+      ? pathComponents.concat(entityField)
+      : [...pathComponents, entityField];
     return basePathComponents.concat([entityKey]);
   }, [entityField, entityKey, pathComponents]);
 

@@ -16,10 +16,10 @@
 import { useSelector } from 'react-redux';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Menu, Avatar, Group, Text, Flex, UnstyledButton } from '@mantine/core';
-import { domain } from 'common/constants.ts';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';
 import { ChevronDownFilledIcon, SignOutIcon } from 'common/icons';
 import classes from './UserMenu.module.scss';
+import { domain } from 'common/configuration.constants.ts';
 
 export default function UserMenu() {
   const { logout } = useAuth0();

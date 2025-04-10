@@ -19,9 +19,10 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { reactionContext } from '../../reactions.context.ts';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 export const buildUseCreate = <T = unknown>(
-  entityName: string,
+  entityName: string | ReactionPathComponents,
   createKeyWithEmpty: (newIndex: number, list: Array<T>, creationInfo?: Partial<T>) => [number | string, T],
   shouldOpenSidebar = true,
 ) =>
@@ -29,11 +30,12 @@ export const buildUseCreate = <T = unknown>(
     const dispatch = useAppDispatch();
     const { reactionId } = useContext(reactionContext);
     const { pathComponents } = useContext(reactionEntityContext);
+    const entityPathComponents: ReactionPathComponents = typeof entityName === 'string' ? [entityName] : entityName;
 
     return useCallback(
       (newIndex: number, entitiesList: Array<T>, creationInfo?: Partial<T>) => {
         const [key, newEntity] = createKeyWithEmpty(newIndex, entitiesList, creationInfo);
-        const updatedPathComponents = [...pathComponents, entityName, key];
+        const updatedPathComponents = pathComponents.concat(entityPathComponents).concat(key);
 
         dispatch(
           addUpdateReactionField({

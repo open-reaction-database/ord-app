@@ -23,9 +23,9 @@ import classes from './componentsKetcherEditor.module.scss';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import { useField } from '@mantine/form';
-import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
+type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 
 interface ComponentsKetcherEditorProps {
   opened: boolean;
@@ -57,7 +57,7 @@ export function ComponentsKetcherEditor({
 
   useEffect(() => {
     if (ketcherInstance && identifier) {
-      ketcherInstance.setMolecule(identifier.value);
+      ketcherInstance.setMolecule(identifier.value ?? '');
     }
   }, [identifier, ketcherInstance]);
 

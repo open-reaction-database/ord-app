@@ -19,7 +19,7 @@ import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.datasets);
 
-const selectDatasets = buildSelector(state => state.datasetsById);
+export const selectDatasets = buildSelector(state => state.datasetsById);
 
 const selectDatasetsOrder = buildSelector(state => state.datasetsOrder);
 

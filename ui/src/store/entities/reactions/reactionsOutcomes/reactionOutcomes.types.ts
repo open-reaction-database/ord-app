@@ -25,7 +25,7 @@ import type { ReactionAnalysisType } from 'store/entities/reactions/reactionEnti
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 export interface ReactionAnalysis
-  extends WithIdName<Omit<ord.IAnalysis, 'data' | 'instrumentLastCalibrated' | 'type' | 'isOfIsolatedSpecies'>> {
+  extends WithIdName<Pick<ord.IAnalysis, 'details' | 'chmoId' | 'instrumentManufacturer'>> {
   type: ReactionAnalysisType;
   analysisData: Record<string, AppData>;
   instrumentLastCalibrated: string | null;

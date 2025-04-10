@@ -31,6 +31,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { reactionToOrdReaction } from 'store/entities/reactions/reactions.converters.ts';
 import { ordBooleanToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import dayjs from 'dayjs';
+import { DATE_FORMAT, DATE_TIME_FORMAT } from 'common/constants.ts';
 
 const produceValueTypeError = (type: string, variable: Variable) =>
   new Error(`Expected ${type} value for variable ${variable.name}`);
@@ -42,10 +43,24 @@ function getDateOrError(value: ValueType, variable: Variable): string {
     throw produceValueTypeError('date', variable);
   }
   const date = dayjs(value);
+  console.info(value, typeof value, date, date.isValid());
+
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }
-  return value;
+  return variable.type === VariableType.Date ? date.format(DATE_FORMAT) : date.format(DATE_TIME_FORMAT);
+}
+
+function getSelectOrError(value: ValueType, variable: Variable): string {
+  if (typeof value === 'boolean') {
+    return ordBooleanToReaction(value);
+  }
+
+  if (typeof value !== 'string') {
+    throw produceValueTypeError('string option', variable);
+  }
+  // All select options should be upper cases
+  return value.toUpperCase();
 }
 
 function getNumberArrayOrError(value: ValueType, variable: Variable): Array<number> {
@@ -77,15 +92,8 @@ function getVariableValueOrError(variable: Variable, value: ValueType): string |
       return value;
     }
     case VariableType.Select:
-      if (typeof value === 'boolean') {
-        return ordBooleanToReaction(value);
-      }
-
-      if (typeof value !== 'string') {
-        throw produceValueTypeError('string option', variable);
-      }
-      // All select options should be upper cases
-      return value.toUpperCase();
+      return getSelectOrError(value, variable);
+    case VariableType.DateTime:
     case VariableType.Date: {
       return getDateOrError(value, variable);
     }

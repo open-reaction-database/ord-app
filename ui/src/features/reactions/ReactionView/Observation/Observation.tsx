@@ -31,7 +31,7 @@ import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormCo
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
 
-export const ENTITY_FIELD = 'observations';
+const ENTITY_FIELD = 'observations';
 
 export function Observation({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
@@ -40,7 +40,9 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
 
   const onObservationsCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, observations.length];
-    const newObservation = ordObservationToReactionObservation(new ord.ReactionObservation());
+    const newObservation = ordObservationToReactionObservation(
+      ord.ReactionObservation.toObject(new ord.ReactionObservation()),
+    );
 
     dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newObservation }));
     dispatch(setReactionPathComponentsList([newIdentifierPath]));

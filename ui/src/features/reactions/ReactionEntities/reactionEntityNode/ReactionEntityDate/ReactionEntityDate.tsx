@@ -24,6 +24,7 @@ import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
+import { DATE_FORMAT } from 'common/constants.ts';
 
 export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
   const { isViewOnly } = useContext(reactionContext);
@@ -47,7 +48,7 @@ export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntit
 
   const handleDateChange = useCallback(
     (date: DateValue) => {
-      const updatedValue = dayjs(date).format('YYYY-MM-DD');
+      const updatedValue = dayjs(date).format(DATE_FORMAT);
       onChange(updatedValue);
     },
     [onChange],
@@ -56,7 +57,7 @@ export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntit
   const handleBlurSelect = (event: FocusEvent<HTMLInputElement>) => {
     const updatedDate = dayjs(event.target.value);
     if (updatedDate.isValid()) {
-      onChange(updatedDate.format('YYYY-MM-DD'));
+      onChange(updatedDate.format(DATE_FORMAT));
       setIsDateValid(true);
     }
   };

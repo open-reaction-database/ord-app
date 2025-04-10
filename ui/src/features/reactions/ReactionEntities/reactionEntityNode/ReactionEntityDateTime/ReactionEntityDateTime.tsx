@@ -19,14 +19,14 @@ import { useUncontrolled } from '@mantine/hooks';
 import { type DateValue, DateTimePicker } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Anchor, Flex, Input, TextInput } from '@mantine/core';
-import { useCallback, useState, type FocusEvent, type MouseEvent, useContext } from 'react';
+import { useCallback, useState, type FocusEvent, type MouseEvent, useContext, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import classes from './reactionEntityDateTime.module.scss';
-
-const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+import { getDate } from 'common/utils';
+import { DATE_TIME_FORMAT } from 'common/constants.ts';
 
 interface ReactionEntityDateTimeLabelProps extends Omit<ReactionEntityNodeProps<ReactionFormDateTime>, 'formMethods'> {
   onChange: (value: string) => void;
@@ -45,7 +45,7 @@ function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntity
     (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
-      onChange(dayjs().format(TIME_FORMAT));
+      onChange(dayjs.utc().format(DATE_TIME_FORMAT));
     },
     [onChange],
   );
@@ -78,7 +78,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
     />
   );
 
-  const dateValue = dayjs(value);
+  const dateValue = useMemo(() => getDate(value), [value]);
 
   const [isDateValid, setIsDateValid] = useState(dateValue.isValid() || value === null);
 
@@ -86,7 +86,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
 
   const handleDateChange = useCallback(
     (date: DateValue) => {
-      const updatedValue = dayjs(date).format(TIME_FORMAT);
+      const updatedValue = dayjs(date).format(DATE_TIME_FORMAT);
       onChange(updatedValue);
     },
     [onChange],
@@ -96,7 +96,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
     const target = event.target as HTMLInputElement;
     const updatedDate = dayjs(target.value);
     if (updatedDate.isValid()) {
-      onChange(updatedDate.format(TIME_FORMAT));
+      onChange(updatedDate.format(DATE_TIME_FORMAT));
       setIsDateValid(true);
     }
   };

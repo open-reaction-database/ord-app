@@ -20,6 +20,9 @@ import { useSelector } from 'react-redux';
 import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionInputPreview } from 'common/components/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'common/components/ReactionPreview/ReactionOutcomePreview.tsx';
+import { ArrowIcon, EmptyPreview } from '../../icons';
+import { Flex, Text, Tooltip } from '@mantine/core';
+import { typographyClasses } from '../../styling';
 
 interface ReactionPreviewProps {
   reaction: ReactionOrTemplate;
@@ -33,7 +36,11 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
   const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
   const outcomes = reaction.data.outcomes;
 
-  return (
+  const conditions = reaction.summary.conditions;
+
+  const hasInputsOrOutcomes = inputs.length > 0 || outcomes.length > 0;
+
+  return hasInputsOrOutcomes ? (
     <div
       className={classes.wrapper}
       ref={ref}
@@ -48,7 +55,17 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
           />
         </Fragment>
       ))}
-      <span className={classes.arrow}>⟶</span>
+      <Flex
+        direction="column"
+        className={classes.arrowWrapper}
+        justify="center"
+      >
+        <Tooltip label={conditions}>
+          <Text className={classes.arrowText}>{conditions}</Text>
+        </Tooltip>
+        <ArrowIcon className={classes.arrow} />
+      </Flex>
+
       {outcomes.map((outcome, index) => (
         <ReactionOutcomePreview
           key={outcome.id}
@@ -56,6 +73,18 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
           outcomeIndex={index}
         />
       ))}
+    </div>
+  ) : (
+    <div className={classes.wrapper}>
+      <Flex
+        align="center"
+        direction="column"
+        gap="xs"
+        className={classes.emptyPreviewWrapper}
+      >
+        <EmptyPreview className={classes.emptyPreviewIcon} />
+        <Text className={typographyClasses.secondary1}>There are no Inputs and Outcomes yet</Text>
+      </Flex>
     </div>
   );
 });

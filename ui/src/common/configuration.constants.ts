@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.previewWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &,
-  & img {
-    max-height: 120px;
-    height: 120px;
-  }
-}
+export const isDev = !import.meta.env.PROD;
+export const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
+export const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
+export const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE as string;
+export const auth0Issuer = import.meta.env.VITE_AUTH0_ISSUER as string;
+export const auth0Scope = import.meta.env.VITE_AUTH0_SCOPE as string;
+export const domain = window.location.origin;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Switch, ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
@@ -21,11 +21,11 @@ import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon, EditIcon }
 import { useCallback, useContext, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { useLocation, useRouter } from 'wouter';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
+import { fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { renameReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
@@ -33,26 +33,37 @@ import { ReactionValidationResult } from 'features/reactions/ReactionHeader/Reac
 import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
 import classes from 'common/components/ReactionCard/reactionCard.module.scss';
 import { reactionContext } from '../reactions.context.ts';
+import { domain } from 'common/configuration.constants.ts';
+import { selectIsReactionRenameOpened } from 'store/features/reactionRename/reactionRename.selector.ts';
+import { setReactionRenameOpenedAction } from 'store/features/reactionRename/reactionRename.actions.ts';
 
 interface ReactionHeaderProps {
   datasetId: number;
   reactionId: number;
-  onViewOnlyToggle: () => void;
 }
 
-export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Readonly<ReactionHeaderProps>) {
+export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeaderProps>) {
   const [location] = useLocation();
   const { base } = useRouter();
   const dispatch = useAppDispatch();
   const { isViewOnly } = useContext(reactionContext);
   const reaction = useSelector(selectReactionById(reactionId));
-  const [opened, { open, close }] = useDisclosure();
+  const isRenameOpened = useSelector(selectIsReactionRenameOpened);
+
+  const onRenameOpen = useCallback(() => {
+    dispatch(setReactionRenameOpenedAction(true));
+  }, [dispatch]);
+
+  const onRenameClose = useCallback(() => {
+    dispatch(setReactionRenameOpenedAction(false));
+  }, [dispatch]);
+
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: ['reactionId'], newValue: name }));
+      dispatch(renameReaction({ reactionId, name }));
     },
     [dispatch, reactionId],
   );
@@ -81,10 +92,6 @@ export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Read
           gap="sm"
         >
           {!isViewOnly && <RemoveReaction reactionId={reactionId} />}
-          <Switch
-            checked={isViewOnly}
-            onChange={() => onViewOnlyToggle()}
-          />
           <Button
             variant="transparent"
             leftSection={<CheckListIcon />}
@@ -140,7 +147,7 @@ export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Read
               <CopyButton options={copyOptions} />
               {!isViewOnly && (
                 <ActionIcon variant="transparent">
-                  <EditIcon onClick={open} />
+                  <EditIcon onClick={onRenameOpen} />
                 </ActionIcon>
               )}
             </Flex>
@@ -159,13 +166,14 @@ export function ReactionHeader({ datasetId, reactionId, onViewOnlyToggle }: Read
           />
         </Flex>
       </Paper>
-      {opened && (
+      {isRenameOpened && (
         <InputModal
-          onClose={close}
+          onClose={onRenameClose}
           onSubmit={onReactionNameChange}
           title="Edit Reaction ID"
           inputLabel="Reaction ID"
           initialValue={reaction.data.reactionId ?? ''}
+          stayOpenedOnSubmit
         />
       )}
     </>

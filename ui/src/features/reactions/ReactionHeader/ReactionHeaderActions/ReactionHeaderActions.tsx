@@ -26,6 +26,7 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 
 interface ReactionHeaderActionsProps {
   reactionId: number;
@@ -40,6 +41,7 @@ export function ReactionHeaderActions({ reactionId, previewRef }: Readonly<React
     copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
 
   return (
     <>
@@ -50,7 +52,7 @@ export function ReactionHeaderActions({ reactionId, previewRef }: Readonly<React
           onClose={closeSaveAsTemplate}
         />
       )}
-      <RemoveReaction reactionId={reaction.id} />
+      {canDatasetBeEdited && <RemoveReaction reactionId={reaction.id} />}
       <Button
         leftSection={<CheckListIcon className={classes.buttonIcon} />}
         variant="transparent"

@@ -19,7 +19,7 @@ type CreateAction = typeof createAction;
 
 type CreateActionKnownPayload<P = void> = (type: string) => PayloadActionCreator<P>;
 
-export interface AsyncAction<RequestPayload = void, SuccessPayload = void, FailurePayload = Error | null> {
+export interface AsyncAction<RequestPayload = void, SuccessPayload = void, FailurePayload = Error | string | null> {
   request: ReturnType<CreateActionKnownPayload<RequestPayload>>;
   success: ReturnType<CreateActionKnownPayload<SuccessPayload>>;
   failure: ReturnType<CreateActionKnownPayload<FailurePayload>>;
