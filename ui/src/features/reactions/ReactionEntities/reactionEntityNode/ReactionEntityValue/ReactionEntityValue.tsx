@@ -48,7 +48,14 @@ export function ReactionEntityValue({
   );
 
   const { value, onChange, defaultValue, ...inputProps } = getInputProps(node.name);
-  const [valueControlled, onControlledChange] = useAppUncontrolled({ value, defaultValue, onChange });
+  const valueNonNull = value === null ? '' : value;
+  const defaultValueNonNull = defaultValue === null ? '' : defaultValue;
+
+  const [valueControlled, onControlledChange] = useAppUncontrolled({
+    value: valueNonNull,
+    defaultValue: defaultValueNonNull,
+    onChange,
+  });
 
   const props = {
     name: node.name,

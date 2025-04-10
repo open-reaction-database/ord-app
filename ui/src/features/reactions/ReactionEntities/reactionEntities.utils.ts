@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Pagination } from './types';
-import type { DownloadMenuOptions } from './types/downloadMenuOptions';
+import type { ReactionFormConditionalRendering } from './reactionEntities.types.ts';
 
-export const emptyPagination: Pagination = { page: 1, size: 10, total: 0, pages: 0 };
-
-export const fileDownloadOptions: Array<DownloadMenuOptions> = [
-  { label: '.binpb', format: 'binpb' },
-  { label: '.txtpb', format: 'txtpb' },
-  { label: '.json', format: 'json' },
-];
-
-export const DOT_DELIMITER = '·';
-
-export const DATE_FORMAT = 'YYYY-MM-DD';
-
-export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-
-export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
+export const createConditionFactory =
+  <T>() =>
+  (types: Array<T>): ReactionFormConditionalRendering['condition'] => ({
+    name: 'type',
+    isHidden: (value: unknown) => !types.includes(value as T),
+  });

@@ -25,10 +25,10 @@ import type {
 
 export interface ReactionWorkup extends WithId<Pick<ord.IReactionWorkup, 'details' | 'keepPhase' | 'targetPh'>> {
   type: WorkupType;
-  duration: ReactionTime;
+  duration: Optional<ReactionTime>;
   input: Optional<ReactionInputWithoutName>;
-  amount: ReactionAmount;
-  temperature: ReactionTemperatureCondition;
-  stirring: ReactionStirringCondition;
+  amount: Optional<ReactionAmount>;
+  temperature: Optional<ReactionTemperatureCondition>;
+  stirring: Optional<ReactionStirringCondition>;
   isAutomated: ReactionBoolean;
 }

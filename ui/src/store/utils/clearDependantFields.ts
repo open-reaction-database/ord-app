@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Pagination } from './types';
-import type { DownloadMenuOptions } from './types/downloadMenuOptions';
+type IsNull<T, K> = T extends null ? K : never;
 
-export const emptyPagination: Pagination = { page: 1, size: 10, total: 0, pages: 0 };
+type NullableKeys<T> = {
+  [K in keyof T]: IsNull<T[K], K>;
+}[keyof T];
 
-export const fileDownloadOptions: Array<DownloadMenuOptions> = [
-  { label: '.binpb', format: 'binpb' },
-  { label: '.txtpb', format: 'txtpb' },
-  { label: '.json', format: 'json' },
-];
+type FieldNamePredicate<T, K> = [K, (object: T) => boolean];
 
-export const DOT_DELIMITER = '·';
+export function clearDependantFields<T>(
+  object: T,
+  fieldsConfiguration: Array<FieldNamePredicate<T, NullableKeys<T>>>,
+): T {
+  const objectCopy: T = { ...object };
 
-export const DATE_FORMAT = 'YYYY-MM-DD';
-
-export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-
-export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
+  fieldsConfiguration.forEach(([field, predicate]) => {
+    if (!predicate(objectCopy)) {
+      objectCopy[field] = null as (typeof objectCopy)[typeof field];
+    }
+  });
+  return objectCopy;
+}

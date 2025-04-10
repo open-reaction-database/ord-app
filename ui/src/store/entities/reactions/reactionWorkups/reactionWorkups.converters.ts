@@ -38,6 +38,7 @@ import {
   reactionStirringConditionToOrd,
   reactionTemperatureConditionToOrd,
 } from '../reactionConditions/reactionConditions.converter.ts';
+import { workupTransform } from './reactionWorkups.tranform.ts';
 
 export const ordWorkupToReaction = ({
   type,
@@ -60,23 +61,19 @@ export const ordWorkupToReaction = ({
     ...workup,
   });
 
-export const reactionWorkupToOrd = ({
-  type,
-  duration,
-  amount,
-  input,
-  temperature,
-  stirring,
-  isAutomated,
-  ...workup
-}: ReactionWorkup): ord.IReactionWorkup =>
-  withoutId({
+export const reactionWorkupToOrd = (workup: ReactionWorkup): ord.IReactionWorkup => {
+  const { type, duration, amount, input, temperature, stirring, isAutomated, ...rest } = withoutId(
+    workupTransform(workup),
+  );
+
+  return {
     type: reactionWorkupTypeToOrd(type),
     duration: reactionTimeToOrd(duration),
-    amount: reactionAmountToOrd(amount),
+    amount: amount ? reactionAmountToOrd(amount) : amount,
     input: input ? reactionInputWithoutNameToOrd(input) : null,
-    temperature: reactionTemperatureConditionToOrd(temperature),
-    stirring: reactionStirringConditionToOrd(stirring),
+    temperature: temperature ? reactionTemperatureConditionToOrd(temperature) : temperature,
+    stirring: stirring ? reactionStirringConditionToOrd(stirring) : stirring,
     isAutomated: reactionBooleanToOrd(isAutomated),
-    ...workup,
-  });
+    ...rest,
+  };
+};

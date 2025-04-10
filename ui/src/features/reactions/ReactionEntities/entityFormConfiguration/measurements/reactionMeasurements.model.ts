@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import {
-  type ReactionFormConditionalRendering,
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -34,18 +33,10 @@ import { MeasurementMasses } from 'features/reactions/ReactionEntities/entityFor
 import { MeasurementsDivider } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementsDivider.tsx';
 import { AuthenticStandard } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/AuthenticStandard/AuthenticStandard.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import {
-  massSpecCompatibleTypes,
-  retentionTimeCompatibleTypes,
-  selectivityCompatibleTypes,
-  valueCompatibleTypes,
-  waveLengthCompatibleTypes,
-} from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/reactionMeasurements.constants.ts';
+import { MeasurementConstants } from 'store/entities/reactions/reactionsMeasurement/reactionMeasurements.constants.ts';
+import { createConditionFactory } from '../../reactionEntities.utils.ts';
 
-const createCondition = (types: Array<ReactionMeasurementType>): ReactionFormConditionalRendering['condition'] => ({
-  name: 'type',
-  isHidden: (value: unknown) => !types.includes(value as ReactionMeasurementType),
-});
+const createCondition = createConditionFactory<ReactionMeasurementType>();
 
 export const reactionMeasurements: Array<ReactionFormNode> = [
   {
@@ -87,7 +78,7 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
     type: ReactionFormNodeType.custom,
     name: 'value',
     Component: MeasurementValueControl,
-    condition: createCondition(valueCompatibleTypes),
+    condition: createCondition(MeasurementConstants.valueCompatibleTypes),
   },
   wrapInputsWithGrid(
     {
@@ -127,7 +118,7 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
     },
     select: 'segmented',
     options: timeUnitOptions,
-    condition: createCondition(retentionTimeCompatibleTypes),
+    condition: createCondition(MeasurementConstants.retentionTimeCompatibleTypes),
   },
 
   {
@@ -137,12 +128,12 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
       label: 'Wave length',
     },
     options: waveLengthTypeOptions,
-    condition: createCondition(waveLengthCompatibleTypes),
+    condition: createCondition(MeasurementConstants.waveLengthCompatibleTypes),
   },
   {
     type: ReactionFormNodeType.objectInitializer,
     name: 'massSpecDetails',
-    condition: createCondition(massSpecCompatibleTypes),
+    condition: createCondition(MeasurementConstants.massSpecCompatibleTypes),
     field: {
       type: ReactionFormNodeType.empty,
       fields: [
@@ -194,7 +185,7 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.objectInitializer,
     name: 'selectivity',
-    condition: createCondition(selectivityCompatibleTypes),
+    condition: createCondition(MeasurementConstants.selectivityCompatibleTypes),
     field: {
       type: ReactionFormNodeType.wrapper,
       grid: 2,

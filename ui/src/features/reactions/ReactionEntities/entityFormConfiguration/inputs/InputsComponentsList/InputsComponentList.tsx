@@ -79,6 +79,7 @@ export function InputsComponentList() {
         <ComponentsList
           components={components}
           rootPathComponents={pathComponents}
+          onlyOpenOneSidebar={true}
           detailsHeader="Amount"
           entityName="components"
           renderDetails={renderDetails}

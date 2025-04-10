@@ -15,14 +15,10 @@
  */
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { Accordion, Text } from '@mantine/core';
-import { useContext } from 'react';
 import classes from './inputsComponentsList.module.scss';
 import clsx from 'clsx';
-import { ComponentDisplayRow } from '../../ComponentsList';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
-import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
+import { InputComponentsListItem } from './InputComponentsListItem/InputComponentsListItem.tsx';
 
 interface InputsComponentsListProps {
   inputs: Array<ReactionInput>;
@@ -36,11 +32,8 @@ const headers = [
   { label: 'Amount', className: componentsListClasses.details },
 ];
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
-
 export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListProps>) {
   const ids = inputs.map(input => input.id);
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
 
   return (
     <>
@@ -62,34 +55,13 @@ export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListPr
         defaultValue={ids}
       >
         {inputs.map(input => (
-          <Accordion.Item
+          <InputComponentsListItem
             key={input.id}
-            value={input.id}
-          >
-            <Accordion.Control
-              icon={
-                <ViewDeleteButtonsComponent
-                  pathComponents={['inputs', input.id]}
-                  entityName="Input"
-                />
-              }
-            >
-              {input.name}
-            </Accordion.Control>
-            <Accordion.Panel>
-              <ComponentsListOrEmpty componentsAmount={input.components.length}>
-                {input.components.map((component, index) => (
-                  <ComponentDisplayRow
-                    key={component.id}
-                    component={component}
-                    renderDetails={renderDetails}
-                    componentPath={['inputs', input.id, 'components', index]}
-                    gridClassName={clsx(classes.grid, classes.row)}
-                  />
-                ))}
-              </ComponentsListOrEmpty>
-            </Accordion.Panel>
-          </Accordion.Item>
+            input={input}
+            name={input.name}
+            pathComponents={['inputs', input.id]}
+            historyPathComponents={[]}
+          />
         ))}
       </Accordion>
     </>
