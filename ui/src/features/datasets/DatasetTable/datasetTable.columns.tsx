@@ -38,7 +38,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'name',
     header: 'Dataset Name',
     Cell: ({ row }) => {
-      const datasetName = row.original.name || `Dataset ${row.original.id}`;
+      const datasetName = row.original.name ?? `Dataset ${row.original.id}`;
       return (
         <Tooltip label={datasetName}>
           <div className={clsx(typographyClasses.oneLineText, classes.datasetName)}>{datasetName}</div>
