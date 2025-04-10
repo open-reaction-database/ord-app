@@ -30,6 +30,8 @@ import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.t
 import { DownloadIcon } from 'common/icons';
 import type { CastingContext } from 'csv-parse';
 import { NUMBER_REGEX } from 'common/constants.ts';
+import { NotificationVariant } from 'common/types/notification.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
 
 interface TemplateFileSelectorProps {
   templateDisabled: boolean;
@@ -52,6 +54,15 @@ function cast(value: string, context: CastingContext): string | number | boolean
   }
 
   return value;
+}
+
+function validateHeaders(headers: Array<string>): boolean {
+  const namesSet = new Set(headers);
+  if (namesSet.size !== headers.length) {
+    showNotification({ variant: NotificationVariant.ERROR, message: 'Duplicate column names are not allowed' });
+    return false;
+  }
+  return true;
 }
 
 export function TemplateFileSelector({ form, templateDisabled }: Readonly<TemplateFileSelectorProps>) {
@@ -124,8 +135,12 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
         const newValue = Buffer.from(buffer).toString();
         const delimiter = guessDelimiter(newValue);
         const [headers] = parse(newValue, { delimiter });
+        if (!validateHeaders(headers)) {
+          form.setFieldValue('csvFile', null);
+          return;
+        }
+
         const content = parse(newValue, { delimiter, cast: cast, columns: true });
-        console.info(content);
         form.setFieldValue('templateCSV', {
           headers,
           content,
