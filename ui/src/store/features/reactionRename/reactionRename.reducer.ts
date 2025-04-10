@@ -15,9 +15,9 @@
  */
 import { createReducer } from '@reduxjs/toolkit';
 import { setReactionRenameOpenedAction } from './reactionRename.actions.ts';
-import { addUpdateReactionFieldActions } from '../../entities/reactions/reactions.actions.ts';
+import { renameReactionActions } from '../../entities/reactions/reactions.actions.ts';
 
 export const reactionRenameReducer = createReducer(false, builder => {
   builder.addCase(setReactionRenameOpenedAction, (_, action) => action.payload);
-  builder.addCase(addUpdateReactionFieldActions.success, () => false);
+  builder.addCase(renameReactionActions.success, () => false);
 });

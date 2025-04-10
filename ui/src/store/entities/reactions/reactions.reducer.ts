@@ -23,6 +23,7 @@ import {
   addUpdateReactionFieldActions,
   deleteReactionFieldActions,
   removeReactionActions,
+  renameReactionActions,
 } from './reactions.actions.ts';
 import {
   getAllTemplatesActions,
@@ -131,6 +132,21 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       [templateId]: {
         ...template,
         variables,
+      },
+    };
+  });
+  builder.addCase(renameReactionActions.success, (state, action) => {
+    const { reactionId, name } = action.payload;
+    const reaction = state[reactionId];
+
+    return {
+      ...state,
+      [action.payload.reactionId]: {
+        ...reaction,
+        data: {
+          ...reaction.data,
+          reactionId: name,
+        },
       },
     };
   });

@@ -25,7 +25,7 @@ import { fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { renameReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
@@ -63,7 +63,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: ['reactionId'], newValue: name }));
+      dispatch(renameReaction({ reactionId, name }));
     },
     [dispatch, reactionId],
   );

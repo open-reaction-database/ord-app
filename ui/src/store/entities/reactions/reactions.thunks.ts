@@ -23,11 +23,12 @@ import {
   getReactionsListActions,
   importReactionFromFileActions,
   removeReactionActions,
+  renameReactionActions,
   searchReactionActions,
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type { ReactionId, ReactionResponse, UpdateReactionSuccessPayload } from './reactions.types.ts';
+import type { AppReaction, ReactionId, ReactionResponse, UpdateReactionSuccessPayload } from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
@@ -131,6 +132,18 @@ async function updateReaction(reactionId: ReactionId, getState: () => AppState):
     validation: updatedValidation,
   };
 }
+
+export const renameReaction = createThunk(renameReactionActions, async (_d, getState, { reactionId, name }) => {
+  const datasetId = selectActiveDatasetId(getState());
+  const reaction = selectReactionById(reactionId)(getState());
+  const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
+  const ordReaction = reactionToOrdReaction(updatedReaction);
+  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  await axiosInstance.patch<ReactionResponse>(`datasets/${datasetId}/reactions/${reactionId}`, {
+    binpb: payload,
+  });
+  return renameReactionActions.success({ reactionId, name });
+});
 
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,

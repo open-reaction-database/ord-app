@@ -123,6 +123,11 @@ export interface ImportReactionFromFilePayload {
   file: File;
 }
 
+export interface RenameReactionPayload {
+  reactionId: ReactionId;
+  name: string;
+}
+
 export interface UpdateReactionPayload {
   reactionId: ReactionId;
   pathComponents: ReactionPathComponents;
