@@ -43,3 +43,28 @@
 .row:hover {
   cursor: pointer;
 }
+
+.datasetName {
+  color: var(--mantine-color-primary-light-color);
+}
+
+.datasetMenu {
+  transform: rotate(90deg);
+}
+
+.sizeCell {
+  display: flex;
+}
+
+.countDivider {
+  padding: 0 6px;
+}
+
+.invalidIcon {
+  display: flex;
+
+  svg {
+    align-self: center;
+    color: var(--mantine-color-red-light-color);
+  }
+}

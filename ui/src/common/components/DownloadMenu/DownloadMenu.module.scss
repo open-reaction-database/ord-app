@@ -41,3 +41,13 @@
     outline: 3px solid #3c78d899;
   }
 }
+
+.removeButton {
+  color: var(--mantine-color-red-light-color);
+  border-top: 1px solid var(--mantine-color-gray-3);
+  border-radius: 0 0 8px 8px;
+
+  svg path {
+    fill: var(--mantine-color-red-light-color);
+  }
+}
