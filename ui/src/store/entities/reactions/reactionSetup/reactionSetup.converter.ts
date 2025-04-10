@@ -19,6 +19,7 @@ import type {
   ReactionVesselSetup,
   ReactionMaterialSetup,
   ReactionEnvironmentSetup,
+  ReactionPreparationSetup,
 } from './reactionSetup.types';
 import {
   ordMaterialTypeToReaction,
@@ -27,6 +28,8 @@ import {
   reactionVesselTypeToOrd,
   ordEnvironmentTypeToReaction,
   reactionEnvitonmentTypeToOrd,
+  ordVesselPreparationsTypeToReaction,
+  reactionVesselPreparationsTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { OrdOptional } from '../reactionEntity/reactionEntity.types';
 import {
@@ -38,20 +41,43 @@ import {
 } from '../reactionEntity/reactionEntity.converters';
 
 export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVesselSetup => {
-  const { type, details, material, volume } = vessel ?? {};
+  const { type, details, material, volume, preparations } = vessel ?? {};
   return {
     details,
     type: ordVesselTypeToReaction(type),
     material: ordMaterialSetupToReaction(material),
     volume: ordVolumeCondititonToReaction(volume),
+    preparations: (preparations || []).map(ordPreparationSetupToReaction),
   };
 };
 
-export const reactionVesselSetupToOrd = ({ type, details, material, volume }: ReactionVesselSetup): ord.IVessel => ({
+export const reactionVesselSetupToOrd = ({
+  type,
+  details,
+  material,
+  volume,
+  preparations,
+}: ReactionVesselSetup): ord.IVessel => ({
   details,
   type: reactionVesselTypeToOrd(type),
   volume: reactionVolumeConditionToOrd(volume),
   material: reactionMaterialSetupToOrd(material),
+  preparations: preparations.length > 0 ? preparations.map(reactionPreparationSetupToOrd) : null,
+});
+
+export const ordPreparationSetupToReaction = (
+  preparations: OrdOptional<ord.IVesselPreparation>,
+): ReactionPreparationSetup => {
+  const { type, details } = preparations ?? {};
+  return {
+    details,
+    type: ordVesselPreparationsTypeToReaction(type),
+  };
+};
+
+export const reactionPreparationSetupToOrd = ({ type, details }: ReactionPreparationSetup): ord.IVesselPreparation => ({
+  details,
+  type: reactionVesselPreparationsTypeToOrd(type),
 });
 
 export const ordMaterialSetupToReaction = (material: OrdOptional<ord.IVesselMaterial>): ReactionMaterialSetup => {

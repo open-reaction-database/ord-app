@@ -19,6 +19,7 @@ import type { ReactionBoolean, VolumeType } from '../reactionEntity/reactionEnti
 import type {
   ReactionEnvironmentType,
   ReactionVesselMaterialType,
+  ReactionVesselPreparationType,
   ReactionVesselType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 
@@ -26,10 +27,15 @@ export interface ReactionMaterialSetup extends Pick<ord.IVesselMaterial, 'detail
   type: ReactionVesselMaterialType;
 }
 
+export interface ReactionPreparationSetup extends Pick<ord.IVesselPreparation, 'details'> {
+  type: ReactionVesselPreparationType;
+}
+
 export interface ReactionVesselSetup extends Pick<ord.IVessel, 'details'> {
   type: ReactionVesselType;
   material: ReactionMaterialSetup;
   volume: VolumeType;
+  preparations: Array<ReactionPreparationSetup>;
 }
 
 export interface ReactionEnvironmentSetup extends Pick<ord.ReactionSetup.IReactionEnvironment, 'details'> {

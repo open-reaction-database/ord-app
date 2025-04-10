@@ -267,6 +267,16 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(value => value),
   },
   {
+    pathComponents: ['vesselPreparation'],
+    entityName: ReactionNodeEntity.VesselPreparation,
+    label: 'Vessel Preparation',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Add Vessel Preparation',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
     pathComponents: ['conditions'],
     entityName: ReactionNodeEntity.Conditions,
     label: 'Conditions',

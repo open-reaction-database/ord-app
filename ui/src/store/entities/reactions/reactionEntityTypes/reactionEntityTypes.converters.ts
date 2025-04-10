@@ -51,6 +51,7 @@ import {
   environmentTypeByValue,
   volumeTypeByValue,
   vesselAttachmentTypeByValue,
+  vesselPreparationTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -215,3 +216,8 @@ export const {
   ordEntityToEntity: ordVesselAttachmentTypeToReaction,
   entityToOrdEntity: reactionVesselAttachmentTypeToOrd,
 } = generateEntityTypeToFromOrd(vesselAttachmentTypeByValue, ord.VesselAttachment.VesselAttachmentType);
+
+export const {
+  ordEntityToEntity: ordVesselPreparationsTypeToReaction,
+  entityToOrdEntity: reactionVesselPreparationsTypeToOrd,
+} = generateEntityTypeToFromOrd(vesselPreparationTypeByValue, ord.VesselPreparation.VesselPreparationType);

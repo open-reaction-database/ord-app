@@ -87,6 +87,8 @@ export type ReactionVesselType = keyof typeof ord.Vessel.VesselType;
 
 export type ReactionVesselMaterialType = keyof typeof ord.VesselMaterial.VesselMaterialType;
 
+export type ReactionVesselPreparationType = keyof typeof ord.VesselPreparation.VesselPreparationType;
+
 export type ReactionEnvironmentType = keyof typeof ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType;
 
 export type ReactionVolumeTypeValues = keyof typeof ord.Volume.VolumeUnit;

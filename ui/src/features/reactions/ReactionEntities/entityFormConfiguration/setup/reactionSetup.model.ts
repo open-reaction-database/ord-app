@@ -22,6 +22,12 @@ import {
 import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid';
 import { booleanOptions } from '../booleanOptions';
+import { buildUseSelectItems } from '../buildUseSelectItems';
+import { createEntityListItemComponent } from '../EntityListItem/entityListItem.utils';
+import { buildUseCreate } from '../buildUseCreate';
+import { ord } from 'ord-schema-protobufjs';
+import type { ReactionPreparationSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
+import { ordVesselSetupToReaction } from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
 
 export const reactionSetup: Array<ReactionFormNode> = [
   {
@@ -117,5 +123,33 @@ export const reactionSetup: Array<ReactionFormNode> = [
         },
       },
     ],
+  },
+  {
+    type: ReactionFormNodeType.list,
+    getKey: (_, index) => index,
+    title: {
+      label: 'Add Vessel Preparation',
+    },
+    useSelectItems: buildUseSelectItems('vesselPreparation'),
+    ItemDisplay: createEntityListItemComponent<ReactionPreparationSetup>({
+      entityField: 'vesselPreparation',
+      title: ' Add Vessel Preparation',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => item.type,
+        },
+        {
+          label: 'Details',
+          render: item => item.details ?? '',
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Add Vessel Preparation',
+      useCreate: buildUseCreate('vesselPreparation', index => {
+        return [index, ordVesselSetupToReaction(ord.VesselPreparation.toObject(new ord.VesselPreparation()))];
+      }),
+    },
   },
 ];
