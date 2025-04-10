@@ -34,6 +34,7 @@ import type {
   ReactionConditions,
   ReactionTemperatureCondition,
 } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
+import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types.ts';
 
 const withoutMeasurements = <T extends object>(object: T, name: keyof T): Omit<T, typeof name> => {
   const { [name]: _, ...rest } = object;
@@ -264,7 +265,10 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Setup',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues(value => value),
+    useInitialValues: buildUseInitialValues(({ vessel, ...rest }: ReactionSetup) => ({
+      ...rest,
+      vessel: withoutMeasurements(vessel, 'preparations'),
+    })),
   },
   {
     pathComponents: ['vesselPreparation'],
