@@ -34,7 +34,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
         selectType: 'dropdown',
         options: vesselTypeOptions,
         wrapperConfig: {
-          label: 'Vessel Type',
+          label: 'Vessel',
         },
       },
       {
@@ -42,7 +42,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
         name: 'vessel.details',
         inputType: 'string',
         wrapperConfig: {
-          label: 'Vessel Details',
+          label: 'Vessel',
         },
       },
     ],
@@ -57,7 +57,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
         selectType: 'dropdown',
         options: vesselMaterialTypeOptions,
         wrapperConfig: {
-          label: 'Material Type',
+          label: 'Material',
         },
       },
       {
@@ -65,7 +65,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
         name: 'vessel.material.details',
         inputType: 'string',
         wrapperConfig: {
-          label: 'Material Details',
+          label: 'Details',
         },
       },
     ],

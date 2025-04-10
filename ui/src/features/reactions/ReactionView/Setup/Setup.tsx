@@ -56,15 +56,15 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
       <RequiredOptionalFields
         entity={setup}
         requiredFields={[
-          { label: 'Vessel Type', render: (setup: ReactionSetup) => setup.vessel.type },
-          { label: 'Vessel Details', render: (setup: ReactionSetup) => setup.vessel.details },
+          { label: 'Vessel', render: (setup: ReactionSetup) => setup.vessel.type },
+          { label: 'Details', render: (setup: ReactionSetup) => setup.vessel.details },
         ]}
       />
       <RequiredOptionalFields
         entity={setup}
         requiredFields={[
-          { label: 'Material Type', render: (setup: ReactionSetup) => setup.vessel.material.type },
-          { label: 'Material Details', render: (setup: ReactionSetup) => setup.vessel.material.details },
+          { label: 'Material', render: (setup: ReactionSetup) => setup.vessel.material.type },
+          { label: 'Details', render: (setup: ReactionSetup) => setup.vessel.material.details },
         ]}
       />
     </Flex>
