@@ -78,6 +78,8 @@ import {
   reactionElectrochemistryCellTypeToOrd,
   ordTubingTypeToReaction,
   reactionTubingTypeToOrd,
+  ordVolumeTypeToReaction,
+  reactionVolumeTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ord } from 'ord-schema-protobufjs';
 import type { ElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
@@ -348,3 +350,6 @@ export const convertElectrochemistryTypeToOrd = (
     ? ordElectrochemistryTypeToReaction(type)
     : ordElectrochemistryTypeToReaction(0);
 };
+
+export const { fromOrd: ordVolumeCondititonToReaction, toOrd: reactionVolumeConditionToOrd } =
+  generateValuePrecisionUnitConverter(ordVolumeTypeToReaction, reactionVolumeTypeToOrd);

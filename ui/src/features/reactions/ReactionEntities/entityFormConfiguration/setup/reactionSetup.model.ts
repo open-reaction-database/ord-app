@@ -30,19 +30,19 @@ export const reactionSetup: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.select,
-        name: 'vessel',
+        name: 'vessel.type',
         selectType: 'dropdown',
         options: vesselTypeOptions,
         wrapperConfig: {
-          label: 'Vessel',
+          label: 'Vessel Type',
         },
       },
       {
         type: ReactionFormNodeType.value,
-        name: 'details',
+        name: 'vessel.details',
         inputType: 'string',
         wrapperConfig: {
-          label: 'Details',
+          label: 'Vessel Details',
         },
       },
     ],
@@ -53,26 +53,26 @@ export const reactionSetup: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.select,
-        name: 'material',
+        name: 'vessel.material.type',
         selectType: 'dropdown',
         options: vesselMaterialTypeOptions,
         wrapperConfig: {
-          label: 'Material',
+          label: 'Material Type',
         },
       },
       {
         type: ReactionFormNodeType.value,
-        name: 'details',
+        name: 'vessel.material.details',
         inputType: 'string',
         wrapperConfig: {
-          label: 'Details',
+          label: 'Material Details',
         },
       },
     ],
   },
   wrapInputsWithGrid({
     type: ReactionFormNodeType.vpu,
-    name: 'volume',
+    name: 'vessel.volume',
     options: volumeTypeOptions,
     wrapperConfig: {
       label: 'Volume',
@@ -85,12 +85,12 @@ export const reactionSetup: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.select,
-        name: 'automated',
+        name: 'isAutomated',
         selectType: 'segmented',
         options: booleanOptions,
         wrapperConfig: {
           label: 'Automated',
-          hint: 'Whether the reaction conditions cannot be fully described by the fields in this schema/form.',
+          hint: 'Whether the reaction conditions cannot be fully described by the fields in this schema.',
         },
       },
     ],
@@ -101,7 +101,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     fields: [
       {
         type: ReactionFormNodeType.select,
-        name: 'environment',
+        name: 'environment.type',
         selectType: 'dropdown',
         options: environmentTypeOptions,
         wrapperConfig: {
@@ -110,7 +110,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
       },
       {
         type: ReactionFormNodeType.value,
-        name: 'details',
+        name: 'environment.details',
         inputType: 'string',
         wrapperConfig: {
           label: 'Details',

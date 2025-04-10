@@ -14,28 +14,90 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import { withId } from '../reactionEntity/reactionEntity.converters';
-import type { ReactionSetup } from './reactionSetup.types';
+import type {
+  ReactionSetup,
+  ReactionVesselSetup,
+  ReactionMaterialSetup,
+  ReactionEnvironmentSetup,
+} from './reactionSetup.types';
 import {
+  ordMaterialTypeToReaction,
   ordVesselTypeToReaction,
+  reactionMaterialTypeToOrd,
   reactionVesselTypeToOrd,
+  ordEnvironmentTypeToReaction,
+  reactionEnvitonmentTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
+import type { OrdOptional } from '../reactionEntity/reactionEntity.types';
+import {
+  ordVolumeCondititonToReaction,
+  reactionVolumeConditionToOrd,
+  withId,
+  ordBooleanToReaction,
+  reactionBooleanToOrd,
+} from '../reactionEntity/reactionEntity.converters';
 
-export const ordSetupToReactionSetup = (setup: ord.IReactionSetup | null | undefined): ReactionSetup => {
-  const base = {
-    id: '',
-    vessel: ordVesselTypeToReaction(setup?.vessel?.type),
+export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVesselSetup => {
+  const { type, details, material, volume } = vessel ?? {};
+  return {
+    details,
+    type: ordVesselTypeToReaction(type),
+    material: ordMaterialSetupToReaction(material),
+    volume: ordVolumeCondititonToReaction(volume),
   };
-
-  return withId(base);
 };
 
-export const reactionsetupToOrdSetup = (setup: ReactionSetup | undefined): ord.IReactionSetup => {
+export const reactionVesselSetupToOrd = ({ type, details, material, volume }: ReactionVesselSetup): ord.IVessel => ({
+  details,
+  type: reactionVesselTypeToOrd(type),
+  volume: reactionVolumeConditionToOrd(volume),
+  material: reactionMaterialSetupToOrd(material),
+});
+
+export const ordMaterialSetupToReaction = (material: OrdOptional<ord.IVesselMaterial>): ReactionMaterialSetup => {
+  const { type, details } = material ?? {};
   return {
-    vessel: setup?.vessel
-      ? {
-          type: reactionVesselTypeToOrd(setup.vessel),
-        }
-      : undefined,
+    details,
+    type: ordMaterialTypeToReaction(type),
+  };
+};
+
+export const reactionMaterialSetupToOrd = ({ type, details }: ReactionMaterialSetup): ord.IVesselMaterial => ({
+  details,
+  type: reactionMaterialTypeToOrd(type),
+});
+
+export const ordEnvironmentSetupToReaction = (
+  environment: OrdOptional<ord.ReactionSetup.IReactionEnvironment>,
+): ReactionEnvironmentSetup => {
+  const { type, details } = environment ?? {};
+  return {
+    details,
+    type: ordEnvironmentTypeToReaction(type),
+  };
+};
+
+export const reactionEnvironmentSetupToOrd = ({
+  type,
+  details,
+}: ReactionEnvironmentSetup): ord.ReactionSetup.IReactionEnvironment => ({
+  details,
+  type: reactionEnvitonmentTypeToOrd(type),
+});
+
+export const ordSetupToReactionSetup = (setup?: ord.IReactionSetup | null): ReactionSetup => {
+  const { isAutomated, vessel, environment } = setup ?? {};
+  return withId({
+    isAutomated: ordBooleanToReaction(isAutomated),
+    vessel: ordVesselSetupToReaction(vessel),
+    environment: ordEnvironmentSetupToReaction(environment),
+  });
+};
+
+export const reactionSetupToOrdSetup = ({ isAutomated, vessel, environment }: ReactionSetup): ord.IReactionSetup => {
+  return {
+    isAutomated: reactionBooleanToOrd(isAutomated),
+    vessel: reactionVesselSetupToOrd(vessel),
+    environment: reactionEnvironmentSetupToOrd(environment),
   };
 };

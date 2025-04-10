@@ -45,7 +45,7 @@ import {
   reactionConditionsToOrdConditions,
 } from './reactionConditions/reactionConditions.converter';
 import { ordWorkupToReaction, reactionWorkupToOrd } from './reactionWorkups/reactionWorkups.converters.ts';
-import { ordSetupToReactionSetup, reactionsetupToOrdSetup } from './reactionSetup/reactionSetup.converter.ts';
+import { ordSetupToReactionSetup, reactionSetupToOrdSetup } from './reactionSetup/reactionSetup.converter.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -68,7 +68,7 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     inputs: reactionInputsToOrdInputs(reaction.inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
     identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
-    setup: reactionsetupToOrdSetup(reaction.setup),
+    setup: reactionSetupToOrdSetup(reaction.setup),
     observations: reaction.observations.map(reactionObservationToOrdObservation),
     conditions: reactionConditionsToOrdConditions(reaction.conditions),
     notes: reactionNotesToOrd(reaction.notes),

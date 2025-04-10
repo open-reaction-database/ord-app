@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactionContext } from 'features/reactions/reactions.context';
+import { Button, Flex, Title } from '@mantine/core';
 import { useContext } from 'react';
-import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
-import { useAppDispatch } from 'store/useAppDispatch';
-import type { ReactionViewSectionProps } from '../reactionView.types';
-import { Button, Flex, Title } from '@mantine/core';
-import { AddCircleIcon } from 'common/icons';
 import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
+import { AddCircleIcon } from 'common/icons';
+import type { ReactionViewSectionProps } from '../reactionView.types';
+import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
+import { reactionContext } from 'features/reactions/reactions.context';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from 'store/useAppDispatch';
 
-export const ENTITY_FIELD = 'setup';
+const ENTITY_FIELD = 'setup';
 
 export function Setup({ reactionId }: ReactionViewSectionProps) {
   const dispatch = useAppDispatch();
   const setup = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  console.log(setup);
 
   const { isViewOnly } = useContext(reactionContext);
 
@@ -55,7 +55,17 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
       </Flex>
       <RequiredOptionalFields
         entity={setup}
-        requiredFields={[{ label: 'Vessel', render: setup => setup.vessel }]}
+        requiredFields={[
+          { label: 'Vessel Type', render: (setup: ReactionSetup) => setup.vessel.type },
+          { label: 'Vessel Details', render: (setup: ReactionSetup) => setup.vessel.details },
+        ]}
+      />
+      <RequiredOptionalFields
+        entity={setup}
+        requiredFields={[
+          { label: 'Material Type', render: (setup: ReactionSetup) => setup.vessel.material.type },
+          { label: 'Material Details', render: (setup: ReactionSetup) => setup.vessel.material.details },
+        ]}
       />
     </Flex>
   );

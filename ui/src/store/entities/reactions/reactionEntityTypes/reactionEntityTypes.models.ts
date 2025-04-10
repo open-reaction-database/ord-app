@@ -156,3 +156,10 @@ export const { options: volumeTypeOptions, byValue: volumeTypeByValue } = genera
 export const { options: environmentTypeOptions, byValue: environmentTypeByValue } = generateOptionsAndByValue(
   ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
 );
+
+export const { options: vesselPreparationTypeOptions, byValue: vesselPreparationTypeByValue } =
+  generateOptionsAndByValue(ord.VesselPreparation.VesselPreparationType);
+
+export const { options: vesselAttachmentTypeOptions, byValue: vesselAttachmentTypeByValue } = generateOptionsAndByValue(
+  ord.VesselAttachment.VesselAttachmentType,
+);

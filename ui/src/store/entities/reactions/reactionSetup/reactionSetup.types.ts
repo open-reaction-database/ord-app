@@ -15,14 +15,29 @@
  */
 
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionBoolean, VolumeType } from '../reactionEntity/reactionEntity.types';
+import type {
+  ReactionEnvironmentType,
+  ReactionVesselMaterialType,
+  ReactionVesselType,
+} from '../reactionEntityTypes/reactionEntityTypes.types';
 
-export type VesselType = keyof typeof ord.Vessel.VesselType;
-
-export interface ReactionSetup {
-  id: string;
-  vessel: VesselType;
+export interface ReactionMaterialSetup extends Pick<ord.IVesselMaterial, 'details'> {
+  type: ReactionVesselMaterialType;
 }
 
-export interface ReactionVessel {
-  type: VesselType | null;
+export interface ReactionVesselSetup extends Pick<ord.IVessel, 'details'> {
+  type: ReactionVesselType;
+  material: ReactionMaterialSetup;
+  volume: VolumeType;
+}
+
+export interface ReactionEnvironmentSetup extends Pick<ord.ReactionSetup.IReactionEnvironment, 'details'> {
+  type: ReactionEnvironmentType;
+}
+
+export interface ReactionSetup {
+  isAutomated: ReactionBoolean;
+  vessel: ReactionVesselSetup;
+  environment: ReactionEnvironmentSetup;
 }
