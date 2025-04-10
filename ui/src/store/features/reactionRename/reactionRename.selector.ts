@@ -13,20 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.label {
-  text-wrap: nowrap;
-}
+import { createSelectorFactory } from '../../utils';
 
-.multilineWrapper {
-  overflow-x: hidden;
-}
+const { buildSelector } = createSelectorFactory(state => state.features.reactionRename);
 
-.inlineValue {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-wrap: nowrap;
-}
-
-.multilineValue {
-  white-space: pre-wrap;
-}
+export const selectIsReactionRenameOpened = buildSelector(state => state);

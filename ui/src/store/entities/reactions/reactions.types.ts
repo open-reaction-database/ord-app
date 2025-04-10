@@ -53,6 +53,7 @@ export enum ReactionNodeEntity {
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;
+  conditions: string;
 }
 
 export interface ReactionValidation {

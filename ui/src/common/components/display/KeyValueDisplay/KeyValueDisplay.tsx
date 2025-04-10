@@ -34,7 +34,7 @@ export function KeyValueDisplay({ label, value, multiline }: Readonly<InlineKeyV
     >
       <Text className={clsx(typographyClasses.secondary2, classes.label)}>{label}:</Text>
       {multiline ? (
-        <Text>{value}</Text>
+        <Text className={classes.multilineValue}>{value}</Text>
       ) : (
         <Tooltip label={value}>
           <Text className={classes.inlineValue}>{value}</Text>

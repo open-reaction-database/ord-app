@@ -35,7 +35,6 @@ import { navigate } from 'wouter/use-browser-location';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
-import { getReactionPreviews } from '../reactions/reactions.thunks.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
@@ -44,6 +43,7 @@ import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import type { ThunkDispatch, Action } from '@reduxjs/toolkit';
 import type { AppState } from '../../configureAppStore.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
+import { getReactionPreviews } from '../reactions/reactions.utils.ts';
 
 const getTemplateIdNumber = (templateId: string): number => parseInt(templateId.split('_')[1]);
 const getTemplateIdString = (templateId: number): string => `template_${templateId}`;

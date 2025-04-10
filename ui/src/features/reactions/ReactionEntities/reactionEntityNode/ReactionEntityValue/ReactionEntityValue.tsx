@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NumberInput, Textarea, TextInput } from '@mantine/core';
+import { Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useContext } from 'react';
@@ -21,6 +21,7 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
+import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
 
 const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
   switch (inputType) {
@@ -77,7 +78,7 @@ export function ReactionEntityValue({
       );
     case 'number':
       return (
-        <NumberInput
+        <AppNumberInput
           {...props}
           disabled={isViewOnly}
         />

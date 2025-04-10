@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.label {
-  text-wrap: nowrap;
-}
+import { createReducer } from '@reduxjs/toolkit';
+import { setReactionRenameOpenedAction } from './reactionRename.actions.ts';
+import { addUpdateReactionFieldActions } from '../../entities/reactions/reactions.actions.ts';
 
-.multilineWrapper {
-  overflow-x: hidden;
-}
-
-.inlineValue {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-wrap: nowrap;
-}
-
-.multilineValue {
-  white-space: pre-wrap;
-}
+export const reactionRenameReducer = createReducer(false, builder => {
+  builder.addCase(setReactionRenameOpenedAction, (_, action) => action.payload);
+  builder.addCase(addUpdateReactionFieldActions.success, () => false);
+});

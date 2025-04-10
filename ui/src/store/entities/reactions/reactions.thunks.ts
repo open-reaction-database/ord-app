@@ -27,104 +27,20 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type {
-  AppReaction,
-  DatasetReaction,
-  ReactionId,
-  ReactionMolBlocks,
-  ReactionResponse,
-  ReactionValidation,
-  UpdateReactionSuccessPayload,
-} from './reactions.types.ts';
+import type { ReactionId, ReactionResponse, UpdateReactionSuccessPayload } from './reactions.types.ts';
 import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
-import {
-  convertReactionFloatsToDoubles,
-  ordReactionToReaction,
-  reactionToOrdReaction,
-} from './reactions.converters.ts';
+import { reactionToOrdReaction } from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 import type { Action, ThunkDispatch } from '@reduxjs/toolkit';
 import { getDataset } from '../datasets/datasets.thunks.ts';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
-
-export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
-  const inputsArray = Object.values(reaction.inputs);
-  const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
-    (acc: PreviewsById, [inputName, input]) => ({
-      ...acc,
-      ...input.reduce((acc: PreviewsById, item, index) => {
-        const component = (inputsArray.find(item => item.name === inputName) as ReactionInput).components[index];
-        return {
-          ...acc,
-          [component.id]: item,
-        };
-      }, {}),
-    }),
-    {},
-  );
-
-  const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
-    (acc: PreviewsById, { products }, outcomeIndex) => ({
-      ...acc,
-      ...products.reduce((acc: PreviewsById, item, productIndex) => {
-        const product = reaction.outcomes[outcomeIndex].products[productIndex];
-        return {
-          ...acc,
-          [product.id]: item.molblock,
-          ...item.measurements.reduce((acc: PreviewsById, measurementMolblock, index) => {
-            const measurement = product.measurements[index];
-            return measurement.authenticStandard
-              ? {
-                  ...acc,
-                  [measurement.authenticStandard.id]: measurementMolblock.authentic_standard.molblock,
-                }
-              : acc;
-          }, {}),
-        };
-      }, {}),
-    }),
-    {},
-  );
-  return { ...inputsPreviews, ...outcomesPreviews };
-};
-
-const protobufClassRegExp = /<class '.+'> /g;
-
-const parseValidation = (validation: ReactionValidation): ReactionValidation => {
-  return {
-    errors: validation.errors.map(item => item.replace(protobufClassRegExp, '')),
-    warnings: validation.warnings.map(item => item.replace(protobufClassRegExp, '')),
-  };
-};
-
-const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): DatasetReaction => {
-  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
-  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
-  convertReactionFloatsToDoubles(appReaction);
-  const previews = getReactionPreviews(appReaction, molblocks);
-  const updatedValidation = validation ? parseValidation(validation) : null;
-
-  return {
-    ...rest,
-    previews,
-    data: appReaction,
-    validation: updatedValidation,
-  };
-};
-
-const parseReactionList = (pages: Pages<ReactionResponse>): Pages<DatasetReaction> => {
-  const { items, ...pagination } = pages;
-  const wrappedItems = items.map(parseReaction);
-  return { ...pagination, items: wrappedItems };
-};
+import { getReactionPreviews, parseReaction, parseReactionList, parseValidation } from './reactions.utils.ts';
 
 export const getReactionsList = createThunk(getReactionsListActions, async (_d, getState, datasetId) => {
   try {

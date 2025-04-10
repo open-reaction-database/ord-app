@@ -13,20 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.label {
-  text-wrap: nowrap;
-}
+import { createActionFactory } from '../../utils';
 
-.multilineWrapper {
-  overflow-x: hidden;
-}
+const { createAction } = createActionFactory('reactionRename');
 
-.inlineValue {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-wrap: nowrap;
-}
-
-.multilineValue {
-  white-space: pre-wrap;
-}
+export const setReactionRenameOpenedAction = createAction<boolean>('setOpened');

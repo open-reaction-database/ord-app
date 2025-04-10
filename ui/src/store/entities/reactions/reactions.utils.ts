@@ -17,8 +17,22 @@
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { deepmerge as deepmergeFactory, type Options } from '@fastify/deepmerge';
 import { allowedNodeEntityNames } from './reactions.models.ts';
+import type {
+  AppReaction,
+  DatasetReaction,
+  ReactionMolBlocks,
+  ReactionResponse,
+  ReactionValidation,
+} from './reactions.types.ts';
+import type { PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
+import type { ReactionInput } from './reactionsInputs/reactionInputs.types.ts';
+import type { Pages } from 'common/types';
+import { ord } from 'ord-schema-protobufjs';
+import { Buffer } from 'buffer';
+import { convertReactionFloatsToDoubles, ordReactionToReaction } from './reactions.converters.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
+const protobufClassRegExp = /<class '.+'> /g;
 
 function mergeArray({ isMergeableObject, deepmerge, clone }: MergeArrayOptions) {
   return function (target: Array<unknown>, source: Array<unknown>) {
@@ -110,3 +124,72 @@ export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponent
   }
   return result;
 }
+
+export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+  const inputsArray = Object.values(reaction.inputs);
+  const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
+    (acc: PreviewsById, [inputName, input]) => ({
+      ...acc,
+      ...input.reduce((acc: PreviewsById, item, index) => {
+        const component = (inputsArray.find(item => item.name === inputName) as ReactionInput).components[index];
+        return {
+          ...acc,
+          [component.id]: item,
+        };
+      }, {}),
+    }),
+    {},
+  );
+
+  const outcomesPreviews: PreviewsById = molblocks.outcomes.reduce(
+    (acc: PreviewsById, { products }, outcomeIndex) => ({
+      ...acc,
+      ...products.reduce((acc: PreviewsById, item, productIndex) => {
+        const product = reaction.outcomes[outcomeIndex].products[productIndex];
+        return {
+          ...acc,
+          [product.id]: item.molblock,
+          ...item.measurements.reduce((acc: PreviewsById, measurementMolblock, index) => {
+            const measurement = product.measurements[index];
+            return measurement.authenticStandard
+              ? {
+                  ...acc,
+                  [measurement.authenticStandard.id]: measurementMolblock.authentic_standard.molblock,
+                }
+              : acc;
+          }, {}),
+        };
+      }, {}),
+    }),
+    {},
+  );
+  return { ...inputsPreviews, ...outcomesPreviews };
+};
+
+export const parseValidation = (validation: ReactionValidation): ReactionValidation => {
+  return {
+    errors: validation.errors.map(item => item.replace(protobufClassRegExp, '')),
+    warnings: validation.warnings.map(item => item.replace(protobufClassRegExp, '')),
+  };
+};
+
+export const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): DatasetReaction => {
+  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
+  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
+  convertReactionFloatsToDoubles(appReaction);
+  const previews = getReactionPreviews(appReaction, molblocks);
+  const updatedValidation = validation ? parseValidation(validation) : null;
+
+  return {
+    ...rest,
+    previews,
+    data: appReaction,
+    validation: updatedValidation,
+  };
+};
+
+export const parseReactionList = (pages: Pages<ReactionResponse>): Pages<DatasetReaction> => {
+  const { items, ...pagination } = pages;
+  const wrappedItems = items.map(parseReaction);
+  return { ...pagination, items: wrappedItems };
+};
