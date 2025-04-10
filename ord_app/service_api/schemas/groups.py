@@ -26,7 +26,7 @@ class GroupResponseSchema(BaseSchema):
 class GroupUserResponseSchema(BaseSchema):
     id: int
     name: str
-    role: UserRolesList
+    role: UserRolesList | None = None
 
 
 class GroupCreateSchema(BaseSchema):

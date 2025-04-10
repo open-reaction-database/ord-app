@@ -13,13 +13,14 @@
 # limitations under the License.
 from base64 import b64decode
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import Field, constr, field_validator, model_validator
 from sqlalchemy import Row
 
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH, BaseSchema
+from ord_app.service_api.schemas.groups import GroupUserResponseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
 DownloadFileFormats = Literal["binpb", "json", "txtpb"]
@@ -32,12 +33,7 @@ class DatasetResponseSchema(BaseSchema):
     created_at: datetime
     modified_at: datetime
     owner: UserResponseSchema
-
-
-class _DatasetResponseUserGroupSchema(BaseSchema):
-    id: int
-    name: str
-    role: Optional[str] = Field(default=None, alias="role")
+    groups: list[GroupUserResponseSchema]
 
 
 class _DatasetReactionCountingSchema(BaseSchema):
@@ -49,13 +45,12 @@ class _DatasetReactionCountingSchema(BaseSchema):
 
 class DatasetSharableResponseSchema(DatasetResponseSchema):
     is_sharable: bool
-    groups: list[_DatasetResponseUserGroupSchema]
+    groups: list[GroupUserResponseSchema]
     reactions_count: _DatasetReactionCountingSchema
 
 
 class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
-    groups: list[_DatasetResponseUserGroupSchema]
-
+    groups: list[GroupUserResponseSchema]
     reactions_count: _DatasetReactionCountingSchema
 
     @model_validator(mode="before")
