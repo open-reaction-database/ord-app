@@ -95,7 +95,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'lastModified',
     header: 'Last Modified',
     Cell: ({ row }) => {
-      return <>{formatDate(row.original.modified_at)}</>;
+      return <span>{formatDate(row.original.modified_at)}</span>;
     },
     size: 145,
   },
