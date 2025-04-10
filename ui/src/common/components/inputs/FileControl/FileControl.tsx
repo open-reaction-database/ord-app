@@ -23,6 +23,7 @@ import { RemoveIcon } from 'common/icons';
 import type { FileControlValue } from './fileControl.types.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
+import { MAX_DATA_FILE_SIZE } from 'common/constants.ts';
 
 interface FileControlProps {
   name: string;
@@ -32,8 +33,6 @@ interface FileControlProps {
   onChange: (value: FileControlValue | null) => void;
 }
 
-const MAX_FILE_SIZE = 1024 * 1024;
-
 export function FileControl({ name, value, disabled, onChange, label }: Readonly<FileControlProps>) {
   const { fileName, href } = useFileNameHref(name, value);
   const [file, setFile] = useState<File | null>(null);
@@ -41,7 +40,7 @@ export function FileControl({ name, value, disabled, onChange, label }: Readonly
   const handleChange = useCallback(
     (file: File | null) => {
       if (file) {
-        if (file.size > MAX_FILE_SIZE) {
+        if (file.size > MAX_DATA_FILE_SIZE) {
           showNotification({
             variant: NotificationVariant.ERROR,
             message: `File ${file.name} is too large. Max size is 1MB.`,
