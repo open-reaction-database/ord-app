@@ -131,21 +131,6 @@ service = awsx.ecs.FargateService(
                             backend.get_output("rds_dsn_secret_arn")
                         ).secret_string,
                     ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="VITE_API_ENDPOINT", value="http://localhost:8000/service_api/api/v1"
-                    ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="VITE_AUTH0_DOMAIN", value="dev-z4acb31kcl4prqtw.us.auth0.com"
-                    ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="VITE_AUTH0_CLIENT_ID", value="6iGbDSlSANtgqktlxmERNKUUM8zx89TR"
-                    ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="VITE_AUTH0_AUDIENCE", value="https://dev-z4acb31kcl4prqtw.us.auth0.com/api/v2/"
-                    ),
-                    awsx.ecs.TaskDefinitionKeyValuePairArgs(
-                        name="VITE_AUTH0_ISSUER", value="https://dev-z4acb31kcl4prqtw.us.auth0.com/"
-                    ),
                 ],
             ),
         ),
