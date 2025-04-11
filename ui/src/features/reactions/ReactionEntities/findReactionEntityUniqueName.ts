@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function findReactionEntityUniqueName(entityName: string, names: Array<string>) {
+
+const nameWithSpace = (entityName: string, counter: number): string => `${entityName} ${counter}`;
+
+const nameWithoutSpace = (entityName: string, counter: number): string => `${entityName}${counter}`;
+
+export function findReactionEntityUniqueName(
+  entityName: string,
+  names: Array<string>,
+  includeSpace: boolean = true,
+): string {
   let counter = 1;
   let isValid = false;
-  let newUniqueName: string = `${entityName} ${counter}`;
+  const generateName = includeSpace ? nameWithSpace : nameWithoutSpace;
+  let newUniqueName: string = generateName(entityName, counter);
   while (!isValid) {
-    newUniqueName = `${entityName} ${counter}`;
+    newUniqueName = generateName(entityName, counter);
     isValid = names.every(existingName => existingName !== newUniqueName);
     counter++;
   }

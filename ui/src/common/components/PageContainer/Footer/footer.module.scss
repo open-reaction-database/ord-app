@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.secondary1 {
-  color: var(--color-text-secondary-1);
+.root {
+  width: 100%;
 }
 
-.secondary2 {
-  color: var(--color-text-secondary-2);
+.copyright {
+  margin-right: 28px;
 }
 
-.secondary3 {
-  color: var(--color-text-secondary-3);
+a {
+  color: var(--mantine-color-primary-light-color);
+  text-decoration: none;
 }
 
-.oneLineText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: inherit;
+.footerLinks {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
 }

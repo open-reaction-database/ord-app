@@ -36,6 +36,7 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
       inputType: 'string',
       wrapperConfig: {
         label: 'Analysis name',
+        cannotBeVariable: true,
       },
     },
     {

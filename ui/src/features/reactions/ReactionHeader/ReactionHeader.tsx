@@ -25,7 +25,7 @@ import { fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { renameReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
@@ -34,6 +34,8 @@ import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPr
 import classes from 'common/components/ReactionCard/reactionCard.module.scss';
 import { reactionContext } from '../reactions.context.ts';
 import { domain } from 'common/configuration.constants.ts';
+import { selectIsReactionRenameOpened } from 'store/features/reactionRename/reactionRename.selector.ts';
+import { setReactionRenameOpenedAction } from 'store/features/reactionRename/reactionRename.actions.ts';
 
 interface ReactionHeaderProps {
   datasetId: number;
@@ -46,13 +48,22 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
   const dispatch = useAppDispatch();
   const { isViewOnly } = useContext(reactionContext);
   const reaction = useSelector(selectReactionById(reactionId));
-  const [opened, { open, close }] = useDisclosure();
+  const isRenameOpened = useSelector(selectIsReactionRenameOpened);
+
+  const onRenameOpen = useCallback(() => {
+    dispatch(setReactionRenameOpenedAction(true));
+  }, [dispatch]);
+
+  const onRenameClose = useCallback(() => {
+    dispatch(setReactionRenameOpenedAction(false));
+  }, [dispatch]);
+
   const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const onReactionNameChange = useCallback(
     async (name: string) => {
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: ['reactionId'], newValue: name }));
+      dispatch(renameReaction({ reactionId, name }));
     },
     [dispatch, reactionId],
   );
@@ -136,7 +147,7 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
               <CopyButton options={copyOptions} />
               {!isViewOnly && (
                 <ActionIcon variant="transparent">
-                  <EditIcon onClick={open} />
+                  <EditIcon onClick={onRenameOpen} />
                 </ActionIcon>
               )}
             </Flex>
@@ -155,13 +166,14 @@ export function ReactionHeader({ datasetId, reactionId }: Readonly<ReactionHeade
           />
         </Flex>
       </Paper>
-      {opened && (
+      {isRenameOpened && (
         <InputModal
-          onClose={close}
+          onClose={onRenameClose}
           onSubmit={onReactionNameChange}
           title="Edit Reaction ID"
           inputLabel="Reaction ID"
           initialValue={reaction.data.reactionId ?? ''}
+          stayOpenedOnSubmit
         />
       )}
     </>

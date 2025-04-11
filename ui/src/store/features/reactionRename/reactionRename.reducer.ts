@@ -13,33 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.tableContainer {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  flex-grow: 1;
-}
+import { createReducer } from '@reduxjs/toolkit';
+import { setReactionRenameOpenedAction } from './reactionRename.actions.ts';
+import { renameReactionActions } from '../../entities/reactions/reactions.actions.ts';
 
-.buttons {
-  display: none;
-}
-
-.table {
-  tr:hover {
-    .buttons {
-      display: block;
-    }
-
-    td {
-      color: var(--color-text-primary);
-    }
-
-    td:first-child {
-      color: var(--color-text-hover);
-    }
-  }
-}
-
-.row:hover {
-  cursor: pointer;
-}
+export const reactionRenameReducer = createReducer(false, builder => {
+  builder.addCase(setReactionRenameOpenedAction, (_, action) => action.payload);
+  builder.addCase(renameReactionActions.success, () => false);
+});

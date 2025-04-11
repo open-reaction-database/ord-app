@@ -13,21 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.secondary1 {
-  color: var(--color-text-secondary-1);
-}
+import { createActionFactory } from '../../utils';
 
-.secondary2 {
-  color: var(--color-text-secondary-2);
-}
+const { createAction } = createActionFactory('reactionRename');
 
-.secondary3 {
-  color: var(--color-text-secondary-3);
-}
-
-.oneLineText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: inherit;
-}
+export const setReactionRenameOpenedAction = createAction<boolean>('setOpened');

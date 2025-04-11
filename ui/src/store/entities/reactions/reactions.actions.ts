@@ -20,6 +20,7 @@ import type {
   DatasetReaction,
   UpdateReactionPayload,
   UpdateReactionSuccessPayload,
+  RenameReactionPayload,
 } from './reactions.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
@@ -41,6 +42,8 @@ export const createEmptyReactionActions = createAsyncAction<void, DatasetReactio
 export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, DatasetReaction>(
   'import_from_file',
 );
+
+export const renameReactionActions = createAsyncAction<RenameReactionPayload, RenameReactionPayload>('rename');
 
 export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
