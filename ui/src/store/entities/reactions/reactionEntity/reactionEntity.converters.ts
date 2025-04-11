@@ -81,6 +81,8 @@ import {
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type { ord } from 'ord-schema-protobufjs';
 import type { ElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
+import { convertUtcDateToUserTZ, convertUserTZDateToUtc } from 'common/utils';
+import { DATE_TIME_FORMAT } from 'common/constants.ts';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -296,11 +298,21 @@ export const reactionCompoundIdentifierToOrd = ({
   ...rest,
 });
 
-export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): ReactionDateTime =>
-  dateTime?.value ?? null;
+export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): ReactionDateTime => {
+  if (!dateTime?.value) {
+    return null;
+  }
+  const date = convertUtcDateToUserTZ(dateTime.value);
+  return date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime.value;
+};
 
-export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> =>
-  dateTime ? { value: dateTime } : null;
+export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> => {
+  if (!dateTime) {
+    return null;
+  }
+  const date = convertUserTZDateToUtc(dateTime);
+  return { value: date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime };
+};
 
 export const ordTubingToReaction = (tubing: OrdOptional<ord.FlowConditions.ITubing>): Tubing => {
   const { type, details, diameter } = tubing ?? {};

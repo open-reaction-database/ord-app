@@ -16,25 +16,21 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { DATE_TIME_HUMAN_FORMAT } from '../constants.ts';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
 const userTimezone = dayjs.tz.guess();
 
-export function getDate(inputDate: string): dayjs.Dayjs {
+export function convertUtcDateToUserTZ(inputDate: string): dayjs.Dayjs {
   return dayjs.utc(inputDate).tz(userTimezone);
 }
 
-export function getDateFromUser(inputDate: string | Date): dayjs.Dayjs {
-  return dayjs.tz(inputDate, userTimezone);
+export function convertUserTZDateToUtc(inputDate: string | Date): dayjs.Dayjs {
+  return dayjs.tz(inputDate, userTimezone).utc();
 }
 
-export function formatDateFromUser(inputDate: string | Date): string {
-  return dayjs.tz(inputDate, userTimezone).utc().format(TZ_FORMAT);
-}
-
-export function formatDate(inputDate: string) {
-  return getDate(inputDate).format(TZ_FORMAT);
+export function formatUtcDateToDisplay(inputDate: string) {
+  return convertUtcDateToUserTZ(inputDate).format(DATE_TIME_HUMAN_FORMAT);
 }

@@ -43,8 +43,6 @@ function getDateOrError(value: ValueType, variable: Variable): string {
     throw produceValueTypeError('date', variable);
   }
   const date = dayjs(value);
-  console.info(value, typeof value, date, date.isValid());
-
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }

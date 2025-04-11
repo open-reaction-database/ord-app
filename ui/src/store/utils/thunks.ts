@@ -21,7 +21,6 @@ import { NotificationVariant } from '../../common/types/notification.ts';
 
 function processAxiosError(error: unknown): string | null {
   if (isAxiosError(error)) {
-    console.info('Axios error', error);
     const detail = error.response?.data?.detail;
     if (typeof detail === 'string') {
       showNotification({
