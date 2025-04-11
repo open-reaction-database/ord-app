@@ -28,7 +28,6 @@ const ENTITY_FIELD = 'setup';
 
 export function Setup({ reactionId }: ReactionViewSectionProps) {
   const setup: ReactionSetup = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-  console.log(setup);
 
   return (
     <Flex direction="column">
