@@ -28,7 +28,7 @@ export const DOT_DELIMITER = '·';
 
 export const DATE_FORMAT = 'YYYY-MM-DD';
 
-export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
 

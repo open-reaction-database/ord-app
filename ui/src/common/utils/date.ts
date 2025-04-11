@@ -27,6 +27,14 @@ export function getDate(inputDate: string): dayjs.Dayjs {
   return dayjs.utc(inputDate).tz(userTimezone);
 }
 
+export function getDateFromUser(inputDate: string | Date): dayjs.Dayjs {
+  return dayjs.tz(inputDate, userTimezone);
+}
+
+export function formatDateFromUser(inputDate: string | Date): string {
+  return dayjs.tz(inputDate, userTimezone).utc().format(TZ_FORMAT);
+}
+
 export function formatDate(inputDate: string) {
   return getDate(inputDate).format(TZ_FORMAT);
 }
