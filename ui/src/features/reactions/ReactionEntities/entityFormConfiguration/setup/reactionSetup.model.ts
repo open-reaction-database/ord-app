@@ -22,118 +22,117 @@ import {
 import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid';
 import { booleanOptions } from '../booleanOptions';
-import { buildUseSelectItems } from '../buildUseSelectItems';
+import { buildUseSelectItems, buildUseSelectItemsListFromMap } from '../buildUseSelectItems';
 import { createEntityListItemComponent } from '../EntityListItem/entityListItem.utils';
 import { buildUseCreate } from '../buildUseCreate';
 import { ord } from 'ord-schema-protobufjs';
 import type { ReactionPreparationSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
 import { ordVesselSetupToReaction } from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { compareNamedEntities } from '../compareNamedEntities.ts';
+import { createReactionDataAddItem, reactionDataDisplay } from '../data/reactionData.models.tsx';
+
+export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'preparations'];
+
+export const automationCodeEntityPath = 'automationCode';
 
 export const reactionSetup: Array<ReactionFormNode> = [
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.select,
+      name: 'vessel.type',
+      selectType: 'dropdown',
+      options: vesselTypeOptions,
+      wrapperConfig: {
+        label: 'Vessel',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'vessel.details',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Vessel',
+      },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.select,
+      name: 'vessel.material.type',
+      selectType: 'dropdown',
+      options: vesselMaterialTypeOptions,
+      wrapperConfig: {
+        label: 'Material',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'vessel.material.details',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Details',
+      },
+    },
+  ),
   {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'vessel.type',
-        selectType: 'dropdown',
-        options: vesselTypeOptions,
-        wrapperConfig: {
-          label: 'Vessel',
-        },
-      },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'vessel.details',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Vessel',
-        },
-      },
-    ],
-  },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'vessel.material.type',
-        selectType: 'dropdown',
-        options: vesselMaterialTypeOptions,
-        wrapperConfig: {
-          label: 'Material',
-        },
-      },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'vessel.material.details',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Details',
-        },
-      },
-    ],
-  },
-  wrapInputsWithGrid({
     type: ReactionFormNodeType.vpu,
     name: 'vessel.volume',
     options: volumeTypeOptions,
     wrapperConfig: {
       label: 'Volume',
     },
-    select: 'native-inline',
-  }),
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'isAutomated',
-        selectType: 'segmented',
-        options: booleanOptions,
-        wrapperConfig: {
-          label: 'Automated',
-          hint: 'Whether the reaction conditions cannot be fully described by the fields in this schema.',
-        },
-      },
-    ],
+    select: 'native',
   },
-  {
-    type: ReactionFormNodeType.wrapper,
-    grid: 2,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'environment.type',
-        selectType: 'dropdown',
-        options: environmentTypeOptions,
-        wrapperConfig: {
-          label: 'Environment',
-        },
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.select,
+      name: 'isAutomated',
+      selectType: 'segmented',
+      options: booleanOptions,
+      wrapperConfig: {
+        label: 'Automated',
       },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'environment.details',
-        inputType: 'string',
-        wrapperConfig: {
-          label: 'Details',
-        },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'automatedPlatform',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Platform',
       },
-    ],
-  },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.select,
+      name: 'environment.type',
+      selectType: 'dropdown',
+      options: environmentTypeOptions,
+      wrapperConfig: {
+        label: 'Environment',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'environment.details',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Details',
+      },
+    },
+  ),
   {
     type: ReactionFormNodeType.list,
     getKey: (_, index) => index,
     title: {
-      label: 'Add Vessel Preparation',
+      label: 'Vessel Preparation',
     },
-    useSelectItems: buildUseSelectItems('vesselPreparation'),
+    useSelectItems: buildUseSelectItems(vesselPreparationEntityPath),
     ItemDisplay: createEntityListItemComponent<ReactionPreparationSetup>({
-      entityField: 'vesselPreparation',
-      title: ' Add Vessel Preparation',
+      entityField: vesselPreparationEntityPath,
+      title: 'Vessel Preparation',
       requiredFields: [
         {
           label: 'Type',
@@ -146,10 +145,21 @@ export const reactionSetup: Array<ReactionFormNode> = [
       ],
     }),
     addItem: {
-      label: 'Add Vessel Preparation',
-      useCreate: buildUseCreate('vesselPreparation', index => {
+      label: 'Vessel Preparation',
+      useCreate: buildUseCreate(vesselPreparationEntityPath, index => {
         return [index, ordVesselSetupToReaction(ord.VesselPreparation.toObject(new ord.VesselPreparation()))];
       }),
     },
+  },
+  {
+    type: ReactionFormNodeType.list,
+    getKey: item => (item as AppData).id,
+    title: {
+      label: 'Automation code',
+      hint: 'Details of the exact automation procedure required to perform the reaction',
+    },
+    useSelectItems: buildUseSelectItemsListFromMap(automationCodeEntityPath, compareNamedEntities),
+    ItemDisplay: reactionDataDisplay(automationCodeEntityPath),
+    addItem: createReactionDataAddItem(automationCodeEntityPath, 'Automation code'),
   },
 ];

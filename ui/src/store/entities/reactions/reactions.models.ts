@@ -15,6 +15,6 @@
  */
 import { ReactionNodeEntity } from './reactions.types.ts';
 
-const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers'];
+const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers', 'automationCode'];
 
 export const allowedNodeEntityNames: Array<string> = [...Object.values(ReactionNodeEntity), ...additionalEntityNames];

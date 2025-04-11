@@ -360,5 +360,5 @@ export const convertElectrochemistryTypeToOrd = (
     : ordElectrochemistryTypeToReaction(0);
 };
 
-export const { fromOrd: ordVolumeCondititonToReaction, toOrd: reactionVolumeConditionToOrd } =
+export const { fromOrd: ordVolumeConditionToReaction, toOrd: reactionVolumeConditionToOrd } =
   generateValuePrecisionUnitConverter(ordVolumeTypeToReaction, reactionVolumeTypeToOrd);

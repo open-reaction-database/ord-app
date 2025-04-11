@@ -15,20 +15,26 @@
  */
 
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionBoolean, VolumeType } from '../reactionEntity/reactionEntity.types';
+import type { ReactionBoolean, VolumeType, WithId } from '../reactionEntity/reactionEntity.types';
 import type {
   ReactionEnvironmentType,
   ReactionVesselMaterialType,
   ReactionVesselPreparationType,
   ReactionVesselType,
+  VesselAttachmentType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
+import type { AppData } from '../reactionData/reactionData.types.ts';
 
 export interface ReactionMaterialSetup extends Pick<ord.IVesselMaterial, 'details'> {
   type: ReactionVesselMaterialType;
 }
 
-export interface ReactionPreparationSetup extends Pick<ord.IVesselPreparation, 'details'> {
+export interface ReactionPreparationSetup extends WithId<Pick<ord.IVesselPreparation, 'details'>> {
   type: ReactionVesselPreparationType;
+}
+
+export interface VesselAttachment extends WithId<Pick<ord.IVesselAttachment, 'details'>> {
+  type: VesselAttachmentType;
 }
 
 export interface ReactionVesselSetup extends Pick<ord.IVessel, 'details'> {
@@ -36,14 +42,16 @@ export interface ReactionVesselSetup extends Pick<ord.IVessel, 'details'> {
   material: ReactionMaterialSetup;
   volume: VolumeType;
   preparations: Array<ReactionPreparationSetup>;
+  attachments: Array<VesselAttachment>;
 }
 
 export interface ReactionEnvironmentSetup extends Pick<ord.ReactionSetup.IReactionEnvironment, 'details'> {
   type: ReactionEnvironmentType;
 }
 
-export interface ReactionSetup {
+export interface ReactionSetup extends Pick<ord.IReactionSetup, 'automationPlatform'> {
   isAutomated: ReactionBoolean;
   vessel: ReactionVesselSetup;
   environment: ReactionEnvironmentSetup;
+  automationCode: Record<string, AppData>;
 }

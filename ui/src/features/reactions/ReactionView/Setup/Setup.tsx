@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Title } from '@mantine/core';
-import { useContext } from 'react';
+import { Flex, Title } from '@mantine/core';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
-import { AddCircleIcon } from 'common/icons';
 import type { ReactionViewSectionProps } from '../reactionView.types';
 import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
-import { reactionContext } from 'features/reactions/reactions.context';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from 'store/useAppDispatch';
+import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 
 const ENTITY_FIELD = 'setup';
 
 export function Setup({ reactionId }: ReactionViewSectionProps) {
-  const dispatch = useAppDispatch();
   const setup = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
-
-  const { isViewOnly } = useContext(reactionContext);
-
-  const onEdit = () => dispatch(setReactionPathComponentsList([[ENTITY_FIELD]]));
 
   return (
     <Flex direction="column">
@@ -44,14 +35,7 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
         >
           <Title order={2}>Setup</Title>
         </Flex>
-        {!isViewOnly && (
-          <Button
-            onClick={onEdit}
-            leftSection={<AddCircleIcon />}
-          >
-            Setup
-          </Button>
-        )}
+        <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>
       <RequiredOptionalFields
         entity={setup}
