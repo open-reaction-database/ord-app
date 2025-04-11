@@ -57,46 +57,46 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
             { label: 'Details', render: setup => setup.vessel.material.details },
           ]}
         />
-        {Object.entries(setup.automationCode as Record<string, AppData>).map(([id, automationCode], index) => (
+        {Object.values(setup.automationCode as Record<string, AppData>).map(automationCode => (
           <EntityListItem
-            key={id}
+            key={automationCode.id}
             historyPathComponents={[[ENTITY_FIELD]]}
-            entityField={[ENTITY_FIELD, 'automationCode', id]}
-            title={`Automation Code`}
+            entityField={[ENTITY_FIELD, 'automationCode']}
+            title={item => `Automation Code ${item.name}`}
             requiredFields={[
               { label: 'Type', render: (entity: AppData) => entity.data.type },
               { label: 'Value', render: (entity: AppData) => entity.data.value },
               { label: 'Description', render: (entity: AppData) => entity.description },
             ]}
             entity={automationCode}
-            entityKey={index}
+            entityKey={automationCode.id}
           />
         ))}
-        {setup.vessel.preparations.map((preparations, index) => (
+        {setup.vessel.vesselPreparations.map((preparation, index) => (
           <EntityListItem
-            key={preparations.id}
+            key={preparation.id}
             historyPathComponents={[[ENTITY_FIELD]]}
-            entityField={[ENTITY_FIELD, 'vessel', 'preparations', index.toString()]}
-            title={`Vessel Preparation`}
+            entityField={[ENTITY_FIELD, 'vessel', 'vesselPreparations']}
+            title="Vessel Preparation"
             requiredFields={[
               { label: 'Type', render: ({ type }) => type },
               { label: 'Details', render: ({ details }) => details },
             ]}
-            entity={preparations}
+            entity={preparation}
             entityKey={index}
           />
         ))}
-        {setup.vessel.attachments.map((attachments, index) => (
+        {setup.vessel.vesselAttachments.map((attachment, index) => (
           <EntityListItem
-            key={attachments.id}
+            key={attachment.id}
             historyPathComponents={[[ENTITY_FIELD]]}
-            entityField={[ENTITY_FIELD, 'vessel', 'attachments', index.toString()]}
-            title={`Vessel Attachments`}
+            entityField={[ENTITY_FIELD, 'vessel', 'vesselAttachments']}
+            title="Vessel Attachments"
             requiredFields={[
               { label: 'Type', render: ({ type }) => type },
               { label: 'Details', render: ({ details }) => details },
             ]}
-            entity={attachments}
+            entity={attachment}
             entityKey={index}
           />
         ))}

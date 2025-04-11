@@ -36,8 +36,8 @@ export interface ReactionVessel extends Pick<ord.IVessel, 'details'> {
   type: ReactionVesselType;
   material: ReactionVesselMaterial;
   volume: Volume;
-  preparations: Array<ReactionVesselPreparation>;
-  attachments: Array<ReactionVesselAttachment>;
+  vesselPreparations: Array<ReactionVesselPreparation>;
+  vesselAttachments: Array<ReactionVesselAttachment>;
 }
 export interface ReactionVesselMaterial extends Pick<ord.IVesselMaterial, 'details'> {
   type: ReactionVesselMaterialType;

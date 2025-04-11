@@ -16,27 +16,22 @@
 import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
 import { vesselAttachmentTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
-export const reactionAttachmentSetupForm: Array<ReactionFormNode> = [
+export const reactionVesselAttachments: Array<ReactionFormNode> = [
   {
-    type: ReactionFormNodeType.block,
-    fields: [
-      {
-        type: ReactionFormNodeType.select,
-        name: 'type',
-        selectType: 'dropdown',
-        options: vesselAttachmentTypeOptions,
-        wrapperConfig: {
-          label: 'Type',
-        },
-      },
-      {
-        type: ReactionFormNodeType.value,
-        name: 'details',
-        inputType: 'textarea',
-        wrapperConfig: {
-          label: 'Details',
-        },
-      },
-    ],
+    type: ReactionFormNodeType.select,
+    name: 'type',
+    selectType: 'dropdown',
+    options: vesselAttachmentTypeOptions,
+    wrapperConfig: {
+      label: 'Type',
+    },
+  },
+  {
+    type: ReactionFormNodeType.value,
+    name: 'details',
+    inputType: 'textarea',
+    wrapperConfig: {
+      label: 'Details',
+    },
   },
 ];

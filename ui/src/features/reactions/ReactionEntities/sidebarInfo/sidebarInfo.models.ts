@@ -36,7 +36,7 @@ import type {
 } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
 import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types.ts';
 
-const withoutNestedArray = <T extends object>(object: T, name: keyof T): Omit<T, typeof name> => {
+const withoutNestedArray = <T extends object, K extends keyof T>(object: T, name: K): Omit<T, K> => {
   const { [name]: _, ...rest } = object;
   return rest;
 };
@@ -267,12 +267,12 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     }),
     useInitialValues: buildUseInitialValues(({ vessel, ...rest }: ReactionSetup) => ({
       ...rest,
-      vessel: withoutNestedArray(vessel, 'preparations'),
+      vessel: withoutNestedArray(withoutNestedArray(vessel, 'vesselPreparations'), 'vesselAttachments'),
     })),
   },
   {
-    pathComponents: ['attachments', 'setup'],
-    entityName: ReactionNodeEntity.VesselAttachment,
+    pathComponents: ['vesselAttachments'],
+    entityName: ReactionNodeEntity.VesselAttachments,
     label: 'Vessel Attachment',
     sidebarTitle: createReactionEntityTitle({
       entityName: 'Vessel Attachment',
@@ -281,8 +281,8 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(value => value),
   },
   {
-    pathComponents: ['preparations', 'setup'],
-    entityName: ReactionNodeEntity.VesselPreparation,
+    pathComponents: ['vesselPreparations'],
+    entityName: ReactionNodeEntity.VesselPreparations,
     label: 'Vessel Preparation',
     sidebarTitle: createReactionEntityTitle({
       entityName: 'Vessel Preparation',

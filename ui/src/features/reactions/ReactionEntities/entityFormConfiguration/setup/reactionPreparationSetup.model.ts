@@ -16,7 +16,7 @@
 import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
 import { vesselPreparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
-export const reactionPreparationSetupForm: Array<ReactionFormNode> = [
+export const reactionVesselPreparations: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.select,
     name: 'type',

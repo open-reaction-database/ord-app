@@ -51,8 +51,8 @@ export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): Reac
     type: ordVesselTypeToReaction(type),
     material: ordMaterialSetupToReaction(material),
     volume: ordVolumeConditionToReaction(volume),
-    preparations: (preparations || []).map(ordPreparationSetupToReaction),
-    attachments: (attachments || []).map(ordVesselAttachmentToReaction),
+    vesselPreparations: (preparations || []).map(ordVesselPreparationToReaction),
+    vesselAttachments: (attachments || []).map(ordVesselAttachmentToReaction),
   };
 };
 
@@ -61,18 +61,16 @@ export const reactionVesselSetupToOrd = ({
   details,
   material,
   volume,
-  preparations,
-  attachments,
+  vesselPreparations,
+  vesselAttachments,
 }: ReactionVessel): ord.IVessel => {
-  const attachmentsOrd: Array<ord.IVesselAttachment> | null = [reactionVesselAttachmentToOrd(attachments[0])];
-
   return {
     details,
     type: reactionVesselTypeToOrd(type),
     volume: reactionVolumeConditionToOrd(volume),
     material: reactionMaterialSetupToOrd(material),
-    preparations: preparations.length > 0 ? preparations.map(reactionPreparationSetupToOrd) : null,
-    attachments: attachmentsOrd,
+    preparations: vesselPreparations.length > 0 ? vesselPreparations.map(reactionVesselPreparationToOrd) : null,
+    attachments: vesselAttachments.length > 0 ? vesselAttachments.map(reactionVesselAttachmentToOrd) : null,
   };
 };
 
@@ -87,13 +85,13 @@ export const reactionVesselAttachmentToOrd = ({ type, details }: ReactionVesselA
   details,
 });
 
-export const ordPreparationSetupToReaction = ({ type, details }: ord.IVesselPreparation): ReactionVesselPreparation =>
+export const ordVesselPreparationToReaction = ({ type, details }: ord.IVesselPreparation): ReactionVesselPreparation =>
   withId({
     type: ordVesselPreparationsTypeToReaction(type),
     details,
   });
 
-export const reactionPreparationSetupToOrd = ({
+export const reactionVesselPreparationToOrd = ({
   type,
   details,
 }: ReactionVesselPreparation): ord.IVesselPreparation => ({

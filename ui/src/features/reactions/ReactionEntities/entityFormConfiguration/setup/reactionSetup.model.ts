@@ -30,14 +30,17 @@ import type {
   ReactionVesselAttachment,
   ReactionVesselPreparation,
 } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
-import { ordVesselSetupToReaction } from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
+import {
+  ordVesselPreparationToReaction,
+  ordVesselAttachmentToReaction,
+} from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { compareNamedEntities } from '../compareNamedEntities.ts';
 import { createReactionDataAddItem, reactionDataDisplay } from '../data/reactionData.models.tsx';
 
-export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'preparations'];
-export const vesselAttachmentEntityPath: ReactionPathComponents = ['vessel', 'attachments'];
+export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'vesselPreparations'];
+export const vesselAttachmentEntityPath: ReactionPathComponents = ['vessel', 'vesselAttachments'];
 
 export const automationCodeEntityPath = 'automationCode';
 
@@ -162,7 +165,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Preparation',
       useCreate: buildUseCreate(vesselPreparationEntityPath, index => {
-        return [index, ordVesselSetupToReaction(ord.VesselPreparation.toObject(new ord.VesselPreparation()))];
+        return [index, ordVesselPreparationToReaction(ord.VesselPreparation.toObject(new ord.VesselPreparation()))];
       }),
     },
   },
@@ -190,7 +193,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Attachment',
       useCreate: buildUseCreate(vesselAttachmentEntityPath, index => {
-        return [index, ordVesselSetupToReaction(ord.VesselAttachment.toObject(new ord.VesselAttachment()))];
+        return [index, ordVesselAttachmentToReaction(ord.VesselAttachment.toObject(new ord.VesselAttachment()))];
       }),
     },
   },
