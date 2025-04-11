@@ -51,6 +51,7 @@ export enum ReactionNodeEntity {
   PressureMeasurements = 'pressureMeasurements',
   Workups = 'workups',
   VesselPreparation = 'vesselPreparation',
+  VesselAttachment = 'vesselAttachment',
 }
 
 export interface ReactionSummary {

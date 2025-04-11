@@ -271,6 +271,16 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     })),
   },
   {
+    pathComponents: ['attachments', 'setup'],
+    entityName: ReactionNodeEntity.VesselAttachment,
+    label: 'Vessel Attachment',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Vessel Attachment',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
     pathComponents: ['preparations', 'setup'],
     entityName: ReactionNodeEntity.VesselPreparation,
     label: 'Vessel Preparation',

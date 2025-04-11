@@ -16,11 +16,11 @@
 import type { ord } from 'ord-schema-protobufjs';
 import type {
   ReactionSetup,
-  ReactionVesselSetup,
-  ReactionMaterialSetup,
-  ReactionEnvironmentSetup,
-  ReactionPreparationSetup,
-  VesselAttachment,
+  ReactionVessel,
+  ReactionVesselMaterial,
+  ReactionEnvironment,
+  ReactionVesselPreparation,
+  ReactionVesselAttachment,
 } from './reactionSetup.types';
 import {
   ordMaterialTypeToReaction,
@@ -44,7 +44,7 @@ import {
 } from '../reactionEntity/reactionEntity.converters';
 import { ordDataMapToReactionDataMap, reactionDataMapToOrdDataMap } from '../reactionData/reactionData.converters.ts';
 
-export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVesselSetup => {
+export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVessel => {
   const { type, details, material, volume, preparations, attachments } = vessel ?? {};
   return {
     details,
@@ -63,7 +63,7 @@ export const reactionVesselSetupToOrd = ({
   volume,
   preparations,
   attachments,
-}: ReactionVesselSetup): ord.IVessel => {
+}: ReactionVessel): ord.IVessel => {
   const attachmentsOrd: Array<ord.IVesselAttachment> | null = [reactionVesselAttachmentToOrd(attachments[0])];
 
   return {
@@ -76,29 +76,32 @@ export const reactionVesselSetupToOrd = ({
   };
 };
 
-export const ordVesselAttachmentToReaction = ({ type, details }: ord.IVesselAttachment): VesselAttachment =>
+export const ordVesselAttachmentToReaction = ({ type, details }: ord.IVesselAttachment): ReactionVesselAttachment =>
   withId({
     type: ordVesselAttachmentTypeToReaction(type),
     details,
   });
 
-export const reactionVesselAttachmentToOrd = ({ type, details }: VesselAttachment): ord.IVesselAttachment => ({
+export const reactionVesselAttachmentToOrd = ({ type, details }: ReactionVesselAttachment): ord.IVesselAttachment => ({
   type: reactionVesselAttachmentTypeToOrd(type),
   details,
 });
 
-export const ordPreparationSetupToReaction = ({ type, details }: ord.IVesselPreparation): ReactionPreparationSetup =>
+export const ordPreparationSetupToReaction = ({ type, details }: ord.IVesselPreparation): ReactionVesselPreparation =>
   withId({
     type: ordVesselPreparationsTypeToReaction(type),
     details,
   });
 
-export const reactionPreparationSetupToOrd = ({ type, details }: ReactionPreparationSetup): ord.IVesselPreparation => ({
+export const reactionPreparationSetupToOrd = ({
+  type,
+  details,
+}: ReactionVesselPreparation): ord.IVesselPreparation => ({
   details,
   type: reactionVesselPreparationsTypeToOrd(type),
 });
 
-export const ordMaterialSetupToReaction = (material: OrdOptional<ord.IVesselMaterial>): ReactionMaterialSetup => {
+export const ordMaterialSetupToReaction = (material: OrdOptional<ord.IVesselMaterial>): ReactionVesselMaterial => {
   const { type, details } = material ?? {};
   return {
     details,
@@ -106,14 +109,14 @@ export const ordMaterialSetupToReaction = (material: OrdOptional<ord.IVesselMate
   };
 };
 
-export const reactionMaterialSetupToOrd = ({ type, details }: ReactionMaterialSetup): ord.IVesselMaterial => ({
+export const reactionMaterialSetupToOrd = ({ type, details }: ReactionVesselMaterial): ord.IVesselMaterial => ({
   details,
   type: reactionMaterialTypeToOrd(type),
 });
 
 export const ordEnvironmentSetupToReaction = (
   environment: OrdOptional<ord.ReactionSetup.IReactionEnvironment>,
-): ReactionEnvironmentSetup => {
+): ReactionEnvironment => {
   const { type, details } = environment ?? {};
   return {
     details,
@@ -124,7 +127,7 @@ export const ordEnvironmentSetupToReaction = (
 export const reactionEnvironmentSetupToOrd = ({
   type,
   details,
-}: ReactionEnvironmentSetup): ord.ReactionSetup.IReactionEnvironment => ({
+}: ReactionEnvironment): ord.ReactionSetup.IReactionEnvironment => ({
   details,
   type: reactionEnvitonmentTypeToOrd(type),
 });

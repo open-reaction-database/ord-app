@@ -144,4 +144,4 @@ export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
   diameter: ReactionLength;
 }
 
-export type VolumeType = ReactionValuePrecisionUnit<ReactionVolumeTypeValues>;
+export type Volume = ReactionValuePrecisionUnit<ReactionVolumeTypeValues>;

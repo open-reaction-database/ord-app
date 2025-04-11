@@ -15,43 +15,42 @@
  */
 
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionBoolean, VolumeType, WithId } from '../reactionEntity/reactionEntity.types';
+import type { ReactionBoolean, Volume, WithId } from '../reactionEntity/reactionEntity.types';
 import type {
   ReactionEnvironmentType,
   ReactionVesselMaterialType,
   ReactionVesselPreparationType,
   ReactionVesselType,
-  VesselAttachmentType,
+  ReactionVesselAttachmentType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 import type { AppData } from '../reactionData/reactionData.types.ts';
 
-export interface ReactionMaterialSetup extends Pick<ord.IVesselMaterial, 'details'> {
+export interface ReactionSetup extends Pick<ord.IReactionSetup, 'automationPlatform'> {
+  isAutomated: ReactionBoolean;
+  vessel: ReactionVessel;
+  environment: ReactionEnvironment;
+  automationCode: Record<string, AppData>;
+}
+
+export interface ReactionVessel extends Pick<ord.IVessel, 'details'> {
+  type: ReactionVesselType;
+  material: ReactionVesselMaterial;
+  volume: Volume;
+  preparations: Array<ReactionVesselPreparation>;
+  attachments: Array<ReactionVesselAttachment>;
+}
+export interface ReactionVesselMaterial extends Pick<ord.IVesselMaterial, 'details'> {
   type: ReactionVesselMaterialType;
 }
 
-export interface ReactionPreparationSetup extends WithId<Pick<ord.IVesselPreparation, 'details'>> {
+export interface ReactionVesselPreparation extends WithId<Pick<ord.IVesselPreparation, 'details'>> {
   type: ReactionVesselPreparationType;
 }
 
-export interface VesselAttachment extends WithId<Pick<ord.IVesselAttachment, 'details'>> {
-  type: VesselAttachmentType;
+export interface ReactionVesselAttachment extends WithId<Pick<ord.IVesselAttachment, 'details'>> {
+  type: ReactionVesselAttachmentType;
 }
 
-export interface ReactionVesselSetup extends Pick<ord.IVessel, 'details'> {
-  type: ReactionVesselType;
-  material: ReactionMaterialSetup;
-  volume: VolumeType;
-  preparations: Array<ReactionPreparationSetup>;
-  attachments: Array<VesselAttachment>;
-}
-
-export interface ReactionEnvironmentSetup extends Pick<ord.ReactionSetup.IReactionEnvironment, 'details'> {
+export interface ReactionEnvironment extends Pick<ord.ReactionSetup.IReactionEnvironment, 'details'> {
   type: ReactionEnvironmentType;
-}
-
-export interface ReactionSetup extends Pick<ord.IReactionSetup, 'automationPlatform'> {
-  isAutomated: ReactionBoolean;
-  vessel: ReactionVesselSetup;
-  environment: ReactionEnvironmentSetup;
-  automationCode: Record<string, AppData>;
 }

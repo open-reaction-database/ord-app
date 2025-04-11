@@ -26,7 +26,10 @@ import { buildUseSelectItems, buildUseSelectItemsListFromMap } from '../buildUse
 import { createEntityListItemComponent } from '../EntityListItem/entityListItem.utils';
 import { buildUseCreate } from '../buildUseCreate';
 import { ord } from 'ord-schema-protobufjs';
-import type { ReactionPreparationSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
+import type {
+  ReactionVesselAttachment,
+  ReactionVesselPreparation,
+} from 'store/entities/reactions/reactionSetup/reactionSetup.types';
 import { ordVesselSetupToReaction } from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
@@ -34,6 +37,7 @@ import { compareNamedEntities } from '../compareNamedEntities.ts';
 import { createReactionDataAddItem, reactionDataDisplay } from '../data/reactionData.models.tsx';
 
 export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'preparations'];
+export const vesselAttachmentEntityPath: ReactionPathComponents = ['vessel', 'attachments'];
 
 export const automationCodeEntityPath = 'automationCode';
 
@@ -125,12 +129,23 @@ export const reactionSetup: Array<ReactionFormNode> = [
   ),
   {
     type: ReactionFormNodeType.list,
+    getKey: item => (item as AppData).id,
+    title: {
+      label: 'Automation code',
+      hint: 'Details of the exact automation procedure required to perform the reaction',
+    },
+    useSelectItems: buildUseSelectItemsListFromMap(automationCodeEntityPath, compareNamedEntities),
+    ItemDisplay: reactionDataDisplay(automationCodeEntityPath),
+    addItem: createReactionDataAddItem(automationCodeEntityPath, 'Automation code'),
+  },
+  {
+    type: ReactionFormNodeType.list,
     getKey: (_, index) => index,
     title: {
       label: 'Vessel Preparation',
     },
     useSelectItems: buildUseSelectItems(vesselPreparationEntityPath),
-    ItemDisplay: createEntityListItemComponent<ReactionPreparationSetup>({
+    ItemDisplay: createEntityListItemComponent<ReactionVesselPreparation>({
       entityField: vesselPreparationEntityPath,
       title: 'Vessel Preparation',
       requiredFields: [
@@ -153,13 +168,30 @@ export const reactionSetup: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
-    getKey: item => (item as AppData).id,
+    getKey: (_, index) => index,
     title: {
-      label: 'Automation code',
-      hint: 'Details of the exact automation procedure required to perform the reaction',
+      label: 'Vessel Attachment',
     },
-    useSelectItems: buildUseSelectItemsListFromMap(automationCodeEntityPath, compareNamedEntities),
-    ItemDisplay: reactionDataDisplay(automationCodeEntityPath),
-    addItem: createReactionDataAddItem(automationCodeEntityPath, 'Automation code'),
+    useSelectItems: buildUseSelectItems(vesselAttachmentEntityPath),
+    ItemDisplay: createEntityListItemComponent<ReactionVesselAttachment>({
+      entityField: vesselAttachmentEntityPath,
+      title: 'Vessel Attachment',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => item.type,
+        },
+        {
+          label: 'Details',
+          render: item => item.details ?? '',
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Vessel Attachment',
+      useCreate: buildUseCreate(vesselAttachmentEntityPath, index => {
+        return [index, ordVesselSetupToReaction(ord.VesselAttachment.toObject(new ord.VesselAttachment()))];
+      }),
+    },
   },
 ];
