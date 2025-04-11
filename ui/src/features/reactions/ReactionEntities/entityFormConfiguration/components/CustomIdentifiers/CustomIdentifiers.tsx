@@ -38,8 +38,9 @@ import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
+type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 
 const ENTITY_FIELD = 'molBlockIdentifiers';
 
@@ -78,7 +79,7 @@ export function CustomIdentifiers() {
     dispatch(setReactionLookupOpenedAction(false));
   }, [dispatch]);
 
-  const identifiers: Array<ord.CompoundIdentifier> = useSelectIdentifiers();
+  const identifiers: Array<ReactionCompoundIdentifier> = useSelectIdentifiers();
 
   const handleCloseKetcher = useCallback(() => {
     setEditedMolblock(null);
@@ -90,7 +91,7 @@ export function CustomIdentifiers() {
     openComponentsEditor();
   };
 
-  const onSaveMolblock = (value: Pick<ord.CompoundIdentifier, 'details' | 'value'>) => {
+  const onSaveMolblock = (value: IdentifierData) => {
     if (editedMolblock !== null) {
       const identifier = {
         ...identifiers[editedMolblock],
@@ -138,7 +139,7 @@ export function CustomIdentifiers() {
       >
         {identifiers.map((identifier, index) => (
           <MolblockIdentifier
-            key={identifier.value}
+            key={identifier.id}
             identifier={identifier}
             itemKey={index}
             index={index}

@@ -20,12 +20,13 @@ import { ActionIcon, Button, Flex, Text } from '@mantine/core';
 import { CloseIcon, EditIcon } from 'common/icons';
 import classes from './reactionValueLabel.module.scss';
 import { useSelector } from 'react-redux';
-import { selectTemplateVariableWrapper } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import clsx from 'clsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateVariable, removeVariable } from 'store/entities/templates/templates.thunks.ts';
 import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
+import { findReactionEntityUniqueName } from '../../ReactionEntities/findReactionEntityUniqueName.ts';
 
 type ReactionValueLabelPropsMandatoryLabel = Omit<ReactionValueLabelProps, 'wrapperConfig'> & {
   label: string;
@@ -68,17 +69,30 @@ function TemplateReactionValueLabel({ label, name, type }: Readonly<ReactionValu
     return fieldPathComponents.join('.');
   }, [fieldPathComponents]);
 
-  const variable = useSelector(selectTemplateVariableWrapper(templateId, variablePath));
+  const templateVariables = useSelector(selectTemplateVariablesWrapper(templateId));
+  const variable = templateVariables[variablePath];
   const hasVariable = !!variable;
+
+  const variableNames = useMemo(() => {
+    return Object.values(templateVariables).map(variable => variable.name);
+  }, [templateVariables]);
 
   const onVariableRemove = useCallback(() => {
     dispatch(removeVariable({ templateId, variable: variable }));
   }, [dispatch, templateId, variable]);
 
   const onEditOpen = useCallback(() => {
-    const name = variable?.name ?? labelToVariableName(label);
+    let name: string;
+    if (!variable?.name) {
+      name = labelToVariableName(label);
+      if (variableNames.includes(name)) {
+        name = findReactionEntityUniqueName(name, variableNames, false);
+      }
+    } else {
+      name = variable.name;
+    }
     setVariableNameValue(name);
-  }, [variable, label, setVariableNameValue]);
+  }, [variable, label, setVariableNameValue, variableNames]);
 
   const rootClassName = clsx(classes.badge, { [classes.filled]: hasVariable });
 

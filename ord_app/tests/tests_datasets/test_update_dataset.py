@@ -29,6 +29,7 @@ async def test_update_dataset(api_client, mock_authenticated_user, test_db_sessi
 
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
+    assert response_data["groups"] == [{"id": group.id, "role": "admin", "name": group.name}]
 
     assert response_data["owner"]["id"] == user.id
     assert response_data["owner"]["external_id"] == user.external_id

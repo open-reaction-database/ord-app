@@ -17,16 +17,17 @@ import { memo, useMemo } from 'react';
 import { renderSvg } from 'common/utils/indigo.ts';
 import classes from './molblockIdentifier.module.scss';
 import { Flex } from '@mantine/core';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 interface DisplayMolblockPreviewProps {
-  molblock: string;
-  details: string;
+  identifier: ReactionCompoundIdentifier;
 }
 
 export const DisplayMolblockPreview = memo(function DisplayMolblockPreview({
-  molblock,
-  details,
+  identifier,
 }: Readonly<DisplayMolblockPreviewProps>) {
+  const { value: molblock, details, type } = identifier;
+
   const preview = useMemo(() => {
     return molblock ? `data:image/svg+xml;base64,${renderSvg(molblock, 80)}` : null;
   }, [molblock]);
@@ -38,7 +39,7 @@ export const DisplayMolblockPreview = memo(function DisplayMolblockPreview({
     >
       <img
         className={classes.preview}
-        alt={details}
+        alt={details ?? type}
         src={preview}
       />
     </Flex>

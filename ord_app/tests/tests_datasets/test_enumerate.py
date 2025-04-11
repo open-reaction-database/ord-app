@@ -36,6 +36,7 @@ async def test_create_enumerate_dataset(api_client, mock_authenticated_user, tes
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
     assert response_data["reactions_count"]["total"] == len(payload["reactions"])
+    assert response_data["groups"] == [{"id": group.id, "role": "admin", "name": group.name}]
 
     response_data = api_client.get(f"/api/v1/datasets/{dataset['id']}/reactions").raise_for_status().json()
     assert response_data["total"] == len(payload["reactions"])

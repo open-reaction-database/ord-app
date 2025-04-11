@@ -31,11 +31,12 @@ faker = Faker()
 async def test_create_dataset(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
 
-    payload = {"name": "test name", "description": "test description"}
+    payload = {"name": faker.name(), "description": faker.text(max_nb_chars=20)}
     response_data = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload).raise_for_status().json()
 
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
+    assert response_data["groups"] == [{"id": group.id, "role": "admin", "name": group.name}]
 
     assert response_data["owner"]["id"] == user.id
     assert response_data["owner"]["external_id"] == user.external_id
@@ -59,7 +60,7 @@ async def test_create_dataset_with_generating_name(api_client, mock_authenticate
     (
         ("txtpb", "empty.txtpb", "empty"),
         ("txtpb", "full.txtpb", "full"),
-        ("txtpb", "reaction_duplication.txtpb", "full")
+        ("txtpb", "reaction_duplication.txtpb", "empty")
     )
 )
 async def test_upload_dataset(kind, filename, expected_name, api_client, mock_authenticated_user):
@@ -69,8 +70,9 @@ async def test_upload_dataset(kind, filename, expected_name, api_client, mock_au
         response_data = api_client.post(
             f"/api/v1/groups/{group.id}/datasets/upload", files={"file": (filename, fd.read())}
         ).raise_for_status().json()
-        response_data["name"] = expected_name
-        response_data["owner"]["id"] = user.id
+        assert response_data["name"] == expected_name
+        assert response_data["owner"]["id"] == user.id
+        assert response_data["groups"] == [{"id": group.id, "role": "admin", "name": group.name}]
 
 
 async def test_upload_dataset_with_reaction_validation(api_client, mock_authenticated_user, test_db_session):

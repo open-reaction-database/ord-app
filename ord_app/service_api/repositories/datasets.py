@@ -76,7 +76,10 @@ class DatasetsRepository:
         stmt = (
             select(DatasetModel)
             .where(DatasetModel.id == dataset_id)
-            .options(joinedload(DatasetModel.owner))
+            .options(
+                joinedload(DatasetModel.owner),
+                joinedload(DatasetModel.groups),
+            )
             .limit(1)
         )
         return await self.db.scalar(stmt)

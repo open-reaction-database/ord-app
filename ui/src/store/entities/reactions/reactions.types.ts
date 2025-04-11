@@ -56,6 +56,7 @@ export enum ReactionNodeEntity {
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;
+  conditions: string;
 }
 
 export interface ReactionValidation {
@@ -124,6 +125,11 @@ export type UpdateReactionSuccessPayload = Omit<DatasetReaction, 'data'>;
 
 export interface ImportReactionFromFilePayload {
   file: File;
+}
+
+export interface RenameReactionPayload {
+  reactionId: ReactionId;
+  name: string;
 }
 
 export interface UpdateReactionPayload {

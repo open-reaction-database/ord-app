@@ -34,7 +34,7 @@ export const addIdentifierByName = createThunkWithExplicitResult(
       const identifierValue = result.data.smiles;
       const newIdentifier = ordCompoundIdentifierToReaction(
         ord.CompoundIdentifier.toObject(
-          new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue }),
+          new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue, details: name }),
         ),
       );
       dispatch(addIdentifierByNameActions.success());

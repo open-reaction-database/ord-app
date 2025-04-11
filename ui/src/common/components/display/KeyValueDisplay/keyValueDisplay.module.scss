@@ -26,3 +26,7 @@
   text-overflow: ellipsis;
   text-wrap: nowrap;
 }
+
+.multilineValue {
+  white-space: pre-wrap;
+}

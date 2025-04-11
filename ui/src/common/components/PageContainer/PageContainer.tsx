@@ -20,6 +20,7 @@ import ORDLogo from './ORDLogo.png';
 import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
 import UserMenu from './UserMenu/UserMenu';
 import type { Breadcrumb } from 'common/types/breadcrumbs';
+import { Footer } from './Footer/Footer';
 
 interface PageContainerProps extends PropsWithChildren {
   breadcrumbs: Array<Breadcrumb>;
@@ -58,7 +59,9 @@ export function PageContainer({ children, breadcrumbs, badge }: Readonly<PageCon
         </Flex>
       </AppShell.Main>
 
-      <AppShell.Footer withBorder={false}>© Copyright 2024 Open Reaction Database</AppShell.Footer>
+      <AppShell.Footer withBorder={true}>
+        <Footer />
+      </AppShell.Footer>
     </AppShell>
   );
 }

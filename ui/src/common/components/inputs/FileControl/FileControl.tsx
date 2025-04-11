@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
-import { useCallback, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useState } from 'react';
 import mime from 'mime/lite';
 import { Buffer } from 'buffer';
 import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
 import { inputWrapperClasses } from '../../display/InputWrapper';
 import { RemoveIcon } from 'common/icons';
 import type { FileControlValue } from './fileControl.types.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
+import { MAX_DATA_FILE_SIZE } from 'common/constants.ts';
 
 interface FileControlProps {
   name: string;
@@ -32,10 +35,19 @@ interface FileControlProps {
 
 export function FileControl({ name, value, disabled, onChange, label }: Readonly<FileControlProps>) {
   const { fileName, href } = useFileNameHref(name, value);
+  const [file, setFile] = useState<File | null>(null);
 
   const handleChange = useCallback(
     (file: File | null) => {
       if (file) {
+        if (file.size > MAX_DATA_FILE_SIZE) {
+          showNotification({
+            variant: NotificationVariant.ERROR,
+            message: `File ${file.name} is too large. Max size is 1MB.`,
+          });
+          return;
+        }
+        setFile(file);
         const fileParts = file.name.split('.');
         const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
         file.arrayBuffer().then(buffer => {
@@ -77,6 +89,7 @@ export function FileControl({ name, value, disabled, onChange, label }: Readonly
         </Flex>
       ) : (
         <FileInput
+          value={file}
           onChange={handleChange}
           disabled={disabled}
         />

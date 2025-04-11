@@ -13,39 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.header {
-  height: 40px;
+.tableContainer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  border-color: var(--color-background-gray);
+  flex-direction: column;
+  padding: 20px;
+  flex-grow: 1;
 }
 
-.main {
+.buttons {
+  display: none;
+}
+
+.table {
+  tr:hover {
+    .buttons {
+      display: block;
+    }
+
+    td {
+      color: var(--color-text-primary);
+    }
+
+    td:first-child {
+      color: var(--color-text-hover);
+    }
+  }
+}
+
+.row:hover {
+  cursor: pointer;
+}
+
+.datasetName {
+  color: var(--mantine-color-primary-light-color);
+}
+
+.datasetMenu {
+  transform: rotate(90deg);
+}
+
+.sizeCell {
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 40px 20px 48px;
-  min-width: 1280px;
-  background-color: var(--color-background-main);
 }
 
-.content {
-  flex: 0 1 1440px;
-  max-width: 1440px;
+.countDivider {
+  padding: 0 6px;
 }
 
-.footer {
-  height: 48px;
+.invalidIcon {
   display: flex;
-  align-items: center;
-  color: var(--color-text-secondary-2);
-  background-color: var(--color-background-main);
-  margin: 0 20px;
-}
 
-.logo {
-  width: 54px;
-  height: 24px;
+  svg {
+    align-self: center;
+    color: var(--mantine-color-red-light-color);
+  }
 }

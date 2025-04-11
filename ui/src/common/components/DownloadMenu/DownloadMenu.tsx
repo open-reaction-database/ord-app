@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type JSX, useCallback } from 'react';
+import { type JSX, type MouseEvent, useCallback } from 'react';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
@@ -52,7 +52,11 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
           <Menu.Item
             key={option.format}
             leftSection={<DownloadIcon />}
-            onClick={() => handleDatasetDownload(option.format)}
+            onClick={(event: MouseEvent) => {
+              event.stopPropagation();
+              event.preventDefault();
+              handleDatasetDownload(option.format);
+            }}
           >
             {option.label}
           </Menu.Item>

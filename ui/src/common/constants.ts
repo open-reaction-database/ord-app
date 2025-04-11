@@ -31,3 +31,6 @@ export const DATE_FORMAT = 'YYYY-MM-DD';
 export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
+
+// 1 MB
+export const MAX_DATA_FILE_SIZE = 1024 * 1024;
