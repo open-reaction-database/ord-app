@@ -25,7 +25,7 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import classes from './reactionEntityDateTime.module.scss';
-import { getDate } from 'common/utils';
+import { formatDateFromUser, getDate, getDateFromUser } from 'common/utils';
 import { DATE_TIME_FORMAT } from 'common/constants.ts';
 
 interface ReactionEntityDateTimeLabelProps extends Omit<ReactionEntityNodeProps<ReactionFormDateTime>, 'formMethods'> {
@@ -86,17 +86,18 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
 
   const handleDateChange = useCallback(
     (date: DateValue) => {
-      const updatedValue = dayjs(date).format(DATE_TIME_FORMAT);
-      onChange(updatedValue);
+      if (date) {
+        onChange(formatDateFromUser(date));
+      }
     },
     [onChange],
   );
 
   const handleBlurSelect = (event: FocusEvent<HTMLElement>) => {
     const target = event.target as HTMLInputElement;
-    const updatedDate = dayjs(target.value);
+    const updatedDate = getDateFromUser(target.value);
     if (updatedDate.isValid()) {
-      onChange(updatedDate.format(DATE_TIME_FORMAT));
+      onChange(formatDateFromUser(target.value));
       setIsDateValid(true);
     }
   };

@@ -148,9 +148,14 @@ export const renameReaction = createThunk(renameReactionActions, async (_d, getS
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   async (dispatch, getState, { reactionId }) => {
-    const result = await updateReaction(reactionId, getState);
-    dispatch(addUpdateReactionFieldActions.success(result));
-    showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+    try {
+      const result = await updateReaction(reactionId, getState);
+      dispatch(addUpdateReactionFieldActions.success(result));
+      showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+    } catch (e) {
+      showNotification({ message: 'Failed to update reaction.', variant: NotificationVariant.ERROR });
+      throw e;
+    }
   },
 );
 
