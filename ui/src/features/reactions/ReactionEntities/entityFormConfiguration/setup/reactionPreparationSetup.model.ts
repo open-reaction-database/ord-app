@@ -29,7 +29,7 @@ export const reactionPreparationSetupForm: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.value,
     name: 'details',
-    inputType: 'string',
+    inputType: 'textarea',
     wrapperConfig: {
       label: 'Details',
     },

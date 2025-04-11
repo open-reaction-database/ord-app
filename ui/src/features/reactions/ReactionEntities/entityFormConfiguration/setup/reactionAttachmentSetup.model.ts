@@ -32,7 +32,7 @@ export const reactionAttachmentSetupForm: Array<ReactionFormNode> = [
       {
         type: ReactionFormNodeType.value,
         name: 'details',
-        inputType: 'string',
+        inputType: 'textarea',
         wrapperConfig: {
           label: 'Details',
         },
