@@ -37,7 +37,7 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
       setIsLoading(true);
       dispatch(downloadFileFromUrl(`${url}?file_format=${format}`))
         .catch(error => {
-          console.error('Error downloading file:', error);
+          console.info('Error downloading file:', error);
         })
         .finally(() => {
           setIsLoading(false);
