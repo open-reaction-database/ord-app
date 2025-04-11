@@ -14,7 +14,25 @@
  * limitations under the License.
  */
 import type { AnyAsyncAction, AsyncAction } from 'common/types';
-import type { ThunkWrapper, AppThunk, AppVoidThunk, ThunkCustomWrapper } from 'common/types/store/thunk.ts';
+import type { AppThunk, AppVoidThunk, ThunkCustomWrapper, ThunkWrapper } from 'common/types/store/thunk.ts';
+import { isAxiosError } from 'axios';
+import { showNotification } from '../../common/utils/showNotification.tsx';
+import { NotificationVariant } from '../../common/types/notification.ts';
+
+function processAxiosError(error: unknown): string | null {
+  if (isAxiosError(error)) {
+    console.info('Axios error', error);
+    const detail = error.response?.data?.detail;
+    if (typeof detail === 'string') {
+      showNotification({
+        variant: NotificationVariant.ERROR,
+        message: detail,
+      });
+      return detail;
+    }
+  }
+  return null;
+}
 
 export function createThunk<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
@@ -28,7 +46,8 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
         dispatch(result);
         return result;
       } catch (e) {
-        dispatch(asyncActionCreator.failure(e));
+        const result = processAxiosError(e);
+        dispatch(asyncActionCreator.failure(result));
         return;
       }
     };
@@ -45,7 +64,8 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       try {
         await appThunk(dispatch, getState, extraArgument);
       } catch (e) {
-        dispatch(asyncActionCreator.failure(e));
+        const result = processAxiosError(e);
+        dispatch(asyncActionCreator.failure(result));
         return;
       }
     };

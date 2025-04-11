@@ -27,6 +27,7 @@ interface InputModalProps {
   initialValue?: string;
   inputLabel: string;
   inputPlaceholder?: string;
+  stayOpenedOnSubmit?: true;
 }
 
 interface InputModalForm {
@@ -40,6 +41,7 @@ export function InputModal({
   inputLabel,
   initialValue = '',
   inputPlaceholder = '',
+  stayOpenedOnSubmit,
 }: Readonly<InputModalProps>) {
   const {
     onSubmit: onFormSubmit,
@@ -69,8 +71,10 @@ export function InputModal({
 
   const handleFormSubmit = async (values: InputModalForm) => {
     await onSubmit(values.value);
-    reset();
-    handleClose();
+    if (!stayOpenedOnSubmit) {
+      reset();
+      handleClose();
+    }
   };
 
   return (

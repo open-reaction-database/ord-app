@@ -55,12 +55,17 @@ class DatasetUseCases:
         self, group_id: int, payload: DatasetCreateSchema
     ) -> DatasetModel:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
-        return await self.dataset_repository.get(dataset.id)
+        dataset = await self.dataset_repository.get(dataset.id)
+        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        return dataset
 
     async def enumerate(self, group_id, payload: DatasetEnumerateCreateSchema):
         dataset_payload = {"name": payload.name, "description": payload.description}
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, dataset_payload)
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
+
+        dataset = await self.dataset_repository.get(dataset.id)
+        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
     async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema):
@@ -101,12 +106,10 @@ class DatasetUseCases:
             group_id,
             self.current_user.id,
             payload=dataset_payload.model_dump(),
-            autocommit=False
         )
-        self.db.add(dataset)
-        await self.db.commit()
-
         await self.add_reactions(dataset, dataset_pb.reactions)
+        dataset = await self.dataset_repository.get(dataset.id)
+        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
     async def add_reactions(self, dataset, reactions):
@@ -156,7 +159,9 @@ class DatasetUseCases:
 
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
-        return await self.dataset_repository.get(dataset_id)
+        dataset = await self.dataset_repository.get(dataset_id)
+        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        return dataset
 
     async def delete(self, dataset_id: int):
         return await self.dataset_repository.delete(dataset_id)

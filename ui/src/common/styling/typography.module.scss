@@ -24,3 +24,10 @@
 .secondary3 {
   color: var(--color-text-secondary-3);
 }
+
+.oneLineText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: inherit;
+}

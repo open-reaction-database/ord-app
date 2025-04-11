@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
-import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
 export const reactionObservations: Array<ReactionFormNode> = [
   {
@@ -23,7 +23,7 @@ export const reactionObservations: Array<ReactionFormNode> = [
     wrapperConfig: {
       label: 'Time',
     },
-    options: timeTypeOptions,
+    options: timeUnitOptions,
   },
   {
     type: ReactionFormNodeType.value,

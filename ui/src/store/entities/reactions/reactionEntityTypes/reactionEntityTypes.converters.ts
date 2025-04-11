@@ -21,7 +21,7 @@ import {
   additionSpeedTypeByValue,
   temperatureTypeByValue,
   textureTypeByValue,
-  timeTypeByValue,
+  timeUnitByValue,
   reactionIdentifierTypeByValue,
   analysisTypeByValue,
   measurementTypeByValue,
@@ -41,6 +41,11 @@ import {
   tubingTypeByValue,
   lengthTypeByValue,
   currentTypeByValue,
+  workupTypeByValue,
+  temperatureMeasurementTypeByValue,
+  pressureControlTypeByValue,
+  voltageUnitByValue,
+  pressureMeasurementTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -66,7 +71,7 @@ export const { ordEntityToEntity: ordReactionRoleToReaction, entityToOrdEntity: 
   generateEntityTypeToFromOrd(reactionRoleByValue, ord.ReactionRole.ReactionRoleType);
 
 export const { ordEntityToEntity: ordTimeTypeToReaction, entityToOrdEntity: reactionTimeTypeToOrd } =
-  generateEntityTypeToFromOrd(timeTypeByValue, ord.Time.TimeUnit);
+  generateEntityTypeToFromOrd(timeUnitByValue, ord.Time.TimeUnit);
 
 export const {
   ordEntityToEntity: ordAdditionDeviceTypeToReaction,
@@ -118,6 +123,9 @@ export const {
   entityToOrdEntity: reactionCompoundIdentifierTypeToOrd,
 } = generateEntityTypeToFromOrd(compoundIdentifierTypeByValue, ord.CompoundIdentifier.CompoundIdentifierType);
 
+export const { ordEntityToEntity: ordWorkupTypeToReaction, entityToOrdEntity: reactionWorkupTypeToOrd } =
+  generateEntityTypeToFromOrd(workupTypeByValue, ord.ReactionWorkup.ReactionWorkupType);
+
 export const { ordEntityToEntity: ordAtmosphereTypeToReaction, entityToOrdEntity: reactionAtmosphereTypeToOrd } =
   generateEntityTypeToFromOrd(atmosphereTypeByValue, ord.PressureConditions.Atmosphere.AtmosphereType);
 
@@ -161,3 +169,27 @@ export const { ordEntityToEntity: ordTubingTypeToReaction, entityToOrdEntity: re
 
 export const { ordEntityToEntity: ordCurrentTypeToReaction, entityToOrdEntity: reactionCurrentTypeToOrd } =
   generateEntityTypeToFromOrd(currentTypeByValue, ord.Current.CurrentUnit);
+
+export const {
+  ordEntityToEntity: ordTemperatureMeasurementTypeToReaction,
+  entityToOrdEntity: reactionTemperatureMeasurementTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  temperatureMeasurementTypeByValue,
+  ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType,
+);
+
+export const {
+  ordEntityToEntity: ordPressureControlTypeToReaction,
+  entityToOrdEntity: reactionPressureControlTypeToOrd,
+} = generateEntityTypeToFromOrd(pressureControlTypeByValue, ord.PressureConditions.PressureControl.PressureControlType);
+
+export const { ordEntityToEntity: ordVoltageUnitToReaction, entityToOrdEntity: reactionVoltageUnitToOrd } =
+  generateEntityTypeToFromOrd(voltageUnitByValue, ord.Voltage.VoltageUnit);
+
+export const {
+  ordEntityToEntity: ordPressureMeasurementTypeToReaction,
+  entityToOrdEntity: reactionPressureMeasurementTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  pressureMeasurementTypeByValue,
+  ord.PressureConditions.PressureMeasurement.PressureMeasurementType,
+);

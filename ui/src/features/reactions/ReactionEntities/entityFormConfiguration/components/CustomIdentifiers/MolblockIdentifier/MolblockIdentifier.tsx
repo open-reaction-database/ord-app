@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import { Flex } from '@mantine/core';
 import classes from './molblockIdentifier.module.scss';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
@@ -21,11 +20,12 @@ import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyVa
 import { useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 interface MolblockIdentifierProps {
   index: number;
   itemKey: number;
-  identifier: ord.CompoundIdentifier;
+  identifier: ReactionCompoundIdentifier;
   onEdit: (index: number) => void;
 }
 
@@ -43,10 +43,7 @@ export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Reado
         gap="md"
         className={classes.molblock}
       >
-        <DisplayMolblockPreview
-          molblock={identifier.value}
-          details={identifier.details}
-        />
+        <DisplayMolblockPreview identifier={identifier} />
         <Flex
           direction="column"
           gap="xs"

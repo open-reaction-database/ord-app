@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 import {
-  ReactionFormNodeType,
   type ReactionFormNode,
+  ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { preparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import type { CompoundPreparationType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 
 export const reactionComponentsPreparations: Array<ReactionFormNode> = [
   wrapInputsWithGrid(
@@ -40,4 +41,22 @@ export const reactionComponentsPreparations: Array<ReactionFormNode> = [
       inputType: 'string',
     },
   ),
+  {
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    fields: [
+      {
+        type: ReactionFormNodeType.value,
+        name: 'reactionId',
+        inputType: 'string',
+        wrapperConfig: {
+          label: 'Reaction ID',
+        },
+        condition: {
+          name: 'type',
+          isHidden: type => (type as CompoundPreparationType) !== 'SYNTHESIZED',
+        },
+      },
+    ],
+  },
 ];

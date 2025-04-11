@@ -25,7 +25,7 @@ import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntitie
 import { ordAnalysisToReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-import { timeTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { ProductsComponentsList } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/ProductComponentsList.tsx';
 
 const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, ReactionAnalysis] => {
@@ -45,7 +45,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
       label: 'Time',
       hint: 'The reaction time at which this analysis/characterization was performed.',
     },
-    options: timeTypeOptions,
+    options: timeUnitOptions,
   },
   {
     type: ReactionFormNodeType.objectInitializer,

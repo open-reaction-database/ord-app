@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
+import { createReducer } from '@reduxjs/toolkit';
+import { setReactionRenameOpenedAction } from './reactionRename.actions.ts';
+import { renameReactionActions } from '../../entities/reactions/reactions.actions.ts';
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const TZ_FORMAT = 'DD.MM.YYYY hh:mm a';
-
-export function formatDate(inputDate: string) {
-  const timezone = dayjs.tz.guess();
-  return dayjs.utc(inputDate).tz(timezone).format(TZ_FORMAT);
-}
+export const reactionRenameReducer = createReducer(false, builder => {
+  builder.addCase(setReactionRenameOpenedAction, (_, action) => action.payload);
+  builder.addCase(renameReactionActions.success, () => false);
+});

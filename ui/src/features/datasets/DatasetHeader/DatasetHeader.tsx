@@ -28,12 +28,14 @@ import { useSelector } from 'react-redux';
 import { selectIsDatasetOpened } from 'store/entities/datasets/datasets.selectors.ts';
 import { setDatasetEditOpenedAction } from 'store/entities/datasets/datasets.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { domain, fileDownloadOptions } from 'common/constants.ts';
+import { fileDownloadOptions } from 'common/constants.ts';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import classes from './datasetHeader.module.scss';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import { domain } from 'common/configuration.constants.ts';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -45,6 +47,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const dispatch = useAppDispatch();
   const isEditOpened = useSelector(selectIsDatasetOpened);
   const [removeConfirmOpened, { open: openRemoveConfirm, close: closeRemoveConfirm }] = useDisclosure(false);
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
 
   const openEdit = useCallback(() => {
     dispatch(setDatasetEditOpenedAction(true));
@@ -106,39 +109,42 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
             </Title>
           )}
           <Title order={1}>{dataset.name || dataset.id}</Title>
-          <ActionIcon
-            variant="transparent"
-            onClick={openEdit}
-          >
-            <EditIcon className={classes.editIcon} />
-          </ActionIcon>
+          {canDatasetBeEdited && (
+            <ActionIcon
+              variant="transparent"
+              onClick={openEdit}
+            >
+              <EditIcon className={classes.editIcon} />
+            </ActionIcon>
+          )}
         </Flex>
 
         <div>{dataset.description}</div>
       </div>
 
       <div className={classes.buttonContainer}>
-        <ConfirmPopover
-          opened={removeConfirmOpened}
-          position="right"
-          offset={8}
-          title="Remove dataset"
-          text="Are you sure to remove this dataset?"
-          onConfirm={handleDatasetRemove}
-          onCancel={closeRemoveConfirm}
-          target={
-            <Button
-              classNames={{ section: classes.removeIcon }}
-              variant="transparent"
-              color="red"
-              leftSection={<RemoveIcon />}
-              onClick={openRemoveConfirm}
-            >
-              Remove
-            </Button>
-          }
-        />
-
+        {canDatasetBeEdited && (
+          <ConfirmPopover
+            opened={removeConfirmOpened}
+            position="right"
+            offset={8}
+            title="Remove dataset"
+            text="Are you sure to remove this dataset?"
+            onConfirm={handleDatasetRemove}
+            onCancel={closeRemoveConfirm}
+            target={
+              <Button
+                classNames={{ section: classes.removeIcon }}
+                variant="transparent"
+                color="red"
+                leftSection={<RemoveIcon />}
+                onClick={openRemoveConfirm}
+              >
+                Remove
+              </Button>
+            }
+          />
+        )}
         <DownloadMenu
           options={fileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}

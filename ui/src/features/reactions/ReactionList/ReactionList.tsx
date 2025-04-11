@@ -29,12 +29,14 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
   const reactionsIds = useSelector(selectReactionsOrder);
   const pagination = useSelector(selectReactionsPagination);
   const isLoading = useSelector(selectReactionsLoading);
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
 
   const hasReactions = reactionsIds.length > 0;
 
@@ -70,7 +72,7 @@ export function ReactionList() {
             <Title order={2}>Dataset Reactions</Title>
             {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
           </Flex>
-          <CreateReactionMenu />
+          {canDatasetBeEdited && <CreateReactionMenu />}
         </Flex>
       </Paper>
 

@@ -23,10 +23,12 @@ import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
 import type { ReactionConditions } from './reactionConditions/reactionConditions.types.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
+  Input = 'input',
   Outcomes = 'outcomes',
   Identifiers = 'identifiers',
   Notes = 'notes',
@@ -42,11 +44,16 @@ export enum ReactionNodeEntity {
   Provenance = 'provenance',
   RecordModified = 'recordModified',
   Conditions = 'conditions',
+  TemperatureMeasurements = 'temperatureMeasurements',
+  ElectrochemistryMeasurements = 'electrochemistryMeasurements',
+  PressureMeasurements = 'pressureMeasurements',
+  Workups = 'workups',
 }
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
   summary: Record<string, string | number>;
+  conditions: string;
 }
 
 export interface ReactionValidation {
@@ -74,6 +81,7 @@ export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   conditions: ReactionConditions;
   notes: ReactionNotes;
   provenance: ReactionProvenance;
+  workups: Array<ReactionWorkup>;
 }
 
 export interface ReactionResponse {
@@ -113,6 +121,11 @@ export type UpdateReactionSuccessPayload = Omit<DatasetReaction, 'data'>;
 
 export interface ImportReactionFromFilePayload {
   file: File;
+}
+
+export interface RenameReactionPayload {
+  reactionId: ReactionId;
+  name: string;
 }
 
 export interface UpdateReactionPayload {

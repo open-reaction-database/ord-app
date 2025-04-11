@@ -15,7 +15,7 @@
  */
 import { DataTable } from 'common/components/display/DataTable/DataTable.tsx';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
-import classes from './DatasetTable.module.scss';
+import classes from './datasetTable.module.scss';
 import { useSelector } from 'react-redux';
 import {
   selectAreDatasetsLoading,

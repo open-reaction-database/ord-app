@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Divider, Grid } from '@mantine/core';
+import { Divider, Grid, Title } from '@mantine/core';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { SearchIcon, StylusNoteIcon } from 'common/icons';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
@@ -32,15 +32,15 @@ import { useSelector } from 'react-redux';
 import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reactionLookup.selectors.ts';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
-import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import classes from './customIdentifiers.module.scss';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  ReactionEntityBlock,
+  ReactionEntityBlockTitle,
+} from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-type IdentifierData = Pick<ord.CompoundIdentifier, 'value' | 'details'>;
+type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 
 const ENTITY_FIELD = 'molBlockIdentifiers';
 
@@ -66,13 +66,10 @@ export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const component: ReactionInputComponent = useSelector(selectReactionPartByPath(reactionId, pathComponents));
   const [componentsEditorOpened, { open: openComponentsEditor, close: closeComponentsEditor }] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
   const createNewMolblockIdentifier = useCreateNewMolblockIdentifier();
   const isReactionLookupOpened = useSelector(selectIsReactionLookupOpen);
-
-  const previewStates = useSelector(selectPreviewsByIdsWrapper([component.id]));
 
   const openAddCustomIdentifier = useCallback(() => {
     dispatch(setReactionLookupOpenedAction(true));
@@ -82,7 +79,7 @@ export function CustomIdentifiers() {
     dispatch(setReactionLookupOpenedAction(false));
   }, [dispatch]);
 
-  const identifiers: Array<ord.CompoundIdentifier> = useSelectIdentifiers();
+  const identifiers: Array<ReactionCompoundIdentifier> = useSelectIdentifiers();
 
   const handleCloseKetcher = useCallback(() => {
     setEditedMolblock(null);
@@ -94,7 +91,7 @@ export function CustomIdentifiers() {
     openComponentsEditor();
   };
 
-  const onSaveMolblock = (value: Pick<ord.CompoundIdentifier, 'details' | 'value'>) => {
+  const onSaveMolblock = (value: IdentifierData) => {
     if (editedMolblock !== null) {
       const identifier = {
         ...identifiers[editedMolblock],
@@ -115,15 +112,12 @@ export function CustomIdentifiers() {
         label="At least one identifier is required"
         labelPosition="left"
       />
-      <div className={classes.previewWrapper}>
-        <ReactionComponentPreview previewState={previewStates[component.id]} />
-      </div>
       {!isViewOnly && (
         <Grid>
           <Grid.Col span={6}>
             <PaperButton
-              title="Look up Name"
-              description="In open databases"
+              title="Add Identifier"
+              description="Via Look up Name"
               icon={<SearchIcon />}
               color={colorToCssVariable['orange']}
               onClick={openAddCustomIdentifier}
@@ -131,7 +125,7 @@ export function CustomIdentifiers() {
           </Grid.Col>
           <Grid.Col span={6}>
             <PaperButton
-              title="Draw Component"
+              title="Add Molblock Identifier"
               description="Via Ketcher"
               icon={<StylusNoteIcon />}
               color={colorToCssVariable['green']}
@@ -140,15 +134,19 @@ export function CustomIdentifiers() {
           </Grid.Col>
         </Grid>
       )}
-      {identifiers.map((identifier, index) => (
-        <MolblockIdentifier
-          key={identifier.value}
-          identifier={identifier}
-          itemKey={index}
-          index={index}
-          onEdit={onEditMolblock}
-        />
-      ))}
+      <ReactionEntityBlock
+        renderedTitle={<ReactionEntityBlockTitle leftSection={<Title order={3}>Molblock Identifiers</Title>} />}
+      >
+        {identifiers.map((identifier, index) => (
+          <MolblockIdentifier
+            key={identifier.id}
+            identifier={identifier}
+            itemKey={index}
+            index={index}
+            onEdit={onEditMolblock}
+          />
+        ))}
+      </ReactionEntityBlock>
 
       <ComponentsKetcherEditor
         opened={componentsEditorOpened}

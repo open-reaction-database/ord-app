@@ -46,7 +46,7 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
         color="primary"
         size="lg"
       >
-        Outcome ({outcomeTime})
+        Outcome{outcomeTime ? ` (${outcomeTime})` : ''}
       </Badge>
       <Flex
         gap="sm"

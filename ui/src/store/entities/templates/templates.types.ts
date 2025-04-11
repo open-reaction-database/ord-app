@@ -21,6 +21,7 @@ export enum VariableType {
   Number = 'number',
   Select = 'select',
   Date = 'date',
+  DateTime = 'dateTime',
   NumberArray = 'numberArray',
 }
 

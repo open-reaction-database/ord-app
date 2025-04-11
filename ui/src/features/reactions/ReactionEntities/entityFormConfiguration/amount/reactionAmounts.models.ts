@@ -35,7 +35,7 @@ export const reactionAmounts: Array<ReactionFormNode> = [
     },
     {
       type: ReactionFormNodeType.select,
-      name: 'volumeIncludesSolutes',
+      name: 'amount.volumeIncludesSolutes',
       wrapperConfig: {
         label: 'Includes solutes',
       },

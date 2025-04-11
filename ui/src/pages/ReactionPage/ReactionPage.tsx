@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
@@ -33,6 +33,7 @@ import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractio
 import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
+import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -44,12 +45,8 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   const error = useSelector(selectErrorPage);
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
-  const [isViewOnly, setIsViewOnly] = useState(false);
-
-  const toggleViewOnly = useCallback(() => {
-    setIsViewOnly(prev => !prev);
-  }, [setIsViewOnly]);
-
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
+  const isViewOnly = !canDatasetBeEdited;
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
       { title: 'Datasets', path: '~/' },
@@ -69,7 +66,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
     (): ReactionsContext => ({
       reactionId,
       isTemplate: false,
-      isViewOnly: isViewOnly,
+      isViewOnly,
       ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
       ValueLabelComponent: DatasetReactionValueLabel,
       ViewOnlyLabelComponent: DatasetReactionValueLabel,
@@ -99,7 +96,6 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}
-              onViewOnlyToggle={toggleViewOnly}
             />
             <Paper
               radius="md"
