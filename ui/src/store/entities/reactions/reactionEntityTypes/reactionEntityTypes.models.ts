@@ -140,3 +140,26 @@ export const { options: voltageUnitOptions, byValue: voltageUnitByValue } = gene
 
 export const { options: pressureMeasurementTypeOptions, byValue: pressureMeasurementTypeByValue } =
   generateOptionsAndByValue(ord.PressureConditions.PressureMeasurement.PressureMeasurementType);
+
+export const { options: vesselTypeOptions, byValue: vesselTypeByValue } = generateOptionsAndByValue(
+  ord.Vessel.VesselType,
+);
+
+export const { options: vesselMaterialTypeOptions, byValue: vesselMaterialTypeByValue } = generateOptionsAndByValue(
+  ord.VesselMaterial.VesselMaterialType,
+);
+
+export const { options: volumeTypeOptions, byValue: volumeTypeByValue } = generateOptionsAndByValue(
+  ord.Volume.VolumeUnit,
+);
+
+export const { options: environmentTypeOptions, byValue: environmentTypeByValue } = generateOptionsAndByValue(
+  ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
+);
+
+export const { options: vesselPreparationTypeOptions, byValue: vesselPreparationTypeByValue } =
+  generateOptionsAndByValue(ord.VesselPreparation.VesselPreparationType);
+
+export const { options: vesselAttachmentTypeOptions, byValue: vesselAttachmentTypeByValue } = generateOptionsAndByValue(
+  ord.VesselAttachment.VesselAttachmentType,
+);

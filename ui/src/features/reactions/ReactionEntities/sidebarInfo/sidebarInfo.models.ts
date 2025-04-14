@@ -34,8 +34,9 @@ import type {
   ReactionConditions,
   ReactionTemperatureCondition,
 } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
+import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types.ts';
 
-const withoutMeasurements = <T extends object>(object: T, name: keyof T): Omit<T, typeof name> => {
+const withoutNestedArray = <T extends object, K extends keyof T>(object: T, name: K): Omit<T, K> => {
   const { [name]: _, ...rest } = object;
   return rest;
 };
@@ -257,6 +258,45 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(value => value),
   },
   {
+    pathComponents: ['setup'],
+    entityName: ReactionNodeEntity.Setup,
+    label: 'Setup',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Setup',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(({ vessel, ...rest }: ReactionSetup) => ({
+      ...rest,
+      vessel: withoutNestedArray(withoutNestedArray(vessel, 'vesselPreparations'), 'vesselAttachments'),
+    })),
+  },
+  {
+    pathComponents: ['vesselAttachments'],
+    entityName: ReactionNodeEntity.VesselAttachments,
+    label: 'Vessel Attachment',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Vessel Attachment',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
+    pathComponents: ['vesselPreparations'],
+    entityName: ReactionNodeEntity.VesselPreparations,
+    label: 'Vessel Preparation',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Vessel Preparation',
+      hasDelete: true,
+    }),
+    useInitialValues: buildUseInitialValues(value => value),
+  },
+  {
+    pathComponents: ['automationCode', 'setup'],
+    ...featureSidebarInfo,
+    label: 'Automation Code',
+    sidebarTitle: createReactionEntityTitle({ entityName: 'Automation Code', hasDelete: true }),
+  },
+  {
     pathComponents: ['conditions'],
     entityName: ReactionNodeEntity.Conditions,
     label: 'Conditions',
@@ -267,9 +307,9 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     useInitialValues: buildUseInitialValues(
       ({ temperature, electrochemistry, pressure, ...rest }: ReactionConditions) => ({
         ...rest,
-        temperature: withoutMeasurements(temperature, 'temperatureMeasurements'),
-        electrochemistry: withoutMeasurements(electrochemistry, 'electrochemistryMeasurements'),
-        pressure: withoutMeasurements(pressure, 'pressureMeasurements'),
+        temperature: withoutNestedArray(temperature, 'temperatureMeasurements'),
+        electrochemistry: withoutNestedArray(electrochemistry, 'electrochemistryMeasurements'),
+        pressure: withoutNestedArray(pressure, 'pressureMeasurements'),
       }),
     ),
   },
@@ -317,7 +357,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       ({ input: _, temperature, ...rest }: ReactionWorkup): Partial<ReactionWorkup> => ({
         ...rest,
         temperature: temperature
-          ? (withoutMeasurements(temperature, 'temperatureMeasurements') as ReactionTemperatureCondition)
+          ? (withoutNestedArray(temperature, 'temperatureMeasurements') as ReactionTemperatureCondition)
           : temperature,
       }),
     ),

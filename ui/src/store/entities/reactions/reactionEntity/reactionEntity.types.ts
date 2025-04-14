@@ -35,6 +35,7 @@ import type {
   VoltageUnit,
   ElectrochemistryCellType,
   TubingType,
+  ReactionVolumeTypeValues,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -142,3 +143,5 @@ export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
   type: TubingType;
   diameter: ReactionLength;
 }
+
+export type Volume = ReactionValuePrecisionUnit<ReactionVolumeTypeValues>;

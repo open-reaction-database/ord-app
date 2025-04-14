@@ -25,12 +25,14 @@ import type { ReactionProvenance } from './reactionProvenance/reactionProvenance
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
 import type { ReactionConditions } from './reactionConditions/reactionConditions.types.ts';
+import type { ReactionSetup } from './reactionSetup/reactionSetup.types.ts';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
   Input = 'input',
   Outcomes = 'outcomes',
   Identifiers = 'identifiers',
+  Setup = 'setup',
   Notes = 'notes',
   Components = 'components',
   CrudeComponents = 'crudeComponents',
@@ -48,6 +50,8 @@ export enum ReactionNodeEntity {
   ElectrochemistryMeasurements = 'electrochemistryMeasurements',
   PressureMeasurements = 'pressureMeasurements',
   Workups = 'workups',
+  VesselPreparations = 'vesselPreparations',
+  VesselAttachments = 'vesselAttachments',
 }
 
 export interface ReactionSummary {
@@ -77,6 +81,7 @@ export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;
+  setup: ReactionSetup;
   observations: Array<ReactionObservation>;
   conditions: ReactionConditions;
   notes: ReactionNotes;
