@@ -21,7 +21,7 @@ import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityF
 import { ord } from 'ord-schema-protobufjs';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { formatDate } from 'common/utils';
+import { formatUtcDateToDisplay } from 'common/utils';
 import { ordRecordEventToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
 import type { ReactionRecordEvent } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
@@ -121,7 +121,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       requiredFields: [
         {
           label: 'Time',
-          render: item => (item.time ? formatDate(item.time) : ''),
+          render: item => (item.time ? formatUtcDateToDisplay(item.time) : ''),
         },
         {
           label: 'Person e-mail',

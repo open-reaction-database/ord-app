@@ -13,8 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionNodeEntity } from './reactions.types.ts';
+import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
+import { vesselPreparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
-const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers', 'automationCode'];
-
-export const allowedNodeEntityNames: Array<string> = [...Object.values(ReactionNodeEntity), ...additionalEntityNames];
+export const reactionVesselPreparations: Array<ReactionFormNode> = [
+  {
+    type: ReactionFormNodeType.select,
+    name: 'type',
+    selectType: 'dropdown',
+    options: vesselPreparationTypeOptions,
+    wrapperConfig: {
+      label: 'Type',
+    },
+  },
+  {
+    type: ReactionFormNodeType.value,
+    name: 'details',
+    inputType: 'textarea',
+    wrapperConfig: {
+      label: 'Details',
+    },
+  },
+];

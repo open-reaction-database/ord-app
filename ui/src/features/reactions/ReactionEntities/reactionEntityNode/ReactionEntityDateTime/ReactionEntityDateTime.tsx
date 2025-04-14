@@ -25,8 +25,11 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import classes from './reactionEntityDateTime.module.scss';
-import { formatDateFromUser, getDate, getDateFromUser } from 'common/utils';
 import { DATE_TIME_FORMAT } from 'common/constants.ts';
+
+function formatDate(inputDate: string | Date): string {
+  return dayjs(inputDate).format(DATE_TIME_FORMAT);
+}
 
 interface ReactionEntityDateTimeLabelProps extends Omit<ReactionEntityNodeProps<ReactionFormDateTime>, 'formMethods'> {
   onChange: (value: string) => void;
@@ -45,7 +48,7 @@ function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntity
     (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
-      onChange(dayjs.utc().format(DATE_TIME_FORMAT));
+      onChange(dayjs().format(DATE_TIME_FORMAT));
     },
     [onChange],
   );
@@ -78,7 +81,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
     />
   );
 
-  const dateValue = useMemo(() => getDate(value), [value]);
+  const dateValue = useMemo(() => dayjs(value), [value]);
 
   const [isDateValid, setIsDateValid] = useState(dateValue.isValid() || value === null);
 
@@ -87,7 +90,7 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
   const handleDateChange = useCallback(
     (date: DateValue) => {
       if (date) {
-        onChange(formatDateFromUser(date));
+        onChange(formatDate(date));
       }
     },
     [onChange],
@@ -95,9 +98,9 @@ export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionE
 
   const handleBlurSelect = (event: FocusEvent<HTMLElement>) => {
     const target = event.target as HTMLInputElement;
-    const updatedDate = getDateFromUser(target.value);
+    const updatedDate = dayjs(target.value);
     if (updatedDate.isValid()) {
-      onChange(formatDateFromUser(target.value));
+      onChange(formatDate(target.value));
       setIsDateValid(true);
     }
   };

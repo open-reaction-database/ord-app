@@ -17,7 +17,7 @@ import type { MRT_ColumnDef } from 'mantine-react-table';
 import { type MouseEvent } from 'react';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
-import { formatDate } from 'common/utils';
+import { formatUtcDateToDisplay } from 'common/utils';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { typographyClasses } from 'common/styling';
 import { Tooltip } from '@mantine/core';
@@ -95,7 +95,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'lastModified',
     header: 'Last Modified',
     Cell: ({ row }) => {
-      return <span>{formatDate(row.original.modified_at)}</span>;
+      return <span>{formatUtcDateToDisplay(row.original.modified_at)}</span>;
     },
     size: 145,
   },
