@@ -188,7 +188,7 @@ export const reactionStirringCondition: ReactionFormNode = {
           name: 'stirring.rate.rpm',
           inputType: 'number',
           wrapperConfig: {
-            label: 'RpM',
+            label: 'RPM',
           },
         },
       ],
@@ -221,7 +221,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       selectType: 'segmented',
       options: booleanOptions,
       wrapperConfig: {
-        label: 'Dinamic Conditions',
+        label: 'Dynamic Conditions',
         hint: 'Whether the reaction conditions cannot be fully described by the fields in this schema/form.',
       },
     },
