@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type JSX, type MouseEvent, useCallback } from 'react';
+import { type JSX, type MouseEvent, useCallback, useState, cloneElement } from 'react';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
@@ -30,9 +30,18 @@ interface DownloadMenuProps {
 export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProps>) {
   const dispatch = useAppDispatch();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDatasetDownload = useCallback(
     (format: string) => {
-      dispatch(downloadFileFromUrl(`${url}?file_format=${format}`));
+      setIsLoading(true);
+      dispatch(downloadFileFromUrl(`${url}?file_format=${format}`))
+        .catch(error => {
+          console.info('Error downloading file:', error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     },
     [dispatch, url],
   );
@@ -46,7 +55,11 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
       }}
       width={140}
     >
-      <Menu.Target>{target}</Menu.Target>
+      <Menu.Target>
+        {cloneElement(target, {
+          loading: isLoading,
+        })}
+      </Menu.Target>
       <Menu.Dropdown>
         {options.map(option => (
           <Menu.Item
