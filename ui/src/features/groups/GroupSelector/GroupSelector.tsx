@@ -16,12 +16,12 @@
 import { Select, type SelectProps } from '@mantine/core';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectOrderedGroupsList } from 'store/entities/groups/groups.selectors.ts';
+import { selectAdminGroupsList } from 'store/entities/groups/groups.selectors.ts';
 
 type GroupSelectorProps = Omit<SelectProps, 'data'>;
 
 export function GroupSelector({ ...rest }: Readonly<GroupSelectorProps>) {
-  const groupsList = useSelector(selectOrderedGroupsList);
+  const groupsList = useSelector(selectAdminGroupsList);
   const data = useMemo(() => {
     return groupsList.map(group => ({ value: group.id.toString(), label: group.name }));
   }, [groupsList]);
