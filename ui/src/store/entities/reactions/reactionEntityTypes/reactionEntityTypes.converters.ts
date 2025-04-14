@@ -46,6 +46,12 @@ import {
   pressureControlTypeByValue,
   voltageUnitByValue,
   pressureMeasurementTypeByValue,
+  vesselTypeByValue,
+  vesselMaterialTypeByValue,
+  environmentTypeByValue,
+  volumeTypeByValue,
+  vesselAttachmentTypeByValue,
+  vesselPreparationTypeByValue,
 } from './reactionEntityTypes.models.ts';
 import { ord } from 'ord-schema-protobufjs';
 
@@ -193,3 +199,25 @@ export const {
   pressureMeasurementTypeByValue,
   ord.PressureConditions.PressureMeasurement.PressureMeasurementType,
 );
+
+export const { ordEntityToEntity: ordVesselTypeToReaction, entityToOrdEntity: reactionVesselTypeToOrd } =
+  generateEntityTypeToFromOrd(vesselTypeByValue, ord.Vessel.VesselType);
+
+export const { ordEntityToEntity: ordMaterialTypeToReaction, entityToOrdEntity: reactionMaterialTypeToOrd } =
+  generateEntityTypeToFromOrd(vesselMaterialTypeByValue, ord.VesselMaterial.VesselMaterialType);
+
+export const { ordEntityToEntity: ordEnvironmentTypeToReaction, entityToOrdEntity: reactionEnvitonmentTypeToOrd } =
+  generateEntityTypeToFromOrd(environmentTypeByValue, ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType);
+
+export const { ordEntityToEntity: ordVolumeTypeToReaction, entityToOrdEntity: reactionVolumeTypeToOrd } =
+  generateEntityTypeToFromOrd(volumeTypeByValue, ord.Volume.VolumeUnit);
+
+export const {
+  ordEntityToEntity: ordVesselAttachmentTypeToReaction,
+  entityToOrdEntity: reactionVesselAttachmentTypeToOrd,
+} = generateEntityTypeToFromOrd(vesselAttachmentTypeByValue, ord.VesselAttachment.VesselAttachmentType);
+
+export const {
+  ordEntityToEntity: ordVesselPreparationsTypeToReaction,
+  entityToOrdEntity: reactionVesselPreparationsTypeToOrd,
+} = generateEntityTypeToFromOrd(vesselPreparationTypeByValue, ord.VesselPreparation.VesselPreparationType);

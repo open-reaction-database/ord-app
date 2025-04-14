@@ -17,7 +17,7 @@ import { DataField } from 'common/components/display/DataField/DataField.tsx';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { formatDate } from 'common/utils';
+import { formatUtcDateToDisplay } from 'common/utils';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
@@ -93,7 +93,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
               <CopyButton options={copyToClipboardOptions} />
             </Flex>
           </DataField>
-          <DataField label="Last Modified">{formatDate(dataset.modified_at)}</DataField>
+          <DataField label="Last Modified">{formatUtcDateToDisplay(dataset.modified_at)}</DataField>
         </div>
         <Flex
           className={classes.title}

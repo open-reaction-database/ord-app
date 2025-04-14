@@ -60,3 +60,7 @@ export const selectMemberRoles = createSelector(
     return { isAdmin, hasTwoAdmins };
   },
 );
+
+export const selectAdminGroupsList = createSelector([selectOrderedGroupsList], orderedGroups => {
+  return orderedGroups.filter(group => group.role === USER_ROLES.ADMIN);
+});

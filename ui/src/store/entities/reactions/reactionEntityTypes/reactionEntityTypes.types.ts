@@ -82,3 +82,15 @@ export type TemperatureMeasurementType =
   keyof typeof ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType;
 
 export type PressureMeasurementType = keyof typeof ord.PressureConditions.PressureMeasurement.PressureMeasurementType;
+
+export type ReactionVesselType = keyof typeof ord.Vessel.VesselType;
+
+export type ReactionVesselMaterialType = keyof typeof ord.VesselMaterial.VesselMaterialType;
+
+export type ReactionVesselPreparationType = keyof typeof ord.VesselPreparation.VesselPreparationType;
+
+export type ReactionVesselAttachmentType = keyof typeof ord.VesselAttachment.VesselAttachmentType;
+
+export type ReactionEnvironmentType = keyof typeof ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType;
+
+export type ReactionVolumeTypeValues = keyof typeof ord.Volume.VolumeUnit;
