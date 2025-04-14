@@ -64,6 +64,9 @@ interface ReactionCardProps {
 
 export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
+  if (!reaction) {
+    return null;
+  }
 
   return (
     <Paper
