@@ -73,11 +73,13 @@ interface DatasetReactionCardProps {
 
 export function DatasetReactionCard({ reactionId, index }: Readonly<DatasetReactionCardProps>) {
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const reaction = useSelector(selectReactionById(reactionId));
   return (
     <ReactionCard
       key={reactionId}
       id={reactionId}
       previewRef={previewRef}
+      isInvalid={!reaction.is_valid}
       actions={
         <ReactionHeaderActions
           reactionId={reactionId}

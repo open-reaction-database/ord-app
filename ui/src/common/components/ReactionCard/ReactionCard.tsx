@@ -59,14 +59,15 @@ interface ReactionCardProps {
   title: ReactNode;
   actions: ReactNode;
   previewRef?: MutableRefObject<HTMLDivElement | null>;
+  isInvalid?: boolean;
 }
 
-export function ReactionCard({ id, title, actions, previewRef }: Readonly<ReactionCardProps>) {
+export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
 
   return (
     <Paper
-      className={classes.container}
+      className={`${classes.container} ${isInvalid ? classes.invalidBorder : ''}`}
       radius="sm"
       p="lg"
     >
