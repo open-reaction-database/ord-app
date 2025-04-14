@@ -23,6 +23,7 @@ import { Flex } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
+
 interface ReactionTitleProps {
   index: number;
   id: number;
