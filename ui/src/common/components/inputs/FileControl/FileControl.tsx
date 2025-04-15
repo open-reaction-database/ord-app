@@ -62,6 +62,7 @@ export function FileControl({ name, value, disabled, onChange, label }: Readonly
   );
 
   const handleRemoveFile = useCallback(() => {
+    setFile(null);
     onChange(null);
   }, [onChange]);
 
