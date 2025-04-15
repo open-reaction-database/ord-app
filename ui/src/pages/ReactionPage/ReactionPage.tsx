@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { Flex, Paper } from '@mantine/core';
+import { Flex, Paper, SegmentedControl } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
@@ -34,6 +34,7 @@ import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import { colorToCssVariable } from 'common/styling/colors.ts';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -47,6 +48,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   const dataset = useSelector(selectDatasetById(datasetId));
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
   const isViewOnly = !canDatasetBeEdited;
+  const [viewMode, setViewMode] = useState<'tabs' | 'list'>('tabs');
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
       { title: 'Datasets', path: '~/' },
@@ -97,12 +99,34 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
               datasetId={datasetId}
               reactionId={reactionId}
             />
-            <Paper
-              radius="md"
-              p="lg"
-            >
-              <ReactionTabs reactionId={reactionId} />
-            </Paper>
+            <SegmentedControl
+              value={viewMode}
+              style={{ width: '300px' }}
+              color={colorToCssVariable['blue']}
+              onChange={value => setViewMode(value as 'tabs' | 'list')}
+              data={[
+                { label: 'Tabs', value: 'tabs' },
+                { label: 'List', value: 'list' },
+              ]}
+            />
+            {viewMode === 'tabs' && (
+              <Paper
+                radius="md"
+                p="lg"
+              >
+                <ReactionTabs reactionId={reactionId} />
+              </Paper>
+            )}
+
+            {viewMode === 'list' && (
+              <Paper
+                radius="md"
+                p="lg"
+              >
+                <div>Test</div>
+              </Paper>
+            )}
+
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>
         )}
