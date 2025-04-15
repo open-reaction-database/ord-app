@@ -19,6 +19,8 @@ import { Link, useParams } from 'wouter';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
+import { Flex } from '@mantine/core';
+import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
 
@@ -50,6 +52,16 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
         {reaction.pb_reaction_id}
       </Link>
       <CopyButton options={copyToClipboardOptions} />
+      {!reaction.is_valid && (
+        <Flex
+          align="center"
+          gap="4px"
+          className={classes.invalidReactionContainer}
+        >
+          <AlertCircleIcon />
+          <span>Invalid reaction</span>
+        </Flex>
+      )}
     </>
   );
 }
@@ -61,11 +73,13 @@ interface DatasetReactionCardProps {
 
 export function DatasetReactionCard({ reactionId, index }: Readonly<DatasetReactionCardProps>) {
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const reaction = useSelector(selectReactionById(reactionId));
   return (
     <ReactionCard
       key={reactionId}
       id={reactionId}
       previewRef={previewRef}
+      isInvalid={!reaction.is_valid}
       actions={
         <ReactionHeaderActions
           reactionId={reactionId}
