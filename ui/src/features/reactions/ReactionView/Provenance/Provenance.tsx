@@ -17,7 +17,7 @@ import { Flex, Title } from '@mantine/core';
 import classes from './provenance.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
-import { formatUtcDateToDisplay } from 'common/utils';
+import { formatDateToDisplay } from 'common/utils';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
@@ -72,7 +72,7 @@ export function Provenance() {
         <RequiredOptionalFields
           entity={provenance.recordCreated}
           requiredFields={[
-            { label: 'Time', render: ({ time }) => (time ? formatUtcDateToDisplay(time) : '') },
+            { label: 'Time', render: ({ time }) => (time ? formatDateToDisplay(time) : '') },
             { label: 'E-mail', render: ({ person }) => person.email },
             { label: 'ORCID ID', render: ({ person }) => person.orcid },
             { label: 'Username', render: ({ person }) => person.username },
@@ -92,7 +92,7 @@ export function Provenance() {
             entityField={[ENTITY_FIELD, 'recordModified']}
             title="Record Modification"
             requiredFields={[
-              { label: 'Time', render: ({ time }) => (time ? formatUtcDateToDisplay(time) : '') },
+              { label: 'Time', render: ({ time }) => (time ? formatDateToDisplay(time) : '') },
               { label: 'Person Email', render: ({ person }) => person.email },
               { label: 'Details', render: ({ details }) => details },
             ]}

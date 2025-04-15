@@ -34,3 +34,7 @@ export function convertUserTZDateToUtc(inputDate: string | Date): dayjs.Dayjs {
 export function formatUtcDateToDisplay(inputDate: string) {
   return convertUtcDateToUserTZ(inputDate).format(DATE_TIME_HUMAN_FORMAT);
 }
+
+export function formatDateToDisplay(inputDate: string | Date) {
+  return dayjs(inputDate).format(DATE_TIME_HUMAN_FORMAT);
+}
