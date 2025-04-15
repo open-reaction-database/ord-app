@@ -19,13 +19,18 @@ import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { GroupsDrawer } from 'features/groups/GroupsSidebar/GroupsDrawer/GroupsDrawer.tsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { createGroup } from 'store/entities/groups/groups.thunks.ts';
+import { createGroup, getGroupList } from 'store/entities/groups/groups.thunks.ts';
 import { GroupsList } from 'features/groups/GroupsList/GroupsList.tsx';
 import classes from './GroupsSidebar.module.scss';
+import { useEffect } from 'react';
 
 export function GroupsSidebar() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
+
+  useEffect(() => {
+    dispatch(getGroupList());
+  }, [dispatch]);
 
   const handleGroupAddition = async (value: string) => {
     dispatch(createGroup(value));
