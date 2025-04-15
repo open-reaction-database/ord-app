@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Flex, Paper, Title } from '@mantine/core';
+import clsx from 'clsx';
 import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
@@ -59,14 +60,18 @@ interface ReactionCardProps {
   title: ReactNode;
   actions: ReactNode;
   previewRef?: MutableRefObject<HTMLDivElement | null>;
+  isInvalid?: boolean;
 }
 
-export function ReactionCard({ id, title, actions, previewRef }: Readonly<ReactionCardProps>) {
+export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
+  if (!reaction) {
+    return null;
+  }
 
   return (
     <Paper
-      className={classes.container}
+      className={clsx(classes.container, { [classes.invalidBorder]: isInvalid })}
       radius="sm"
       p="lg"
     >
