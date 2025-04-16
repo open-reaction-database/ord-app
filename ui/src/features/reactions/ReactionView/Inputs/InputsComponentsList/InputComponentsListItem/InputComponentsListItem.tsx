@@ -23,6 +23,7 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 
 interface InputComponentsListItemProps {
   name: string;
@@ -31,7 +32,7 @@ interface InputComponentsListItemProps {
   historyPathComponents: Array<ReactionPathComponents>;
 }
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
+const renderDetails = ({ amount }: ReactionInputComponent) => renderValuePrecisionUnit(amount);
 
 export function InputComponentsListItem({
   input,
