@@ -23,7 +23,7 @@ const activeGroupId = createReducer<number | null>(null, builder => {
 
 const editingGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(setEditingGroupIdAction, (_, action) => action.payload);
-  builder.addCase(createGroupActions.success, (_, action) => action.payload.id);
+  builder.addCase(createGroupActions.success, (_, action) => action.payload);
 });
 
 const isAddingMember = createReducer<boolean>(false, builder => {

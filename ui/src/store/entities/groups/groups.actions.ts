@@ -19,11 +19,11 @@ import type { USER_ROLES } from 'common/types';
 
 const { createAsyncAction, createAction } = createActionFactory('groups');
 
-export const getGroupActions = createAsyncAction<number, GroupItem>('get');
+export const getGroupActions = createAsyncAction<number, void>('get');
 
 export const getGroupListActions = createAsyncAction<void, Array<GroupItem>>('list');
 
-export const createGroupActions = createAsyncAction<string, GroupItem>('create');
+export const createGroupActions = createAsyncAction<string, number>('create');
 
 export const updateGroupActions = createAsyncAction<Partial<Group>, GroupItem>('update');
 
