@@ -30,9 +30,11 @@ import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisi
 import { appAmountUnspecified, massUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
-import { useContext, type ChangeEvent } from 'react';
+import { type ChangeEvent, useContext, useMemo } from 'react';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
+import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 
@@ -128,6 +130,44 @@ const typeToDefaultValue = {
   [ReactionMeasurementValueType.String]: '',
 };
 
+function optionalStringNumberToNumber(value: Optional<number | string>): Optional<number> {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  const parsedValue = parseFloat(value);
+  return Number.isNaN(parsedValue) ? null : parsedValue;
+}
+
+function handleMeasurementTypeChange(
+  previousValue: ReactionMeasurementValue,
+  newType: ReactionMeasurementValueType,
+): ReactionMeasurementValue {
+  let precisionNumberValue: Optional<number>;
+  let mainValue: Optional<number | string>;
+  if (previousValue.type === ReactionMeasurementValueType.String) {
+    mainValue = previousValue.value;
+    precisionNumberValue = null;
+  } else {
+    mainValue = previousValue.value.value ?? null;
+    precisionNumberValue = previousValue.value.precision ?? null;
+  }
+
+  if (newType === ReactionMeasurementValueType.String) {
+    return { type: newType, value: mainValue ? mainValue.toString() : '' };
+  }
+  const mainNumberValue = optionalStringNumberToNumber(mainValue);
+  const newValue = {
+    ...typeToDefaultValue[newType],
+    value: mainNumberValue,
+    precision: precisionNumberValue,
+  };
+
+  return { type: newType, value: newValue } as ReactionMeasurementValue;
+}
+
 const defaultValueType = ReactionMeasurementValueType.Percent;
 
 const defaultMeasurementValue: ReactionMeasurementValueNumber = {
@@ -136,20 +176,42 @@ const defaultMeasurementValue: ReactionMeasurementValueNumber = {
 };
 
 export function MeasurementValueControl({ name, formMethods }: Readonly<ReactionFormCustomProps>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
   const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
   });
-  const { value, type } = measurementValue ?? defaultMeasurementValue;
+  const activeMeasurementValue = measurementValue ?? defaultMeasurementValue;
+  const { value, type } = activeMeasurementValue;
   const Component = typeToComponent[type];
+
+  const valueName = useMemo(() => {
+    switch (type) {
+      case ReactionMeasurementValueType.Mass:
+      case ReactionMeasurementValueType.Percent:
+      case ReactionMeasurementValueType.Number:
+        return `${name}.value.value`;
+      default:
+        return `${name}.value`;
+    }
+  }, [name, type]);
+
+  const valueType = useMemo(() => {
+    switch (type) {
+      case ReactionMeasurementValueType.Mass:
+      case ReactionMeasurementValueType.Number:
+      case ReactionMeasurementValueType.Percent:
+        return VariableType.Number;
+      case ReactionMeasurementValueType.String:
+        return VariableType.String;
+    }
+  }, [type]);
 
   const handleValueChange = (newValue: ReactionMeasurementValue['value']) => {
     onChange({ type: type, value: newValue } as ReactionMeasurementValue);
   };
 
   const handleTypeChange = (newType: string) => {
-    const type = newType as ReactionMeasurementValueType;
-    onChange({ type, value: typeToDefaultValue[type] } as ReactionMeasurementValue);
+    onChange(handleMeasurementTypeChange(activeMeasurementValue, newType as ReactionMeasurementValueType));
   };
 
   // Cannot produce correct type because of the map
@@ -157,7 +219,15 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
   const controlValue = value as any;
 
   return (
-    <Input.Wrapper label="Value">
+    <Input.Wrapper
+      label={
+        <ValueLabelComponent
+          name={valueName}
+          type={valueType}
+          wrapperConfig={{ label: 'Value' }}
+        />
+      }
+    >
       <div className={classes.wrapper}>
         <Component
           value={controlValue}

@@ -29,6 +29,7 @@ import { enumerationSetupExistingDatasetSchema, enumerationSetupNewDatasetSchema
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { startEnumeration } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.types.ts';
+import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 
 export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
@@ -48,6 +49,7 @@ export function EnumerationSetup({
     },
     [dispatch],
   );
+  const activeGroupId = useSelector(selectActiveGroupId);
   const doesDatasetExist = !!datasetId;
   const schema = doesDatasetExist ? enumerationSetupExistingDatasetSchema : enumerationSetupNewDatasetSchema;
   const title = doesDatasetExist
@@ -59,7 +61,7 @@ export function EnumerationSetup({
   const form: EnumerationForm = useForm<EnumerationSetupForm, EnumerationFormTransform>({
     initialValues: {
       dataset: datasetId ?? {
-        groupId: null,
+        groupId: activeGroupId ? activeGroupId.toString() : '',
         name: '',
         description: '',
       },

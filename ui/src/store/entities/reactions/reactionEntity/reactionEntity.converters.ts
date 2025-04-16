@@ -32,6 +32,8 @@ import {
   type ReactionDateTime,
   type Tubing,
   type StirringRate,
+  type OrdValuePrecision,
+  type ReactionValuePrecision,
   ReactionBoolean,
 } from './reactionEntity.types';
 import {
@@ -127,6 +129,21 @@ export function reactionBooleanToOrd(value: ReactionBoolean): boolean | null {
     case ReactionBoolean.False:
       return false;
   }
+}
+
+export function ordValuePrecisionToReaction(ordValue: OrdOptional<OrdValuePrecision>): ReactionValuePrecision {
+  const { value, precision } = ordValue ?? {};
+  return {
+    value: value ?? null,
+    precision: precision ?? null,
+  };
+}
+
+export function reactionValuePrecisionToOrd({ value, precision }: ReactionValuePrecision): Optional<OrdValuePrecision> {
+  if (value === null && precision === null) {
+    return null;
+  }
+  return { value, precision };
 }
 
 const generateValuePrecisionUnitConverter = <T extends string>(

@@ -48,46 +48,37 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
     options: timeUnitOptions,
   },
   {
-    type: ReactionFormNodeType.objectInitializer,
-    name: 'conversion',
-    field: {
-      type: ReactionFormNodeType.wrapper,
-      grid: 2,
-      wrapperConfig: {
-        label: 'Limiting reactant conversion',
-        hint: 'Reaction conversion with respect to the limiting reactant. Yields should be associated with specific product structures, defined below.',
-      },
-      fields: [
-        {
-          type: ReactionFormNodeType.group,
-          fields: [
-            {
-              type: ReactionFormNodeType.value,
-              name: 'conversion.value',
-              inputType: 'number',
-              inputConfig: {
-                placeholder: 'Value',
-              },
-              wrapperConfig: {
-                templateLabel: 'Value',
-              },
-            },
-            {
-              type: ReactionFormNodeType.value,
-              name: 'conversion.precision',
-              inputType: 'number',
-              inputConfig: {
-                leftSection: '±',
-                placeholder: 'Precision',
-              },
-              wrapperConfig: {
-                templateLabel: 'Precision',
-              },
-            },
-          ],
-        },
-      ],
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    wrapperConfig: {
+      label: 'Limiting reactant conversion',
+      hint: 'Reaction conversion with respect to the limiting reactant. Yields should be associated with specific product structures, defined below.',
     },
+    fields: [
+      {
+        type: ReactionFormNodeType.value,
+        name: 'conversion.value',
+        inputType: 'number',
+        inputConfig: {
+          placeholder: 'Value',
+        },
+        wrapperConfig: {
+          templateLabel: 'Value',
+        },
+      },
+      {
+        type: ReactionFormNodeType.value,
+        name: 'conversion.precision',
+        inputType: 'number',
+        inputConfig: {
+          leftSection: '±',
+          placeholder: 'Precision',
+        },
+        wrapperConfig: {
+          templateLabel: 'Precision',
+        },
+      },
+    ],
   },
   {
     type: ReactionFormNodeType.custom,
