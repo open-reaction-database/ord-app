@@ -70,12 +70,16 @@ def get_molblocks(pb):
         key: [safe_molblock(component) for component in value.components]
         for key, value in pb.inputs.items()
     }
-    workups = [
-        safe_molblock(component)
-        for workup in pb.workups
-        if hasattr(workup, "input") and hasattr(workup.input, "components")
-        for component in workup.input.components
-    ]
+
+    workups = []
+    for workup in pb.workups:
+        if hasattr(workup, "input") and hasattr(workup.input, "components"):
+            workups.append(
+                [safe_molblock(component) for component in workup.input.components]
+            )
+        else:
+            workups.append([])
+
     return {"outcomes": outcomes, "inputs": inputs, "workups": workups}
 
 
