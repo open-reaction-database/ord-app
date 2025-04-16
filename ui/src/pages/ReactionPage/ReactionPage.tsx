@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { Flex, Paper, SegmentedControl } from '@mantine/core';
+import { type SegmentedControlItem, Flex, Paper, SegmentedControl } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
@@ -36,6 +36,11 @@ import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractio
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { colorToCssVariable } from 'common/styling/colors.ts';
 import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
+
+const VIEW_MODE_OPTIONS: Array<SegmentedControlItem> = [
+  { label: 'Tabs', value: 'tabs' },
+  { label: 'List', value: 'list' },
+];
 
 interface ReactionPageProps {
   reactionId: number;
@@ -103,13 +108,10 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <Paper className={classes.tableContainer}>
               <SegmentedControl
                 value={viewMode}
-                style={{ width: '200px' }}
+                className={classes.controlBlock}
                 color={colorToCssVariable['blue']}
                 onChange={value => setViewMode(value as 'tabs' | 'list')}
-                data={[
-                  { label: 'Tabs', value: 'tabs' },
-                  { label: 'List', value: 'list' },
-                ]}
+                data={VIEW_MODE_OPTIONS}
               />
             </Paper>
             <Paper
