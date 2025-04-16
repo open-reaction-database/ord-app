@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import classes from './reactionPage.module.scss';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
@@ -24,7 +25,6 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
-import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
@@ -35,6 +35,7 @@ import { ReactionViewButton } from 'features/reactions/ReactionInteractions/Reac
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { colorToCssVariable } from 'common/styling/colors.ts';
+import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
 
 interface ReactionPageProps {
   reactionId: number;
@@ -99,34 +100,27 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
               datasetId={datasetId}
               reactionId={reactionId}
             />
-            <SegmentedControl
-              value={viewMode}
-              style={{ width: '300px' }}
-              color={colorToCssVariable['blue']}
-              onChange={value => setViewMode(value as 'tabs' | 'list')}
-              data={[
-                { label: 'Tabs', value: 'tabs' },
-                { label: 'List', value: 'list' },
-              ]}
-            />
-            {viewMode === 'tabs' && (
-              <Paper
-                radius="md"
-                p="lg"
-              >
-                <ReactionTabs reactionId={reactionId} />
-              </Paper>
-            )}
-
-            {viewMode === 'list' && (
-              <Paper
-                radius="md"
-                p="lg"
-              >
-                <div>Test</div>
-              </Paper>
-            )}
-
+            <Paper className={classes.tableContainer}>
+              <SegmentedControl
+                value={viewMode}
+                style={{ width: '200px' }}
+                color={colorToCssVariable['blue']}
+                onChange={value => setViewMode(value as 'tabs' | 'list')}
+                data={[
+                  { label: 'Tabs', value: 'tabs' },
+                  { label: 'List', value: 'list' },
+                ]}
+              />
+            </Paper>
+            <Paper
+              radius="md"
+              p="lg"
+            >
+              <ReactionContent
+                reactionId={reactionId}
+                viewMode={viewMode}
+              />
+            </Paper>
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>
         )}

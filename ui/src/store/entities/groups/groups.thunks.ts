@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * Copyright 2024 Open Reaction Database Project Authors
  *
@@ -30,10 +31,11 @@ import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
+import type { ThunkDispatch } from '@reduxjs/toolkit';
 
-export const getGroup = createThunk(getGroupActions, async (_d, _g, groupId) => {
-  const group = (await axiosInstance.get<GroupItem>(`/groups/${groupId}`)).data;
-  return getGroupActions.success(group);
+export const getGroup = createThunk(getGroupActions, async (dispatch, _g) => {
+  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+  return getGroupActions.success();
 });
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
@@ -41,9 +43,11 @@ export const getGroupList = createThunk(getGroupListActions, async () => {
   return getGroupListActions.success(groups);
 });
 
-export const createGroup = createThunk(createGroupActions, async (_d, _g, name) => {
-  const group = (await axiosInstance.post<GroupItem>('/groups', { name })).data;
-  return createGroupActions.success(group);
+export const createGroup = createThunk(createGroupActions, async (dispatch, _g, name) => {
+  const { id } = (await axiosInstance.post<GroupItem>('/groups', { name })).data;
+
+  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+  return createGroupActions.success(id);
 });
 
 export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g, groupId) => {

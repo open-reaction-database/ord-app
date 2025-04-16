@@ -19,8 +19,6 @@ import { itemsById } from 'common/utils';
 import type { GroupMember, GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
-  createGroupActions,
-  getGroupActions,
   getGroupListActions,
   getGroupMembersActions,
   removeGroupMembersActions,
@@ -44,14 +42,6 @@ const groupNameSearch = createReducer('', builder => {
 
 const groupsById = createReducer<ItemsById<GroupItem>>({}, builder => {
   builder.addCase(getGroupListActions.success, (_, action) => itemsById(action.payload, getGroupId));
-  [getGroupActions.success, createGroupActions.success, updateGroupActions.success].forEach(action =>
-    builder.addCase(action, (state, action) => {
-      return {
-        ...state,
-        [getGroupId(action.payload)]: action.payload,
-      };
-    }),
-  );
 });
 
 const groupsMembersByGroupId = createReducer<ItemsById<Array<GroupMember>>>({}, builder => {
