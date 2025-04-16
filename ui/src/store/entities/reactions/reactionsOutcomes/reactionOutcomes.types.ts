@@ -18,6 +18,7 @@ import type { AppData } from 'store/entities/reactions/reactionData/reactionData
 import type {
   ReactionBoolean,
   ReactionTime,
+  ReactionValuePrecision,
   WithId,
   WithIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
@@ -32,8 +33,9 @@ export interface ReactionAnalysis
   isOfIsolatedSpecies: ReactionBoolean;
 }
 
-export interface ReactionOutcome extends WithId<Pick<ord.IReactionOutcome, 'conversion'>> {
+export interface ReactionOutcome extends WithId<object> {
   reactionTime: ReactionTime;
+  conversion: ReactionValuePrecision;
   analyses: Record<string, ReactionAnalysis>;
   products: Array<ReactionProduct>;
 }

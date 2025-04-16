@@ -74,16 +74,24 @@ export interface ReactionTypeDetails<T extends string> {
   details: Optional<string>;
 }
 
-export interface OrdValuePrecisionUnit {
+export interface OrdValuePrecision {
+  value?: Optional<number>;
+  precision?: Optional<number>;
+}
+
+export interface OrdValuePrecisionUnit extends OrdValuePrecision {
   value?: Optional<number>;
   precision?: Optional<number>;
   units?: Optional<number>;
 }
 
-export interface ReactionValuePrecisionUnit<T extends string> {
-  units: T;
+export interface ReactionValuePrecision {
   value: Optional<number>;
   precision: Optional<number>;
+}
+
+export interface ReactionValuePrecisionUnit<T extends string> extends ReactionValuePrecision {
+  units: T;
 }
 
 export type ReactionSpeed = ReactionTypeDetails<ReactionSpeedType>;

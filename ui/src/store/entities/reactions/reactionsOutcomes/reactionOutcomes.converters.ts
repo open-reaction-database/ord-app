@@ -22,8 +22,10 @@ import {
 import {
   ordBooleanToReaction,
   ordTimeToReaction,
+  ordValuePrecisionToReaction,
   reactionBooleanToOrd,
   reactionTimeToOrd,
+  reactionValuePrecisionToOrd,
   withId,
   withIdName,
   withoutIdName,
@@ -76,7 +78,7 @@ export const ordOutcomeToReactionOutcome = ({
 }: ord.IReactionOutcome): ReactionOutcome =>
   withId({
     reactionTime: ordTimeToReaction(reactionTime),
-    conversion,
+    conversion: ordValuePrecisionToReaction(conversion),
     analyses: Object.entries(analyses || {}).reduce((acc, [name, value]) => {
       const analysis = ordAnalysisToReactionAnalysis(value, name);
       return {
@@ -94,7 +96,7 @@ export const reactionOutcomeToOrdOutcome = ({
   products,
 }: ReactionOutcome): ord.IReactionOutcome => ({
   reactionTime: reactionTimeToOrd(reactionTime),
-  conversion,
+  conversion: reactionValuePrecisionToOrd(conversion),
   analyses: Object.values(analyses || {}).reduce(
     (acc, value) => ({
       ...acc,

@@ -22,7 +22,6 @@ import { ord } from 'ord-schema-protobufjs';
 import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
@@ -52,7 +51,7 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
     const newIdentifier = ordCompoundIdentifierToReaction(
       ord.CompoundIdentifier.toObject(
         new ord.CompoundIdentifier({
-          type: CompoundIdentifierType.MOLBLOCK,
+          type: ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK,
           ...((value as IdentifierData) || {}),
         }),
       ),

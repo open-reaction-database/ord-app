@@ -20,7 +20,7 @@ import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/Group
 import { formatUtcDateToDisplay } from 'common/utils';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { typographyClasses } from 'common/styling';
-import { Tooltip } from '@mantine/core';
+import { ActionIcon, Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import classes from './datasetTable.module.scss';
 import { DotsIcon, AlertCircleIcon } from 'common/icons';
@@ -120,10 +120,13 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
           options={fileDownloadOptions}
           url={`/datasets/${row.original.id}/download`}
           target={
-            <DotsIcon
-              className={classes.datasetMenu}
+            <ActionIcon
               onClick={handleMenu}
-            />
+              variant="transparent"
+              color="default"
+            >
+              <DotsIcon className={classes.datasetMenu} />
+            </ActionIcon>
           }
         />
       );
