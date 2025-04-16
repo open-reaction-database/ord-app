@@ -28,7 +28,7 @@ async def test_get_all_user_templates(api_client, mock_authenticated_user, test_
     response_data = api_client.get("/api/v1/templates").raise_for_status().json()
     assert len(response_data) == 1
     assert response_data[0]["id"] == template.id
-    assert response_data[0]["molblocks"] == {'inputs': {}, 'outcomes': []}
+    assert response_data[0]["molblocks"] == {'inputs': {}, 'outcomes': [], 'workups': []}
 
 
 async def test_get_template(api_client, mock_authenticated_user, test_db_session):

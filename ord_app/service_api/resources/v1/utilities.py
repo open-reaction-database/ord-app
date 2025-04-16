@@ -20,8 +20,8 @@ from ord_schema.message_helpers import create_message, molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
 
-from ord_app.service_api.domain.datasets import send_message
 from ord_app.service_api.schemas.utilites import ResolveCompoundInputs, ResolveCompoundOutputs
+from ord_app.service_api.services.pb_utils import send_message
 from ord_app.service_api.services.resolvers import canonicalize_smiles_cached, name_resolve_cached
 
 router = APIRouter(tags=["utilities"])

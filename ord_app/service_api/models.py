@@ -15,9 +15,12 @@ import datetime
 import re
 from typing import Literal, get_args
 
+from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import Enum, ForeignKey, Index, LargeBinary, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
+
+from ord_app.service_api.services.pb_utils import load_message
 
 UserRolesList = Literal["admin", "editor", "viewer"]
 
@@ -173,6 +176,9 @@ class ReactionModel(BaseModel):
     def __repr__(self):
         return f"<Reaction(id={self.id}, dataset_id={self.dataset_id}, name={self.pb_reaction_id})>"
 
+    @property
+    def pb(self) -> Reaction | None:
+        return load_message(self.binpb, Reaction, "binpb") if self.binpb else None
 
 class TemplateModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)

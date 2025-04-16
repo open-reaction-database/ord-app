@@ -15,7 +15,7 @@ from base64 import b64decode
 
 from ord_schema.proto.reaction_pb2 import Reaction
 
-from ord_app.service_api.domain.datasets import load_message
+from ord_app.service_api.services.pb_utils import load_message
 from ord_app.tests.conftest import create_test_dataset
 
 
