@@ -19,11 +19,10 @@ import type { Group, GroupMember, GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
-  getGroupActions,
   getGroupListActions,
   getGroupMembersActions,
   removeGroupMembersActions,
-  updateGroupActions,
+  renameGroupActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
@@ -32,11 +31,6 @@ import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
 import type { ThunkDispatch } from '@reduxjs/toolkit';
-
-export const getGroup = createThunk(getGroupActions, async (dispatch, _g) => {
-  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
-  return getGroupActions.success();
-});
 
 export const getGroupList = createThunk(getGroupListActions, async () => {
   const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;
@@ -55,20 +49,16 @@ export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g
   return getGroupMembersActions.success({ groupId, members });
 });
 
-export const updateGroup = createThunkWithExplicitResult(
-  updateGroupActions,
-  async (dispatch, getState, updatedGroup) => {
-    const updatedGroupData = (await axiosInstance.patch<Group>(`/groups/${updatedGroup.id}`, updatedGroup)).data;
-    const state = getState();
-    const groupId = Number(selectEditingGroupId(state));
-    const group = state.entities.groups.groupsById[groupId];
-    dispatch(updateGroupActions.success({ id: groupId, name: updatedGroupData.name, role: group.role }));
-    showNotification({
-      message: `${updatedGroupData.name} group changes have been successfully saved`,
-      variant: NotificationVariant.SUCCESS,
-    });
-  },
-);
+export const renameGroup = createThunkWithExplicitResult(renameGroupActions, async (dispatch, _g, updatedGroup) => {
+  const { name, id } = updatedGroup;
+  await axiosInstance.patch<Group>(`/groups/${id}`, updatedGroup);
+  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+  dispatch(renameGroupActions.success());
+  showNotification({
+    message: `${name} group changes have been successfully saved`,
+    variant: NotificationVariant.SUCCESS,
+  });
+});
 
 export const updateGroupMembers = createThunkWithExplicitResult(
   updateGroupMembersActions,
@@ -76,22 +66,12 @@ export const updateGroupMembers = createThunkWithExplicitResult(
     const state = getState();
     const groupId = selectEditingGroupId(state);
     const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
+    (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
     dispatch(updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember }));
-
     showNotification({
       message: `${updatedMember.user.name}'s role has been successfully updated`,
       variant: NotificationVariant.SUCCESS,
     });
-
-    if (state.entities.users.self?.id === updatedMember.user.id) {
-      const groupIdNumber = Number(groupId);
-      const updatedGroupItem = {
-        id: groupIdNumber,
-        name: state.entities.groups.groupsById[groupIdNumber].name,
-        role: updatedMember.role,
-      };
-      dispatch(updateGroupActions.success(updatedGroupItem));
-    }
   },
 );
 

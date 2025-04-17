@@ -103,28 +103,24 @@ export const textureDetails: ReactionFormNode = {
     label: 'Isolated Product Characteristics',
   },
   fields: [
-    {
-      type: ReactionFormNodeType.objectInitializer,
-      name: 'texture',
-      field: wrapInputsWithGrid(
-        {
-          type: ReactionFormNodeType.select,
-          name: 'texture.type',
-          selectType: 'dropdown',
-          options: textureTypeOptions,
-          wrapperConfig: {
-            label: 'Texture',
-          },
+    wrapInputsWithGrid(
+      {
+        type: ReactionFormNodeType.select,
+        name: 'texture.type',
+        selectType: 'dropdown',
+        options: textureTypeOptions,
+        wrapperConfig: {
+          label: 'Texture',
         },
-        {
-          type: ReactionFormNodeType.value,
-          name: 'texture.details',
-          inputType: 'string',
-          wrapperConfig: {
-            label: 'Texture details',
-          },
+      },
+      {
+        type: ReactionFormNodeType.value,
+        name: 'texture.details',
+        inputType: 'string',
+        wrapperConfig: {
+          label: 'Texture details',
         },
-      ),
-    },
+      },
+    ),
   ],
 };

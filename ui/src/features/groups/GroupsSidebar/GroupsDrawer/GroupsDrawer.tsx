@@ -19,7 +19,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Drawer, Flex, Text } from '@mantine/core';
 import { EditIcon } from 'common/icons';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
-import { getGroupMembers, updateGroup } from 'store/entities/groups/groups.thunks.ts';
+import { getGroupMembers, renameGroup } from 'store/entities/groups/groups.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { selectGroupById, selectIsGroupUpdating, selectMemberRoles } from 'store/entities/groups/groups.selectors.ts';
 import { GroupMembersList } from './GroupMembersList/GroupMembersList.tsx';
@@ -40,7 +40,7 @@ export function GroupsDrawer() {
   const { isAdmin } = useSelector(selectMemberRoles);
 
   const handleGroupRename = async (value: string) => {
-    dispatch(updateGroup({ id: group.id, name: value }));
+    dispatch(renameGroup({ id: group.id, name: value }));
   };
 
   useEffect(() => {

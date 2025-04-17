@@ -36,6 +36,8 @@ import type {
   ElectrochemistryCellType,
   TubingType,
   ReactionVolumeTypeValues,
+  ReactionVesselMaterialType,
+  ReactionEnvironmentType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ord } from 'ord-schema-protobufjs';
 
@@ -153,3 +155,7 @@ export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
 }
 
 export type Volume = ReactionValuePrecisionUnit<ReactionVolumeTypeValues>;
+
+export type VesselMaterial = ReactionTypeDetails<ReactionVesselMaterialType>;
+
+export type ReactionEnvironment = ReactionTypeDetails<ReactionEnvironmentType>;

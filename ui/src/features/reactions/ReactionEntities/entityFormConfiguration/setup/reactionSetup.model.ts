@@ -60,7 +60,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
       name: 'vessel.details',
       inputType: 'string',
       wrapperConfig: {
-        label: 'Vessel',
+        label: 'Details',
       },
     },
   ),
@@ -104,7 +104,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     },
     {
       type: ReactionFormNodeType.value,
-      name: 'automatedPlatform',
+      name: 'automationPlatform',
       inputType: 'string',
       wrapperConfig: {
         label: 'Platform',

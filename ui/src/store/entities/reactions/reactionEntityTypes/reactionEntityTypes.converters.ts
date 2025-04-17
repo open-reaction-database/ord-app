@@ -203,10 +203,12 @@ export const {
 export const { ordEntityToEntity: ordVesselTypeToReaction, entityToOrdEntity: reactionVesselTypeToOrd } =
   generateEntityTypeToFromOrd(vesselTypeByValue, ord.Vessel.VesselType);
 
-export const { ordEntityToEntity: ordMaterialTypeToReaction, entityToOrdEntity: reactionMaterialTypeToOrd } =
-  generateEntityTypeToFromOrd(vesselMaterialTypeByValue, ord.VesselMaterial.VesselMaterialType);
+export const {
+  ordEntityToEntity: ordVesselMaterialTypeToReaction,
+  entityToOrdEntity: reactionVesselMaterialTypeToOrd,
+} = generateEntityTypeToFromOrd(vesselMaterialTypeByValue, ord.VesselMaterial.VesselMaterialType);
 
-export const { ordEntityToEntity: ordEnvironmentTypeToReaction, entityToOrdEntity: reactionEnvitonmentTypeToOrd } =
+export const { ordEntityToEntity: ordEnvironmentTypeToReaction, entityToOrdEntity: reactionEnvironmentTypeToOrd } =
   generateEntityTypeToFromOrd(environmentTypeByValue, ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType);
 
 export const { ordEntityToEntity: ordVolumeTypeToReaction, entityToOrdEntity: reactionVolumeTypeToOrd } =

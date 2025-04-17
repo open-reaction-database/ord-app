@@ -88,52 +88,44 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
           },
         ],
       },
-      {
-        type: ReactionFormNodeType.objectInitializer,
-        name: 'additionSpeed',
-        field: wrapInputsWithGrid(
-          {
-            type: ReactionFormNodeType.select,
-            name: 'additionSpeed.type',
-            selectType: 'dropdown',
-            options: additionSpeedTypeOptions,
-            wrapperConfig: {
-              label: 'Speed',
-            },
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'additionSpeed.type',
+          selectType: 'dropdown',
+          options: additionSpeedTypeOptions,
+          wrapperConfig: {
+            label: 'Speed',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'additionSpeed.details',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'Speed details',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'additionSpeed.details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Speed details',
           },
-        ),
-      },
-      {
-        type: ReactionFormNodeType.objectInitializer,
-        name: 'additionDevice',
-        field: wrapInputsWithGrid(
-          {
-            type: ReactionFormNodeType.select,
-            name: 'additionDevice.type',
-            selectType: 'dropdown',
-            options: additionDeviceTypeOptions,
-            wrapperConfig: {
-              label: 'Device',
-            },
+        },
+      ),
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.select,
+          name: 'additionDevice.type',
+          selectType: 'dropdown',
+          options: additionDeviceTypeOptions,
+          wrapperConfig: {
+            label: 'Device',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'additionDevice.details',
-            inputType: 'string',
-            wrapperConfig: {
-              label: 'Device details',
-            },
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'additionDevice.details',
+          inputType: 'string',
+          wrapperConfig: {
+            label: 'Device details',
           },
-        ),
-      },
+        },
+      ),
       {
         type: ReactionFormNodeType.vpu,
         name: 'additionTime',

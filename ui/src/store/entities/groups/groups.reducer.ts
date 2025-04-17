@@ -26,7 +26,7 @@ import {
   setAddMemberInputValueAction,
   setEditingGroupIdAction,
   setGroupSearchAction,
-  updateGroupActions,
+  renameGroupActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 
@@ -100,7 +100,7 @@ const addMemberError = createReducer<Error | null>(null, builder => {
 const isGroupUpdating = createReducer<boolean>(false, builder => {
   builder.addMatcher(
     isAnyOf(
-      updateGroupActions.request,
+      renameGroupActions.request,
       updateGroupMembersActions.request,
       removeGroupMembersActions.request,
       addGroupMemberActions.request,
@@ -109,11 +109,11 @@ const isGroupUpdating = createReducer<boolean>(false, builder => {
   );
   builder.addMatcher(
     isAnyOf(
-      updateGroupActions.success,
+      renameGroupActions.success,
       updateGroupMembersActions.success,
       removeGroupMembersActions.success,
       addGroupMemberActions.success,
-      updateGroupActions.failure,
+      renameGroupActions.failure,
       updateGroupMembersActions.failure,
       removeGroupMembersActions.failure,
       addGroupMemberActions.failure,

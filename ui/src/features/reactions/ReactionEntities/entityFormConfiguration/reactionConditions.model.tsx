@@ -432,7 +432,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
       wrapInputsWithGrid(
         {
           type: ReactionFormNodeType.select,
-          name: 'electrochemistry.cell',
+          name: 'electrochemistry.cell.type',
           selectType: 'dropdown',
           options: electrochemistryCellTypeOptions,
           wrapperConfig: {
@@ -441,7 +441,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         },
         {
           type: ReactionFormNodeType.value,
-          name: 'electrochemistry.details',
+          name: 'electrochemistry.cell.details',
           inputType: 'string',
           wrapperConfig: {
             label: 'Details',

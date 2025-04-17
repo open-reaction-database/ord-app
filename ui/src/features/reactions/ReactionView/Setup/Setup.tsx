@@ -23,6 +23,7 @@ import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/react
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { OpenSingleEntityButton } from 'features/reactions/ReactionView/OpenSingleEntityButton/OpenSingleEntityButton';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types';
+import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 
 const ENTITY_FIELD = 'setup';
 
@@ -65,7 +66,7 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
             title={item => `Automation Code ${item.name}`}
             requiredFields={[
               { label: 'Type', render: (entity: AppData) => entity.data.type },
-              { label: 'Value', render: (entity: AppData) => entity.data.value },
+              { label: 'Value', render: (entity: AppData) => <AppDataDisplay appData={entity} /> },
               { label: 'Description', render: (entity: AppData) => entity.description },
             ]}
             entity={automationCode}

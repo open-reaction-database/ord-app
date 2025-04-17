@@ -22,10 +22,10 @@ import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/react
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
 import type { ReactionConditions } from './reactionConditions/reactionConditions.types.ts';
 import type { ReactionSetup } from './reactionSetup/reactionSetup.types.ts';
+import type { ord } from 'ord-schema-protobufjs';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
@@ -75,6 +75,7 @@ interface ReactionMolBlockProducts {
 export interface ReactionMolBlocks {
   inputs: Record<string, Array<ComponentProductPreview>>;
   outcomes: Array<{ products: Array<ReactionMolBlockProducts> }>;
+  workups: Array<Array<ComponentProductPreview>>;
 }
 
 export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {

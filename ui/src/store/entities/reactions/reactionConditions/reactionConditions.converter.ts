@@ -15,50 +15,50 @@
  */
 import { ord } from 'ord-schema-protobufjs';
 import {
-  ordBooleanToReaction,
-  ordTemperatureToReaction,
-  ordPressureToReaction,
-  reactionBooleanToOrd,
-  reactionPressureToOrd,
-  withId,
-  ordWaveLengthToReaction,
-  reactionWaveLengthToOrd,
-  ordLengthToReaction,
-  reactionLengthToOrd,
-  reactionCurrentToOrd,
-  ordCurrentToReaction,
   convertElectrochemistryTypeToOrd,
+  ordAtmosphereToReaction,
+  ordBooleanToReaction,
+  ordCurrentToReaction,
+  ordElectrochemistryCellToReaction,
+  ordLengthToReaction,
+  ordPressureControlToReaction,
+  ordPressureToReaction,
+  ordStirringRateToReaction,
+  ordTemperatureControlToReaction,
+  ordTemperatureToReaction,
+  ordTimeToReaction,
+  ordTubingToReaction,
+  ordVoltageToReaction,
+  ordWaveLengthToReaction,
+  reactionAtmosphereToOrd,
+  reactionBooleanToOrd,
+  reactionCurrentToOrd,
+  reactionElectrochemistryCellToOrd,
+  reactionLengthToOrd,
+  reactionPressureControlToOrd,
+  reactionPressureToOrd,
+  reactionStirringRateToOrd,
   reactionTemperatureControlToOrd,
   reactionTemperatureToOrd,
-  ordTemperatureControlToReaction,
-  withoutId,
-  ordPressureControlToReaction,
-  ordAtmosphereToReaction,
-  reactionPressureControlToOrd,
-  reactionAtmosphereToOrd,
-  ordStirringRateToReaction,
-  reactionStirringRateToOrd,
-  ordElectrochemistryCellToReaction,
-  ordVoltageToReaction,
-  reactionVoltageToOrd,
-  reactionElectrochemistryCellToOrd,
-  ordTubingToReaction,
-  reactionTubingToOrd,
-  ordTimeToReaction,
   reactionTimeToOrd,
+  reactionTubingToOrd,
+  reactionVoltageToOrd,
+  reactionWaveLengthToOrd,
+  withId,
+  withoutId,
 } from '../reactionEntity/reactionEntity.converters';
 import {
-  ordStirringMethodTypeToReaction,
-  reactionStirringMethodTypeToOrd,
-  ordIlluminationTypeToReaction,
-  reactionIlluminationTypeToOrd,
-  reactionElectrochemistryTypeToOrd,
   ordFlowTypeToReaction,
-  reactionFlowTypeToOrd,
-  ordTemperatureMeasurementTypeToReaction,
-  reactionTemperatureMeasurementTypeToOrd,
+  ordIlluminationTypeToReaction,
   ordPressureMeasurementTypeToReaction,
+  ordStirringMethodTypeToReaction,
+  ordTemperatureMeasurementTypeToReaction,
+  reactionElectrochemistryTypeToOrd,
+  reactionFlowTypeToOrd,
+  reactionIlluminationTypeToOrd,
   reactionPressureMeasurementTypeToOrd,
+  reactionStirringMethodTypeToOrd,
+  reactionTemperatureMeasurementTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
 import type {
   ElectrochemistryMeasurement,
@@ -72,7 +72,8 @@ import type {
   ReactionTemperatureCondition,
   TemperatureMeasurement,
 } from './reactionConditions.types';
-import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
 
 export const ordTemperatureMeasurementToReaction = ({
   type,
@@ -160,12 +161,13 @@ export const reactionTemperatureConditionToOrd = ({
   control,
   setpoint,
   temperatureMeasurements,
-}: ReactionTemperatureCondition): ord.ITemperatureConditions => ({
-  control: reactionTemperatureControlToOrd(control),
-  setpoint: reactionTemperatureToOrd(setpoint),
-  measurements:
-    temperatureMeasurements.length > 0 ? temperatureMeasurements.map(reactionTemperatureMeasurementToOrd) : null,
-});
+}: ReactionTemperatureCondition): Optional<ord.ITemperatureConditions> =>
+  convertObjectToNullIfEmpty({
+    control: reactionTemperatureControlToOrd(control),
+    setpoint: reactionTemperatureToOrd(setpoint),
+    measurements:
+      temperatureMeasurements.length > 0 ? temperatureMeasurements.map(reactionTemperatureMeasurementToOrd) : null,
+  });
 
 const ordPressureConditionToReaction = (pressure: OrdOptional<ord.IPressureConditions>): ReactionPressureCondition => {
   const { setpoint, atmosphere, control, measurements } = pressure ?? {};
@@ -182,13 +184,13 @@ const reactionPressureConditionToOrd = ({
   setpoint,
   atmosphere,
   pressureMeasurements,
-}: ReactionPressureCondition): ord.IPressureConditions => {
-  return {
+}: ReactionPressureCondition): Optional<ord.IPressureConditions> => {
+  return convertObjectToNullIfEmpty({
     control: reactionPressureControlToOrd(control),
     setpoint: reactionPressureToOrd(setpoint),
     atmosphere: reactionAtmosphereToOrd(atmosphere),
     measurements: pressureMeasurements.length > 0 ? pressureMeasurements.map(reactionPressureMeasurementToOrd) : null,
-  };
+  });
 };
 
 export const ordStirringConditionToReaction = (
@@ -207,11 +209,12 @@ export const reactionStirringConditionToOrd = ({
   type,
   details,
   rate,
-}: ReactionStirringCondition): ord.IStirringConditions => ({
-  type: reactionStirringMethodTypeToOrd(type),
-  details,
-  rate: reactionStirringRateToOrd(rate),
-});
+}: ReactionStirringCondition): Optional<ord.IStirringConditions> =>
+  convertObjectToNullIfEmpty({
+    type: reactionStirringMethodTypeToOrd(type),
+    details,
+    rate: reactionStirringRateToOrd(rate),
+  });
 
 const ordIlluminationConditionToReaction = (
   illumination: OrdOptional<ord.IIlluminationConditions>,
@@ -231,13 +234,13 @@ export const reactionIlluminationConditionToOrd = ({
   peakWavelength,
   distanceToVessel,
   ...rest
-}: ReactionIlluminationCondition) => {
-  return {
+}: ReactionIlluminationCondition): Optional<ord.IIlluminationConditions> => {
+  return convertObjectToNullIfEmpty({
     type: reactionIlluminationTypeToOrd(type),
     peakWavelength: reactionWaveLengthToOrd(peakWavelength),
     distanceToVessel: reactionLengthToOrd(distanceToVessel),
     ...rest,
-  };
+  });
 };
 
 const ordElectrochemistryConditionToReaction = (

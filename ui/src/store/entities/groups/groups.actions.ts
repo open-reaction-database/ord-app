@@ -25,7 +25,7 @@ export const getGroupListActions = createAsyncAction<void, Array<GroupItem>>('li
 
 export const createGroupActions = createAsyncAction<string, number>('create');
 
-export const updateGroupActions = createAsyncAction<Partial<Group>, GroupItem>('update');
+export const renameGroupActions = createAsyncAction<Pick<Group, 'id' | 'name'>, void>('update');
 
 export const setGroupSearchAction = createAction<string>('set_search');
 
