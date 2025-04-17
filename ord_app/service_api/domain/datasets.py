@@ -11,16 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from base64 import b64encode
-from typing import Type
 from uuid import uuid4
 
 import orjson
 from fastapi import Depends
 from fastapi_pagination import Page
-from google.protobuf import json_format, text_format
 from google.protobuf.json_format import ParseError as JsonParseError
-from google.protobuf.message import DecodeError, Message
+from google.protobuf.message import DecodeError
 from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
 from ord_schema.proto.dataset_pb2 import Dataset
@@ -41,6 +38,7 @@ from ord_app.service_api.schemas.datasets import (
     DownloadFileFormats,
 )
 from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError, UnprocessableEntityError
+from ord_app.service_api.services.pb_utils import load_message, write_message
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -206,56 +204,6 @@ class DatasetUseCases:
             return await self.dataset_repository.unshare_dataset(primary_dataset_id, payload.secondary_group_id)
 
         raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
-
-
-def write_message(message: Dataset | Reaction, kind: str) -> bytes:
-    """Serializes a dataset or reaction.
-
-    Args:
-        message: Dataset or Reaction proto.
-        kind: Serialization kind.
-
-    Returns:
-        Serialized proto.
-    """
-    match kind:
-        case "binpb":
-            data = message.SerializeToString()
-        case "json":
-            data = json_format.MessageToJson(message).encode()
-        case "txtpb":
-            data = text_format.MessageToBytes(message)
-        case _:
-            raise ValueError(kind)
-    return data
-
-
-def load_message(data: bytes, message_type: Type[Dataset | Reaction], kind: str) -> Dataset | Reaction:
-    """Loads a serialized dataset.
-
-    Args:
-        data: Serialized dataset proto.
-        message_type: Message type.
-        kind: Serialization kind.
-
-    Returns:
-        Dataset or Reaction proto.
-    """
-    match kind:
-        case "binpb":
-            dataset = message_type.FromString(data)
-        case "json":
-            dataset = json_format.Parse(data, message_type())
-        case "txtpb":
-            dataset = text_format.Parse(data.decode(), message_type())
-        case _:
-            raise ValueError(kind)
-    return dataset
-
-
-def send_message(message: Message) -> str:
-    """Converts a protocol buffer message to a base64-encoded string."""
-    return b64encode(message.SerializeToString()).decode()
 
 
 def get_dataset_use_case(

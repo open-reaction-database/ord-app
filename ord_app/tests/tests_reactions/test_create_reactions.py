@@ -18,8 +18,8 @@ from fastapi import status
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 
-from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
+from ord_app.service_api.services.pb_utils import load_message
 from ord_app.service_api.settings import RuntimeSettings
 from ord_app.tests.conftest import create_test_dataset
 

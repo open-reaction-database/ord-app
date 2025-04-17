@@ -18,8 +18,8 @@ from ord_schema.message_helpers import molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Reaction
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
-from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import BaseSchema
+from ord_app.service_api.services.pb_utils import load_message
 
 
 class _ReactionValidation(BaseSchema):
@@ -70,7 +70,17 @@ def get_molblocks(pb):
         key: [safe_molblock(component) for component in value.components]
         for key, value in pb.inputs.items()
     }
-    return {"outcomes": outcomes, "inputs": inputs}
+
+    workups = []
+    for workup in pb.workups:
+        if hasattr(workup, "input") and hasattr(workup.input, "components"):
+            workups.append(
+                [safe_molblock(component) for component in workup.input.components]
+            )
+        else:
+            workups.append([])
+
+    return {"outcomes": outcomes, "inputs": inputs, "workups": workups}
 
 
 class ReactionResponseSchema(BaseSchema):

@@ -18,9 +18,9 @@ import orjson
 from ord_schema.proto.reaction_pb2 import Reaction
 from pydantic import Field, Json, constr, field_validator, model_validator
 
-from ord_app.service_api.domain.datasets import load_message
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
 from ord_app.service_api.schemas.reactions import get_molblocks
+from ord_app.service_api.services.pb_utils import load_message
 
 
 class TemplateResponseModel(BaseSchema):
