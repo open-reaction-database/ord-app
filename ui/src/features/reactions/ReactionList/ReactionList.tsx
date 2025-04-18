@@ -81,7 +81,9 @@ export function ReactionList() {
             gap="sm"
           >
             <Title order={2}>Dataset Reactions</Title>
-            {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+            <div className={classes.counterContainer}>
+              {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+            </div>
             <Switch
               className={classes.switcher}
               size="sm"
