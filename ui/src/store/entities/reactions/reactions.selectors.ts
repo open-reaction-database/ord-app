@@ -26,6 +26,8 @@ export const selectReactionsOrder = buildSelector(state => state.reactionsOrder)
 
 export const selectReactions = buildSelector(state => state.reactionsById);
 
+export const selectShowInvalidOnly = buildSelector(state => state.showInvalidOnly);
+
 export function selectReactionById(id: string): (state: AppState) => ReactionTemplate;
 export function selectReactionById(id: number): (state: AppState) => DatasetReaction;
 export function selectReactionById(id: ReactionId): (state: AppState) => DatasetReaction | ReactionTemplate;

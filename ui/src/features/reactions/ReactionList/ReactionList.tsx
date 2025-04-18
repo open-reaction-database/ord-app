@@ -15,7 +15,7 @@
  */
 import { useCallback, useMemo } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
-import { Flex, Paper, Title, Loader } from '@mantine/core';
+import { Flex, Paper, Title, Loader, Switch } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
 import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
@@ -23,6 +23,7 @@ import {
   selectReactionsLoading,
   selectReactionsOrder,
   selectReactionsPagination,
+  selectShowInvalidOnly,
 } from 'store/entities/reactions/reactions.selectors.ts';
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -30,6 +31,7 @@ import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx'
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import { setShowInvalidOnly } from 'store/entities/reactions/reactions.actions.ts';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -37,6 +39,7 @@ export function ReactionList() {
   const pagination = useSelector(selectReactionsPagination);
   const isLoading = useSelector(selectReactionsLoading);
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
+  const showInvalidOnly = useSelector(selectShowInvalidOnly);
 
   const hasReactions = reactionsIds.length > 0;
 
@@ -52,6 +55,14 @@ export function ReactionList() {
       dispatch(getReactionsPage({ page: 1, size }));
     },
     [dispatch],
+  );
+
+  const handleToggleInvalid = useCallback(
+    (checked: boolean) => {
+      dispatch(setShowInvalidOnly(checked));
+      dispatch(getReactionsPage({ page: 1, size: pagination.size }));
+    },
+    [dispatch, pagination.size],
   );
 
   const pageStartIndex = useMemo(() => {
@@ -71,6 +82,13 @@ export function ReactionList() {
           >
             <Title order={2}>Dataset Reactions</Title>
             {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+            <Switch
+              className={classes.switcher}
+              size="sm"
+              label="Show Invalid Only"
+              checked={showInvalidOnly}
+              onChange={event => handleToggleInvalid(event.currentTarget.checked)}
+            />
           </Flex>
           {canDatasetBeEdited && <CreateReactionMenu />}
         </Flex>

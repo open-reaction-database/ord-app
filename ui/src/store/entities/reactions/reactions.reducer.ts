@@ -24,6 +24,7 @@ import {
   deleteReactionFieldActions,
   removeReactionActions,
   renameReactionActions,
+  setShowInvalidOnly,
 } from './reactions.actions.ts';
 import {
   getAllTemplatesActions,
@@ -250,6 +251,10 @@ const areReactionsLoading = createReducer<boolean>(false, builder => {
   );
 });
 
+const showInvalidOnly = createReducer<boolean>(false, builder => {
+  builder.addCase(setShowInvalidOnly, (_, action) => action.payload);
+});
+
 export const reactionsReducer = combineReducers({
   reactionsById,
   reactionsOrder,
@@ -257,5 +262,6 @@ export const reactionsReducer = combineReducers({
   activeDatasetId,
   isReactionCreating,
   areReactionsLoading,
+  showInvalidOnly,
   reactionsPreviews: reactionsPreviewsReducer,
 });

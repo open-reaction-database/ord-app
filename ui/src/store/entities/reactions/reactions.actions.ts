@@ -25,7 +25,7 @@ import type {
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
 
-const { createAsyncAction } = createActionFactory('reactions');
+const { createAsyncAction, createAction } = createActionFactory('reactions');
 
 export const getReactionsListActions = createAsyncAction<number, Pages<DatasetReaction>, RejectValue>('get_list');
 
@@ -57,3 +57,5 @@ export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayloa
 );
 
 export const removeReactionActions = createAsyncAction<number, number>('remove_dataset');
+
+export const setShowInvalidOnly = createAction<boolean>('setShowInvalidOnly');

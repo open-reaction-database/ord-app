@@ -45,9 +45,14 @@ import { getReactionPreviews, parseReaction, parseReactionList, parseValidation 
 
 export const getReactionsList = createThunk(getReactionsListActions, async (_d, getState, datasetId) => {
   try {
-    const currentPage = selectReactionsPagination(getState());
-    const params = { page: currentPage.page, size: currentPage.size };
-
+    const state = getState();
+    const currentPage = selectReactionsPagination(state);
+    const showInvalidOnly = state.entities.reactions.showInvalidOnly;
+    const params = {
+      page: currentPage.page,
+      size: currentPage.size,
+      is_valid: showInvalidOnly ? false : undefined,
+    };
     const response = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
 
     return getReactionsListActions.success(parseReactionList(response.data));
@@ -60,7 +65,13 @@ export const getReactionsPage = createThunk(getReactionPageActions, async (_d, g
   const state = getState();
   const currentPage = selectReactionsPagination(state);
   const datasetId = selectActiveDatasetId(state);
-  const params = { page: currentPage.page, size: currentPage.size };
+  const showInvalidOnly = state.entities.reactions.showInvalidOnly;
+
+  const params = {
+    page: currentPage.page,
+    size: currentPage.size,
+    is_valid: showInvalidOnly ? false : undefined,
+  };
 
   const result = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
   return getReactionPageActions.success(parseReactionList(result.data));
