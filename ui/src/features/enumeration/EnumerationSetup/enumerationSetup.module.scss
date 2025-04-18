@@ -84,9 +84,12 @@ $headerHeight: 64px;
   display: flex;
   gap: var(--mantine-spacing-xs);
   align-items: center;
+  flex: 1;
+  min-width: 0;
 
   & svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
   }
 }
