@@ -27,7 +27,6 @@ export enum ReactionFormNodeType {
   value = 'value',
   select = 'select',
   vpu = 'vpu',
-  objectInitializer = 'objectInitializer',
   block = 'block',
   list = 'list',
   data = 'data',
@@ -106,12 +105,6 @@ export interface ReactionFormDateTime extends ReactionFormNodeBase, ReactionForm
   name: string;
 }
 
-export interface ReactionFormObjectInitializer extends ReactionFormNodeBase {
-  type: ReactionFormNodeType.objectInitializer;
-  name: string;
-  field: ReactionFormNode;
-}
-
 export interface ReactionFormBlock extends ReactionFormNodeBase {
   type: ReactionFormNodeType.block;
   title?: ReactionFormTitle;
@@ -165,7 +158,6 @@ export type ReactionFormNode =
   | ReactionFormWrapper
   | ReactionFormValue
   | ReactionFormSelect
-  | ReactionFormObjectInitializer
   | ReactionFormValuePrecisionUnit
   | ReactionFormBlock
   | ReactionFormList

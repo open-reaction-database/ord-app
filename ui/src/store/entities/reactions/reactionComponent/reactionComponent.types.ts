@@ -49,10 +49,11 @@ export interface ReactionComponentPreparation extends WithId<Omit<ord.ICompoundP
   type: CompoundPreparationType;
 }
 
-export interface ReactionInputComponent extends ReactionComponentBase, Pick<ord.ICompound, 'source'> {
+export interface ReactionInputComponent extends ReactionComponentBase {
   isLimiting: ReactionBoolean;
   amount: ReactionAmount;
   preparations: Array<ReactionComponentPreparation>;
+  source: ord.Compound.ISource;
 }
 
 export interface ReactionMeasurementAnalysis {

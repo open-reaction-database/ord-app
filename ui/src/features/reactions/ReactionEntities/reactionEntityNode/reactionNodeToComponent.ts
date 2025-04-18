@@ -16,7 +16,6 @@
 import { ReactionFormNodeType } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import {
   ReactionEntityGroup,
-  ReactionEntityObjectInitializer,
   ReactionEntityBlockNode,
   ReactionEntityVPU,
   ReactionEntityValue,
@@ -39,7 +38,6 @@ export const reactionNodeToComponent = {
   [ReactionFormNodeType.group]: ReactionEntityGroup,
   [ReactionFormNodeType.wrapper]: ReactionEntityRow,
   [ReactionFormNodeType.vpu]: ReactionEntityVPU,
-  [ReactionFormNodeType.objectInitializer]: ReactionEntityObjectInitializer,
   [ReactionFormNodeType.block]: ReactionEntityBlockNode,
   [ReactionFormNodeType.list]: ReactionEntityList,
   [ReactionFormNodeType.data]: ReactionEntityData,

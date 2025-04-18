@@ -30,6 +30,7 @@ import type { Pages } from 'common/types';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { convertReactionFloatsToDoubles, ordReactionToReaction } from './reactions.converters.ts';
+import type { OrdOptional } from './reactionEntity/reactionEntity.types.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
 const protobufClassRegExp = /<class '.+'> /g;
@@ -163,7 +164,27 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
     }),
     {},
   );
-  return { ...inputsPreviews, ...outcomesPreviews };
+
+  const workupsPreviews = molblocks.workups.reduce((acc: PreviewsById, item, workupIndex) => {
+    const components = reaction.workups[workupIndex].input?.components;
+
+    if (!components) {
+      return acc;
+    }
+
+    return {
+      ...acc,
+      ...item.reduce((acc: PreviewsById, componentMolblock, componentIndex) => {
+        const component = components[componentIndex];
+        return {
+          ...acc,
+          [component.id]: componentMolblock,
+        };
+      }, {}),
+    };
+  }, {});
+
+  return { ...inputsPreviews, ...outcomesPreviews, ...workupsPreviews };
 };
 
 export const parseValidation = (validation: ReactionValidation): ReactionValidation => {
@@ -193,3 +214,21 @@ export const parseReactionList = (pages: Pages<ReactionResponse>): Pages<Dataset
   const wrappedItems = items.map(parseReaction);
   return { ...pagination, items: wrappedItems };
 };
+
+const ENUM_UNSPECIFIED_VALUE = 0;
+
+type ObjectValue = OrdOptional<number | string | Array<unknown> | boolean | object>;
+
+export function convertObjectToNullIfEmpty<T extends Record<string, ObjectValue>>(
+  object: T,
+  enumKeys: Array<keyof T> = [],
+): T | null {
+  const isEmpty = Object.keys(object).every(key => {
+    const value = object[key];
+    if (enumKeys.includes(key) && value === ENUM_UNSPECIFIED_VALUE) {
+      return true;
+    }
+    return value === undefined || value === null || value === '';
+  });
+  return isEmpty ? null : object;
+}

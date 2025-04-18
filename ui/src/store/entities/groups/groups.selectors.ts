@@ -62,5 +62,5 @@ export const selectMemberRoles = createSelector(
 );
 
 export const selectAdminGroupsList = createSelector([selectOrderedGroupsList], orderedGroups => {
-  return orderedGroups.filter(group => group.role === USER_ROLES.ADMIN);
+  return orderedGroups.filter(group => [USER_ROLES.ADMIN, USER_ROLES.EDITOR].includes(group.role));
 });

@@ -77,36 +77,32 @@ export const reactionComponents: Array<ReactionFormNode> = [
       label: 'Source',
     },
     fields: [
-      {
-        type: ReactionFormNodeType.objectInitializer,
-        name: 'source',
-        field: wrapInputsWithGrid(
-          {
-            type: ReactionFormNodeType.value,
-            name: 'source.vendor',
-            wrapperConfig: {
-              label: 'Vendor',
-            },
-            inputType: 'string',
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.vendor',
+          wrapperConfig: {
+            label: 'Vendor',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'source.catalogId',
-            wrapperConfig: {
-              label: 'Catalog ID',
-            },
-            inputType: 'string',
+          inputType: 'string',
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.catalogId',
+          wrapperConfig: {
+            label: 'Catalog ID',
           },
-          {
-            type: ReactionFormNodeType.value,
-            name: 'source.lot',
-            wrapperConfig: {
-              label: 'Lot number',
-            },
-            inputType: 'string',
+          inputType: 'string',
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.lot',
+          wrapperConfig: {
+            label: 'Lot number',
           },
-        ),
-      },
+          inputType: 'string',
+        },
+      ),
     ],
   },
   {

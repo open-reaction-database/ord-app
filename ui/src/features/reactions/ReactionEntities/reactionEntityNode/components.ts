@@ -17,7 +17,6 @@ export * from './ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 export * from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 export * from './ReactionEntityCustom/ReactionEntityCustom.tsx';
 export * from './ReactionEntityGroup/ReactionEntityGroup.tsx';
-export * from './ReactionEntityObjectInitializer/ReactionEntityObjectInitializer.tsx';
 export * from './ReactionEntityRow/ReactionEntityRow.tsx';
 export * from './ReactionEntitySelect/ReacitonEntitySelect.tsx';
 export * from './ReactionEntityValue/ReactionEntityValue.tsx';

@@ -59,11 +59,27 @@ import {
 } from './reactionComponent.types.ts';
 import type {
   Optional,
+  OrdOptional,
   ReactionCompoundIdentifier,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { measurementTransform } from '../reactionsMeasurement/reactionMeasurements.transform.ts';
 
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
+
+const ordCompoundSourceToReaction = (compoundSource: OrdOptional<ord.Compound.ISource>): ord.Compound.ISource => {
+  const { vendor, lot, catalogId } = compoundSource ?? {};
+  return {
+    vendor: vendor ?? null,
+    catalogId: catalogId ?? null,
+    lot: lot ?? null,
+  };
+};
+
+const reactionCompoundSourceToOrd = (compoundSource: ord.Compound.ISource): Optional<ord.Compound.ISource> => {
+  const { vendor, lot, catalogId } = compoundSource;
+  const hasAnyValues = !!vendor || !!lot || !!catalogId;
+  return hasAnyValues ? compoundSource : null;
+};
 
 const ordPreparationToReactionPreparation = ({
   type,
@@ -158,10 +174,10 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     isNormalized: ordBooleanToReaction(isNormalized),
     usesInternalStandard: ordBooleanToReaction(usesInternalStandard),
     usesAuthenticStandard: ordBooleanToReaction(usesAuthenticStandard),
-    retentionTime: retentionTime ? ordTimeToReaction(retentionTime) : null,
-    selectivity: selectivity ? ordSelectivityToReaction(selectivity) : null,
-    waveLength: wavelength ? ordWaveLengthToReaction(wavelength) : null,
-    massSpecDetails: massSpecDetails ? ordMassSpecToReaction(massSpecDetails) : null,
+    retentionTime: ordTimeToReaction(retentionTime),
+    selectivity: ordSelectivityToReaction(selectivity),
+    waveLength: ordWaveLengthToReaction(wavelength),
+    massSpecDetails: ordMassSpecToReaction(massSpecDetails),
     authenticStandard: authenticStandard ? ordInputComponentToReaction(authenticStandard) : null,
   });
 };
@@ -248,7 +264,7 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
   return {
     ...ordComponentBaseToReaction(inputComponent),
     isLimiting: ordBooleanToReaction(isLimiting),
-    source,
+    source: ordCompoundSourceToReaction(source),
     preparations: (preparations ?? []).map(ordPreparationToReactionPreparation),
     amount: ordAmountToReaction(amount),
   };
@@ -261,7 +277,7 @@ export function reactionInputComponentToOrd(inputComponent: ReactionInputCompone
   return {
     ...reactionComponentBaseToOrd(inputComponent),
     isLimiting,
-    source,
+    source: reactionCompoundSourceToOrd(source),
     preparations: preparations.map(reactionPreparationToOrdPreparation),
     amount: reactionAmountToOrd(amount),
   };

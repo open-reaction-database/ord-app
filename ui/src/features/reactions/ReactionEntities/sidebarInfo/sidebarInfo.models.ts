@@ -263,7 +263,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     label: 'Setup',
     sidebarTitle: createReactionEntityTitle({
       entityName: 'Setup',
-      hasDelete: true,
+      hasDelete: false,
     }),
     useInitialValues: buildUseInitialValues(({ vessel, ...rest }: ReactionSetup) => ({
       ...rest,
@@ -302,7 +302,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     label: 'Conditions',
     sidebarTitle: createReactionEntityTitle({
       entityName: 'Conditions',
-      hasDelete: true,
+      hasDelete: false,
     }),
     useInitialValues: buildUseInitialValues(
       ({ temperature, electrochemistry, pressure, ...rest }: ReactionConditions) => ({
