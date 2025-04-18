@@ -143,8 +143,8 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     return {
       ...state,
       [action.payload.reactionId]: {
-        pb_reaction_id: name,
         ...reaction,
+        pb_reaction_id: name,
         data: {
           ...reaction.data,
           reactionId: name,
