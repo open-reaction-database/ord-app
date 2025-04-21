@@ -61,10 +61,14 @@ export function AddMemberInput() {
         value={inputValue}
         onChange={handleSearchChange}
         disabled={!isAdmin || isGroupUpdating}
+        classNames={{ root: classes.inputWrapper }}
         error={
           inputError && (
             <Group gap="4px">
-              <AlertCircleIcon color="red" />
+              <AlertCircleIcon
+                color="red"
+                className={classes.icon}
+              />
               There is no user in ORD with this identifier yet
             </Group>
           )

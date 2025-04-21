@@ -92,9 +92,9 @@ const addMemberInputValue = createReducer('', builder => {
   builder.addCase(addGroupMemberActions.success, () => '');
 });
 
-const addMemberError = createReducer<Error | null>(null, builder => {
-  builder.addCase(addGroupMemberActions.failure, (_, action) => action.payload);
-  builder.addCase(resetAddMemberErrorAction, () => null);
+const addMemberError = createReducer<boolean>(false, builder => {
+  builder.addCase(addGroupMemberActions.failure, () => true);
+  builder.addCase(resetAddMemberErrorAction, () => false);
 });
 
 const isGroupUpdating = createReducer<boolean>(false, builder => {
