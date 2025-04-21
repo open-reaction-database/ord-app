@@ -151,9 +151,19 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
           return { variable: variable.name, csvColumn };
         });
         form.setFieldValue('matching', matching);
+      } catch (_e: unknown) {
+        showNotification({ variant: NotificationVariant.ERROR, message: 'Invalid CSV file' });
+        form.setFieldValue('csvFile', null);
+        form.setFieldValue('templateCSV', null);
+        form.setFieldValue('matching', []);
       } finally {
         setIsCsvFileParsing(false);
       }
+    } else {
+      form.setFieldValue('csvFile', null);
+      form.setFieldValue('templateCSV', null);
+      form.setFieldValue('matching', []);
+      setIsCsvFileParsing(false);
     }
   };
 
