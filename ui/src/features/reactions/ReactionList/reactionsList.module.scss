@@ -30,6 +30,10 @@
   color: var(--color-text-secondary-3);
 }
 
+.titleWrapper {
+  padding-top: 4px;
+}
+
 .link {
   font-size: var(--font-size-lg);
   color: var(--color-primary);
@@ -38,6 +42,12 @@
 
 .invalidReactionContainer {
   color: var(--color-red);
+  min-width: fit-content;
+
+  & > svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .switcher {

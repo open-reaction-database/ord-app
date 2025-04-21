@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import classes from './UserDataField.module.scss';
+import { typographyClasses } from 'common/styling';
+import clsx from 'clsx';
 
 interface UserDataFieldProps {
   fieldName: string;
@@ -22,9 +24,9 @@ interface UserDataFieldProps {
 
 export function UserDataField({ fieldName, value }: Readonly<UserDataFieldProps>) {
   return (
-    <div>
-      <span className={classes.category}>{fieldName}:</span>
-      <span>{value ?? 'Unavailable'}</span>
+    <div className={typographyClasses.oneLineTextWrapperWithContent}>
+      <span className={clsx(classes.category, typographyClasses.fitContentText)}>{fieldName}:</span>
+      <span className={typographyClasses.oneLineText}>{value ?? 'Unavailable'}</span>
     </div>
   );
 }

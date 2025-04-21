@@ -23,6 +23,8 @@ import { Flex } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
+import { typographyClasses } from 'common/styling';
+import clsx from 'clsx';
 
 interface ReactionTitleProps {
   index: number;
@@ -43,10 +45,14 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
   const linkToPage = `~/datasets/${datasetId}/reactions/${id}`;
 
   return (
-    <>
+    <Flex
+      align="center"
+      gap="xs"
+      className={clsx(classes.titleWrapper, typographyClasses.oneLineTextWrapper)}
+    >
       <span className={classes.index}>{index}.</span>
       <Link
-        className={classes.link}
+        className={clsx(classes.link, typographyClasses.oneLineText)}
         to={linkToPage}
       >
         {reaction.pb_reaction_id}
@@ -62,7 +68,7 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
           <span>Invalid reaction</span>
         </Flex>
       )}
-    </>
+    </Flex>
   );
 }
 

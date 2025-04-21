@@ -28,6 +28,8 @@ import { AddMemberInput } from './AddMemberInput/AddMemberInput.tsx';
 import classes from './GroupsDrawer.module.scss';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
+import clsx from 'clsx';
+import { typographyClasses } from 'common/styling';
 
 export function GroupsDrawer() {
   const dispatch = useAppDispatch();
@@ -69,13 +71,17 @@ export function GroupsDrawer() {
             <Flex
               direction="column"
               gap="4"
+              className={typographyClasses.oneLineTextWrapper}
             >
               <Text className={classes.subtitle}>Group Management</Text>
               <Flex
                 align="center"
                 gap="4"
+                className={typographyClasses.oneLineTextWrapper}
               >
-                <Drawer.Title className={classes.title}>{group?.name}</Drawer.Title>
+                <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
+                  {group?.name}
+                </Drawer.Title>
                 <ActionIcon
                   variant="transparent"
                   onClick={openModal}

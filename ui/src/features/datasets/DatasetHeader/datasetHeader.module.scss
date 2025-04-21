@@ -16,11 +16,21 @@
 .header {
   display: flex;
   justify-content: space-between;
+  overflow: hidden;
+}
+
+.leftTitlePart {
+  overflow: hidden;
 }
 
 .datasetInfo {
   display: flex;
   gap: 40px;
+
+  & > * {
+    max-width: 25%;
+    overflow: hidden;
+  }
 }
 
 .title {
@@ -30,6 +40,10 @@
 
 .titlePlaceholder {
   color: var(--color-text-secondary-1);
+}
+
+.datasetDescription {
+  white-space: pre-wrap;
 }
 
 .editIcon {

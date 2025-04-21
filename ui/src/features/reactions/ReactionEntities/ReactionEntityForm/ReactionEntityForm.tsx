@@ -147,11 +147,9 @@ export function ReactionEntityForm({
             className={classes.actions}
           >
             {!isTemplate && (
-              <>
-                <Button onClick={() => copyReactionPart(sidebarInfo.entityName, reactionPartWithNestedEntities)}>
-                  Copy Chunk
-                </Button>
-              </>
+              <Button onClick={() => copyReactionPart(sidebarInfo.entityName, reactionPartWithNestedEntities)}>
+                Copy Chunk
+              </Button>
             )}
             {!isViewOnly && <Button onClick={open}>Paste Chunk</Button>}
             <Button

@@ -31,6 +31,7 @@ import { InfoCircleIcon } from 'common/icons';
 import classes from './GroupMembersList.module.scss';
 import { UserDataField } from './UserDataField/UserDataField.tsx';
 import { selectEditingGroupId, selectIsAddingMember } from 'store/features/groups/groups.selectors.ts';
+import { typographyClasses } from 'common/styling';
 
 const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
 
@@ -100,6 +101,7 @@ export function GroupMembersList() {
             <Flex
               align="center"
               gap="12"
+              className={typographyClasses.oneLineTextWrapper}
             >
               <Avatar
                 radius="xl"
@@ -109,8 +111,9 @@ export function GroupMembersList() {
               <Flex
                 direction="column"
                 gap="4"
+                className={typographyClasses.oneLineTextWrapper}
               >
-                <div>{name}</div>
+                <span className={typographyClasses.oneLineText}>{name}</span>
                 <Flex gap="8">
                   <UserDataField
                     fieldName="ORCID"

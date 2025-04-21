@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Avatar, Group } from '@mantine/core';
+import { typographyClasses } from 'common/styling';
 
 interface UserFieldProps {
   username: string;
@@ -22,12 +23,15 @@ interface UserFieldProps {
 export function UserField({ username }: Readonly<UserFieldProps>) {
   return (
     // TODO: Update avatar src and consider the behaviour for long names
-    <Group gap="4px">
+    <Group
+      gap="4px"
+      className={typographyClasses.oneLineTextWrapperWithContent}
+    >
       <Avatar
         src={null}
         size="28"
       />
-      <span>{username}</span>
+      <span className={typographyClasses.oneLineText}>{username}</span>
     </Group>
   );
 }

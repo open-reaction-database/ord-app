@@ -31,3 +31,18 @@
   white-space: nowrap;
   width: inherit;
 }
+
+.oneLineTextWrapper {
+  overflow: hidden;
+}
+
+.oneLineTextWrapperWithContent {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.fitContentText {
+  min-width: fit-content;
+}

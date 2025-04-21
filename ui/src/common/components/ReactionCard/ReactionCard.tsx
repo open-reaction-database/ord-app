@@ -75,8 +75,8 @@ export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Read
       radius="sm"
       p="lg"
     >
-      <div className={classes.topContainer}>
-        <div className={classes.titleContainer}>
+      <div className={clsx(classes.topContainer, typographyClasses.oneLineTextWrapper)}>
+        <div className={clsx(classes.titleContainer, typographyClasses.oneLineTextWrapper)}>
           <Flex
             align="center"
             gap="4"

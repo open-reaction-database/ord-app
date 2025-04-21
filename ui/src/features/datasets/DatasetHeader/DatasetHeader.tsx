@@ -36,6 +36,7 @@ import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/Group
 import classes from './datasetHeader.module.scss';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
+import { typographyClasses } from 'common/styling';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -76,7 +77,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
       radius="sm"
       p="lg"
     >
-      <div>
+      <div className={classes.leftTitlePart}>
         <div className={classes.datasetInfo}>
           <DataField label="Group">
             <GroupsListWithRoles data={dataset?.groups || []} />
@@ -108,7 +109,12 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
               Dataset
             </Title>
           )}
-          <Title order={1}>{dataset.name || dataset.id}</Title>
+          <Title
+            className={typographyClasses.oneLineText}
+            order={1}
+          >
+            {dataset.name || dataset.id}
+          </Title>
           {canDatasetBeEdited && (
             <ActionIcon
               variant="transparent"
@@ -119,7 +125,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
           )}
         </Flex>
 
-        <div>{dataset.description}</div>
+        <p className={classes.datasetDescription}>{dataset.description}</p>
       </div>
 
       <div className={classes.buttonContainer}>
