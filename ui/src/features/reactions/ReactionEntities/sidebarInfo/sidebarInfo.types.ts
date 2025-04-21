@@ -23,5 +23,8 @@ export interface ReactionSidebarInfo {
   entityName: ReactionNodeEntity;
   label: string;
   sidebarTitle: FC<ReactionEntityTitleProps>;
-  useInitialValues: (reactionId: ReactionId, pathComponents: ReactionPathComponents) => object;
+  useInitialValues: (
+    reactionId: ReactionId,
+    pathComponents: ReactionPathComponents,
+  ) => [object, object, (values: object) => object];
 }

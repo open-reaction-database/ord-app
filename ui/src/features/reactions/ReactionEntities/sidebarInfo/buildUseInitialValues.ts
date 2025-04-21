@@ -22,11 +22,19 @@ import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 export function buildUseInitialValues<Result extends object, Input extends Result>(
   filterInitialValues: (values: Input) => Result,
 ) {
-  return function useInitialValues(reactionId: ReactionId, pathComponents: ReactionPathComponents) {
+  return function useInitialValues(
+    reactionId: ReactionId,
+    pathComponents: ReactionPathComponents,
+  ): [object, object, (values: object) => object] {
     const { id: _, ...reactionPart } = useSelector(selectReactionPartByPath(reactionId, pathComponents));
 
-    return useMemo((): object => {
-      return structuredClone(filterInitialValues(reactionPart));
-    }, [reactionPart]);
+    const originalValue = useMemo((): Input => structuredClone(reactionPart), [reactionPart]);
+
+    const valueWithoutNestedFields = useMemo(
+      (): Result => structuredClone(filterInitialValues(originalValue)),
+      [originalValue],
+    );
+
+    return [valueWithoutNestedFields, originalValue, filterInitialValues as unknown as (values: object) => object];
   };
 }
