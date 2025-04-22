@@ -18,7 +18,7 @@ import { createUserActions } from './users.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { User } from './users.types.ts';
 
-export const createUser = createThunk(createUserActions, async (_d, _s, tokens) => {
+export const createUser = createThunk(createUserActions, tokens => async () => {
   const user = (await axiosInstance.post<User>('/auth/jit-provisioning', tokens)).data;
   return createUserActions.success(user);
 });

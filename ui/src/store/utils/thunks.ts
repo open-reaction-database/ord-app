@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { AnyAsyncAction, AsyncAction } from 'common/types';
-import type { AppThunk, AppVoidThunk, ThunkCustomWrapper, ThunkWrapper } from 'common/types/store/thunk.ts';
+import type { AnyAsyncAction } from 'common/types';
+import type { AppThunk, AppVoidThunk, ThunkWrapper } from 'common/types/store/thunk.ts';
 import { isAxiosError } from 'axios';
 import { showNotification } from '../../common/utils/showNotification.tsx';
 import { NotificationVariant } from '../../common/types/notification.ts';
@@ -38,10 +38,10 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
   appThunk: AppThunk<AsyncAction>,
 ): ThunkWrapper<AsyncAction> {
   return extraArgument => {
-    return async (dispatch, getState) => {
+    return async dispatch => {
       dispatch(asyncActionCreator.request(extraArgument));
       try {
-        const result = await appThunk(dispatch, getState, extraArgument);
+        const result = await dispatch(appThunk(extraArgument));
         dispatch(result);
         return result;
       } catch (e) {
@@ -58,10 +58,10 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
   appThunk: AppVoidThunk<AsyncAction>,
 ): ThunkWrapper<AsyncAction> {
   return extraArgument => {
-    return async (dispatch, getState) => {
+    return async dispatch => {
       dispatch(asyncActionCreator.request(extraArgument));
       try {
-        await appThunk(dispatch, getState, extraArgument);
+        await dispatch(appThunk(extraArgument));
       } catch (e) {
         const result = processAxiosError(e);
         dispatch(asyncActionCreator.failure(result));
@@ -69,8 +69,4 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       }
     };
   };
-}
-
-export function createCustomThunk(appThunk: AppVoidThunk<AsyncAction>): ThunkCustomWrapper<void> {
-  return () => appThunk;
 }
