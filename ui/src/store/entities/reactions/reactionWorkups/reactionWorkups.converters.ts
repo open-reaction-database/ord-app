@@ -29,7 +29,7 @@ import {
 } from '../reactionEntityTypes/reactionEntityTypes.converters.ts';
 import { ordAmountToReaction, reactionAmountToOrd } from '../reactionAmount/reactionAmount.converters.ts';
 import {
-  ordInputToReactionInputWithoutName,
+  ordInputWithoutNameToReaction,
   reactionInputWithoutNameToOrd,
 } from '../reactionsInputs/reactionsInputs.converters.ts';
 import {
@@ -54,7 +54,7 @@ export const ordWorkupToReaction = ({
     type: ordWorkupTypeToReaction(type),
     duration: ordTimeToReaction(duration),
     amount: ordAmountToReaction(amount),
-    input: input ? ordInputToReactionInputWithoutName(input) : null,
+    input: input ? ordInputWithoutNameToReaction(input) : null,
     temperature: ordTemperatureConditionToReaction(temperature),
     stirring: ordStirringConditionToReaction(stirring),
     isAutomated: ordBooleanToReaction(isAutomated),

@@ -21,7 +21,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { ReactionEntityBaseNode, reactionEntityToForm } from 'features/reactions/ReactionEntities';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import { getReactionEntityTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToTransform.ts';
@@ -50,6 +50,10 @@ export function ReactionEntityForm({
   const { reactionId, isViewOnly, isTemplate } = useContext(reactionContext);
   const dispatch = useAppDispatch();
   const [pasteOpened, { open, close }] = useDisclosure();
+  // Dirty hack to reset all the components within form during paste operation
+  // Since form is uncontrolled some components are not visually updated when form is reset
+  // This hack allows us to rerender those components from scratch
+  const [formKey, setFormKey] = useState(crypto.randomUUID());
 
   const contextValue = useMemo(
     (): ReactionEntityContext => ({
@@ -103,12 +107,13 @@ export function ReactionEntityForm({
     [dispatch, formMethods, isViewOnly, onSetFormDirty, reactionId, reactionPathComponents],
   );
 
-  const onSave = useCallback(
+  const onPasteChunk = useCallback(
     (reactionPart: object) => {
       try {
         const formValues = filterValues(reactionPart);
         form.setValues(formValues);
         onSubmit(reactionPart);
+        setFormKey(crypto.randomUUID());
       } catch (_e: unknown) {
         showNotification({
           variant: NotificationVariant.ERROR,
@@ -126,6 +131,7 @@ export function ReactionEntityForm({
           className={classes.wrapper}
           form={form}
           onSubmit={onSubmit}
+          key={formKey}
         >
           <Flex
             className={classes.content}
@@ -174,7 +180,7 @@ export function ReactionEntityForm({
           name={sidebarInfo.label}
           entityField={sidebarInfo.entityName}
           onClose={close}
-          onSave={onSave}
+          onSave={onPasteChunk}
         />
       )}
     </reactionEntityContext.Provider>

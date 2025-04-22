@@ -26,7 +26,7 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { ord } from 'ord-schema-protobufjs';
-import { ordObservationToReactionObservation } from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
+import { ordObservationToReaction } from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
@@ -40,9 +40,7 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
 
   const onObservationsCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, observations.length];
-    const newObservation = ordObservationToReactionObservation(
-      ord.ReactionObservation.toObject(new ord.ReactionObservation()),
-    );
+    const newObservation = ordObservationToReaction(ord.ReactionObservation.toObject(new ord.ReactionObservation()));
 
     dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newObservation }));
     dispatch(setReactionPathComponentsList([newIdentifierPath]));

@@ -81,17 +81,14 @@ const reactionCompoundSourceToOrd = (compoundSource: ord.Compound.ISource): Opti
   return hasAnyValues ? compoundSource : null;
 };
 
-const ordPreparationToReactionPreparation = ({
-  type,
-  ...rest
-}: ord.ICompoundPreparation): ReactionComponentPreparation => {
+export const ordPreparationToReaction = ({ type, ...rest }: ord.ICompoundPreparation): ReactionComponentPreparation => {
   return withId({
     type: ordPreparationTypeToReaction(type),
     ...rest,
   });
 };
 
-const reactionPreparationToOrdPreparation = ({
+export const reactionPreparationToOrd = ({
   type,
   details,
   reactionId,
@@ -182,7 +179,7 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
   });
 };
 
-const reactionMeasurementToOrd = (measurement: ReactionMeasurement): ord.IProductMeasurement => {
+export const reactionMeasurementToOrd = (measurement: ReactionMeasurement): ord.IProductMeasurement => {
   const {
     type,
     details,
@@ -265,7 +262,7 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
     ...ordComponentBaseToReaction(inputComponent),
     isLimiting: ordBooleanToReaction(isLimiting),
     source: ordCompoundSourceToReaction(source),
-    preparations: (preparations ?? []).map(ordPreparationToReactionPreparation),
+    preparations: (preparations ?? []).map(ordPreparationToReaction),
     amount: ordAmountToReaction(amount),
   };
 }
@@ -278,7 +275,7 @@ export function reactionInputComponentToOrd(inputComponent: ReactionInputCompone
     ...reactionComponentBaseToOrd(inputComponent),
     isLimiting,
     source: reactionCompoundSourceToOrd(source),
-    preparations: preparations.map(reactionPreparationToOrdPreparation),
+    preparations: preparations.map(reactionPreparationToOrd),
     amount: reactionAmountToOrd(amount),
   };
 }

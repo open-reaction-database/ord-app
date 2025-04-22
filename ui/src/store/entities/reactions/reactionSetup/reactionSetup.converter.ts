@@ -112,7 +112,7 @@ export const ordSetupToReactionSetup = (setup?: ord.IReactionSetup | null): Reac
   });
 };
 
-export const reactionSetupToOrdSetup = ({
+export const reactionSetupToOrd = ({
   isAutomated,
   vessel,
   environment,

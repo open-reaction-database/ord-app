@@ -22,7 +22,7 @@ import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntit
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { ReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
-import { ordAnalysisToReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
+import { ordAnalysisToReaction } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
@@ -33,7 +33,7 @@ const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, Reac
     'Analysis',
     (analyses as Array<ReactionAnalysis>).map(({ name }) => name),
   );
-  const analysis = ordAnalysisToReactionAnalysis(ord.Analysis.toObject(new ord.Analysis()), uniqueName);
+  const analysis = ordAnalysisToReaction(ord.Analysis.toObject(new ord.Analysis()), uniqueName);
   return [analysis.id, analysis];
 };
 

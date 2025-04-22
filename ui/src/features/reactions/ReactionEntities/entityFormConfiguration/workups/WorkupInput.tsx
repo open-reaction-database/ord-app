@@ -31,7 +31,7 @@ import { AddCircleIcon } from 'common/icons';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { ordInputToReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
+import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
@@ -68,7 +68,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
-    const input = ordInputToReactionInputWithoutName(ord.ReactionInput.toObject(new ord.ReactionInput()));
+    const input = ordInputWithoutNameToReaction(ord.ReactionInput.toObject(new ord.ReactionInput()));
     dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: input }));
   }, [currentPath, dispatch, reactionId]);
 

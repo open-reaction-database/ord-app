@@ -16,6 +16,10 @@
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import {
+  ordToReactionConvertersByNodeEntity,
+  reactionToOrdConvertersByNodeEntity,
+} from 'store/entities/reactions/reactions.models.ts';
 
 interface ClipboardMessage {
   type: ReactionNodeEntity;
@@ -23,10 +27,11 @@ interface ClipboardMessage {
 }
 
 export async function copyReactionPart(entityName: ReactionNodeEntity, reactionPart: object) {
+  const value = reactionToOrdConvertersByNodeEntity[entityName](reactionPart);
   const clipboardMessage = JSON.stringify(
     {
       type: entityName,
-      value: reactionPart,
+      value,
     },
     null,
     2,
@@ -66,11 +71,13 @@ export async function pasteReactionPart(entityField: ReactionNodeEntity): Promis
     if (!checkEntityNames(entityField, message.type)) {
       throw `Invalid entity name "${message.type}" expected "${entityField}".`;
     }
-    const { value } = message;
-    if ('name' in value && typeof value.name === 'string') {
-      delete value.name;
+    const { value, type } = message;
+    const converter = ordToReactionConvertersByNodeEntity[type];
+    const reactionValue = converter.hasName ? converter.convert(value, '') : converter.convert(value);
+    if (converter.hasName) {
+      delete reactionValue.name;
     }
-    return [value, text];
+    return [reactionValue, text];
   } catch (e: unknown) {
     let message = `Failed to paste clipboard content.`;
     if (typeof e === 'string') {
