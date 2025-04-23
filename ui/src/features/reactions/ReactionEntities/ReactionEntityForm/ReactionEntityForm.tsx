@@ -24,13 +24,13 @@ import { reactionEntityContext } from 'features/reactions/ReactionEntities/react
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
-import { getReactionEntityTransform } from 'features/reactions/ReactionEntities/entityFormConfiguration/reactionEntityToTransform.ts';
 import { reactionContext } from '../../reactions.context.ts';
 import { copyReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
+import { useReactionEntityValidation } from '../entityFormConfiguration/reactionEntityToValidation.ts';
 
 interface ReactionEntityFormProps {
   isHidden: boolean;
@@ -64,7 +64,7 @@ export function ReactionEntityForm({
   );
 
   const formEntity = sidebarInfo.entityName;
-  const transform = getReactionEntityTransform(formEntity);
+  const validate = useReactionEntityValidation(reactionId, reactionPathComponents, formEntity);
 
   const [initialValues, reactionPartWithNestedEntities, filterValues] = sidebarInfo.useInitialValues(
     reactionId,
@@ -74,7 +74,7 @@ export function ReactionEntityForm({
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: { ...initialValues },
-    transformValues: transform,
+    validate,
   });
   const { watch, getValues, getInputProps, setValues, resetDirty } = form;
   const formMethods = useMemo(
