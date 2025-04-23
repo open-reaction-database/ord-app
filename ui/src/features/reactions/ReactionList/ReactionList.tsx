@@ -32,7 +32,6 @@ import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { setShowInvalidOnly } from 'store/entities/reactions/reactions.actions.ts';
-import { FormattedText } from 'common/components/display/FormattedText/FormattedText.tsx';
 
 export function ReactionList() {
   const dispatch = useAppDispatch();
@@ -81,16 +80,14 @@ export function ReactionList() {
             align="center"
             gap="sm"
           >
-            <Title order={2}>
-              <FormattedText text="DATASET_REACTIONS" />
-            </Title>
+            <Title order={2}>Dataset Reactions</Title>
             <div className={classes.counterContainer}>
               {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
             </div>
             <Switch
               className={classes.switcher}
               size="sm"
-              label={<FormattedText text="SHOW_INVALID_ONLY" />}
+              label="Show Invalid Only"
               checked={showInvalidOnly}
               onChange={event => handleToggleInvalid(event.currentTarget.checked)}
             />

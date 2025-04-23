@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useTextFormatting } from 'common/hooks/useTextFormatting';
-import type formatting from 'common/dictionary/formatting.json';
+import { useTextFormatting, type FormattingKey } from 'common/hooks/useTextFormatting';
 
-type FormattingKey = keyof typeof formatting;
-
-interface FormattedTextProps {
-  readonly text: FormattingKey;
-  readonly className?: string;
+interface FormattedUnitProps {
+  unit: FormattingKey;
 }
 
-export function FormattedText({ text, className }: FormattedTextProps) {
-  const formattedText = useTextFormatting(text);
-
-  return <span className={className}>{formattedText}</span>;
+export function FormattedUnit({ unit }: Readonly<FormattedUnitProps>) {
+  const formattedUnit = useTextFormatting(unit);
+  return <>{formattedUnit}</>;
 }

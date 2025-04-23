@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useMemo } from 'react';
-import { formatText } from '../dictionary/textFormatting';
+import formatting from '../dictionary/formatting.json';
 
-interface UseTextFormattingOptions {
-  fallbackToHumanized?: boolean;
-}
+export type FormattingKey = keyof typeof formatting;
 
-export function useTextFormatting(text: string, options: UseTextFormattingOptions = {}) {
-  const { fallbackToHumanized = true } = options;
-
-  return useMemo(() => formatText(text, fallbackToHumanized), [text, fallbackToHumanized]);
+export function useTextFormatting(text: FormattingKey) {
+  return formatting[text] ?? text;
 }
