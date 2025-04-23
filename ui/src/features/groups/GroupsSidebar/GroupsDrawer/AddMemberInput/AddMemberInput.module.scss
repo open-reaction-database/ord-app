@@ -19,8 +19,13 @@
   gap: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--color-border-1);
+}
 
-  div {
-    flex: 1;
-  }
+.inputWrapper {
+  flex: 1;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
 }

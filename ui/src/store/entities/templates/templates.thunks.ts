@@ -40,8 +40,6 @@ import { NotificationVariant } from 'common/types/notification.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 import { ordTemplateVariablesToReaction, reactionTemplateVariablesToOrd } from './temlpates.converters.ts';
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
-import type { ThunkDispatch, Action } from '@reduxjs/toolkit';
-import type { AppState } from '../../configureAppStore.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
 import { getReactionPreviews } from '../reactions/reactions.utils.ts';
 
@@ -70,13 +68,13 @@ const parseTemplate = ({
   };
 };
 
-export const getTemplate = createThunk(getTemplateActions, async (_d, _s, templateId) => {
+export const getTemplate = createThunk(getTemplateActions, templateId => async () => {
   const result = await axiosInstance.get<TemplateResponse>(`/templates/${templateId}`);
   const template = parseTemplate(result.data);
   return getTemplateActions.success(template);
 });
 
-export const getAllTemplates = createThunk(getAllTemplatesActions, async (_d, _s) => {
+export const getAllTemplates = createThunk(getAllTemplatesActions, () => async () => {
   const result = await axiosInstance.get<Array<TemplateResponse>>(`/templates`);
   const templates = result.data;
   const parsedTemplates = templates.map(template => parseTemplate(template));
@@ -86,7 +84,7 @@ export const getAllTemplates = createThunk(getAllTemplatesActions, async (_d, _s
 
 export const createTemplate = createThunkWithExplicitResult(
   createNewTemplateActions,
-  async (dispatch, getState, templateLoad) => {
+  templateLoad => async (dispatch, getState) => {
     const baseReaction = selectReactionById(templateLoad.reactionId)(getState());
     const ordReaction = reactionToOrdReaction(baseReaction.data);
     const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
@@ -103,14 +101,17 @@ export const createTemplate = createThunkWithExplicitResult(
   },
 );
 
-export const removeTemplate = createThunkWithExplicitResult(removeTemplateActions, async (dispatch, _s, templateId) => {
-  const entityId = getTemplateIdNumber(templateId);
-  await axiosInstance.delete(`/templates/${entityId}`);
-  dispatch(removeTemplateActions.success(templateId));
-  navigate(`/templates`);
-});
+export const removeTemplate = createThunkWithExplicitResult(
+  removeTemplateActions,
+  templateId => async (dispatch, _s) => {
+    const entityId = getTemplateIdNumber(templateId);
+    await axiosInstance.delete(`/templates/${entityId}`);
+    dispatch(removeTemplateActions.success(templateId));
+    navigate(`/templates`);
+  },
+);
 
-export const renameTemplate = createThunk(renameTemplateActions, async (_d, _g, { templateId, name }) => {
+export const renameTemplate = createThunk(renameTemplateActions, ({ templateId, name }) => async () => {
   const entityId = getTemplateIdNumber(templateId);
   const result = await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, { name });
   const template = parseTemplate(result.data);
@@ -127,13 +128,13 @@ const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> = temp
   showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
 };
 
-export const addUpdateVariable = createThunk(addUpdateVariableActions, async (dispatch, _g, { templateId }) => {
-  await (dispatch as ThunkDispatch<AppState, never, Action>)(syncVariablesWithBackend(templateId));
+export const addUpdateVariable = createThunk(addUpdateVariableActions, ({ templateId }) => async (dispatch, _g) => {
+  await dispatch(syncVariablesWithBackend(templateId));
   return addUpdateVariableActions.success();
 });
 
-export const removeVariable = createThunk(removeVariableActions, async (dispatch, _g, { templateId }) => {
-  await (dispatch as ThunkDispatch<AppState, never, Action>)(syncVariablesWithBackend(templateId));
+export const removeVariable = createThunk(removeVariableActions, ({ templateId }) => async (dispatch, _g) => {
+  await dispatch(syncVariablesWithBackend(templateId));
   return removeVariableActions.success();
 });
 
@@ -155,25 +156,26 @@ export const downloadTemplateInJSON: ThunkCustomWrapper<string> = (templateId: s
 
 export const importFromFile = createThunkWithExplicitResult(
   importTemplateFromFileActions,
-  async (dispatch, _g, { name, file }) => {
-    try {
-      const fileContentString = Buffer.from(await file.arrayBuffer()).toString();
-      const { binpb, variables } = JSON.parse(fileContentString);
-      if (!Array.isArray(variables)) {
-        throw new Error('Incorrect variables schema');
+  ({ name, file }) =>
+    async dispatch => {
+      try {
+        const fileContentString = Buffer.from(await file.arrayBuffer()).toString();
+        const { binpb, variables } = JSON.parse(fileContentString);
+        if (!Array.isArray(variables)) {
+          throw new Error('Incorrect variables schema');
+        }
+        const payload = {
+          name: name,
+          binpb: binpb,
+          variables: JSON.stringify(variables),
+        };
+        const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
+        const template = parseTemplate(templateData);
+        navigate(`/templates/${templateData.id}`);
+        dispatch(importTemplateFromFileActions.success(template));
+      } catch (e: unknown) {
+        console.error(e);
+        dispatch(importTemplateFromFileActions.failure('Incorrect template file provided'));
       }
-      const payload = {
-        name: name,
-        binpb: binpb,
-        variables: JSON.stringify(variables),
-      };
-      const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
-      const template = parseTemplate(templateData);
-      navigate(`/templates/${templateData.id}`);
-      dispatch(importTemplateFromFileActions.success(template));
-    } catch (e: unknown) {
-      console.error(e);
-      dispatch(importTemplateFromFileActions.failure('Incorrect template file provided'));
-    }
-  },
+    },
 );

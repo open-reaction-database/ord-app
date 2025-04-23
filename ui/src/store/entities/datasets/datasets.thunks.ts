@@ -31,7 +31,7 @@ import { navigate } from 'wouter/use-browser-location';
 import { selectActiveGroupId } from '../../features/groups/groups.selectors.ts';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 
-export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetId) => {
+export const getDataset = createThunk(getDatasetActions, datasetId => async () => {
   try {
     const response = await axiosInstance.get<Dataset>(`/datasets/${datasetId}`);
     return getDatasetActions.success(response.data);
@@ -40,7 +40,7 @@ export const getDataset = createThunk(getDatasetActions, async (_d, _g, datasetI
   }
 });
 
-export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, async (_d, _g, groupId) => {
+export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, groupId => async () => {
   const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
   const params = { page: 1, size: 10 };
 
@@ -48,7 +48,7 @@ export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListAct
   return getGroupsInitialDatasetListActions.success(datasetsPages);
 });
 
-export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, getState) => {
+export const getDatasetsPage = createThunk(getDatasetPageActions, () => async (_d, getState) => {
   const state = getState();
   const activeGroupId = selectActiveGroupId(state);
   const currentPage = selectDatasetsPagination(state);
@@ -62,11 +62,12 @@ export const getDatasetsPage = createThunk(getDatasetPageActions, async (_d, get
 
 export const createEmptyDataset = createThunkWithExplicitResult(
   createNewDatasetActions,
-  async (dispatch, _g, { groupId, ...payload }) => {
-    const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)).data;
-    dispatch(createNewDatasetActions.success(dataset));
-    navigate(`/datasets/${dataset.id}`);
-  },
+  ({ groupId, ...payload }) =>
+    async dispatch => {
+      const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)).data;
+      dispatch(createNewDatasetActions.success(dataset));
+      navigate(`/datasets/${dataset.id}`);
+    },
 );
 
 export async function createDatasetFromFileOperation(groupId: number, file: File) {
@@ -77,19 +78,20 @@ export async function createDatasetFromFileOperation(groupId: number, file: File
 
 export const createDatasetFromFile = createThunkWithExplicitResult(
   createDatasetFromFileActions,
-  async (dispatch, _g, { groupId, file }) => {
-    const dataset = (await createDatasetFromFileOperation(groupId, file)).data;
-    dispatch(createDatasetFromFileActions.success(dataset));
-    navigate(`/datasets/${dataset.id}`);
-  },
+  ({ groupId, file }) =>
+    async dispatch => {
+      const dataset = (await createDatasetFromFileOperation(groupId, file)).data;
+      dispatch(createDatasetFromFileActions.success(dataset));
+      navigate(`/datasets/${dataset.id}`);
+    },
 );
 
-export const updateDataset = createThunk(updateDatasetActions, async (_d, _g, { id, ...payload }) => {
+export const updateDataset = createThunk(updateDatasetActions, ({ id, ...payload }) => async () => {
   const updatedDataset = (await axiosInstance.patch<Dataset>(`datasets/${id}`, payload)).data;
   return updateDatasetActions.success(updatedDataset);
 });
 
-export const removeDataset = createThunkWithExplicitResult(removeDatasetActions, async (dispatch, _g, datasetId) => {
+export const removeDataset = createThunkWithExplicitResult(removeDatasetActions, datasetId => async dispatch => {
   await axiosInstance.delete(`/datasets/${datasetId}`);
   dispatch(removeDatasetActions.success());
   navigate(`/`);

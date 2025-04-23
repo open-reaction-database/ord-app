@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Accordion, Flex, Text, Tooltip } from '@mantine/core';
+import { Accordion, Flex, Text } from '@mantine/core';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types';
 import { useMemo } from 'react';
 import { ComponentDisplayRow, componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
@@ -21,13 +21,10 @@ import clsx from 'clsx';
 import classes from './outcomeListItem.module.scss';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
-import type {
-  ReactionMeasurement,
-  ReactionProduct,
-} from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import { renderValuePrecisionUnit } from '../../renderValuePrecisionUnit';
+import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { MeasurementsPreview } from '../MeasurementsPreview/MeasurementsPreview.tsx';
 
 const ENTITY_NAME = 'outcomes';
 
@@ -37,10 +34,6 @@ interface OutcomeListItemProps {
   outcomeIndex: number;
 }
 
-interface MeasurementPreviewProps {
-  measurement: ReactionMeasurement;
-}
-
 const headers = [
   { label: 'Identifiers', className: componentsListClasses.identifiers },
   { label: 'Preview', className: componentsListClasses.preview },
@@ -48,49 +41,7 @@ const headers = [
   { label: 'Measurements', className: componentsListClasses.details },
 ];
 
-function MeasurementPreview({ measurement }: Readonly<MeasurementPreviewProps>) {
-  const valuePreview = useMemo(() => {
-    if (!measurement.value) return null;
-    if (measurement.value.type === 'Mass') {
-      return renderValuePrecisionUnit(measurement.value.value);
-    } else if (measurement.value.type === 'String') {
-      return measurement.value.value;
-    } else {
-      const postfix = measurement.value.type === '%' ? '%' : '';
-      return renderValuePrecisionUnit({ ...measurement.value.value, units: postfix });
-    }
-  }, [measurement.value]);
-
-  return (
-    <Flex
-      gap="sm"
-      wrap="nowrap"
-      className={classes.measurementWrapper}
-    >
-      {measurement.type && <Text className={classes.measurementKeyType}>{measurement.type}</Text>}
-      {measurement?.analysis?.name && <Text className={classes.measurementKeyType}>{measurement?.analysis?.name}</Text>}
-      {measurement.value && (
-        <Tooltip label={valuePreview}>
-          <Text className={classes.measurementValue}>{valuePreview}</Text>
-        </Tooltip>
-      )}
-    </Flex>
-  );
-}
-
-const renderDetails = (product: ReactionProduct) => (
-  <Flex
-    direction="column"
-    gap="xs"
-  >
-    {product.measurements.map(measurement => (
-      <MeasurementPreview
-        key={measurement.id}
-        measurement={measurement}
-      />
-    ))}
-  </Flex>
-);
+const renderDetails = (product: ReactionProduct) => <MeasurementsPreview product={product} />;
 
 export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<OutcomeListItemProps>) {
   const outcomePathComponents = useMemo(() => [ENTITY_NAME, outcomeIndex], [outcomeIndex]);

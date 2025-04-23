@@ -19,7 +19,7 @@ import { Buffer } from 'buffer';
 import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
-export function ordDataToReactionData(dataWrapper: OrdOptional<ord.IData>, name: string): AppData {
+export function ordDataToReaction(dataWrapper: OrdOptional<ord.IData>, name: string): AppData {
   const { description, format, ...data } = dataWrapper || {};
   let type: AppData['data']['type'];
   let value: AppData['data']['value'];
@@ -51,7 +51,7 @@ export function ordDataToReactionData(dataWrapper: OrdOptional<ord.IData>, name:
   );
 }
 
-export function reactionDataToOrdData({ description, data }: AppData): ord.IData {
+export function reactionDataToOrd({ description, data }: AppData): ord.IData {
   const emptyData = ord.Data.toObject(new ord.Data({ description, format: data.format }));
   if (data.value === null) {
     // Nothing to add here
@@ -72,7 +72,7 @@ export function reactionDataToOrdData({ description, data }: AppData): ord.IData
 
 export function ordDataMapToReactionDataMap(ordDataMap: Record<string, ord.IData>): Record<string, AppData> {
   return Object.entries(ordDataMap).reduce((acc, [name, ordData]) => {
-    const reactionData = ordDataToReactionData(ordData, name);
+    const reactionData = ordDataToReaction(ordData, name);
     return {
       ...acc,
       [reactionData.id]: reactionData,
@@ -84,7 +84,7 @@ export function reactionDataMapToOrdDataMap(reactionDataMap: Record<string, AppD
   return Object.values(reactionDataMap).reduce(
     (acc, item) => ({
       ...acc,
-      [item.name]: reactionDataToOrdData(item),
+      [item.name]: reactionDataToOrd(item),
     }),
     {},
   );

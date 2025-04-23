@@ -83,7 +83,7 @@ export function DatasetTable() {
             : {}
         }
       />
-      {datasets?.length > 0 && (
+      {datasets?.length > 0 && pagination.pages > 1 && (
         <Pagination
           currentPage={pagination.page}
           onPageChange={onPageChange}

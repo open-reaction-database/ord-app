@@ -17,7 +17,12 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ComponentProductPreview, PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type { Optional, ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  ReactionIdentifier,
+  WithId,
+  WithIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
@@ -46,13 +51,30 @@ export enum ReactionNodeEntity {
   Provenance = 'provenance',
   RecordModified = 'recordModified',
   Conditions = 'conditions',
+  Workups = 'workups',
   TemperatureMeasurements = 'temperatureMeasurements',
   ElectrochemistryMeasurements = 'electrochemistryMeasurements',
   PressureMeasurements = 'pressureMeasurements',
-  Workups = 'workups',
   VesselPreparations = 'vesselPreparations',
   VesselAttachments = 'vesselAttachments',
 }
+
+export interface OrdToReactionNamelessEntityConverter {
+  hasName: false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  convert: (ordEntity: any) => WithId<any>;
+}
+
+export interface OrdToReactionNamedEntityConverter {
+  hasName: true;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  convert: (ordEntity: any, name: string) => WithIdName<any>;
+}
+
+export type OrdToReactionEntityConverter = OrdToReactionNamelessEntityConverter | OrdToReactionNamedEntityConverter;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ReactionToOrdEntityConverter = (reactionEntity: any) => object;
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;

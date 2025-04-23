@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * Copyright 2024 Open Reaction Database Project Authors
  *
@@ -30,29 +29,28 @@ import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
-import type { ThunkDispatch } from '@reduxjs/toolkit';
 
-export const getGroupList = createThunk(getGroupListActions, async () => {
+export const getGroupList = createThunk(getGroupListActions, () => async () => {
   const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;
   return getGroupListActions.success(groups);
 });
 
-export const createGroup = createThunk(createGroupActions, async (dispatch, _g, name) => {
+export const createGroup = createThunk(createGroupActions, name => async dispatch => {
   const { id } = (await axiosInstance.post<GroupItem>('/groups', { name })).data;
 
-  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+  dispatch(getGroupList());
   return createGroupActions.success(id);
 });
 
-export const getGroupMembers = createThunk(getGroupMembersActions, async (_d, _g, groupId) => {
+export const getGroupMembers = createThunk(getGroupMembersActions, groupId => async () => {
   const members = (await axiosInstance.get<Array<GroupMember>>(`/groups/${groupId}/members`)).data;
   return getGroupMembersActions.success({ groupId, members });
 });
 
-export const renameGroup = createThunkWithExplicitResult(renameGroupActions, async (dispatch, _g, updatedGroup) => {
+export const renameGroup = createThunkWithExplicitResult(renameGroupActions, updatedGroup => async dispatch => {
   const { name, id } = updatedGroup;
   await axiosInstance.patch<Group>(`/groups/${id}`, updatedGroup);
-  (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+  dispatch(getGroupList());
   dispatch(renameGroupActions.success());
   showNotification({
     message: `${name} group changes have been successfully saved`,
@@ -62,11 +60,11 @@ export const renameGroup = createThunkWithExplicitResult(renameGroupActions, asy
 
 export const updateGroupMembers = createThunkWithExplicitResult(
   updateGroupMembersActions,
-  async (dispatch, getState, memberInfo) => {
+  memberInfo => async (dispatch, getState) => {
     const state = getState();
     const groupId = selectEditingGroupId(state);
     const updatedMember = (await axiosInstance.patch<GroupMember>(`/groups/${groupId}/members`, memberInfo)).data;
-    (dispatch as ThunkDispatch<any, any, any>)(getGroupList());
+    dispatch(getGroupList());
     dispatch(updateGroupMembersActions.success({ groupId: Number(groupId), member: updatedMember }));
     showNotification({
       message: `${updatedMember.user.name}'s role has been successfully updated`,
@@ -75,7 +73,7 @@ export const updateGroupMembers = createThunkWithExplicitResult(
   },
 );
 
-export const removeGroupMembers = createThunk(removeGroupMembersActions, async (_d, getState, membersId) => {
+export const removeGroupMembers = createThunk(removeGroupMembersActions, membersId => async (_d, getState) => {
   const state = getState();
   const groupId = selectEditingGroupId(state);
 
@@ -88,7 +86,7 @@ export const removeGroupMembers = createThunk(removeGroupMembersActions, async (
   return removeGroupMembersActions.success({ groupId: Number(groupId), membersId });
 });
 
-export const addGroupMember = createThunk(addGroupMemberActions, async (_d, getState, identity) => {
+export const addGroupMember = createThunk(addGroupMemberActions, identity => async (_d, getState) => {
   const state = getState();
   const groupId = selectEditingGroupId(state);
 

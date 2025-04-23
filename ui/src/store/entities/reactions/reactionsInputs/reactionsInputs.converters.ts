@@ -75,7 +75,7 @@ export function reactionCrudeComponentToOrd({
   };
 }
 
-export function ordInputToReactionInputWithoutName(ordInput: ord.IReactionInput): ReactionInputWithoutName {
+export function ordInputWithoutNameToReaction(ordInput: ord.IReactionInput): ReactionInputWithoutName {
   const {
     components,
     additionDuration,
@@ -129,20 +129,20 @@ export function reactionInputWithoutNameToOrd(input: ReactionInputWithoutName): 
   };
 }
 
-export function ordInputToReactionsInput(ordInput: ord.IReactionInput, name: string): ReactionInput {
+export function ordInputToReaction(ordInput: ord.IReactionInput, name: string): ReactionInput {
   return {
     name,
-    ...ordInputToReactionInputWithoutName(ordInput),
+    ...ordInputWithoutNameToReaction(ordInput),
   };
 }
 
-export function reactionInputToOrdInput({ name: _, ...input }: ReactionInput): ord.IReactionInput {
+export function reactionInputToOrd({ name: _, ...input }: ReactionInput): ord.IReactionInput {
   return reactionInputWithoutNameToOrd(input);
 }
 
 export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): AppReaction['inputs'] {
   return Object.entries(ordInputs || {}).reduce((acc, [name, ordInput]) => {
-    const reactionInput = ordInputToReactionsInput(ordInput, name);
+    const reactionInput = ordInputToReaction(ordInput, name);
     return {
       ...acc,
       [reactionInput.id]: reactionInput,
@@ -154,7 +154,7 @@ export function reactionInputsToOrdInputs(reactionInputs: AppReaction['inputs'])
   return Object.values(reactionInputs).reduce(
     (acc, item) => ({
       ...acc,
-      [item.name]: reactionInputToOrdInput(item),
+      [item.name]: reactionInputToOrd(item),
     }),
     {},
   );

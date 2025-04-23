@@ -40,7 +40,7 @@ import {
 } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { itemsById } from 'common/utils';
 
-export const ordAnalysisToReactionAnalysis = (
+export const ordAnalysisToReaction = (
   { type, data, instrumentLastCalibrated, isOfIsolatedSpecies, ...rest }: ord.IAnalysis,
   name: string,
 ): ReactionAnalysis =>
@@ -55,7 +55,7 @@ export const ordAnalysisToReactionAnalysis = (
     name,
   );
 
-const reactionAnalysisToOrdAnalysis = ({
+export const reactionAnalysisToOrd = ({
   type,
   analysisData,
   instrumentLastCalibrated,
@@ -80,7 +80,7 @@ export const ordOutcomeToReactionOutcome = ({
     reactionTime: ordTimeToReaction(reactionTime),
     conversion: ordValuePrecisionToReaction(conversion),
     analyses: Object.entries(analyses || {}).reduce((acc, [name, value]) => {
-      const analysis = ordAnalysisToReactionAnalysis(value, name);
+      const analysis = ordAnalysisToReaction(value, name);
       return {
         ...acc,
         [analysis.id]: analysis,
@@ -89,7 +89,7 @@ export const ordOutcomeToReactionOutcome = ({
     products: (products || []).map(ordProductToReaction),
   });
 
-export const reactionOutcomeToOrdOutcome = ({
+export const reactionOutcomeToOrd = ({
   reactionTime,
   conversion,
   analyses,
@@ -100,7 +100,7 @@ export const reactionOutcomeToOrdOutcome = ({
   analyses: Object.values(analyses || {}).reduce(
     (acc, value) => ({
       ...acc,
-      [value.name]: reactionAnalysisToOrdAnalysis(value),
+      [value.name]: reactionAnalysisToOrd(value),
     }),
     {},
   ),
@@ -116,7 +116,7 @@ export const ordOutcomesListToReactionOutcomesList = (
 export const reactionOutcomesListToOrdOutcomesList = (
   outcomes: Array<ReactionOutcome>,
 ): Array<ord.IReactionOutcome> => {
-  return outcomes.map(reactionOutcomeToOrdOutcome);
+  return outcomes.map(reactionOutcomeToOrd);
 };
 
 export const linkReactionOutcome = (outcome: ReactionOutcome): ReactionOutcome => {

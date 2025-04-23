@@ -15,8 +15,8 @@
  */
 import type { ReactionInput } from './reactionInputs.types.ts';
 import { ord } from 'ord-schema-protobufjs';
-import { ordInputToReactionsInput } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
+import { ordInputToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 
 export function createEmptyReactionInput(name: string): ReactionInput {
-  return ordInputToReactionsInput(ord.ReactionInput.toObject(new ord.ReactionInput()), name);
+  return ordInputToReaction(ord.ReactionInput.toObject(new ord.ReactionInput()), name);
 }

@@ -20,33 +20,36 @@ import { ord } from 'ord-schema-protobufjs';
 import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ThunkDispatch } from '@reduxjs/toolkit';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 
 export const addIdentifierByName = createThunkWithExplicitResult(
   addIdentifierByNameActions,
-  async (dispatch, getState, { reactionId, pathComponents, name }) => {
-    try {
-      const result = await axiosInstance.post<{ smiles: string }>('/resolve-compound', {
-        identifier_type: 'name',
-        identifier: name,
-      });
-      const identifierValue = result.data.smiles;
-      const newIdentifier = ordCompoundIdentifierToReaction(
-        ord.CompoundIdentifier.toObject(
-          new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue, details: name }),
-        ),
-      );
-      dispatch(addIdentifierByNameActions.success());
-      const identifiers: Array<ord.CompoundIdentifier> =
-        selectReactionPartByPath(reactionId, pathComponents)(getState()) || [];
-      const newIndex = identifiers.length;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (dispatch as ThunkDispatch<any, any, any>)(
-        addUpdateReactionField({ reactionId, pathComponents: [...pathComponents, newIndex], newValue: newIdentifier }),
-      );
-    } catch (_e) {
-      dispatch(addIdentifierByNameActions.failure());
-    }
-  },
+  ({ reactionId, pathComponents, name }) =>
+    async (dispatch, getState) => {
+      try {
+        const result = await axiosInstance.post<{ smiles: string }>('/resolve-compound', {
+          identifier_type: 'name',
+          identifier: name,
+        });
+        const identifierValue = result.data.smiles;
+        const newIdentifier = ordCompoundIdentifierToReaction(
+          ord.CompoundIdentifier.toObject(
+            new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue, details: name }),
+          ),
+        );
+        dispatch(addIdentifierByNameActions.success());
+        const identifiers: Array<ord.CompoundIdentifier> =
+          selectReactionPartByPath(reactionId, pathComponents)(getState()) || [];
+        const newIndex = identifiers.length;
+        dispatch(
+          addUpdateReactionField({
+            reactionId,
+            pathComponents: [...pathComponents, newIndex],
+            newValue: newIdentifier,
+          }),
+        );
+      } catch (_e) {
+        dispatch(addIdentifierByNameActions.failure());
+      }
+    },
 );

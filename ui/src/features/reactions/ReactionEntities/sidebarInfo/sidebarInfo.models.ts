@@ -58,7 +58,9 @@ const inputSidebarInfo: Omit<SidebarInfoPathLess, 'entityName'> = {
     hasDelete: true,
     description: 'Reaction inputs include every chemical added to the reaction vessel',
   }),
-  useInitialValues: buildUseInitialValues(({ components: _, ...rest }: ReactionInput) => rest),
+  useInitialValues: buildUseInitialValues(
+    ({ components: _c, crudeComponents: _crude, ...rest }: ReactionInput) => rest,
+  ),
 };
 
 const featureSidebarInfo: SidebarInfoPathLess = {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import { ordDataToReactionData, reactionDataToOrdData } from '../reactionData/reactionData.converters';
+import { ordDataToReaction, reactionDataToOrd } from '../reactionData/reactionData.converters';
 import type { AppData } from '../reactionData/reactionData.types';
 import { ordTimeToReaction, reactionTimeToOrd, withId } from '../reactionEntity/reactionEntity.converters';
 import type { ReactionTime } from '../reactionEntity/reactionEntity.types';
@@ -27,21 +27,17 @@ export interface ReactionObservation {
   description?: string;
 }
 
-export const ordObservationToReactionObservation = (observation: ord.IReactionObservation): ReactionObservation => {
-  const base: ReactionObservation = {
-    id: '',
+export const ordObservationToReaction = (observation: ord.IReactionObservation): ReactionObservation =>
+  withId({
     comment: observation.comment ?? '',
     time: ordTimeToReaction(observation.time),
-    image: ordDataToReactionData(observation?.image, 'Observation'),
-  };
+    image: ordDataToReaction(observation?.image, 'Observation'),
+  });
 
-  return withId(base);
-};
-
-export const reactionObservationToOrdObservation = (observation: ReactionObservation): ord.IReactionObservation => {
+export const reactionObservationToOrd = (observation: ReactionObservation): ord.IReactionObservation => {
   return {
     comment: observation.comment,
-    image: reactionDataToOrdData(observation.image),
+    image: reactionDataToOrd(observation.image),
     time: reactionTimeToOrd(observation.time),
   };
 };

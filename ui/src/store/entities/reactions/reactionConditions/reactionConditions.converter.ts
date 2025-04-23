@@ -300,7 +300,7 @@ export const reactionFlowConditionToOrd = ({ type, tubing, ...rest }: ReactionFl
   };
 };
 
-export const ordConditionsToReactionConditions = (conditions?: ord.IReactionConditions | null): ReactionConditions => {
+export const ordConditionsToReaction = (conditions: OrdOptional<ord.IReactionConditions>): ReactionConditions => {
   const {
     temperature,
     reflux,
@@ -326,7 +326,7 @@ export const ordConditionsToReactionConditions = (conditions?: ord.IReactionCond
   });
 };
 
-export const reactionConditionsToOrdConditions = ({
+export const reactionConditionsToOrd = ({
   temperature,
   pressure,
   stirring,

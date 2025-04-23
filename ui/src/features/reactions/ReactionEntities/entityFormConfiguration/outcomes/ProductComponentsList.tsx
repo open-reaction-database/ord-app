@@ -32,12 +32,13 @@ import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/C
 import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { MeasurementsPreview } from 'features/reactions/ReactionView/Outcomes/MeasurementsPreview/MeasurementsPreview.tsx';
 
 const ENTITY_FIELD = 'products';
 
 const useSelectData = buildUseSelectItems(ENTITY_FIELD);
 
-const renderDetails = (_: ReactionProduct) => '';
+const renderDetails = (product: ReactionProduct) => <MeasurementsPreview product={product} />;
 
 export function ProductsComponentsList() {
   const dispatch = useAppDispatch();

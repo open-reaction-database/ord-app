@@ -33,19 +33,16 @@ import {
 } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
-  ordObservationToReactionObservation,
-  reactionObservationToOrdObservation,
+  ordObservationToReaction,
+  reactionObservationToOrd,
 } from './reactionObservation/reactionObservation.converter';
 import {
-  ordProvenanceToReactionProvenance,
-  reactionProvenanceToOrdProvenance,
+  ordProvenanceToReaction,
+  reactionProvenanceToOrd,
 } from './reactionProvenance/reactionProvenance.converters.ts';
-import {
-  ordConditionsToReactionConditions,
-  reactionConditionsToOrdConditions,
-} from './reactionConditions/reactionConditions.converter';
+import { ordConditionsToReaction, reactionConditionsToOrd } from './reactionConditions/reactionConditions.converter';
 import { ordWorkupToReaction, reactionWorkupToOrd } from './reactionWorkups/reactionWorkups.converters.ts';
-import { ordSetupToReactionSetup, reactionSetupToOrdSetup } from './reactionSetup/reactionSetup.converter.ts';
+import { ordSetupToReactionSetup, reactionSetupToOrd } from './reactionSetup/reactionSetup.converter.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -54,10 +51,10 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
     outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
     identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
     setup: ordSetupToReactionSetup(reaction.setup),
-    observations: (reaction.observations || []).map(ordObservationToReactionObservation),
-    conditions: ordConditionsToReactionConditions(reaction.conditions),
+    observations: (reaction.observations || []).map(ordObservationToReaction),
+    conditions: ordConditionsToReaction(reaction.conditions),
     notes: ordNotesToReaction(reaction.notes),
-    provenance: ordProvenanceToReactionProvenance(reaction.provenance),
+    provenance: ordProvenanceToReaction(reaction.provenance),
     workups: (reaction.workups || []).map(ordWorkupToReaction),
   };
 }
@@ -68,11 +65,11 @@ export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
     inputs: reactionInputsToOrdInputs(reaction.inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
     identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
-    setup: reactionSetupToOrdSetup(reaction.setup),
-    observations: reaction.observations.map(reactionObservationToOrdObservation),
-    conditions: reactionConditionsToOrdConditions(reaction.conditions),
+    setup: reactionSetupToOrd(reaction.setup),
+    observations: reaction.observations.map(reactionObservationToOrd),
+    conditions: reactionConditionsToOrd(reaction.conditions),
     notes: reactionNotesToOrd(reaction.notes),
-    provenance: reactionProvenanceToOrdProvenance(reaction.provenance),
+    provenance: reactionProvenanceToOrd(reaction.provenance),
     workups: reaction.workups.map(reactionWorkupToOrd),
   };
 }
