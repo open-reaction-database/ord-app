@@ -89,7 +89,6 @@ export async function pasteReactionPart(entityField: ReactionNodeEntity): Promis
     } = converter.hasName ? converter.convert(value, '') : converter.convert(value);
     return [reactionValue, text];
   } catch (e: unknown) {
-    console.info(e);
     let message = `Failed to paste clipboard content.`;
     if (typeof e === 'string') {
       message = e;
