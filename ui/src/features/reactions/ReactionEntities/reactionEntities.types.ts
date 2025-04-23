@@ -20,6 +20,7 @@ import type { useForm } from '@mantine/form';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { EntityListItemRuntimeProps } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.types.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { WithId } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export enum ReactionFormNodeType {
   group = 'group',
@@ -118,7 +119,7 @@ export interface ReactionFormData extends ReactionFormNodeBase, ReactionFormFiel
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ReactionFormList<T = any> extends ReactionFormNodeBase {
+export interface ReactionFormList<T = WithId<any>> extends ReactionFormNodeBase {
   type: ReactionFormNodeType.list;
   title: ReactionFormStandaloneField;
   getKey: (item: T, index: number) => string | number;

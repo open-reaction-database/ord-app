@@ -33,9 +33,11 @@ import {
   textureDetails,
 } from './reactionComponentsBase.model.tsx';
 import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+import { ordPreparationToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
+import type { ReactionComponentPreparation } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
-const emptyPreparation = (newIndex: number): [number, ord.ICompoundPreparation] => {
-  return [newIndex, ord.CompoundPreparation.toObject(new ord.CompoundPreparation())];
+const emptyPreparation = (newIndex: number): [number, ReactionComponentPreparation] => {
+  return [newIndex, ordPreparationToReaction(ord.CompoundPreparation.toObject(new ord.CompoundPreparation()))];
 };
 
 export const reactionComponents: Array<ReactionFormNode> = [
@@ -112,7 +114,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
     },
     getKey: (_, index) => index,
     useSelectItems: buildUseSelectItems('preparations'),
-    ItemDisplay: createEntityListItemComponent<ord.CompoundPreparation>({
+    ItemDisplay: createEntityListItemComponent<ReactionComponentPreparation>({
       entityField: 'preparations',
       title: 'Preparation',
       requiredFields: [

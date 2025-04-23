@@ -87,8 +87,8 @@ export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<Re
           gap="sm"
         >
           {items.map((item, index) => (
-            // eslint-disable-next-line react/jsx-key
             <ItemDisplay
+              key={item.id}
               entity={item}
               entityKey={node.getKey(item, index)}
             />
