@@ -16,7 +16,7 @@
 import { reactionContext } from '../../reactions.context.ts';
 import { useCallback, useContext, type ReactNode } from 'react';
 import { Button } from '@mantine/core';
-import { AddCircleIcon, EditIcon, ViewIcon } from 'common/icons';
+import { EditIcon, ViewIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
@@ -45,7 +45,7 @@ export function OpenSingleEntityButton({ pathComponents }: Readonly<OpenSingleEn
     icon = <ViewIcon />;
   } else {
     text = 'Edit';
-    icon = <AddCircleIcon />;
+    icon = <EditIcon />;
   }
 
   return (
