@@ -25,7 +25,6 @@ import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { useTextFormatting, type FormattingKey } from 'common/hooks/useTextFormatting';
 
 interface ValuePrecisionUnitControlProps {
   value?: ValuePrecisionUnit;
@@ -64,28 +63,6 @@ export function ValuePrecisionUnitControl({
   ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
-  const formatText = useTextFormatting;
-
-  const formattedOptions: SelectOptions = options.map(option => {
-    if (typeof option === 'string') {
-      const formatted = formatText(option as FormattingKey);
-      return {
-        label: Array.isArray(formatted) ? formatted[1] : formatted,
-        value: option,
-      };
-    }
-    if ('items' in option) {
-      return {
-        group: option.group,
-        items: option.items,
-      };
-    }
-    const formatted = formatText(option.value as FormattingKey);
-    return {
-      ...option,
-      label: Array.isArray(formatted) ? formatted[1] : formatted,
-    };
-  });
 
   const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number | null) => {
     const previousValue = uncontrolledValue ?? {};
@@ -114,7 +91,7 @@ export function ValuePrecisionUnitControl({
           {select === 'native-inline' && (
             <AppNativeSelect
               value={uncontrolledValue.units}
-              options={formattedOptions}
+              options={options}
               onChange={unitOnChange}
               disabled={disabled}
             />
@@ -123,7 +100,7 @@ export function ValuePrecisionUnitControl({
         {select === 'native' && (
           <AppNativeSelect
             value={uncontrolledValue.units}
-            options={formattedOptions}
+            options={options}
             onChange={unitOnChange}
             disabled={disabled}
           />
@@ -131,7 +108,7 @@ export function ValuePrecisionUnitControl({
         {select === 'segmented' && (
           <AppSegmentedControl
             value={uncontrolledValue.units}
-            options={formattedOptions}
+            options={options}
             onChange={unitOnChange}
             fullWidth
             disabled={disabled}

@@ -20,3 +20,7 @@ export type FormattingKey = keyof typeof formatting;
 export function useTextFormatting(text: FormattingKey) {
   return formatting[text] ?? text;
 }
+
+export function getFormattedValue(value: string) {
+  return value in formatting ? formatting[value as FormattingKey] : value;
+}
