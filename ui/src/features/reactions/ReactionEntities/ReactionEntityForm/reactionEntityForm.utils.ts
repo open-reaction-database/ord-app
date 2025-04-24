@@ -20,10 +20,19 @@ import {
   ordToReactionConvertersByNodeEntity,
   reactionToOrdConvertersByNodeEntity,
 } from 'store/entities/reactions/reactions.models.ts';
+import { Buffer } from 'buffer';
 
 interface ClipboardMessage {
   type: ReactionNodeEntity;
   value: object;
+}
+
+// TODO parse\stringify via ord-schema
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function replacer(_: unknown, value: any): any {
+  if (value instanceof Uint8Array) {
+    return Buffer.from(value).toString('base64');
+  } else return value;
 }
 
 export async function copyReactionPart(entityName: ReactionNodeEntity, reactionPart: object) {
@@ -33,7 +42,7 @@ export async function copyReactionPart(entityName: ReactionNodeEntity, reactionP
       type: entityName,
       value,
     },
-    null,
+    replacer,
     2,
   );
   try {

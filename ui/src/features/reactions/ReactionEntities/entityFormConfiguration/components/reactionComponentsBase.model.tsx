@@ -100,7 +100,7 @@ export const featuresList: ReactionFormNode = {
 export const textureDetails: ReactionFormNode = {
   type: ReactionFormNodeType.block,
   title: {
-    label: 'Isolated Product Characteristics',
+    label: 'Isolated Material Characteristics',
   },
   fields: [
     wrapInputsWithGrid(

@@ -110,7 +110,7 @@ function MeasurementValueControlString({
     <TextInput
       value={value}
       onChange={handleChange}
-      placeholder="Type"
+      placeholder=""
       disabled={disabled}
     />
   );

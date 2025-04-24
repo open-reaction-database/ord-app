@@ -61,7 +61,6 @@ export function ReactionEntityValue({
   const props = {
     name: node.name,
     label,
-    placeholder: 'Type',
     ...inputProps,
     value: valueControlled,
     onChange: onControlledChange,

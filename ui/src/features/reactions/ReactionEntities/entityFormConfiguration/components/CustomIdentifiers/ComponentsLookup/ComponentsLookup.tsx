@@ -106,6 +106,7 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
           label="Compound name"
           {...inputProps}
           error={hasError ? 'Compound not found' : inputProps.error}
+          data-autofocus
         />
         <Flex
           justify="flex-end"

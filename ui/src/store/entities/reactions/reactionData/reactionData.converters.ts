@@ -32,7 +32,13 @@ export function ordDataToReaction(dataWrapper: OrdOptional<ord.IData>, name: str
     value = data.stringValue;
   } else if (data.bytesValue) {
     type = AppDataType.Upload;
-    value = Buffer.from(data.bytesValue).toString('base64');
+    const bytesValue: string | Uint8Array = data.bytesValue;
+    // During copy\paste chunk we pass data via json and since utf8 array cannot be parsed correctly we need this workaround
+    if (typeof bytesValue === 'string') {
+      value = bytesValue;
+    } else {
+      value = Buffer.from(bytesValue).toString('base64');
+    }
   } else {
     type = AppDataType.Number;
     value = data.floatValue ?? data.integerValue ?? null;
@@ -52,22 +58,22 @@ export function ordDataToReaction(dataWrapper: OrdOptional<ord.IData>, name: str
 }
 
 export function reactionDataToOrd({ description, data }: AppData): ord.IData {
-  const emptyData = ord.Data.toObject(new ord.Data({ description, format: data.format }));
+  const ordData = ord.Data.toObject(new ord.Data({ description, format: data.format }));
   if (data.value === null) {
     // Nothing to add here
   } else if (data.type === AppDataType.Url) {
-    emptyData.url = data.value;
+    ordData.url = data.value;
   } else if (data.type === AppDataType.Text) {
-    emptyData.stringValue = data.value;
+    ordData.stringValue = data.value;
   } else if (data.type === AppDataType.Upload) {
-    emptyData.bytesValue = Uint8Array.from(Buffer.from(data.value as string, 'base64'));
+    ordData.bytesValue = Uint8Array.from(Buffer.from(data.value as string, 'base64'));
   } else if (Number.isInteger(data.value)) {
-    emptyData.integerValue = data.value;
+    ordData.integerValue = data.value;
   } else {
-    emptyData.floatValue = data.value;
+    ordData.floatValue = data.value;
   }
 
-  return emptyData;
+  return ordData;
 }
 
 export function ordDataMapToReactionDataMap(ordDataMap: Record<string, ord.IData>): Record<string, AppData> {
