@@ -64,21 +64,26 @@ export function ValuePrecisionUnitControl({
   ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
-  const formatUnit = useTextFormatting;
+  const formatText = useTextFormatting;
 
-  const formattedOptions = options.map(option => {
+  const formattedOptions: SelectOptions = options.map(option => {
     if (typeof option === 'string') {
-      return formatUnit(option as FormattingKey);
+      const formatted = formatText(option as FormattingKey);
+      return {
+        label: Array.isArray(formatted) ? formatted[1] : formatted,
+        value: option,
+      };
     }
     if ('items' in option) {
       return {
         group: option.group,
-        items: option.items.map(item => formatUnit(item as FormattingKey)),
+        items: option.items,
       };
     }
+    const formatted = formatText(option.value as FormattingKey);
     return {
       ...option,
-      label: formatUnit(option.value as FormattingKey),
+      label: Array.isArray(formatted) ? formatted[1] : formatted,
     };
   });
 

@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
+import formatting from 'common/dictionary/formatting.json';
+
+type FormattingKey = keyof typeof formatting;
 
 export function renderValuePrecisionUnit(valuePrecision: ValuePrecisionUnit | Omit<ValuePrecisionUnit, 'units'>) {
   const { value, precision } = valuePrecision;
   const units = 'units' in valuePrecision ? valuePrecision.units : '';
   const precisionString = precision ? `±${precision}` : '';
-  return [value, precisionString, units].filter(item => item !== '').join(' ');
+  const formattedUnits = units ? (formatting[units as FormattingKey]?.[1] ?? units) : '';
+  return [value, precisionString, formattedUnits].filter(item => item !== '').join(' ');
 }
