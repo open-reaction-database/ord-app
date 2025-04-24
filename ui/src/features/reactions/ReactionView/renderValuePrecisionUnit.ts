@@ -22,6 +22,6 @@ export function renderValuePrecisionUnit(valuePrecision: ValuePrecisionUnit | Om
   const { value, precision } = valuePrecision;
   const units = 'units' in valuePrecision ? valuePrecision.units : '';
   const precisionString = precision ? `±${precision}` : '';
-  const formattedUnits = units ? (formatting[units as FormattingKey]?.[1] ?? units) : '';
+  const formattedUnits = units ? (formatting[units as FormattingKey] ?? units) : '';
   return [value, precisionString, formattedUnits].filter(item => item !== '').join(' ');
 }
