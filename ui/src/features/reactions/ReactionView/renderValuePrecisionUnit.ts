@@ -21,7 +21,7 @@ type FormattingKey = keyof typeof formatting;
 export function renderValuePrecisionUnit(valuePrecision: ValuePrecisionUnit | Omit<ValuePrecisionUnit, 'units'>) {
   const { value, precision } = valuePrecision;
   const units = 'units' in valuePrecision ? valuePrecision.units : '';
-  const precisionString = precision ? `±${precision}` : '';
+  const precisionString = precision ? `± ${precision}` : '';
   const formattedUnits = units ? (formatting[units as FormattingKey] ?? units) : '';
   return [value, precisionString, formattedUnits].filter(item => item !== '').join(' ');
 }
