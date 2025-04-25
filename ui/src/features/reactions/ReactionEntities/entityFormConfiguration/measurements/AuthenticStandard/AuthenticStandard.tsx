@@ -26,6 +26,7 @@ import { ordInputComponentToReaction } from 'store/entities/reactions/reactionCo
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { AddCircleIcon } from 'common/icons';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 import classes from './authenticStandard.module.scss';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import {
@@ -34,7 +35,7 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
+const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
