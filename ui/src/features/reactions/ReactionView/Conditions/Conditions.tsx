@@ -57,7 +57,17 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             {
               label: 'Setpoint',
-              render: ({ temperature }) => renderValuePrecisionUnit(temperature.setpoint),
+              render: ({ temperature }) => temperature.setpoint && renderValuePrecisionUnit(temperature.setpoint),
+            },
+          ]}
+          optionalFields={[
+            {
+              label: 'Control',
+              render: ({ temperature }) => temperature.control?.type,
+            },
+            {
+              label: 'Control Details',
+              render: ({ temperature }) => temperature.control?.details,
             },
           ]}
         />
@@ -67,7 +77,34 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             {
               label: 'Setpoint',
-              render: ({ pressure }) => renderValuePrecisionUnit(pressure.setpoint),
+              render: ({ pressure }) => pressure.setpoint && renderValuePrecisionUnit(pressure.setpoint),
+            },
+          ]}
+        />
+        <span className={classes.conditionsLabel}>Stirring</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[]}
+          optionalFields={[
+            {
+              label: 'Method',
+              render: ({ stirring }) => stirring.type,
+            },
+            {
+              label: 'Details',
+              render: ({ stirring }) => stirring.details,
+            },
+            {
+              label: 'Rate',
+              render: ({ stirring }) => stirring.rate?.type,
+            },
+            {
+              label: 'Rate Details',
+              render: ({ stirring }) => stirring.rate?.details,
+            },
+            {
+              label: 'RPM',
+              render: ({ stirring }) => stirring.rate?.rpm,
             },
           ]}
         />
