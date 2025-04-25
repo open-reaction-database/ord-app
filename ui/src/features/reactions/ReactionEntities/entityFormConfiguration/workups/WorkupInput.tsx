@@ -37,12 +37,13 @@ import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionVie
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { ComponentsListHeader } from 'features/reactions/ReactionView/ComponentsList';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 
 const ENTITY_NAME = 'Input';
 
 const COMPONENTS_FIELD = 'components';
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
+const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
 
 export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();

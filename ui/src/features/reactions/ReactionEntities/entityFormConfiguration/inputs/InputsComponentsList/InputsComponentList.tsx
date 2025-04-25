@@ -32,10 +32,11 @@ import { ordInputComponentToReaction } from 'store/entities/reactions/reactionCo
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 
 const useSelectData = buildUseSelectItems('components');
 
-const renderDetails = ({ amount }: ReactionInputComponent) => `${amount.value ?? ''} ${amount.units}`.trim();
+const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
 
 export function InputsComponentList() {
   const dispatch = useAppDispatch();
