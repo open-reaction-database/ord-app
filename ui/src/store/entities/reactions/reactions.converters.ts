@@ -59,18 +59,29 @@ export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   };
 }
 
-export function reactionToOrdReaction(reaction: AppReaction): ord.IReaction {
+export function reactionToOrdReaction({
+  reactionId,
+  inputs,
+  outcomes,
+  identifiers,
+  setup,
+  observations,
+  conditions,
+  notes,
+  provenance,
+  workups,
+}: AppReaction): ord.IReaction {
   return {
-    ...reaction,
-    inputs: reactionInputsToOrdInputs(reaction.inputs),
-    outcomes: reactionOutcomesListToOrdOutcomesList(reaction.outcomes),
-    identifiers: reaction.identifiers.map(reactionIdentifierToOrd),
-    setup: reactionSetupToOrd(reaction.setup),
-    observations: reaction.observations.map(reactionObservationToOrd),
-    conditions: reactionConditionsToOrd(reaction.conditions),
-    notes: reactionNotesToOrd(reaction.notes),
-    provenance: reactionProvenanceToOrd(reaction.provenance),
-    workups: reaction.workups.map(reactionWorkupToOrd),
+    reactionId,
+    inputs: reactionInputsToOrdInputs(inputs),
+    outcomes: reactionOutcomesListToOrdOutcomesList(outcomes),
+    identifiers: identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : null,
+    setup: reactionSetupToOrd(setup),
+    observations: observations.length > 0 ? observations.map(reactionObservationToOrd) : null,
+    conditions: reactionConditionsToOrd(conditions),
+    notes: reactionNotesToOrd(notes),
+    provenance: reactionProvenanceToOrd(provenance),
+    workups: workups.length > 0 ? workups.map(reactionWorkupToOrd) : null,
   };
 }
 

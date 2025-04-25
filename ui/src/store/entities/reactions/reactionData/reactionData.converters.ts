@@ -17,7 +17,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { AppDataType, type AppData } from './reactionData.types.ts';
 import { Buffer } from 'buffer';
 import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
 export function ordDataToReaction(dataWrapper: OrdOptional<ord.IData>, name: string): AppData {
   const { description, format, ...data } = dataWrapper || {};
@@ -86,12 +86,17 @@ export function ordDataMapToReactionDataMap(ordDataMap: Record<string, ord.IData
   }, {});
 }
 
-export function reactionDataMapToOrdDataMap(reactionDataMap: Record<string, AppData>): Record<string, ord.IData> {
-  return Object.values(reactionDataMap).reduce(
-    (acc, item) => ({
-      ...acc,
-      [item.name]: reactionDataToOrd(item),
-    }),
-    {},
-  );
+export function reactionDataMapToOrdDataMap(
+  reactionDataMap: Record<string, AppData>,
+): Optional<Record<string, ord.IData>> {
+  const values = Object.values(reactionDataMap);
+  return values.length > 0
+    ? values.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.name]: reactionDataToOrd(item),
+        }),
+        {},
+      )
+    : null;
 }

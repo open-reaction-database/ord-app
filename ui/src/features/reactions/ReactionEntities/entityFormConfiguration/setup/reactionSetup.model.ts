@@ -38,6 +38,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { compareNamedEntities } from '../compareNamedEntities.ts';
 import { createReactionDataAddItem, reactionDataDisplay } from '../data/reactionData.models.tsx';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'vesselPreparations'];
 export const vesselAttachmentEntityPath: ReactionPathComponents = ['vessel', 'vesselAttachments'];
@@ -106,6 +107,10 @@ export const reactionSetup: Array<ReactionFormNode> = [
       type: ReactionFormNodeType.value,
       name: 'automationPlatform',
       inputType: 'string',
+      condition: {
+        name: 'isAutomated',
+        isHidden: isAutomated => isAutomated !== ReactionBoolean.True,
+      },
       wrapperConfig: {
         label: 'Platform',
       },

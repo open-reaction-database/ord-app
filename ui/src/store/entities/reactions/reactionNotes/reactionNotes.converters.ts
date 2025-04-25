@@ -19,7 +19,8 @@ import {
   ordBooleanToReaction,
   reactionBooleanToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type { OrdOptional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { Optional, OrdOptional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
 
 export const ordNotesToReaction = (notes: OrdOptional<ord.IReactionNotes>): ReactionNotes => {
   const {
@@ -54,13 +55,14 @@ export const reactionNotesToOrd = ({
   isSensitiveToMoisture,
   offgasses,
   ...rest
-}: ReactionNotes): ord.IReactionNotes => ({
-  isHeterogeneous: reactionBooleanToOrd(isHeterogeneous),
-  formsPrecipitate: reactionBooleanToOrd(formsPrecipitate),
-  isExothermic: reactionBooleanToOrd(isExothermic),
-  isSensitiveToLight: reactionBooleanToOrd(isSensitiveToLight),
-  isSensitiveToMoisture: reactionBooleanToOrd(isSensitiveToMoisture),
-  isSensitiveToOxygen: reactionBooleanToOrd(isSensitiveToOxygen),
-  offgasses: reactionBooleanToOrd(offgasses),
-  ...rest,
-});
+}: ReactionNotes): Optional<ord.IReactionNotes> =>
+  convertObjectToNullIfEmpty({
+    isHeterogeneous: reactionBooleanToOrd(isHeterogeneous),
+    formsPrecipitate: reactionBooleanToOrd(formsPrecipitate),
+    isExothermic: reactionBooleanToOrd(isExothermic),
+    isSensitiveToLight: reactionBooleanToOrd(isSensitiveToLight),
+    isSensitiveToMoisture: reactionBooleanToOrd(isSensitiveToMoisture),
+    isSensitiveToOxygen: reactionBooleanToOrd(isSensitiveToOxygen),
+    offgasses: reactionBooleanToOrd(offgasses),
+    ...rest,
+  });
