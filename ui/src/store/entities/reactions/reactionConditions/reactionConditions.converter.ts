@@ -210,11 +210,14 @@ export const reactionStirringConditionToOrd = ({
   details,
   rate,
 }: ReactionStirringCondition): Optional<ord.IStirringConditions> =>
-  convertObjectToNullIfEmpty({
-    type: reactionStirringMethodTypeToOrd(type),
-    details,
-    rate: reactionStirringRateToOrd(rate),
-  });
+  convertObjectToNullIfEmpty(
+    {
+      type: reactionStirringMethodTypeToOrd(type),
+      details,
+      rate: reactionStirringRateToOrd(rate),
+    },
+    ['type'],
+  );
 
 const ordIlluminationConditionToReaction = (
   illumination: OrdOptional<ord.IIlluminationConditions>,
@@ -235,12 +238,15 @@ export const reactionIlluminationConditionToOrd = ({
   distanceToVessel,
   ...rest
 }: ReactionIlluminationCondition): Optional<ord.IIlluminationConditions> => {
-  return convertObjectToNullIfEmpty({
-    type: reactionIlluminationTypeToOrd(type),
-    peakWavelength: reactionWaveLengthToOrd(peakWavelength),
-    distanceToVessel: reactionLengthToOrd(distanceToVessel),
-    ...rest,
-  });
+  return convertObjectToNullIfEmpty(
+    {
+      type: reactionIlluminationTypeToOrd(type),
+      peakWavelength: reactionWaveLengthToOrd(peakWavelength),
+      distanceToVessel: reactionLengthToOrd(distanceToVessel),
+      ...rest,
+    },
+    ['type'],
+  );
 };
 
 const ordElectrochemistryConditionToReaction = (
@@ -267,19 +273,22 @@ export const reactionElectrochemistryConditionToOrd = ({
   cell,
   electrochemistryMeasurements,
   ...rest
-}: ReactionElectrochemistryCondition): ord.IElectrochemistryConditions => {
-  return {
-    type: reactionElectrochemistryTypeToOrd(type),
-    current: reactionCurrentToOrd(current),
-    voltage: reactionVoltageToOrd(voltage),
-    electrodeSeparation: reactionLengthToOrd(electrodeSeparation),
-    cell: reactionElectrochemistryCellToOrd(cell),
-    measurements:
-      electrochemistryMeasurements.length > 0
-        ? electrochemistryMeasurements.map(reactionElectrochemistryMeasurementToOrd)
-        : null,
-    ...rest,
-  };
+}: ReactionElectrochemistryCondition): Optional<ord.IElectrochemistryConditions> => {
+  return convertObjectToNullIfEmpty(
+    {
+      type: reactionElectrochemistryTypeToOrd(type),
+      current: reactionCurrentToOrd(current),
+      voltage: reactionVoltageToOrd(voltage),
+      electrodeSeparation: reactionLengthToOrd(electrodeSeparation),
+      cell: reactionElectrochemistryCellToOrd(cell),
+      measurements:
+        electrochemistryMeasurements.length > 0
+          ? electrochemistryMeasurements.map(reactionElectrochemistryMeasurementToOrd)
+          : null,
+      ...rest,
+    },
+    ['type'],
+  );
 };
 
 const ordFlowConditionToReaction = (flow: OrdOptional<ord.IFlowConditions>): ReactionFlowCondition => {
@@ -292,12 +301,19 @@ const ordFlowConditionToReaction = (flow: OrdOptional<ord.IFlowConditions>): Rea
   };
 };
 
-export const reactionFlowConditionToOrd = ({ type, tubing, ...rest }: ReactionFlowCondition): ord.IFlowConditions => {
-  return {
-    type: reactionFlowTypeToOrd(type),
-    tubing: reactionTubingToOrd(tubing),
-    ...rest,
-  };
+export const reactionFlowConditionToOrd = ({
+  type,
+  tubing,
+  ...rest
+}: ReactionFlowCondition): Optional<ord.IFlowConditions> => {
+  return convertObjectToNullIfEmpty(
+    {
+      type: reactionFlowTypeToOrd(type),
+      tubing: reactionTubingToOrd(tubing),
+      ...rest,
+    },
+    ['type'],
+  );
 };
 
 export const ordConditionsToReaction = (conditions: OrdOptional<ord.IReactionConditions>): ReactionConditions => {
@@ -336,16 +352,18 @@ export const reactionConditionsToOrd = ({
   reflux,
   conditionsAreDynamic,
   ...rest
-}: ReactionConditions): ord.IReactionConditions => {
-  return withoutId({
-    temperature: reactionTemperatureConditionToOrd(temperature),
-    pressure: reactionPressureConditionToOrd(pressure),
-    stirring: reactionStirringConditionToOrd(stirring),
-    illumination: reactionIlluminationConditionToOrd(illumination),
-    electrochemistry: reactionElectrochemistryConditionToOrd(electrochemistry),
-    flow: reactionFlowConditionToOrd(flow),
-    reflux: reactionBooleanToOrd(reflux),
-    conditionsAreDynamic: reactionBooleanToOrd(conditionsAreDynamic),
-    ...rest,
-  });
+}: ReactionConditions): Optional<ord.IReactionConditions> => {
+  return convertObjectToNullIfEmpty(
+    withoutId({
+      temperature: reactionTemperatureConditionToOrd(temperature),
+      pressure: reactionPressureConditionToOrd(pressure),
+      stirring: reactionStirringConditionToOrd(stirring),
+      illumination: reactionIlluminationConditionToOrd(illumination),
+      electrochemistry: reactionElectrochemistryConditionToOrd(electrochemistry),
+      flow: reactionFlowConditionToOrd(flow),
+      reflux: reactionBooleanToOrd(reflux),
+      conditionsAreDynamic: reactionBooleanToOrd(conditionsAreDynamic),
+      ...rest,
+    }),
+  );
 };

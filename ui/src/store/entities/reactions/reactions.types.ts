@@ -74,7 +74,7 @@ export interface OrdToReactionNamedEntityConverter {
 export type OrdToReactionEntityConverter = OrdToReactionNamelessEntityConverter | OrdToReactionNamedEntityConverter;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ReactionToOrdEntityConverter = (reactionEntity: any) => object;
+export type ReactionToOrdEntityConverter = (reactionEntity: any) => Optional<object>;
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;

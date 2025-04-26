@@ -267,7 +267,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Setup',
       hasDelete: false,
     }),
-    useInitialValues: buildUseInitialValues(({ vessel, ...rest }: ReactionSetup) => ({
+    useInitialValues: buildUseInitialValues(({ vessel, automationCode: _, ...rest }: ReactionSetup) => ({
       ...rest,
       vessel: withoutNestedArray(withoutNestedArray(vessel, 'vesselPreparations'), 'vesselAttachments'),
     })),

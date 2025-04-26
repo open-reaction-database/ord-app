@@ -42,6 +42,7 @@ import {
 } from '../reactionEntity/reactionEntity.converters';
 import { ordDataMapToReactionDataMap, reactionDataMapToOrdDataMap } from '../reactionData/reactionData.converters.ts';
 import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
+import { setupTransform } from './reactionSetup.transform.ts';
 
 export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVessel => {
   const { type, details, material, volume, preparations, attachments } = vessel ?? {};
@@ -112,18 +113,13 @@ export const ordSetupToReactionSetup = (setup?: ord.IReactionSetup | null): Reac
   });
 };
 
-export const reactionSetupToOrd = ({
-  isAutomated,
-  vessel,
-  environment,
-  automationPlatform,
-  automationCode,
-}: ReactionSetup): ord.IReactionSetup => {
-  return {
+export const reactionSetupToOrd = (setup: ReactionSetup): Optional<ord.IReactionSetup> => {
+  const { isAutomated, vessel, environment, automationPlatform, automationCode } = setupTransform(setup);
+  return convertObjectToNullIfEmpty({
     isAutomated: reactionBooleanToOrd(isAutomated),
     vessel: reactionVesselSetupToOrd(vessel),
     environment: reactionEnvironmentToOrd(environment),
     automationPlatform,
     automationCode: reactionDataMapToOrdDataMap(automationCode),
-  };
+  });
 };
