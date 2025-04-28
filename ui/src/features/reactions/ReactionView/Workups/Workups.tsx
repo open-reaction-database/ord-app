@@ -47,7 +47,6 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
     label: 'Target PH',
     render: item => (WorkupConstants.targetPhCompatibleTypes.includes(item.type) ? item.targetPh : ''),
   },
-
   {
     label: 'Duration',
     render: item =>
@@ -63,6 +62,47 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
       WorkupConstants.aliquotCompatibleTypes.includes(item.type) && item.amount
         ? renderValuePrecisionUnit(item.amount)
         : '',
+  },
+  {
+    label: 'Temperature',
+    render: item =>
+      WorkupConstants.temperatureCompatibleTypes.includes(item.type) && item.temperature?.setpoint
+        ? renderValuePrecisionUnit(item.temperature.setpoint)
+        : '',
+  },
+  {
+    label: 'Stirring',
+    render: item =>
+      WorkupConstants.stirringCompatibleTypes.includes(item.type) ? (
+        <RequiredOptionalFields
+          entity={item}
+          requiredFields={[]}
+          optionalFields={[
+            {
+              label: 'Method',
+              render: ({ stirring }) => stirring?.type,
+            },
+            {
+              label: 'Details',
+              render: ({ stirring }) => stirring?.details,
+            },
+            {
+              label: 'Rate',
+              render: ({ stirring }) => stirring?.rate?.type,
+            },
+            {
+              label: 'Rate Details',
+              render: ({ stirring }) => stirring?.rate?.details,
+            },
+            {
+              label: 'RPM',
+              render: ({ stirring }) => stirring?.rate?.rpm,
+            },
+          ]}
+        />
+      ) : (
+        ''
+      ),
   },
 ];
 
