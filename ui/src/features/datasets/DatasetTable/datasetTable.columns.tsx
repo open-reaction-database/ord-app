@@ -86,7 +86,14 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'owner',
     header: 'Owner',
     Cell: ({ row }) => {
-      return <UserField username={row.original.owner.name} />;
+      const ownerName = row.original.owner.name;
+      return (
+        <Tooltip label={ownerName}>
+          <div className={clsx(typographyClasses.oneLineText, classes.ownerName)}>
+            <UserField username={ownerName} />
+          </div>
+        </Tooltip>
+      );
     },
     size: 145,
   },

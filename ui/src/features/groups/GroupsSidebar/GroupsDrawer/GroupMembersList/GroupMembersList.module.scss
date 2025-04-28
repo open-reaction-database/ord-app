@@ -67,3 +67,15 @@
 .role {
   text-transform: capitalize;
 }
+
+.oneLineTextWrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.oneLineText {
+  flex: 1;
+  min-width: 0;
+}

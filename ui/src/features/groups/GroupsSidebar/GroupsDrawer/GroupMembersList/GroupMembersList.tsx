@@ -15,7 +15,7 @@
  */
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
-import { Avatar, Flex, Group, Loader, Text } from '@mantine/core';
+import { Avatar, Flex, Group, Loader, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { RoleSelector } from '../RoleSelector/RoleSelector.tsx';
 import {
@@ -113,7 +113,9 @@ export function GroupMembersList() {
                 gap="4"
                 className={typographyClasses.oneLineTextWrapper}
               >
-                <span className={typographyClasses.oneLineText}>{name}</span>
+                <Tooltip label={name}>
+                  <div className={typographyClasses.oneLineText}>{name}</div>
+                </Tooltip>
                 <Flex gap="8">
                   <UserDataField
                     fieldName="ORCID"
