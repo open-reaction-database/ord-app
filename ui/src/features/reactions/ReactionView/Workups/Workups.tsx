@@ -66,9 +66,29 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
   {
     label: 'Temperature',
     render: item =>
-      WorkupConstants.temperatureCompatibleTypes.includes(item.type) && item.temperature?.setpoint
-        ? renderValuePrecisionUnit(item.temperature.setpoint)
-        : '',
+      WorkupConstants.temperatureCompatibleTypes.includes(item.type) ? (
+        <RequiredOptionalFields
+          entity={item}
+          requiredFields={[
+            {
+              label: 'Setpoint',
+              render: ({ temperature }) => temperature?.setpoint && renderValuePrecisionUnit(temperature.setpoint),
+            },
+          ]}
+          optionalFields={[
+            {
+              label: 'Control Type',
+              render: ({ temperature }) => temperature?.control?.type,
+            },
+            {
+              label: 'Control Details',
+              render: ({ temperature }) => temperature?.control?.details,
+            },
+          ]}
+        />
+      ) : (
+        ''
+      ),
   },
   {
     label: 'Stirring',

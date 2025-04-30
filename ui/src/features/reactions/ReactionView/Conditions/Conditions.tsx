@@ -79,6 +79,14 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
               label: 'Setpoint',
               render: ({ pressure }) => pressure.setpoint && renderValuePrecisionUnit(pressure.setpoint),
             },
+            {
+              label: 'Control',
+              render: ({ pressure }) => pressure.control?.type,
+            },
+            {
+              label: 'Atmosphere',
+              render: ({ pressure }) => pressure.atmosphere?.type,
+            },
           ]}
         />
         <span className={classes.conditionsLabel}>Stirring</span>
@@ -107,6 +115,39 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
               render: ({ stirring }) => stirring.rate?.rpm,
             },
           ]}
+        />
+        <span className={classes.conditionsLabel}>Illumination</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            {
+              label: 'Type',
+              render: ({ illumination }) => illumination.type,
+            },
+          ]}
+          optionalFields={[]}
+        />
+        <span className={classes.conditionsLabel}>Electrochemistry</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            {
+              label: 'Type',
+              render: ({ electrochemistry }) => electrochemistry.type,
+            },
+          ]}
+          optionalFields={[]}
+        />
+        <span className={classes.conditionsLabel}>Flow</span>
+        <RequiredOptionalFields
+          entity={conditions}
+          requiredFields={[
+            {
+              label: 'Type',
+              render: ({ flow }) => flow.type,
+            },
+          ]}
+          optionalFields={[]}
         />
       </Flex>
     </Flex>
