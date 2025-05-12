@@ -108,7 +108,7 @@ export function getDeepReactionPart(reaction: any, pathComponents: ReactionPathC
   }
 }
 
-const nodeEntitiesNamesWithoutCollection = ['authenticStandard', 'notes', 'conditions', 'provenance', 'input'];
+const nodeEntitiesNamesWithoutCollection = ['authenticStandard', 'notes', 'conditions', 'provenance', 'input', 'setup'];
 
 export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponents): Array<ReactionPathComponents> {
   const result: Array<ReactionPathComponents> = [];

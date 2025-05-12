@@ -23,6 +23,7 @@ import { ReactionOutcomePreview } from 'common/components/ReactionPreview/Reacti
 import { ArrowIcon, EmptyPreview } from '../../icons';
 import { Flex, Text, Tooltip } from '@mantine/core';
 import { typographyClasses } from '../../styling';
+import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface ReactionPreviewProps {
   reaction: ReactionOrTemplate;
@@ -60,9 +61,11 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
         className={classes.arrowWrapper}
         justify="center"
       >
-        <Tooltip label={conditions}>
-          <Text className={classes.arrowText}>{conditions}</Text>
-        </Tooltip>
+        {showReactionPreviewDetails && (
+          <Tooltip label={conditions}>
+            <Text className={classes.arrowText}>{conditions}</Text>
+          </Tooltip>
+        )}
         <ArrowIcon className={classes.arrow} />
       </Flex>
 

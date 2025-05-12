@@ -22,6 +22,7 @@ import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from 'common/styling';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface DescriptorsListProps {
   title: string;
@@ -84,10 +85,12 @@ export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Read
             {title}
           </Flex>
 
-          <DescriptorsList
-            title="Provenance"
-            items={reaction.summary.provenance}
-          />
+          {showReactionPreviewDetails && (
+            <DescriptorsList
+              title="Provenance"
+              items={reaction.summary.provenance}
+            />
+          )}
         </div>
         <Flex
           align="flex-start"
@@ -106,10 +109,12 @@ export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Read
         reaction={reaction}
         ref={previewRef}
       />
-      <DescriptorsList
-        title="Summary"
-        items={reaction.summary.summary}
-      />
+      {showReactionPreviewDetails && (
+        <DescriptorsList
+          title="Summary"
+          items={reaction.summary.summary}
+        />
+      )}
     </Paper>
   );
 }

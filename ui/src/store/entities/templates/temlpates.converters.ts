@@ -25,7 +25,7 @@ type VariableMap = Record<string, Variable>;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
-const mapKeys = ['inputs', 'analyses', 'features', 'analysisData'];
+const mapKeys = ['inputs', 'analyses', 'features', 'analysisData', 'automationCode'];
 
 type NamedEntity = WithIdName<unknown>;
 type NamedEntityMap = Record<string, NamedEntity>;
