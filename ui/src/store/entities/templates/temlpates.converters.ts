@@ -15,61 +15,19 @@
  */
 import type { Variable } from './templates.types.ts';
 import type { AppReaction } from '../reactions/reactions.types.ts';
-import { getDeepReactionPart } from '../reactions/reactions.utils.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { WithIdName } from '../reactions/reactionEntity/reactionEntity.types.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
+import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 
 type VariableMap = Record<string, Variable>;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
-const mapKeys = ['inputs', 'analyses', 'features', 'analysisData', 'automationCode'];
-
-type NamedEntity = WithIdName<unknown>;
-type NamedEntityMap = Record<string, NamedEntity>;
-
-const findEntityByName = (name: string, reactionPart: NamedEntityMap): NamedEntity =>
-  Object.values(reactionPart).find(item => item.name === name)!;
-
-const findEntityById = (id: string, reactionPart: NamedEntityMap): NamedEntity =>
-  Object.values(reactionPart).find(item => item.id === id)!;
-
-function replaceNameIdInVariablePath(
-  variable: Variable,
-  reaction: AppReaction,
-  replaceWith: 'id' | 'name',
-): ReactionPathComponents {
-  let updatedPath: ReactionPathComponents = [];
-  for (let index = 0; index < variable.path.length; index++) {
-    const pathComponent = variable.path[index];
-    updatedPath = updatedPath.concat([pathComponent]);
-    if (mapKeys.includes(pathComponent as string)) {
-      const nameId = variable.path[index + 1] as string;
-      let reactionPart: Record<string, WithIdName<unknown>>;
-      if (replaceWith === 'id') {
-        reactionPart = getDeepReactionPart(reaction, updatedPath);
-      } else {
-        reactionPart = getDeepReactionPart(reaction, variable.path.slice(0, index + 1));
-      }
-      if (replaceWith === 'id') {
-        const entity = findEntityByName(nameId, reactionPart);
-        updatedPath = updatedPath.concat([entity.id]);
-      } else {
-        const entity = findEntityById(nameId, reactionPart);
-        updatedPath = updatedPath.concat([entity.name]);
-      }
-      index++;
-    }
-  }
-  return updatedPath;
-}
-
 export function ordTemplateVariablesToReaction(variables: Array<Variable>, reaction: AppReaction): VariableMap {
   return variables.reduce((acc: VariableMap, variable) => {
     try {
-      const updatedPath: ReactionPathComponents = replaceNameIdInVariablePath(variable, reaction, 'id');
+      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(variable.path, reaction, 'id');
       const appVariable: Variable = {
         ...variable,
         path: updatedPath,
@@ -89,7 +47,7 @@ export function ordTemplateVariablesToReaction(variables: Array<Variable>, react
 export function reactionTemplateVariablesToOrd(variables: VariableMap, reaction: AppReaction): Array<Variable> {
   return Object.values(variables).reduce((acc: Array<Variable>, variable) => {
     try {
-      const updatedPath: ReactionPathComponents = replaceNameIdInVariablePath(variable, reaction, 'name');
+      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(variable.path, reaction, 'name');
       const ordVariable: Variable = {
         ...variable,
         path: updatedPath,

@@ -18,8 +18,18 @@ import { InfoCircleIcon } from 'common/icons';
 import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
 import classes from './reactionValueLabel.module.scss';
 import clsx from 'clsx';
+import { useContext, useMemo } from 'react';
+import { reactionEntityContext } from '../../ReactionEntities/reactionEntity.context.ts';
+import { ReactionNodeValidationResult } from '../ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-export function DatasetReactionValueLabel({ wrapperConfig }: Readonly<ReactionValueLabelProps>) {
+export function DatasetReactionValueLabel({ wrapperConfig, name }: Readonly<ReactionValueLabelProps>) {
+  const { pathComponents } = useContext(reactionEntityContext);
+
+  const fieldPathComponents = useMemo((): ReactionPathComponents => {
+    return pathComponents.concat(name.split('.'));
+  }, [pathComponents, name]);
+
   if (!wrapperConfig?.label) {
     return null;
   }
@@ -40,6 +50,7 @@ export function DatasetReactionValueLabel({ wrapperConfig }: Readonly<ReactionVa
           <InfoCircleIcon className={clsx(classes.icon, classes.info)} />
         </Tooltip>
       )}
+      <ReactionNodeValidationResult pathComponents={fieldPathComponents} />
     </Flex>
   ) : (
     wrapperConfig.label

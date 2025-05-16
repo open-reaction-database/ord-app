@@ -82,9 +82,25 @@ export interface ReactionSummary {
   conditions: string;
 }
 
-export interface ReactionValidation {
+export interface ErrorWarningMessageTextOnly {
+  text: string;
+}
+
+export interface ErrorWarningMessageWithPath extends ErrorWarningMessageTextOnly {
+  path: ReactionPathComponents;
+  originalPath: string;
+}
+
+export type ErrorWarningMessage = ErrorWarningMessageTextOnly | ErrorWarningMessageWithPath;
+
+export interface OrdValidation {
   errors: Array<string>;
   warnings: Array<string>;
+}
+
+export interface ReactionValidation {
+  errors: Array<ErrorWarningMessage>;
+  warnings: Array<ErrorWarningMessage>;
 }
 
 interface ReactionMolBlockProducts {
@@ -117,7 +133,7 @@ export interface ReactionResponse {
   pb_reaction_id: string;
   is_valid: boolean;
   summary: ReactionSummary;
-  validation: Optional<ReactionValidation>;
+  validation: Optional<OrdValidation>;
   binpb: string;
   molblocks: ReactionMolBlocks;
 }

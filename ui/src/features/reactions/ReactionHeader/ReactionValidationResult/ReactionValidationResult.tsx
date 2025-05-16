@@ -15,12 +15,9 @@
  */
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { ChevronDownIcon } from 'common/icons';
-import classes from './reactionValidationResult.module.scss';
-import { ActionIcon, Flex } from '@mantine/core';
+import { Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect } from 'react';
-import clsx from 'clsx';
 import { ReactionValidationBadge } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationBadge.tsx';
 import { ReactionValidationList } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationList.tsx';
 
@@ -41,18 +38,10 @@ export function ReactionValidationResult({ reactionId }: Readonly<ReactionValida
 
   return (
     <Flex>
-      <ActionIcon
-        onClick={toggle}
-        variant="transparent"
-        disabled={!hasErrorsWarnings}
-        color="default"
-        className={clsx({ [classes.closed]: !opened })}
-      >
-        <ChevronDownIcon />
-      </ActionIcon>
       <ReactionValidationBadge
         isValid={is_valid}
         validation={validation}
+        onClick={toggle}
       />
       {hasErrorsWarnings && (
         <ReactionValidationList

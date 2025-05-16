@@ -17,16 +17,19 @@ import type { Optional } from 'store/entities/reactions/reactionEntity/reactionE
 import type { ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
 import { CheckCircleIcon, CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
-import { Badge, Flex, Text, type BadgeProps } from '@mantine/core';
+import { Badge, Flex, Text, Button, type ButtonProps } from '@mantine/core';
 
 const amountText = (count: number, singleLabel: string) => `${count} ${singleLabel}${count === 1 ? '' : 's'}`;
 
 interface ReactionValidationBadgeProps {
   isValid: boolean;
   validation: Optional<ReactionValidation>;
+  onClick: () => void;
 }
 
-const badgeCommonProps: BadgeProps = {
+const badgeCommonProps: Pick<ButtonProps, 'variant' | 'size' | 'radius'> & {
+  classNames: { root: string };
+} = {
   variant: 'outline',
   size: 'lg',
   radius: 'md',
@@ -35,12 +38,15 @@ const badgeCommonProps: BadgeProps = {
   },
 };
 
-export function ReactionValidationBadge({ isValid, validation }: Readonly<ReactionValidationBadgeProps>) {
+export function ReactionValidationBadge({ isValid, validation, onClick }: Readonly<ReactionValidationBadgeProps>) {
   const hasDataToDisplay = validation && (validation.errors.length > 0 || validation.warnings.length > 0);
 
   if (hasDataToDisplay) {
     return (
-      <Badge {...badgeCommonProps}>
+      <Button
+        onClick={onClick}
+        {...badgeCommonProps}
+      >
         <Flex
           align="center"
           gap="sm"
@@ -60,7 +66,7 @@ export function ReactionValidationBadge({ isValid, validation }: Readonly<Reacti
             <Text className={classes.text}>{amountText(validation.warnings.length, 'warning')}</Text>
           </Flex>
         </Flex>
-      </Badge>
+      </Button>
     );
   }
 

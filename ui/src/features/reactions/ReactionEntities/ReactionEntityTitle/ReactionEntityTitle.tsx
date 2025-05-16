@@ -16,6 +16,7 @@
 import type { ReactionEntityTitleConstructorProps, ReactionEntityTitleProps } from './reactionEntityTitle.types.ts';
 import { Flex, Text, Title } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 export function ReactionEntityTitle({
   reactionId,
@@ -42,6 +43,7 @@ export function ReactionEntityTitle({
             shouldCloseSidebar
           />
         )}
+        <ReactionNodeValidationResult pathComponents={pathComponents} />
       </Flex>
       {description && <Text component="span">{description}</Text>}
     </Flex>

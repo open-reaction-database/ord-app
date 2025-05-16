@@ -136,7 +136,7 @@ async function updateReaction(reactionId: ReactionId, getState: () => AppState):
       binpb: payload,
     })
   ).data;
-  const updatedValidation = validation ? parseValidation(validation) : null;
+  const updatedValidation = validation ? parseValidation(validation, reaction.data) : null;
   return {
     ...reactionMetadata,
     previews: getReactionPreviews(reaction.data, molblocks),
