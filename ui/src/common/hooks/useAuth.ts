@@ -47,8 +47,16 @@ export function useAuth() {
 
   useEffect(() => {
     const provisionUser = async () => {
-      const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);
-      dispatch(createUser({ access_token: accessToken, id_token: idToken?.__raw as string }));
+      try {
+        const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);
+        dispatch(createUser({ access_token: accessToken, id_token: idToken?.__raw as string }));
+      } catch (_: unknown) {
+        loginWithRedirect({
+          appState: {
+            returnTo: window.location.href,
+          },
+        });
+      }
     };
 
     if (user) {
