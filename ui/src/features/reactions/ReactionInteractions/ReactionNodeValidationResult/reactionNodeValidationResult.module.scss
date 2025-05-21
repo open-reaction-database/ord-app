@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.icon {
-  width: 20px;
-  height: 20px;
+
+.badge {
+  padding: 0 8px;
+}
+
+.tooltipContent {
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  color: var(--mantine-color-black);
+}
+
+.path {
+  font-weight: 600;
 }
 
 .errorTooltip {
-  background-color: var(--mantine-color-red-7);
+  background-color: var(--mantine-color-red-6);
 }
 
 .warningTooltip {
-  background-color: var(--mantine-color-yellow-7);
+  background-color: var(--mantine-color-yellow-6);
 }

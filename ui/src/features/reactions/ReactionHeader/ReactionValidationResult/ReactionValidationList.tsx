@@ -44,6 +44,7 @@ function ErrorWarningMessageDisplay({ message, type, onClose }: Readonly<ErrorWa
   return (
     <Flex
       align="flex-start"
+      wrap="wrap"
       gap="xs"
     >
       {type === 'warning' ? <WarningIcon className={classes.icon} /> : <CrossCircleIcon className={classes.icon} />}

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type {
+  ErrorWarningMessage,
+  ErrorWarningMessageWithPath,
+  ReactionValidation,
+} from 'store/entities/reactions/reactions.types.ts';
+import { Badge, Flex, Text, Tooltip } from '@mantine/core';
+import classes from './reactionNodeValidationResult.module.scss';
 import { useContext, useMemo } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
-import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ErrorWarningMessage, ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
-import { Flex, Text, Tooltip } from '@mantine/core';
-import { CrossCircleIcon, WarningIcon } from 'common/icons';
-import classes from './reactionNodeValidationResult.module.scss';
+import { useSelector } from 'react-redux';
 
 interface ReactionNodeValidationResultProps {
   pathComponents: ReactionPathComponents;
@@ -32,7 +35,7 @@ interface ReactionNodeValidationResultDisplayProps extends ReactionNodeValidatio
 }
 
 interface ReactionNodeValidationTooltipContentProps {
-  messages: Array<ErrorWarningMessage>;
+  messages: Array<ErrorWarningMessageWithPath>;
 }
 
 function ReactionNodeValidationTooltipContent({ messages }: Readonly<ReactionNodeValidationTooltipContentProps>) {
@@ -40,9 +43,19 @@ function ReactionNodeValidationTooltipContent({ messages }: Readonly<ReactionNod
     <Flex
       direction="column"
       gap="xs"
+      className={classes.tooltipContent}
     >
       {messages.map(message => (
-        <Text key={message.text}>{message.text}</Text>
+        <Flex
+          align="center"
+          key={`${message.path.toString()}_${message.text}`}
+          direction="row"
+          wrap="wrap"
+          gap="xs"
+        >
+          {message.path.length > 0 && <Text className={classes.path}>{message.path.join('.')}:</Text>}
+          <Text>{message.text}.</Text>
+        </Flex>
       ))}
     </Flex>
   );
@@ -51,8 +64,15 @@ function ReactionNodeValidationTooltipContent({ messages }: Readonly<ReactionNod
 function filterErrorWarningMessagesByPath(
   messages: Array<ErrorWarningMessage>,
   pathComponents: ReactionPathComponents,
-): Array<ErrorWarningMessage> {
-  return messages.filter(item => 'path' in item && item.path.toString() === pathComponents.toString());
+): Array<ErrorWarningMessageWithPath> {
+  const messagesWithPath = messages.filter(
+    item => 'path' in item && item.path.toString().includes(pathComponents.toString()),
+  ) as Array<ErrorWarningMessageWithPath>;
+
+  return messagesWithPath.map(item => ({
+    ...item,
+    path: item.originalPath.split('.').slice(pathComponents.length),
+  }));
 }
 
 export function ReactionNodeValidationResultDisplay({
@@ -64,10 +84,7 @@ export function ReactionNodeValidationResultDisplay({
   }, [pathComponents, validation.errors]);
 
   const warningsToDisplay = useMemo(() => {
-    return validation.warnings
-      .filter(item => 'path' in item && item.path.toString() === pathComponents.toString())
-      .map(item => item.text)
-      .join('<br/>');
+    return filterErrorWarningMessagesByPath(validation.warnings, pathComponents);
   }, [pathComponents, validation.warnings]);
 
   const shouldDisplay = warningsToDisplay.length > 0 || errorsToDisplay.length > 0;
@@ -80,16 +97,26 @@ export function ReactionNodeValidationResultDisplay({
           label={<ReactionNodeValidationTooltipContent messages={errorsToDisplay} />}
           classNames={{ tooltip: classes.errorTooltip }}
         >
-          <CrossCircleIcon className={classes.icon} />
+          <Badge
+            className={classes.badge}
+            color="red"
+          >
+            {errorsToDisplay.length}
+          </Badge>
         </Tooltip>
       )}
       {warningsToDisplay.length > 0 && (
         <Tooltip
           multiline
-          label={warningsToDisplay}
+          label={<ReactionNodeValidationTooltipContent messages={warningsToDisplay} />}
           classNames={{ tooltip: classes.warningTooltip }}
         >
-          <WarningIcon className={classes.icon} />
+          <Badge
+            className={classes.badge}
+            color="yellow"
+          >
+            {warningsToDisplay.length}
+          </Badge>
         </Tooltip>
       )}
     </>

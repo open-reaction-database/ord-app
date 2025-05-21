@@ -206,7 +206,7 @@ function parseErrorWarning(text: string, reaction: AppReaction): ErrorWarningMes
   const updatedText = rest.join(':');
   try {
     const convertedPath = replaceNameIdInReactionComponentPath(reactionComponentPath, reaction, 'id');
-    return { text: updatedText, path: convertedPath, originalPath: error };
+    return { text: updatedText, path: convertedPath, originalPath: path };
   } catch (_: unknown) {
     return { text };
   }

@@ -75,6 +75,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
   identifiersList,
   {
     type: ReactionFormNodeType.block,
+    name: 'source',
     title: {
       label: 'Source',
     },
@@ -109,6 +110,7 @@ export const reactionComponents: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: 'preparations',
     title: {
       label: 'Preparations',
     },

@@ -47,6 +47,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: 'crudeComponents',
     title: {
       label: 'Crude components',
     },
@@ -69,6 +70,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.block,
+    name: 'additionSpeed',
     title: {
       label: 'Addition Information',
     },
@@ -157,6 +159,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.block,
+    name: 'flowRate',
     title: {
       label: 'Flow rate',
       hint: 'Infusion rate when running reactions in continuous flow.',

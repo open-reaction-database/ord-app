@@ -24,6 +24,7 @@ import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/react
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { reactionContext } from '../../reactions.context.ts';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
@@ -40,11 +41,11 @@ const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
 type ValueType = ReactionNotes[keyof ReactionNotes];
 type NotEmptyValueType = Exclude<ValueType, null | undefined>;
 
-const ENTITY_NAME = 'notes';
+const ENTITY_FIELD = 'notes';
 
 export function Notes() {
   const { reactionId } = useContext(reactionContext);
-  const notesOrNull = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
+  const notesOrNull = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
   const fields = useMemo((): Array<[string, string]> => {
     const notes: ReactionNotes = notesOrNull || {};
     return notesFields
@@ -58,8 +59,14 @@ export function Notes() {
       gap="md"
     >
       <Flex justify="space-between">
-        <Title order={2}>Notes</Title>
-        <OpenSingleEntityButton pathComponents={[ENTITY_NAME]} />
+        <Flex
+          align="center"
+          gap="sm"
+        >
+          <Title order={2}>Notes</Title>
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
+        </Flex>
+        <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>
       <div className={classes.grid}>
         {fields.map(([label, value]) => (

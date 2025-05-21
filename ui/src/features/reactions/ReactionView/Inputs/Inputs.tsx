@@ -27,8 +27,11 @@ import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormCo
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
 import { reactionContext } from '../../reactions.context.ts';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
-const useCreate = buildUseCreate<ReactionInput>('inputs', (_, list) => {
+const ENTITY_FIELD = 'inputs';
+
+const useCreate = buildUseCreate<ReactionInput>(ENTITY_FIELD, (_, list): [string, ReactionInput] => {
   const newInputName = findReactionEntityUniqueName(
     'Input',
     list.map(input => input.name),
@@ -55,6 +58,7 @@ export function Inputs() {
         >
           <Title order={2}>Inputs</Title>
           <Counter amount={inputs.length} />
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly ? (
           <Button

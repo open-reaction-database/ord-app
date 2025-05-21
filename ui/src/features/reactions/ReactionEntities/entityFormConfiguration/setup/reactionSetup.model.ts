@@ -137,6 +137,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
   ),
   {
     type: ReactionFormNodeType.list,
+    name: automationCodeEntityPath,
     getKey: item => (item as AppData).id,
     title: {
       label: 'Automation code',
@@ -148,6 +149,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: vesselPreparationEntityPath.join('.'),
     getKey: (_, index) => index,
     title: {
       label: 'Vessel Preparation',
@@ -176,6 +178,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: vesselAttachmentEntityPath.join('.'),
     getKey: (_, index) => index,
     title: {
       label: 'Vessel Attachment',

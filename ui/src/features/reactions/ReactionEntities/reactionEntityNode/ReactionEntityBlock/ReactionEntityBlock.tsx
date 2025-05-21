@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { PropsWithChildren, ReactNode } from 'react';
+import { useContext, useMemo, type PropsWithChildren, type ReactNode } from 'react';
 import { Flex, Title } from '@mantine/core';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormBlock } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import classes from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/reactionEntityBlock.module.scss';
 import { ReactionEntityBaseNode } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 import { ReactionEntityLabel } from '../ReactionEntityLabel/ReactionEntityLabel.tsx';
+import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { reactionEntityContext } from '../../reactionEntity.context.ts';
 
 interface ReactionEntityBlockProps extends PropsWithChildren {
   renderedTitle: ReactNode;
@@ -73,14 +75,25 @@ export function ReactionEntityBlockTitle({ leftSection, rightSection }: Readonly
 }
 
 export function ReactionEntityBlockNode({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormBlock>>) {
+  const { pathComponents } = useContext(reactionEntityContext);
+  const blockPathComponents = useMemo(() => {
+    return pathComponents.concat(node.name.split('.'));
+  }, [node.name, pathComponents]);
+
   return (
     <ReactionEntityBlock
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <Title order={3}>
-              <ReactionEntityLabel wrapperConfig={node.title} />
-            </Title>
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              <Title order={3}>
+                <ReactionEntityLabel wrapperConfig={node.title} />
+              </Title>
+              <ReactionNodeValidationResult pathComponents={blockPathComponents} />
+            </Flex>
           }
         />
       }

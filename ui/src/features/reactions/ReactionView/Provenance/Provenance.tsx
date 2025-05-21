@@ -24,6 +24,7 @@ import { RequiredOptionalFields } from 'common/components/display/RequiredOption
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'provenance';
 
@@ -45,6 +46,7 @@ export function Provenance() {
           gap="sm"
         >
           <Title order={2}>Provenance</Title>
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>

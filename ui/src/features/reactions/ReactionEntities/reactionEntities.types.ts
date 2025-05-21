@@ -108,6 +108,7 @@ export interface ReactionFormDateTime extends ReactionFormNodeBase, ReactionForm
 
 export interface ReactionFormBlock extends ReactionFormNodeBase {
   type: ReactionFormNodeType.block;
+  name: string;
   title?: ReactionFormTitle;
   fields: Array<ReactionFormNode>;
 }
@@ -121,6 +122,7 @@ export interface ReactionFormData extends ReactionFormNodeBase, ReactionFormFiel
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ReactionFormList<T = WithId<any>> extends ReactionFormNodeBase {
   type: ReactionFormNodeType.list;
+  name: string;
   title: ReactionFormStandaloneField;
   getKey: (item: T, index: number) => string | number;
   addItem?: {

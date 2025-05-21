@@ -24,6 +24,7 @@ import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormCo
 import { OpenSingleEntityButton } from 'features/reactions/ReactionView/OpenSingleEntityButton/OpenSingleEntityButton';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types';
 import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'setup';
 
@@ -35,9 +36,10 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
       <Flex justify="space-between">
         <Flex
           align="center"
-          gap="lg"
+          gap="sm"
         >
           <Title order={2}>Setup</Title>
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>

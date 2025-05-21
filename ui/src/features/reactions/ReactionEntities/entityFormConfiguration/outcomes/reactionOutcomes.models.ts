@@ -87,6 +87,7 @@ export const reactionOutcomes: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: 'analyses',
     getKey: (item: ReactionAnalysis) => item.id,
     title: {
       label: 'Analyses',
