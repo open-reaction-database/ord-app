@@ -20,6 +20,8 @@ import { getDeepReactionPart } from '../entities/reactions/reactions.utils.ts';
 
 const mapKeys = ['inputs', 'analyses', 'features', 'analysisData', 'automationCode'];
 
+const conditionsWithMeasurements = ['temperature', 'electrochemistry', 'pressure'];
+
 type NamedEntity = WithIdName<unknown>;
 type NamedEntityMap = Record<string, NamedEntity>;
 
@@ -54,6 +56,19 @@ export function replaceNameIdInReactionComponentPath(
         updatedPath = updatedPath.concat([entity.name]);
       }
       index++;
+    }
+    // TODO move somewhere or rewrite - quite fix necessary because of fields renaming
+    const currentValue = updatedPath[index];
+    if (
+      index > 0 &&
+      conditionsWithMeasurements.includes(updatedPath[index - 1] as string) &&
+      typeof currentValue === 'string'
+    ) {
+      if (currentValue === 'measurements') {
+        updatedPath[index] = `${updatedPath[index - 1]}Measurements`;
+      } else if (currentValue.endsWith('Measurements')) {
+        updatedPath[index] = 'measurements';
+      }
     }
   }
   return updatedPath;
