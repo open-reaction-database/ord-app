@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { CreateDatasetFromFilePayload, CreateNewDatasetPayload, Dataset } from './datasets.types.ts';
+import type {
+  CreateDatasetFromFilePayload,
+  CreateNewDatasetPayload,
+  Dataset,
+  DatasetGroup,
+  DatasetShareUnsharePayload,
+} from './datasets.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
 
@@ -37,3 +43,11 @@ export const setDatasetEditOpenedAction = createAction<boolean>('set_edit_opened
 export const updateDatasetActions = createAsyncAction<Pick<Dataset, 'id' | 'name' | 'description'>, Dataset>('update');
 
 export const removeDatasetActions = createAsyncAction<number>('remove_dataset');
+
+export const getDatasetGroupsActions = createAsyncAction<number, Array<DatasetGroup>>('get_groups');
+
+export const clearDatasetGroupsListAction = createAction('clear_groups_list');
+
+export const shareDatasetWithGroupActions = createAsyncAction<DatasetShareUnsharePayload, void>('share_dataset');
+
+export const unshareDatasetWithGroupActions = createAsyncAction<DatasetShareUnsharePayload, number>('unshare_dataset');

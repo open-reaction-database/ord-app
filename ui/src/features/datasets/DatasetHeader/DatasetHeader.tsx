@@ -37,6 +37,7 @@ import classes from './datasetHeader.module.scss';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
 import { typographyClasses } from 'common/styling';
+import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
 
 interface DatasetHeaderProps {
   dataset: Dataset;
@@ -128,7 +129,11 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         <p className={classes.datasetDescription}>{dataset.description}</p>
       </div>
 
-      <div className={classes.buttonContainer}>
+      <Flex
+        align="flex-start"
+        className={classes.buttonContainer}
+        gap="sm"
+      >
         {canDatasetBeEdited && (
           <ConfirmPopover
             opened={removeConfirmOpened}
@@ -151,6 +156,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
             }
           />
         )}
+        <ShareDataset dataset={dataset} />
         <DownloadMenu
           options={fileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}
@@ -164,7 +170,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
             </Button>
           }
         />
-      </div>
+      </Flex>
       {isEditOpened && (
         <EditDataset
           datasetId={dataset.id}

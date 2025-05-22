@@ -17,12 +17,15 @@ import {
   createDatasetFromFileActions,
   createNewDatasetActions,
   getDatasetActions,
+  getDatasetGroupsActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
   removeDatasetActions,
+  shareDatasetWithGroupActions,
+  unshareDatasetWithGroupActions,
   updateDatasetActions,
 } from './datasets.actions.ts';
-import type { Dataset } from './datasets.types.ts';
+import type { Dataset, DatasetGroup } from './datasets.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
@@ -96,3 +99,33 @@ export const removeDataset = createThunkWithExplicitResult(removeDatasetActions,
   dispatch(removeDatasetActions.success());
   navigate(`/`);
 });
+
+export const getDatasetGroups = createThunk(getDatasetGroupsActions, datasetId => async () => {
+  const response = await axiosInstance.get<Array<DatasetGroup>>(`/datasets/${datasetId}/groups`);
+  return getDatasetGroupsActions.success(response.data);
+});
+
+export const shareDatasetWithGroup = createThunkWithExplicitResult(
+  shareDatasetWithGroupActions,
+  ({ groupId, datasetId, primaryGroupId }) =>
+    async dispatch => {
+      await axiosInstance.post(`/groups/${primaryGroupId}/datasets/${datasetId}/share`, {
+        secondary_group_id: groupId,
+      });
+      dispatch(shareDatasetWithGroupActions.success());
+      dispatch(getDataset(datasetId));
+      dispatch(getDatasetGroups(datasetId));
+    },
+);
+
+export const unshareDatasetWithGroup = createThunkWithExplicitResult(
+  unshareDatasetWithGroupActions,
+  ({ groupId, datasetId, primaryGroupId }) =>
+    async dispatch => {
+      await axiosInstance.post(`/groups/${primaryGroupId}/datasets/${datasetId}/unshare`, {
+        secondary_group_id: groupId,
+      });
+      dispatch(unshareDatasetWithGroupActions.success(groupId));
+      dispatch(getDataset(datasetId));
+    },
+);

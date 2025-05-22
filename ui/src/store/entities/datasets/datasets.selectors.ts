@@ -36,3 +36,7 @@ export const selectOrderedDatasets = createSelector([selectDatasetsOrder, select
 export const selectIsDatasetCreating = buildSelector(state => state.isDatasetCreating);
 
 export const selectIsDatasetOpened = buildSelector(state => state.isDatasetEditOpened);
+
+export const selectDatasetGroups = buildSelector(state => state.datasetGroups);
+
+export const selectAreDatasetGroupsLoading = buildSelector(state => state.areDatasetGroupsLoading);

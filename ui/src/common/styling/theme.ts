@@ -137,5 +137,20 @@ export const theme = createTheme({
         },
       },
     },
+    Drawer: {
+      styles: {
+        header: {
+          borderBottom: '1px solid var(--color-border-1)',
+        },
+        body: {
+          padding: 'var(--mantine-spacing-md) var(--mantine-spacing-lg)',
+        },
+        title: {
+          fontSize: 'var(--mantine-h2-font-size)',
+          lineHeight: 'var(--mantine-h2-line-height)',
+          fontWeight: 600,
+        },
+      },
+    },
   },
 });

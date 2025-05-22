@@ -35,12 +35,25 @@ export interface CreateDatasetFromFilePayload {
   file: File;
 }
 
+export interface DatasetShareUnsharePayload {
+  datasetId: number;
+  groupId: number;
+  primaryGroupId: number;
+}
+
+export interface DatasetGroup {
+  id: number;
+  name: string;
+  is_primary: boolean;
+}
+
 export interface Dataset extends CreateDatasetBase {
   id: number;
   owner: DatasetCreator;
   created_at: string;
   modified_at: string;
   groups: Array<GroupItem>;
+  is_sharable?: boolean;
   reactions_count: {
     total: number;
     invalid: number;

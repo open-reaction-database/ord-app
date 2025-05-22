@@ -15,17 +15,20 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById, Pagination } from 'common/types';
-import type { Dataset } from './datasets.types.ts';
+import type { Dataset, DatasetGroup } from './datasets.types.ts';
 import {
+  clearDatasetGroupsListAction,
   createDatasetFromFileActions,
   createNewDatasetActions,
   getDatasetActions,
+  getDatasetGroupsActions,
   getDatasetPageActions,
   getGroupsInitialDatasetListActions,
   setDatasetEditOpenedAction,
+  shareDatasetWithGroupActions,
+  unshareDatasetWithGroupActions,
   updateDatasetActions,
 } from './datasets.actions.ts';
-import { itemsById } from 'common/utils';
 import { emptyPagination } from 'common/constants.ts';
 import { setActiveGroupIdAction } from '../groups/groups.actions.ts';
 
@@ -74,8 +77,21 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
       [getDatasetId(action.payload)]: action.payload,
     }),
   );
-  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
-    itemsById(action.payload.items, getDatasetId),
+  builder.addMatcher(
+    isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success),
+    (state, action) => ({
+      ...state,
+      ...action.payload.items.reduce(
+        (acc: Record<string, Dataset>, item) => ({
+          ...acc,
+          [getDatasetId(item)]: {
+            ...(state[item.id] || {}),
+            ...item,
+          },
+        }),
+        {},
+      ),
+    }),
   );
 });
 
@@ -105,6 +121,36 @@ const isDatasetEditOpened = createReducer<boolean>(false, builder => {
   builder.addCase(updateDatasetActions.success, () => false);
 });
 
+const datasetGroups = createReducer<Array<DatasetGroup> | null>(null, builder => {
+  builder.addCase(clearDatasetGroupsListAction, () => null);
+  builder.addCase(getDatasetGroupsActions.success, (_, action) => action.payload);
+  builder.addCase(unshareDatasetWithGroupActions.success, (state, action) =>
+    state ? state.filter(item => item.id !== action.payload) : null,
+  );
+});
+
+const areDatasetGroupsLoading = createReducer<boolean>(false, builder => {
+  builder.addMatcher(
+    isAnyOf(
+      getDatasetGroupsActions.request,
+      shareDatasetWithGroupActions.request,
+      unshareDatasetWithGroupActions.request,
+    ),
+    () => true,
+  );
+  builder.addMatcher(
+    isAnyOf(
+      getDatasetGroupsActions.success,
+      getDatasetGroupsActions.failure,
+      clearDatasetGroupsListAction,
+      shareDatasetWithGroupActions.failure,
+      unshareDatasetWithGroupActions.success,
+      unshareDatasetWithGroupActions.failure,
+    ),
+    () => false,
+  );
+});
+
 export const datasetsReducer = combineReducers({
   datasetsById,
   datasetsOrder,
@@ -112,4 +158,6 @@ export const datasetsReducer = combineReducers({
   areDatasetsLoading,
   isDatasetCreating,
   isDatasetEditOpened,
+  datasetGroups,
+  areDatasetGroupsLoading,
 });
