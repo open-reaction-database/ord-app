@@ -27,7 +27,7 @@ from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import DatasetModel, UserModel
+from ord_app.service_api.models import DatasetModel, GroupModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import (
@@ -78,6 +78,9 @@ class DatasetUseCases:
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
         return await self.dataset_repository.datasets_stmt(self.current_user.id, group_id)
+
+    async def get_dataset_groups(self, dataset_id: int) -> list[GroupModel]:
+        return await self.dataset_repository.get_dataset_groups(dataset_id)
 
     async def extend(self, dataset_id: int, file_data, kind):
         try:
