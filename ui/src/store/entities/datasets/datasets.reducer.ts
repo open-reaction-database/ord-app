@@ -68,7 +68,10 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
   }));
   builder.addCase(updateDatasetActions.success, (state, action) => ({
     ...state,
-    [action.payload.id]: action.payload,
+    [action.payload.id]: {
+      ...state[action.payload.id],
+      ...action.payload,
+    },
   }));
   builder.addMatcher(
     isAnyOf(createNewDatasetActions.success, createDatasetFromFileActions.success),
