@@ -23,6 +23,10 @@ class GroupResponseSchema(BaseSchema):
     name: str
 
 
+class GroupShareSchema(GroupResponseSchema):
+    is_primary: bool
+
+
 class GroupUserResponseSchema(BaseSchema):
     id: int
     name: str

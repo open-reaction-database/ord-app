@@ -130,6 +130,19 @@ class DatasetsRepository:
 
         return dataset
 
+    async def get_dataset_groups(self, dataset_id: int) -> list[GroupModel]:
+        stmt = (
+            select(DatasetGroupAssociationModel)
+            .filter_by(dataset_id=dataset_id)
+            .options(joinedload(DatasetGroupAssociationModel.group))
+        )
+        assocs = (await self.db.scalars(stmt)).all()
+        return [
+            setattr(assoc.group, "is_primary", assoc.is_primary) or assoc.group
+            for assoc in assocs
+        ]
+
+
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel:
         stmt = (
             select(DatasetModel)

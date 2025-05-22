@@ -32,6 +32,7 @@ from ord_app.service_api.schemas.datasets import (
     DatasetWithReactionCountResponseSchema,
     DownloadFileFormats,
 )
+from ord_app.service_api.schemas.groups import GroupShareSchema
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.pb_utils import (
     validate_uploaded_pb_file,
@@ -195,6 +196,20 @@ async def extend_dataset(
     response = await use_case.extend(dataset_id, file_data, kind)
     background_tasks.add_task(validate_dataset_reactions, db)
     return response
+
+
+@router.get(
+    "/datasets/{dataset_id}/groups",
+    response_model=list[GroupShareSchema],
+    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
+)
+async def get_dataset_groups(
+    dataset_id: int,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+):
+    if groups := await use_case.get_dataset_groups(dataset_id):
+        return groups
+    raise EntityNotFoundError("Dataset not found")
 
 
 @router.post(
