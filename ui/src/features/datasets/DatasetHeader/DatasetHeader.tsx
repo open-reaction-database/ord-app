@@ -140,7 +140,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
             position="right"
             offset={8}
             title="Remove dataset"
-            text="Are you sure to remove this dataset?"
+            text="Are you sure to remove this dataset? It will be removed from all of the groups"
             onConfirm={handleDatasetRemove}
             onCancel={closeRemoveConfirm}
             target={

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button } from '@mantine/core';
+import { Button, Flex } from '@mantine/core';
 import { ord } from 'ord-schema-protobufjs';
 import { AddCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -33,6 +33,7 @@ import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAm
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
+import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const useSelectData = buildUseSelectItems('components');
 
@@ -57,10 +58,21 @@ export function InputsComponentList() {
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <TitleDelimiterAmount
-              title="Components"
-              amount={components.length}
-            />
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              <Flex
+                align="center"
+                gap="xs"
+              >
+                <TitleDelimiterAmount
+                  title="Components"
+                  amount={components.length}
+                />
+              </Flex>
+              <ReactionNodeValidationResult pathComponents={['components']} />
+            </Flex>
           }
           rightSection={
             !isViewOnly && (

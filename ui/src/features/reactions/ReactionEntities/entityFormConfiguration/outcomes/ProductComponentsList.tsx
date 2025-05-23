@@ -33,6 +33,7 @@ import { ordProductToReaction } from 'store/entities/reactions/reactionComponent
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { MeasurementsPreview } from 'features/reactions/ReactionView/Outcomes/MeasurementsPreview/MeasurementsPreview.tsx';
+import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'products';
 
@@ -59,10 +60,21 @@ export function ProductsComponentsList() {
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <TitleDelimiterAmount
-              title="Products"
-              amount={components.length}
-            />
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              <Flex
+                align="center"
+                gap="xs"
+              >
+                <TitleDelimiterAmount
+                  title="Products"
+                  amount={components.length}
+                />
+              </Flex>
+              <ReactionNodeValidationResult pathComponents={['products']} />
+            </Flex>
           }
           rightSection={
             !isViewOnly && (
