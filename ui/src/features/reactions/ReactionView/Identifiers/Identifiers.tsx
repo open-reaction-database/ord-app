@@ -28,6 +28,7 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 import { reactionContext } from '../../reactions.context.ts';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'identifiers';
 
@@ -60,6 +61,7 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         >
           <Title order={2}>Identifiers</Title>
           <Counter amount={identifiers.length} />
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
           <Button

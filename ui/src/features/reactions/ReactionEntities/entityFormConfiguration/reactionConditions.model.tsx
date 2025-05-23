@@ -64,6 +64,7 @@ function createMeasurementListItem<T>(
 ): ReactionFormNode {
   return {
     type: ReactionFormNodeType.list,
+    name: pathComponents.join('.'),
     getKey: (_, index) => index,
     title: {
       label: 'Measurements',
@@ -85,6 +86,7 @@ function createMeasurementListItem<T>(
 
 export const reactionTemperatureCondition: ReactionFormNode = {
   type: ReactionFormNodeType.block,
+  name: 'temperature',
   title: {
     label: 'Temperature',
   },
@@ -137,6 +139,7 @@ export const reactionTemperatureCondition: ReactionFormNode = {
 
 export const reactionStirringCondition: ReactionFormNode = {
   type: ReactionFormNodeType.block,
+  name: 'stirring',
   title: {
     label: 'Stirring',
   },
@@ -239,6 +242,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
   reactionStirringCondition,
   {
     type: ReactionFormNodeType.block,
+    name: 'pressure',
     title: {
       label: 'Pressure',
     },
@@ -311,6 +315,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.block,
+    name: 'illumination',
     title: {
       label: 'Illumination',
     },
@@ -370,6 +375,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.block,
+    name: 'electrochemistry',
     title: {
       label: 'Electrochemistry',
     },
@@ -467,6 +473,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.block,
+    name: 'flow',
     title: {
       label: 'Flow',
     },

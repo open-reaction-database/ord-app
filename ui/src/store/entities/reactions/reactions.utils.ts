@@ -20,6 +20,8 @@ import { allowedNodeEntityNames } from './reactions.models.ts';
 import type {
   AppReaction,
   DatasetReaction,
+  ErrorWarningMessage,
+  OrdValidation,
   ReactionMolBlocks,
   ReactionResponse,
   ReactionValidation,
@@ -31,6 +33,7 @@ import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { convertReactionFloatsToDoubles, ordReactionToReaction } from './reactions.converters.ts';
 import type { OrdOptional } from './reactionEntity/reactionEntity.types.ts';
+import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 
 type MergeArrayOptions = Parameters<Required<Options>['mergeArray']>[0];
 const protobufClassRegExp = /<class '.+'> /g;
@@ -187,10 +190,38 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
   return { ...inputsPreviews, ...outcomesPreviews, ...workupsPreviews };
 };
 
-export const parseValidation = (validation: ReactionValidation): ReactionValidation => {
+function parseErrorWarning(text: string, reaction: AppReaction): ErrorWarningMessage {
+  if (!text.includes(':')) {
+    return { text };
+  }
+  const [error, ...rest] = text.split(':');
+  const path = error.replace(/\[(")*/g, '.').replace(/(")*]/g, '');
+  const reactionComponentPath = path.split('.').map(item => {
+    const parsedNumber = parseInt(item);
+    if (Number.isNaN(parsedNumber)) {
+      return item;
+    }
+    return parsedNumber;
+  });
+  const updatedText = rest.join(':');
+  try {
+    const convertedPath = replaceNameIdInReactionComponentPath(reactionComponentPath, reaction, 'id');
+    return { text: updatedText, path: convertedPath, originalPath: path };
+  } catch (_: unknown) {
+    return { text };
+  }
+}
+
+export const parseValidation = (validation: OrdValidation, reaction: AppReaction): ReactionValidation => {
+  const errorsWithoutClassNames = validation.errors.map(item => item.replace(protobufClassRegExp, ''));
+  const warningsWithoutClassNames = validation.warnings.map(item => item.replace(protobufClassRegExp, ''));
+
+  const parsedErrors = errorsWithoutClassNames.map(item => parseErrorWarning(item, reaction));
+  const parsedWarnings = warningsWithoutClassNames.map(item => parseErrorWarning(item, reaction));
+
   return {
-    errors: validation.errors.map(item => item.replace(protobufClassRegExp, '')),
-    warnings: validation.warnings.map(item => item.replace(protobufClassRegExp, '')),
+    errors: parsedErrors,
+    warnings: parsedWarnings,
   };
 };
 
@@ -199,7 +230,7 @@ export const parseReaction = ({ binpb, molblocks, validation, ...rest }: Reactio
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
-  const updatedValidation = validation ? parseValidation(validation) : null;
+  const updatedValidation = validation ? parseValidation(validation, appReaction) : null;
 
   return {
     ...rest,

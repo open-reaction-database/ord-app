@@ -30,6 +30,7 @@ import { ordObservationToReaction } from 'store/entities/reactions/reactionObser
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'observations';
 
@@ -57,6 +58,7 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
         >
           <Title order={2}>Observations</Title>
           <Counter amount={observations.length} />
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
           <Button

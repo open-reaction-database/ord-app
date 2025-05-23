@@ -13,39 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.validationBadge {
-  height: auto;
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-color: var(--color-border-2);
-  color: var(--color-text-primary);
+
+.badge {
+  padding: 0 8px;
 }
 
-.icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.closed {
-  svg {
-    transform: rotate(-90deg);
-  }
-}
-
-.text {
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.sidebar {
-  min-width: 680px;
-}
-
-.title {
-  font-size: 1.5rem;
-  font-weight: 700;
+.tooltipContent {
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  color: var(--mantine-color-black);
 }
 
 .path {
-  white-space: nowrap;
+  font-weight: 600;
+}
+
+.errorTooltip {
+  background-color: var(--mantine-color-red-6);
+}
+
+.warningTooltip {
+  background-color: var(--mantine-color-yellow-6);
 }

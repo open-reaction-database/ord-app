@@ -28,16 +28,17 @@ import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsO
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
 import { useMemo, useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
   ordOutcomeToReactionOutcome(ord.ReactionOutcome.toObject(new ord.ReactionOutcome())),
 ]);
 
-const ENTITY_NAME = 'outcomes';
+const ENTITY_FIELD = 'outcomes';
 
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
-  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_NAME]));
+  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
   const onCreateNew = useCreate();
   const { isViewOnly } = useContext(reactionContext);
   const handleCreate = () => {
@@ -55,6 +56,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
         >
           <Title order={2}>Outcomes</Title>
           <Counter amount={outcomes?.length} />
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
           <Button

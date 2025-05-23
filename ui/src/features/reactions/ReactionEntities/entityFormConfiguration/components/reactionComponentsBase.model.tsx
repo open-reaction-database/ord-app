@@ -51,6 +51,7 @@ export const molBlockIdentifiers: ReactionFormNode = {
 
 export const identifiersList: ReactionFormNode = {
   type: ReactionFormNodeType.list,
+  name: 'identifiers',
   title: {
     label: 'Identifiers',
   },
@@ -87,6 +88,7 @@ export const identifiersList: ReactionFormNode = {
 
 export const featuresList: ReactionFormNode = {
   type: ReactionFormNodeType.list,
+  name: 'features',
   title: {
     label: 'Features',
     hint: 'Additional chemical features (e.g., calculated descriptors) that are important to associate with this compound.',
@@ -99,6 +101,7 @@ export const featuresList: ReactionFormNode = {
 
 export const textureDetails: ReactionFormNode = {
   type: ReactionFormNodeType.block,
+  name: 'texture',
   title: {
     label: 'Isolated Material Characteristics',
   },

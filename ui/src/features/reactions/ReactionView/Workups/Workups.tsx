@@ -33,6 +33,7 @@ import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactio
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit.ts';
 import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
 import { InputComponentsListItem } from '../Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 const ENTITY_FIELD = 'workups';
 
@@ -151,6 +152,7 @@ export function Workups() {
         >
           <Title order={2}>Workups</Title>
           <Counter amount={workups.length} />
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
           <Button

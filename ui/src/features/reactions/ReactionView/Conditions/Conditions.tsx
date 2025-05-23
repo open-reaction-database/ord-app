@@ -22,8 +22,9 @@ import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
 import classes from './conditions.module.scss';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
+import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
-export const ENTITY_FIELD = 'conditions';
+const ENTITY_FIELD = 'conditions';
 
 export function Conditions({ reactionId }: ReactionViewSectionProps) {
   const conditions: ReactionConditions = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
@@ -36,6 +37,7 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <Title order={2}>Conditions</Title>
+          <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>

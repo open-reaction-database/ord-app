@@ -22,9 +22,11 @@ import {
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 import { Button, Flex } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { reactionEntityContext } from '../../reactionEntity.context.ts';
 
 interface ReactionEntityAddButtonProps extends Required<Pick<ReactionFormList, 'addItem'>> {
   items: Array<unknown>;
@@ -53,19 +55,35 @@ function ReactionEntityAddButton({ items, addItem, nextIndex }: Readonly<Reactio
 export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
   const items = node.useSelectItems() ?? [];
   const { isViewOnly } = useContext(reactionContext);
+  const { pathComponents } = useContext(reactionEntityContext);
   const title = useReactionEntityLabel(node.title);
   const nextIndex = items.length;
   const { ItemDisplay } = node;
+
+  const listPathComponents = useMemo(() => {
+    return pathComponents.concat(node.name.split('.'));
+  }, [node.name, pathComponents]);
 
   return (
     <ReactionEntityBlock
       renderedTitle={
         <ReactionEntityBlockTitle
           leftSection={
-            <TitleDelimiterAmount
-              title={title}
-              amount={items.length}
-            />
+            <Flex
+              align="center"
+              gap="sm"
+            >
+              <Flex
+                align="center"
+                gap="xs"
+              >
+                <TitleDelimiterAmount
+                  title={title}
+                  amount={items.length}
+                />
+              </Flex>
+              <ReactionNodeValidationResult pathComponents={listPathComponents} />
+            </Flex>
           }
           rightSection={
             node.addItem && !isViewOnly ? (

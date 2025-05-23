@@ -72,6 +72,7 @@ export const reactionProducts: Array<ReactionFormNode> = [
   identifiersList,
   {
     type: ReactionFormNodeType.list,
+    name: 'measurements',
     title: {
       label: 'Measurements',
     },
@@ -102,6 +103,7 @@ export const reactionProducts: Array<ReactionFormNode> = [
   featuresList,
   {
     type: ReactionFormNodeType.block,
+    name: 'texture',
     title: {
       label: 'Isolated Product Characteristics',
     },

@@ -79,6 +79,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
   ),
   {
     type: ReactionFormNodeType.block,
+    name: 'recordCreated',
     title: {
       label: 'Record Creation',
     },
@@ -110,6 +111,7 @@ export const reactionProvenance: Array<ReactionFormNode> = [
   },
   {
     type: ReactionFormNodeType.list,
+    name: 'recordModified',
     title: {
       label: 'Record Modification',
     },
