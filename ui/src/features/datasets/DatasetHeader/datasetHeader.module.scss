@@ -20,7 +20,6 @@
 }
 
 .leftTitlePart {
-  flex-basis: 50%;
   overflow: hidden;
 }
 
@@ -53,9 +52,13 @@
   color: var(--mantine-color-primary);
 }
 
-.buttonContainer button {
-  border-radius: 8px;
-  font-weight: 400;
+.buttonContainer {
+  flex-shrink: 0;
+
+  button {
+    border-radius: 8px;
+    font-weight: 400;
+  }
 }
 
 .removeIcon {

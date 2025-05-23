@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Drawer, Flex, Text } from '@mantine/core';
@@ -30,6 +30,7 @@ import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts'
 import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import clsx from 'clsx';
 import { typographyClasses } from 'common/styling';
+import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 
 export function GroupsDrawer() {
   const dispatch = useAppDispatch();
@@ -57,6 +58,8 @@ export function GroupsDrawer() {
     dispatch(setEditingGroupIdAction(null));
   };
 
+  const copyButtonOptions = useMemo(() => (group ? [{ label: 'Copy ID', value: group.id.toString() }] : []), [group]);
+
   return (
     <>
       <Drawer.Root
@@ -82,6 +85,7 @@ export function GroupsDrawer() {
                 <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
                   {group?.name}
                 </Drawer.Title>
+                <CopyButton options={copyButtonOptions} />
                 <ActionIcon
                   variant="transparent"
                   onClick={openModal}
