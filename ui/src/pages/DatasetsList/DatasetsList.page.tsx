@@ -23,7 +23,6 @@ import ReactGA from 'react-ga4';
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 
-
 export function DatasetsListPage() {
   const [location] = useLocation();
 
