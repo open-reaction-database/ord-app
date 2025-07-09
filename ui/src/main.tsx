@@ -19,8 +19,7 @@ import { AppRoot } from './core/AppRoot.tsx';
 import { Buffer } from 'buffer';
 import ReactGA from 'react-ga4';
 
-const TRACKING_ID = 'G-S334YDGZB8';
-ReactGA.initialize(TRACKING_ID);
+ReactGA.initialize('G-R9MFY2X2C7');
 
 // Because ketcher depends on draft-js which requires setImmediate package
 // https://github.com/yuzujs/setImmediate
