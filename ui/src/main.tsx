@@ -17,9 +17,6 @@ import { createRoot } from 'react-dom/client';
 import './index.scss';
 import { AppRoot } from './core/AppRoot.tsx';
 import { Buffer } from 'buffer';
-import ReactGA from 'react-ga4';
-
-ReactGA.initialize('G-R9MFY2X2C7');
 
 // Because ketcher depends on draft-js which requires setImmediate package
 // https://github.com/yuzujs/setImmediate
