@@ -19,8 +19,18 @@ import { DatasetTable } from 'features/datasets';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { DatasetsListTopActions } from './DatasetsListTopActions/DatasetsListTopActions.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu.tsx';
+import ReactGA from 'react-ga4';
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
+
 
 export function DatasetsListPage() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: 'pageview', page: location, title: document.title });
+  }, [location]);
+
   return (
     <PageContainer breadcrumbs={[{ title: 'Datasets', path: '~/' }]}>
       <Flex
