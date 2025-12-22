@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Stage 1: Build the React app
-FROM node:alpine AS react-build
+FROM node:22-alpine AS react-build
 
 WORKDIR /app
 
@@ -56,7 +56,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     nginx \
     supervisor \
-    ntpdate && \
+    ntpsec-ntpdate && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
