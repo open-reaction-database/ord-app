@@ -26,8 +26,10 @@ export interface EntityListItemRuntimeProps<T> extends Pick<RequiredOptionalFiel
   entityKey: string | number;
 }
 
-export interface EntityListItemStaticProps<T>
-  extends Pick<RequiredOptionalFieldsProps<T>, 'requiredFields' | 'optionalFields'> {
+export interface EntityListItemStaticProps<T> extends Pick<
+  RequiredOptionalFieldsProps<T>,
+  'requiredFields' | 'optionalFields'
+> {
   entityField: string | ReactionPathComponents;
   historyPathComponents?: Array<ReactionPathComponents>;
   title: ((entity: T) => string) | string;

@@ -21,8 +21,10 @@ export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'deta
   person: ord.IPerson;
 }
 
-export interface ReactionProvenance
-  extends Omit<ord.IReactionProvenance, 'experimentStart' | 'recordModified' | 'experimenter' | 'recordCreated'> {
+export interface ReactionProvenance extends Omit<
+  ord.IReactionProvenance,
+  'experimentStart' | 'recordModified' | 'experimenter' | 'recordCreated'
+> {
   id: string;
   experimentStart: ReactionDateTime;
   experimenter: ord.IPerson;

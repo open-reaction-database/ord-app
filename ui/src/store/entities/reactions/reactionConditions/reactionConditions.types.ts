@@ -40,8 +40,9 @@ import type {
   PressureMeasurementType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 
-export interface TemperatureMeasurement
-  extends WithId<Pick<ord.TemperatureConditions.ITemperatureMeasurement, 'details'>> {
+export interface TemperatureMeasurement extends WithId<
+  Pick<ord.TemperatureConditions.ITemperatureMeasurement, 'details'>
+> {
   type: TemperatureMeasurementType;
   time: ReactionTime;
   temperature: ReactionTemperature;
@@ -83,8 +84,10 @@ export interface ReactionIlluminationCondition extends Pick<ord.IIlluminationCon
   distanceToVessel: ReactionLength;
 }
 
-export interface ReactionElectrochemistryCondition
-  extends Pick<ord.IElectrochemistryConditions, 'details' | 'anodeMaterial' | 'cathodeMaterial'> {
+export interface ReactionElectrochemistryCondition extends Pick<
+  ord.IElectrochemistryConditions,
+  'details' | 'anodeMaterial' | 'cathodeMaterial'
+> {
   type: ElectrochemistryType;
   current: ReactionCurrent;
   voltage: Voltage;
