@@ -104,7 +104,7 @@ security_group = aws.ec2.SecurityGroup(
 
 cluster = aws.ecs.Cluster("cluster")
 
-github_client = json.loads(aws.secretsmanager.get_secret_version("github-client").secret_string)
+github_client = json.loads(aws.secretsmanager.get_secret_version(secret_id="github-client").secret_string)
 
 service = awsx.ecs.FargateService(
     "service",
