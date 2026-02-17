@@ -86,7 +86,7 @@ cluster_instance = aws.rds.ClusterInstance(
     "cluster_instance",
     identifier="cluster-instance-0",
     cluster_identifier=cluster.id,
-    engine=cluster.engine,
+    engine=aws.rds.EngineType.AURORA_POSTGRESQL,
     engine_version=cluster.engine_version,
     instance_class="db.serverless",
 )

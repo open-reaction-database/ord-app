@@ -94,7 +94,7 @@ security_group = aws.ec2.SecurityGroup(
             from_port=5173,
             to_port=5173,
             protocol="tcp",
-            cidr_blocks=[aws.ec2.get_vpc(id=backend.get_output("vpc_id")).cidr_block],
+            cidr_blocks=[aws.ec2.get_vpc_output(id=backend.get_output("vpc_id")).cidr_block],
         )
     ],
     vpc_id=backend.get_output("vpc_id"),
@@ -127,8 +127,8 @@ service = awsx.ecs.FargateService(
                 environment=[
                     awsx.ecs.TaskDefinitionKeyValuePairArgs(
                         name="PG_DSN",
-                        value=aws.secretsmanager.get_secret_version(
-                            backend.get_output("rds_dsn_secret_arn")
+                        value=aws.secretsmanager.get_secret_version_output(
+                            secret_id=backend.get_output("rds_dsn_secret_arn")
                         ).secret_string,
                     ),
                 ],

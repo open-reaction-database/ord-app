@@ -15,6 +15,7 @@
 """An AWS Python Pulumi program."""
 
 import json
+from collections.abc import Sequence
 from functools import partial
 
 import pulumi
@@ -75,19 +76,23 @@ records = []
 wildcard_records = []
 
 
-def create_records(options: list[aws.acm.CertificateDomainValidationOptionArgs], wildcard: bool) -> None:
+def create_records(options: Sequence[aws.acm.outputs.CertificateDomainValidationOption], wildcard: bool) -> None:
     for i, value in enumerate(options):
         if wildcard:
             name = f"wildcard-record-{i}"
         else:
             name = f"record-{i}"
+        record_value = value.resource_record_value
+        record_type = value.resource_record_type
+        if record_value is None or record_type is None:
+            continue
         record = aws.route53.Record(
             name,
             allow_overwrite=True,
             name=value.resource_record_name,
-            records=[value.resource_record_value],
+            records=[record_value],
             ttl=300,
-            type=aws.route53.RecordType(value.resource_record_type),
+            type=aws.route53.RecordType(record_type),
             zone_id=zone.zone_id,
         )
         if wildcard:
