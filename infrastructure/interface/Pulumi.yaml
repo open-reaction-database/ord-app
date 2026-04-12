@@ -16,7 +16,3 @@ name: interface
 description: A minimal AWS Python Pulumi program
 runtime:
   name: python
-config:
-  pulumi:tags:
-    value:
-      pulumi:template: aws-python
