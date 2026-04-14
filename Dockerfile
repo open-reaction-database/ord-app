@@ -36,18 +36,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ntpsec-ntpdate && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir poetry
+RUN pip install --no-cache-dir uv
+
+ENV UV_PROJECT_ENVIRONMENT=/usr/local \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 COPY migrations/ ./migrations/
 COPY alembic.ini .
-COPY poetry.lock .
+COPY uv.lock .
 COPY pyproject.toml .
 COPY tox.ini .
 COPY ord_app/ ./ord_app
 
-RUN pip install --no-cache-dir poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --with dev --no-root --no-interaction --no-ansi
+RUN uv sync --frozen
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
