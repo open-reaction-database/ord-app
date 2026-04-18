@@ -13,4 +13,4 @@
 # limitations under the License.
 ntpdate pool.ntp.org
 
-exec poetry run uvicorn ord_app.service_api.main:app --host 0.0.0.0 --port 8000 --reload
+exec uvicorn ord_app.service_api.main:app --host 0.0.0.0 --port 8000 --reload
