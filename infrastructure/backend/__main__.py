@@ -14,6 +14,8 @@
 
 """An AWS Python Pulumi program."""
 
+import json
+
 import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx
@@ -145,6 +147,57 @@ dev_security_group = aws.ec2.SecurityGroup(
     vpc_id=vpc.vpc_id,
 )
 
+# Bastion for local DB access via SSM port forwarding (no public IP, no inbound ports).
+bastion_role = aws.iam.Role(
+    "bastion_role",
+    assume_role_policy=json.dumps(
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"Service": "ec2.amazonaws.com"},
+                    "Action": "sts:AssumeRole",
+                }
+            ],
+        }
+    ),
+)
+aws.iam.RolePolicyAttachment(
+    "bastion_ssm_policy",
+    role=bastion_role.name,
+    policy_arn="arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+)
+bastion_instance_profile = aws.iam.InstanceProfile("bastion_instance_profile", role=bastion_role.name)
+
+bastion_security_group = aws.ec2.SecurityGroup(
+    "bastion_security_group",
+    egress=[
+        aws.ec2.SecurityGroupEgressArgs(
+            from_port=0,
+            to_port=0,
+            protocol="-1",
+            cidr_blocks=["0.0.0.0/0"],
+            ipv6_cidr_blocks=["::/0"],
+        )
+    ],
+    vpc_id=vpc.vpc_id,
+)
+
+bastion_ami_id = aws.ssm.get_parameter_output(
+    name="/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id",
+).value
+
+bastion = aws.ec2.Instance(
+    "bastion",
+    ami=bastion_ami_id,
+    instance_type="t4g.nano",
+    iam_instance_profile=bastion_instance_profile.name,
+    subnet_id=vpc.private_subnet_ids.apply(lambda ids: ids[0]),
+    vpc_security_group_ids=[bastion_security_group.id],
+    tags={"Name": "bastion"},
+)
+
 pulumi.export("vpc_id", vpc.vpc_id)
 pulumi.export("public_subnet_ids", vpc.public_subnet_ids)
 pulumi.export("private_subnet_ids", vpc.private_subnet_ids)
@@ -152,3 +205,4 @@ pulumi.export("rds_endpoint", cluster.endpoint)
 pulumi.export("rds_password_secret_arn", rds_password_secret.arn)
 pulumi.export("rds_dsn_secret_arn", rds_dsn_secret.arn)
 pulumi.export("redis_endpoint", redis.endpoints.apply(lambda endpoints: endpoints[0]["address"]))
+pulumi.export("bastion_instance_id", bastion.id)
