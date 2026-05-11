@@ -36,6 +36,8 @@ dependencies = [
     "fastapi-pagination>=0.12.34,<0.13",
     "pydantic[email]>=2.10.6,<3",
     "greenlet>=3",
+    "httpx>=0.28.1,<0.29",
+    "psycopg>=3.2.5,<4",
 ]
 
 [dependency-groups]
@@ -44,11 +46,9 @@ dev = [
     "faker>=36.1.1,<37",
     "sqlalchemy-utils>=0.41.2,<0.42",
     "coverage>=7.6.12,<8",
-    "httpx>=0.28.1,<0.29",
     "pytest-cov>=6.0.0,<7",
     "pytype>=2024.10.11",
     "pytest-asyncio>=0.25.3,<0.26",
-    "psycopg>=3.2.5,<4",
     "ruff>=0.9.9,<0.10",
 ]
 
