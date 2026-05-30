@@ -21,6 +21,7 @@ import type { User } from 'store/entities/users/users.types.ts';
 export const ADD_MEMBER_ERROR = {
   ALREADY_MEMBER: 'ALREADY_MEMBER',
   NOT_FOUND: 'NOT_FOUND',
+  GENERIC: 'GENERIC',
 } as const;
 
 export interface Group {

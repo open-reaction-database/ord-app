@@ -105,6 +105,19 @@ export const addGroupMember = createThunk(addGroupMemberActions, identity => asy
     // The backend returns 409 when the user is already a member of the group and 404
     // when no user with the given identity exists; surface the right inline message.
     const status = isAxiosError(error) ? error.response?.status : undefined;
-    return addGroupMemberActions.failure(status === 409 ? ADD_MEMBER_ERROR.ALREADY_MEMBER : ADD_MEMBER_ERROR.NOT_FOUND);
+    if (status === 409) {
+      return addGroupMemberActions.failure(ADD_MEMBER_ERROR.ALREADY_MEMBER);
+    }
+    if (status === 404) {
+      return addGroupMemberActions.failure(ADD_MEMBER_ERROR.NOT_FOUND);
+    }
+    // Anything else (500, 403, network error, ...) is unexpected: keep it visible with a
+    // toast carrying the backend detail rather than silently mislabeling it as "no user".
+    const detail = isAxiosError(error) ? error.response?.data?.detail : undefined;
+    showNotification({
+      variant: NotificationVariant.ERROR,
+      message: typeof detail === 'string' ? detail : 'Failed to add the user. Please try again.',
+    });
+    return addGroupMemberActions.failure(ADD_MEMBER_ERROR.GENERIC);
   }
 });
