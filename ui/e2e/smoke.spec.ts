@@ -19,27 +19,11 @@ import { test, expect } from '@playwright/test';
 // backend e2e mode enabled, the app must load without redirecting to Auth0 and render the
 // authenticated shell. Reaching the Datasets page proves the dev user was provisioned.
 test('loads the authenticated app without Auth0 and shows the Datasets page', async ({ page }) => {
-  const diagnostics: Array<string> = [];
-  page.on('console', message => {
-    if (message.type() === 'error') diagnostics.push(`console.error: ${message.text()}`);
-  });
-  page.on('pageerror', error => diagnostics.push(`pageerror: ${error.message}`));
-  page.on('crash', () => diagnostics.push('PAGE CRASHED'));
-  page.on('requestfailed', request => {
-    if (!request.url().includes('google-analytics')) {
-      diagnostics.push(`requestfailed: ${request.url()} -> ${request.failure()?.errorText}`);
-    }
-  });
-
-  const response = await page.goto('/', { waitUntil: 'domcontentloaded' }).catch(error => {
-    diagnostics.push(`goto threw: ${error.message}`);
-    return null;
-  });
-  await page.waitForTimeout(15_000);
-  console.log(`E2E DIAG: gotoStatus=${response?.status()} url=${page.url()} :: ${diagnostics.join(' | ')}`);
+  // 'load' may not fire reliably for this WASM-heavy app; domcontentloaded is enough to start it.
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
 
   // "/" redirects to "/datasets" (client-side, after the dev user is provisioned) — and
-  // crucially we stay on the app, not the Auth0 domain.
+  // crucially we stay on the app, never the Auth0 domain.
   await expect(page).toHaveURL(/\/datasets/, { timeout: 30_000 });
 
   // The Datasets list heading only renders once the dev user has been provisioned.
