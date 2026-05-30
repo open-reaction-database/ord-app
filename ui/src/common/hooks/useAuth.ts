@@ -20,6 +20,8 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';
 import { createUser } from 'store/entities/users/users.thunks';
 import { selectSelf } from 'store/entities/users/users.selectors';
+import { e2eDevToken, noAuth } from 'common/noAuth.constants.ts';
+import type { GetAccessToken } from 'common/types/auth.ts';
 
 export function useAuth() {
   const auth0 = useAuth0();
@@ -30,6 +32,10 @@ export function useAuth() {
   const isAppLoading = !isUserCreated;
 
   useEffect(() => {
+    // In the dev/test no-auth bypass we never redirect to Auth0.
+    if (noAuth) {
+      return;
+    }
     if (!isLoading && !isAuthenticated) {
       loginWithRedirect({
         appState: {
@@ -40,12 +46,31 @@ export function useAuth() {
   }, [isAuthenticated, isLoading, loginWithRedirect]);
 
   useEffect(() => {
+    if (noAuth) {
+      // The axios interceptor only ever calls this with no args; cast to satisfy Auth0's
+      // overloaded getter type (which also has a detailed-response variant).
+      setAccessTokenGetter((async () => e2eDevToken) as GetAccessToken);
+      return;
+    }
     if (isAuthenticated) {
       setAccessTokenGetter(getAccessTokenSilently);
     }
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
+    // Provision the mock user once with the static dev token (requires the backend e2e mode, #664).
+    // Kept in its own effect with a [dispatch]-only dep so changing Auth0 function references
+    // (unused in this path) can't trigger duplicate provisioning calls.
+    if (noAuth) {
+      dispatch(createUser({ access_token: e2eDevToken, id_token: e2eDevToken }));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (noAuth) {
+      return;
+    }
+
     const provisionUser = async () => {
       try {
         const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);

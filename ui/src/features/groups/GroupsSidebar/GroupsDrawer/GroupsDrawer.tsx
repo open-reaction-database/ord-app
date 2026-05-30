@@ -16,7 +16,7 @@
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@mantine/hooks';
-import { ActionIcon, Drawer, Flex, Text } from '@mantine/core';
+import { ActionIcon, Drawer, Flex, Text, Tooltip } from '@mantine/core';
 import { EditIcon } from 'common/icons';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { getGroupMembers, renameGroup } from 'store/entities/groups/groups.thunks.ts';
@@ -82,9 +82,14 @@ export function GroupsDrawer() {
                 gap="4"
                 className={typographyClasses.oneLineTextWrapper}
               >
-                <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
-                  {group?.name}
-                </Drawer.Title>
+                <Tooltip
+                  label={group?.name}
+                  disabled={!group?.name}
+                >
+                  <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
+                    {group?.name}
+                  </Drawer.Title>
+                </Tooltip>
                 <CopyButton options={copyButtonOptions} />
                 <ActionIcon
                   variant="transparent"

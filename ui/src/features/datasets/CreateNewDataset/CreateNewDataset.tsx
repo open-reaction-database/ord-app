@@ -66,16 +66,19 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
       submitTitle="Save"
     >
       <GroupSelector
+        withAsterisk
         disabled={isLoading}
         {...form.getInputProps('groupId')}
       />
       <TextInput
         label="Dataset name"
+        withAsterisk
         disabled={isLoading}
         {...form.getInputProps('name')}
       />
       <Textarea
         label="Description"
+        withAsterisk
         disabled={isLoading}
         {...form.getInputProps('description')}
       />

@@ -24,6 +24,8 @@ import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPrevi
 import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
 import type { EnumerationForm, EnumerationFormTransform, EnumerationSetupForm } from './enumerationSetup.types.ts';
 import { TemplateFileSelector } from './TemplateFileSelector/TemplateFileSelector.tsx';
+import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
+import { useDisclosure } from '@mantine/hooks';
 import { useCallback } from 'react';
 import { enumerationSetupExistingDatasetSchema, enumerationSetupNewDatasetSchema } from './enumerationSetup.schema.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -43,6 +45,7 @@ export function EnumerationSetup({
   onClose,
 }: Readonly<CreateDatasetFromEnumerationProps>) {
   const dispatch = useAppDispatch();
+  const [cancelConfirmOpened, { open: openCancelConfirm, close: closeCancelConfirm }] = useDisclosure(false);
   const handleSubmit = useCallback(
     (data: SetupEnumeration) => {
       dispatch(startEnumeration(data));
@@ -89,7 +92,7 @@ export function EnumerationSetup({
   return (
     <Drawer
       opened
-      onClose={onClose}
+      onClose={openCancelConfirm}
       position="right"
       title={title}
       classNames={{ content: classes.content, header: classes.header, title: classes.title, body: classes.body }}
@@ -139,12 +142,22 @@ export function EnumerationSetup({
           justify="flex-end"
           className={classes.actions}
         >
-          <Button
-            onClick={onClose}
-            variant="default"
-          >
-            Cancel
-          </Button>
+          <ConfirmPopover
+            opened={cancelConfirmOpened}
+            position="top"
+            title="Cancel enumeration setup?"
+            text="Are you sure you want to cancel? Your enumeration setup will be lost."
+            onConfirm={onClose}
+            onCancel={closeCancelConfirm}
+            target={
+              <Button
+                onClick={openCancelConfirm}
+                variant="default"
+              >
+                Cancel
+              </Button>
+            }
+          />
           <Button
             type="submit"
             color="primary"

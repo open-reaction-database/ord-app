@@ -16,6 +16,14 @@ import type { User } from 'store/entities/users/users.types.ts';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// Discriminates why adding a group member failed, so the UI can show the right message.
+export const ADD_MEMBER_ERROR = {
+  ALREADY_MEMBER: 'ALREADY_MEMBER',
+  NOT_FOUND: 'NOT_FOUND',
+  GENERIC: 'GENERIC',
+} as const;
+
 export interface Group {
   id: number;
   name: string;
