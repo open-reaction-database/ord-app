@@ -96,21 +96,6 @@ jobs:
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
-      - name: Start backend (e2e no-auth mode)
-        run: |
-          nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
-          for _ in $(seq 1 60); do
-            if curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null; then echo "backend up"; exit 0; fi
-            sleep 2
-          done
-          echo "backend failed to start"; cat /tmp/backend.log; exit 1
-        env:
-          APP_ENV: localhost
-          ORD_APP_E2E: "true"
-          PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
-          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
-          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -127,23 +112,32 @@ jobs:
           VITE_E2E_NO_AUTH: "TRUE"
           VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
 
-      - name: Start UI preview
-        working-directory: ui
-        run: |
-          nohup npm run preview > /tmp/preview.log 2>&1 &
-          for _ in $(seq 1 30); do
-            if curl -sf http://localhost:5173 > /dev/null; then echo "preview up"; exit 0; fi
-            sleep 2
-          done
-          echo "preview failed to start"; cat /tmp/preview.log; exit 1
-
       - name: Install Playwright browsers
         working-directory: ui
         run: npx playwright install --with-deps chromium
 
-      - name: Run E2E tests
-        working-directory: ui
-        run: npm run test:e2e
+      # Backend + UI preview must run in the same step as Playwright: background processes
+      # started in earlier steps do not survive into later ones on GitHub runners.
+      - name: Start servers and run E2E
+        run: |
+          set -e
+          nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          nohup npm --prefix ui run preview > /tmp/preview.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2
+          done
+          curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null || { echo "backend failed"; cat /tmp/backend.log; exit 1; }
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:5173 > /dev/null && break || sleep 2
+          done
+          curl -sf http://localhost:5173 > /dev/null || { echo "preview failed"; cat /tmp/preview.log; exit 1; }
+          npm --prefix ui run test:e2e
+        env:
+          APP_ENV: localhost
+          ORD_APP_E2E: "true"
+          PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
+          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Server logs (on failure)
         if: failure()
