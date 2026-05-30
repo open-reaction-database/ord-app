@@ -51,8 +51,18 @@ def test_authenticate_resolves_to_dev_user(api_client, e2e_mode):
     assert response.json()["email"] == E2E_EMAIL
 
 
-def test_bypass_is_disabled_in_production(monkeypatch):
-    monkeypatch.setattr(RuntimeSettings, "app_env", AppEnvs.production)
+@pytest.mark.parametrize("app_env", ["production", "Production", "PRODUCTION", "staging", ""])
+def test_bypass_is_disabled_outside_localhost(monkeypatch, app_env):
+    # The bypass is allowlisted to localhost, so even with e2e set it stays off everywhere else
+    # (including case variants of "production" and any unknown environment).
+    monkeypatch.setattr(RuntimeSettings, "app_env", app_env)
     monkeypatch.setattr(RuntimeSettings, "e2e", True)
+
+    assert e2e_auth_enabled() is False
+
+
+def test_bypass_requires_the_flag(monkeypatch):
+    monkeypatch.setattr(RuntimeSettings, "app_env", AppEnvs.localhost)
+    monkeypatch.setattr(RuntimeSettings, "e2e", False)
 
     assert e2e_auth_enabled() is False

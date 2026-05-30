@@ -30,10 +30,10 @@ E2E_USER_AUTH0_ID = "e2e|local-dev"
 def e2e_auth_enabled() -> bool:
     """Return whether the dev/test Auth0 bypass is active.
 
-    Gated on a non-production ``app_env`` so the bypass can never weaken authentication in a
-    production deployment, even if ``e2e`` is mistakenly set.
+    Allowlisted to the ``localhost`` environment (case-insensitive), so the bypass can never
+    weaken authentication in a production (or any other) deployment, even if ``e2e`` is set.
     """
-    return RuntimeSettings.e2e and RuntimeSettings.app_env != AppEnvs.production
+    return RuntimeSettings.e2e and RuntimeSettings.app_env.lower() == AppEnvs.localhost
 
 
 async def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:

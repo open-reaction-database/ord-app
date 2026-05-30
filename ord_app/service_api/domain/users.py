@@ -17,6 +17,7 @@ import httpx
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.domain.auth import authenticate
@@ -84,7 +85,14 @@ async def _provision_e2e_user(db_session: AsyncSession) -> UserModel:
     group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
 
     db_session.add_all([user, group, group_member])
-    await db_session.commit()
+    try:
+        await db_session.commit()
+    except IntegrityError:
+        # A concurrent request (e.g. parallel E2E setup) already created the dev user.
+        await db_session.rollback()
+        if existing := await user_use_case.get_user_by_auth0_id(E2E_USER_AUTH0_ID):
+            return existing
+        raise
     await db_session.refresh(user)
     return user
 
