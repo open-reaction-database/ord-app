@@ -15,7 +15,7 @@
  */
 import { DataField } from 'common/components/display/DataField/DataField.tsx';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
-import { ActionIcon, Button, Flex, Paper, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Paper, Title, Tooltip } from '@mantine/core';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { formatUtcDateToDisplay } from 'common/utils';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
@@ -110,12 +110,14 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
               Dataset
             </Title>
           )}
-          <Title
-            className={typographyClasses.oneLineText}
-            order={1}
-          >
-            {dataset.name || dataset.id}
-          </Title>
+          <Tooltip label={dataset.name || dataset.id}>
+            <Title
+              className={typographyClasses.oneLineText}
+              order={1}
+            >
+              {dataset.name || dataset.id}
+            </Title>
+          </Tooltip>
           {canDatasetBeEdited && (
             <ActionIcon
               variant="transparent"

@@ -15,7 +15,7 @@
  */
 import { useEffect, useCallback, type ChangeEvent, type MouseEvent } from 'react';
 import { useSelector } from 'react-redux';
-import { ActionIcon, Flex, Input, ScrollArea } from '@mantine/core';
+import { ActionIcon, Flex, Input, ScrollArea, Tooltip } from '@mantine/core';
 import {
   selectGroupSearch,
   selectHaveAnyGroups,
@@ -105,7 +105,9 @@ export function GroupsList() {
             >
               <div className={classes.buttonName}>
                 <GroupArrowIcon />
-                <div title={group.name}>{group.name}</div>
+                <Tooltip label={group.name}>
+                  <div>{group.name}</div>
+                </Tooltip>
               </div>
 
               <ActionIcon

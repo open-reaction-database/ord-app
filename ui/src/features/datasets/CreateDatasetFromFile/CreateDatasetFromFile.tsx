@@ -66,9 +66,13 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       submitTitle="Save"
       loading={isDatasetCreating}
     >
-      <GroupSelector {...form.getInputProps('groupId')} />
+      <GroupSelector
+        withAsterisk
+        {...form.getInputProps('groupId')}
+      />
       <FileInput
         label="Dataset file"
+        withAsterisk
         accept=".binpb,.txtpb,application/json"
         description=".binpb, .txtpb or .json | Max: 100 MB"
         {...form.getInputProps('file')}
