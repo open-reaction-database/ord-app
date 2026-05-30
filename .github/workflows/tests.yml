@@ -122,19 +122,20 @@ jobs:
         run: |
           set -e
           nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
-          nohup npm --prefix ui run preview > /tmp/preview.log 2>&1 &
+          nohup npm --prefix ui run preview -- --host 127.0.0.1 --port 5173 > /tmp/preview.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2
           done
           curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null || { echo "backend failed"; cat /tmp/backend.log; exit 1; }
           for _ in $(seq 1 30); do
-            curl -sf http://localhost:5173 > /dev/null && break || sleep 2
+            curl -sf http://127.0.0.1:5173 > /dev/null && break || sleep 2
           done
-          curl -sf http://localhost:5173 > /dev/null || { echo "preview failed"; cat /tmp/preview.log; exit 1; }
+          curl -sf http://127.0.0.1:5173 > /dev/null || { echo "preview failed"; cat /tmp/preview.log; exit 1; }
           npm --prefix ui run test:e2e
         env:
           APP_ENV: localhost
           ORD_APP_E2E: "true"
+          CORS_ORIGINS: '["http://127.0.0.1:5173"]'
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"

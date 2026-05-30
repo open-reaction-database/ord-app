@@ -17,7 +17,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 // The UI preview server (see vite.config.ts `preview.port`). The backend + UI are started by
 // the caller (the test_e2e CI job or scripts/dev-e2e.sh) with the no-auth bypass enabled.
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = 'http://127.0.0.1:5173';
 
 export default defineConfig({
   testDir: './e2e',
