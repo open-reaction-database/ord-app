@@ -82,7 +82,10 @@ export function GroupsDrawer() {
                 gap="4"
                 className={typographyClasses.oneLineTextWrapper}
               >
-                <Tooltip label={group?.name}>
+                <Tooltip
+                  label={group?.name}
+                  disabled={!group?.name}
+                >
                   <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
                     {group?.name}
                   </Drawer.Title>
