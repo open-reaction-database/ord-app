@@ -28,7 +28,6 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-14"]
-        python-version: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -45,29 +44,23 @@ jobs:
           postgres-version: "17"
           ssl: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install Poetry
-        run: |
-          pipx install poetry
+          python-version: "3.12"
 
       - name: Install dependencies
-        run: |
-          poetry add greenlet
-          poetry install --with dev --no-interaction --no-ansi
+        run: uv sync --frozen
 
       - name: Run alembic migrations
-        run: poetry run alembic upgrade head
+        run: uv run alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
-        run: poetry run pytest -vv --cov=ord_app --durations=10
+        run: uv run pytest -vv --cov=ord_app --durations=10
         env:
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"

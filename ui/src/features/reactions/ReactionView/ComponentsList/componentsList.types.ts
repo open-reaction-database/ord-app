@@ -24,8 +24,10 @@ export interface ComponentsDisplayRowCustomActions<T extends ReactionComponentBa
   actions: ReactNode;
 }
 
-export interface ComponentDisplayRowProps<T extends ReactionComponentBase>
-  extends Omit<ComponentsDisplayRowCustomActions<T>, 'actions'> {
+export interface ComponentDisplayRowProps<T extends ReactionComponentBase> extends Omit<
+  ComponentsDisplayRowCustomActions<T>,
+  'actions'
+> {
   componentPath: ReactionPathComponents;
   historyPathComponents?: Array<ReactionPathComponents>;
 }

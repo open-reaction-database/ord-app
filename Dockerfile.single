@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Stage 1: Build the React app
-FROM node:22.13-alpine AS react-build
+FROM node:22-alpine AS react-build
 
 WORKDIR /app
 
@@ -56,18 +56,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     nginx \
     supervisor \
-    ntpdate && \
+    ntpsec-ntpdate && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry
+# Install uv
+RUN pip install --no-cache-dir uv
 
-# Copy Poetry files
-COPY poetry.lock pyproject.toml ./
+ENV UV_PROJECT_ENVIRONMENT=/usr/local \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-# Install Python dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-interaction --no-ansi
+# Copy project files
+COPY uv.lock pyproject.toml ./
+
+# Install Python dependencies (production only, no dev group)
+RUN uv sync --frozen --no-dev
 
 # Copy the rest of the FastAPI app
 COPY ord_app/ ./ord_app
