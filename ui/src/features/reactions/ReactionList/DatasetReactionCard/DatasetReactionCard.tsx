@@ -19,7 +19,7 @@ import { Link, useParams } from 'wouter';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { Flex } from '@mantine/core';
+import { Flex, Tooltip } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
@@ -51,12 +51,14 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
       className={clsx(classes.titleWrapper, typographyClasses.oneLineTextWrapper)}
     >
       <span className={classes.index}>{index}.</span>
-      <Link
-        className={clsx(classes.link, typographyClasses.oneLineText)}
-        to={linkToPage}
-      >
-        {reaction.pb_reaction_id}
-      </Link>
+      <Tooltip label={reaction.pb_reaction_id}>
+        <Link
+          className={clsx(classes.link, typographyClasses.oneLineText)}
+          to={linkToPage}
+        >
+          {reaction.pb_reaction_id}
+        </Link>
+      </Tooltip>
       <CopyButton options={copyToClipboardOptions} />
       {!reaction.is_valid && (
         <Flex

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Tooltip } from '@mantine/core';
 import classes from './UserDataField.module.scss';
 import { typographyClasses } from 'common/styling';
 import clsx from 'clsx';
@@ -26,7 +27,9 @@ export function UserDataField({ fieldName, value }: Readonly<UserDataFieldProps>
   return (
     <div className={typographyClasses.oneLineTextWrapperWithContent}>
       <span className={clsx(classes.category, typographyClasses.fitContentText)}>{fieldName}:</span>
-      <span className={typographyClasses.oneLineText}>{value ?? 'Unavailable'}</span>
+      <Tooltip label={value ?? 'Unavailable'}>
+        <span className={typographyClasses.oneLineText}>{value ?? 'Unavailable'}</span>
+      </Tooltip>
     </div>
   );
 }
