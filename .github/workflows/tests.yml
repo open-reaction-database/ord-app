@@ -98,7 +98,7 @@ jobs:
 
       - name: Start backend (e2e no-auth mode)
         run: |
-          nohup uv run fastapi run ord_app/service_api/main.py --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
           for _ in $(seq 1 60); do
             if curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null; then echo "backend up"; exit 0; fi
             sleep 2

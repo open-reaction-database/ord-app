@@ -31,7 +31,7 @@ echo "Applying database migrations..."
 uv run alembic upgrade head
 
 echo "Starting backend (no-auth e2e mode) on http://127.0.0.1:8000 ..."
-uv run fastapi dev ord_app/service_api/main.py --host 127.0.0.1 --port 8000 &
+uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 --reload &
 backend_pid=$!
 trap 'kill "${backend_pid}" 2>/dev/null || true' EXIT
 
