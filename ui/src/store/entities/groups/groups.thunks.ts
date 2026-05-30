@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import axiosInstance from 'store/axiosInstance.ts';
-import type { Group, GroupMember, GroupItem } from './groups.types.ts';
+import { isAxiosError } from 'axios';
+import { ADD_MEMBER_ERROR, type Group, type GroupMember, type GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -90,13 +91,33 @@ export const addGroupMember = createThunk(addGroupMemberActions, identity => asy
   const state = getState();
   const groupId = selectEditingGroupId(state);
 
-  const member = (
-    await axiosInstance.post<GroupMember>(`/groups/${groupId}/members`, { identity, role: USER_ROLES.VIEWER })
-  ).data;
+  try {
+    const member = (
+      await axiosInstance.post<GroupMember>(`/groups/${groupId}/members`, { identity, role: USER_ROLES.VIEWER })
+    ).data;
 
-  showNotification({
-    message: `${member.user.name} has been successfully added`,
-    variant: NotificationVariant.SUCCESS,
-  });
-  return addGroupMemberActions.success({ groupId: Number(groupId), member });
+    showNotification({
+      message: `${member.user.name} has been successfully added`,
+      variant: NotificationVariant.SUCCESS,
+    });
+    return addGroupMemberActions.success({ groupId: Number(groupId), member });
+  } catch (error) {
+    // The backend returns 409 when the user is already a member of the group and 404
+    // when no user with the given identity exists; surface the right inline message.
+    const status = isAxiosError(error) ? error.response?.status : undefined;
+    if (status === 409) {
+      return addGroupMemberActions.failure(ADD_MEMBER_ERROR.ALREADY_MEMBER);
+    }
+    if (status === 404) {
+      return addGroupMemberActions.failure(ADD_MEMBER_ERROR.NOT_FOUND);
+    }
+    // Anything else (500, 403, network error, ...) is unexpected: keep it visible with a
+    // toast carrying the backend detail rather than silently mislabeling it as "no user".
+    const detail = isAxiosError(error) ? error.response?.data?.detail : undefined;
+    showNotification({
+      variant: NotificationVariant.ERROR,
+      message: typeof detail === 'string' ? detail : 'Failed to add the user. Please try again.',
+    });
+    return addGroupMemberActions.failure(ADD_MEMBER_ERROR.GENERIC);
+  }
 });
