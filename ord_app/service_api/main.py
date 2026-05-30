@@ -49,7 +49,8 @@ async def run_background_task():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(run_background_task())
+    # Keep a reference so the task isn't garbage-collected before it completes.
+    app.state.background_task = asyncio.create_task(run_background_task())
     yield
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True}, lifespan=lifespan)

@@ -20,18 +20,16 @@ from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.services.pb_utils import load_message
-from ord_app.service_api.settings import RuntimeSettings
-from ord_app.tests.conftest import create_test_dataset
+from ord_app.tests.conftest import create_test_dataset, read_testdata_bytes
 
 fake = Faker()
 
 async def test_create_reaction_with_pb(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
-    with open(RuntimeSettings.base_dir.parent/"tests"/"testdata"/"ord-nielsen-example.txtpb", "rb") as fd:
-        pb_dataset = load_message(fd.read(), Dataset, "txtpb")
-        pb_reaction = pb_dataset.reactions[0]
-        pb_reaction.reaction_id = "test"
+    pb_dataset = load_message(read_testdata_bytes("ord-nielsen-example.txtpb"), Dataset, "txtpb")
+    pb_reaction = pb_dataset.reactions[0]
+    pb_reaction.reaction_id = "test"
 
     payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
 

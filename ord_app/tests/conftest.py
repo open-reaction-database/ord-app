@@ -38,6 +38,23 @@ from ord_app.service_api.settings import RuntimeSettings
 
 fake = Faker()
 
+
+def _testdata_path(filename: str):
+    return RuntimeSettings.base_dir.parent / "tests" / "testdata" / filename
+
+
+def read_testdata_text(filename: str) -> str:
+    """Read a test-data file as text (sync helper; keeps file I/O out of async tests)."""
+    with open(_testdata_path(filename), encoding="utf-8") as fd:
+        return fd.read()
+
+
+def read_testdata_bytes(filename: str) -> bytes:
+    """Read a test-data file as bytes (sync helper; keeps file I/O out of async tests)."""
+    with open(_testdata_path(filename), "rb") as fd:
+        return fd.read()
+
+
 pg_engine = create_async_engine(RuntimeSettings.pg_test_dsn)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
 
