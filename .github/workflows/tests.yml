@@ -65,3 +65,86 @@ jobs:
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+
+  test_e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - uses: ikalnytskyi/action-setup-postgres@v7
+        with:
+          username: ord
+          password: password
+          database: test
+          port: 5432
+          postgres-version: "17"
+          ssl: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: uv sync --frozen
+
+      - name: Run alembic migrations
+        run: uv run alembic upgrade head
+        env:
+          PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+
+      - name: Start backend (e2e no-auth mode)
+        run: |
+          nohup uv run fastapi run ord_app/service_api/main.py --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          for _ in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null; then echo "backend up"; exit 0; fi
+            sleep 2
+          done
+          echo "backend failed to start"; cat /tmp/backend.log; exit 1
+        env:
+          APP_ENV: localhost
+          ORD_APP_E2E: "true"
+          PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
+          PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+          PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install UI dependencies
+        working-directory: ui
+        run: npm ci
+
+      - name: Build UI (no-auth)
+        working-directory: ui
+        run: npm run build
+        env:
+          VITE_E2E_NO_AUTH: "TRUE"
+          VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
+
+      - name: Start UI preview
+        working-directory: ui
+        run: |
+          nohup npm run preview > /tmp/preview.log 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl -sf http://localhost:5173 > /dev/null; then echo "preview up"; exit 0; fi
+            sleep 2
+          done
+          echo "preview failed to start"; cat /tmp/preview.log; exit 1
+
+      - name: Install Playwright browsers
+        working-directory: ui
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        working-directory: ui
+        run: npm run test:e2e
+
+      - name: Server logs (on failure)
+        if: failure()
+        run: cat /tmp/backend.log /tmp/preview.log || true
