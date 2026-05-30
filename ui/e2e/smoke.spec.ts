@@ -24,14 +24,18 @@ test('loads the authenticated app without Auth0 and shows the Datasets page', as
     if (message.type() === 'error') diagnostics.push(`console.error: ${message.text()}`);
   });
   page.on('pageerror', error => diagnostics.push(`pageerror: ${error.message}`));
-  page.on('requestfailed', request =>
-    diagnostics.push(`requestfailed: ${request.url()} -> ${request.failure()?.errorText}`),
-  );
+  page.on('crash', () => diagnostics.push('PAGE CRASHED'));
+  page.on('requestfailed', request => {
+    if (!request.url().includes('google-analytics')) {
+      diagnostics.push(`requestfailed: ${request.url()} -> ${request.failure()?.errorText}`);
+    }
+  });
 
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' }).catch(error => {
     diagnostics.push(`goto threw: ${error.message}`);
     return null;
   });
+  await page.waitForTimeout(15_000);
   console.log(`E2E DIAG: gotoStatus=${response?.status()} url=${page.url()} :: ${diagnostics.join(' | ')}`);
 
   // "/" redirects to "/datasets" (client-side, after the dev user is provisioned) — and
