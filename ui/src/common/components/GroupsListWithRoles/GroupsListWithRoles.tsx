@@ -17,7 +17,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import classes from './GroupsListWithRoles.module.scss';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
-import { Popover, Text } from '@mantine/core';
+import { Popover, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import { USER_ROLES } from 'common/types';
@@ -42,7 +42,9 @@ const roleOrder = {
 
 const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
   <>
-    <Text className={clsx(classes.groupName, typographyClasses.oneLineText)}>{name}: </Text>
+    <Tooltip label={name}>
+      <Text className={clsx(classes.groupName, typographyClasses.oneLineText)}>{name}: </Text>
+    </Tooltip>
     <span className={classes.groupRole}>{role} </span>
   </>
 );

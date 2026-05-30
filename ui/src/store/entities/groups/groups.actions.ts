@@ -47,7 +47,7 @@ export const removeGroupMembersActions = createAsyncAction<
   { groupId: number; membersId: Array<number> }
 >('remove_group_members');
 
-export const addGroupMemberActions = createAsyncAction<string, { groupId: number; member: GroupMember }>(
+export const addGroupMemberActions = createAsyncAction<string, { groupId: number; member: GroupMember }, string | null>(
   'add_group_member',
 );
 
