@@ -26,4 +26,5 @@ export const isNoAuthEnabled = (env: { PROD: boolean; VITE_E2E_NO_AUTH?: string 
 
 export const noAuth = isNoAuthEnabled(import.meta.env);
 
-export const e2eDevToken = (import.meta.env.VITE_E2E_DEV_TOKEN as string) || 'e2e-dev-token';
+// Gated on `noAuth` so the fallback literal is never the effective value in a production bundle.
+export const e2eDevToken = noAuth ? (import.meta.env.VITE_E2E_DEV_TOKEN as string) || 'e2e-dev-token' : '';

@@ -58,9 +58,16 @@ export function useAuth() {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
+    // Provision the mock user once with the static dev token (requires the backend e2e mode, #664).
+    // Kept in its own effect with a [dispatch]-only dep so changing Auth0 function references
+    // (unused in this path) can't trigger duplicate provisioning calls.
     if (noAuth) {
-      // Provision the mock user with the static dev token (requires the backend e2e mode, #664).
       dispatch(createUser({ access_token: e2eDevToken, id_token: e2eDevToken }));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (noAuth) {
       return;
     }
 
