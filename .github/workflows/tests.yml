@@ -105,24 +105,19 @@ jobs:
         working-directory: ui
         run: npm ci
 
-      - name: Build UI (no-auth)
-        working-directory: ui
-        run: npm run build
-        env:
-          VITE_E2E_NO_AUTH: "TRUE"
-          VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
-
       - name: Install Playwright browsers
         working-directory: ui
         run: npx playwright install --with-deps chromium
 
-      # Backend + UI preview must run in the same step as Playwright: background processes
+      # The UI is served via the dev server (vite dev), not a production build: the no-auth
+      # bypass is hard-gated off in production builds (import.meta.env.PROD), so e2e must use
+      # dev mode. Backend + UI + Playwright all run in one step because background processes
       # started in earlier steps do not survive into later ones on GitHub runners.
       - name: Start servers and run E2E
         run: |
           set -e
           nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
-          nohup npm --prefix ui run preview -- --host 127.0.0.1 --port 5173 > /tmp/preview.log 2>&1 &
+          nohup npm --prefix ui run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2
           done
@@ -130,16 +125,18 @@ jobs:
           for _ in $(seq 1 30); do
             curl -sf http://127.0.0.1:5173 > /dev/null && break || sleep 2
           done
-          curl -sf http://127.0.0.1:5173 > /dev/null || { echo "preview failed"; cat /tmp/preview.log; exit 1; }
+          curl -sf http://127.0.0.1:5173 > /dev/null || { echo "ui failed"; cat /tmp/ui.log; exit 1; }
           npm --prefix ui run test:e2e
         env:
           APP_ENV: localhost
           ORD_APP_E2E: "true"
           CORS_ORIGINS: '["http://127.0.0.1:5173"]'
+          VITE_E2E_NO_AUTH: "TRUE"
+          VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Server logs (on failure)
         if: failure()
-        run: cat /tmp/backend.log /tmp/preview.log || true
+        run: cat /tmp/backend.log /tmp/ui.log || true
