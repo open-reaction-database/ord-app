@@ -92,7 +92,7 @@ export function EnumerationSetup({
   return (
     <Drawer
       opened
-      onClose={onClose}
+      onClose={openCancelConfirm}
       position="right"
       title={title}
       classNames={{ content: classes.content, header: classes.header, title: classes.title, body: classes.body }}
