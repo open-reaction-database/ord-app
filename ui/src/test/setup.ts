@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe } from 'vitest';
 
-describe('Dummy spec file', () => {
-  it('First test', () => {
-    expect(true).toEqual(true);
-  });
-});
+// Registers jest-dom matchers (toBeInTheDocument, etc.). @testing-library/react auto-cleans
+// the DOM after each test when Vitest globals are enabled.
+import '@testing-library/jest-dom/vitest';
