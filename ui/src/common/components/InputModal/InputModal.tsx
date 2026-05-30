@@ -89,6 +89,7 @@ export function InputModal({
         <TextInput
           className={classes.inputWrapper}
           label={inputLabel}
+          withAsterisk
           placeholder={inputPlaceholder || ''}
           {...getInputProps('value')}
         />
