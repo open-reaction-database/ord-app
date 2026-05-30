@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { AxiosError, type AxiosResponse } from 'axios';
-import { getErrorDetails, handleApiError } from './handleApiError.ts';
+import { handleApiError } from './handleApiError.ts';
 
 const axiosErrorWith = (status: number, data: unknown = {}): AxiosError =>
   new AxiosError('request failed', 'ERR_BAD_RESPONSE', undefined, undefined, {
@@ -40,6 +40,6 @@ describe('handleApiError', () => {
   });
 
   it('returns a 500 RejectValue for non-axios errors', () => {
-    expect(getErrorDetails(new Error('boom'))).toEqual({ errorCode: 500, errorMessage: 'Unknown error' });
+    expect(handleApiError(new Error('boom'))).toEqual({ errorCode: 500, errorMessage: 'Unknown error' });
   });
 });
