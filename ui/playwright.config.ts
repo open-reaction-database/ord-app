@@ -28,6 +28,9 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: 'on-first-retry',
+    // --disable-dev-shm-usage avoids renderer crashes on heavy WASM pages (Ketcher/Indigo) in
+    // CI containers where /dev/shm is small; --no-sandbox is required on CI runners.
+    launchOptions: { args: ['--no-sandbox', '--disable-dev-shm-usage'] },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

@@ -34,8 +34,9 @@ test('loads the authenticated app without Auth0 and shows the Datasets page', as
   });
   console.log(`E2E DIAG: gotoStatus=${response?.status()} url=${page.url()} :: ${diagnostics.join(' | ')}`);
 
-  // "/" redirects to "/datasets" — and crucially we stay on the app, not the Auth0 domain.
-  await expect(page).toHaveURL(/\/datasets/);
+  // "/" redirects to "/datasets" (client-side, after the dev user is provisioned) — and
+  // crucially we stay on the app, not the Auth0 domain.
+  await expect(page).toHaveURL(/\/datasets/, { timeout: 30_000 });
 
   // The Datasets list heading only renders once the dev user has been provisioned.
   await expect(page.getByRole('heading', { name: 'Datasets', level: 1 })).toBeVisible({ timeout: 30_000 });
