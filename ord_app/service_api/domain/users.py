@@ -25,7 +25,7 @@ from ord_app.service_api.repositories.groups import GroupRepository
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema, UserUpdateSchema
-from ord_app.service_api.services.auth0 import verify_access_token
+from ord_app.service_api.services.auth0 import E2E_USER_AUTH0_ID, e2e_auth_enabled, verify_access_token
 from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -64,7 +64,35 @@ def get_user_use_case(
     return UserUseCase(db=db, current_user=current_user)
 
 
+async def _provision_e2e_user(db_session: AsyncSession) -> UserModel:
+    """Idempotently provision the fixed dev user for the no-auth E2E bypass.
+
+    Mirrors the normal provisioning (a user owning a default admin group) so the rest of the app
+    behaves identically, without decoding a real Auth0 token or calling the Auth0 userinfo API.
+    """
+    user_use_case = UserUseCase(db_session)
+    if user := await user_use_case.get_user_by_auth0_id(E2E_USER_AUTH0_ID):
+        return user
+
+    user = UserModel(
+        email="e2e@example.com",
+        name="E2E User",
+        external_id=E2E_USER_AUTH0_ID,
+        auth0_id=E2E_USER_AUTH0_ID,
+    )
+    group = GroupModel(name="default", owner=user)
+    group_member = UserGroupsMembershipModel(user=user, group=group, role="admin")
+
+    db_session.add_all([user, group, group_member])
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
 async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
+    if e2e_auth_enabled():
+        return await _provision_e2e_user(db_session)
+
     user_use_case = UserUseCase(db_session)
 
     # Decode token

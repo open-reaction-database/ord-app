@@ -17,13 +17,28 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
 from starlette.concurrency import run_in_threadpool
 
+from ord_app.service_api.constants import AppEnvs
 from ord_app.service_api.services.exceptions import ForbiddenError, UnauthenticatedError
 from ord_app.service_api.settings import RuntimeSettings
 
 jwks_client = jwt.PyJWKClient(f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json")
 
+# Identity used for the dev/test no-auth bypass (see ``e2e_auth_enabled``).
+E2E_USER_AUTH0_ID = "e2e|local-dev"
+
+
+def e2e_auth_enabled() -> bool:
+    """Return whether the dev/test Auth0 bypass is active.
+
+    Gated on a non-production ``app_env`` so the bypass can never weaken authentication in a
+    production deployment, even if ``e2e`` is mistakenly set.
+    """
+    return RuntimeSettings.e2e and RuntimeSettings.app_env != AppEnvs.production
+
 
 async def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
+    if e2e_auth_enabled():
+        return {"sub": E2E_USER_AUTH0_ID}
     return await _verify_token(
         token,
         algorithms=RuntimeSettings.auth0_algorithms,

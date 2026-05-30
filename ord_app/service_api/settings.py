@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     app_env: str = AppEnvs.production
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
+    # Dev/test-only Auth0 bypass for local development and E2E (see #664). Ignored unless
+    # app_env is non-production (see ``e2e_auth_enabled``), so it can never weaken prod auth.
+    e2e: bool = Field(False, validation_alias="ord_app_e2e")
+
     # databases
     pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"  # NOSONAR
     # Alembic can't work with asynchronous driver
