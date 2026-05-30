@@ -13,7 +13,7 @@
 # limitations under the License.
 import asyncio
 import sys
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 import asyncpg
 import psycopg.errors
@@ -52,6 +52,10 @@ async def lifespan(app: FastAPI):
     # Keep a reference so the task isn't garbage-collected before it completes.
     app.state.background_task = asyncio.create_task(run_background_task())
     yield
+    # On shutdown, cancel the background task so it isn't force-killed mid-DB-session.
+    app.state.background_task.cancel()
+    with suppress(asyncio.CancelledError):
+        await app.state.background_task
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True}, lifespan=lifespan)
 
