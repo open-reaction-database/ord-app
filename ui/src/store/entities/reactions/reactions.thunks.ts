@@ -198,7 +198,7 @@ export const searchReaction = createThunkWithExplicitResult(
     try {
       const result = (
         await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/search`, {
-          params: { pb_reaction_id: reactionPbId },
+          params: { pb_reaction_id: reactionPbId.trim() },
         })
       ).data;
       const parsedReaction = parseReaction(result);
