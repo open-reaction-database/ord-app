@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe } from 'vitest';
 
-describe('Dummy spec file', () => {
-  it('First test', () => {
-    expect(true).toEqual(true);
-  });
+// Registers jest-dom matchers (toBeInTheDocument, etc.) and cleans up the DOM after each test.
+import '@testing-library/jest-dom/vitest';
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
+afterEach(() => {
+  cleanup();
 });
