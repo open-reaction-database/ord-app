@@ -19,7 +19,20 @@ import { test, expect } from '@playwright/test';
 // backend e2e mode enabled, the app must load without redirecting to Auth0 and render the
 // authenticated shell. Reaching the Datasets page proves the dev user was provisioned.
 test('loads the authenticated app without Auth0 and shows the Datasets page', async ({ page }) => {
-  await page.goto('/');
+  const diagnostics: Array<string> = [];
+  page.on('console', message => {
+    if (message.type() === 'error') diagnostics.push(`console.error: ${message.text()}`);
+  });
+  page.on('pageerror', error => diagnostics.push(`pageerror: ${error.message}`));
+  page.on('requestfailed', request =>
+    diagnostics.push(`requestfailed: ${request.url()} -> ${request.failure()?.errorText}`),
+  );
+
+  const response = await page.goto('/', { waitUntil: 'domcontentloaded' }).catch(error => {
+    diagnostics.push(`goto threw: ${error.message}`);
+    return null;
+  });
+  console.log(`E2E DIAG: gotoStatus=${response?.status()} url=${page.url()} :: ${diagnostics.join(' | ')}`);
 
   // "/" redirects to "/datasets" — and crucially we stay on the app, not the Auth0 domain.
   await expect(page).toHaveURL(/\/datasets/);
