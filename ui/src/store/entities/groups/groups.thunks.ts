@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import axiosInstance from 'store/axiosInstance.ts';
-import type { Group, GroupMember, GroupItem } from './groups.types.ts';
+import { isAxiosError } from 'axios';
+import { ADD_MEMBER_ERROR, type Group, type GroupMember, type GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -90,13 +91,20 @@ export const addGroupMember = createThunk(addGroupMemberActions, identity => asy
   const state = getState();
   const groupId = selectEditingGroupId(state);
 
-  const member = (
-    await axiosInstance.post<GroupMember>(`/groups/${groupId}/members`, { identity, role: USER_ROLES.VIEWER })
-  ).data;
+  try {
+    const member = (
+      await axiosInstance.post<GroupMember>(`/groups/${groupId}/members`, { identity, role: USER_ROLES.VIEWER })
+    ).data;
 
-  showNotification({
-    message: `${member.user.name} has been successfully added`,
-    variant: NotificationVariant.SUCCESS,
-  });
-  return addGroupMemberActions.success({ groupId: Number(groupId), member });
+    showNotification({
+      message: `${member.user.name} has been successfully added`,
+      variant: NotificationVariant.SUCCESS,
+    });
+    return addGroupMemberActions.success({ groupId: Number(groupId), member });
+  } catch (error) {
+    // The backend returns 409 when the user is already a member of the group and 404
+    // when no user with the given identity exists; surface the right inline message.
+    const status = isAxiosError(error) ? error.response?.status : undefined;
+    return addGroupMemberActions.failure(status === 409 ? ADD_MEMBER_ERROR.ALREADY_MEMBER : ADD_MEMBER_ERROR.NOT_FOUND);
+  }
 });

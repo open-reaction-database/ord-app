@@ -25,6 +25,7 @@ import {
   selectMemberRoles,
 } from 'store/entities/groups/groups.selectors.ts';
 import { addGroupMember } from 'store/entities/groups/groups.thunks.ts';
+import { ADD_MEMBER_ERROR } from 'store/entities/groups/groups.types.ts';
 import { resetAddMemberErrorAction, setAddMemberInputValueAction } from 'store/entities/groups/groups.actions.ts';
 import classes from './AddMemberInput.module.scss';
 
@@ -69,7 +70,9 @@ export function AddMemberInput() {
                 color="red"
                 className={classes.icon}
               />
-              There is no user in ORD with this identifier yet
+              {inputError === ADD_MEMBER_ERROR.ALREADY_MEMBER
+                ? 'User with this identifier is already added to this group'
+                : 'There is no user in ORD with this identifier yet'}
             </Group>
           )
         }
