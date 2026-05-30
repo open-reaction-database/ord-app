@@ -26,6 +26,8 @@ set -euo pipefail
 
 export APP_ENV="${APP_ENV:-localhost}"
 export ORD_APP_E2E="${ORD_APP_E2E:-true}"
+# Match the UI origin (127.0.0.1:5173) below; the backend default only allows localhost:5173.
+export CORS_ORIGINS="${CORS_ORIGINS:-[\"http://127.0.0.1:5173\"]}"
 
 echo "Applying database migrations..."
 uv run alembic upgrade head
@@ -35,5 +37,5 @@ uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 &
 backend_pid=$!
 trap 'kill "${backend_pid}" 2>/dev/null || true' EXIT
 
-echo "Starting UI (no-auth) on http://localhost:5173 ..."
-( cd ui && VITE_E2E_NO_AUTH=TRUE npm run dev )
+echo "Starting UI (no-auth) on http://127.0.0.1:5173 ..."
+( cd ui && VITE_E2E_NO_AUTH=TRUE npm run dev -- --host 127.0.0.1 --port 5173 )
