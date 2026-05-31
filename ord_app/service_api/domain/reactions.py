@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import UTC, datetime
+from typing import cast
 from uuid import uuid4
 
 from fastapi import Depends
@@ -51,9 +52,11 @@ async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = 
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
         for reaction in reactions:
-            pb_reaction = None
+            pb_reaction: Reaction | None = None
             if reaction.binpb is not None:
-                pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
+                # run_in_threadpool erases load_message's generic to the constraint union; we
+                # passed Reaction, so the result is a Reaction.
+                pb_reaction = cast(Reaction, await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb"))
 
             is_valid, *_ = await async_validate_pb_reaction(pb_reaction)
             update_values.append({"id": reaction.id, "is_valid": is_valid})
@@ -103,7 +106,7 @@ class ReactionsUseCase:
 
     async def create(self, dataset_id: int, payload: ReactionCreateSchema):
         try:
-            pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
+            pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to load reaction dataset_id={dataset_id}, kind=binpb: {e}")
             raise ProtobufDecodeError("An error occurred while load reaction.") from e
@@ -133,7 +136,7 @@ class ReactionsUseCase:
 
     async def upload(self, dataset_id: int, file_data, kind):
         try:
-            pb_reaction = await run_in_threadpool(load_message, file_data, Reaction, kind)
+            pb_reaction = cast(Reaction, await run_in_threadpool(load_message, file_data, Reaction, kind))
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(f"Failed to read the file dataset_id={dataset_id}, kind={kind}: {e}")
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
@@ -169,7 +172,7 @@ class ReactionsUseCase:
         raise EntityNotFoundError(f"Reaction with {kwargs} not found")
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
-        pb_reaction = await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb")
+        pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
         pb_reaction_id = (pb_reaction.reaction_id or "").strip()
         if len(pb_reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
             raise UnprocessableEntityError(
