@@ -1,0 +1,37 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { describe, it, expect } from 'vitest';
+import { emptyFieldMessage, requiredTextField } from './requiredTextField.schema.ts';
+
+describe('emptyFieldMessage', () => {
+  it('builds a label-specific message', () => {
+    expect(emptyFieldMessage('Name')).toBe('Name should not be empty');
+  });
+});
+
+describe('requiredTextField', () => {
+  it('accepts a non-empty value', async () => {
+    await expect(requiredTextField('Name').validate('ethanol')).resolves.toBe('ethanol');
+  });
+
+  it('rejects an empty string with the empty-field message', async () => {
+    await expect(requiredTextField('Name').validate('')).rejects.toThrow('Name should not be empty');
+  });
+
+  it('rejects a whitespace-only value', async () => {
+    await expect(requiredTextField('Name').isValid('   ')).resolves.toBe(false);
+  });
+});
