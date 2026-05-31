@@ -48,6 +48,5 @@ async def test_delete_foreign_template(api_client, mock_authenticated_user, test
 
 
 async def test_delete_non_existent_template(api_client, mock_authenticated_user):
-    user, *_, = mock_authenticated_user
     response = api_client.delete("/api/v1/templates/100500")
     assert response.status_code == status.HTTP_404_NOT_FOUND

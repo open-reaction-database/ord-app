@@ -19,7 +19,7 @@ from ord_schema.proto.reaction_pb2 import Reaction
 faker = Faker()
 
 async def test_create_enumerate_dataset(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
     payload = {
         "name": faker.name(),
         "description": faker.text(),

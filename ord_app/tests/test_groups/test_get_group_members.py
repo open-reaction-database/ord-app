@@ -14,7 +14,7 @@
 
 
 async def test_list_current_user_groups(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     response_data = api_client.get("/api/v1/groups").raise_for_status().json()[0]
 
@@ -24,7 +24,7 @@ async def test_list_current_user_groups(api_client, mock_authenticated_user):
 
 
 async def test_get_group(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     response_data = api_client.get(f"/api/v1/groups/{group.id}").raise_for_status().json()
 

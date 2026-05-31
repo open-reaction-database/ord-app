@@ -163,7 +163,7 @@ class ReactionsUseCase:
 
     async def get(self, dataset_id: int, reaction_id: int):
         if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
-            is_valid, errors, warning = await async_validate_pb_reaction(reaction.pb)
+            _, errors, warning = await async_validate_pb_reaction(reaction.pb)
             reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
