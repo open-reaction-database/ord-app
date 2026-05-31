@@ -31,7 +31,7 @@ describe('requiredTextField', () => {
     await expect(requiredTextField('Name').validate('')).rejects.toThrow('Name should not be empty');
   });
 
-  it('rejects a whitespace-only value', async () => {
-    await expect(requiredTextField('Name').isValid('   ')).resolves.toBe(false);
+  it('rejects a whitespace-only value with the empty-field message', async () => {
+    await expect(requiredTextField('Name').validate('   ')).rejects.toThrow('Name should not be empty');
   });
 });
