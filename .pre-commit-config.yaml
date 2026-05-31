@@ -1,0 +1,64 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Run `uv run pre-commit install` once to enable these hooks locally.
+repos:
+  # License headers. addlicense stamps the Apache header on any file missing it
+  # and (in CI, via `addlicense -check`) treats the copyright year as a wildcard,
+  # so new files use the current year without tripping the check.
+  - repo: https://github.com/google/addlicense
+    rev: v1.2.0
+    hooks:
+      - id: addlicense
+        args:
+          - -c
+          - Open Reaction Database Project Authors
+          - -l
+          - apache
+
+  # Python lint + format. Scoped to ord_app/ to match CI (`ruff check ord_app/`)
+  # and to leave the generated alembic migrations untouched.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Keep in sync with the ruff version pinned in uv.lock so the hook and the
+    # `ruff format --check` CI step never disagree.
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^ord_app/
+      - id: ruff-format
+        files: ^ord_app/
+
+  # UI lint + format. Delegated to the tools already installed under ui/ via
+  # their npm scripts (run `npm ci` in ui/ first).
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier (ui)
+        entry: npm --prefix ui run prettier
+        language: system
+        files: ^ui/
+        pass_filenames: false
+      - id: eslint
+        name: eslint (ui)
+        entry: npm --prefix ui run lint:fix
+        language: system
+        files: ^ui/.*\.(ts|tsx|cjs|mjs)$
+        pass_filenames: false
+      - id: stylelint
+        name: stylelint (ui)
+        entry: npm --prefix ui run lint:css:fix
+        language: system
+        files: ^ui/.*\.s?css$
+        pass_filenames: false

@@ -27,7 +27,6 @@ from ord_app.service_api.services.resolvers import canonicalize_smiles_cached, n
 router = APIRouter(tags=["utilities"])
 
 
-
 def adjust_error(error: str) -> str:
     """Strips the message name from errors to make them more readable."""
     fields = error.split(":")

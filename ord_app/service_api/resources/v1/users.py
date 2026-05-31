@@ -35,8 +35,6 @@ async def get_user(user_id: int, use_case: Annotated[UserUseCase, Depends(get_us
 
 @router.patch("/{user_id}", response_model=UserResponseSchema)
 async def update_user(
-    user_id: int,
-    payload: UserUpdateSchema,
-    use_case: Annotated[UserUseCase, Depends(get_user_use_case)]
+    user_id: int, payload: UserUpdateSchema, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]
 ):
     return await use_case.update(user_id, payload)

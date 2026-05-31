@@ -40,6 +40,7 @@ class AbstractRepository(ABC, Generic[T]):
     async def get(self, **kwargs) -> Optional[T]:
         pass
 
+
 class BaseRepository(AbstractRepository[T]):
     @staticmethod
     def _get_filter_stmt(model: Any, **kwargs: Any) -> List[BinaryExpression]:
@@ -49,14 +50,9 @@ class BaseRepository(AbstractRepository[T]):
                 raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
 
             attr = getattr(model, field_name)
-            ft = filters_map.get(
-                type(field_value),
-                lambda field, value: field == value
-            )(attr, field_value)
+            ft = filters_map.get(type(field_value), lambda field, value: field == value)(attr, field_value)
 
-            filters.append(
-                ft
-            )
+            filters.append(ft)
         return filters
 
     async def create(self, payload: dict) -> T:

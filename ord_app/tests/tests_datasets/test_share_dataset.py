@@ -41,10 +41,14 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
 
     # share primary dataset by primary user to the secondary user
     set_user_auth(primary_user)
-    share_response_data = api_client.post(
-        f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
-        json={"secondary_group_id": secondary_group.id}
-    ).raise_for_status().json()
+    share_response_data = (
+        api_client.post(
+            f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
+            json={"secondary_group_id": secondary_group.id},
+        )
+        .raise_for_status()
+        .json()
+    )
     assert share_response_data == {"dataset_id": primary_dataset.id, "group_id": secondary_group.id}
 
     # now secondary user should have 1 dataset with the primary id
@@ -60,12 +64,12 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert False is secondary_user_dataset["is_sharable"]
     secondary_share_response = api_client.post(
         f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
-        json={"secondary_group_id": foreign_group.id}
+        json={"secondary_group_id": foreign_group.id},
     )
     assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
     secondary_share_response = api_client.post(
         f"/api/v1/groups/{secondary_group.id}/datasets/{primary_dataset.id}/share",
-        json={"secondary_group_id": foreign_group.id}
+        json={"secondary_group_id": foreign_group.id},
     )
     assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
 
@@ -84,7 +88,7 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     # unshare dataset from the secondary user
     api_client.post(
         f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/unshare",
-        json={"secondary_group_id": secondary_group.id}
+        json={"secondary_group_id": secondary_group.id},
     ).raise_for_status()
 
     # check how many datasets secondary user has now
@@ -100,7 +104,6 @@ async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_us
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
     response = api_client.post(
-        f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share",
-        json={"secondary_group_id": group.id}
+        f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share", json={"secondary_group_id": group.id}
     )
     assert status.HTTP_422_UNPROCESSABLE_ENTITY == response.status_code

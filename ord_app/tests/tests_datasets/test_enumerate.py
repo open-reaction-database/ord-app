@@ -18,6 +18,7 @@ from ord_schema.proto.reaction_pb2 import Reaction
 
 faker = Faker()
 
+
 async def test_create_enumerate_dataset(api_client, mock_authenticated_user, test_db_session):
     *_, group = mock_authenticated_user
     payload = {
@@ -26,12 +27,17 @@ async def test_create_enumerate_dataset(api_client, mock_authenticated_user, tes
         "reactions": [
             b64encode(Reaction(reaction_id=faker.uuid4()).SerializeToString()).decode(),
             b64encode(Reaction(reaction_id=faker.uuid4()).SerializeToString()).decode(),
-        ]
+        ],
     }
 
-    dataset = api_client.post(
-        f"/api/v1/groups/{group.id}/datasets/enumerate", json=payload,
-    ).raise_for_status().json()
+    dataset = (
+        api_client.post(
+            f"/api/v1/groups/{group.id}/datasets/enumerate",
+            json=payload,
+        )
+        .raise_for_status()
+        .json()
+    )
     response_data = api_client.get(f"/api/v1/datasets/{dataset['id']}").raise_for_status().json()
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
@@ -48,7 +54,8 @@ async def test_create_enumerate_dataset(api_client, mock_authenticated_user, tes
         ]
     }
     api_client.post(
-        f"/api/v1/datasets/{dataset['id']}/enumerate/extend", json=payload,
+        f"/api/v1/datasets/{dataset['id']}/enumerate/extend",
+        json=payload,
     )
 
     response_data = api_client.get(f"/api/v1/datasets/{dataset['id']}/reactions").raise_for_status().json()

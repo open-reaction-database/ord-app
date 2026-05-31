@@ -9,27 +9,14 @@
     "build": "tsc -b && vite build",
     "prettier": "prettier --write .",
     "lint": "eslint src *.ts *.cjs *.mjs",
+    "lint:fix": "eslint --fix src *.ts *.cjs *.mjs",
     "lint:css": "stylelint '**/*.[s]css'",
+    "lint:css:fix": "stylelint --fix '**/*.[s]css'",
     "lint:check": "prettier --check . && npm run lint && npm run lint:css",
     "preview": "vite preview",
-    "prepare": "cd .. && husky ./ui/.husky",
-    "add-license": "license-check-and-add add",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test"
-  },
-  "lint-staged": {
-    "(*.ts|*.tsx|*.cjs|*.mjs)": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.[s]css": [
-      "prettier --write",
-      "stylelint --fix"
-    ],
-    "*": [
-      "license-check-and-add add"
-    ]
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
@@ -79,9 +66,6 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "happy-dom": "^20.9.0",
-    "husky": "^9.1.7",
-    "license-check-and-add": "^4.0.5",
-    "lint-staged": "^15.2.10",
     "postcss": "^8.4.49",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",

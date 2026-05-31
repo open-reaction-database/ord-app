@@ -99,17 +99,17 @@ async def test_order_datasets(api_client, mock_authenticated_user, test_db_sessi
     test_db_session.add(dataset2)
     await test_db_session.commit()
 
-    test_db_session.add_all([
-        DatasetGroupAssociationModel(dataset=dataset1, group=group),
-        DatasetGroupAssociationModel(dataset=dataset2, group=group)
-    ])
+    test_db_session.add_all(
+        [
+            DatasetGroupAssociationModel(dataset=dataset1, group=group),
+            DatasetGroupAssociationModel(dataset=dataset2, group=group),
+        ]
+    )
     await test_db_session.commit()
     await test_db_session.flush()
 
     response_data = api_client.get("/api/v1/datasets").raise_for_status().json()
 
-    assert (
-        datetime.strptime(response_data["items"][0]["modified_at"], '%Y-%m-%dT%H:%M:%S.%f')
-        >
-        datetime.strptime(response_data["items"][1]["modified_at"], '%Y-%m-%dT%H:%M:%S.%f')
+    assert datetime.strptime(response_data["items"][0]["modified_at"], "%Y-%m-%dT%H:%M:%S.%f") > datetime.strptime(
+        response_data["items"][1]["modified_at"], "%Y-%m-%dT%H:%M:%S.%f"
     )

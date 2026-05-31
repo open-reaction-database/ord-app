@@ -20,7 +20,10 @@ fake = Faker()
 
 
 async def test_get_all_user_templates(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     user2, _ = await create_test_user_with_group(test_db_session)
     template = await create_template(test_db_session, user.id)
     await create_template(test_db_session, user2.id)
@@ -28,11 +31,14 @@ async def test_get_all_user_templates(api_client, mock_authenticated_user, test_
     response_data = api_client.get("/api/v1/templates").raise_for_status().json()
     assert len(response_data) == 1
     assert response_data[0]["id"] == template.id
-    assert response_data[0]["molblocks"] == {'inputs': {}, 'outcomes': [], 'workups': []}
+    assert response_data[0]["molblocks"] == {"inputs": {}, "outcomes": [], "workups": []}
 
 
 async def test_get_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     template = await create_template(test_db_session, user.id)
 
     response_data = api_client.get(f"/api/v1/templates/{template.id}").raise_for_status().json()
@@ -40,7 +46,10 @@ async def test_get_template(api_client, mock_authenticated_user, test_db_session
 
 
 async def test_get_foreign_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     user2, _ = await create_test_user_with_group(test_db_session)
     await create_template(test_db_session, user.id)
     template2 = await create_template(test_db_session, user2.id)

@@ -50,19 +50,41 @@ dev = [
     "pytype>=2024.10.11",
     "pytest-asyncio>=0.25.3,<0.26",
     "ruff>=0.9.9,<0.10",
+    "pre-commit>=4.0,<5",
 ]
 
 [tool.uv]
 package = false
 
-[tool.black]
+# Ruff config lives here (single source of truth); the former root ruff.toml
+# took precedence over [tool.ruff] and has been folded in.
+[tool.ruff]
+# Same as Black.
 line-length = 120
+indent-width = 4
+# Assume Python 3.12.
+target-version = "py312"
 
-[tool.isort]
-skip_glob = ["**/*_pb2.py*"]
-line_length = 120
-profile = "black"
-known_third_party = ["ord_schema"]
+[tool.ruff.lint]
+# Pyflakes (F), a subset of pycodestyle (E), import sorting (I), bugbear (B).
+select = ["E4", "E7", "E9", "F", "I", "B"]
+ignore = ["B008"]
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.isort]
+# ord_schema is an external dependency; pin its classification so import
+# ordering is deterministic even when the environment is not fully resolved.
+known-third-party = ["ord_schema"]
+
+[tool.ruff.format]
+# Like Black: double quotes, space indent, respect magic trailing commas.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.pytype]
 inputs = ["ord_app"]

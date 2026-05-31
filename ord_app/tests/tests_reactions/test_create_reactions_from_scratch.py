@@ -36,4 +36,3 @@ async def test_create_reaction_from_scratch(api_client, mock_authenticated_user,
     assert experimenter.email == person.email == user.email
     assert experimenter.name == person.name == user.name
     assert experimenter.orcid == person.orcid == user.orcid_id
-

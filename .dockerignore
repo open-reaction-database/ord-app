@@ -16,6 +16,5 @@ Dockerfile.single
 format.sh
 Makefile
 MANIFEST.in
-ruff.toml
 
 ui/node_modules/

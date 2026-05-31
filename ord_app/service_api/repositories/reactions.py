@@ -23,12 +23,7 @@ from ord_app.service_api.repositories.base import BaseRepository
 class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
 
-    async def get_by_reaction_ids_gen(
-        self,
-        dataset_id: int,
-        pb_reaction_ids: list[str],
-        max_num_query_args=10_000
-    ):
+    async def get_by_reaction_ids_gen(self, dataset_id: int, pb_reaction_ids: list[str], max_num_query_args=10_000):
         for batch in batched(pb_reaction_ids, max_num_query_args):
             for item in await self.filter(dataset_id=dataset_id, pb_reaction_id=batch):
                 yield item
@@ -68,11 +63,7 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
         return reaction
 
     def all_reactions_stmt(self, dataset_id: int, is_valid_query: dict | None = None):
-        stmt = (
-            select(ReactionModel)
-            .where(ReactionModel.dataset_id == dataset_id)
-            .order_by(ReactionModel.id)
-        )
+        stmt = select(ReactionModel).where(ReactionModel.dataset_id == dataset_id).order_by(ReactionModel.id)
 
         if is_valid_query is not None:
             or_stmt = []
@@ -91,10 +82,7 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
             logger.debug("Bulk reaction created with payload")
 
     async def find_duplicated_by_pb_reaction_id(
-        self,
-        dataset_id: int,
-        pb_reaction_id,
-        exclude_pb_reaction_ids: list[str]
+        self, dataset_id: int, pb_reaction_id, exclude_pb_reaction_ids: list[str]
     ):
         stmt = (
             select(ReactionModel)

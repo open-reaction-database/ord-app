@@ -19,8 +19,9 @@ from ord_schema.proto.reaction_pb2 import Reaction
 
 fake = Faker()
 
+
 def parse_dt(dt):
-    return datetime.strptime(dt, '%Y-%m-%dT%H:%M:%S.%f')
+    return datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S.%f")
 
 
 async def test_dataset_modified_at(api_client, mock_authenticated_user):

@@ -31,7 +31,7 @@ from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, t
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
-RDLogger.DisableLog('rdApp.*')
+RDLogger.DisableLog("rdApp.*")
 logger.remove()
 match RuntimeSettings.app_env:
     case AppEnvs.production:
@@ -56,6 +56,7 @@ async def lifespan(app: FastAPI):
     app.state.background_task.cancel()
     with suppress(asyncio.CancelledError):
         await app.state.background_task
+
 
 app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True}, lifespan=lifespan)
 
@@ -97,7 +98,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Disposition"]
+    expose_headers=["Content-Disposition"],
 )
 
 editor = APIRouter(prefix="/api/v1")

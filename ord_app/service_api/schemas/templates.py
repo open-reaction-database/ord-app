@@ -63,7 +63,7 @@ class TemplateCreateModel(BaseSchema):
     def load_binpb(cls, raw):
         return load_message(b64decode(raw), Reaction, "binpb")
 
-    def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         data["binpb"] = data["binpb"].SerializeToString()
         return data
@@ -80,7 +80,7 @@ class TemplateUpdateModel(BaseSchema):
         if raw is not None:
             return load_message(b64decode(raw), Reaction, "binpb")
 
-    def model_dump(self, *args, **kwargs)  -> dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         if data.get("binpb") is not None:
             data["binpb"] = data["binpb"].SerializeToString()

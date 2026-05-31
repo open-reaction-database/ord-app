@@ -27,6 +27,7 @@ from ord_app.tests.conftest import create_test_dataset, read_testdata_bytes, rea
 
 faker = Faker()
 
+
 async def test_create_dataset(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
 
@@ -59,8 +60,8 @@ async def test_create_dataset_with_generating_name(api_client, mock_authenticate
     (
         ("txtpb", "empty.txtpb", "empty"),
         ("txtpb", "full.txtpb", "full"),
-        ("txtpb", "reaction_duplication.txtpb", "empty")
-    )
+        ("txtpb", "reaction_duplication.txtpb", "empty"),
+    ),
 )
 async def test_upload_dataset(kind, filename, expected_name, api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
@@ -95,7 +96,10 @@ async def test_upload_dataset_with_reaction_validation(api_client, mock_authenti
 
     stmt = select(ReactionModel.is_valid).where(ReactionModel.dataset_id == response_data["id"])
     await validate_dataset_reactions(test_db_session)
-    assert {True,} == set((await test_db_session.scalars(stmt)).all())
+    assert {
+        True,
+    } == set((await test_db_session.scalars(stmt)).all())
+
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
     *_, group = mock_authenticated_user
@@ -135,8 +139,7 @@ async def test_dataset_extend(api_client, mock_authenticated_user, test_db_sessi
     enum_reaction_id = faker.uuid4()
     enum_dataset_pb = Dataset(reactions=[Reaction(reaction_id=enum_reaction_id)])
     response_data = api_client.post(
-        f"/api/v1/datasets/{dataset.id}/extend",
-        files={"file": ("dataset.binpb", enum_dataset_pb.SerializeToString())}
+        f"/api/v1/datasets/{dataset.id}/extend", files={"file": ("dataset.binpb", enum_dataset_pb.SerializeToString())}
     )
     assert response_data.status_code == status.HTTP_200_OK
 
@@ -151,7 +154,7 @@ async def test_create_dataset_with_character_limitations(api_client, mock_authen
     *_, group = mock_authenticated_user
     payload = {
         "name": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2),
-        "description": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
+        "description": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2),
     }
     response = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

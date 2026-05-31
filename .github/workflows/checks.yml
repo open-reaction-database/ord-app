@@ -52,6 +52,9 @@ jobs:
       - name: ruff
         run: uv run ruff check ord_app/
 
+      - name: ruff format
+        run: uv run ruff format --check ord_app/
+
       - name: pytype
         run: uv run pytype -j auto
 

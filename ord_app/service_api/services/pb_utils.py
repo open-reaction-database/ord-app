@@ -47,8 +47,7 @@ async def validate_uploaded_pb_file(file: UploadFile):
     kind = validate_pb_kind_by_file_ext(file.filename)
     if not kind:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            f"Invalid file extension. Please use: {MAP_FILE_EXT_TO_PB_KIND.keys()}"
+            status.HTTP_400_BAD_REQUEST, f"Invalid file extension. Please use: {MAP_FILE_EXT_TO_PB_KIND.keys()}"
         )
 
     file_data = await file.read()
@@ -69,9 +68,7 @@ def _adjust_error(error: str) -> str:
 
 
 async def validate_pb_reaction(
-    reaction: Reaction | None,
-    raise_on_error=False,
-    options=ValidationOptions(require_provenance=True)
+    reaction: Reaction | None, raise_on_error=False, options=ValidationOptions(require_provenance=True)
 ) -> tuple[bool | None, list[str], list[str]]:
     if reaction is None:
         return None, [], []
@@ -87,9 +84,7 @@ async def validate_pb_reaction(
 
 
 async def async_validate_pb_reaction(
-    reaction: Reaction | None,
-    raise_on_error=False,
-    options=ValidationOptions(require_provenance=True)
+    reaction: Reaction | None, raise_on_error=False, options=ValidationOptions(require_provenance=True)
 ) -> tuple[bool | None, list[str], list[str]]:
     """
     Asynchronously validate a protocol buffer reaction.
@@ -155,7 +150,6 @@ def load_message(data: bytes, message_type: Type[Dataset | Reaction], kind: str)
         case _:
             raise ValueError(kind)
     return dataset
-
 
 
 def send_message(message: Message) -> str:

@@ -25,6 +25,19 @@
     This creates a test PostgreSQL database and starts the server at http://localhost:8000. Navigate to
     http://localhost:8000/docs for the interactive Swagger docs.
 
+## Code style
+
+Formatting and linting run through [pre-commit](https://pre-commit.com): license headers via
+[`addlicense`](https://github.com/google/addlicense), Python via [Ruff](https://docs.astral.sh/ruff/), and the UI via
+Prettier/ESLint/Stylelint. Install the hooks once after cloning (and run `npm ci` in `ui/` so the UI hooks can find
+their tools):
+
+```shell
+uv run pre-commit install
+```
+
+Run them against the whole tree at any time with `uv run pre-commit run --all-files`.
+
 ## Run in Docker
 ### docker-compose
 You can run the Back-End and the Database using a single docker-compose file.

@@ -79,14 +79,10 @@ class GroupModel(BaseModel):
 
 class UserGroupsMembershipModel(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    user: Mapped[UserModel] = relationship(
-        UserModel, backref="groups_member", overlaps="groups,members"
-    )
+    user: Mapped[UserModel] = relationship(UserModel, backref="groups_member", overlaps="groups,members")
 
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id", ondelete="CASCADE"), primary_key=True)
-    group: Mapped[GroupModel] = relationship(
-        GroupModel, backref="groups_member", overlaps="groups,members"
-    )
+    group: Mapped[GroupModel] = relationship(GroupModel, backref="groups_member", overlaps="groups,members")
 
     role: Mapped[UserRolesList] = mapped_column(
         Enum(
@@ -110,9 +106,7 @@ class DatasetModel(BaseModel):
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
     reactions: Mapped[list["ReactionModel"]] = relationship(
-        "ReactionModel",
-        back_populates="dataset",
-        order_by="ReactionModel.id"
+        "ReactionModel", back_populates="dataset", order_by="ReactionModel.id"
     )
 
     groups: Mapped[list[GroupModel]] = relationship(
@@ -121,9 +115,7 @@ class DatasetModel(BaseModel):
         overlaps="dataset_group_associations",
     )
 
-    __table_args__ = (
-        Index('ix_dataset_owner_id', 'owner_id', postgresql_using='hash'),
-    )
+    __table_args__ = (Index("ix_dataset_owner_id", "owner_id", postgresql_using="hash"),)
 
     def __repr__(self):
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
@@ -154,6 +146,7 @@ class DatasetGroupAssociationModel(BaseModel):
             ")>"
         )
 
+
 class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     pb_reaction_id: Mapped[str]
@@ -168,9 +161,9 @@ class ReactionModel(BaseModel):
 
     __table_args__ = (
         UniqueConstraint("pb_reaction_id", "dataset_id", name="uq_pb_reaction_id_dataset_id"),
-        Index('ix_reaction_pb_reaction_id', 'pb_reaction_id', postgresql_using='hash'),
-        Index('ix_reaction_dataset_id', 'dataset_id', postgresql_using='hash'),
-        Index('ix_reaction_owner_id', 'owner_id', postgresql_using='hash'),
+        Index("ix_reaction_pb_reaction_id", "pb_reaction_id", postgresql_using="hash"),
+        Index("ix_reaction_dataset_id", "dataset_id", postgresql_using="hash"),
+        Index("ix_reaction_owner_id", "owner_id", postgresql_using="hash"),
     )
 
     def __repr__(self):
@@ -179,6 +172,7 @@ class ReactionModel(BaseModel):
     @property
     def pb(self) -> Reaction | None:
         return load_message(self.binpb, Reaction, "binpb") if self.binpb else None
+
 
 class TemplateModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -189,9 +183,7 @@ class TemplateModel(BaseModel):
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     owner: Mapped[UserModel] = relationship(UserModel, back_populates="templates")
 
-    __table_args__ = (
-        Index('ix_template_owner_id', 'owner_id', postgresql_using='hash'),
-    )
+    __table_args__ = (Index("ix_template_owner_id", "owner_id", postgresql_using="hash"),)
 
     def __repr__(self):
         return f"<Template(id={self.id}, name={self.name})>"
