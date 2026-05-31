@@ -19,11 +19,11 @@ faker = Faker()
 
 
 async def test_get_dataset_groups(api_client, mock_authenticated_user, test_db_session):
-    primary_user, set_user_auth, primary_group = mock_authenticated_user
+    *_, primary_group = mock_authenticated_user
     primary_dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
     # share primary dataset by primary user to the secondary user
-    secondary_user, secondary_group = await create_test_user_with_group(test_db_session)
+    _, secondary_group = await create_test_user_with_group(test_db_session)
     share_response_data = api_client.post(
         f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
         json={"secondary_group_id": secondary_group.id}

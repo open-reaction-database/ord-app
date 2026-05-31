@@ -51,7 +51,6 @@ async def test_update_foreign_template(api_client, mock_authenticated_user, test
 
 
 async def test_get_non_existent_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
     payload = {
         "binpb": b64encode(Reaction(reaction_id=fake.name()).SerializeToString()).decode(),
         "name": fake.name(),
