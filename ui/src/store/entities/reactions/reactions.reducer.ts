@@ -65,10 +65,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
       const reaction = state[reactionId];
       const updatedReaction: AppReaction = linkReactionEntities(
-        deepMergeWithArrayMerge(
-          reaction.data,
-          generateDeepPartialReactionByPath(pathComponents, newValue) as unknown as AppReaction,
-        ),
+        deepMergeWithArrayMerge(reaction.data, generateDeepPartialReactionByPath(pathComponents, newValue)),
       );
       return {
         ...state,

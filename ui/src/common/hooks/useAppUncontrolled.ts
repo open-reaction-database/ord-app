@@ -84,7 +84,7 @@ export function useAppUncontrolled<T>({
   }, [setUncontrolledValue, defaultValue]);
 
   if (value !== undefined) {
-    return [value as T, onChange, true];
+    return [value, onChange, true];
   }
 
   return [uncontrolledValue as T, handleUncontrolledChange, false];

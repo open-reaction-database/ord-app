@@ -66,7 +66,7 @@ export function ValuePrecisionUnitControl({
 
   const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number | null) => {
     const previousValue = uncontrolledValue ?? {};
-    uncontrolledOnChange({ ...previousValue, [name]: newValue } as ValuePrecisionUnit);
+    uncontrolledOnChange({ ...previousValue, [name]: newValue });
   };
 
   const unitOnChange = handleChange.bind(null, 'units');
