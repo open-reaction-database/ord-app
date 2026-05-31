@@ -14,7 +14,7 @@
 import gzip
 from base64 import b64encode
 from pathlib import Path
-from typing import Type
+from typing import TypeVar
 
 from fastapi import HTTPException, UploadFile, status
 from google.protobuf import json_format, text_format
@@ -23,6 +23,10 @@ from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from ord_schema.validations import ValidationOptions, validate_message
 from starlette.concurrency import run_in_threadpool
+
+# Constrained to the proto messages this module serializes; load_message returns
+# the same concrete type passed via message_type rather than the bare union.
+MessageT = TypeVar("MessageT", Dataset, Reaction)
 
 MAP_FILE_EXT_TO_PB_KIND = {
     ".json": "json",
@@ -129,27 +133,27 @@ def write_message(message: Dataset | Reaction, kind: str) -> bytes:
     return data
 
 
-def load_message(data: bytes, message_type: Type[Dataset | Reaction], kind: str) -> Dataset | Reaction:
-    """Loads a serialized dataset.
+def load_message(data: bytes, message_type: type[MessageT], kind: str) -> MessageT:
+    """Loads a serialized dataset or reaction.
 
     Args:
-        data: Serialized dataset proto.
-        message_type: Message type.
+        data: Serialized proto.
+        message_type: Message type to parse into (Dataset or Reaction).
         kind: Serialization kind.
 
     Returns:
-        Dataset or Reaction proto.
+        A proto of the type given by ``message_type``.
     """
     match kind:
         case "binpb":
-            dataset = message_type.FromString(data)
+            message = message_type.FromString(data)
         case "json":
-            dataset = json_format.Parse(data, message_type())
+            message = json_format.Parse(data, message_type())
         case "txtpb":
-            dataset = text_format.Parse(data.decode(), message_type())
+            message = text_format.Parse(data.decode(), message_type())
         case _:
             raise ValueError(kind)
-    return dataset
+    return message
 
 
 def send_message(message: Message) -> str:
