@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydantic import constr
+from typing import Annotated
+
+from pydantic import StringConstraints
 
 from ord_app.service_api.models import UserRolesList
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, BaseSchema
@@ -34,11 +36,11 @@ class GroupUserResponseSchema(BaseSchema):
 
 
 class GroupCreateSchema(BaseSchema):
-    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
+    name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)]
 
 
 class GroupAddMemberSchema(BaseSchema):
-    identity: constr(min_length=5)
+    identity: Annotated[str, StringConstraints(min_length=5)]
     role: UserRolesList
 
 

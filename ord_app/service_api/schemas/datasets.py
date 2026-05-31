@@ -13,10 +13,10 @@
 # limitations under the License.
 from base64 import b64decode
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 from uuid import uuid4
 
-from pydantic import Field, constr, field_validator, model_validator
+from pydantic import Field, StringConstraints, field_validator, model_validator
 from sqlalchemy import Row
 
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH, BaseSchema
@@ -71,8 +71,8 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
 
 
 class DatasetCreateSchema(BaseSchema):
-    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
-    description: constr(max_length=MAX_FIELD_LENGTH) | None = ""
+    name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)]
+    description: Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None = ""
 
     @field_validator("name", mode="before")
     def set_name_default(cls, value: str | None) -> str:
@@ -82,8 +82,8 @@ class DatasetCreateSchema(BaseSchema):
 
 
 class DatasetEnumerateCreateSchema(BaseSchema):
-    name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
-    description: constr(max_length=MAX_FIELD_LENGTH) | None = ""
+    name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)]
+    description: Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None = ""
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")
