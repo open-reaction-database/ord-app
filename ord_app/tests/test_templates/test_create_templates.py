@@ -40,7 +40,7 @@ async def test_create_template(api_client, mock_authenticated_user, test_db_sess
 async def test_create_template_with_character_limitations(api_client, mock_authenticated_user, test_db_session):
     payload = {
         "binpb": b64encode(Reaction(reaction_id=fake.uuid4()).SerializeToString()).decode(),
-        "name": fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2),
+        "name": fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH + 1, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2),
         "variables": {"foo": "bar"},
     }
     response = api_client.post("/api/v1/templates", json=payload)

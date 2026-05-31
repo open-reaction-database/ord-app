@@ -107,7 +107,7 @@ async def test_create_reaction_with_character_limitations(api_client, mock_authe
     payload = {
         "binpb": b64encode(
             Reaction(
-                reaction_id=fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
+                reaction_id=fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH + 1, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
             ).SerializeToString()
         ).decode()
     }
