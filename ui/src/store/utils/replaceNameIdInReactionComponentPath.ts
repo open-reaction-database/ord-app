@@ -18,9 +18,9 @@ import type { ReactionPathComponents } from '../../common/types/reaction/reactio
 import type { WithIdName } from '../entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { getDeepReactionPart } from '../entities/reactions/reactions.utils.ts';
 
-const mapKeys = ['inputs', 'analyses', 'features', 'analysisData', 'automationCode'];
+const mapKeys = new Set(['inputs', 'analyses', 'features', 'analysisData', 'automationCode']);
 
-const conditionsWithMeasurements = ['temperature', 'electrochemistry', 'pressure'];
+const conditionsWithMeasurements = new Set(['temperature', 'electrochemistry', 'pressure']);
 
 type NamedEntity = WithIdName<unknown>;
 type NamedEntityMap = Record<string, NamedEntity>;
@@ -40,7 +40,7 @@ export function replaceNameIdInReactionComponentPath(
   for (let index = 0; index < path.length; index++) {
     const pathComponent = path[index];
     updatedPath = updatedPath.concat([pathComponent]);
-    if (mapKeys.includes(pathComponent as string)) {
+    if (mapKeys.has(pathComponent as string)) {
       const nameId = path[index + 1] as string;
       let reactionPart: Record<string, WithIdName<unknown>>;
       if (replaceWith === 'id') {
@@ -61,7 +61,7 @@ export function replaceNameIdInReactionComponentPath(
     const currentValue = updatedPath[index];
     if (
       index > 0 &&
-      conditionsWithMeasurements.includes(updatedPath[index - 1] as string) &&
+      conditionsWithMeasurements.has(updatedPath[index - 1] as string) &&
       typeof currentValue === 'string'
     ) {
       if (currentValue === 'measurements') {

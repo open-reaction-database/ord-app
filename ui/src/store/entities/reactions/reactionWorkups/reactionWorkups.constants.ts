@@ -17,10 +17,10 @@ import type { WorkupType } from '../reactionEntityTypes/reactionEntityTypes.type
 import { workupTypeOptions } from '../reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export namespace WorkupConstants {
-  const durationUnCompatibleTypes: Array<WorkupType> = ['UNSPECIFIED', 'ALIQUOT'];
+  const durationUnCompatibleTypes = new Set<WorkupType>(['UNSPECIFIED', 'ALIQUOT']);
 
   export const durationCompatibleTypes = workupTypeOptions.filter(
-    item => !durationUnCompatibleTypes.includes(item as WorkupType),
+    item => !durationUnCompatibleTypes.has(item as WorkupType),
   ) as Array<WorkupType>;
 
   export const aliquotCompatibleTypes: Array<WorkupType> = ['ALIQUOT', 'CUSTOM'];
@@ -47,15 +47,15 @@ export namespace WorkupConstants {
     'CUSTOM',
   ];
 
-  const stirringUnCompatibleTypes: Array<WorkupType> = [
+  const stirringUnCompatibleTypes = new Set<WorkupType>([
     'UNSPECIFIED',
     'FLASH_CHROMATOGRAPHY',
     'OTHER_CHROMATOGRAPHY',
     'WAIT',
     'ALIQUOT',
-  ];
+  ]);
 
   export const stirringCompatibleTypes = workupTypeOptions.filter(
-    item => !stirringUnCompatibleTypes.includes(item as WorkupType),
+    item => !stirringUnCompatibleTypes.has(item as WorkupType),
   ) as Array<WorkupType>;
 }

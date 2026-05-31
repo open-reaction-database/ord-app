@@ -15,14 +15,14 @@
  */
 const allowedSymbols = /[A-Za-z0-9]/;
 const defaultDelimiter = ';';
-const lineBreaks: Array<string> = ['\n', '\r'];
+const lineBreaks = new Set(['\n', '\r']);
 
 export function guessDelimiter(fileContent: string): string {
   let firstLineDelimiters = '';
   let index = 0;
   while (index < fileContent.length) {
     const char = fileContent.charAt(index);
-    if (lineBreaks.includes(char)) {
+    if (lineBreaks.has(char)) {
       break;
     }
     if (!allowedSymbols.test(char)) {

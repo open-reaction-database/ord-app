@@ -60,14 +60,14 @@ export async function copyReactionPart(entityName: ReactionNodeEntity, reactionP
   }
 }
 
-const inputAliases = [ReactionNodeEntity.Inputs, ReactionNodeEntity.Input];
+const inputAliases = new Set([ReactionNodeEntity.Inputs, ReactionNodeEntity.Input]);
 
 function checkEntityNames(previousName: ReactionNodeEntity, currentName: ReactionNodeEntity): boolean {
   if (previousName === currentName) {
     return true;
   }
   // Input has two sidebars - with and without a name.
-  return inputAliases.includes(previousName) && inputAliases.includes(currentName);
+  return inputAliases.has(previousName) && inputAliases.has(currentName);
 }
 
 export async function pasteReactionPart(entityField: ReactionNodeEntity): Promise<[object | null, string]> {
