@@ -60,6 +60,11 @@ package = false
 line-length = 120
 target-version = "py312"
 
+[tool.ruff.lint.isort]
+# Preserve the explicit classification carried over from the old isort config;
+# keeps import ordering deterministic if/when the "I" rules are enabled.
+known-third-party = ["ord_schema"]
+
 [tool.pytype]
 inputs = ["ord_app"]
 exclude = ["**/*_test.py", "**/test_*.py", "build/", "dist/"]

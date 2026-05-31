@@ -30,7 +30,9 @@ repos:
   # Python lint + format. Scoped to ord_app/ to match CI (`ruff check ord_app/`)
   # and to leave the generated alembic migrations untouched.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    # Keep in sync with the ruff version pinned in uv.lock so the hook and the
+    # `ruff format --check` CI step never disagree.
+    rev: v0.9.10
     hooks:
       - id: ruff
         args: [--fix]
