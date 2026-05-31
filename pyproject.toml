@@ -56,14 +56,35 @@ dev = [
 [tool.uv]
 package = false
 
+# Ruff config lives here (single source of truth); the former root ruff.toml
+# took precedence over [tool.ruff] and has been folded in.
 [tool.ruff]
+# Same as Black.
 line-length = 120
+indent-width = 4
+# Assume Python 3.12.
 target-version = "py312"
 
+[tool.ruff.lint]
+# Pyflakes (F), a subset of pycodestyle (E), import sorting (I), bugbear (B).
+select = ["E4", "E7", "E9", "F", "I", "B"]
+ignore = ["B008"]
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
 [tool.ruff.lint.isort]
-# Preserve the explicit classification carried over from the old isort config;
-# keeps import ordering deterministic if/when the "I" rules are enabled.
+# ord_schema is an external dependency; pin its classification so import
+# ordering is deterministic even when the environment is not fully resolved.
 known-third-party = ["ord_schema"]
+
+[tool.ruff.format]
+# Like Black: double quotes, space indent, respect magic trailing commas.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.pytype]
 inputs = ["ord_app"]
