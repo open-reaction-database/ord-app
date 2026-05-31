@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { Buffer } from 'buffer';
 import {
   ordDataMapToReactionDataMap,
   ordDataToReaction,
@@ -38,14 +37,19 @@ describe('ordDataToReaction', () => {
     });
   });
 
-  it('maps a numeric value, preferring float over integer', () => {
+  it('maps a numeric value, preferring float over integer when both are present', () => {
     expect(ordDataToReaction({ floatValue: 1.5 }, 'n').data).toMatchObject({ type: AppDataType.Number, value: 1.5 });
     expect(ordDataToReaction({ integerValue: 3 }, 'n').data).toMatchObject({ type: AppDataType.Number, value: 3 });
+    expect(ordDataToReaction({ floatValue: 1.5, integerValue: 9 }, 'n').data).toMatchObject({
+      type: AppDataType.Number,
+      value: 1.5,
+    });
     expect(ordDataToReaction({}, 'n').data).toMatchObject({ type: AppDataType.Number, value: null });
   });
 
   it('passes a string bytesValue through and base64-encodes a Uint8Array', () => {
-    expect(ordDataToReaction({ bytesValue: 'YWJj' }, 'n').data).toMatchObject({
+    // The string branch is the copy/paste-via-JSON workaround; the field type is Uint8Array.
+    expect(ordDataToReaction({ bytesValue: 'YWJj' as unknown as Uint8Array }, 'n').data).toMatchObject({
       type: AppDataType.Upload,
       value: 'YWJj',
     });
@@ -76,8 +80,9 @@ describe('reactionDataToOrd', () => {
   });
 
   it('decodes an Upload base64 string to bytes', () => {
+    // 'YWJj' is base64 for 'abc' (bytes 97, 98, 99).
     const ordData = reactionDataToOrd({ ...base, data: { type: AppDataType.Upload, value: 'YWJj' } });
-    expect(Buffer.from(ordData.bytesValue as Uint8Array).toString()).toBe('abc');
+    expect(ordData.bytesValue).toEqual(Uint8Array.from([97, 98, 99]));
   });
 
   it('adds no value field when value is null', () => {
@@ -94,6 +99,8 @@ describe('ordDataMapToReactionDataMap / reactionDataMapToOrdDataMap', () => {
     expect(entries).toHaveLength(1);
     expect(entries[0].name).toBe('first');
     expect(entries[0].data.value).toBe('a');
+    // The map is keyed by the generated id, not by the ord name.
+    expect(Object.keys(result)).toEqual([entries[0].id]);
   });
 
   it('returns null for an empty reaction data map', () => {

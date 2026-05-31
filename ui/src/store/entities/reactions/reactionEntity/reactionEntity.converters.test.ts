@@ -54,7 +54,7 @@ describe('withIdName / withoutIdName', () => {
 
 describe('ordBooleanToReaction', () => {
   it('maps null/undefined to Unspecified', () => {
-    expect(ordBooleanToReaction(undefined)).toBe(ReactionBoolean.Unspecified);
+    expect(ordBooleanToReaction()).toBe(ReactionBoolean.Unspecified);
     expect(ordBooleanToReaction(null)).toBe(ReactionBoolean.Unspecified);
   });
 
