@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,10 +24,10 @@ import { AppDataType } from './reactionData.types.ts';
 
 describe('ordDataToReaction', () => {
   it('maps a URL value', () => {
-    const result = ordDataToReaction({ url: 'http://example.com' }, 'link');
+    const result = ordDataToReaction({ url: 'https://example.com' }, 'link');
     expect(result.name).toBe('link');
     expect(result.data.type).toBe(AppDataType.Url);
-    expect(result.data.value).toBe('http://example.com');
+    expect(result.data.value).toBe('https://example.com');
   });
 
   it('maps a string value', () => {
@@ -67,7 +67,7 @@ describe('reactionDataToOrd', () => {
   const base = { id: 'i', name: 'n', description: 'd' };
 
   it('round-trips a URL', () => {
-    expect(reactionDataToOrd({ ...base, data: { type: AppDataType.Url, value: 'http://x' } }).url).toBe('http://x');
+    expect(reactionDataToOrd({ ...base, data: { type: AppDataType.Url, value: 'https://x' } }).url).toBe('https://x');
   });
 
   it('round-trips a string', () => {
