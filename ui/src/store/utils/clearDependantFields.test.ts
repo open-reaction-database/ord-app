@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { clearDependantFields } from './clearDependantFields.ts';
 
 interface Sample {
-  keep: string;
+  keep: string | null;
   dependant: string | null;
 }
 
@@ -32,11 +32,14 @@ describe('clearDependantFields', () => {
     expect(result).toEqual({ keep: 'v', dependant: 'x' });
   });
 
-  it('evaluates each predicate against the working copy', () => {
-    const result = clearDependantFields<Sample>({ keep: '', dependant: 'x' }, [
-      ['dependant', object => object.keep !== ''],
+  it('evaluates each predicate against the working copy, not the original', () => {
+    // The first rule nulls `keep`; the second rule's predicate must observe that
+    // mutation. Were it reading the original object, `dependant` would survive.
+    const result = clearDependantFields<Sample>({ keep: 'set', dependant: 'x' }, [
+      ['keep', () => false],
+      ['dependant', object => object.keep !== null],
     ]);
-    expect(result.dependant).toBeNull();
+    expect(result).toEqual({ keep: null, dependant: null });
   });
 
   it('does not mutate the input object', () => {
