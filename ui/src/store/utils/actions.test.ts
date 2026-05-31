@@ -28,22 +28,25 @@ describe('createAsyncAction', () => {
     const actions = createAsyncAction<number, string>('x');
     expect(actions.request(7)).toEqual({ type: 'x/request', payload: 7 });
     expect(actions.success('ok')).toEqual({ type: 'x/success', payload: 'ok' });
+    const error = new Error('boom');
+    expect(actions.failure(error)).toEqual({ type: 'x/failure', payload: error });
   });
 });
 
 describe('createActionFactory', () => {
-  it('prefixes plain action types', () => {
+  it('prefixes plain action types and round-trips the payload', () => {
     const factory = createActionFactory('templates');
-    const action = factory.createAction('rename');
+    const action = factory.createAction<string>('rename');
     expect(action.type).toBe('templates/rename');
     expect(action('value')).toEqual({ type: 'templates/rename', payload: 'value' });
   });
 
-  it('prefixes async action types', () => {
+  it('prefixes async action types and round-trips the request payload', () => {
     const factory = createActionFactory('templates');
-    const actions = factory.createAsyncAction('save');
+    const actions = factory.createAsyncAction<number>('save');
     expect(actions.request.type).toBe('templates/save/request');
     expect(actions.success.type).toBe('templates/save/success');
     expect(actions.failure.type).toBe('templates/save/failure');
+    expect(actions.request(3)).toEqual({ type: 'templates/save/request', payload: 3 });
   });
 });
