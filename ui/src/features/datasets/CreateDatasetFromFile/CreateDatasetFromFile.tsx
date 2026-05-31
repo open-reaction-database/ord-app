@@ -45,7 +45,7 @@ export function CreateDatasetFromFile({ onClose }: Readonly<CreateDatasetFromFil
       file: '',
     },
     transformValues: values => ({
-      groupId: parseInt(values.groupId),
+      groupId: Number.parseInt(values.groupId),
       file: values.file as File,
     }),
     validate: yupResolver(createDatasetFromFileSchema),

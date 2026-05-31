@@ -43,7 +43,7 @@ import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
 import { getReactionPreviews } from '../reactions/reactions.utils.ts';
 
-const getTemplateIdNumber = (templateId: string): number => parseInt(templateId.split('_')[1]);
+const getTemplateIdNumber = (templateId: string): number => Number.parseInt(templateId.split('_')[1]);
 const getTemplateIdString = (templateId: number): string => `template_${templateId}`;
 
 const parseTemplate = ({

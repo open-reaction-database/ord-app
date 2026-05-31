@@ -74,7 +74,7 @@ export function Pagination({
       <Select
         classNames={{ root: classes.select, input: classes.selectInput }}
         value={String(rowsPerPage)}
-        onChange={value => onRowsPerPageChange(parseInt(value as string))}
+        onChange={value => onRowsPerPageChange(Number.parseInt(value as string))}
         allowDeselect={false}
         data={ROW_PER_PAGE_OPTIONS}
         rightSectionWidth={30}

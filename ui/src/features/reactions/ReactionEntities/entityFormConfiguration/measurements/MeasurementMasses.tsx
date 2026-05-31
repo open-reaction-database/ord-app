@@ -37,7 +37,7 @@ export function MeasurementMasses({ name, formMethods }: Readonly<ReactionFormCu
 
   const handleChange = (value: Array<string | number>) => {
     const numericValues = value
-      .map(item => (typeof item === 'string' ? parseFloat(item) : item))
+      .map(item => (typeof item === 'string' ? Number.parseFloat(item) : item))
       .filter(item => !isNaN(item));
     onChange(numericValues);
   };

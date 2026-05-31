@@ -47,7 +47,7 @@ function cast(value: string, context: CastingContext): string | number | boolean
     return lowerCaseValue === 'true';
   }
   if (NUMBER_REGEX.test(value)) {
-    const parsedValue = parseFloat(value);
+    const parsedValue = Number.parseFloat(value);
     if (!Number.isNaN(parsedValue)) {
       return parsedValue;
     }

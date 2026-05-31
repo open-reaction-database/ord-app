@@ -45,7 +45,7 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
     validateInputOnChange: true,
     validate: yupResolver(createNewDatasetSchema),
     transformValues: (values: CreateNewDatasetFormValues): CreateNewDatasetPayload => ({
-      groupId: parseInt(values.groupId),
+      groupId: Number.parseInt(values.groupId),
       name: values.name,
       description: values.description,
     }),

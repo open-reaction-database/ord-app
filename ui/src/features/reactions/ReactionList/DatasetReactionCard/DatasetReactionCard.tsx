@@ -33,7 +33,7 @@ interface ReactionTitleProps {
 
 function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
-  const datasetId = parseInt(rawDatasetId);
+  const datasetId = Number.parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(id));
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     {

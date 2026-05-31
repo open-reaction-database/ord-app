@@ -137,7 +137,7 @@ function optionalStringNumberToNumber(value: Optional<number | string>): Optiona
   if (typeof value === 'number') {
     return value;
   }
-  const parsedValue = parseFloat(value);
+  const parsedValue = Number.parseFloat(value);
   return Number.isNaN(parsedValue) ? null : parsedValue;
 }
 

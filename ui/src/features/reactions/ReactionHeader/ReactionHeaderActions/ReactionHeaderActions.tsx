@@ -35,7 +35,7 @@ interface ReactionHeaderActionsProps {
 
 export function ReactionHeaderActions({ reactionId, previewRef }: Readonly<ReactionHeaderActionsProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
-  const datasetId = parseInt(rawDatasetId);
+  const datasetId = Number.parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(reactionId));
   const onPreviewSave = useCallback(() => {
     copyPreviewAsImage(previewRef.current);

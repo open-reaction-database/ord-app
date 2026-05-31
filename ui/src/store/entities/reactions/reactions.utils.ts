@@ -197,7 +197,7 @@ function parseErrorWarning(text: string, reaction: AppReaction): ErrorWarningMes
   const [error, ...rest] = text.split(':');
   const path = error.replace(/\[(")*/g, '.').replace(/(")*]/g, '');
   const reactionComponentPath = path.split('.').map(item => {
-    const parsedNumber = parseInt(item);
+    const parsedNumber = Number.parseInt(item);
     if (Number.isNaN(parsedNumber)) {
       return item;
     }

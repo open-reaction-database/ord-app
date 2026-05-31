@@ -113,9 +113,9 @@ export function convertReactionFloatsToDoubles(reactionPart: unknown): void {
         convertReactionFloatsToDoubles(value);
       } else if (typeof value === 'number') {
         if (Number.isInteger(value)) {
-          dynamicReactionPart[key] = parseInt(value.toString(), 10);
+          dynamicReactionPart[key] = Number.parseInt(value.toString(), 10);
         } else {
-          dynamicReactionPart[key] = parseFloat(value.toPrecision(PRECISION));
+          dynamicReactionPart[key] = Number.parseFloat(value.toPrecision(PRECISION));
         }
       }
     });

@@ -68,7 +68,7 @@ function getNumberArrayOrError(value: ValueType, variable: Variable): Array<numb
   if (typeof value !== 'string') {
     throw produceValueTypeError('number array', variable);
   }
-  const values = value.split(',').map(item => parseFloat(item));
+  const values = value.split(',').map(item => Number.parseFloat(item));
   if (values.some(item => Number.isNaN(item))) {
     throw produceValueTypeError('number array', variable);
   }

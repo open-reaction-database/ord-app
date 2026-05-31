@@ -81,7 +81,7 @@ export function EnumerationSetup({
             ? dataset
             : {
                 ...dataset,
-                groupId: parseInt(dataset.groupId ?? ''),
+                groupId: Number.parseInt(dataset.groupId ?? ''),
               },
       }) as SetupEnumeration,
     validate: yupResolver(schema),
