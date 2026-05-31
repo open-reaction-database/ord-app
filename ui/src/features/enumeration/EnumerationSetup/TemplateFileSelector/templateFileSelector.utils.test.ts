@@ -23,7 +23,7 @@ describe('guessDelimiter', () => {
     expect(guessDelimiter('a;b;c')).toBe(';');
   });
 
-  it('only inspects the first line, stopping at \\n or \\r', () => {
+  it(String.raw`only inspects the first line, stopping at \n or \r`, () => {
     expect(guessDelimiter('a|b|c\nx,y,z')).toBe('|');
     expect(guessDelimiter('a|b|c\rx,y,z')).toBe('|');
   });
@@ -35,5 +35,13 @@ describe('guessDelimiter', () => {
 
   it('falls back to the default when the first line mixes different delimiters', () => {
     expect(guessDelimiter('a,b;c\n')).toBe(';');
+  });
+
+  it('treats a space like any other non-alphanumeric delimiter character', () => {
+    // `allowedSymbols` is /[A-Za-z0-9]/, so spaces count as delimiters: a
+    // consistently space-separated header yields ' ', while a header mixing
+    // spaces with another separator is "mixed" and falls back to ';'.
+    expect(guessDelimiter('col a col b\n')).toBe(' ');
+    expect(guessDelimiter('first name,last name\n')).toBe(';');
   });
 });
