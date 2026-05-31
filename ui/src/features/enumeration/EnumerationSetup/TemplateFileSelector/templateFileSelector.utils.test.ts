@@ -1,0 +1,39 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { describe, it, expect } from 'vitest';
+import { guessDelimiter } from './templateFileSelector.utils.ts';
+
+describe('guessDelimiter', () => {
+  it('detects a consistent delimiter from the first line', () => {
+    expect(guessDelimiter('a,b,c\nd,e,f')).toBe(',');
+    expect(guessDelimiter('a\tb\tc\n')).toBe('\t');
+    expect(guessDelimiter('a;b;c')).toBe(';');
+  });
+
+  it('only inspects the first line, stopping at \\n or \\r', () => {
+    expect(guessDelimiter('a|b|c\nx,y,z')).toBe('|');
+    expect(guessDelimiter('a|b|c\rx,y,z')).toBe('|');
+  });
+
+  it('falls back to the default (";") when the first line has no delimiters', () => {
+    expect(guessDelimiter('')).toBe(';');
+    expect(guessDelimiter('abc\n')).toBe(';');
+  });
+
+  it('falls back to the default when the first line mixes different delimiters', () => {
+    expect(guessDelimiter('a,b;c\n')).toBe(';');
+  });
+});
