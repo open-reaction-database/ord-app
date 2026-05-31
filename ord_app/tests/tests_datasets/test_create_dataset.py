@@ -98,7 +98,7 @@ async def test_upload_dataset_with_reaction_validation(api_client, mock_authenti
     assert {True,} == set((await test_db_session.scalars(stmt)).all())
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     response_data = api_client.post(
         f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("wrong.pdf", BytesIO(b"pdf"))}
@@ -107,7 +107,7 @@ async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
 
 
 async def test_upload_wrong_file(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     response_data = api_client.post(
         f"/api/v1/groups/{group.id}/datasets/upload", files={"file": ("wrongfile.pb", BytesIO(b"pdf"))}
@@ -116,7 +116,7 @@ async def test_upload_wrong_file(api_client, mock_authenticated_user):
 
 
 async def test_dataset_extend(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
+    user, *_ = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction_id = faker.uuid4()
     reaction = ReactionModel(

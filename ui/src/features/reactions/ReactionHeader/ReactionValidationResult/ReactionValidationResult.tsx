@@ -46,7 +46,7 @@ export function ReactionValidationResult({ reactionId }: Readonly<ReactionValida
       {hasErrorsWarnings && (
         <ReactionValidationList
           opened={opened}
-          validation={validation!}
+          validation={validation}
           onClose={close}
         />
       )}

@@ -24,7 +24,7 @@ def parse_dt(dt):
 
 
 async def test_dataset_modified_at(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
 
     payload = {"name": fake.company(), "description": fake.text(5)}
     resp1 = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload).raise_for_status().json()

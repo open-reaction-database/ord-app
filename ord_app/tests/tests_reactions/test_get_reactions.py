@@ -17,7 +17,6 @@ from ord_app.tests.conftest import create_test_dataset, create_test_reaction
 
 
 async def test_paginate_reactions(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
@@ -25,7 +24,6 @@ async def test_paginate_reactions(api_client, mock_authenticated_user, test_db_s
     assert response_data["total"] == 1
 
 async def test_paginate_query_reactions(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction_is_valid_none = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
     reaction_is_valid_true = await create_test_reaction(
@@ -64,7 +62,6 @@ async def test_paginate_query_reactions(api_client, mock_authenticated_user, tes
 
 
 async def test_get_reaction(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
@@ -73,7 +70,6 @@ async def test_get_reaction(api_client, mock_authenticated_user, test_db_session
 
 
 async def test_search_reaction(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
@@ -84,7 +80,6 @@ async def test_search_reaction(api_client, mock_authenticated_user, test_db_sess
 
 
 async def test_download_reaction(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 

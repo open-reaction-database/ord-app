@@ -60,7 +60,7 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
             { label: 'Details', render: setup => setup.vessel.material.details },
           ]}
         />
-        {Object.values(setup.automationCode as Record<string, AppData>).map(automationCode => (
+        {Object.values(setup.automationCode).map(automationCode => (
           <EntityListItem
             key={automationCode.id}
             historyPathComponents={[[ENTITY_FIELD]]}

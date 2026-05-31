@@ -181,7 +181,7 @@ async def create_test_reaction(
     is_valid=None
 ) -> ReactionModel:
     pb_reaction = pb_reaction or Reaction(reaction_id=fake.uuid4())
-    user, _, group = mock_authenticated_user
+    user, *_ = mock_authenticated_user
     reaction = ReactionModel(
         pb_reaction_id=pb_reaction.reaction_id,
         dataset=dataset,

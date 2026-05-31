@@ -20,7 +20,6 @@ faker = Faker()
 
 
 async def test_create_group(api_client, mock_authenticated_user):
-    user, _, group = mock_authenticated_user
     payload = {"name": faker.company()}
     response_data = api_client.post("/api/v1/groups", json=payload).raise_for_status().json()
     assert payload["name"] == response_data["name"]

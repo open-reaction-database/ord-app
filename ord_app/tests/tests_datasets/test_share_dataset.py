@@ -54,7 +54,7 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert secondary_group_datasets["items"][0]["id"] == primary_dataset.id
 
     # And secondary user cannot share that dataset
-    foreign_user, foreign_group = await create_test_user_with_group(test_db_session)
+    _, foreign_group = await create_test_user_with_group(test_db_session)
     secondary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
     assert primary_dataset.id == secondary_user_dataset["id"]
     assert False is secondary_user_dataset["is_sharable"]

@@ -17,7 +17,7 @@ from ord_app.tests.conftest import create_test_user_with_group
 
 
 async def test_add_group_member(api_client, mock_authenticated_user, test_db_session):
-    user, _, group = mock_authenticated_user
+    *_, group = mock_authenticated_user
     extra_user, _ = await create_test_user_with_group(test_db_session)
 
     payload = {"identity": extra_user.email, "role": "admin"}

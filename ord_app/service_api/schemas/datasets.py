@@ -57,7 +57,7 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
     @classmethod
     def reaction_count(cls, data: Any):  # noqa: F811
         if isinstance(data, (Row, tuple)):
-            dataset, rct_total, rct_invalid, rct_valid, rct_none = data
+            _, rct_total, rct_invalid, rct_valid, rct_none = data
             # first element of the data is Dataset ORM object
             # second is reactions count
             data[0].reactions_count = _DatasetReactionCountingSchema(
