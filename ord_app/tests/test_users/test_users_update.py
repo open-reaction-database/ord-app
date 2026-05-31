@@ -20,7 +20,10 @@ fake = Faker()
 
 
 async def test_update_user(api_client, mock_authenticated_user):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
 
     payload = {"email": fake.email(), "orcid_id": fake.uuid4()}
     response_data = api_client.patch(f"/api/v1/users/{user.id}", json=payload).raise_for_status().json()
@@ -38,7 +41,10 @@ async def test_update_foreign_user(api_client, mock_authenticated_user):
 
 
 async def test_update_duplicated_data(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     user2, _ = await create_test_user_with_group(test_db_session)
 
     payload = {"email": user2.email}

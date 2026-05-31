@@ -77,17 +77,16 @@ async def mock_validate_reactions_task(*args, **kwargs):
 @pytest.fixture(autouse=True)
 def override_validate_reactions_task(monkeypatch):
     monkeypatch.setattr(
-        "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions",
-        mock_validate_reactions_task
+        "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions", mock_validate_reactions_task
     )
+
 
 @pytest.fixture(autouse=True)
 async def override_engine(monkeypatch):
     monkeypatch.setattr("ord_app.service_api.services.postgresql.pg_engine", pg_engine)
-    test_session_maker = async_sessionmaker(
-        pg_engine, expire_on_commit=False, autoflush=False, autocommit=False
-    )
+    test_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
     monkeypatch.setattr("ord_app.service_api.services.postgresql.db_session_maker", test_session_maker)
+
 
 @pytest.fixture
 def api_client():
@@ -174,11 +173,7 @@ async def create_test_dataset(db_session, mock_authenticated_user) -> DatasetMod
 
 
 async def create_test_reaction(
-    db_session,
-    mock_authenticated_user,
-    dataset,
-    pb_reaction=None,
-    is_valid=None
+    db_session, mock_authenticated_user, dataset, pb_reaction=None, is_valid=None
 ) -> ReactionModel:
     pb_reaction = pb_reaction or Reaction(reaction_id=fake.uuid4())
     user, *_ = mock_authenticated_user
@@ -187,7 +182,7 @@ async def create_test_reaction(
         dataset=dataset,
         owner=user,
         binpb=pb_reaction.SerializeToString(),
-        is_valid=is_valid
+        is_valid=is_valid,
     )
     db_session.add(reaction)
     await db_session.commit()
@@ -202,11 +197,7 @@ async def create_test_user_with_group(test_db_session, role="admin"):
         orcid_id=str(fake.uuid4()),
     )
     group = GroupModel(name=fake.word(), owner=user)
-    group_member = UserGroupsMembershipModel(
-        user=user,
-        group=group,
-        role=role
-    )
+    group_member = UserGroupsMembershipModel(user=user, group=group, role=role)
     test_db_session.add_all([user, group, group_member])
     await test_db_session.commit()
     await test_db_session.refresh(user)

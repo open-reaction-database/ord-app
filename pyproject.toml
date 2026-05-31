@@ -50,19 +50,15 @@ dev = [
     "pytype>=2024.10.11",
     "pytest-asyncio>=0.25.3,<0.26",
     "ruff>=0.9.9,<0.10",
+    "pre-commit>=4.0,<5",
 ]
 
 [tool.uv]
 package = false
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-
-[tool.isort]
-skip_glob = ["**/*_pb2.py*"]
-line_length = 120
-profile = "black"
-known_third_party = ["ord_schema"]
+target-version = "py312"
 
 [tool.pytype]
 inputs = ["ord_app"]

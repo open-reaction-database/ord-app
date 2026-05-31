@@ -49,9 +49,7 @@ class DatasetUseCases:
         self.dataset_repository = DatasetsRepository(db)
         self.reaction_repository = ReactionsRepository(db)
 
-    async def create(
-        self, group_id: int, payload: DatasetCreateSchema
-    ) -> DatasetModel:
+    async def create(self, group_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
         dataset = await self.dataset_repository.get(dataset.id)
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
@@ -151,7 +149,7 @@ class DatasetUseCases:
         # on the maximum number of elements that can be written to the database at a time
         chunk_size = 1_000
         for i in range(0, len(reactions_payload), chunk_size):
-            await self.reaction_repository.bulk_create(reactions_payload[i:i + chunk_size])
+            await self.reaction_repository.bulk_create(reactions_payload[i : i + chunk_size])
 
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
@@ -174,9 +172,7 @@ class DatasetUseCases:
             raise EntityDoesNotExist("Dataset not found")
 
         dataset_pb = load_message(
-            orjson.dumps({"name": dataset.name, "description": dataset.description}),
-            Dataset,
-            "json"
+            orjson.dumps({"name": dataset.name, "description": dataset.description}), Dataset, "json"
         )
 
         dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
@@ -188,8 +184,8 @@ class DatasetUseCases:
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError("Cannot share datasets with the same secondary group")
 
-        dataset_group_association = (
-            await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
+        dataset_group_association = await self.dataset_repository.get_dataset_group_association(
+            primary_group_id, primary_dataset_id
         )
         if dataset_group_association:
             return await self.dataset_repository.share_dataset(primary_dataset_id, payload.secondary_group_id)
@@ -200,8 +196,8 @@ class DatasetUseCases:
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError("Cannot unshare datasets with the same secondary group")
 
-        dataset_group_association = (
-            await self.dataset_repository.get_dataset_group_association(primary_group_id, primary_dataset_id)
+        dataset_group_association = await self.dataset_repository.get_dataset_group_association(
+            primary_group_id, primary_dataset_id
         )
         if dataset_group_association:
             return await self.dataset_repository.unshare_dataset(primary_dataset_id, payload.secondary_group_id)

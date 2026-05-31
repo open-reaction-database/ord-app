@@ -29,10 +29,7 @@ from ord_app.service_api.services.exceptions import ForbiddenError, Unauthentica
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def authenticate(
-    db_session: AsyncSession = Depends(get_db_session),
-    token: dict = Depends(verify_access_token)
-):
+async def authenticate(db_session: AsyncSession = Depends(get_db_session), token: dict = Depends(verify_access_token)):
     if user := await UserRepository(db_session).get(auth0_id=token["sub"]):
         return user
     raise UnauthenticatedError(detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})

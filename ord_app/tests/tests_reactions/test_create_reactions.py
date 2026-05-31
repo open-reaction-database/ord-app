@@ -24,6 +24,7 @@ from ord_app.tests.conftest import create_test_dataset, read_testdata_bytes
 
 fake = Faker()
 
+
 async def test_create_reaction_with_pb(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
@@ -44,10 +45,14 @@ async def test_upload_reaction(api_client, mock_authenticated_user, test_db_sess
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     pb_reaction = Reaction(reaction_id="test")
 
-    response_data = api_client.post(
-        f"/api/v1/datasets/{dataset.id}/reactions/upload",
-        files={"file": ("reaction.pb", pb_reaction.SerializeToString())}
-    ).raise_for_status().json()
+    response_data = (
+        api_client.post(
+            f"/api/v1/datasets/{dataset.id}/reactions/upload",
+            files={"file": ("reaction.pb", pb_reaction.SerializeToString())},
+        )
+        .raise_for_status()
+        .json()
+    )
     assert response_data["pb_reaction_id"] == pb_reaction.reaction_id
 
 
@@ -55,16 +60,24 @@ async def test_upload_reaction_with_duplicate_reaction_id(api_client, mock_authe
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     pb_reaction = Reaction(reaction_id="test")
 
-    response_data = api_client.post(
-        f"/api/v1/datasets/{dataset.id}/reactions/upload",
-        files={"file": ("reaction.pb", pb_reaction.SerializeToString())}
-    ).raise_for_status().json()
+    response_data = (
+        api_client.post(
+            f"/api/v1/datasets/{dataset.id}/reactions/upload",
+            files={"file": ("reaction.pb", pb_reaction.SerializeToString())},
+        )
+        .raise_for_status()
+        .json()
+    )
     assert response_data["pb_reaction_id"] == pb_reaction.reaction_id
 
-    response_data = api_client.post(
-        f"/api/v1/datasets/{dataset.id}/reactions/upload",
-        files={"file": ("reaction.pb", pb_reaction.SerializeToString())}
-    ).raise_for_status().json()
+    response_data = (
+        api_client.post(
+            f"/api/v1/datasets/{dataset.id}/reactions/upload",
+            files={"file": ("reaction.pb", pb_reaction.SerializeToString())},
+        )
+        .raise_for_status()
+        .json()
+    )
     assert response_data["pb_reaction_id"].startswith("duplicate-test")
 
 

@@ -46,11 +46,7 @@ async def _emolecules_resolve(*args, value: str) -> tuple[str, str]:
 async def name_resolve_cached(value_type: str, value: str) -> tuple[str, str] | None:
     tasks = []
     for resolver_func in (_pubchem_resolve, _cactus_resolve, _emolecules_resolve):
-        tasks.append(
-            asyncio.create_task(
-                resolver_func(value_type, value=value)
-            )
-        )
+        tasks.append(asyncio.create_task(resolver_func(value_type, value=value)))
 
     for completed_task in asyncio.as_completed(tasks):
         try:

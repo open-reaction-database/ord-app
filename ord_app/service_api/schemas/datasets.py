@@ -70,7 +70,6 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
         return data
 
 
-
 class DatasetCreateSchema(BaseSchema):
     name: constr(max_length=MAX_CRITICAL_FIELD_LENGTH)
     description: constr(max_length=MAX_FIELD_LENGTH) | None = ""

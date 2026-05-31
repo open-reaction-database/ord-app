@@ -104,7 +104,9 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     user_use_case = UserUseCase(db_session)
 
     # Decode token
-    decoded_token = await verify_access_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=payload.access_token))
+    decoded_token = await verify_access_token(
+        HTTPAuthorizationCredentials(scheme="Bearer", credentials=payload.access_token)
+    )
 
     # getting information about the user from the found 'userinfo' link in decoded_token["aud"]
     user_info_api = next(filter(lambda i: "userinfo" in i, decoded_token["aud"]), None)
@@ -129,15 +131,12 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
         avatar_url=user_info.get("picture") or None,
         external_id=external_id,
         orcid_id=orcid_id,
-        auth0_id=user_info["sub"]
+        auth0_id=user_info["sub"],
     )
 
     if user := await user_use_case.get_user_by_auth0_id(user_info["sub"]):
         logger.debug(f"<User(id={user.id})> already exists")
-        return await user_use_case.user_repo.update(
-            payload=user_payload.model_dump(exclude_unset=True),
-            id=user.id
-        )
+        return await user_use_case.user_repo.update(payload=user_payload.model_dump(exclude_unset=True), id=user.id)
 
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)

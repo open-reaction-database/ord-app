@@ -72,12 +72,7 @@ async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, au
 
     try:
         payload = jwt.decode(
-            token.credentials,
-            signing_key,
-            algorithms=algorithms,
-            audience=audience,
-            issuer=issuer,
-            leeway=10
+            token.credentials, signing_key, algorithms=algorithms, audience=audience, issuer=issuer, leeway=10
         )
     except Exception as error:
         logger.error(error)

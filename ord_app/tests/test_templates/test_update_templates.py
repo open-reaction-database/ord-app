@@ -23,7 +23,10 @@ fake = Faker()
 
 
 async def test_update_templates(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     template = await create_template(test_db_session, user.id)
 
     payload = {
@@ -36,7 +39,10 @@ async def test_update_templates(api_client, mock_authenticated_user, test_db_ses
 
 
 async def test_update_foreign_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     user2, _ = await create_test_user_with_group(test_db_session)
     await create_template(test_db_session, user.id)
     template2 = await create_template(test_db_session, user2.id)

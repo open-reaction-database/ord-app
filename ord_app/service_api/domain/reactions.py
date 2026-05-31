@@ -49,10 +49,8 @@ from ord_app.service_api.services.postgresql import get_db_session
 async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = None):
     reaction_repo = ReactionsRepository(db)
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
-
         update_values = []
         for reaction in reactions:
-
             pb_reaction = None
             if reaction.binpb is not None:
                 pb_reaction = await run_in_threadpool(load_message, reaction.binpb, Reaction, "binpb")
@@ -125,10 +123,7 @@ class ReactionsUseCase:
             orcid=self.current_user.orcid_id,
             email=self.current_user.email,
         )
-        record_event = RecordEvent(
-            time=DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")),
-            person=person
-        )
+        record_event = RecordEvent(time=DateTime(value=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")), person=person)
         provenance = ReactionProvenance(experimenter=person, record_created=record_event)
         pb_reaction = Reaction(provenance=provenance)
 
@@ -189,7 +184,7 @@ class ReactionsUseCase:
         duplicated_reactions = await self.reaction_repo.find_duplicated_by_pb_reaction_id(
             dataset_id=dataset_id,
             pb_reaction_id=pb_reaction.reaction_id,
-            exclude_pb_reaction_ids=[db_reaction.pb_reaction_id]
+            exclude_pb_reaction_ids=[db_reaction.pb_reaction_id],
         )
         if duplicated_reactions:
             raise ConflictError(f"Reaction with id={pb_reaction.reaction_id} already exists")

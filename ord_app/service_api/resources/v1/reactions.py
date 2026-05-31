@@ -42,16 +42,17 @@ async def create_reaction(
 ):
     return await use_case.create(dataset_id, payload)
 
+
 @router.post(
     "/from-scratch",
     dependencies=[Depends(dataset_authorization(("admin", "editor")))],
-    response_model=ReactionResponseSchema
+    response_model=ReactionResponseSchema,
 )
 async def create_reaction_from_scratch(
-    dataset_id: int,
-    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)]
+    dataset_id: int, use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)]
 ):
     return await use_case.create_from_scratch(dataset_id)
+
 
 @router.post(
     "/upload",
@@ -64,7 +65,7 @@ async def upload_reaction(
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
-    response =  await use_case.upload(dataset_id, file_data, kind)
+    response = await use_case.upload(dataset_id, file_data, kind)
     return response
 
 

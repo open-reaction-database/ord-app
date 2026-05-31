@@ -24,10 +24,14 @@ async def test_get_dataset_groups(api_client, mock_authenticated_user, test_db_s
 
     # share primary dataset by primary user to the secondary user
     _, secondary_group = await create_test_user_with_group(test_db_session)
-    share_response_data = api_client.post(
-        f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
-        json={"secondary_group_id": secondary_group.id}
-    ).raise_for_status().json()
+    share_response_data = (
+        api_client.post(
+            f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
+            json={"secondary_group_id": secondary_group.id},
+        )
+        .raise_for_status()
+        .json()
+    )
     assert share_response_data == {"dataset_id": primary_dataset.id, "group_id": secondary_group.id}
 
     response_data = api_client.get(f"/api/v1/datasets/{primary_dataset.id}/groups").raise_for_status().json()

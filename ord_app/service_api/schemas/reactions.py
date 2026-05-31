@@ -52,31 +52,23 @@ def get_molblocks(pb):
     for outcome in pb.outcomes:
         outcome_item = []
         for product in outcome.products:
-            product_item = {
-                "molblock": safe_molblock(product),
-                "measurements": []
-            }
+            product_item = {"molblock": safe_molblock(product), "measurements": []}
             for measurement in product.measurements:
-                product_item["measurements"].append({
-                    "authentic_standard": {
-                        "molblock": safe_molblock(measurement.authentic_standard)
-                    },
-                })
+                product_item["measurements"].append(
+                    {
+                        "authentic_standard": {"molblock": safe_molblock(measurement.authentic_standard)},
+                    }
+                )
 
             outcome_item.append(product_item)
         outcomes.append({"products": outcome_item})
 
-    inputs = {
-        key: [safe_molblock(component) for component in value.components]
-        for key, value in pb.inputs.items()
-    }
+    inputs = {key: [safe_molblock(component) for component in value.components] for key, value in pb.inputs.items()}
 
     workups = []
     for workup in pb.workups:
         if hasattr(workup, "input") and hasattr(workup.input, "components"):
-            workups.append(
-                [safe_molblock(component) for component in workup.input.components]
-            )
+            workups.append([safe_molblock(component) for component in workup.input.components])
         else:
             workups.append([])
 
@@ -93,7 +85,7 @@ class ReactionResponseSchema(BaseSchema):
         default_factory=lambda: {
             "provenance": {"doi": "foo"},
             "summary": {"yield": 25.5},
-            "conditions": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis."
+            "conditions": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis.",
         }
     )
     molblocks: dict

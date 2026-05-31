@@ -28,9 +28,7 @@ class GroupRepository(BaseRepository[GroupModel]):
 
     async def create(self, owner_id: int, payload: dict, autocommit: bool = True) -> GroupModel:
         group = GroupModel(
-            owner_id=owner_id,
-            groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")],
-            **payload
+            owner_id=owner_id, groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")], **payload
         )
 
         if autocommit:
@@ -48,10 +46,7 @@ class GroupRepository(BaseRepository[GroupModel]):
             .where(UserGroupsMembershipModel.user_id == user_id)
         )
         rows = (await self.db.execute(stmt)).all()
-        groups = [
-            dict(id=group.id, name=group.name, role=user_group.role)
-            for group, user_group in rows
-        ]
+        groups = [dict(id=group.id, name=group.name, role=user_group.role) for group, user_group in rows]
         return groups
 
 
@@ -67,9 +62,7 @@ class GroupMembersRepository:
                 UserGroupsMembershipModel.user_id == user_id,
                 UserGroupsMembershipModel.group_id == group_id,
             )
-            .options(
-                joinedload(UserGroupsMembershipModel.user)
-            )
+            .options(joinedload(UserGroupsMembershipModel.user))
             .limit(1)
         )
         result = await self.db.scalar(stmt)
@@ -79,9 +72,7 @@ class GroupMembersRepository:
         stmt = (
             select(UserGroupsMembershipModel)
             .where(UserGroupsMembershipModel.group_id == group_id)
-            .options(
-                joinedload(UserGroupsMembershipModel.user)
-            )
+            .options(joinedload(UserGroupsMembershipModel.user))
         )
         return (await self.db.scalars(stmt)).all()
 

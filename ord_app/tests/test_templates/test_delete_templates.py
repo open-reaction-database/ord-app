@@ -22,9 +22,11 @@ from ord_app.tests.conftest import create_template, create_test_user_with_group
 fake = Faker()
 
 
-
 async def test_delete_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     template = await create_template(test_db_session, user.id)
     api_client.delete(f"/api/v1/templates/{template.id}").raise_for_status()
 
@@ -34,7 +36,10 @@ async def test_delete_template(api_client, mock_authenticated_user, test_db_sess
 
 
 async def test_delete_foreign_template(api_client, mock_authenticated_user, test_db_session):
-    user, *_, = mock_authenticated_user
+    (
+        user,
+        *_,
+    ) = mock_authenticated_user
     user2, _ = await create_test_user_with_group(test_db_session)
     template = await create_template(test_db_session, user.id)
     template2 = await create_template(test_db_session, user2.id)

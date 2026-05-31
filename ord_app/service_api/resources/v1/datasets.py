@@ -79,7 +79,7 @@ async def upload_dataset(
     file: UploadFile,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     dataset = await use_case.upload(group_id, file_data, kind)
@@ -98,7 +98,7 @@ async def enumerate_dataset(
     payload: DatasetEnumerateCreateSchema,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ):
     dataset = await use_case.enumerate(group_id, payload)
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
@@ -115,7 +115,7 @@ async def extend_enumerate_dataset(
     payload: DatasetEnumerateExtendSchema,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ):
     dataset = await use_case.extend_enumerate(dataset_id, payload)
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
@@ -132,10 +132,8 @@ async def download_dataset(
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ):
     dataset, data = await use_case.download(dataset_id, file_format)
-    return Response(
-        data,
-        headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'}
-    )
+    return Response(data, headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'})
+
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountResponseSchema])
 async def get_user_datasets(
@@ -190,7 +188,7 @@ async def extend_dataset(
     file: UploadFile,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ):
     file_data, kind = await validate_uploaded_pb_file(file)
     response = await use_case.extend(dataset_id, file_data, kind)
@@ -215,7 +213,7 @@ async def get_dataset_groups(
 @router.post(
     "/groups/{group_id}/datasets/{dataset_id}/share",
     dependencies=[Depends(group_authorization(("admin",)))],
-    response_model=DatasetShareSchema
+    response_model=DatasetShareSchema,
 )
 async def share_dataset(
     group_id: int,
@@ -229,7 +227,7 @@ async def share_dataset(
 @router.post(
     "/groups/{group_id}/datasets/{dataset_id}/unshare",
     dependencies=[Depends(group_authorization(("admin",)))],
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def unshare_dataset(
     group_id: int,
