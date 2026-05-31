@@ -20,7 +20,7 @@ import { Buffer } from 'buffer';
 
 // Because ketcher depends on draft-js which requires setImmediate package
 // https://github.com/yuzujs/setImmediate
-window.global ||= window;
-window.Buffer = Buffer;
+globalThis.global ||= globalThis;
+globalThis.Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(<AppRoot />);

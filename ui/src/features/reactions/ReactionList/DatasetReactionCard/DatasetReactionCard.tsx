@@ -38,7 +38,7 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     {
       label: 'Copy Reaction Link',
-      value: `${window.location.href}/reactions/${id}`,
+      value: `${globalThis.location.href}/reactions/${id}`,
     },
     { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
   ];

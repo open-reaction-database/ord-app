@@ -34,7 +34,7 @@ interface ComponentsKetcherEditorProps {
   identifier: IdentifierData | null;
 }
 
-const appWindow = window as unknown as { ketcher: Ketcher | null };
+const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 

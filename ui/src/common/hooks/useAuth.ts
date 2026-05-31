@@ -39,7 +39,7 @@ export function useAuth() {
     if (!isLoading && !isAuthenticated) {
       loginWithRedirect({
         appState: {
-          returnTo: window.location.href,
+          returnTo: globalThis.location.href,
         },
       });
     }
@@ -78,7 +78,7 @@ export function useAuth() {
       } catch (_: unknown) {
         loginWithRedirect({
           appState: {
-            returnTo: window.location.href,
+            returnTo: globalThis.location.href,
           },
         });
       }
