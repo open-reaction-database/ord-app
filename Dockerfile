@@ -46,7 +46,6 @@ COPY migrations/ ./migrations/
 COPY alembic.ini .
 COPY uv.lock .
 COPY pyproject.toml .
-COPY tox.ini .
 COPY ord_app/ ./ord_app
 
 RUN uv sync --frozen

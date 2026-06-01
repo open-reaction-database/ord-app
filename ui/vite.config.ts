@@ -36,7 +36,9 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
+      // text/text-summary -> console; html + lcov -> uploaded artifacts; json-summary -> CI step summary.
+      reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],
+      reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.d.ts', 'src/test/**', 'src/**/*.module.scss'],
     },
