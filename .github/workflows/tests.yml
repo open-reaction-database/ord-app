@@ -79,11 +79,13 @@ jobs:
       # merging this upload with the UI lcov via the `python`/`ui` flags.
       - name: Upload coverage to Codecov
         if: ${{ always() && matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
         with:
           files: coverage.xml
           flags: python
           token: ${{ secrets.CODECOV_TOKEN }}
+          # Strict on push + same-repo PRs; tolerate fork/dependabot (tokenless). Mirrors ord-schema.
+          fail_ci_if_error: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && !startsWith(github.head_ref, 'dependabot/')) }}
 
       - name: Upload Python coverage report
         if: ${{ always() && matrix.os == 'ubuntu-latest' }}

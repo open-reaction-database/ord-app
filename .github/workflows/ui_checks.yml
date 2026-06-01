@@ -65,11 +65,13 @@ jobs:
       # (python flag) into one PR comment with project (total) + patch (delta) coverage.
       - name: Upload coverage to Codecov
         if: always()
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
         with:
           files: ui/coverage/lcov.info
           flags: ui
           token: ${{ secrets.CODECOV_TOKEN }}
+          # Strict on push + same-repo PRs; tolerate fork/dependabot (tokenless). Mirrors ord-schema.
+          fail_ci_if_error: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && !startsWith(github.head_ref, 'dependabot/')) }}
 
       - name: Upload UI coverage report
         if: always()
