@@ -45,4 +45,13 @@ describe('selectTemplates', () => {
   it('returns an empty list when there is no order', () => {
     expect(selectTemplates(buildState([], { a: makeTemplate('a') }))).toEqual([]);
   });
+
+  // An id can be in templatesOrder before its reaction data has loaded (getAllTemplates
+  // populates the order, individual reaction data arrives separately). The selector does
+  // an unguarded lookup, so it yields undefined for the missing entry — pin that behavior.
+  it('yields undefined for an ordered id that is not yet in the reactions store', () => {
+    const a = makeTemplate('a');
+    const result = selectTemplates(buildState(['a', 'missing'], { a }));
+    expect(result).toEqual([a, undefined]);
+  });
 });
