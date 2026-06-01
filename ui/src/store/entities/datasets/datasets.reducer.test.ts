@@ -214,9 +214,32 @@ describe('datasetsReducer', () => {
       expect(state.areDatasetGroupsLoading).toBe(true);
     });
 
-    it('is false once the groups list resolves or is cleared', () => {
+    it('is false once the groups list resolves', () => {
       let state = datasetsReducer(initialState(), getDatasetGroupsActions.request(1));
       expect(state.areDatasetGroupsLoading).toBe(true);
+      state = datasetsReducer(state, getDatasetGroupsActions.success([]));
+      expect(state.areDatasetGroupsLoading).toBe(false);
+    });
+
+    it('is false once the groups list is cleared', () => {
+      let state = datasetsReducer(initialState(), getDatasetGroupsActions.request(1));
+      expect(state.areDatasetGroupsLoading).toBe(true);
+      state = datasetsReducer(state, clearDatasetGroupsListAction());
+      expect(state.areDatasetGroupsLoading).toBe(false);
+    });
+
+    // shareDatasetWithGroupActions.success is intentionally NOT a reset trigger: the
+    // shareDatasetWithGroup thunk dispatches success() and then re-fetches via
+    // getDatasetGroups, so the loading flag is cleared by that follow-up
+    // getDatasetGroupsActions.request -> .success cycle, keeping the spinner up across
+    // the refetch. This test pins that cascaded-request design.
+    it('stays true after share success alone (reset by the follow-up refetch)', () => {
+      let state = datasetsReducer(initialState(), shareDatasetWithGroupActions.request(sharePayload));
+      expect(state.areDatasetGroupsLoading).toBe(true);
+      state = datasetsReducer(state, shareDatasetWithGroupActions.success());
+      expect(state.areDatasetGroupsLoading).toBe(true);
+      // the thunk's follow-up getDatasetGroups request/success is what clears it
+      state = datasetsReducer(state, getDatasetGroupsActions.request(sharePayload.datasetId));
       state = datasetsReducer(state, getDatasetGroupsActions.success([]));
       expect(state.areDatasetGroupsLoading).toBe(false);
     });
