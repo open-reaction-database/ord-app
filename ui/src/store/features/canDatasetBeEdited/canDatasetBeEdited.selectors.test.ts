@@ -42,12 +42,17 @@ describe('selectCanDatasetBeEdited', () => {
     expect(selectCanDatasetBeEdited(buildState(1, {}, {}))).toBe(false);
   });
 
-  it('is true when the user is admin or editor in any of the dataset groups', () => {
+  it('is true when the user is an editor in any of the dataset groups', () => {
     const state = buildState(
       1,
       { 1: datasetWithGroups([10, 20]) },
       { 10: group(10, USER_ROLES.VIEWER), 20: group(20, USER_ROLES.EDITOR) },
     );
+    expect(selectCanDatasetBeEdited(state)).toBe(true);
+  });
+
+  it('is true when the user is an admin in any of the dataset groups', () => {
+    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.ADMIN) });
     expect(selectCanDatasetBeEdited(state)).toBe(true);
   });
 
