@@ -42,9 +42,6 @@ jobs:
 
   test_ui:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -61,16 +58,18 @@ jobs:
               echo "### UI test coverage"
               echo ""
               jq -r '.total | "| Metric | % | Covered / Total |\n|---|---:|---:|\n| Lines | \(.lines.pct)% | \(.lines.covered) / \(.lines.total) |\n| Statements | \(.statements.pct)% | \(.statements.covered) / \(.statements.total) |\n| Functions | \(.functions.pct)% | \(.functions.covered) / \(.functions.total) |\n| Branches | \(.branches.pct)% | \(.branches.covered) / \(.branches.total) |"' coverage/coverage-summary.json
-            } > coverage-comment.md
-            cat coverage-comment.md >> "$GITHUB_STEP_SUMMARY"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Comment UI coverage on PR
-        if: ${{ always() && github.event_name == 'pull_request' && hashFiles('ui/coverage-comment.md') != '' }}
-        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
+      # Codecov merges this lcov upload (ui flag) with the Python coverage.xml
+      # (python flag) into one PR comment with project (total) + patch (delta) coverage.
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
         with:
-          header: ui-coverage
-          path: ui/coverage-comment.md
+          files: ui/coverage/lcov.info
+          flags: ui
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload UI coverage report
         if: always()
