@@ -60,11 +60,30 @@ jobs:
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
-        run: uv run pytest -vv --cov=ord_app --durations=10
+        run: uv run pytest -vv --cov=ord_app --cov-report=term-missing --cov-report=xml --cov-report=html --durations=10
         env:
           PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
+
+      - name: Coverage summary
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        run: |
+          {
+            echo "### Python test coverage"
+            echo ""
+            uv run coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Python coverage report
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: python-coverage
+          path: |
+            coverage.xml
+            htmlcov/
+          retention-days: 7
 
   test_e2e:
     runs-on: ubuntu-latest
