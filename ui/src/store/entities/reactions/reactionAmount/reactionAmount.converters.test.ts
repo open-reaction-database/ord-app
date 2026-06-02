@@ -15,12 +15,19 @@
  */
 import { describe, it, expect } from 'vitest';
 import { ordAmountToReaction, reactionAmountToOrd } from './reactionAmount.converters.ts';
-import { appAmountUnspecified, massUnitNames, volumeUnitNames, unitValueByName } from './reactionAmount.models.ts';
-import type { AppMassUnit, AppVolumeUnit } from './reactionAmount.types.ts';
+import {
+  appAmountUnspecified,
+  massUnitNames,
+  molesUnitNames,
+  volumeUnitNames,
+  unitValueByName,
+} from './reactionAmount.models.ts';
+import type { AppMassUnit, AppMolesUnit, AppVolumeUnit } from './reactionAmount.types.ts';
 import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 // Object.keys() widens these to string[]; narrow back to the unit unions for the converters.
 const massUnit = massUnitNames[0] as AppMassUnit;
+const molesUnit = molesUnitNames[0] as AppMolesUnit;
 const volumeUnit = volumeUnitNames[0] as AppVolumeUnit;
 
 describe('reactionAmountToOrd', () => {
@@ -43,9 +50,21 @@ describe('reactionAmountToOrd', () => {
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     });
     expect(result?.mass).toEqual({ value: 5, precision: 0.1, units: unitValueByName[massUnit] });
-    // A mass amount is not a volume, so volumeIncludesSolutes is dropped.
+    // A mass amount is not a volume, so volumeIncludesSolutes is set to null (present, not omitted).
     expect(result?.volumeIncludesSolutes).toBeNull();
     expect(result?.moles).toBeUndefined();
+  });
+
+  it('nests a moles amount under the moles key', () => {
+    const result = reactionAmountToOrd({
+      value: 3,
+      precision: null,
+      units: molesUnit,
+      volumeIncludesSolutes: ReactionBoolean.Unspecified,
+    });
+    expect(result?.moles).toEqual({ value: 3, precision: null, units: unitValueByName[molesUnit] });
+    expect(result?.mass).toBeUndefined();
+    expect(result?.volume).toBeUndefined();
   });
 
   it('keeps volumeIncludesSolutes only for volume units', () => {
@@ -92,11 +111,15 @@ describe('ordAmountToReaction', () => {
 });
 
 describe('round trip', () => {
-  it('preserves a mass amount through ord and back', () => {
+  it.each([
+    ['mass', massUnit],
+    ['moles', molesUnit],
+    ['volume', volumeUnit],
+  ])('preserves a %s amount through ord and back', (_dimension, units) => {
     const amount = {
       value: 12,
       precision: 0.5,
-      units: massUnit,
+      units,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     };
     expect(ordAmountToReaction(reactionAmountToOrd(amount))).toMatchObject(amount);

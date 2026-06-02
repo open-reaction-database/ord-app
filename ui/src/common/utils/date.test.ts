@@ -15,21 +15,23 @@
  */
 import { describe, it, expect } from 'vitest';
 import { convertUtcDateToUserTZ, convertUserTZDateToUtc, formatUtcDateToDisplay, formatDateToDisplay } from './date.ts';
-import { DATE_TIME_FORMAT } from '../constants.ts';
 
 // DATE_TIME_HUMAN_FORMAT renders as e.g. "01.06.2024 02:00 pm" (DD.MM.YYYY hh:mm a).
 const humanFormat = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)$/;
 
+// These assert timezone-independent invariants (instant + UTC offset) so they stay meaningful on a
+// UTC CI runner, where a wall-clock round trip through the guessed zone would pass vacuously.
 describe('timezone conversions', () => {
-  it('changes the displayed zone without moving the instant', () => {
+  it('parses a UTC string without moving the instant', () => {
     const iso = '2024-06-01T12:00:00Z';
     expect(convertUtcDateToUserTZ(iso).valueOf()).toBe(Date.parse(iso));
   });
 
-  it('round-trips a UTC instant through the user timezone and back', () => {
-    const iso = '2024-06-01T12:00:00Z';
-    const userLocal = convertUtcDateToUserTZ(iso).format(DATE_TIME_FORMAT);
-    expect(convertUserTZDateToUtc(userLocal).valueOf()).toBe(Date.parse(iso));
+  it('converts an absolute Date to a UTC-mode value at the same instant', () => {
+    const date = new Date('2024-06-01T12:00:00Z');
+    const utc = convertUserTZDateToUtc(date);
+    expect(utc.valueOf()).toBe(date.getTime());
+    expect(utc.utcOffset()).toBe(0);
   });
 });
 
