@@ -53,7 +53,7 @@ export function OutcomeListItemHeader({ outcome, pathComponents }: Readonly<Outc
           amount={outcome.products.length}
         />
       </Flex>
-      {outcome.reactionTime && outcome.reactionTime.value && (
+      {outcome.reactionTime?.value && (
         <Flex
           align="center"
           gap="xs"
@@ -63,7 +63,7 @@ export function OutcomeListItemHeader({ outcome, pathComponents }: Readonly<Outc
           <Text className={classes.shortInfoText}>{renderValuePrecisionUnit(outcome.reactionTime)}</Text>
         </Flex>
       )}
-      {outcome.conversion && outcome.conversion.value && (
+      {outcome.conversion?.value && (
         <Flex
           align="center"
           gap="xs"

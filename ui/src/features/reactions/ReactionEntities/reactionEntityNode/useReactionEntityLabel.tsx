@@ -18,7 +18,7 @@ import type { ReactNode } from 'react';
 import { ReactionEntityLabel } from './ReactionEntityLabel/ReactionEntityLabel.tsx';
 
 export function useReactionEntityLabel(wrapperConfig?: ReactionFormStandaloneField): ReactNode {
-  if (!wrapperConfig || !wrapperConfig.label) {
+  if (!wrapperConfig?.label) {
     return null;
   }
   return <ReactionEntityLabel wrapperConfig={wrapperConfig} />;
