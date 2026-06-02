@@ -21,8 +21,10 @@ export function useFileNameHref(name: string, value: FileControlValue | null) {
   const stringValue = value?.value ?? '';
 
   const fileName = useMemo(() => {
-    // In case there are incorrect saved format files
-    return [name, format.replace('.', '')].join('.');
+    // Guard against incorrect saved format files; omit the extension entirely when there is no
+    // format so we don't produce a trailing-dot filename (which some platforms mishandle).
+    const extension = format.replace('.', '');
+    return extension ? `${name}.${extension}` : name;
   }, [format, name]);
 
   const href = useMemo(() => {

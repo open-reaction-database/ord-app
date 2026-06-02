@@ -30,9 +30,13 @@ describe('copyToClipboard', () => {
     expect(writeText).toHaveBeenCalledWith('hello world');
   });
 
-  it('does not throw when the clipboard write is rejected', () => {
-    writeText.mockRejectedValue(new Error('denied'));
+  it('logs the error and does not throw when the clipboard write is rejected', async () => {
+    const error = new Error('denied');
+    writeText.mockRejectedValue(error);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     expect(() => copyToClipboard('x')).not.toThrow();
     expect(writeText).toHaveBeenCalledWith('x');
+    await vi.waitFor(() => expect(errorSpy).toHaveBeenCalledWith(error));
   });
 });

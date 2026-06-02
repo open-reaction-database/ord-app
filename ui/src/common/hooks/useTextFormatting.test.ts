@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import formatting from '../dictionary/formatting.json';
 import { getFormattedValue } from './useTextFormatting.ts';
 
 describe('getFormattedValue', () => {
   it('maps a known key to its formatted symbol', () => {
-    const [key, mapped] = Object.entries(formatting)[0];
-    expect(getFormattedValue(key)).toBe(mapped);
+    expect(getFormattedValue('LITER')).toBe('L');
   });
 
   it('returns the input unchanged when there is no mapping', () => {

@@ -24,9 +24,9 @@ describe('useFileNameHref', () => {
     expect(result.current.href).toBe('data:application/octet-stream;base64,YWJj');
   });
 
-  it('falls back to empty format/value when there is no file value', () => {
+  it('omits the extension (no trailing dot) and empties the href when there is no file value', () => {
     const { result } = renderHook(() => useFileNameHref('molecule', null));
-    expect(result.current.fileName).toBe('molecule.');
+    expect(result.current.fileName).toBe('molecule');
     expect(result.current.href).toBe('data:application/octet-stream;base64,');
   });
 });
