@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { workupTransform } from './reactionWorkups.tranform.ts';
+import { workupTransform } from './reactionWorkups.transform.ts';
 import type { ReactionWorkup } from './reactionWorkups.types.ts';
 import type { WorkupType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 

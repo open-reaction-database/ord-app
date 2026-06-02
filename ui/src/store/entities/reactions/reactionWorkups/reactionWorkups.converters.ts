@@ -38,7 +38,7 @@ import {
   reactionStirringConditionToOrd,
   reactionTemperatureConditionToOrd,
 } from '../reactionConditions/reactionConditions.converter.ts';
-import { workupTransform } from './reactionWorkups.tranform.ts';
+import { workupTransform } from './reactionWorkups.transform.ts';
 
 export const ordWorkupToReaction = ({
   type,
