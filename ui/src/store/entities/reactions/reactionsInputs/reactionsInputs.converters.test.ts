@@ -65,11 +65,12 @@ describe('ordInputToReaction', () => {
 
 describe('input map converters', () => {
   it('keys converted inputs by their generated id', () => {
+    const byString = (a: string, b: string) => a.localeCompare(b);
     const result = ordInputsToReactionInputs({ reagent: {}, solvent: {} });
     const entries = Object.values(result);
     expect(entries).toHaveLength(2);
-    expect(entries.map(input => input.name).sort()).toEqual(['reagent', 'solvent']);
-    expect(Object.keys(result).sort()).toEqual(entries.map(input => input.id).sort());
+    expect(entries.map(input => input.name).sort(byString)).toEqual(['reagent', 'solvent']);
+    expect(Object.keys(result).sort(byString)).toEqual(entries.map(input => input.id).sort(byString));
   });
 
   it('round-trips a single input back to an ord map keyed by name', () => {
