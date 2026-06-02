@@ -42,7 +42,9 @@ vi.mock('store/axiosInstance.ts', () => ({
 }));
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
 
-const axiosMock = vi.mocked(axiosInstance);
+// axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
+// cast to a plain record of mock fns instead.
+const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 
 /** A store that records every dispatched action so follow-up refetches can be asserted by type. */
 function makeStore() {
@@ -88,7 +90,7 @@ describe('getDatasetsPage', () => {
   it('requests the unscoped datasets list when no active group is set', async () => {
     axiosMock.get.mockResolvedValueOnce({ data: { items: [], page: 1, size: 10, total: 0, pages: 0 } });
     const { store, types } = makeStore();
-    await store.dispatch(getDatasetsPage() as unknown as UnknownAction);
+    await store.dispatch(getDatasetsPage({ page: 1, size: 10 }) as unknown as UnknownAction);
     expect(axiosMock.get).toHaveBeenCalledWith('/datasets', expect.objectContaining({ params: expect.any(Object) }));
     expect(types()).toContain(getDatasetPageActions.success.type);
   });

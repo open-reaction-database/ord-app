@@ -43,7 +43,9 @@ vi.mock('./reactions.converters.ts', async importActual => ({
   linkReactionEntities: (data: unknown) => data,
 }));
 
-const axiosMock = vi.mocked(axiosInstance);
+// axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
+// cast to a plain record of mock fns instead.
+const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 
 function makeStore() {

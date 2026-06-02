@@ -34,7 +34,9 @@ vi.mock('store/axiosInstance.ts', () => ({
 }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
-const axiosMock = vi.mocked(axiosInstance);
+// axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
+// cast to a plain record of mock fns instead.
+const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 
 function makeStore() {
   const actions: Array<UnknownAction> = [];
@@ -81,8 +83,8 @@ describe('updateGroupMembers', () => {
   it('patches the member, refetches the list, and dispatches success', async () => {
     const { store, types } = makeStore();
     store.dispatch(setEditingGroupIdAction(3));
-    await store.dispatch(updateGroupMembers({ userId: 8, role: 'EDITOR' }) as unknown as UnknownAction);
-    expect(axiosMock.patch).toHaveBeenCalledWith('/groups/3/members', { userId: 8, role: 'EDITOR' });
+    await store.dispatch(updateGroupMembers({ user_id: 8, role: USER_ROLES.EDITOR }) as unknown as UnknownAction);
+    expect(axiosMock.patch).toHaveBeenCalledWith('/groups/3/members', { user_id: 8, role: USER_ROLES.EDITOR });
     expect(types()).toEqual(
       expect.arrayContaining([getGroupListActions.request.type, updateGroupMembersActions.success.type]),
     );
@@ -121,9 +123,9 @@ describe('addGroupMember', () => {
     const { store, actions } = makeStore();
     store.dispatch(setEditingGroupIdAction(3));
     await store.dispatch(addGroupMember('ann@example.com') as unknown as UnknownAction);
-    const failure = actions.find(action => action.type === addGroupMemberActions.failure.type) as {
-      payload: string;
-    };
+    const failure = actions.find(action => action.type === addGroupMemberActions.failure.type) as unknown as
+      | { payload: string }
+      | undefined;
     expect(failure?.payload).toBe(expected);
   });
 });
