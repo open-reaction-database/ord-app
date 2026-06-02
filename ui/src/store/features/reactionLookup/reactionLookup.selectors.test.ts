@@ -24,11 +24,18 @@ import type { AppState } from 'store/configureAppStore.ts';
 const buildState = (reactionLookup: Record<string, unknown>): AppState =>
   ({ features: { reactionLookup } }) as unknown as AppState;
 
+const state = buildState({ isOpened: true, isLoading: false, hasError: true });
+
 describe('reactionLookup selectors', () => {
-  it('reads the isOpened, isLoading, and hasError flags', () => {
-    const state = buildState({ isOpened: true, isLoading: false, hasError: true });
+  it('selectIsReactionLookupOpen reads the isOpened flag', () => {
     expect(selectIsReactionLookupOpen(state)).toBe(true);
+  });
+
+  it('selectReactionLookupIsLoading reads the isLoading flag', () => {
     expect(selectReactionLookupIsLoading(state)).toBe(false);
+  });
+
+  it('selectHasReactionLookupError reads the hasError flag', () => {
     expect(selectHasReactionLookupError(state)).toBe(true);
   });
 });

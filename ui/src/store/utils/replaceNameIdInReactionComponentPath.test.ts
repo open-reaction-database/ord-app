@@ -41,6 +41,11 @@ describe('replaceNameIdInReactionComponentPath', () => {
     ]);
   });
 
+  it('throws when the referenced input is not present in the reaction map', () => {
+    // findEntityByName uses a non-null assertion, so a missing key throws on the subsequent access.
+    expect(() => replaceNameIdInReactionComponentPath(['inputs', 'missing-key'], reactionWithInput, 'id')).toThrow();
+  });
+
   it('rewrites a condition `measurements` segment to its prefixed form and back', () => {
     expect(replaceNameIdInReactionComponentPath(['temperature', 'measurements'], {} as AppReaction, 'id')).toEqual([
       'temperature',
