@@ -87,7 +87,7 @@ export function useAuth() {
     if (user) {
       provisionUser();
     }
-  }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims]);
+  }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims, loginWithRedirect]);
 
   return isAppLoading;
 }
