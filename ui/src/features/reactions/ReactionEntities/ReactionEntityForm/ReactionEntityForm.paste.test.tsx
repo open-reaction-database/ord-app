@@ -35,7 +35,7 @@ vi.mock('./reactionEntityForm.utils.ts', async importActual => ({
   pasteReactionPart: (...args: Array<unknown>) => pasteReactionPartMock(...args),
 }));
 
-const addUpdateReactionFieldMock = vi.fn(() => ({ type: 'test/noop' }));
+const addUpdateReactionFieldMock = vi.fn((_arg: unknown) => ({ type: 'test/noop' }));
 vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   addUpdateReactionField: (arg: unknown) => addUpdateReactionFieldMock(arg),
