@@ -17,6 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { enumerationSetupReducer } from './enumerationSetup.reducer.tsx';
 import { setEnumerationSetupOpenedAction } from './enumerationSetup.actions.ts';
 import { startEnumerationActions } from '../../entities/enumeration/enumeration.actions.ts';
+import type { StartEnumeration } from '../../entities/enumeration/enumeration.types.ts';
 
 describe('enumerationSetupReducer', () => {
   it('toggles the opened flag via setEnumerationSetupOpenedAction', () => {
@@ -28,7 +29,7 @@ describe('enumerationSetupReducer', () => {
 
   it('closes the setup when enumeration starts', () => {
     const opened = enumerationSetupReducer(undefined, setEnumerationSetupOpenedAction(true));
-    const result = enumerationSetupReducer(opened, startEnumerationActions({} as never));
+    const result = enumerationSetupReducer(opened, startEnumerationActions({} as unknown as StartEnumeration));
     expect(result.isEnumerationSetupOpened).toBe(false);
   });
 });

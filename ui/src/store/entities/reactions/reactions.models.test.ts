@@ -20,6 +20,10 @@ import {
   reactionToOrdConvertersByNodeEntity,
 } from './reactions.models.ts';
 import { ReactionNodeEntity } from './reactions.types.ts';
+import {
+  ordVesselAttachmentToReaction,
+  ordVesselPreparationToReaction,
+} from './reactionSetup/reactionSetup.converter.ts';
 
 describe('node-entity converter registries', () => {
   const entities = Object.values(ReactionNodeEntity);
@@ -32,6 +36,16 @@ describe('node-entity converter registries', () => {
       );
       expect(reactionToOrdConvertersByNodeEntity[entity], `reaction->ord for ${entity}`).toBeTypeOf('function');
     }
+  });
+
+  it('wires vessel attachments and preparations to their own distinct ord->reaction converters', () => {
+    // Guards against the copy-paste that pointed VesselAttachments at the preparation converter.
+    expect(ordToReactionConvertersByNodeEntity[ReactionNodeEntity.VesselAttachments].convert).toBe(
+      ordVesselAttachmentToReaction,
+    );
+    expect(ordToReactionConvertersByNodeEntity[ReactionNodeEntity.VesselPreparations].convert).toBe(
+      ordVesselPreparationToReaction,
+    );
   });
 
   it('lists every node entity among the allowed entity names', () => {

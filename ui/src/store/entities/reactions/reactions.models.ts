@@ -40,6 +40,7 @@ import {
 } from './reactionEntity/reactionEntity.converters.ts';
 import {
   ordSetupToReactionSetup,
+  ordVesselAttachmentToReaction,
   ordVesselPreparationToReaction,
   reactionSetupToOrd,
   reactionVesselAttachmentToOrd,
@@ -178,7 +179,7 @@ export const ordToReactionConvertersByNodeEntity: Record<ReactionNodeEntity, Ord
   },
   [ReactionNodeEntity.VesselAttachments]: {
     hasName: false,
-    convert: ordVesselPreparationToReaction,
+    convert: ordVesselAttachmentToReaction,
   },
 };
 
