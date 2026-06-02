@@ -32,4 +32,26 @@ describe('SelectableButton', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Pick me' }));
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('renders the filled variant when selected and transparent when not', () => {
+    const { rerender } = renderWithMantine(
+      <SelectableButton
+        isSelected
+        onClick={() => {}}
+      >
+        Toggle
+      </SelectableButton>,
+    );
+    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute('data-variant', 'filled');
+
+    rerender(
+      <SelectableButton
+        isSelected={false}
+        onClick={() => {}}
+      >
+        Toggle
+      </SelectableButton>,
+    );
+    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute('data-variant', 'transparent');
+  });
 });
