@@ -83,6 +83,8 @@ jobs:
         with:
           files: coverage.xml
           flags: python
+          # CODECOV_TOKEN is an org-wide token, so the repo slug must be explicit.
+          slug: open-reaction-database/ord-app
           token: ${{ secrets.CODECOV_TOKEN }}
           # Strict on push + same-repo PRs; tolerate fork/dependabot (tokenless). Mirrors ord-schema.
           fail_ci_if_error: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && !startsWith(github.head_ref, 'dependabot/')) }}
