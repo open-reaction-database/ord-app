@@ -50,11 +50,13 @@ export function emptyReactionData(): AppReaction {
   } as unknown as AppReaction;
 }
 
+// Only the dataset-reaction shape is modelled here (isTemplate: false). The template variant of
+// ReactionsContext additionally requires a string reactionId + isViewOnly: true; if a template
+// smoke test is ever needed, add a dedicated helper rather than loosening these options.
 interface ReactionViewOptions extends Omit<RenderOptions, 'wrapper'> {
-  reactionId?: number | string;
+  reactionId?: number;
   pathComponents?: ReactionPathComponents;
   reaction?: AppReaction;
-  isTemplate?: boolean;
   isViewOnly?: boolean;
 }
 
@@ -63,14 +65,7 @@ interface ReactionViewOptions extends Omit<RenderOptions, 'wrapper'> {
  * the store, so components that read `reactionContext`/`reactionEntityContext` mount correctly.
  */
 export function renderInReactionView(ui: ReactElement, options: ReactionViewOptions = {}) {
-  const {
-    reactionId = 1,
-    pathComponents = [],
-    reaction,
-    isTemplate = false,
-    isViewOnly = false,
-    ...renderOptions
-  } = options;
+  const { reactionId = 1, pathComponents = [], reaction, isViewOnly = false, ...renderOptions } = options;
   const store = configureStore({
     reducer: rootReducer,
     preloadedState: {
@@ -81,7 +76,7 @@ export function renderInReactionView(ui: ReactElement, options: ReactionViewOpti
   });
   const reactionCtxValue = {
     reactionId,
-    isTemplate,
+    isTemplate: false,
     isViewOnly,
     ViewDeleteButtonsComponent: Dummy,
     ValueLabelComponent: Dummy,

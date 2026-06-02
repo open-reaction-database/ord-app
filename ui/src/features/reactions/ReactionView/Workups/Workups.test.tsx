@@ -17,6 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { Workups } from './Workups.tsx';
 
+// Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
 const Component = Workups as unknown as () => JSX.Element;
 
 describe('Workups', () => {
