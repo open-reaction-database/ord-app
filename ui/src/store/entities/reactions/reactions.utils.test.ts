@@ -16,6 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   convertObjectToNullIfEmpty,
+  deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
   getDeepReactionPart,
   removeDeepReactionPart,
@@ -87,5 +88,33 @@ describe('convertObjectToNullIfEmpty', () => {
   it('keeps a 0-valued key that is not declared as an enum key', () => {
     const object = { type: 0 };
     expect(convertObjectToNullIfEmpty(object)).toBe(object);
+  });
+});
+
+describe('deepMergeWithArrayMerge', () => {
+  it('deep-merges nested objects, keeping keys from both sides', () => {
+    expect(deepMergeWithArrayMerge({ a: { x: 1 }, b: 1 }, { a: { y: 2 } })).toEqual({ a: { x: 1, y: 2 }, b: 1 });
+  });
+
+  it('merges arrays element-wise by index rather than concatenating', () => {
+    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [{ b: 9 }])).toEqual([{ a: 1, b: 9 }, { a: 2 }]);
+  });
+
+  it('replaces a primitive array element at the same index', () => {
+    expect(deepMergeWithArrayMerge([1, 2, 3], [9])).toEqual([9, 2, 3]);
+  });
+
+  it('skips falsy source items, preserving the target element at that index', () => {
+    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [null, { b: 9 }])).toEqual([{ a: 1 }, { a: 2, b: 9 }]);
+  });
+
+  it('appends a new element when the target has no value at that index', () => {
+    expect(deepMergeWithArrayMerge([], [{ x: 1 }])).toEqual([{ x: 1 }]);
+  });
+
+  it('does not mutate the target operand', () => {
+    const target = { a: { x: 1 }, list: [{ k: 1 }] };
+    deepMergeWithArrayMerge(target, { a: { y: 2 }, list: [{ j: 2 }] });
+    expect(target).toEqual({ a: { x: 1 }, list: [{ k: 1 }] });
   });
 });

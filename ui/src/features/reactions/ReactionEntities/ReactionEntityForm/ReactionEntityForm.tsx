@@ -110,9 +110,12 @@ export function ReactionEntityForm({
   const onPasteChunk = useCallback(
     (reactionPart: object) => {
       try {
+        // Submit the filtered values, not the raw clipboard chunk: fields the sidebar excludes
+        // (e.g. setup.automationCode, provenance.recordModified, product.measurements) are edited
+        // in their own sidebars and must not be merged in here, or they get duplicated/retained.
         const formValues = filterValues(reactionPart);
         form.setValues(formValues);
-        onSubmit(reactionPart);
+        onSubmit(formValues);
         setFormKey(crypto.randomUUID());
       } catch (_e: unknown) {
         showNotification({
