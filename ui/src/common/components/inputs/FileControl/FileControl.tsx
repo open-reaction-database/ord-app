@@ -80,6 +80,7 @@ export function FileControl({ name, value, disabled, onChange, label }: Readonly
             {fileName}
           </a>
           <ActionIcon
+            aria-label="Remove file"
             onClick={handleRemoveFile}
             variant="transparent"
             color="red"

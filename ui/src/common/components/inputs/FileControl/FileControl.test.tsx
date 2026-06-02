@@ -42,7 +42,7 @@ describe('FileControl', () => {
       />,
     );
     expect(screen.getByRole('link', { name: 'molecule.pb' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /remove file/i }));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 });

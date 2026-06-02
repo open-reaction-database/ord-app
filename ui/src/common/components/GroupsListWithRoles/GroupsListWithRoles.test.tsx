@@ -32,10 +32,16 @@ const stateWithGroups = {
 } as unknown as Partial<AppState>;
 
 describe('GroupsListWithRoles', () => {
-  it('renders no group rows when the store has no matching groups', () => {
+  it('renders nothing when data is empty', () => {
     renderWithProviders(<GroupsListWithRoles data={[]} />, { preloadedState: {} });
     expect(screen.queryByText('Alpha:')).toBeNull();
-    expect(screen.queryByText('+1')).toBeNull();
+  });
+
+  it('renders nothing when the referenced groups are absent from the store', () => {
+    renderWithProviders(<GroupsListWithRoles data={[{ id: 99, name: 'Ghost', role: USER_ROLES.VIEWER }]} />, {
+      preloadedState: {},
+    });
+    expect(screen.queryByText('Ghost:')).toBeNull();
   });
 
   it('shows the highest-priority group first and a counter for the rest', () => {
