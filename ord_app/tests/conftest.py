@@ -167,8 +167,9 @@ def create_test_database():
 
     yield
 
-    # Release pooled connections so drop_database isn't blocked by our own sessions.
-    sync_engine.dispose()
+    # drop_database() runs pg_terminate_backend on every other connection to this database
+    # (both sync_engine's pool and the async pg_engine's pool) before issuing DROP, so neither
+    # engine needs explicit disposal here.
     drop_database(TEST_DSN)
 
 
