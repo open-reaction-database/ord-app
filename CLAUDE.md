@@ -22,7 +22,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 - Setup: `cd ui && npm ci`. Dev: `npm run dev`. Build: `npm run build` (= `tsc -b && vite build`).
 - Unit tests: `npx vitest run` (Vitest + happy-dom + Testing Library). E2E: `npm run test:e2e` (Playwright, specs in `e2e/`).
-- Lint/format: `npm run lint:check` (`prettier --check . && eslint && stylelint`).
+- Lint/format: `npm run lint:check` (= `prettier --check . && npm run lint && npm run lint:css`, i.e. `eslint src *.ts *.cjs *.mjs` + `stylelint '**/*.[s]css'`).
 - **Type-check with `tsc -b`, not bare `tsc --noEmit`** (the latter skips test files → false green; CI runs `tsc -b`). See `.claude/rules/ui-testing.md` and the **`ord-app-ui-testing` skill** for the full testing playbook (mocking patterns, render helpers, thunk harness, E2E stack boot).
 
 ## Formatting & pre-commit

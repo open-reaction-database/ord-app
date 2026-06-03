@@ -1,7 +1,6 @@
 ---
 name: ord-app-ui-testing
 description: Use when writing, debugging, or running tests for the ord-app `ui/` package — Vitest unit/integration tests (components, thunks, reducers, converters), mocking patterns (axios, Ketcher, protobuf), or Playwright E2E against the live no-auth stack. Covers the CI gotchas that cause "passes locally, fails in CI".
-version: 0.1.0
 ---
 
 # ORD-App UI Testing
@@ -11,7 +10,7 @@ Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Manti
 ## Pre-flight: match CI or get a false green
 
 - **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd ui && npx tsc -b --force`.
-- **Lint/format** exactly as CI (`lint:check` = `prettier --check . && eslint && stylelint`): run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
+- **Lint/format** exactly as CI: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint src *.ts *.cjs *.mjs` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
 - **zsh word-splitting**: a `$VAR` holding a space-separated file list does NOT split. Use `${=FILES}` (e.g. `npx eslint ${=FILES}`).
 - ESLint rules that bite tests: `no-duplicate-imports`; use `Array<string>` not `string[]`; `react-refresh/only-export-components` fires on files that export both a component and helpers (add a file-level `/* eslint-disable react-refresh/only-export-components */` to test-only render helpers); forbids inline `import()` type annotations (`@typescript-eslint/consistent-type-imports`) — see the partial-mock note below.
 
@@ -119,7 +118,3 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 curl -s "https://sonarcloud.io/api/issues/search?componentKeys=open-reaction-database_ord-app&rules=typescript:S6582&resolved=false&ps=50"
 ```
 The gate is part of CI; a PR isn't green over a red Sonar check. Many TS rules in this repo are documented false-positives/won't-fix (tracked in #671) — don't churn working code (e.g. `S2486` catches that already handle their condition, `S7735` readability-only branch flips). Avoid bare `Array.sort()` in tests (S-rule, needs a `localeCompare` comparator).
-
-## Merge gate (when authorized to merge)
-
-Test/no-behavior PRs auto-merge at **Greptile 5/5 + all checks green + 0 unresolved threads**. Greptile posts its score into the PR **body** (`<!-- greptile_comment -->` block, "Confidence Score: N/5"), not always a review — read it there. `test_e2e` flakes on network (`ECONNRESET` during install); re-run rather than treating as a real failure. Merge with `gh pr merge --squash --admin --delete-branch` (admin overrides the review-required ruleset).

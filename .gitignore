@@ -168,3 +168,5 @@ cython_debug/
 .idea/
 
 .vite/
+# personal, machine-local Claude rules (e.g. admin-merge workflow)
+.claude/rules/*.local.md
