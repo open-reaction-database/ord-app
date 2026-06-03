@@ -49,6 +49,7 @@ dev = [
     "pytest-cov>=6.0.0,<7",
     "pytype>=2024.10.11",
     "pytest-asyncio>=0.25.3,<0.26",
+    "pytest-xdist>=3.6,<4",
     "ruff>=0.9.9,<0.10",
     "pre-commit>=4.0,<5",
 ]

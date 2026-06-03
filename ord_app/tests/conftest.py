@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+
 import pytest
 from alembic import command
 from alembic.config import Config
 from faker import Faker
 from fastapi.testclient import TestClient
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, make_url, text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
@@ -55,7 +57,28 @@ def read_testdata_bytes(filename: str) -> bytes:
         return fd.read()
 
 
-pg_engine = create_async_engine(RuntimeSettings.pg_test_dsn)
+def _worker_test_dsn() -> str:
+    """Return a per-xdist-worker test database URL so parallel workers don't share state.
+
+    pytest-xdist runs each worker in its own process. The autouse ``clear_database`` fixture
+    TRUNCATEs every table before each test, so without isolation concurrent workers would wipe
+    each other's data mid-test. Suffix the database name with the worker id (``gw0``, ``gw1``,
+    …); a plain (non-``-n``) ``pytest`` run has no worker id and uses the base DSN unchanged.
+
+    Returns:
+        The ``pg_test_dsn`` with the database name suffixed by ``PYTEST_XDIST_WORKER`` when set.
+    """
+    url = make_url(RuntimeSettings.pg_test_dsn)
+    worker = os.getenv("PYTEST_XDIST_WORKER")
+    if worker:
+        url = url.set(database=f"{url.database}_{worker}")
+    # hide_password=False keeps the credential that str(url) would mask as "***".
+    return url.render_as_string(hide_password=False)
+
+
+TEST_DSN = _worker_test_dsn()
+
+pg_engine = create_async_engine(TEST_DSN)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
 
 
@@ -97,24 +120,24 @@ def api_client():
 
 @pytest.fixture(scope="session", autouse=True)
 def create_test_database():
-    engine = create_engine(RuntimeSettings.pg_test_dsn)
+    engine = create_engine(TEST_DSN)
     if not database_exists(engine.url):
         create_database(engine.url)
     engine.dispose()
 
     alembic_cfg = Config(str(RuntimeSettings.base_dir.parent.parent / "alembic.ini"))
     alembic_cfg.set_main_option("script_location", str(RuntimeSettings.base_dir.parent.parent / "migrations"))
-    alembic_cfg.set_main_option("sqlalchemy.url", RuntimeSettings.pg_test_dsn)
+    alembic_cfg.set_main_option("sqlalchemy.url", TEST_DSN)
     command.upgrade(alembic_cfg, "head")
 
     yield
 
-    drop_database(RuntimeSettings.pg_test_dsn)
+    drop_database(TEST_DSN)
 
 
 @pytest.fixture(autouse=True)
 def clear_database():
-    engine = create_engine(RuntimeSettings.pg_test_dsn)
+    engine = create_engine(TEST_DSN)
     db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     with db_session() as session:
