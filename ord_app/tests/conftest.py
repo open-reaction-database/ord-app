@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import time
 
 import pytest
 from alembic import command
@@ -20,8 +21,8 @@ from faker import Faker
 from fastapi.testclient import TestClient
 from ord_schema.proto.reaction_pb2 import Reaction
 from sqlalchemy import create_engine, make_url, text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from ord_app.service_api.main import app
@@ -69,6 +70,8 @@ def _worker_test_dsn() -> str:
         The ``pg_test_dsn`` with the database name suffixed by ``PYTEST_XDIST_WORKER`` when set.
     """
     url = make_url(RuntimeSettings.pg_test_dsn)
+    if url.database is None:
+        raise RuntimeError(f"pg_test_dsn must name a database: {RuntimeSettings.pg_test_dsn!r}")
     worker = os.getenv("PYTEST_XDIST_WORKER")
     if worker:
         url = url.set(database=f"{url.database}_{worker}")
@@ -76,10 +79,45 @@ def _worker_test_dsn() -> str:
     return url.render_as_string(hide_password=False)
 
 
+def _recreate_test_database(dsn: str, attempts: int = 5, delay: float = 0.5) -> None:
+    """Create a fresh database for ``dsn``, dropping any leftover one first.
+
+    Dropping a database left behind by a crashed run avoids a stale/partial schema failing the
+    migration below. Concurrent xdist workers each issue ``CREATE DATABASE`` (which clones
+    ``template1``); Postgres rejects the clone while another worker is using ``template1``
+    (SQLSTATE 55006, raised as ``OperationalError``), so retry a few times.
+
+    Args:
+        dsn: Target database URL to (re)create.
+        attempts: Maximum create attempts before giving up.
+        delay: Seconds to wait between attempts.
+
+    Raises:
+        OperationalError: If every attempt fails (re-raised from the last attempt).
+    """
+    for attempt in range(attempts):
+        try:
+            if database_exists(dsn):
+                drop_database(dsn)
+            create_database(dsn)
+            return
+        except OperationalError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(delay)
+
+
 TEST_DSN = _worker_test_dsn()
 
 pg_engine = create_async_engine(TEST_DSN)
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
+
+# Reused across every clear_database call instead of building a new engine per test.
+sync_engine = create_engine(TEST_DSN)
+# Single statement clears every table once per test; CASCADE handles FK order.
+_truncate_all_tables = text(
+    "TRUNCATE TABLE " + ", ".join(f'"{table.name}"' for table in BaseModel.metadata.sorted_tables) + " CASCADE"
+)
 
 
 async def _test_db_session():
@@ -120,10 +158,7 @@ def api_client():
 
 @pytest.fixture(scope="session", autouse=True)
 def create_test_database():
-    engine = create_engine(TEST_DSN)
-    if not database_exists(engine.url):
-        create_database(engine.url)
-    engine.dispose()
+    _recreate_test_database(TEST_DSN)
 
     alembic_cfg = Config(str(RuntimeSettings.base_dir.parent.parent / "alembic.ini"))
     alembic_cfg.set_main_option("script_location", str(RuntimeSettings.base_dir.parent.parent / "migrations"))
@@ -132,20 +167,15 @@ def create_test_database():
 
     yield
 
+    # Release pooled connections so drop_database isn't blocked by our own sessions.
+    sync_engine.dispose()
     drop_database(TEST_DSN)
 
 
 @pytest.fixture(autouse=True)
 def clear_database():
-    engine = create_engine(TEST_DSN)
-    db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    with db_session() as session:
-        for table in reversed(BaseModel.metadata.sorted_tables):
-            session.execute(text(f'TRUNCATE TABLE "{table.name}" CASCADE;'))
-        session.commit()
-
-    engine.dispose()
+    with sync_engine.begin() as conn:
+        conn.execute(_truncate_all_tables)
 
     yield
 
