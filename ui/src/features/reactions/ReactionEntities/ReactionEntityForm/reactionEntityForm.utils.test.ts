@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { copyReactionPart, pasteReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
@@ -32,7 +32,7 @@ function stubClipboard() {
   return { writeText, readText, setStored: (text: string) => (stored = text) };
 }
 
-beforeEach(() => {
+afterEach(() => {
   vi.unstubAllGlobals();
 });
 
