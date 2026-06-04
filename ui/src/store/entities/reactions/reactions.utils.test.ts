@@ -19,8 +19,12 @@ import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
   getDeepReactionPart,
+  getReactionPreviews,
+  parseValidation,
+  reactionFlatPathToSidebars,
   removeDeepReactionPart,
 } from './reactions.utils.ts';
+import type { AppReaction, ReactionMolBlocks, OrdValidation } from './reactions.types.ts';
 
 describe('generateDeepPartialReactionByPath', () => {
   it('returns the value directly for an empty path', () => {
@@ -116,5 +120,91 @@ describe('deepMergeWithArrayMerge', () => {
     const target = { a: { x: 1 }, list: [{ k: 1 }] };
     deepMergeWithArrayMerge(target, { a: { y: 2 }, list: [{ j: 2 }] });
     expect(target).toEqual({ a: { x: 1 }, list: [{ k: 1 }] });
+  });
+});
+
+describe('reactionFlatPathToSidebars', () => {
+  it('expands a collection entity plus its index into one sidebar path, nesting deeper collections', () => {
+    expect(reactionFlatPathToSidebars(['inputs', 0, 'components', 1])).toEqual([
+      ['inputs', 0],
+      ['inputs', 0, 'components', 1],
+    ]);
+  });
+
+  it('treats collection-less entities (e.g. conditions) as a single segment with no index skip', () => {
+    expect(reactionFlatPathToSidebars(['conditions', 'temperatureMeasurements', 0])).toEqual([
+      ['conditions'],
+      ['conditions', 'temperatureMeasurements', 0],
+    ]);
+  });
+
+  it('ignores path components that are neither collection-less entities nor known collections', () => {
+    expect(reactionFlatPathToSidebars(['notAnEntity', 3])).toEqual([]);
+  });
+});
+
+describe('getReactionPreviews', () => {
+  it('maps molblocks onto component/product/measurement/workup ids across inputs, outcomes, and workups', () => {
+    const reaction = {
+      inputs: { in1: { name: 'reagentA', components: [{ id: 'comp1' }] } },
+      outcomes: [{ products: [{ id: 'prod1', measurements: [{ authenticStandard: { id: 'auth1' } }] }] }],
+      workups: [{ input: { components: [{ id: 'wcomp1' }] } }],
+    } as unknown as AppReaction;
+    const molblocks = {
+      inputs: { reagentA: ['COMP1_MB'] },
+      outcomes: [
+        { products: [{ molblock: 'PROD1_MB', measurements: [{ authentic_standard: { molblock: 'AUTH1_MB' } }] }] },
+      ],
+      workups: [['WCOMP1_MB']],
+    } as unknown as ReactionMolBlocks;
+
+    expect(getReactionPreviews(reaction, molblocks)).toEqual({
+      comp1: 'COMP1_MB',
+      prod1: 'PROD1_MB',
+      auth1: 'AUTH1_MB',
+      wcomp1: 'WCOMP1_MB',
+    });
+  });
+
+  it('skips measurements without an authentic standard and workups whose input has no components', () => {
+    const reaction = {
+      inputs: {},
+      outcomes: [{ products: [{ id: 'prod1', measurements: [{ authenticStandard: undefined }] }] }],
+      workups: [{ input: undefined }],
+    } as unknown as AppReaction;
+    const molblocks = {
+      inputs: {},
+      outcomes: [{ products: [{ molblock: 'PROD1_MB', measurements: [{ authentic_standard: { molblock: 'X' } }] }] }],
+      workups: [['UNUSED_MB']],
+    } as unknown as ReactionMolBlocks;
+
+    expect(getReactionPreviews(reaction, molblocks)).toEqual({ prod1: 'PROD1_MB' });
+  });
+});
+
+describe('parseValidation', () => {
+  const reaction = {
+    inputs: { in1: { name: 'reagentA', id: 'input-id-1', components: [] } },
+  } as unknown as AppReaction;
+
+  it('returns plain text for a message with no path separator', () => {
+    const result = parseValidation({ errors: [], warnings: ['just a warning'] } as OrdValidation, reaction);
+    expect(result.warnings).toEqual([{ text: 'just a warning' }]);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('strips the protobuf class prefix and resolves a name in the path to its id', () => {
+    const validation = {
+      errors: ['<class \'ord.Reaction\'> inputs["reagentA"].value: bad value'],
+      warnings: [],
+    } as OrdValidation;
+    expect(parseValidation(validation, reaction).errors).toEqual([
+      { text: ' bad value', path: ['inputs', 'input-id-1', 'value'], originalPath: 'inputs.reagentA.value' },
+    ]);
+  });
+
+  it('falls back to the raw text when the path cannot be resolved', () => {
+    const validation = { errors: ['inputs["ghost"].value: orphaned'], warnings: [] } as OrdValidation;
+    expect(parseValidation(validation, reaction).errors).toEqual([{ text: 'inputs["ghost"].value: orphaned' }]);
   });
 });
