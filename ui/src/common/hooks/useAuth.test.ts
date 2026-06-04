@@ -30,10 +30,14 @@ vi.mock('common/noAuth.constants.ts', () => ({
 const auth0 = vi.hoisted(() => ({ value: {} as Record<string, unknown> }));
 vi.mock('@auth0/auth0-react', () => ({ useAuth0: () => auth0.value }));
 
-// useSelector is wired only to selectSelf here; return the controlled self value
-// directly so no store/Provider is needed.
+// useSelector runs the real selector against a minimal state shaped to the path
+// selectSelf reads (state.entities.users.self), so the mock honors the selector
+// argument — and would catch a selector-path regression — without a Provider.
 const redux = vi.hoisted(() => ({ self: null as unknown }));
-vi.mock('react-redux', () => ({ useSelector: () => redux.self }));
+vi.mock('react-redux', () => ({
+  useSelector: (selector: (state: { entities: { users: { self: unknown } } }) => unknown) =>
+    selector({ entities: { users: { self: redux.self } } }),
+}));
 
 const mocks = vi.hoisted(() => ({
   dispatch: vi.fn(),
@@ -72,12 +76,12 @@ beforeEach(() => {
   loginWithRedirect = vi.fn();
   getAccessTokenSilently = vi.fn().mockResolvedValue('access-tok');
   getIdTokenClaims = vi.fn().mockResolvedValue({ __raw: 'id-raw' });
-  mocks.dispatch.mockClear();
-  mocks.setAccessTokenGetter.mockClear();
-  mocks.createUser.mockClear();
   setAuth0();
 });
 
+// vi.clearAllMocks() resets the persistent hoisted mocks' call history between
+// tests (their vi.fn implementations are preserved); the per-test Auth0 spies
+// are rebuilt fresh in beforeEach.
 afterEach(() => {
   vi.clearAllMocks();
 });
@@ -138,7 +142,10 @@ describe('useAuth — Auth0 flow', () => {
       renderHook(() => useAuth());
     });
     expect(mocks.createUser).toHaveBeenCalledWith({ access_token: 'access-tok', id_token: 'id-raw' });
-    expect(mocks.dispatch).toHaveBeenCalled();
+    expect(mocks.dispatch).toHaveBeenCalledWith({
+      type: 'users/createUser',
+      payload: { access_token: 'access-tok', id_token: 'id-raw' },
+    });
     expect(loginWithRedirect).not.toHaveBeenCalled();
   });
 
