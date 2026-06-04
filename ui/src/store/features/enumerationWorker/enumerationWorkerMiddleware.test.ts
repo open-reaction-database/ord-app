@@ -16,8 +16,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { enumerationWorkerMiddleware } from './enumerationWorkerMiddleware.ts';
 import { enumerateBatchActions } from 'store/entities/enumeration/enumeration.actions.ts';
+import { enumerateBatchResult } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { EnumerationBatchResult } from 'store/entities/enumeration/enumeration.types.ts';
 import { createWorkerHarness, itForwardsNonWorkerActions } from 'test/workerStub.ts';
+
+// enumerateBatchResult is a thunk creator (new function per call, so no
+// reference equality); stub it to a plain action so the dispatch assertion can
+// check both the data it was built from and that exact value reaching dispatch.
+vi.mock('store/entities/enumeration/enumeration.thunks.ts', () => ({
+  enumerateBatchResult: vi.fn((batch: unknown) => ({ type: 'enumeration/batch-result', payload: batch })),
+}));
 
 function setup() {
   const { workers, dispatch, next, api } = createWorkerHarness();
@@ -44,11 +52,12 @@ describe('enumerationWorkerMiddleware', () => {
     expect(next).toHaveBeenCalledWith(action);
   });
 
-  it('dispatches the batch result when the worker posts a message back', () => {
+  it('dispatches enumerateBatchResult built from the posted batch when the worker replies', () => {
     const { dispatch, worker } = setup();
     const result: EnumerationBatchResult = { reactions: ['enc'], errors: [] };
     worker.onmessage?.({ data: result });
-    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(enumerateBatchResult).toHaveBeenCalledWith(result);
+    expect(dispatch).toHaveBeenCalledWith({ type: 'enumeration/batch-result', payload: result });
   });
 
   it('logs worker errors without throwing', () => {
