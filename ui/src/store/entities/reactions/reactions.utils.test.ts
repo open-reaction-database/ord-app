@@ -13,18 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// parseReaction orchestrates protobuf decode → app reaction → previews/validation.
+// Stub the decode + ord→app converter so the test exercises parseReaction's own
+// assembly (previews via the real getReactionPreviews, validation passthrough)
+// without a real binpb fixture. getReactionPreviews/parseValidation stay real.
+// Keep the real ord namespace (other modules read ord.ReactionRole etc. at load)
+// and override only the two decode helpers parseReaction calls.
+vi.mock('ord-schema-protobufjs', async importActual => {
+  const actual = (await importActual()) as { ord: Record<string, unknown> } & Record<string, unknown>;
+  return {
+    ...actual,
+    ord: { ...actual.ord, Reaction: { decode: vi.fn(() => ({})), toObject: vi.fn(() => ({})) } },
+  };
+});
+vi.mock('./reactions.converters.ts', () => ({
+  ordReactionToReaction: vi.fn(() => ({ inputs: {}, outcomes: [], workups: [] })),
+  convertReactionFloatsToDoubles: vi.fn(),
+}));
+
 import {
   convertObjectToNullIfEmpty,
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
   getDeepReactionPart,
   getReactionPreviews,
+  parseReaction,
+  parseReactionList,
   parseValidation,
   reactionFlatPathToSidebars,
   removeDeepReactionPart,
 } from './reactions.utils.ts';
-import type { AppReaction, ReactionMolBlocks, OrdValidation } from './reactions.types.ts';
+import type { AppReaction, ReactionMolBlocks, OrdValidation, ReactionResponse } from './reactions.types.ts';
+import type { Pages } from 'common/types';
 
 describe('generateDeepPartialReactionByPath', () => {
   it('returns the value directly for an empty path', () => {
@@ -206,5 +228,55 @@ describe('parseValidation', () => {
   it('falls back to the raw text when the path cannot be resolved', () => {
     const validation = { errors: ['inputs["ghost"].value: orphaned'], warnings: [] } as OrdValidation;
     expect(parseValidation(validation, reaction).errors).toEqual([{ text: 'inputs["ghost"].value: orphaned' }]);
+  });
+});
+
+describe('parseReaction', () => {
+  const molblocks = { inputs: {}, outcomes: [], workups: [] } as unknown as ReactionMolBlocks;
+
+  it('decodes the protobuf, attaches previews, and keeps remaining fields with null validation', () => {
+    const response = { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx1', isValid: true };
+    expect(parseReaction(response as unknown as ReactionResponse)).toEqual({
+      reactionId: 'rx1',
+      isValid: true,
+      previews: {},
+      data: { inputs: {}, outcomes: [], workups: [] },
+      validation: null,
+    });
+  });
+
+  it('parses validation when present', () => {
+    const response = {
+      binpb: 'AAEC',
+      molblocks,
+      validation: { errors: ['plain error'], warnings: [] },
+      reactionId: 'rx2',
+    };
+    expect(parseReaction(response as unknown as ReactionResponse).validation).toEqual({
+      errors: [{ text: 'plain error' }],
+      warnings: [],
+    });
+  });
+});
+
+describe('parseReactionList', () => {
+  it('wraps every item with parseReaction while preserving pagination', () => {
+    const molblocks = { inputs: {}, outcomes: [], workups: [] };
+    const pages = {
+      page: 1,
+      size: 10,
+      total: 2,
+      items: [
+        { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx1' },
+        { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx2' },
+      ],
+    } as unknown as Pages<ReactionResponse>;
+
+    const result = parseReactionList(pages);
+    expect(result.page).toBe(1);
+    expect(result.total).toBe(2);
+    expect(result.items).toHaveLength(2);
+    expect(result.items[0].previews).toEqual({});
+    expect(result.items[1].data).toEqual({ inputs: {}, outcomes: [], workups: [] });
   });
 });
