@@ -231,52 +231,50 @@ describe('parseValidation', () => {
   });
 });
 
-describe('parseReaction', () => {
-  const molblocks = { inputs: {}, outcomes: [], workups: [] } as unknown as ReactionMolBlocks;
+// Real ReactionResponse field names so the pass-through assertions are a faithful
+// spec; binpb/molblocks/summary still need a cast (decode + render are stubbed).
+const reactionResponse = (id: number, validation: ReactionResponse['validation'] = null) =>
+  ({
+    id,
+    pb_reaction_id: `rx${id}`,
+    is_valid: true,
+    summary: {},
+    binpb: 'AAEC',
+    molblocks: { inputs: {}, outcomes: [], workups: [] },
+    validation,
+  }) as unknown as ReactionResponse;
 
-  it('decodes the protobuf, attaches previews, and keeps remaining fields with null validation', () => {
-    const response = { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx1', isValid: true };
-    expect(parseReaction(response as unknown as ReactionResponse)).toEqual({
-      reactionId: 'rx1',
-      isValid: true,
-      previews: {},
-      data: { inputs: {}, outcomes: [], workups: [] },
-      validation: null,
-    });
+describe('parseReaction', () => {
+  it('decodes the protobuf, attaches previews, and preserves the response fields with null validation', () => {
+    const result = parseReaction(reactionResponse(1));
+    expect(result.id).toBe(1);
+    expect(result.pb_reaction_id).toBe('rx1');
+    expect(result.is_valid).toBe(true);
+    expect(result.previews).toEqual({});
+    expect(result.data).toEqual({ inputs: {}, outcomes: [], workups: [] });
+    expect(result.validation).toBeNull();
   });
 
   it('parses validation when present', () => {
-    const response = {
-      binpb: 'AAEC',
-      molblocks,
-      validation: { errors: ['plain error'], warnings: [] },
-      reactionId: 'rx2',
-    };
-    expect(parseReaction(response as unknown as ReactionResponse).validation).toEqual({
-      errors: [{ text: 'plain error' }],
-      warnings: [],
-    });
+    const result = parseReaction(reactionResponse(2, { errors: ['plain error'], warnings: [] }));
+    expect(result.validation).toEqual({ errors: [{ text: 'plain error' }], warnings: [] });
   });
 });
 
 describe('parseReactionList', () => {
-  it('wraps every item with parseReaction while preserving pagination', () => {
-    const molblocks = { inputs: {}, outcomes: [], workups: [] };
+  it('maps every item through parseReaction in order while preserving pagination', () => {
     const pages = {
       page: 1,
       size: 10,
       total: 2,
-      items: [
-        { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx1' },
-        { binpb: 'AAEC', molblocks, validation: null, reactionId: 'rx2' },
-      ],
+      items: [reactionResponse(1), reactionResponse(2)],
     } as unknown as Pages<ReactionResponse>;
 
     const result = parseReactionList(pages);
     expect(result.page).toBe(1);
     expect(result.total).toBe(2);
-    expect(result.items).toHaveLength(2);
+    expect(result.items.map(item => item.id)).toEqual([1, 2]);
+    expect(result.items.map(item => item.pb_reaction_id)).toEqual(['rx1', 'rx2']);
     expect(result.items[0].previews).toEqual({});
-    expect(result.items[1].data).toEqual({ inputs: {}, outcomes: [], workups: [] });
   });
 });
