@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MiddlewareAPI, UnknownAction } from '@reduxjs/toolkit';
+import type { MiddlewareAPI } from '@reduxjs/toolkit';
 import { enumerationWorkerMiddleware } from './enumerationWorkerMiddleware.ts';
 import { enumerateBatchActions } from 'store/entities/enumeration/enumeration.actions.ts';
-import type { EnumerationBatchRequest, EnumerationBatchResult } from 'store/entities/enumeration/enumeration.types.ts';
+import type { EnumerationBatchResult } from 'store/entities/enumeration/enumeration.types.ts';
 
 interface CapturedWorker {
   postMessage: ReturnType<typeof vi.fn>;
@@ -66,15 +66,17 @@ describe('enumerationWorkerMiddleware', () => {
 
   it('posts the payload to the worker for a batch-request action and forwards it', () => {
     const { invoke, next, worker } = setup();
-    const action = enumerateBatchActions.request(batchRequest as unknown as EnumerationBatchRequest);
-    invoke(action as unknown as UnknownAction);
+    // The middleware matches by action.type and forwards payload verbatim, so a
+    // plain {type, payload} literal exercises it without a full request payload.
+    const action = { type: enumerateBatchActions.request.type, payload: batchRequest };
+    invoke(action);
     expect(worker.postMessage).toHaveBeenCalledWith(batchRequest);
     expect(next).toHaveBeenCalledWith(action);
   });
 
   it('does not post unrelated actions but still forwards them', () => {
     const { invoke, next, worker } = setup();
-    const action = { type: 'something/unrelated' } as UnknownAction;
+    const action = { type: 'something/unrelated' };
     invoke(action);
     expect(worker.postMessage).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(action);

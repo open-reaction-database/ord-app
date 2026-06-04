@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MiddlewareAPI, UnknownAction } from '@reduxjs/toolkit';
+import type { MiddlewareAPI } from '@reduxjs/toolkit';
 import { previewsWorkerMiddleware } from './previewsWorkerMiddleware.ts';
 import {
   getReactionActions,
@@ -47,6 +47,11 @@ function setup() {
   return { dispatch, next, invoke, worker: workers[0] };
 }
 
+// The middleware matches by action.type and only reads payload.previews /
+// payload.items, so plain {type, payload} literals exercise it faithfully
+// without fabricating full DatasetReaction/Pages payloads.
+const action = (type: string, payload: unknown) => ({ type, payload });
+
 beforeEach(() => {
   workers = [];
   vi.stubGlobal('Worker', MockWorker);
@@ -68,48 +73,38 @@ describe('previewsWorkerMiddleware', () => {
   it("posts a single reaction action's previews to the worker and forwards the action", () => {
     const { invoke, next, worker } = setup();
     const previews = { r1: 'svgA' };
-    const action = getReactionActions.success({ previews } as unknown as Parameters<
-      typeof getReactionActions.success
-    >[0]);
-    invoke(action as unknown as UnknownAction);
+    const single = action(getReactionActions.success.type, { previews });
+    invoke(single);
     expect(worker.postMessage).toHaveBeenCalledWith(previews);
-    expect(next).toHaveBeenCalledWith(action);
+    expect(next).toHaveBeenCalledWith(single);
   });
 
   it('merges previews across items for a reactions-list action', () => {
     const { invoke, worker } = setup();
-    const action = getReactionsListActions.success({
-      items: [{ previews: { a: '1' } }, { previews: { b: '2' } }],
-    } as unknown as Parameters<typeof getReactionsListActions.success>[0]);
-    invoke(action as unknown as UnknownAction);
+    invoke(
+      action(getReactionsListActions.success.type, { items: [{ previews: { a: '1' } }, { previews: { b: '2' } }] }),
+    );
     expect(worker.postMessage).toHaveBeenCalledWith({ a: '1', b: '2' });
   });
 
   it('merges previews across items for a reaction-page action', () => {
     const { invoke, worker } = setup();
-    const action = getReactionPageActions.success({
-      items: [{ previews: { p: '9' } }],
-    } as unknown as Parameters<typeof getReactionPageActions.success>[0]);
-    invoke(action as unknown as UnknownAction);
+    invoke(action(getReactionPageActions.success.type, { items: [{ previews: { p: '9' } }] }));
     expect(worker.postMessage).toHaveBeenCalledWith({ p: '9' });
   });
 
   it('merges previews across templates for a get-all-templates action', () => {
     const { invoke, worker } = setup();
-    const action = getAllTemplatesActions.success([
-      { previews: { t1: 'x' } },
-      { previews: { t2: 'y' } },
-    ] as unknown as Parameters<typeof getAllTemplatesActions.success>[0]);
-    invoke(action as unknown as UnknownAction);
+    invoke(action(getAllTemplatesActions.success.type, [{ previews: { t1: 'x' } }, { previews: { t2: 'y' } }]));
     expect(worker.postMessage).toHaveBeenCalledWith({ t1: 'x', t2: 'y' });
   });
 
   it('does not post unrelated actions but still forwards them', () => {
     const { invoke, next, worker } = setup();
-    const action = { type: 'something/unrelated' } as UnknownAction;
-    invoke(action);
+    const unrelated = action('something/unrelated', undefined);
+    invoke(unrelated);
     expect(worker.postMessage).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(action);
+    expect(next).toHaveBeenCalledWith(unrelated);
   });
 
   it('dispatches setPreviewsByIds when the worker posts a result back', () => {
