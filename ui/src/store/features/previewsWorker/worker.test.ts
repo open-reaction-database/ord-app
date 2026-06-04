@@ -58,6 +58,12 @@ describe('previews worker', () => {
     expect(postMessageMock).not.toHaveBeenCalled();
   });
 
+  it('ignores a null payload (typeof null === "object") instead of throwing', () => {
+    handler({ data: null });
+    expect(waitForIndigoMock).not.toHaveBeenCalled();
+    expect(postMessageMock).not.toHaveBeenCalled();
+  });
+
   it('renders every preview to SVG and posts the keyed result', async () => {
     handler({ data: { a: 'molA', b: 'molB' } });
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));

@@ -19,7 +19,9 @@ import { initIndigo, renderSvg, waitForIndigo } from 'common/utils/indigo.ts';
 initIndigo();
 
 onmessage = event => {
-  if (typeof event.data !== 'object') {
+  // typeof null === 'object', so guard null explicitly — otherwise Object.entries(null)
+  // below would throw a TypeError inside the waitForIndigo() callback.
+  if (typeof event.data !== 'object' || event.data === null) {
     return;
   }
 
