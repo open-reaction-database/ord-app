@@ -13,41 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MiddlewareAPI } from '@reduxjs/toolkit';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { enumerationWorkerMiddleware } from './enumerationWorkerMiddleware.ts';
 import { enumerateBatchActions } from 'store/entities/enumeration/enumeration.actions.ts';
 import type { EnumerationBatchResult } from 'store/entities/enumeration/enumeration.types.ts';
-import { type CapturedWorker, stubWorker } from 'test/workerStub.ts';
-
-let workers: Array<CapturedWorker>;
+import { createWorkerHarness, itForwardsNonWorkerActions } from 'test/workerStub.ts';
 
 function setup() {
-  const dispatch = vi.fn((action: unknown) => action);
-  const api = { dispatch, getState: vi.fn() } as unknown as MiddlewareAPI;
-  const next = vi.fn((action: unknown) => action);
+  const { workers, dispatch, next, api } = createWorkerHarness();
   const invoke = enumerationWorkerMiddleware(api)(next) as (action: unknown) => unknown;
   return { dispatch, next, invoke, worker: workers[0] };
 }
 
 const batchRequest = { index: 0, data: {}, variables: [], matching: [], templateCSV: { headers: [], content: [] } };
 
-beforeEach(() => {
-  workers = stubWorker();
-});
-
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe('enumerationWorkerMiddleware', () => {
-  it('passes thunk (function) actions straight through without posting to the worker', () => {
-    const { invoke, next, worker } = setup();
-    const thunk = () => undefined;
-    invoke(thunk);
-    expect(next).toHaveBeenCalledWith(thunk);
-    expect(worker.postMessage).not.toHaveBeenCalled();
-  });
+  itForwardsNonWorkerActions(setup);
 
   it('posts the payload to the worker for a batch-request action and forwards it', () => {
     const { invoke, next, worker } = setup();
@@ -56,14 +41,6 @@ describe('enumerationWorkerMiddleware', () => {
     const action = { type: enumerateBatchActions.request.type, payload: batchRequest };
     invoke(action);
     expect(worker.postMessage).toHaveBeenCalledWith(batchRequest);
-    expect(next).toHaveBeenCalledWith(action);
-  });
-
-  it('does not post unrelated actions but still forwards them', () => {
-    const { invoke, next, worker } = setup();
-    const action = { type: 'something/unrelated' };
-    invoke(action);
-    expect(worker.postMessage).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(action);
   });
 
