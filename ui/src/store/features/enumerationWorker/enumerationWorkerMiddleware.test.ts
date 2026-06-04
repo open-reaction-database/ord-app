@@ -18,23 +18,9 @@ import type { MiddlewareAPI } from '@reduxjs/toolkit';
 import { enumerationWorkerMiddleware } from './enumerationWorkerMiddleware.ts';
 import { enumerateBatchActions } from 'store/entities/enumeration/enumeration.actions.ts';
 import type { EnumerationBatchResult } from 'store/entities/enumeration/enumeration.types.ts';
-
-interface CapturedWorker {
-  postMessage: ReturnType<typeof vi.fn>;
-  onmessage: ((event: { data: unknown }) => void) | null;
-  onerror: ((error: unknown) => void) | null;
-}
+import { type CapturedWorker, stubWorker } from 'test/workerStub.ts';
 
 let workers: Array<CapturedWorker>;
-
-class MockWorker {
-  postMessage = vi.fn();
-  onmessage: ((event: { data: unknown }) => void) | null = null;
-  onerror: ((error: unknown) => void) | null = null;
-  constructor() {
-    workers.push(this);
-  }
-}
 
 function setup() {
   const dispatch = vi.fn((action: unknown) => action);
@@ -47,8 +33,7 @@ function setup() {
 const batchRequest = { index: 0, data: {}, variables: [], matching: [], templateCSV: { headers: [], content: [] } };
 
 beforeEach(() => {
-  workers = [];
-  vi.stubGlobal('Worker', MockWorker);
+  workers = stubWorker();
 });
 
 afterEach(() => {

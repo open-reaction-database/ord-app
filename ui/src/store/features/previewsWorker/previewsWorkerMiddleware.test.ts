@@ -23,21 +23,9 @@ import {
 } from 'store/entities/reactions/reactions.actions.ts';
 import { getAllTemplatesActions } from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
-
-interface CapturedWorker {
-  postMessage: ReturnType<typeof vi.fn>;
-  onmessage: ((event: { data: unknown }) => void) | null;
-}
+import { type CapturedWorker, stubWorker } from 'test/workerStub.ts';
 
 let workers: Array<CapturedWorker>;
-
-class MockWorker {
-  postMessage = vi.fn();
-  onmessage: ((event: { data: unknown }) => void) | null = null;
-  constructor() {
-    workers.push(this);
-  }
-}
 
 function setup() {
   const dispatch = vi.fn((action: unknown) => action);
@@ -53,8 +41,7 @@ function setup() {
 const action = (type: string, payload: unknown) => ({ type, payload });
 
 beforeEach(() => {
-  workers = [];
-  vi.stubGlobal('Worker', MockWorker);
+  workers = stubWorker();
 });
 
 afterEach(() => {
