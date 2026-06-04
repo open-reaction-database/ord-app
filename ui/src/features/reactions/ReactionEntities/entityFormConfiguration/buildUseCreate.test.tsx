@@ -27,7 +27,6 @@ vi.mock('store/entities/reactions/reactions.thunks.ts', () => ({
 }));
 vi.mock('store/features/reactionForm/reactionForm.actions.ts', () => ({
   addReactionPathComponentToList: (payload: unknown) => ({ type: 'addReactionPathComponentToList', payload }),
-  setReactionPathComponentsList: (payload: unknown) => ({ type: 'setReactionPathComponentsList', payload }),
 }));
 
 import { buildUseCreate } from './buildUseCreate.ts';
@@ -88,7 +87,7 @@ describe('buildUseCreate', () => {
     });
   });
 
-  it('appends an array entityName verbatim to the context path', () => {
+  it('appends an array entityName verbatim to the context path (and opens the sidebar there)', () => {
     renderCreate(['conditions', 'temperature'])(0, []);
     expect(dispatch).toHaveBeenCalledWith({
       type: 'addUpdateReactionField',
@@ -97,6 +96,10 @@ describe('buildUseCreate', () => {
         pathComponents: ['inputs', 0, 'conditions', 'temperature', 'key1'],
         newValue: { entity: 'new' },
       },
+    });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'addReactionPathComponentToList',
+      payload: ['inputs', 0, 'conditions', 'temperature', 'key1'],
     });
   });
 
