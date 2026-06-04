@@ -31,6 +31,7 @@ import {
 import {
   addUpdateVariableActions,
   getAllTemplatesActions,
+  removeTemplateActions,
   removeVariableActions,
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
@@ -71,9 +72,14 @@ describe('reactions.reducer — activeDatasetId', () => {
 
 describe('reactions.reducer — list/page lifecycle', () => {
   it('clears order/pagination and flags loading on a list request', () => {
-    const seeded = { reactionsOrder: [1, 2], areReactionsLoading: false };
+    const seeded = {
+      reactionsOrder: [1, 2],
+      areReactionsLoading: false,
+      pagination: { ...initialState().pagination, total: 9, page: 4 },
+    };
     const state = reduce(seeded, getReactionsListActions.request(3));
     expect(state.reactionsOrder).toEqual([]);
+    expect(state.pagination).toEqual(initialState().pagination);
     expect(state.areReactionsLoading).toBe(true);
   });
 
@@ -108,12 +114,14 @@ describe('reactions.reducer — create/remove', () => {
     expect(state.pagination.pages).toBe(1);
   });
 
-  it('flags creating on an import request and clears it on import success', () => {
+  it('flags creating on an import request and clears it (bumping pagination total) on import success', () => {
     expect(reduce(undefined, importReactionFromFileActions.request({} as never)).isReactionCreating).toBe(true);
-    expect(
-      reduce({ isReactionCreating: true }, importReactionFromFileActions.success(reaction(99) as never))
-        .isReactionCreating,
-    ).toBe(false);
+    const state = reduce(
+      { isReactionCreating: true, pagination: { ...initialState().pagination, total: 4, size: 10 } },
+      importReactionFromFileActions.success(reaction(99) as never),
+    );
+    expect(state.isReactionCreating).toBe(false);
+    expect(state.pagination.total).toBe(5);
   });
 
   it('removes the reaction from byId/order and decrements pagination total', () => {
@@ -163,6 +171,12 @@ describe('reactions.reducer — templates', () => {
     ];
     const state = reduce(undefined, getAllTemplatesActions.success(templates as never));
     expect(Object.keys(state.reactionsById)).toEqual(['t1', 't2']);
+  });
+
+  it('removes the template_<id> entry on a remove-template success', () => {
+    const seeded = { reactionsById: { template_5: { id: 'template_5' }, template_6: { id: 'template_6' } } as never };
+    const state = reduce(seeded, removeTemplateActions.success(5 as never));
+    expect(Object.keys(state.reactionsById)).toEqual(['template_6']);
   });
 
   it('replaces a template entry on a rename-template success', () => {
