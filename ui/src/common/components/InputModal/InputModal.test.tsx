@@ -33,6 +33,31 @@ describe('InputModal', () => {
     expect(screen.getByDisplayValue('old name')).toBeInTheDocument();
   });
 
+  it('forwards maxLength to the input when provided', () => {
+    renderWithMantine(
+      <InputModal
+        title="Create Group"
+        onClose={() => {}}
+        onSubmit={async () => {}}
+        inputLabel="Group name"
+        maxLength={512}
+      />,
+    );
+    expect(screen.getByRole('textbox')).toHaveAttribute('maxlength', '512');
+  });
+
+  it('leaves the input unbounded when maxLength is omitted', () => {
+    renderWithMantine(
+      <InputModal
+        title="Create Group"
+        onClose={() => {}}
+        onSubmit={async () => {}}
+        inputLabel="Group name"
+      />,
+    );
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('maxlength');
+  });
+
   it('submits the current value', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderWithMantine(

@@ -32,6 +32,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { startEnumeration } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.types.ts';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
+import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 
 export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
@@ -117,12 +118,14 @@ export function EnumerationSetup({
                 <TextInput
                   label="Dataset Name"
                   placeholder="Dataset Name"
+                  maxLength={MAX_CRITICAL_FIELD_LENGTH}
                   {...form.getInputProps('dataset.name')}
                 />
               </div>
               <Textarea
                 label="Description"
                 placeholder="Description"
+                maxLength={MAX_FIELD_LENGTH}
                 {...form.getInputProps('dataset.description')}
               />
             </Flex>

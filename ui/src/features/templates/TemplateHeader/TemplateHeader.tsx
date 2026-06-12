@@ -21,6 +21,7 @@ import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
+import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions';
 import { renameTemplate } from 'store/entities/templates/templates.thunks.ts';
@@ -101,6 +102,7 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
             title="Edit Template ID"
             inputLabel="Template ID"
             initialValue={template.name}
+            maxLength={MAX_CRITICAL_FIELD_LENGTH}
           />
         )}
       </Paper>

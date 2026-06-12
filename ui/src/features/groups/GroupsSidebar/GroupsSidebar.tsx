@@ -17,6 +17,7 @@ import { Button, Flex, Paper, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
+import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 import { GroupsDrawer } from 'features/groups/GroupsSidebar/GroupsDrawer/GroupsDrawer.tsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { createGroup } from 'store/entities/groups/groups.thunks.ts';
@@ -61,6 +62,7 @@ export function GroupsSidebar() {
           onSubmit={handleGroupAddition}
           title="Create Group"
           inputLabel="Group name"
+          maxLength={MAX_CRITICAL_FIELD_LENGTH}
         />
       )}
       <GroupsDrawer />

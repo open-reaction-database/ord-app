@@ -27,6 +27,7 @@ interface InputModalProps {
   initialValue?: string;
   inputLabel: string;
   inputPlaceholder?: string;
+  maxLength?: number;
   stayOpenedOnSubmit?: true;
 }
 
@@ -41,6 +42,7 @@ export function InputModal({
   inputLabel,
   initialValue = '',
   inputPlaceholder = '',
+  maxLength,
   stayOpenedOnSubmit,
 }: Readonly<InputModalProps>) {
   const {
@@ -91,6 +93,7 @@ export function InputModal({
           label={inputLabel}
           withAsterisk
           placeholder={inputPlaceholder || ''}
+          maxLength={maxLength}
           {...getInputProps('value')}
         />
         <Flex

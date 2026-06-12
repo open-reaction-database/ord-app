@@ -25,6 +25,7 @@ import { selectIsDatasetCreating } from 'store/entities/datasets/datasets.select
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 import { GroupSelector } from 'features/groups/GroupSelector/GroupSelector.tsx';
+import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 
 interface CreateNewDatasetProps {
   onClose: () => void;
@@ -74,12 +75,14 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
         label="Dataset name"
         withAsterisk
         disabled={isLoading}
+        maxLength={MAX_CRITICAL_FIELD_LENGTH}
         {...form.getInputProps('name')}
       />
       <Textarea
         label="Description"
         withAsterisk
         disabled={isLoading}
+        maxLength={MAX_FIELD_LENGTH}
         {...form.getInputProps('description')}
       />
     </FormModal>

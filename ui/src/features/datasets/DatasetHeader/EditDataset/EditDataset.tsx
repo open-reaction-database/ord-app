@@ -21,6 +21,7 @@ import { type EditDatasetFormValues, editDatasetSchema } from './editDataset.sch
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { updateDataset } from 'store/entities/datasets/datasets.thunks.ts';
+import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 
 interface EditDatasetProps {
   datasetId: number;
@@ -61,10 +62,12 @@ export function EditDataset({ datasetId, onClose }: Readonly<EditDatasetProps>) 
         >
           <TextInput
             label="Dataset name"
+            maxLength={MAX_CRITICAL_FIELD_LENGTH}
             {...form.getInputProps('name')}
           />
           <Textarea
             label="Description"
+            maxLength={MAX_FIELD_LENGTH}
             {...form.getInputProps('description')}
           />
 

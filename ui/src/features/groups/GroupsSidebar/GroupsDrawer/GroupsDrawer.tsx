@@ -19,6 +19,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Drawer, Flex, Text, Tooltip } from '@mantine/core';
 import { EditIcon } from 'common/icons';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
+import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 import { getGroupMembers, renameGroup } from 'store/entities/groups/groups.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { selectGroupById, selectIsGroupUpdating, selectMemberRoles } from 'store/entities/groups/groups.selectors.ts';
@@ -115,6 +116,7 @@ export function GroupsDrawer() {
           title="Edit Group Name"
           inputLabel="Group name"
           initialValue={group?.name}
+          maxLength={MAX_CRITICAL_FIELD_LENGTH}
         />
       )}
     </>
