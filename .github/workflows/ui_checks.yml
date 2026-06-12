@@ -72,8 +72,10 @@ jobs:
           # CODECOV_TOKEN is an org-wide token, so the repo slug must be explicit.
           slug: open-reaction-database/ord-app
           token: ${{ secrets.CODECOV_TOKEN }}
-          # Strict on push + same-repo PRs; tolerate fork/dependabot (tokenless). Mirrors ord-schema.
-          fail_ci_if_error: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && !startsWith(github.head_ref, 'dependabot/')) }}
+          # Best-effort: don't fail CI on Codecov uploader flakes (e.g. transient GPG
+          # signature-verification / keyserver outages). The Codecov status check and the
+          # SonarCloud gate still surface coverage regressions.
+          fail_ci_if_error: false
 
       - name: Upload UI coverage report
         if: always()
