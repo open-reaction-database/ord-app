@@ -32,8 +32,8 @@ export function GroupSelector({ ...rest }: Readonly<GroupSelectorProps>) {
       label="Group"
       placeholder="Select a group"
       searchable
-      classNames={{ option: classes.option }}
       {...rest}
+      classNames={{ option: classes.option, ...rest.classNames }}
     />
   );
 }
