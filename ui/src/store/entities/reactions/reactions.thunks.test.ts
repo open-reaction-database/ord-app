@@ -108,8 +108,8 @@ describe('removeReaction', () => {
     expect(types()).not.toContain(getReactionPageActions.request.type);
   });
 
-  it('refetches the clamped page when the last reaction on the last page is removed (#586)', async () => {
-    const { store, types } = makeStore();
+  it('refetches the clamped page (1) when the last reaction on the last page is removed (#586)', async () => {
+    const { store, actions } = makeStore();
     // On page 2 of 2, with a single reaction (#42) loaded on that page.
     store.dispatch(getReactionsListActions.request(5)); // sets the active dataset id
     store.dispatch(getReactionPageActions.request({ page: 2, size: 10 }));
@@ -122,12 +122,19 @@ describe('removeReaction', () => {
         pages: 2,
       } as unknown as Parameters<typeof getReactionPageActions.success>[0]),
     );
-    const before = types().length;
+    const before = actions().length;
 
     await store.dispatch(removeReaction(42) as unknown as UnknownAction);
 
-    // Page 2 is now past the new last page (1), so the thunk refetches the clamped page.
-    expect(types().slice(before)).toContain(getReactionPageActions.request.type);
+    // Page 2 is now past the new last page (1), so the thunk refetches the clamped page —
+    // assert it requests page 1 specifically, not just that some page request fired.
+    const refetch = actions()
+      .slice(before)
+      .find(action => action.type === getReactionPageActions.request.type) as
+      | { payload?: { page?: number } }
+      | undefined;
+    expect(refetch).toBeDefined();
+    expect(refetch?.payload?.page).toBe(1);
   });
 });
 

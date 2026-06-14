@@ -31,5 +31,10 @@ export function makeRecordingStore() {
     reducer: rootReducer,
     middleware: getDefault => getDefault().concat(recorder),
   });
-  return { store, types: () => actions.map(action => action.type) };
+  return {
+    store,
+    types: () => actions.map(action => action.type),
+    // The raw recorded actions, for asserting payloads (not just types).
+    actions: () => [...actions],
+  };
 }
