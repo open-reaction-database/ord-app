@@ -57,13 +57,4 @@ describe('ComponentMetadata', () => {
     expect(screen.getByText('5 g')).toBeInTheDocument();
     expect(screen.queryByText(/GRAM/)).toBeNull();
   });
-
-  it("shows a product's yield % from its YIELD measurement (#598)", () => {
-    const product = {
-      identifiers: [],
-      measurements: [{ type: 'YIELD', value: { type: '%', value: { value: 85 } } }],
-    } as unknown as ReactionInputComponent;
-    renderWithMantine(<ComponentMetadata component={product} />);
-    expect(screen.getByText('85% yield')).toBeInTheDocument();
-  });
 });

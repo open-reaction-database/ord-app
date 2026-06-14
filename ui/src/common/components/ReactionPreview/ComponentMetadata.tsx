@@ -22,7 +22,6 @@ import type {
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
-import { getProductYieldPercent } from 'common/components/ReactionPreview/reactionPreview.utils';
 
 interface ComponentMetadataProps {
   component: ReactionInputComponent | ReactionProduct;
@@ -32,14 +31,6 @@ export function ComponentMetadata({ component }: Readonly<ComponentMetadataProps
   const name = useMemo(() => {
     return (component.identifiers || []).find(identifier => identifier.type === 'NAME');
   }, [component]);
-
-  // Products carry a yield as a YIELD measurement; surface it as a bottom-label "% yield". (#598)
-  const productYield = useMemo(
-    () => ('measurements' in component ? getProductYieldPercent(component) : undefined),
-    [component],
-  );
-  const amount = 'amount' in component ? component.amount : undefined;
-  const isLimiting = 'isLimiting' in component && component.isLimiting === ReactionBoolean.True;
 
   return (
     <Flex
@@ -57,10 +48,11 @@ export function ComponentMetadata({ component }: Readonly<ComponentMetadataProps
           </Text>
         </Tooltip>
       )}
-      {amount && <Text size="xs">{renderValuePrecisionUnit(amount)}</Text>}
-      {productYield != null && <Text size="xs">{productYield}% yield</Text>}
+      {'amount' in component && component?.amount && (
+        <Text size="xs">{renderValuePrecisionUnit(component.amount)}</Text>
+      )}
       {component?.reactionRole && <Text size="xs">{component.reactionRole}</Text>}
-      {isLimiting && (
+      {'isLimiting' in component && component.isLimiting === ReactionBoolean.True && (
         <Badge
           size="xs"
           variant="light"
