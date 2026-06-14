@@ -25,6 +25,7 @@ import classes from './outcomes.module.scss';
 import { typographyClasses } from 'common/styling';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
+import { sortOutcomesByReactionTime } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.utils.ts';
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
 import { useMemo, useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
@@ -46,6 +47,9 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   };
 
   const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
+  // Display outcomes ordered by reaction time when available, else stored order. The original
+  // stored index is preserved for each so the edit path stays correct. (#599)
+  const orderedOutcomes = useMemo(() => sortOutcomesByReactionTime(outcomes ?? []), [outcomes]);
 
   return (
     <Flex direction="column">
@@ -76,7 +80,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           className={classes.itemsList}
           defaultValue={ids}
         >
-          {outcomes.map((outcome, index) => (
+          {orderedOutcomes.map(({ outcome, index }) => (
             <OutcomeListItem
               key={outcome.id}
               reactionId={reactionId}
