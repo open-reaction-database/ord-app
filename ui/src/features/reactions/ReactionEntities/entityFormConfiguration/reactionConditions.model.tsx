@@ -31,6 +31,7 @@ import {
   temperatureControlTypeOptions,
   temperatureOptions,
   tubingTypeOptions,
+  voltageUnitOptions,
   waveLengthTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 import { buildUseSelectItems } from './buildUseSelectItems.ts';
@@ -405,6 +406,17 @@ export const reactionConditions: Array<ReactionFormNode> = [
         options: currentTypeOptions,
         wrapperConfig: {
           label: 'Current',
+        },
+        select: 'native-inline',
+      },
+      {
+        // The voltage value/precision/units field was missing from the form even though the data
+        // model and ord converters already support it. (#623)
+        type: ReactionFormNodeType.vpu,
+        name: 'electrochemistry.voltage',
+        options: voltageUnitOptions,
+        wrapperConfig: {
+          label: 'Voltage',
         },
         select: 'native-inline',
       },
