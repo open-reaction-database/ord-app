@@ -22,7 +22,7 @@ import type {
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
-import { getProductYieldPercent } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
+import { getProductYieldPercent } from 'common/components/ReactionPreview/reactionPreview.utils';
 
 interface ComponentMetadataProps {
   component: ReactionInputComponent | ReactionProduct;
