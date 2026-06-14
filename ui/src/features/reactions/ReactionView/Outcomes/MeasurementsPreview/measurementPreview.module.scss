@@ -19,10 +19,19 @@
 
 .measurementKeyType {
   text-wrap: nowrap;
+
+  /* Let a long type/analysis name shrink and ellipsize instead of pushing the value out of
+     the (overflow:hidden) row. (#609) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .measurementValue {
   overflow: hidden;
   text-wrap: nowrap;
   text-overflow: ellipsis;
+
+  /* Keep the measurement value visible even when the analysis name is long. (#609) */
+  flex-shrink: 0;
 }
