@@ -38,6 +38,12 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
   const outcomeTime = useMemo(() => {
     return outcome.reactionTime?.value ? renderValuePrecisionUnit(outcome.reactionTime) : '';
   }, [outcome.reactionTime]);
+  // Top label: reaction time and the limiting-reactant conversion %, when available. (#598)
+  const outcomeLabel = useMemo(() => {
+    const conversion = outcome.conversion?.value != null ? `${outcome.conversion.value}% conversion` : '';
+    const parts = [outcomeTime, conversion].filter(Boolean);
+    return parts.length > 0 ? ` (${parts.join(', ')})` : '';
+  }, [outcomeTime, outcome.conversion]);
 
   return (
     <div className={classes.inputCard}>
@@ -46,7 +52,7 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
         color="primary"
         size="lg"
       >
-        Outcome{outcomeTime ? ` (${outcomeTime})` : ''}
+        Outcome{outcomeLabel}
       </Badge>
       <Flex
         gap="sm"

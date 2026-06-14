@@ -15,9 +15,10 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as htmlToImage from 'html-to-image';
-import { copyPreviewAsImage } from './reactionPreview.utils.ts';
+import { copyPreviewAsImage, getProductYieldPercent } from './reactionPreview.utils.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
+import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 vi.mock('html-to-image', () => ({ toBlob: vi.fn() }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
@@ -67,5 +68,39 @@ describe('copyPreviewAsImage', () => {
     toBlobMock.mockRejectedValue(new Error('boom'));
     await copyPreviewAsImage(node);
     expectNotified(NotificationVariant.ERROR);
+  });
+});
+
+describe('getProductYieldPercent (#598)', () => {
+  const product = (measurements: Array<unknown>): ReactionProduct => ({ measurements }) as unknown as ReactionProduct;
+
+  it('returns the percent value of a YIELD measurement', () => {
+    const p = product([
+      { type: 'PURITY', value: { type: '%', value: { value: 99 } } },
+      { type: 'YIELD', value: { type: '%', value: { value: 85 } } },
+    ]);
+    expect(getProductYieldPercent(p)).toBe(85);
+  });
+
+  it('returns undefined when there is no YIELD measurement', () => {
+    expect(
+      getProductYieldPercent(product([{ type: 'PURITY', value: { type: '%', value: { value: 99 } } }])),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined when the YIELD measurement is not a percent value', () => {
+    expect(
+      getProductYieldPercent(product([{ type: 'YIELD', value: { type: 'String', value: 'n/a' } }])),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined when the YIELD percent has no numeric value', () => {
+    expect(
+      getProductYieldPercent(product([{ type: 'YIELD', value: { type: '%', value: { value: null } } }])),
+    ).toBeUndefined();
+  });
+
+  it('handles a product with no measurements', () => {
+    expect(getProductYieldPercent({} as ReactionProduct)).toBeUndefined();
   });
 });
