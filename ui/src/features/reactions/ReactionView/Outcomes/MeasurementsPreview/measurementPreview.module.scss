@@ -28,10 +28,10 @@
 }
 
 .measurementValue {
-  overflow: hidden;
   text-wrap: nowrap;
-  text-overflow: ellipsis;
 
-  /* Keep the measurement value visible even when the analysis name is long. (#609) */
+  /* Keep the measurement value visible even when the analysis name is long: never shrink it, so
+     the name (which can ellipsize) yields space instead of pushing the value out of the row. A
+     pathologically long value is hard-clipped by .measurementWrapper's overflow:hidden. (#609) */
   flex-shrink: 0;
 }
