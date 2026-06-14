@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { configureStore, type UnknownAction } from '@reduxjs/toolkit';
-import { rootReducer } from 'store/rootReducer.ts';
+import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
+import { makeRecordingStore } from 'test/recordingStore.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { createEmptyReaction, getReactionsList, getReactionsPage, removeReaction } from './reactions.thunks.ts';
 import {
@@ -49,15 +49,7 @@ vi.mock('./reactions.converters.ts', async importActual => ({
 const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 
-function makeStore() {
-  const actions: Array<UnknownAction> = [];
-  const recorder = () => (next: (action: unknown) => unknown) => (action: unknown) => {
-    actions.push(action as UnknownAction);
-    return next(action);
-  };
-  const store = configureStore({ reducer: rootReducer, middleware: getDefault => getDefault().concat(recorder) });
-  return { store, types: () => actions.map(action => action.type) };
-}
+const makeStore = makeRecordingStore;
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { configureStore, type UnknownAction } from '@reduxjs/toolkit';
-import { rootReducer } from 'store/rootReducer.ts';
+import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
+import { makeRecordingStore } from 'test/recordingStore.ts';
 import { finishEnumeration } from './enumeration.thunks.ts';
 import { enumerateBatchActions, finishEnumerationAction, startEnumerationActions } from './enumeration.actions.ts';
 import type { StartEnumeration } from './enumeration.types.ts';
@@ -30,19 +30,9 @@ vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() 
 const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 
-function makeStore() {
-  const actions: Array<UnknownAction> = [];
-  const recorder = () => (next: (action: unknown) => unknown) => (action: unknown) => {
-    actions.push(action as UnknownAction);
-    return next(action);
-  };
-  const store = configureStore({ reducer: rootReducer, middleware: getDefault => getDefault().concat(recorder) });
-  return { store, types: () => actions.map(action => action.type) };
-}
-
 // Seed an in-progress enumeration that targets a NEW dataset (dataset is an object, not an id),
 // with one enumerated reaction so finishEnumeration doesn't early-return.
-function seedNewDatasetProgress(store: ReturnType<typeof makeStore>['store']) {
+function seedNewDatasetProgress(store: ReturnType<typeof makeRecordingStore>['store']) {
   const startPayload: StartEnumeration = {
     dataset: { groupId: 3, name: 'Enumerated', description: 'desc' },
     matching: [],
@@ -62,7 +52,7 @@ beforeEach(() => {
 
 describe('finishEnumeration (new dataset)', () => {
   it('creates the dataset and refetches the datasets list so it appears without a manual reload (#611)', async () => {
-    const { store, types } = makeStore();
+    const { store, types } = makeRecordingStore();
     seedNewDatasetProgress(store);
 
     await store.dispatch(finishEnumeration() as unknown as UnknownAction);

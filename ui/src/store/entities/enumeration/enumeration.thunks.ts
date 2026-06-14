@@ -102,6 +102,10 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch
 
   const datasetEnumeration = prepareDataset(enumerationProgress);
   const isNewDataset = typeof dataset === 'object';
+  // Capture the active group before the await so a group switch during the request can't
+  // retarget the refetch. We refetch the *active* group's list (which can be null = "All
+  // Groups") to match what the Datasets page shows, rather than the new dataset's own group. (#611)
+  const activeGroupId = selectActiveGroupId(getState());
 
   if (isNewDataset) {
     const createdDataset = await axiosInstance.post<Dataset>(
@@ -111,7 +115,7 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch
     dispatch(finishEnumerationAction(createdDataset.data.id));
     // Refresh the datasets list so the newly created dataset appears without a manual
     // page reload, including when the user dismisses the result modal with "Close". (#611)
-    dispatch(getInitialDatasetsList(selectActiveGroupId(getState())));
+    dispatch(getInitialDatasetsList(activeGroupId));
   } else {
     const datasetId = dataset;
     await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);

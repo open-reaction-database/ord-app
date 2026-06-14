@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { configureStore, type UnknownAction } from '@reduxjs/toolkit';
-import { rootReducer } from 'store/rootReducer.ts';
+import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { navigate } from 'wouter/use-browser-location';
+import { makeRecordingStore } from 'test/recordingStore.ts';
 import {
   createEmptyDataset,
   getDataset,
@@ -46,19 +46,7 @@ vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
 // cast to a plain record of mock fns instead.
 const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
 
-/** A store that records every dispatched action so follow-up refetches can be asserted by type. */
-function makeStore() {
-  const actions: Array<UnknownAction> = [];
-  const recorder = () => (next: (action: unknown) => unknown) => (action: unknown) => {
-    actions.push(action as UnknownAction);
-    return next(action);
-  };
-  const store = configureStore({
-    reducer: rootReducer,
-    middleware: getDefault => getDefault().concat(recorder),
-  });
-  return { store, types: () => actions.map(action => action.type) };
-}
+const makeStore = makeRecordingStore;
 
 const dataset = { id: 1, name: 'd1', description: '', groups: [] };
 
