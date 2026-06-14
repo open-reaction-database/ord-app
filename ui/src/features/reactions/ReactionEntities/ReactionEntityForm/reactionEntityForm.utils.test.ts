@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { copyReactionPart, pasteReactionPart } from './reactionEntityForm.utils.ts';
+import { copyReactionPart, fillEmptyDeepMerge, pasteReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
 
@@ -74,5 +74,45 @@ describe('pasteReactionPart', () => {
     const clipboard = stubClipboard();
     clipboard.setStored('not valid json');
     expect(await pasteReactionPart(ReactionNodeEntity.Notes)).toEqual([null, '']);
+  });
+});
+
+describe('fillEmptyDeepMerge (Paste Chunk fill-empty semantics, #589)', () => {
+  it("fills the destination's blank fields from the source", () => {
+    const dest = { reactionRole: 'REACTANT', molBlockIdentifiers: [], amount: {} };
+    const source = { reactionRole: 'PRODUCT', molBlockIdentifiers: [{ value: 'MOL' }], amount: { value: '5' } };
+    // Blank arrays/objects in the destination are filled; a value the destination already set is kept.
+    expect(fillEmptyDeepMerge(dest, source)).toEqual({
+      reactionRole: 'REACTANT',
+      molBlockIdentifiers: [{ value: 'MOL' }],
+      amount: { value: '5' },
+    });
+  });
+
+  it('keeps a structure the destination already has rather than replacing it', () => {
+    const dest = { molBlockIdentifiers: [{ value: 'EXISTING' }] };
+    const source = { molBlockIdentifiers: [{ value: 'PASTED' }] };
+    expect(fillEmptyDeepMerge(dest, source)).toEqual({ molBlockIdentifiers: [{ value: 'EXISTING' }] });
+  });
+
+  it('treats 0 and false as set (does not overwrite them)', () => {
+    expect(fillEmptyDeepMerge({ isLimiting: false, n: 0 }, { isLimiting: true, n: 9 })).toEqual({
+      isLimiting: false,
+      n: 0,
+    });
+  });
+
+  it('fills nested blanks without clobbering nested set values', () => {
+    const dest = { source: { vendor: 'Acme', catalogId: '' } };
+    const source = { source: { vendor: 'Other', catalogId: 'C-1', lot: 'L-1' } };
+    expect(fillEmptyDeepMerge(dest, source)).toEqual({ source: { vendor: 'Acme', catalogId: 'C-1', lot: 'L-1' } });
+  });
+
+  it('never pastes separately-managed metadata even into a blank destination (#704)', () => {
+    const dest = { doi: '' };
+    const source = { doi: '10.1/x', recordModified: { time: 'leaked' }, automationCode: { v: 'x' }, measurements: [1] };
+    const result = fillEmptyDeepMerge(dest, source);
+    expect(result).toEqual({ doi: '10.1/x' });
+    expect(JSON.stringify(result)).not.toContain('leaked');
   });
 });

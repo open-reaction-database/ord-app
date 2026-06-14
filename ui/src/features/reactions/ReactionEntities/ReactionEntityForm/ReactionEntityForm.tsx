@@ -25,7 +25,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import { reactionContext } from '../../reactions.context.ts';
-import { copyReactionPart } from './reactionEntityForm.utils.ts';
+import { copyReactionPart, fillEmptyDeepMerge } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification } from 'common/utils/showNotification.tsx';
@@ -110,12 +110,14 @@ export function ReactionEntityForm({
   const onPasteChunk = useCallback(
     (reactionPart: object) => {
       try {
-        // Submit the filtered values, not the raw clipboard chunk: fields the sidebar excludes
-        // (e.g. setup.automationCode, provenance.recordModified, product.measurements) are edited
-        // in their own sidebars and must not be merged in here, or they get duplicated/retained.
-        const formValues = filterValues(reactionPart);
-        form.setValues(formValues);
-        onSubmit(formValues);
+        // Fill the destination's blank fields from the pasted chunk without clobbering values the
+        // user already set, and without pulling in separately-managed metadata (automationCode,
+        // recordModified, measurements — see PASTE_PRESERVED_FIELDS). The form only renders its
+        // managed subset (filterValues), but we persist the full merged entity so pasted
+        // structure/identifiers the form doesn't itself show are saved too. (#589)
+        const merged = fillEmptyDeepMerge(reactionPartWithNestedEntities, reactionPart);
+        form.setValues(filterValues(merged));
+        onSubmit(merged);
         setFormKey(crypto.randomUUID());
       } catch (_e: unknown) {
         showNotification({
@@ -124,7 +126,7 @@ export function ReactionEntityForm({
         });
       }
     },
-    [filterValues, form, onSubmit],
+    [filterValues, form, onSubmit, reactionPartWithNestedEntities],
   );
 
   return (

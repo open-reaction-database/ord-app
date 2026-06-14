@@ -27,6 +27,48 @@ interface ClipboardMessage {
   value: object;
 }
 
+/**
+ * Fields that are auto-generated or edited in their own dedicated sidebars and must never be
+ * carried over by Paste Chunk, even into an empty destination — pasting them sets wrong metadata
+ * or duplicates separately-managed data (see #704). Everything else is paste-eligible.
+ */
+const PASTE_PRESERVED_FIELDS = new Set(['recordModified', 'automationCode', 'measurements']);
+
+/** A value counts as "not set" (a blank the paste may fill) if it's nullish, an empty string, or an empty array/object. */
+function isUnset(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === 'string') return value.length === 0;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'object') return Object.keys(value as object).length === 0;
+  // Meaningful primitives (0, false, non-empty strings) are "set".
+  return false;
+}
+
+/**
+ * Deep "fill-empty" merge used by Paste Chunk (#589): keep every value the destination has
+ * already set, and only fill the destination's blanks from the pasted source. Non-empty arrays
+ * are kept wholesale (we don't splice source items into a list the user already populated), and
+ * {@link PASTE_PRESERVED_FIELDS} are never taken from the source. This lets a pasted component
+ * bring over its structure/identifiers into an empty target without clobbering anything the user
+ * already entered.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function fillEmptyDeepMerge(destination: any, source: any): any {
+  if (isUnset(source)) return destination;
+  if (isUnset(destination)) return source;
+  // Both sides are set. Recurse into plain objects; for primitives and (non-empty) arrays the
+  // destination already has a value, so it wins.
+  if (Array.isArray(destination) || typeof destination !== 'object' || typeof source !== 'object') {
+    return destination;
+  }
+  const result: Record<string, unknown> = { ...destination };
+  for (const key of Object.keys(source)) {
+    if (PASTE_PRESERVED_FIELDS.has(key)) continue;
+    result[key] = fillEmptyDeepMerge(destination[key], source[key]);
+  }
+  return result;
+}
+
 // TODO parse\stringify via ord-schema
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function replacer(_: unknown, value: any): any {
