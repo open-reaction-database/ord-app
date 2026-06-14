@@ -34,7 +34,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import classes from './datasetHeader.module.scss';
-import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import {
+  selectCanDatasetBeDeleted,
+  selectCanDatasetBeEdited,
+} from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
 import { typographyClasses } from 'common/styling';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
@@ -50,6 +53,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const isEditOpened = useSelector(selectIsDatasetOpened);
   const [removeConfirmOpened, { open: openRemoveConfirm, close: closeRemoveConfirm }] = useDisclosure(false);
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
+  const canDatasetBeDeleted = useSelector(selectCanDatasetBeDeleted);
 
   const openEdit = useCallback(() => {
     dispatch(setDatasetEditOpenedAction(true));
@@ -136,7 +140,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         className={classes.buttonContainer}
         gap="sm"
       >
-        {canDatasetBeEdited && (
+        {canDatasetBeDeleted && (
           <ConfirmPopover
             opened={removeConfirmOpened}
             position="right"

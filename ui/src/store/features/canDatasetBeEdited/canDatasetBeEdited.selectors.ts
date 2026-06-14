@@ -19,13 +19,21 @@ import { selectGroupsByIds } from '../../entities/groups/groups.selectors.ts';
 import { selectDatasets } from '../../entities/datasets/datasets.selectors.ts';
 import { USER_ROLES } from 'common/types';
 
-export const selectCanDatasetBeEdited = createSelector(
+const selectActiveDatasetRoles = createSelector(
   [selectActiveDatasetId, selectDatasets, selectGroupsByIds],
   (activeDatasetId, datasets, groups) => {
     const dataset = datasets[activeDatasetId];
-    if (!dataset) return false;
-
-    const roles = dataset.groups.map(group => groups[group.id]?.role);
-    return roles.some(role => [USER_ROLES.ADMIN, USER_ROLES.EDITOR].includes(role));
+    if (!dataset) return [];
+    return dataset.groups.map(group => groups[group.id]?.role);
   },
+);
+
+// Editing is allowed for Admins and Editors.
+export const selectCanDatasetBeEdited = createSelector([selectActiveDatasetRoles], roles =>
+  roles.some(role => [USER_ROLES.ADMIN, USER_ROLES.EDITOR].includes(role)),
+);
+
+// Deleting a dataset is Admin-only — Editors can edit but must not see/use the Remove action. (#610)
+export const selectCanDatasetBeDeleted = createSelector([selectActiveDatasetRoles], roles =>
+  roles.some(role => role === USER_ROLES.ADMIN),
 );
