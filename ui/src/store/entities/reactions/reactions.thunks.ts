@@ -29,7 +29,12 @@ import {
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import type { AppReaction, ReactionId, ReactionResponse, UpdateReactionSuccessPayload } from './reactions.types.ts';
-import { selectActiveDatasetId, selectReactionById, selectReactionsPagination } from './reactions.selectors.ts';
+import {
+  selectActiveDatasetId,
+  selectReactionById,
+  selectReactionsOrder,
+  selectReactionsPagination,
+} from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
 import { ord } from 'ord-schema-protobufjs';
@@ -190,6 +195,13 @@ export const removeReaction = createThunkWithExplicitResult(
     // Refresh the dataset so its "Last modified" and reaction counts reflect the removal
     // even when we're already on the dataset page (navigate to the same URL is a no-op there). (#431)
     dispatch(getDataset(datasetId));
+    // If removing the last reaction on the current page left it empty or past the new last page,
+    // fetch the now-correct page so pagination and the list stay usable without a reload. (#586)
+    // (The list is server-paged, so the optimistic prune alone leaves the page stranded.)
+    const { page, pages } = selectReactionsPagination(getState());
+    if (pages > 0 && (page > pages || selectReactionsOrder(getState()).length === 0)) {
+      dispatch(getReactionsPage({ page: Math.min(page, pages) }));
+    }
     navigate(`/datasets/${datasetId}`);
   },
 );
