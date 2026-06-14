@@ -15,18 +15,23 @@
  */
 import type { ReactionOutcome } from './reactionOutcomes.types.ts';
 import type { ReactionTime } from '../reactionEntity/reactionEntity.types.ts';
+import type { ReactionTimeType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 
 // Reaction-time units normalized to seconds so outcomes recorded in different units sort correctly.
-const TIME_UNIT_TO_SECONDS: Record<string, number> = {
+// `satisfies` makes this exhaustive at compile time: every non-UNSPECIFIED `ord.Time.TimeUnit`
+// must have a factor here, so adding a unit to the schema (e.g. WEEK) breaks the build until mapped.
+const TIME_UNIT_TO_SECONDS = {
   DAY: 86_400,
   HOUR: 3_600,
   MINUTE: 60,
   SECOND: 1,
-};
+} satisfies Record<Exclude<ReactionTimeType, 'UNSPECIFIED'>, number>;
 
 /** A reaction time normalized to seconds, or undefined when it has no usable value/unit. */
 function reactionTimeInSeconds(time: ReactionTime | undefined): number | undefined {
-  const unitSeconds = time?.units ? TIME_UNIT_TO_SECONDS[time.units] : undefined;
+  const unitSeconds = time?.units
+    ? (TIME_UNIT_TO_SECONDS as Record<string, number | undefined>)[time.units]
+    : undefined;
   if (time?.value == null || unitSeconds === undefined) return undefined;
   return time.value * unitSeconds;
 }
