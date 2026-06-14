@@ -187,6 +187,9 @@ export const removeReaction = createThunkWithExplicitResult(
     const datasetId = selectActiveDatasetId(getState());
     await axiosInstance.delete(`/datasets/${datasetId}/reactions/${reactionId}`);
     dispatch(removeReactionActions.success(reactionId));
+    // Refresh the dataset so its "Last modified" and reaction counts reflect the removal
+    // even when we're already on the dataset page (navigate to the same URL is a no-op there). (#431)
+    dispatch(getDataset(datasetId));
     navigate(`/datasets/${datasetId}`);
   },
 );

@@ -25,6 +25,7 @@ import {
   getReactionsListActions,
   removeReactionActions,
 } from './reactions.actions.ts';
+import { getDatasetActions } from '../datasets/datasets.actions.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -106,8 +107,11 @@ describe('removeReaction', () => {
     expect(axiosMock.delete).toHaveBeenCalledWith('/datasets/5/reactions/42');
     expect(types()).toContain(removeReactionActions.success.type);
     expect(navigate).toHaveBeenCalledWith('/datasets/5');
-    // Characterization: removal updates the store optimistically (reducer prunes order + total) and
-    // does NOT trigger a list refetch — no getReactionPage/List request follows the success.
+    // Refetches the parent dataset so its "Last modified" / reaction counts refresh
+    // even when already on the dataset page (navigate is a no-op there). (#431)
+    expect(types()).toContain(getDatasetActions.request.type);
+    // Removal still updates the reactions store optimistically (reducer prunes order + total) and
+    // does NOT trigger a reactions-list refetch — no getReactionPage request follows the success.
     expect(types()).not.toContain(getReactionPageActions.request.type);
   });
 });

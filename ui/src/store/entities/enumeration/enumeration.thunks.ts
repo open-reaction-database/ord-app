@@ -21,8 +21,9 @@ import type { EnumerationProgress, SetupEnumeration } from './enumeration.types.
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import type { CreateDatasetBase, Dataset } from '../datasets/datasets.types.ts';
 import axiosInstance from '../../axiosInstance.ts';
-import { getDataset } from '../datasets/datasets.thunks.ts';
+import { getDataset, getInitialDatasetsList } from '../datasets/datasets.thunks.ts';
 import { getReactionsPage } from '../reactions/reactions.thunks.ts';
+import { selectActiveGroupId } from '../../features/groups/groups.selectors.ts';
 
 const BATCH_SIZE = 50;
 
@@ -108,6 +109,9 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch
       datasetEnumeration,
     );
     dispatch(finishEnumerationAction(createdDataset.data.id));
+    // Refresh the datasets list so the newly created dataset appears without a manual
+    // page reload, including when the user dismisses the result modal with "Close". (#611)
+    dispatch(getInitialDatasetsList(selectActiveGroupId(getState())));
   } else {
     const datasetId = dataset;
     await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
