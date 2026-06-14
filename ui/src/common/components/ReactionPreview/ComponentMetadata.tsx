@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Flex, Text, Tooltip } from '@mantine/core';
+import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionPreview.module.scss';
 import { useMemo } from 'react';
 import type {
   ReactionInputComponent,
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 
 interface ComponentMetadataProps {
@@ -51,6 +52,15 @@ export function ComponentMetadata({ component }: Readonly<ComponentMetadataProps
         <Text size="xs">{renderValuePrecisionUnit(component.amount)}</Text>
       )}
       {component?.reactionRole && <Text size="xs">{component.reactionRole}</Text>}
+      {'isLimiting' in component && component.isLimiting === ReactionBoolean.True && (
+        <Badge
+          size="xs"
+          variant="light"
+          w="fit-content"
+        >
+          Limiting reactant
+        </Badge>
+      )}
     </Flex>
   );
 }

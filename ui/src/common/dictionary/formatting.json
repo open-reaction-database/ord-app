@@ -1,10 +1,15 @@
 {
+  "KILOGRAM": "kg",
+  "GRAM": "g",
+  "MILLIGRAM": "mg",
+  "MICROGRAM": "µg",
+  "MOLE": "mol",
+  "MILLIMOLE": "mmol",
+  "MICROMOLE": "µmol",
+  "NANOMOLE": "nmol",
   "LITER": "L",
   "MILLILITER": "ml",
   "MICROLITER": "µl",
   "NANOLITER": "nl",
-  "MILLIMOLE": "mmol",
-  "MICROMOLE": "µmol",
-  "HOUR": "h",
-  "MILLIGRAM": "mg"
+  "HOUR": "h"
 }
