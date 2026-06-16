@@ -23,7 +23,7 @@ const inputs = [{ id: 'in1', name: 'Input 1', components: [] }] as unknown as Ar
 describe('InputsComponentsList', () => {
   it('renders the column headers and one accordion item per input', () => {
     const { getByText } = renderInReactionView(<InputsComponentsList inputs={inputs} />);
-    for (const header of ['Identifiers', 'Preview', 'Role', 'Amount']) {
+    for (const header of ['Input', 'Identifiers', 'Preview', 'Role', 'Amount']) {
       expect(getByText(header)).toBeInTheDocument();
     }
     expect(getByText('Input 1')).toBeInTheDocument();
