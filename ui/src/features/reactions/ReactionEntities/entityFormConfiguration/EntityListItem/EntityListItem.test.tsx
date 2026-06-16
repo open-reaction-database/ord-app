@@ -39,6 +39,21 @@ describe('EntityListItem', () => {
     expect(getByText('NMR')).toBeInTheDocument();
   });
 
+  it('offsets a numeric key by one for a string title (1-based display)', () => {
+    const { getByText } = renderInReactionView(
+      <EntityListItem<Analysis>
+        entityKey={0}
+        entity={{ type: 'NMR' }}
+        entityField="analyses"
+        title="Measurement"
+        requiredFields={[]}
+        historyPathComponents={[]}
+      />,
+      { pathComponents: ['outcomes', 0] },
+    );
+    expect(getByText('Measurement 1')).toBeInTheDocument();
+  });
+
   it('uses a function title when provided', () => {
     const { getByText } = renderInReactionView(
       <EntityListItem<Analysis>
