@@ -112,6 +112,25 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 - Create-reaction lives on the **dataset** page (`/datasets/:id` → "Reaction" button → "From Scratch"), not the reaction editor.
 - **Before/after on a one-line change**: edit the source file while the dev server runs — Vite HMR reloads it live — capture the buggy screenshot, revert, capture the fixed one. Verify the working tree is clean afterward.
 
+## Exploratory screenshot verification (manual, not a spec)
+
+For confirming a fix in the real app (e.g. "does this label/badge/unit render?"), drive Chromium with a throwaway Node script instead of a Playwright spec. It iterates faster — dump affordances, screenshot, adjust, rerun. These gotchas each cost a rerun; avoid them:
+
+- **Standalone script import**: `@playwright/test` is CJS, so `import { chromium }` fails. Use:
+  ```js
+  import pkg from '/abs/path/ui/node_modules/@playwright/test/index.js';
+  const { chromium } = pkg;
+  ```
+  Run with `node /tmp/shot.mjs`. Screenshot to `/tmp/*.png` and Read the image back.
+- **`Close` discards unsaved edits.** The entity edit drawer commits only via its bottom **`Save`**; clicking `Close` (or navigating away) throws away role/amount/etc. you just set — they'll show as `UNSPECIFIED` on reload. The in-drawer select still shows your value (in-memory form state) even when nothing persisted, so **verify by reloading the page and reading the read-only view**, not the drawer.
+- **Nested drawers have their own `Save`.** Adding an Identifier opens a sub-drawer (breadcrumb `Input / Component / Identifier`); its `Save` persists only the identifier. Set the component-level fields (role, amount, limiting) and then click the **component** drawer's `Save` — saving the sub-drawer or `Close`-ing the parent loses them. Breadcrumb items are links but not reliably `getByRole('link')`; click via `locator('a,[role=link],button').filter({ hasText: /^Component$/ })`.
+- **Menu items are `role=menuitem`, not `button`.** The Reaction dropdown's "From Scratch"/"From File"/"From Enumeration" need `getByRole('menuitem', { name })`; `getByRole('button', …)` times out.
+- **Combobox vs native `<select>` — don't assume.** The Create-Dataset **Group** field is a Mantine combobox: `dialog.getByPlaceholder('Select a group').click()` then `getByRole('option').first().click()`. Unit / reaction-role / identifier-type fields are real `<select>` (`AppNativeSelect`): use `selectOption({ label })`. To find the right one among several, match by its options (`if ((await s.locator('option').allTextContents()).includes('MILLILITER'))`).
+- **Empty `placeholder=""` breaks `input:not([placeholder])`** (the attribute is present-but-empty). Target form fields by `getByLabel(/…/)` instead.
+- **Build a component without Ketcher**: set Reaction role `REACTANT` (this reveals the `Limiting reactant` field), add an identifier row and set Type `SMILES` + value `O`/`CCO` — no WASM structure editor needed.
+- **Cross-branch visual checks**: DB data persists across `git checkout`, and HMR picks up the new branch's source. Build the fixture reaction once, then check out each branch and re-screenshot the same URL — handy when two fixes live on separate branches.
+- **Dumping the DOM for text** catches `<style>`/`<script>` contents (they contain words like "License"). Filter to leaf nodes (`el.childElementCount === 0`) or just read the screenshot.
+
 ## SonarCloud issues (public API, no token)
 
 ```bash
