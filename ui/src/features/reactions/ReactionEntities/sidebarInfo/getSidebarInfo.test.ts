@@ -23,15 +23,17 @@ describe('getSidebarInfo', () => {
     expect(getSidebarInfo(['identifiers']).label).toBe('Identifier');
   });
 
-  it('recursively narrows a nested path to the matching entry', () => {
-    // products live under outcomes; the two-segment path must resolve to the Products entry.
-    const info = getSidebarInfo(['products', 'outcomes']);
-    expect(info.label).toBe('Products');
+  it('recurses to later segments when the first segment is ambiguous', () => {
+    // "identifiers" alone matches several entries (component/molblock/product identifiers), so the
+    // match must narrow on the following segments to reach the component-identifiers entry.
+    const info = getSidebarInfo(['identifiers', 'products', 'outcomes']);
+    expect(info.label).toBe('Identifiers');
     expect(typeof info.sidebarTitle).toBe('function');
   });
 
-  it('skips numeric indices when matching the path', () => {
-    // A concrete reaction path interleaves numeric ids, which must be ignored during matching.
-    expect(getSidebarInfo(['products', 0, 'outcomes', 1]).label).toBe('Products');
+  it('skips numeric indices interleaved in a concrete reaction path', () => {
+    // Same ambiguous-first-segment path, but with numeric ids between entities — they must be
+    // skipped at each recursion step to still resolve to the component-identifiers entry.
+    expect(getSidebarInfo(['identifiers', 0, 'products', 1, 'outcomes']).label).toBe('Identifiers');
   });
 });
