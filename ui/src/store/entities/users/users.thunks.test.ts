@@ -23,6 +23,9 @@ import { createUserActions } from './users.actions.ts';
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
+// createThunk imports showNotification transitively; mock it so this file stays insulated from the
+// toast infrastructure even if a future transitive dependency needs React context.
+vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
 const axiosMock = axiosInstance as unknown as Record<'post', ReturnType<typeof vi.fn>>;
 const tokens = { access_token: 'a-token', id_token: 'i-token' };

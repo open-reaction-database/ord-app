@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
@@ -34,6 +34,10 @@ beforeEach(() => {
   axiosMock.delete.mockResolvedValue({ data: {} });
 });
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('removeTemplate', () => {
   it('parses the numeric id, deletes the template, dispatches success, and navigates to the list', async () => {
     const { store, types } = makeRecordingStore();
@@ -47,6 +51,8 @@ describe('removeTemplate', () => {
 
 describe('importFromFile', () => {
   it('dispatches failure (and never POSTs) when the file variables are not an array', async () => {
+    // The production catch logs the parse error; silence it so the failure test stays quiet in CI.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const file = new File([JSON.stringify({ binpb: 'AA==', variables: 'not-an-array' })], 't.json', {
       type: 'application/json',
     });
