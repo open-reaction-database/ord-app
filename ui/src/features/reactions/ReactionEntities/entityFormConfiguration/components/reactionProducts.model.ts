@@ -105,7 +105,7 @@ export const reactionProducts: Array<ReactionFormNode> = [
     type: ReactionFormNodeType.block,
     name: 'texture',
     title: {
-      label: 'Isolated Product Characteristics',
+      label: 'Isolated Material Characteristics',
     },
     fields: [
       wrapInputsWithGrid(
