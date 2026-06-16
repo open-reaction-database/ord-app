@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { UpdatePersonInfo } from './UpdatePersonInfo.tsx';
@@ -37,13 +37,26 @@ const renderButton = (isViewOnly = false) =>
     { isViewOnly },
   );
 
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 describe('UpdatePersonInfo', () => {
   it('renders the action button and merges the user info on click when editable', () => {
     const { getByRole } = renderButton();
     const button = getByRole('button', { name: 'Use my info' });
     expect(button).toBeInTheDocument();
     fireEvent.click(button);
-    expect(setValues).toHaveBeenCalled();
+    expect(setValues).toHaveBeenCalledTimes(1);
+    // setValues receives an updater; applying it to an empty form should populate the person at the
+    // node's path from the mocked user (name/email, and orcid_id mapped to the proto `orcid` key).
+    const updater = setValues.mock.calls[0][0] as (prev: object) => unknown;
+    const result = updater({}) as { provenance: { recordCreated: { person: object } } };
+    expect(result.provenance.recordCreated.person).toEqual({
+      name: 'Me',
+      email: 'me@example.com',
+      orcid: '0000-0001',
+    });
   });
 
   it('renders nothing in view-only mode', () => {
