@@ -47,10 +47,14 @@ describe('useReactionEntityValidation', () => {
     expect(validate({ name: 'Existing' }).name).toBeTruthy();
   });
 
-  it('accepts a unique name, and the entity keeping its own name', () => {
+  it('accepts a genuinely new, unique name', () => {
     const validate = renderValidate(ReactionNodeEntity.Inputs, ['inputs', 'in2']);
     expect(validate({ name: 'Brand New' }).name).toBeFalsy();
-    // 'Other' is in2's own current name, so it is excluded from the uniqueness set.
+  });
+
+  it("excludes the entity's own current name from the uniqueness set", () => {
+    const validate = renderValidate(ReactionNodeEntity.Inputs, ['inputs', 'in2']);
+    // 'Other' is in2's own current name, so re-using it is allowed.
     expect(validate({ name: 'Other' }).name).toBeFalsy();
   });
 
