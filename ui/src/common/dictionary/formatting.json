@@ -8,8 +8,8 @@
   "MICROMOLE": "µmol",
   "NANOMOLE": "nmol",
   "LITER": "L",
-  "MILLILITER": "ml",
-  "MICROLITER": "µl",
-  "NANOLITER": "nl",
+  "MILLILITER": "mL",
+  "MICROLITER": "µL",
+  "NANOLITER": "nL",
   "HOUR": "h"
 }
