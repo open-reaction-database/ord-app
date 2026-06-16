@@ -34,11 +34,12 @@ describe('ReactionValidationResult', () => {
     expect(getByText('1 warning')).toBeInTheDocument();
   });
 
-  it('does not show an error count when the reaction is valid', () => {
+  it('shows neither an error nor a warning count when the reaction is valid', () => {
     const { queryByText } = renderWithProviders(
       <ReactionValidationResult reactionId={1} />,
       stateWith({ is_valid: true, validation: null }),
     );
     expect(queryByText(/error/)).not.toBeInTheDocument();
+    expect(queryByText(/warning/)).not.toBeInTheDocument();
   });
 });
