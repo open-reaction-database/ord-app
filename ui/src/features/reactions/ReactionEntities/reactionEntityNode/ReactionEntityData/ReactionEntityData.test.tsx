@@ -34,7 +34,7 @@ const formMethods = {
 
 describe('ReactionEntityData', () => {
   it('renders the data-type selector and a text value control for Text data', () => {
-    const { container, getByText } = renderInReactionView(
+    const { getByText, getByRole } = renderInReactionView(
       <ReactionEntityData
         node={node}
         formMethods={formMethods}
@@ -43,7 +43,7 @@ describe('ReactionEntityData', () => {
     // Segmented control exposes each data type as a radio option.
     expect(getByText('Text')).toBeInTheDocument();
     expect(getByText('Number')).toBeInTheDocument();
-    // The value control for the Text type is a text input (the segmented control uses radios).
-    expect(container.querySelector('input:not([type="radio"])')).not.toBeNull();
+    // The value control for the Text type is a text input (role=textbox; the selector uses radios).
+    expect(getByRole('textbox')).toBeInTheDocument();
   });
 });

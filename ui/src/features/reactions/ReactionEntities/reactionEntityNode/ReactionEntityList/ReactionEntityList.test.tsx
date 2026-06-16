@@ -25,6 +25,7 @@ const makeNode = () =>
   ({
     name: 'items',
     title: { label: 'Items' },
+    getKey: (_item: unknown, index: number) => index,
     useSelectItems: () => [],
     ItemDisplay: () => null,
     addItem: { label: 'Add', useCreate: () => () => {} },
