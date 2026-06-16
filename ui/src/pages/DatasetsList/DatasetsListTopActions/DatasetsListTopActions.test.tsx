@@ -42,4 +42,11 @@ describe('DatasetsListTopActions', () => {
     fireEvent.click(getByText('New Dataset'));
     expect(queryByTestId('create-new-dataset')).toBeInTheDocument();
   });
+
+  it('opens the create-from-file modal when "From File" is clicked', () => {
+    const { getByText, queryByTestId } = renderWithProviders(<DatasetsListTopActions />);
+    expect(queryByTestId('create-from-file')).not.toBeInTheDocument();
+    fireEvent.click(getByText('From File'));
+    expect(queryByTestId('create-from-file')).toBeInTheDocument();
+  });
 });
