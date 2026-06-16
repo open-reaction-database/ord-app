@@ -50,7 +50,7 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             { label: 'Reflux', render: conditions => conditions.reflux },
             { label: 'pH', render: conditions => conditions.ph },
-            { label: 'Dynamic conditions:', render: conditions => conditions.conditionsAreDynamic },
+            { label: 'Dynamic conditions', render: conditions => conditions.conditionsAreDynamic },
           ]}
         />
         <span className={classes.conditionsLabel}>Temperature</span>
