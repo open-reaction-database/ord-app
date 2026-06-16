@@ -19,7 +19,7 @@ import { EnumerationResult } from './EnumerationResult.tsx';
 import type { EnumerationProgress } from 'store/entities/enumeration/enumeration.types.ts';
 
 const progress = (overrides: object) =>
-  ({ resultDatasetId: 0, reactions: [], errors: [], ...overrides }) as unknown as Required<EnumerationProgress>;
+  ({ resultDatasetId: null, reactions: [], errors: [], ...overrides }) as unknown as Required<EnumerationProgress>;
 
 describe('EnumerationResult', () => {
   it('reports the number of reactions created on success', () => {
