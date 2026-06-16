@@ -48,4 +48,16 @@ describe('ReactionNodeValidationResultDisplay', () => {
     expect(queryByText('2')).not.toBeInTheDocument();
     expect(queryByText('1')).not.toBeInTheDocument();
   });
+
+  it('matches messages under a parent-path prefix (substring path match)', () => {
+    // pathComponents=['inputs'] is a prefix of the messages' 'inputs.0.*' paths, so all of them count.
+    const { getByText } = renderWithMantine(
+      <ReactionNodeValidationResultDisplay
+        pathComponents={['inputs']}
+        validation={validation}
+      />,
+    );
+    expect(getByText('2')).toBeInTheDocument();
+    expect(getByText('1')).toBeInTheDocument();
+  });
 });
