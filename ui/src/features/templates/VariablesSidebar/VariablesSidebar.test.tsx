@@ -38,8 +38,9 @@ describe('VariablesSidebar', () => {
     expect(getByText('@reagent')).toBeInTheDocument();
   });
 
-  it('does not render the variable list while the drawer is closed', () => {
+  it('does not render the drawer title or the variable list while closed', () => {
     const { queryByText } = renderWithProviders(<VariablesSidebar templateId="template_1" />, buildState(false));
+    expect(queryByText('Variables')).not.toBeInTheDocument();
     expect(queryByText('@reagent')).not.toBeInTheDocument();
   });
 });
