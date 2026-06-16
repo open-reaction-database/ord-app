@@ -18,10 +18,10 @@ import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { ReactionValidationList } from './ReactionValidationList.tsx';
 import type { ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
 
-const validation = {
+const validation: ReactionValidation = {
   errors: [{ text: 'Reaction inputs are required' }],
   warnings: [{ text: 'Consider adding a yield' }],
-} as unknown as ReactionValidation;
+};
 
 describe('ReactionValidationList', () => {
   it('renders the drawer with the error and warning messages when opened', () => {
