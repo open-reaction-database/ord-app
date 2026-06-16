@@ -36,9 +36,10 @@ describe('DatasetReactionValueLabel', () => {
     expect(getByText('extra')).toBeInTheDocument();
   });
 
-  it('renders nothing when no label is configured', () => {
-    const { queryByText } = render({});
-    expect(queryByText('pH')).not.toBeInTheDocument();
-    expect(queryByText('extra')).not.toBeInTheDocument();
+  it('renders nothing — not even children — when no label is configured', () => {
+    // children ARE passed here, so their absence proves the no-label guard returns null before
+    // any children would render (rather than being vacuously true).
+    const { queryByText } = render({ children: <span>orphan</span> });
+    expect(queryByText('orphan')).not.toBeInTheDocument();
   });
 });
