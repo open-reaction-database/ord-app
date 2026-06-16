@@ -51,4 +51,11 @@ describe('ReactionEntitySelect', () => {
     expect(getByText('A')).toBeInTheDocument();
     expect(getByText('B')).toBeInTheDocument();
   });
+
+  it('disables the segmented control in view-only mode', () => {
+    const { container } = renderSelect('segmented', true);
+    const radios = container.querySelectorAll('input[type=radio]');
+    expect(radios.length).toBeGreaterThan(0);
+    radios.forEach(radio => expect(radio).toBeDisabled());
+  });
 });
