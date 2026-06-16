@@ -33,7 +33,7 @@ describe('ReactionPreview', () => {
     expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
   });
 
-  it('renders an input card and the arrow when the reaction has inputs', () => {
+  it('renders an input card when the reaction has inputs', () => {
     const data = {
       ...emptyReactionData(),
       inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
