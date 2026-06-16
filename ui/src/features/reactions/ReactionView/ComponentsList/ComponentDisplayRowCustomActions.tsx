@@ -15,7 +15,8 @@
  */
 import type { ComponentsDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/componentsList.types.ts';
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import { Flex } from '@mantine/core';
+import { Badge, Flex } from '@mantine/core';
+import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
@@ -56,9 +57,20 @@ export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase
       </Flex>
       <Flex
         align="center"
+        direction="column"
+        gap={4}
         className={classes.role}
       >
         {component.reactionRole}
+        {'isLimiting' in component && component.isLimiting === ReactionBoolean.True && (
+          <Badge
+            size="xs"
+            variant="light"
+            w="fit-content"
+          >
+            Limiting reactant
+          </Badge>
+        )}
       </Flex>
       <Flex
         align="center"
