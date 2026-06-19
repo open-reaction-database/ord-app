@@ -54,6 +54,7 @@ const reaction = (id: number, data: Record<string, unknown> = {}) => ({ id, data
 interface EntryShape {
   pb_reaction_id?: string;
   data: { notes?: Record<string, unknown>; reactionId?: string; outcomes?: Array<unknown> };
+  dataBeforeEdit?: { notes?: Record<string, unknown> };
   variables: Record<string, unknown>;
 }
 const asEntry = (entry: unknown): EntryShape => entry as EntryShape;
@@ -160,6 +161,74 @@ describe('reactions.reducer — reactionsById field edits', () => {
     const seeded = { reactionsById: { 1: { ...reaction(1), pb_reaction_id: 'old' } } as never };
     const state = reduce(seeded, renameReactionActions.success({ reactionId: 1, name: 'new-name' } as never));
     expect(state.reactionsById[1]).toMatchObject({ pb_reaction_id: 'new-name', data: { reactionId: 'new-name' } });
+  });
+});
+
+describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
+  const seedNotes = (text: string) => ({ reactionsById: { 1: reaction(1, { notes: { text } }) } as never });
+
+  it('snapshots the pre-edit data when an edit is dispatched', () => {
+    const state = reduce(
+      seedNotes('original'),
+      deleteReactionFieldActions.request({ reactionId: 1, pathComponents: ['notes', 'text'] } as never),
+    );
+    expect(asEntry(state.reactionsById[1]).data.notes).toEqual({});
+    expect(asEntry(state.reactionsById[1]).dataBeforeEdit?.notes).toEqual({ text: 'original' });
+  });
+
+  it('restores the snapshot and clears it when the backend rejects the edit', () => {
+    const afterEdit = reduce(
+      seedNotes('original'),
+      deleteReactionFieldActions.request({ reactionId: 1, pathComponents: ['notes', 'text'] } as never),
+    );
+    const afterFailure = reduce(afterEdit, deleteReactionFieldActions.failure('Access denied' as never));
+    expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({ text: 'original' });
+    expect(asEntry(afterFailure.reactionsById[1]).dataBeforeEdit).toBeUndefined();
+  });
+
+  it('clears the snapshot once the edit is committed', () => {
+    const afterEdit = reduce(
+      seedNotes('original'),
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: 'edited',
+      } as never),
+    );
+    expect(asEntry(afterEdit.reactionsById[1]).dataBeforeEdit).toBeDefined();
+    // The real success payload (Omit<DatasetReaction, 'data'>) carries previews; the
+    // reactionsPreviews slice also handles this action and indexes them.
+    const afterSuccess = reduce(afterEdit, addUpdateReactionFieldActions.success({ id: 1, previews: {} } as never));
+    expect(asEntry(afterSuccess.reactionsById[1]).dataBeforeEdit).toBeUndefined();
+    expect(asEntry(afterSuccess.reactionsById[1]).data.notes).toEqual({ text: 'edited' });
+  });
+
+  it('keeps the earliest baseline across successive edits so a rollback reverts all the way', () => {
+    const edit1 = reduce(
+      seedNotes('original'),
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: 'first',
+      } as never),
+    );
+    const edit2 = reduce(
+      edit1,
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: 'second',
+      } as never),
+    );
+    expect(asEntry(edit2.reactionsById[1]).data.notes).toEqual({ text: 'second' });
+    expect(asEntry(edit2.reactionsById[1]).dataBeforeEdit?.notes).toEqual({ text: 'original' });
+  });
+
+  it('is a no-op on failure when no edit is pending', () => {
+    const seeded = seedNotes('x');
+    const state = reduce(seeded, deleteReactionFieldActions.failure('err' as never));
+    expect(asEntry(state.reactionsById[1]).data.notes).toEqual({ text: 'x' });
+    expect(asEntry(state.reactionsById[1]).dataBeforeEdit).toBeUndefined();
   });
 });
 

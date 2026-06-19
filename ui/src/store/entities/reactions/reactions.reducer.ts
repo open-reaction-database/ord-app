@@ -71,6 +71,9 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
         ...state,
         [reactionId]: {
           ...reaction,
+          // Snapshot the pre-edit data so the optimistic change can be rolled back if the backend
+          // rejects it; keep the earliest baseline if several edits queue up. (#615)
+          dataBeforeEdit: reaction.dataBeforeEdit ?? reaction.data,
           data: updatedReaction,
         },
       };
@@ -83,6 +86,9 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       ...state,
       [reactionId]: {
         ...reaction,
+        // Snapshot the pre-edit data so the optimistic change can be rolled back if the backend
+        // rejects it; keep the earliest baseline if several edits queue up. (#615)
+        dataBeforeEdit: reaction.dataBeforeEdit ?? reaction.data,
         data: updatedReaction,
       },
     };
@@ -164,6 +170,8 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, { payload }) => {
       const { id } = payload;
       const { data } = state[id];
+      // Rebuilt from the server payload (which carries no `dataBeforeEdit`), so the optimistic
+      // snapshot is implicitly cleared now that the edit is committed. (#615)
       return {
         ...state,
         [id]: {
@@ -173,6 +181,21 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       };
     },
   );
+  builder.addMatcher(isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure), state => {
+    // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
+    // the optimistic change by restoring the snapshot, so the UI never shows an unsaved edit as
+    // applied. Edits are issued one at a time, so at most one reaction is ever pending. (#615)
+    const restored = { ...state };
+    let didRollback = false;
+    for (const [id, reaction] of Object.entries(state)) {
+      if (reaction.dataBeforeEdit === undefined) {
+        continue;
+      }
+      restored[id] = { ...reaction, data: reaction.dataBeforeEdit, dataBeforeEdit: undefined };
+      didRollback = true;
+    }
+    return didRollback ? restored : state;
+  });
   builder.addMatcher(
     isAnyOf(getReactionActions.success, createEmptyReactionActions.success, importReactionFromFileActions.success),
     (state, action) => ({
