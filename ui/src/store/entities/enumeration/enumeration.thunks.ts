@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { enumerateBatchActions, finishEnumerationAction, startEnumerationActions } from './enumeration.actions.ts';
+import {
+  enumerateBatchActions,
+  finishEnumerationAction,
+  interruptEnumerationAction,
+  startEnumerationActions,
+} from './enumeration.actions.ts';
+import { notifyApiError } from '../../utils';
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import type { ActionPayload } from 'common/types';
 import { selectEnumerationProgress } from './enumeration.selectors.ts';
@@ -107,20 +113,28 @@ export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch
   // Groups") to match what the Datasets page shows, rather than the new dataset's own group. (#611)
   const activeGroupId = selectActiveGroupId(getState());
 
-  if (isNewDataset) {
-    const createdDataset = await axiosInstance.post<Dataset>(
-      `/groups/${dataset.groupId}/datasets/enumerate`,
-      datasetEnumeration,
-    );
-    dispatch(finishEnumerationAction(createdDataset.data.id));
-    // Refresh the datasets list so the newly created dataset appears without a manual
-    // page reload, including when the user dismisses the result modal with "Close". (#611)
-    dispatch(getInitialDatasetsList(activeGroupId));
-  } else {
-    const datasetId = dataset;
-    await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
-    dispatch(finishEnumerationAction(datasetId));
-    dispatch(getDataset(datasetId));
-    dispatch(getReactionsPage({ page: 1 }));
+  try {
+    if (isNewDataset) {
+      const createdDataset = await axiosInstance.post<Dataset>(
+        `/groups/${dataset.groupId}/datasets/enumerate`,
+        datasetEnumeration,
+      );
+      dispatch(finishEnumerationAction(createdDataset.data.id));
+      // Refresh the datasets list so the newly created dataset appears without a manual
+      // page reload, including when the user dismisses the result modal with "Close". (#611)
+      dispatch(getInitialDatasetsList(activeGroupId));
+    } else {
+      const datasetId = dataset;
+      await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
+      dispatch(finishEnumerationAction(datasetId));
+      dispatch(getDataset(datasetId));
+      dispatch(getReactionsPage({ page: 1 }));
+    }
+  } catch (error) {
+    // The backend rejects the enumeration when the user no longer has edit access (role changed
+    // to viewer, removed from the group). Surface it and stop the enumeration instead of failing
+    // silently in the console. (#614)
+    notifyApiError(error);
+    dispatch(interruptEnumerationAction());
   }
 };

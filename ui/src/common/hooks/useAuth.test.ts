@@ -42,15 +42,19 @@ vi.mock('react-redux', () => ({
 const mocks = vi.hoisted(() => ({
   dispatch: vi.fn(),
   setAccessTokenGetter: vi.fn(),
+  setPermissionDeniedHandler: vi.fn(),
   createUser: vi.fn((arg: unknown) => ({ type: 'users/createUser', payload: arg })),
+  getGroupList: vi.fn(() => ({ type: 'groups/getGroupList' })),
 }));
 vi.mock('store/useAppDispatch', () => ({ useAppDispatch: () => mocks.dispatch }));
 vi.mock('store/axiosInstance.ts', () => ({
   default: {},
   setAccessTokenGetter: mocks.setAccessTokenGetter,
+  setPermissionDeniedHandler: mocks.setPermissionDeniedHandler,
   getAccessToken: undefined,
 }));
 vi.mock('store/entities/users/users.thunks', () => ({ createUser: mocks.createUser }));
+vi.mock('store/entities/groups/groups.thunks', () => ({ getGroupList: mocks.getGroupList }));
 
 import { useAuth } from './useAuth.ts';
 
@@ -159,5 +163,41 @@ describe('useAuth — Auth0 flow', () => {
     expect(loginWithRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ appState: expect.objectContaining({ returnTo: expect.any(String) }) }),
     );
+  });
+});
+
+describe('useAuth — permission re-gate on 403 (#617)', () => {
+  it('registers a handler that refreshes group roles', async () => {
+    renderHook(() => useAuth());
+    expect(mocks.setPermissionDeniedHandler).toHaveBeenCalledTimes(1);
+    const handler = mocks.setPermissionDeniedHandler.mock.calls[0][0] as () => void;
+
+    await act(async () => {
+      handler();
+    });
+
+    expect(mocks.getGroupList).toHaveBeenCalledTimes(1);
+    expect(mocks.dispatch).toHaveBeenCalledWith({ type: 'groups/getGroupList' });
+  });
+
+  it('ignores re-entrant refreshes while one is still in flight', async () => {
+    renderHook(() => useAuth());
+    const handler = mocks.setPermissionDeniedHandler.mock.calls[0][0] as () => void;
+
+    // Hold the first refresh open so the in-flight guard is active for the re-entrant call.
+    let settleRefresh: () => void = () => {};
+    mocks.dispatch.mockReturnValueOnce(new Promise<void>(resolve => (settleRefresh = resolve)));
+
+    handler();
+    handler(); // re-entrant; must be ignored while the first refresh is pending
+    expect(mocks.getGroupList).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      settleRefresh();
+      await Promise.resolve();
+    });
+
+    handler(); // the guard has cleared, so a fresh 403 refreshes again
+    expect(mocks.getGroupList).toHaveBeenCalledTimes(2);
   });
 });

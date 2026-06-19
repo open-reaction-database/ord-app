@@ -22,6 +22,15 @@ export function setAccessTokenGetter(getAccessTokenParam: GetAccessToken) {
   getAccessToken = getAccessTokenParam;
 }
 
+// Called when the backend rejects a request with 403 Forbidden — the UI's cue that the user's
+// permissions may have changed (role downgraded to viewer, removed from a group) so it should
+// refresh and re-gate. Wired up by the app once the store is available; a no-op until then. (#617)
+let onPermissionDenied: (() => void) | undefined;
+
+export function setPermissionDeniedHandler(handler: () => void) {
+  onPermissionDenied = handler;
+}
+
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
 });
@@ -31,11 +40,16 @@ axiosInstance.interceptors.request.use(async config => {
   return config;
 });
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  async error => {
-    return Promise.reject(error);
-  },
-);
+// Exported for unit testing; registered as the response error interceptor below. A 403 means the
+// user is authenticated but no longer authorized for the action, so trigger a permission refresh.
+// (401 is an authentication failure handled by the Auth0 token-refresh/redirect path, not here.)
+export async function handleResponseError(error: unknown): Promise<never> {
+  if (axios.isAxiosError(error) && error.response?.status === 403) {
+    onPermissionDenied?.();
+  }
+  return Promise.reject(error);
+}
+
+axiosInstance.interceptors.response.use(response => response, handleResponseError);
 
 export default axiosInstance;

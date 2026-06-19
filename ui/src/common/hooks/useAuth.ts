@@ -15,10 +15,11 @@
  */
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import { setAccessTokenGetter } from 'store/axiosInstance.ts';
+import { setAccessTokenGetter, setPermissionDeniedHandler } from 'store/axiosInstance.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';
 import { createUser } from 'store/entities/users/users.thunks';
+import { getGroupList } from 'store/entities/groups/groups.thunks';
 import { selectSelf } from 'store/entities/users/users.selectors';
 import { e2eDevToken, noAuth } from 'common/noAuth.constants.ts';
 import type { GetAccessToken } from 'common/types/auth.ts';
@@ -56,6 +57,23 @@ export function useAuth() {
       setAccessTokenGetter(getAccessTokenSilently);
     }
   }, [isAuthenticated, getAccessTokenSilently]);
+
+  useEffect(() => {
+    // When the backend rejects an action with 403 (role downgraded to viewer, removed from a
+    // group), refresh the current user's group memberships/roles so permission-gated affordances
+    // re-gate without a manual page reload. (#617) The in-flight guard prevents re-entrancy if the
+    // refresh request is itself rejected.
+    let isRefreshing = false;
+    setPermissionDeniedHandler(() => {
+      if (isRefreshing) {
+        return;
+      }
+      isRefreshing = true;
+      void Promise.resolve(dispatch(getGroupList())).finally(() => {
+        isRefreshing = false;
+      });
+    });
+  }, [dispatch]);
 
   useEffect(() => {
     // Provision the mock user once with the static dev token (requires the backend e2e mode, #664).

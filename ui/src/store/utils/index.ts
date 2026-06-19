@@ -16,3 +16,4 @@
 export * from './actions.ts';
 export * from './thunks.ts';
 export * from './createSelectorFactory.ts';
+export * from './notifyApiError.ts';

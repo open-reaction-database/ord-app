@@ -18,9 +18,16 @@ import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
 import { finishEnumeration } from './enumeration.thunks.ts';
-import { enumerateBatchActions, finishEnumerationAction, startEnumerationActions } from './enumeration.actions.ts';
+import {
+  enumerateBatchActions,
+  finishEnumerationAction,
+  interruptEnumerationAction,
+  startEnumerationActions,
+} from './enumeration.actions.ts';
 import type { StartEnumeration } from './enumeration.types.ts';
 import { getGroupsInitialDatasetListActions } from '../datasets/datasets.actions.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -61,5 +68,22 @@ describe('finishEnumeration (new dataset)', () => {
     expect(types()).toContain(finishEnumerationAction.type);
     // The new dataset is created server-side but isn't in the list store yet; refetch the list. (#611)
     expect(types()).toContain(getGroupsInitialDatasetListActions.request.type);
+  });
+});
+
+describe('finishEnumeration (backend rejects the request)', () => {
+  it('notifies the user and stops the enumeration instead of failing silently (#614)', async () => {
+    const { store, types } = makeRecordingStore();
+    seedNewDatasetProgress(store);
+    axiosMock.post.mockRejectedValueOnce({ isAxiosError: true, response: { status: 403 } });
+
+    await store.dispatch(finishEnumeration() as unknown as UnknownAction);
+
+    // The user gets feedback rather than a console-only error...
+    expect(showNotification).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'Access denied' });
+    // ...and the enumeration is stopped (progress reset), with no success result dispatched.
+    expect(types()).toContain(interruptEnumerationAction.type);
+    expect(types()).not.toContain(finishEnumerationAction.type);
+    expect(types()).not.toContain(getGroupsInitialDatasetListActions.request.type);
   });
 });

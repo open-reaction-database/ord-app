@@ -16,6 +16,7 @@
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import type { AppState } from '../configureAppStore.ts';
 import axiosInstance from '../axiosInstance.ts';
+import { notifyApiError } from './notifyApiError.ts';
 
 export const downloadFile = (blob: Blob, fileName: string) => {
   const link = document.createElement('a');
@@ -44,7 +45,9 @@ export const downloadFileFromUrl =
       const fileName = header.replace(/^.*filename="(.*)"/, '$1');
       downloadFile(blob, fileName);
     } catch (error) {
-      console.error(error);
+      // A removed dataset/reaction (404) or lost group access (403) rejects the download; tell the
+      // user instead of only logging to the console. (#616)
+      notifyApiError(error);
     }
   };
 

@@ -16,8 +16,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axiosInstance from '../axiosInstance.ts';
 import { downloadFile, downloadFileFromUrl, downloadAsJson } from './downloadFile.thunks.ts';
+import { notifyApiError } from './notifyApiError.ts';
 
 vi.mock('../axiosInstance.ts', () => ({ default: { get: vi.fn() } }));
+vi.mock('./notifyApiError.ts', () => ({ notifyApiError: vi.fn() }));
 const axiosMock = axiosInstance as unknown as Record<'get', ReturnType<typeof vi.fn>>;
 
 let clickSpy: ReturnType<typeof vi.fn>;
@@ -71,12 +73,11 @@ describe('downloadFileFromUrl', () => {
     expect(clickSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('swallows errors (logs, no throw, no download) when the request fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    axiosMock.get.mockRejectedValueOnce(new Error('network'));
+  it('notifies the user (no throw, no download) when the request fails (#616)', async () => {
+    axiosMock.get.mockRejectedValueOnce({ isAxiosError: true, response: { status: 404 } });
     await expect(downloadFileFromUrl('/bad')(vi.fn(), vi.fn(), undefined)).resolves.toBeUndefined();
     expect(clickSpy).not.toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalled();
+    expect(notifyApiError).toHaveBeenCalledTimes(1);
   });
 });
 
