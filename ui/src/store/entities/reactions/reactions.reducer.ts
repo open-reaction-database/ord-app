@@ -170,13 +170,14 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, { payload }) => {
       const { id } = payload;
       const { data } = state[id];
-      // Rebuilt from the server payload (which carries no `dataBeforeEdit`), so the optimistic
-      // snapshot is implicitly cleared now that the edit is committed. (#615)
+      // The edit is committed, so clear the rollback snapshot explicitly (don't rely on the server
+      // payload omitting it). (#615)
       return {
         ...state,
         [id]: {
           ...payload,
           data,
+          dataBeforeEdit: undefined,
         },
       };
     },

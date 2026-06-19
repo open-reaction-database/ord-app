@@ -165,7 +165,8 @@ export type ReactionOrTemplate = DatasetReaction | ReactionTemplate;
 
 export type ReactionId = number | string;
 
-export type UpdateReactionSuccessPayload = Omit<DatasetReaction, 'data'>;
+// The server response never includes the client-only `dataBeforeEdit` snapshot. (#615)
+export type UpdateReactionSuccessPayload = Omit<DatasetReaction, 'data' | 'dataBeforeEdit'>;
 
 export interface ImportReactionFromFilePayload {
   file: File;
