@@ -31,7 +31,32 @@ import { ord } from 'ord-schema-protobufjs';
 import { reactionToOrdReaction } from 'store/entities/reactions/reactions.converters.ts';
 import { ordBooleanToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import { DATE_FORMAT, DATE_TIME_FORMAT } from 'common/constants.ts';
+
+// customParseFormat gives dayjs strict parsing against an explicit format list. Without it dayjs
+// falls back to the lenient native Date parser, which silently coerces garbage like "Aprillllll,
+// 2025" into April 1 — see issue #544. Strict mode rejects anything that doesn't match a format.
+dayjs.extend(customParseFormat);
+
+// Date/date-time formats accepted for enumeration CSV cells. Covers the app's own output
+// (YYYY-MM-DD / ISO date-time) plus common human-authored formats. Extend this list if a legitimate
+// CSV format is rejected.
+const ACCEPTED_DATE_FORMATS = [
+  'YYYY-MM-DD',
+  'YYYY-MM-DDTHH:mm:ss',
+  'YYYY-MM-DDTHH:mm',
+  'YYYY/MM/DD',
+  'MM/DD/YYYY',
+  'M/D/YYYY',
+  'DD.MM.YYYY',
+  'MMMM D, YYYY',
+  'MMMM D YYYY',
+  'MMM D, YYYY',
+  'MMM D YYYY',
+  'D MMMM YYYY',
+  'D MMM YYYY',
+];
 
 const produceValueTypeError = (type: string, variable: Variable) =>
   new Error(`Expected ${type} value for variable ${variable.name}`);
@@ -42,7 +67,7 @@ function getDateOrError(value: ValueType, variable: Variable): string {
   if (typeof value !== 'string') {
     throw produceValueTypeError('date', variable);
   }
-  const date = dayjs(value);
+  const date = dayjs(value, ACCEPTED_DATE_FORMATS, true);
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }

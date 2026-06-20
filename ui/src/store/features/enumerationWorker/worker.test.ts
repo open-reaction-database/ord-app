@@ -157,9 +157,26 @@ describe('value coercion by VariableType', () => {
     expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00');
   });
 
+  it('accepts a plain ISO date and common human-authored formats', () => {
+    for (const input of ['2025-04-01', '04/01/2025', '4/1/2025', '01.04.2025', 'April 1, 2025', 'Apr 1 2025']) {
+      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+      expect(result.errors).toEqual([]);
+      expect(lastMergedTemplate().valueField).toBe('2025-04-01');
+    }
+  });
+
   it('rejects an invalid date', () => {
     const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: 'not-a-date' }] });
     expect(result.errors[0].message).toBe('Expected date value for variable v1');
+  });
+
+  it('rejects a garbage date that the lenient parser would silently coerce (#544)', () => {
+    // dayjs(value) without strict mode parses these as April 1 / month-overflow; strict mode must not.
+    for (const input of ['Aprillllll, 2025', 'MayMayMay, 2025', '2025-13-45']) {
+      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+      expect(result.reactions).toEqual([]);
+      expect(result.errors[0].message).toBe('Expected date value for variable v1');
+    }
   });
 
   it('rejects a non-string date value', () => {
