@@ -24,7 +24,7 @@ router = APIRouter(tags=["users"], prefix="/users")
 
 
 @router.get("/me", response_model=UserResponseSchema)
-async def read_users_me(current_user: UserModel = Depends(authenticate)) -> UserModel:
+async def read_users_me(current_user: Annotated[UserModel, Depends(authenticate)]) -> UserModel:
     return current_user
 
 

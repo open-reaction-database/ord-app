@@ -57,6 +57,12 @@ class UserModel(BaseModel):
 
 
 class GroupModel(BaseModel):
+    # The current user's role in this group is computed per request and attached for
+    # serialization; it is not persisted. __allow_unmapped__ keeps SQLAlchemy from
+    # treating this plain annotation as a mapped column.
+    __allow_unmapped__ = True
+    role: "UserRolesList | None" = None
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), nullable=True)

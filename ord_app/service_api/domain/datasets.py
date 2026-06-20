@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Any
 from uuid import uuid4
 
 import orjson
@@ -61,7 +62,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def enumerate(self, group_id, payload: DatasetEnumerateCreateSchema) -> DatasetModel:
+    async def enumerate(self, group_id: int, payload: DatasetEnumerateCreateSchema) -> DatasetModel:
         dataset_payload = {"name": payload.name, "description": payload.description}
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, dataset_payload)
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
@@ -89,7 +90,7 @@ class DatasetUseCases:
     async def get_dataset_groups(self, dataset_id: int) -> list[GroupModel]:
         return await self.dataset_repository.get_dataset_groups(dataset_id)
 
-    async def extend(self, dataset_id: int, file_data, kind) -> DatasetModel | None:
+    async def extend(self, dataset_id: int, file_data: bytes, kind: str) -> DatasetModel | None:
         try:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -97,12 +98,13 @@ class DatasetUseCases:
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
         dataset = await self.dataset_repository.get(dataset_id)
+        assert dataset is not None  # existence enforced upstream by dataset_authorization
         await self.add_reactions(dataset, dataset_pb.reactions)
         dataset = await self.dataset_repository.update_modified_at(dataset_id)
 
         return dataset
 
-    async def upload(self, group_id: int, file_data, kind) -> DatasetModel:
+    async def upload(self, group_id: int, file_data: bytes, kind: str) -> DatasetModel:
         try:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -121,7 +123,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def add_reactions(self, dataset, reactions) -> None:
+    async def add_reactions(self, dataset: DatasetModel, reactions: Any) -> None:
         seen_ids = set()
         reactions_ids = []
 

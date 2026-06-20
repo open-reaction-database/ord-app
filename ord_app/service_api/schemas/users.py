@@ -27,7 +27,7 @@ class UserResponseSchema(BaseSchema):
 
     @field_validator("external_id", mode="after")
     @classmethod
-    def _external_id(cls, raw) -> str | None:
+    def _external_id(cls, raw: str | None) -> str | None:
         return raw.split("|")[-1] if raw else None  # split auth0 id
 
 

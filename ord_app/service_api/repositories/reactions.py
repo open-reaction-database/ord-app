@@ -25,13 +25,13 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
 
     async def get_by_reaction_ids_gen(
-        self, dataset_id: int, pb_reaction_ids: list[str], max_num_query_args=10_000
+        self, dataset_id: int, pb_reaction_ids: list[str], max_num_query_args: int = 10_000
     ) -> AsyncIterator[ReactionModel]:
         for batch in batched(pb_reaction_ids, max_num_query_args):
             for item in await self.filter(dataset_id=dataset_id, pb_reaction_id=batch):
                 yield item
 
-    async def bulk_update(self, values) -> None:
+    async def bulk_update(self, values: list[dict]) -> None:
         await self.db.execute(update(ReactionModel), values)
         await self.db.commit()
 
@@ -91,7 +91,7 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
             logger.debug("Bulk reaction created with payload")
 
     async def find_duplicated_by_pb_reaction_id(
-        self, dataset_id: int, pb_reaction_id, exclude_pb_reaction_ids: list[str]
+        self, dataset_id: int, pb_reaction_id: str, exclude_pb_reaction_ids: list[str]
     ) -> ReactionModel | None:
         stmt = (
             select(ReactionModel)

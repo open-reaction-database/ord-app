@@ -121,7 +121,7 @@ class GroupMembersRepository:
             await self.db.commit()
             logger.debug(f"Members upsert: {value}")
 
-    async def remove_members(self, group_id, members_ids: list[int]) -> None:
+    async def remove_members(self, group_id: int, members_ids: list[int]) -> None:
         stmt = delete(UserGroupsMembershipModel).where(
             UserGroupsMembershipModel.group_id == group_id,
             UserGroupsMembershipModel.user_id.in_(members_ids),

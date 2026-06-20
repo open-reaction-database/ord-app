@@ -19,18 +19,18 @@ from typing import Any
 
 
 class LRUCacheDict:
-    def __init__(self, maxsize=None) -> None:
+    def __init__(self, maxsize: int | None = None) -> None:
         self.maxsize = maxsize
         self._data = OrderedDict()
 
-    def get(self, key) -> Any:
+    def get(self, key: Any) -> Any:
         if key in self._data:
             value = self._data.pop(key)
             self._data[key] = value
             return value
         return None
 
-    def set(self, key, value) -> None:
+    def set(self, key: Any, value: Any) -> None:
         if key in self._data:
             self._data.pop(key)
             self._data[key] = value
@@ -40,13 +40,13 @@ class LRUCacheDict:
                 self._data.popitem(last=False)
 
 
-def alru_cache(maxsize=None) -> Callable:
-    def decorator(func) -> Callable:
+def alru_cache(maxsize: int | None = None) -> Callable:
+    def decorator(func: Callable) -> Callable:
         lock = asyncio.Lock()
         cache = LRUCacheDict(maxsize=maxsize)
 
         @wraps(func)
-        async def wrapped(*args, **kwargs) -> Any:
+        async def wrapped(*args: Any, **kwargs: Any) -> Any:
             key = (args, frozenset(kwargs.items()))
             cached = cache.get(key)
             if cached is not None:

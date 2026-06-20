@@ -31,7 +31,7 @@ class ReactionsQueryParams(BaseSchema):
     is_valid: list[bool | None] | None = None
 
     @field_validator("is_valid", mode="before")
-    def convert_str_to_bool(cls, v) -> Any:
+    def convert_str_to_bool(cls, v: Any) -> Any:
         if isinstance(v, str):
             return cls.parse_bool(v)
         elif isinstance(v, list):
@@ -39,14 +39,14 @@ class ReactionsQueryParams(BaseSchema):
         return v
 
 
-def safe_molblock(product) -> str | None:
+def safe_molblock(product: Any) -> str | None:
     try:
         return molblock_from_compound(product)
     except ValueError:
         return None
 
 
-def get_molblocks(pb) -> dict:
+def get_molblocks(pb: Reaction) -> dict:
     outcomes = []
 
     for outcome in pb.outcomes:
@@ -92,7 +92,7 @@ class ReactionResponseSchema(BaseSchema):
 
     @field_validator("binpb", mode="before")
     @classmethod
-    def _binpb(cls, raw) -> str:
+    def _binpb(cls, raw: bytes) -> str:
         return b64encode(raw).decode()
 
     @model_validator(mode="before")
@@ -113,7 +113,7 @@ class ReactionCreateSchema(BaseSchema):
     binpb: bytes
 
     @field_validator("binpb", mode="before")
-    def load_binpb(cls, raw) -> bytes:
+    def load_binpb(cls, raw: Any) -> bytes:
         return b64decode(raw)
 
 
@@ -122,5 +122,5 @@ class ReactionUpdateSchema(BaseSchema):
     binpb: bytes
 
     @field_validator("binpb", mode="before")
-    def load_binpb(cls, raw) -> bytes:
+    def load_binpb(cls, raw: Any) -> bytes:
         return b64decode(raw)

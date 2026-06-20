@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +28,6 @@ router = APIRouter(prefix="/auth", tags=["Authorization"])
 @router.post("/jit-provisioning", status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
 async def _jit_provisioning(
     payload: Auth0CreateSchema,
-    db_session: AsyncSession = Depends(get_db_session),
+    db_session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> UserModel | None:
     return await jit_provisioning(db_session, payload)

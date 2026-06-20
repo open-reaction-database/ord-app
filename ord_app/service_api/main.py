@@ -24,6 +24,7 @@ from fastapi_pagination import add_pagination
 from loguru import logger
 from rdkit import RDLogger
 from sqlalchemy.exc import DataError, DBAPIError
+from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
 from ord_app.service_api.constants import AppEnvs
@@ -63,7 +64,7 @@ app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled"
 
 
 @app.middleware("http")
-async def catch_errors(request: Request, call_next) -> Response:
+async def catch_errors(request: Request, call_next: RequestResponseEndpoint) -> Response:
     try:
         return await call_next(request)
     except (DataError, DBAPIError) as err:

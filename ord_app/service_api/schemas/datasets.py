@@ -89,7 +89,7 @@ class DatasetEnumerateCreateSchema(BaseSchema):
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")
-    def load_reactions(cls, raw) -> map[bytes]:
+    def load_reactions(cls, raw: Any) -> map[bytes]:
         return map(b64decode, raw)
 
 
@@ -97,7 +97,7 @@ class DatasetEnumerateExtendSchema(BaseSchema):
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")
-    def load_reactions(cls, raw) -> map[bytes]:
+    def load_reactions(cls, raw: Any) -> map[bytes]:
         return map(b64decode, raw)
 
 

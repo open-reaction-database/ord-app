@@ -38,7 +38,7 @@ class AbstractRepository(ABC, Generic[T]):
         self.current_user = current_user
 
     @abstractmethod
-    async def get(self, **kwargs) -> T | None:
+    async def get(self, **kwargs: Any) -> T | None:
         pass
 
 
@@ -63,17 +63,17 @@ class BaseRepository(AbstractRepository[T]):
         await self.db.refresh(instance)
         return instance
 
-    async def get(self, **kwargs) -> T | None:
+    async def get(self, **kwargs: Any) -> T | None:
         stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalar(stmt)
         return result
 
-    async def filter(self, **kwargs) -> Sequence[T]:
+    async def filter(self, **kwargs: Any) -> Sequence[T]:
         stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> T | None:
+    async def update(self, payload: dict, autocommit: bool = True, **kwargs: Any) -> T | None:
         stmt = (
             update(self.model)
             .where(*self._get_filter_stmt(self.model, **kwargs))
@@ -87,7 +87,7 @@ class BaseRepository(AbstractRepository[T]):
             logger.debug(f"{self.model.__name__} updated with payload: {payload}")
             return obj
 
-    async def delete(self, **kwargs) -> int:
+    async def delete(self, **kwargs: Any) -> int:
         stmt = delete(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.execute(stmt)
         await self.db.commit()

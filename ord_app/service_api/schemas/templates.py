@@ -39,12 +39,12 @@ class TemplateResponseModel(BaseSchema):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw) -> bytes:
+    def load_variables(cls, raw: Any) -> bytes:
         return orjson.dumps(raw)
 
     @field_validator("binpb", mode="before")
     @classmethod
-    def load_binpb(cls, raw) -> bytes:
+    def load_binpb(cls, raw: Any) -> bytes:
         return b64encode(raw)
 
 
@@ -55,15 +55,15 @@ class TemplateCreateModel(BaseSchema):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw) -> bytes:
+    def load_variables(cls, raw: Any) -> bytes:
         return orjson.dumps(raw)
 
     @field_validator("binpb", mode="after")
     @classmethod
-    def load_binpb(cls, raw) -> Reaction:
+    def load_binpb(cls, raw: Any) -> Reaction:
         return load_message(b64decode(raw), Reaction, "binpb")
 
-    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         data["binpb"] = data["binpb"].SerializeToString()
         return data
@@ -76,11 +76,11 @@ class TemplateUpdateModel(BaseSchema):
 
     @field_validator("binpb", mode="after")
     @classmethod
-    def load_binpb(cls, raw) -> Reaction | None:
+    def load_binpb(cls, raw: Any) -> Reaction | None:
         if raw is not None:
             return load_message(b64decode(raw), Reaction, "binpb")
 
-    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)
         if data.get("binpb") is not None:
             data["binpb"] = data["binpb"].SerializeToString()
@@ -88,5 +88,5 @@ class TemplateUpdateModel(BaseSchema):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw) -> bytes:
+    def load_variables(cls, raw: Any) -> bytes:
         return orjson.dumps(raw)

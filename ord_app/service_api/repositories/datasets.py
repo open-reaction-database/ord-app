@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Sequence
+
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
@@ -52,7 +54,7 @@ class DatasetsRepository:
         await self.db.commit()
         return dataset
 
-    async def create(self, group_id: int, owner_id: int, payload: dict, autocommit=True) -> DatasetModel:
+    async def create(self, group_id: int, owner_id: int, payload: dict, autocommit: bool = True) -> DatasetModel:
         dataset = DatasetModel(owner_id=owner_id, **payload)
         dataset_group_association = DatasetGroupAssociationModel(dataset=dataset, group_id=group_id)
         self.db.add_all([dataset, dataset_group_association])
@@ -130,7 +132,7 @@ class DatasetsRepository:
         stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(selectinload(DatasetModel.reactions))
         return await self.db.scalar(stmt)
 
-    async def enrich_datasets_with_user_roles(self, datasets, user_id) -> None:
+    async def enrich_datasets_with_user_roles(self, datasets: Sequence[DatasetModel], user_id: int) -> None:
         # Collect all group IDs from the paginated datasets
         group_ids = {group.id for dataset in datasets for group in dataset.groups}
 
@@ -182,7 +184,9 @@ class DatasetsRepository:
         await self.db.commit()
         logger.debug(f"<Dataset(id={dataset_id})> deleted")
 
-    async def get_dataset_group_association(self, group_id, dataset_id: int) -> DatasetGroupAssociationModel | None:
+    async def get_dataset_group_association(
+        self, group_id: int, dataset_id: int
+    ) -> DatasetGroupAssociationModel | None:
         dataset_group_association_stmt = select(DatasetGroupAssociationModel).where(
             DatasetGroupAssociationModel.group_id == group_id,
             DatasetGroupAssociationModel.dataset_id == dataset_id,

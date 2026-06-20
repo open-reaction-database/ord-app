@@ -77,7 +77,9 @@ MAP_FILE_EXT_TO_PB_KIND = {
 }
 
 
-def validate_pb_kind_by_file_ext(filename) -> str | None:
+def validate_pb_kind_by_file_ext(filename: str | None) -> str | None:
+    if filename is None:
+        return None
     suffixes = Path(filename).suffixes
     if suffixes and suffixes[-1] == ".gz" and len(suffixes) > 1:
         file_ext = suffixes[-2]
@@ -112,7 +114,9 @@ def _adjust_error(error: str) -> str:
 
 
 async def validate_pb_reaction(
-    reaction: Reaction | None, raise_on_error=False, options=ValidationOptions(require_provenance=True)
+    reaction: Reaction | None,
+    raise_on_error: bool = False,
+    options: ValidationOptions = ValidationOptions(require_provenance=True),
 ) -> tuple[bool | None, list[str], list[str]]:
     if reaction is None:
         return None, [], []
@@ -128,7 +132,9 @@ async def validate_pb_reaction(
 
 
 async def async_validate_pb_reaction(
-    reaction: Reaction | None, raise_on_error=False, options=ValidationOptions(require_provenance=True)
+    reaction: Reaction | None,
+    raise_on_error: bool = False,
+    options: ValidationOptions = ValidationOptions(require_provenance=True),
 ) -> tuple[bool | None, list[str], list[str]]:
     """
     Asynchronously validate a protocol buffer reaction.

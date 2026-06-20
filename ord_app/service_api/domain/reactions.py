@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import UTC, datetime
-from typing import cast
+from typing import Any, cast
 from uuid import uuid4
 
 from fastapi import Depends
@@ -146,7 +146,7 @@ class ReactionsUseCase:
         await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
-    async def upload(self, dataset_id: int, file_data, kind) -> ReactionModel:
+    async def upload(self, dataset_id: int, file_data: bytes, kind: str) -> ReactionModel:
         try:
             pb_reaction = cast(Reaction, await run_in_threadpool(load_message, file_data, Reaction, kind))
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -178,7 +178,7 @@ class ReactionsUseCase:
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
-    async def search(self, **kwargs) -> ReactionModel:
+    async def search(self, **kwargs: Any) -> ReactionModel:
         if reaction := await self.reaction_repo.get(**kwargs):
             return reaction
         raise EntityNotFoundError(f"Reaction with {kwargs} not found")

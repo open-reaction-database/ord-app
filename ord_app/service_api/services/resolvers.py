@@ -13,6 +13,7 @@
 # limitations under the License.
 import asyncio
 from functools import lru_cache
+from typing import Any
 from urllib.parse import quote
 
 from httpx import AsyncClient
@@ -28,14 +29,14 @@ async def _pubchem_resolve(value_type: str, value: str) -> tuple[str, str]:
         return "PubChem API", response.raise_for_status().text.strip()
 
 
-async def _cactus_resolve(*args, value: str) -> tuple[str, str]:
+async def _cactus_resolve(*args: Any, value: str) -> tuple[str, str]:
     """Resolves compound identifiers to SMILES via the CACTUS API."""
     async with AsyncClient(base_url="https://cactus.nci.nih.gov") as client:
         response = await client.get(f"/chemical/structure/{quote(value)}/smiles")
         return "NCI/CADD Chemical Identifier Resolver", response.raise_for_status().text.strip()
 
 
-async def _emolecules_resolve(*args, value: str) -> tuple[str, str]:
+async def _emolecules_resolve(*args: Any, value: str) -> tuple[str, str]:
     """Resolves compound identifiers to SMILES via the eMolecules API."""
     async with AsyncClient(base_url="https://www.emolecules.com") as client:
         response = await client.get(f"lookup?q={quote(value)}")
