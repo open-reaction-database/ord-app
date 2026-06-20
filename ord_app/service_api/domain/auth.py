@@ -25,7 +25,7 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.services.auth0 import verify_access_token
-from ord_app.service_api.services.exceptions import ForbiddenError, UnauthenticatedError
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError, UnauthenticatedError
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -60,16 +60,20 @@ def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]):
         user: UserModel = Depends(authenticate),
         db_session: AsyncSession = Depends(get_db_session),
     ):
-        stmt = select(
-            exists().where(
-                DatasetGroupAssociationModel.dataset_id == dataset_id,
-                DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
-                UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
-                UserGroupsMembershipModel.user_id == user.id,
-                UserGroupsMembershipModel.role.in_(allowed_roles),
-            )
+        membership = (
+            DatasetGroupAssociationModel.dataset_id == dataset_id,
+            DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
+            UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
+            UserGroupsMembershipModel.user_id == user.id,
         )
-        if not await db_session.scalar(stmt):
+        # A user with no membership in any of the dataset's groups (or a dataset that doesn't exist)
+        # gets a 404 — we don't reveal whether the dataset exists. A member whose role is insufficient
+        # for the action gets a 403, which lets the UI re-gate to read-only on the next write. (#446)
+        if not await db_session.scalar(select(exists().where(*membership))):
+            raise EntityNotFoundError(detail="Dataset not found")
+        if not await db_session.scalar(
+            select(exists().where(*membership, UserGroupsMembershipModel.role.in_(allowed_roles)))
+        ):
             raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
 
     return _authorize

@@ -17,7 +17,7 @@ from datetime import datetime
 from faker import Faker
 from fastapi import status
 
-from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, ReactionModel
+from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, ReactionModel, UserModel
 from ord_app.tests.conftest import create_test_dataset
 
 faker = Faker()
@@ -78,6 +78,27 @@ async def test_get_dataset(api_client, mock_authenticated_user, test_db_session)
 async def test_get_dataset_by_long_id(api_client, mock_authenticated_user, test_db_session):
     response_data = api_client.get("/api/v1/datasets/1234567891011")
     assert response_data.status_code == status.HTTP_400_BAD_REQUEST
+
+
+async def test_get_nonexistent_dataset_returns_404(api_client, mock_authenticated_user, test_db_session):
+    # A dataset that doesn't exist is indistinguishable from one the user can't access: 404, not 403,
+    # so we never leak whether the dataset exists. (#446)
+    response = api_client.get("/api/v1/datasets/999999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+async def test_get_dataset_without_membership_returns_404(api_client, mock_authenticated_user, test_db_session):
+    # A user with no membership in any of the dataset's groups gets 404 (not 403) — no existence leak. (#446)
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    _, set_user_auth, _ = mock_authenticated_user
+    outsider = UserModel(email=faker.email(), external_id=str(faker.uuid4()), auth0_id=str(faker.uuid4()))
+    test_db_session.add(outsider)
+    await test_db_session.commit()
+    await test_db_session.refresh(outsider)
+    set_user_auth(outsider)
+
+    response = api_client.get(f"/api/v1/datasets/{dataset.id}")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test_download_dataset(api_client, mock_authenticated_user, test_db_session):

@@ -95,8 +95,10 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     set_user_auth(secondary_user)
     secondary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
     assert secondary_group_datasets["total"] == 0
+    # Having been unshared, the secondary user has lost access: a 404 (not 403) so we don't reveal
+    # that the dataset still exists. (#446)
     secondary_user_response = api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
-    assert status.HTTP_403_FORBIDDEN == secondary_user_response.status_code
+    assert status.HTTP_404_NOT_FOUND == secondary_user_response.status_code
 
 
 async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_user, test_db_session):
