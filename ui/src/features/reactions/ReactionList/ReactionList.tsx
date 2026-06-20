@@ -15,16 +15,18 @@
  */
 import { useCallback, useMemo } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
-import { Flex, Paper, Title, Loader, Switch } from '@mantine/core';
+import { Flex, Paper, Title, Loader, Switch, Text } from '@mantine/core';
 import { EmptyIcon } from 'common/icons';
 import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
 import {
+  selectActiveDatasetId,
   selectReactionsLoading,
   selectReactionsOrder,
   selectReactionsPagination,
   selectShowInvalidOnly,
 } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
@@ -40,6 +42,11 @@ export function ReactionList() {
   const isLoading = useSelector(selectReactionsLoading);
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
   const showInvalidOnly = useSelector(selectShowInvalidOnly);
+  const activeDatasetId = useSelector(selectActiveDatasetId);
+  const dataset = useSelector(selectDatasetById(activeDatasetId));
+  // Reactions with a null validation status (still being validated server-side) are counted under
+  // `none`; while any are pending we can't trust the valid/invalid split. (#622)
+  const isValidationInProgress = (dataset?.reactions_count?.none ?? 0) > 0;
 
   const hasReactions = reactionsIds.length > 0;
 
@@ -84,13 +91,23 @@ export function ReactionList() {
             <div className={classes.counterContainer}>
               {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
             </div>
-            <Switch
-              className={classes.switcher}
-              size="sm"
-              label="Show Invalid Only"
-              checked={showInvalidOnly}
-              onChange={event => handleToggleInvalid(event.currentTarget.checked)}
-            />
+            {isValidationInProgress ? (
+              <Flex
+                align="center"
+                gap="xs"
+              >
+                <Loader size="sm" />
+                <Text size="sm">Reaction validation in progress</Text>
+              </Flex>
+            ) : (
+              <Switch
+                className={classes.switcher}
+                size="sm"
+                label="Show Invalid Only"
+                checked={showInvalidOnly}
+                onChange={event => handleToggleInvalid(event.currentTarget.checked)}
+              />
+            )}
           </Flex>
           {canDatasetBeEdited && <CreateReactionMenu />}
         </Flex>
