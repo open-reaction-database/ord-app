@@ -206,4 +206,9 @@ describe('reactions.reducer — showInvalidOnly', () => {
     expect(reduce(undefined, setShowInvalidOnly(true)).showInvalidOnly).toBe(true);
     expect(reduce({ showInvalidOnly: true }, setShowInvalidOnly(false)).showInvalidOnly).toBe(false);
   });
+
+  it('resets to the default when a dataset loads, so the filter is per-dataset (#591)', () => {
+    const state = reduce({ showInvalidOnly: true }, getReactionsListActions.request(7));
+    expect(state.showInvalidOnly).toBe(false);
+  });
 });

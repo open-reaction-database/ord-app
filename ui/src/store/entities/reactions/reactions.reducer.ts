@@ -251,6 +251,11 @@ const areReactionsLoading = createReducer<boolean>(false, builder => {
 
 const showInvalidOnly = createReducer<boolean>(false, builder => {
   builder.addCase(setShowInvalidOnly, (_, action) => action.payload);
+  // Reset to the default (show all) whenever a dataset's reactions load — on open, refresh, or
+  // switching datasets — so the filter is scoped per dataset rather than persisting globally,
+  // mirroring the Tabs/List view toggle. The in-list toggle refetches via getReactionsPage, so it
+  // doesn't trip this reset. (#591)
+  builder.addCase(getReactionsListActions.request, () => false);
 });
 
 export const reactionsReducer = combineReducers({
