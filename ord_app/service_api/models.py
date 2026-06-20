@@ -148,6 +148,12 @@ class DatasetGroupAssociationModel(BaseModel):
 
 
 class ReactionModel(BaseModel):
+    # Validation errors/warnings are computed per request and attached for serialization;
+    # they are not persisted. __allow_unmapped__ tells SQLAlchemy to treat this plain
+    # annotation as an ordinary attribute rather than a mapped column.
+    __allow_unmapped__ = True
+    validation: dict[str, list[str]] | None = None
+
     id: Mapped[int] = mapped_column(primary_key=True)
     pb_reaction_id: Mapped[str]
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)

@@ -47,7 +47,7 @@ dev = [
     "sqlalchemy-utils>=0.41.2,<0.42",
     "coverage>=7.6.12,<8",
     "pytest-cov>=6.0.0,<7",
-    "pytype>=2024.10.11",
+    "ty>=0.0.28",
     "pytest-asyncio>=0.25.3,<0.26",
     "pytest-xdist>=3.6,<4",
     "ruff>=0.9.9,<0.10",
@@ -93,9 +93,6 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 
-[tool.pytype]
-inputs = ["ord_app"]
-exclude = ["**/*_test.py", "**/test_*.py", "build/", "dist/"]
-keep_going = true
-disable = ["module-attr", "pyi-error"]
-jobs = 0
+# ty (Astral's type checker) is invoked as `ty check ord_app` by CI and the pre-commit
+# hook, so no input globs are configured here; ord_app ships no generated sources, so no
+# excludes are needed. ty type-checks the test suite too, which is intentional.

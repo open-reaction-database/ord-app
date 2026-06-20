@@ -52,6 +52,7 @@ class DatasetUseCases:
     async def create(self, group_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
         dataset = await self.dataset_repository.get(dataset.id)
+        assert dataset is not None  # just created above
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
@@ -61,11 +62,13 @@ class DatasetUseCases:
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
 
         dataset = await self.dataset_repository.get(dataset.id)
+        assert dataset is not None  # just created above
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
     async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema):
         dataset = await self.dataset_repository.get(dataset_id)
+        assert dataset is not None  # existence enforced upstream by dataset_authorization
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
         return dataset
 
@@ -108,6 +111,7 @@ class DatasetUseCases:
         )
         await self.add_reactions(dataset, dataset_pb.reactions)
         dataset = await self.dataset_repository.get(dataset.id)
+        assert dataset is not None  # just created above
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
@@ -159,6 +163,7 @@ class DatasetUseCases:
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
         dataset = await self.dataset_repository.get(dataset_id)
+        assert dataset is not None  # existence enforced upstream by dataset_authorization
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 

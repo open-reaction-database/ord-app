@@ -64,7 +64,7 @@ class DatasetsRepository:
 
         return dataset
 
-    async def get(self, dataset_id: int) -> DatasetModel:
+    async def get(self, dataset_id: int) -> DatasetModel | None:
         stmt = (
             select(DatasetModel)
             .where(DatasetModel.id == dataset_id)
@@ -94,7 +94,9 @@ class DatasetsRepository:
             )
             .group_by(DatasetModel.id)
         )
-        dataset, rct_total, rct_invalid, rct_valid, rct_none = (await self.db.execute(stmt)).first()
+        row = (await self.db.execute(stmt)).first()
+        assert row is not None  # dataset existence is enforced upstream by dataset_authorization
+        dataset, rct_total, rct_invalid, rct_valid, rct_none = row
         dataset.reactions_count = {
             "total": rct_total,
             "invalid": rct_invalid,
@@ -124,7 +126,7 @@ class DatasetsRepository:
         assocs = (await self.db.scalars(stmt)).all()
         return [setattr(assoc.group, "is_primary", assoc.is_primary) or assoc.group for assoc in assocs]
 
-    async def get_with_reactions(self, dataset_id: int) -> DatasetModel:
+    async def get_with_reactions(self, dataset_id: int) -> DatasetModel | None:
         stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(selectinload(DatasetModel.reactions))
         return await self.db.scalar(stmt)
 

@@ -91,4 +91,4 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.execute(stmt)
         await self.db.commit()
         logger.debug(f"<{self.model.__name__.title()}({kwargs})> was deleted")
-        return result.rowcount
+        return result.rowcount  # ty: ignore[unresolved-attribute]  # execute() returns a CursorResult here

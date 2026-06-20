@@ -55,8 +55,8 @@ jobs:
       - name: ruff format
         run: uv run ruff format --check ord_app/
 
-      - name: pytype
-        run: uv run pytype -j auto
+      - name: ty
+        run: uv run ty check ord_app
 
   check_javascript:
     runs-on: ubuntu-latest

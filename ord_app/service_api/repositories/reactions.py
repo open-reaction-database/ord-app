@@ -14,7 +14,7 @@
 from itertools import batched
 
 from loguru import logger
-from sqlalchemy import insert, or_, select, update
+from sqlalchemy import insert, or_, select, true, update
 
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
@@ -38,8 +38,8 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
             stmt = (
                 select(ReactionModel)
                 .where(
-                    ReactionModel.id > last_id if last_id is not None else True,
-                    ReactionModel.dataset_id == dataset_id if dataset_id is not None else True,
+                    ReactionModel.id > last_id if last_id is not None else true(),
+                    ReactionModel.dataset_id == dataset_id if dataset_id is not None else true(),
                     ReactionModel.is_valid.is_(None),
                 )
                 .order_by(ReactionModel.id)
@@ -51,7 +51,11 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
             yield reactions
             last_id = reactions[-1].id
 
-    async def create(self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True):
+    # Reaction creation needs ownership and dataset context, so this override deliberately
+    # takes a wider signature than the base create(payload).
+    async def create(  # ty: ignore[invalid-method-override]
+        self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True
+    ):
         reaction = ReactionModel(owner_id=user_id, dataset_id=dataset_id, **payload)
 
         if autocommit:

@@ -55,7 +55,7 @@ async def validate_uploaded_pb_file(file: UploadFile):
         )
 
     file_data = await file.read()
-    if file.filename.endswith(".gz"):
+    if file.filename and file.filename.endswith(".gz"):
         file_data = gzip.decompress(file_data)
 
     return file_data, kind

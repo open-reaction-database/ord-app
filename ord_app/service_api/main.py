@@ -31,7 +31,7 @@ from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, t
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
-RDLogger.DisableLog("rdApp.*")
+RDLogger.DisableLog("rdApp.*")  # ty: ignore[unresolved-attribute]  # rdkit ships no type stubs
 logger.remove()
 match RuntimeSettings.app_env:
     case AppEnvs.production:
@@ -66,7 +66,7 @@ async def catch_errors(request: Request, call_next):
     try:
         return await call_next(request)
     except (DataError, DBAPIError) as err:
-        context_err = err.orig.__context__ or err.orig
+        context_err = (err.orig.__context__ or err.orig) if err.orig is not None else err
         if isinstance(context_err, asyncpg.UniqueViolationError):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,

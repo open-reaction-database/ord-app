@@ -26,7 +26,11 @@ from ord_app.service_api.repositories.base import BaseRepository
 class GroupRepository(BaseRepository[GroupModel]):
     model = GroupModel
 
-    async def create(self, owner_id: int, payload: dict, autocommit: bool = True) -> GroupModel:
+    # Group creation needs an owner and seeds an admin membership, so this override
+    # deliberately takes a wider signature than the base create(payload).
+    async def create(  # ty: ignore[invalid-method-override]
+        self, owner_id: int, payload: dict, autocommit: bool = True
+    ) -> GroupModel:
         group = GroupModel(
             owner_id=owner_id, groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")], **payload
         )
@@ -55,7 +59,7 @@ class GroupMembersRepository:
         self.db = db
         self.autocommit = autocommit
 
-    async def get(self, user_id: int, group_id: int) -> UserGroupsMembershipModel:
+    async def get(self, user_id: int, group_id: int) -> UserGroupsMembershipModel | None:
         stmt = (
             select(UserGroupsMembershipModel)
             .where(

@@ -18,6 +18,7 @@ async def test_get(test_db_session, test_user):
     ur = UserRepository(test_db_session)
     user = await ur.get(id=test_user.id)
 
+    assert user is not None
     assert user.id == test_user.id
 
 

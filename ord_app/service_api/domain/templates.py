@@ -32,8 +32,8 @@ class TemplatesUseCase:
         self.template_repo = TemplateRepository(db)
 
     async def create(self, payload: TemplateCreateModel) -> TemplateModel:
-        payload = payload.model_dump() | {"owner_id": self.current_user.id}
-        return await self.template_repo.create(payload)
+        data = payload.model_dump() | {"owner_id": self.current_user.id}
+        return await self.template_repo.create(data)
 
     async def all(self) -> Sequence[TemplateModel]:
         return await self.template_repo.filter(owner_id=self.current_user.id)
@@ -44,8 +44,8 @@ class TemplatesUseCase:
         raise EntityNotFoundError("Template not found")
 
     async def update(self, template_id: int, payload: TemplateUpdateModel):
-        payload = payload.model_dump(exclude_none=True)
-        if template := await self.template_repo.update(payload, id=template_id, owner_id=self.current_user.id):
+        data = payload.model_dump(exclude_none=True)
+        if template := await self.template_repo.update(data, id=template_id, owner_id=self.current_user.id):
             return template
         raise EntityNotFoundError("Template not found")
 

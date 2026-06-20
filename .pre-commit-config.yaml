@@ -40,6 +40,17 @@ repos:
       - id: ruff-format
         files: ^ord_app/
 
+  # Type checking. ty (Astral) checks ord_app/ via uv, matching the CI step. It is a
+  # local hook because ty resolves through the project's uv environment.
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty check (ord_app)
+        entry: uv run ty check ord_app
+        language: system
+        files: ^ord_app/.*\.py$
+        pass_filenames: false
+
   # UI lint + format. Delegated to the tools already installed under ui/ via
   # their npm scripts (run `npm ci` in ui/ first).
   - repo: local

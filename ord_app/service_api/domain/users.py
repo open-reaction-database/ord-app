@@ -47,7 +47,7 @@ class UserUseCase:
         return await self.user_repo.get(auth0_id=auth0_id)
 
     async def update(self, user_id: int, payload: UserUpdateSchema):
-        if self.current_user.id != user_id:
+        if self.current_user is None or self.current_user.id != user_id:
             raise ForbiddenError("Action prohibited")
         if user := await self.user_repo.update(payload.model_dump(exclude_unset=True), id=user_id):
             return user
@@ -110,6 +110,8 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
 
     # getting information about the user from the found 'userinfo' link in decoded_token["aud"]
     user_info_api = next(filter(lambda i: "userinfo" in i, decoded_token["aud"]), None)
+    if user_info_api is None:
+        raise ForbiddenError("userinfo endpoint not found in token audience")
     async with httpx.AsyncClient() as client:
         response = await client.get(user_info_api, headers={"Authorization": f"Bearer {payload.access_token}"})
         user_info = response.raise_for_status().json()

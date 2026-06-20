@@ -200,6 +200,8 @@ class ReactionsUseCase:
         }
 
         reaction = await self.reaction_repo.update(updating_data, id=reaction_id, dataset_id=dataset_id)
+        if reaction is None:
+            raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
         await self.dataset_repo.update_modified_at(dataset_id)
         reaction.validation = {"errors": errors, "warnings": warning}
         return reaction

@@ -16,7 +16,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate: `uv run alembic upgrade head`.
 - Run dev server: `cd ord_app/service_api && ORD_APP_TESTING=TRUE uv run fastapi dev main.py` → http://localhost:8000 (`/docs`).
 - Tests: `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
-- Lint/type: `ruff` + `ruff format`, `pytype` (migration to `ty` in progress — see #681).
+- Lint/type: `ruff` + `ruff format`, `ty` (Astral's type checker; `uv run ty check ord_app`).
 
 ## Frontend (`ui/`)
 
@@ -32,7 +32,7 @@ Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` 
 ## CI gates (a PR is not mergeable until these are green)
 
 - **Tests**: `test_python` (ubuntu + macos), `test_ui`, `test_e2e` (boots the full no-auth stack).
-- **Checks**: `check_python` (ruff / ruff-format / pytype), `check_javascript` (clang-format), `lint_and_build_ui` (`lint:check` + `npm run build`), `check_license_headers`.
+- **Checks**: `check_python` (ruff / ruff-format / ty), `check_javascript` (clang-format), `lint_and_build_ui` (`lint:check` + `npm run build`), `check_license_headers`.
 - **SonarCloud quality gate** and **Greptile review** also gate merges — never merge over a red Sonar check; address Greptile findings (and read its PR-body summary for sub-threshold notes) before merging.
 
 ## Conventions
