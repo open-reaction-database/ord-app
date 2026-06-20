@@ -47,10 +47,10 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe('ReactionEntityForm — Paste Chunk filtering', () => {
-  it('submits the filtered chunk, dropping fields the sidebar excludes (e.g. recordModified)', async () => {
-    // A clipboard chunk that includes recordModified — which the Provenance sidebar filters out
-    // (it is edited in its own sidebar) — plus an ordinary field that must survive the paste.
+describe('ReactionEntityForm — Paste Chunk fill-empty (#589)', () => {
+  it("fills the destination's blanks from the chunk but never pastes separately-managed metadata", async () => {
+    // A clipboard chunk that includes recordModified — auto-managed metadata that must never be
+    // pasted (#704) — plus a doi the (blank) destination should be filled with.
     pasteReactionPartMock.mockResolvedValue([
       { doi: '10.0000/paste-test', recordModified: { time: { value: 'leaked' } } },
       'clipboard-text',
@@ -72,8 +72,10 @@ describe('ReactionEntityForm — Paste Chunk filtering', () => {
     await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalled());
 
     const { newValue } = addUpdateReactionFieldMock.mock.calls[0][0] as { newValue: Record<string, unknown> };
-    // The bug submitted the raw chunk, leaking recordModified into the merge; the fix submits filtered values.
-    expect(newValue).not.toHaveProperty('recordModified');
+    // The blank doi is filled from the chunk...
     expect(newValue).toHaveProperty('doi', '10.0000/paste-test');
+    // ...but the chunk's recordModified is not applied (it's separately-managed metadata, and the
+    // pasted "leaked" value never reaches the merge).
+    expect(JSON.stringify(newValue)).not.toContain('leaked');
   });
 });
