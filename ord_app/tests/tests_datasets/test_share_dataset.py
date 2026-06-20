@@ -66,12 +66,12 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
         f"/api/v1/groups/{primary_group.id}/datasets/{primary_dataset.id}/share",
         json={"secondary_group_id": foreign_group.id},
     )
-    assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
+    assert secondary_share_response.status_code == status.HTTP_403_FORBIDDEN
     secondary_share_response = api_client.post(
         f"/api/v1/groups/{secondary_group.id}/datasets/{primary_dataset.id}/share",
         json={"secondary_group_id": foreign_group.id},
     )
-    assert status.HTTP_403_FORBIDDEN == secondary_share_response.status_code
+    assert secondary_share_response.status_code == status.HTTP_403_FORBIDDEN
 
     # But he can update primary dataset
     payload = {"name": "updated name", "description": "updated description"}
@@ -98,7 +98,7 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     # Having been unshared, the secondary user has lost access: a 404 (not 403) so we don't reveal
     # that the dataset still exists. (#446)
     secondary_user_response = api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
-    assert status.HTTP_404_NOT_FOUND == secondary_user_response.status_code
+    assert secondary_user_response.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_user, test_db_session):
@@ -108,4 +108,4 @@ async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_us
     response = api_client.post(
         f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share", json={"secondary_group_id": group.id}
     )
-    assert status.HTTP_422_UNPROCESSABLE_ENTITY == response.status_code
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

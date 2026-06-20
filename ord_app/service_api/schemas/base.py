@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -21,7 +20,7 @@ MAX_FIELD_LENGTH = 8192
 
 class BaseSchema(BaseModel):
     @staticmethod
-    def parse_bool(value: str) -> Optional[bool]:
+    def parse_bool(value: str) -> bool | None:
         value_lower = value.lower()
         if value_lower in {"none", "null"}:
             return None

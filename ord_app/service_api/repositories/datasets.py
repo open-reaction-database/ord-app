@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
@@ -149,7 +148,7 @@ class DatasetsRepository:
             # filter out groups that the user is not a member of
             dataset.groups = [group for group in dataset.groups if group.role is not None]
 
-    async def datasets_stmt(self, user_id: int, group_id: Optional[int] = None):
+    async def datasets_stmt(self, user_id: int, group_id: int | None = None):
         filters = [DatasetModel.groups.any(GroupModel.members.any(UserModel.id == user_id))]
 
         if group_id is not None:

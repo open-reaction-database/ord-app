@@ -73,13 +73,20 @@ indent-width = 4
 target-version = "py312"
 
 [tool.ruff.lint]
-# Pyflakes (F), a subset of pycodestyle (E), import sorting (I), bugbear (B).
-select = ["E4", "E7", "E9", "F", "I", "B"]
-ignore = ["B008"]
+# Mirror ord-schema's ruleset: pycodestyle errors+warnings (E/W), pyflakes (F),
+# import sorting (I), bugbear (B), pyupgrade (UP), and flake8-simplify (SIM).
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+# E501 (line length) is the formatter's job; SIM108 (ternaries aren't always
+# clearer); B008 (function calls in argument defaults are fine here, e.g. FastAPI Depends).
+ignore = ["E501", "SIM108", "B008"]
 fixable = ["ALL"]
 unfixable = []
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests redefine fixtures and use patterns bugbear dislikes (asserts, blind excepts).
+"ord_app/tests/**" = ["B011", "B017"]
 
 [tool.ruff.lint.isort]
 # ord_schema is an external dependency; pin its classification so import

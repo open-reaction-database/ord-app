@@ -44,7 +44,7 @@ async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, 
     payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
     response_data = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{100500}", json=payload)
 
-    assert status.HTTP_404_NOT_FOUND == response_data.status_code
+    assert response_data.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test_update_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
@@ -57,7 +57,7 @@ async def test_update_reaction_rejects_oversized_attachments(api_client, mock_au
     payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
     response = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload)
 
-    assert status.HTTP_422_UNPROCESSABLE_ENTITY == response.status_code
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "10 MB" in response.json()["detail"]
 
 

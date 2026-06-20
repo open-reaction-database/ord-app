@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 import httpx
 from fastapi import Depends
@@ -43,7 +42,7 @@ class UserUseCase:
             return user
         raise EntityNotFoundError(f"User {user_id} not found")
 
-    async def get_user_by_auth0_id(self, auth0_id: str) -> Optional[UserModel]:
+    async def get_user_by_auth0_id(self, auth0_id: str) -> UserModel | None:
         return await self.user_repo.get(auth0_id=auth0_id)
 
     async def update(self, user_id: int, payload: UserUpdateSchema):

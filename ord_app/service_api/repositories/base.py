@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, Optional, Sequence, Type, TypeVar
+from collections.abc import Sequence
+from typing import Any, Generic, TypeVar
 
 from loguru import logger
 from sqlalchemy import BinaryExpression, delete, select, update
@@ -30,21 +31,21 @@ filters_map = {
 
 
 class AbstractRepository(ABC, Generic[T]):
-    model: Type[T]
+    model: type[T]
 
     def __init__(self, db: AsyncSession, current_user: UserModel | None = None) -> None:
         self.db = db
         self.current_user = current_user
 
     @abstractmethod
-    async def get(self, **kwargs) -> Optional[T]:
+    async def get(self, **kwargs) -> T | None:
         pass
 
 
 class BaseRepository(AbstractRepository[T]):
     @staticmethod
-    def _get_filter_stmt(model: Any, **kwargs: Any) -> List[BinaryExpression]:
-        filters: List[BinaryExpression] = []
+    def _get_filter_stmt(model: Any, **kwargs: Any) -> list[BinaryExpression]:
+        filters: list[BinaryExpression] = []
         for field_name, field_value in kwargs.items():
             if field_name not in model.__table__.columns:
                 raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
@@ -62,7 +63,7 @@ class BaseRepository(AbstractRepository[T]):
         await self.db.refresh(instance)
         return instance
 
-    async def get(self, **kwargs) -> Optional[T]:
+    async def get(self, **kwargs) -> T | None:
         stmt = select(self.model).where(*self._get_filter_stmt(self.model, **kwargs))
         result = await self.db.scalar(stmt)
         return result
@@ -72,7 +73,7 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> Optional[T] | None:
+    async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> T | None | None:
         stmt = (
             update(self.model)
             .where(*self._get_filter_stmt(self.model, **kwargs))
