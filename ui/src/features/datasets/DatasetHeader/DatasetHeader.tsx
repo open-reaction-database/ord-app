@@ -39,7 +39,7 @@ import {
   selectCanDatasetBeEdited,
 } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
-import { typographyClasses } from 'common/styling';
+import { buttonClasses, typographyClasses } from 'common/styling';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
 
 interface DatasetHeaderProps {
@@ -151,6 +151,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
             onCancel={closeRemoveConfirm}
             target={
               <Button
+                className={buttonClasses.redHover}
                 classNames={{ section: classes.removeIcon }}
                 variant="transparent"
                 color="red"

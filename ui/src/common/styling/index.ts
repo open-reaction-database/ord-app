@@ -15,3 +15,4 @@
  */
 export * from './theme';
 export { default as typographyClasses } from './typography.module.scss';
+export { default as buttonClasses } from './buttons.module.scss';
