@@ -19,8 +19,21 @@ import { DatasetTable } from 'features/datasets';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { DatasetsListTopActions } from './DatasetsListTopActions/DatasetsListTopActions.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu.tsx';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { getInitialDatasetsList } from 'store/entities/datasets/datasets.thunks.ts';
+import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 
 export function DatasetsListPage() {
+  const dispatch = useAppDispatch();
+  const activeGroupId = useSelector(selectActiveGroupId);
+  // Refetch whenever the list view is shown (and on group switch) so a dataset removed by another
+  // user — or after losing access — disappears on return instead of lingering stale. (#584)
+  useEffect(() => {
+    dispatch(getInitialDatasetsList(activeGroupId));
+  }, [activeGroupId, dispatch]);
+
   return (
     <PageContainer breadcrumbs={[{ title: 'Datasets', path: '~/' }]}>
       <Flex

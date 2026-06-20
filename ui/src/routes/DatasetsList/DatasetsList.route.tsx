@@ -16,19 +16,10 @@
 import { Route, Switch } from 'wouter';
 import { DatasetRoute } from './Dataset/Dataset.route.tsx';
 import { DatasetsListPage } from 'pages/DatasetsList/DatasetsList.page.tsx';
-import { useEffect } from 'react';
-import { getInitialDatasetsList } from 'store/entities/datasets/datasets.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useSelector } from 'react-redux';
-import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 
 export function DatasetsListRoute() {
-  const dispatch = useAppDispatch();
-  const activeGroupId = useSelector(selectActiveGroupId);
-  useEffect(() => {
-    dispatch(getInitialDatasetsList(activeGroupId));
-  }, [activeGroupId, dispatch]);
-
+  // The datasets list is fetched by DatasetsListPage on mount (and on group switch), so navigating
+  // back to the list always gets a fresh list rather than a stale cached one. (#584)
   return (
     <Switch>
       <Route
