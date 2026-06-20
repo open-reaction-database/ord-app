@@ -17,6 +17,8 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import { ActionIcon } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
 import classes from './reactionEntityDelete.module.scss';
+import { buttonClasses } from 'common/styling';
+import clsx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
@@ -66,7 +68,7 @@ export function ReactionEntityDelete({
       target={
         <ActionIcon
           onClick={openConfirmation}
-          className={classes.icon}
+          className={clsx(classes.icon, buttonClasses.redHover)}
           variant="transparent"
           color="red"
           ref={ref}

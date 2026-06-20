@@ -20,6 +20,7 @@ import { Buffer } from 'buffer';
 import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
 import { inputWrapperClasses } from '../../display/InputWrapper';
 import { RemoveIcon } from 'common/icons';
+import { buttonClasses } from 'common/styling';
 import type { FileControlValue } from './fileControl.types.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
@@ -81,6 +82,7 @@ export function FileControl({ name, value, disabled, onChange, label }: Readonly
           </a>
           <ActionIcon
             aria-label="Remove file"
+            className={buttonClasses.redHover}
             onClick={handleRemoveFile}
             variant="transparent"
             color="red"
