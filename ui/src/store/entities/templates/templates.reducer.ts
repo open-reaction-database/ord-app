@@ -53,11 +53,12 @@ const isTemplateCreating = createReducer<boolean>(false, builder => {
   );
 });
 
-// Whether the full template list has been fetched. Lets the template page tell "still loading"
-// apart from "no such template" so it can show a 404 for a missing id rather than a blank page,
-// without flashing the 404 during the initial load. (#496)
+// Whether the template-list fetch has settled. Lets the template page tell "still loading" apart
+// from "no such template" so it can show a 404 for a missing id rather than a blank page, without
+// flashing the 404 during the initial load. Set on failure too, so a failed fetch still reaches the
+// 404 path instead of leaving a permanently blank page. (#496)
 const areTemplatesLoaded = createReducer<boolean>(false, builder => {
-  builder.addCase(getAllTemplatesActions.success, () => true);
+  builder.addMatcher(isAnyOf(getAllTemplatesActions.success, getAllTemplatesActions.failure), () => true);
 });
 
 export const templatesReducer = combineReducers({
