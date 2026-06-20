@@ -22,6 +22,8 @@ import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSideba
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { selectAreTemplatesLoaded } from 'store/entities/templates/templates.selectors.ts';
+import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
@@ -35,6 +37,7 @@ export function TemplatePage() {
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
   const templateId = `template_${rawTemplateId}`;
   const template = useSelector(selectReactionById(templateId));
+  const areTemplatesLoaded = useSelector(selectAreTemplatesLoaded);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -57,6 +60,12 @@ export function TemplatePage() {
     }),
     [templateId],
   );
+
+  // Once the template list has loaded, an unknown id is genuinely missing — show a 404 instead of
+  // a blank page. While templates are still loading we keep rendering so we don't flash a 404. (#496)
+  if (areTemplatesLoaded && !template) {
+    return <NotFoundPage rejectValue={{ errorCode: 404, errorMessage: 'Template not found' }} />;
+  }
 
   return (
     <PageContainer

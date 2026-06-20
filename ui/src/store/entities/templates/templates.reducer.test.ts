@@ -31,7 +31,15 @@ const initialState = () => templatesReducer(undefined, { type: '@@INIT' });
 
 describe('templatesReducer', () => {
   it('returns the initial state', () => {
-    expect(initialState()).toEqual({ templatesOrder: [], isTemplateCreating: false });
+    expect(initialState()).toEqual({ templatesOrder: [], isTemplateCreating: false, areTemplatesLoaded: false });
+  });
+
+  describe('areTemplatesLoaded', () => {
+    it('is false initially and flips to true once the full list is fetched (#496)', () => {
+      expect(initialState().areTemplatesLoaded).toBe(false);
+      const state = templatesReducer(initialState(), getAllTemplatesActions.success([makeTemplate('a')]));
+      expect(state.areTemplatesLoaded).toBe(true);
+    });
   });
 
   describe('templatesOrder', () => {

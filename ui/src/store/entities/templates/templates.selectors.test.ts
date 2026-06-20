@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { selectTemplates, selectTemplatesOrder } from './templates.selectors.ts';
+import { selectAreTemplatesLoaded, selectTemplates, selectTemplatesOrder } from './templates.selectors.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 import type { AppState } from '../../configureAppStore.ts';
 
@@ -31,6 +31,15 @@ const buildState = (templatesOrder: Array<string>, reactionsById: Record<string,
 describe('selectTemplatesOrder', () => {
   it('returns the stored order', () => {
     expect(selectTemplatesOrder(buildState(['a', 'b'], {}))).toEqual(['a', 'b']);
+  });
+});
+
+describe('selectAreTemplatesLoaded', () => {
+  it('reflects the templates-loaded flag (#496)', () => {
+    const state = (loaded: boolean) =>
+      ({ entities: { templates: { areTemplatesLoaded: loaded } } }) as unknown as AppState;
+    expect(selectAreTemplatesLoaded(state(false))).toBe(false);
+    expect(selectAreTemplatesLoaded(state(true))).toBe(true);
   });
 });
 
