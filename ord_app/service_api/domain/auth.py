@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from fastapi import Depends
-from sqlalchemy import exists, select
+from sqlalchemy import exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ord_app.service_api.models import (
@@ -66,14 +66,16 @@ def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]):
             UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
             UserGroupsMembershipModel.user_id == user.id,
         )
-        # A user with no membership in any of the dataset's groups (or a dataset that doesn't exist)
-        # gets a 404 — we don't reveal whether the dataset exists. A member whose role is insufficient
-        # for the action gets a 403, which lets the UI re-gate to read-only on the next write. (#446)
-        if not await db_session.scalar(select(exists().where(*membership))):
+        # Single query (no TOCTOU window): bool_or over the user's memberships for this dataset is
+        # None when there's no membership at all -> 404 (don't reveal whether the dataset exists),
+        # False when the user is a member but has no allowed role -> 403 (lets the UI re-gate to
+        # read-only on the next write), and True when an allowed role is present. (#446)
+        authorized = await db_session.scalar(
+            select(func.bool_or(UserGroupsMembershipModel.role.in_(allowed_roles))).where(*membership)
+        )
+        if authorized is None:
             raise EntityNotFoundError(detail="Dataset not found")
-        if not await db_session.scalar(
-            select(exists().where(*membership, UserGroupsMembershipModel.role.in_(allowed_roles)))
-        ):
+        if not authorized:
             raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
 
     return _authorize
