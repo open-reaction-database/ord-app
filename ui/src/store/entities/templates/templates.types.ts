@@ -49,6 +49,7 @@ export interface TemplateResponse {
   variables: string;
   summary: ReactionSummary;
   molblocks: ReactionMolBlocks;
+  modified_at: string;
 }
 
 export interface SaveAsTemplatePayload {

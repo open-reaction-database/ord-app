@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
+
 from faker import Faker
 from fastapi import status
 
@@ -43,6 +45,8 @@ async def test_get_template(api_client, mock_authenticated_user, test_db_session
 
     response_data = api_client.get(f"/api/v1/templates/{template.id}").raise_for_status().json()
     assert response_data["id"] == template.id
+    # The template carries a server-managed last-modified timestamp (#619); it must be serialized.
+    assert datetime.fromisoformat(response_data["modified_at"])
 
 
 async def test_get_foreign_template(api_client, mock_authenticated_user, test_db_session):

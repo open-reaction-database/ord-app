@@ -159,6 +159,7 @@ export interface ReactionTemplate extends BaseReaction {
   id: string;
   name: string;
   variables: Record<string, Variable>;
+  modified_at: string;
 }
 
 export type ReactionOrTemplate = DatasetReaction | ReactionTemplate;

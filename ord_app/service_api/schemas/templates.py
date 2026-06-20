@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from base64 import b64decode, b64encode
+from datetime import datetime
 from typing import Annotated, Any
 
 import orjson
@@ -29,6 +30,7 @@ class TemplateResponseModel(BaseSchema):
     binpb: bytes | Any
     variables: Json
     molblocks: dict
+    modified_at: datetime
     summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
 
     @model_validator(mode="before")

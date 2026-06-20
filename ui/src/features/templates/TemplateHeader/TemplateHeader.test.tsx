@@ -30,7 +30,11 @@ vi.mock('features/templates/TemplateHeaderActions/TemplateHeaderActions', () => 
 const stateWithVariables = (variables: object): { preloadedState: AppState } => ({
   preloadedState: {
     entities: {
-      reactions: { reactionsById: { template_1: { id: 1, data: {}, name: 'My Template', variables } } },
+      reactions: {
+        reactionsById: {
+          template_1: { id: 1, data: {}, name: 'My Template', variables, modified_at: '2025-06-15T14:30:00Z' },
+        },
+      },
     },
   } as unknown as AppState,
 });
@@ -48,5 +52,12 @@ describe('TemplateHeader', () => {
       stateWithVariables({ v1: { name: 'reagent' } }),
     );
     expect(getByText('Template is valid')).toBeInTheDocument();
+  });
+
+  it('shows the last-modified date formatted in the user timezone (#619)', () => {
+    const { getByText } = renderWithProviders(<TemplateHeader templateId="template_1" />, stateWithVariables({}));
+    expect(getByText('Last Modified')).toBeInTheDocument();
+    // DD.MM.YYYY hh:mm a (DATE_TIME_HUMAN_FORMAT); exact value is timezone-dependent, so match the shape.
+    expect(getByText(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)/)).toBeInTheDocument();
   });
 });
