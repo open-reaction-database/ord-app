@@ -57,7 +57,9 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
       return (
         <Tooltip label={tooltipText}>
           <div className={classes.sizeCell}>
-            <span className={classes.sizeBadge}>{row.original.reactions_count?.total}</span>
+            {row.original.reactions_count?.total != null && (
+              <span className={classes.sizeBadge}>{row.original.reactions_count.total}</span>
+            )}
             {hasInvalidReactions && (
               <div className={classes.invalidIcon}>
                 <span className={classes.countDivider}>/</span>
