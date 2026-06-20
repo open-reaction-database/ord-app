@@ -128,4 +128,31 @@ describe('createThunkWithExplicitResult', () => {
     expect(failure?.payload).toBe('explicit-boom');
     expect(notifyMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'explicit-boom' });
   });
+
+  it('on an axios error without a string detail: dispatches failure with null, no toast', async () => {
+    const inner: AppVoidThunk<typeof testActions> = () => async () => {
+      throw axiosErrorWithDetail({ nested: 'object' });
+    };
+    const { store, actions } = makeRecordingStore();
+
+    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction);
+
+    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    expect(failure?.payload).toBeNull();
+    expect(notifyMock).not.toHaveBeenCalled();
+  });
+
+  it('on a non-axios error: dispatches failure with null, no toast', async () => {
+    const inner: AppVoidThunk<typeof testActions> = () => async () => {
+      throw new Error('plain');
+    };
+    const { store, types, actions } = makeRecordingStore();
+
+    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction);
+
+    expect(types()).toContain(testActions.failure.type);
+    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    expect(failure?.payload).toBeNull();
+    expect(notifyMock).not.toHaveBeenCalled();
+  });
 });
