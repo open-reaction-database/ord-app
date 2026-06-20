@@ -54,9 +54,14 @@ def total_attachment_size(message: Message) -> int:
             if field.label != FieldDescriptor.LABEL_REPEATED:
                 total += total_attachment_size(value)
             elif field.message_type.GetOptions().map_entry:
-                if field.message_type.fields_by_name["value"].type == FieldDescriptor.TYPE_MESSAGE:
+                value_type = field.message_type.fields_by_name["value"].type
+                if value_type == FieldDescriptor.TYPE_MESSAGE:
                     for item in value.values():
                         total += total_attachment_size(item)
+                elif value_type == FieldDescriptor.TYPE_BYTES:
+                    # Defensive: no map<string, bytes> exists in the Reaction schema today, but count
+                    # it toward the cap if one is ever added so attachments there can't slip past.
+                    total += sum(len(item) for item in value.values())
             else:
                 for item in value:
                     total += total_attachment_size(item)
