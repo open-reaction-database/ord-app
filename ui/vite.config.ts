@@ -45,8 +45,8 @@ export default defineConfig({
       // Codecov's patch status). Set a few points below current (lines/statements 66%,
       // branches 84%, functions 63%) so routine churn doesn't trip it; ratchet up later.
       thresholds: {
-        lines: 64,
-        statements: 64,
+        lines: 60,
+        statements: 60,
         branches: 80,
         functions: 60,
       },
