@@ -18,13 +18,18 @@
 
 coverage:
   status:
-    # Report-only: surface project/patch coverage without failing the PR.
+    # Project (total) coverage stays report-only so PRs aren't blocked by base-branch
+    # drift; the enforced per-PR gate is on patch (new-code) coverage below.
     project:
       default:
         informational: true
+    # Patch = coverage of the lines changed in the PR. This is the enforced
+    # "coverage on new code" gate that replaces SonarCloud's coverage quality gate.
+    # target: auto -> new code must be covered at least as well as the project average.
     patch:
       default:
-        informational: true
+        target: auto
+        informational: false
 
 flag_management:
   default_rules:

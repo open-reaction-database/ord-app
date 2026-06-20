@@ -41,6 +41,15 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.d.ts', 'src/test/**', 'src/**/*.module.scss'],
+      // Local total-coverage floor (a regression backstop; the per-PR new-code gate is
+      // Codecov's patch status). Set a few points below current (lines/statements 66%,
+      // branches 84%, functions 63%) so routine churn doesn't trip it; ratchet up later.
+      thresholds: {
+        lines: 64,
+        statements: 64,
+        branches: 80,
+        functions: 60,
+      },
     },
   },
   preview: {

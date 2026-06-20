@@ -63,6 +63,13 @@ package = false
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
+# Local total-coverage floor (a regression backstop; the per-PR new-code gate is
+# Codecov's patch status). pytest-cov honors this on every `pytest --cov` run. Set a
+# few points below current (~83% total, which includes the test modules) so routine
+# churn doesn't trip it; ratchet up over time.
+[tool.coverage.report]
+fail_under = 80
+
 # Ruff config lives here (single source of truth); the former root ruff.toml
 # took precedence over [tool.ruff] and has been folded in.
 [tool.ruff]
