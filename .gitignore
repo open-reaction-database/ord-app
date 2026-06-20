@@ -170,3 +170,7 @@ cython_debug/
 .vite/
 # personal, machine-local Claude rules (e.g. admin-merge workflow)
 .claude/rules/*.local.md
+
+# Local plan / working-note docs (e.g. Claude-authored plans). Also covers the
+# already-untracked ISSUE_TRIAGE_PLAN.md, which is synced to issue #656.
+*_PLAN.md
