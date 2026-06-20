@@ -73,7 +73,7 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> T | None | None:
+    async def update(self, payload: dict, autocommit: bool = True, **kwargs) -> T | None:
         stmt = (
             update(self.model)
             .where(*self._get_filter_stmt(self.model, **kwargs))
