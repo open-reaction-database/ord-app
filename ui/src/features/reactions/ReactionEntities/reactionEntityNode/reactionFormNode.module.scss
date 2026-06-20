@@ -17,3 +17,13 @@
   display: grid;
   grid-column-gap: var(--mantine-spacing-sm);
 }
+
+/*
+ * Value fields grouped under a wrapper heading (e.g. "Limiting reactant conversion") carry only a
+ * templateLabel, so their per-field label renders empty outside template mode. Mantine still
+ * reserves the label band, leaving stray vertical space under the heading; collapse it. (#555)
+ */
+/* stylelint-disable-next-line selector-pseudo-class-no-unknown -- :global is CSS-modules syntax */
+.wrapper :global(.mantine-InputWrapper-label):empty {
+  display: none;
+}
