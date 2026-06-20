@@ -56,7 +56,7 @@ async def name_resolve_cached(value_type: str, value: str) -> tuple[str, str] | 
                 if not t.done():
                     t.cancel()
             return response
-        except Exception:
+        except Exception:  # noqa: S112 -- intentional: try the next resolver; a failed/empty lookup is expected (returns None overall)
             continue
 
 

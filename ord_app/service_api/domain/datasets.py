@@ -58,7 +58,7 @@ class DatasetUseCases:
     async def create(self, group_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above
+        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
@@ -68,7 +68,7 @@ class DatasetUseCases:
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
 
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above
+        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
@@ -120,7 +120,7 @@ class DatasetUseCases:
         )
         await self.add_reactions(dataset, dataset_pb.reactions)
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above
+        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 

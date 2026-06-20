@@ -75,8 +75,9 @@ target-version = "py312"
 [tool.ruff.lint]
 # pycodestyle errors+warnings (E/W), pyflakes (F), import sorting (I), bugbear (B),
 # pyupgrade (UP), flake8-simplify (SIM), full type annotations (ANN: arguments,
-# *args/**kwargs, return types, and no bare Any), and flake8-fastapi (FAST).
-select = ["E", "F", "W", "I", "B", "UP", "SIM", "ANN", "FAST"]
+# *args/**kwargs, return types, and no bare Any), flake8-fastapi (FAST), and
+# flake8-bandit (S: security/SAST -- replaces SonarCloud's Python security findings).
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ANN", "FAST", "S"]
 # E501 (line length) is the formatter's job; SIM108 (ternaries aren't always
 # clearer); B008 (function calls in argument defaults are fine here, e.g. FastAPI Depends).
 # ANN401 (no bare `Any`): off because `Any` is the honest type for **kwargs forwarded to
@@ -91,8 +92,9 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.ruff.lint.per-file-ignores]
 # Tests trip a couple of flake8-bugbear (the "B" rules) checks -- B011 (`assert False`)
 # and B017 (overly broad `pytest.raises(Exception)`); type annotations (ANN) also add
-# little value on test functions. Skip both in tests.
-"ord_app/tests/**" = ["B011", "B017", "ANN"]
+# little value on test functions. S101 (flake8-bandit) flags `assert`, which is exactly
+# how pytest expresses checks, so it is pure noise in tests. Skip all of these in tests.
+"ord_app/tests/**" = ["B011", "B017", "ANN", "S101"]
 
 [tool.ruff.lint.isort]
 # ord_schema is an external dependency; pin its classification so import

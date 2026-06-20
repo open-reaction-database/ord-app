@@ -97,7 +97,7 @@ class DatasetsRepository:
             .group_by(DatasetModel.id)
         )
         row = (await self.db.execute(stmt)).first()
-        assert row is not None  # dataset existence is enforced upstream by dataset_authorization
+        assert row is not None  # enforced upstream by dataset_authorization  # noqa: S101 (type-narrowing guard)
         dataset, rct_total, rct_invalid, rct_valid, rct_none = row
         dataset.reactions_count = {
             "total": rct_total,
