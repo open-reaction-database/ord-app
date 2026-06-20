@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel
+from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserRolesList
 from ord_app.service_api.repositories.base import BaseRepository
 
 
@@ -48,6 +48,13 @@ class GroupRepository(BaseRepository[GroupModel]):
         rows = (await self.db.execute(stmt)).all()
         groups = [dict(id=group.id, name=group.name, role=user_group.role) for group, user_group in rows]
         return groups
+
+    async def get_user_role(self, user_id: int, group_id: int) -> UserRolesList | None:
+        stmt = select(UserGroupsMembershipModel.role).where(
+            UserGroupsMembershipModel.user_id == user_id,
+            UserGroupsMembershipModel.group_id == group_id,
+        )
+        return await self.db.scalar(stmt)
 
 
 class GroupMembersRepository:

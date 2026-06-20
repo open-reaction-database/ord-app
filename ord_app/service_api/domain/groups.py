@@ -33,16 +33,25 @@ class GroupUseCases:
 
     async def create(self, payload: GroupCreateSchema):
         group = await self.group_repository.create(self.current_user.id, payload.model_dump(exclude_unset=True))
-        return group
+        # The creator is added as the group's admin (see GroupRepository.create). (#569)
+        return {"id": group.id, "name": group.name, "role": "admin"}
 
     async def get(self, group_id: int):
-        return await self.group_repository.get(id=group_id)
+        group = await self.group_repository.get(id=group_id)
+        if group is None:
+            raise EntityNotFoundError(f"Group {group_id} not found")
+        role = await self.group_repository.get_user_role(self.current_user.id, group_id)
+        return {"id": group.id, "name": group.name, "role": role}
 
     async def user_groups(self):
         return await self.group_repository.get_user_groups(self.current_user.id)
 
     async def update(self, group_id: int, payload: GroupCreateSchema):
-        return await self.group_repository.update(payload.model_dump(), id=group_id)
+        group = await self.group_repository.update(payload.model_dump(), id=group_id)
+        if group is None:
+            raise EntityNotFoundError(f"Group {group_id} not found")
+        role = await self.group_repository.get_user_role(self.current_user.id, group_id)
+        return {"id": group.id, "name": group.name, "role": role}
 
     async def delete(self, group_id: int):
         await self.group_repository.delete(id=group_id)

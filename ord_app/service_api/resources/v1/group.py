@@ -26,7 +26,6 @@ from ord_app.service_api.schemas.groups import (
     GroupAddMemberSchema,
     GroupCreateSchema,
     GroupMemberResponseSchema,
-    GroupResponseSchema,
     GroupUpdateMemberSchema,
     GroupUserResponseSchema,
 )
@@ -34,7 +33,7 @@ from ord_app.service_api.schemas.groups import (
 router = APIRouter(tags=["group"], prefix="/groups")
 
 
-@router.post("", response_model=GroupResponseSchema, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=GroupUserResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_group(payload: GroupCreateSchema, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
     return await use_case.create(payload)
 
@@ -47,7 +46,7 @@ async def list_current_user_groups(use_case: Annotated[GroupUseCases, Depends(ge
 
 @router.get(
     "/{group_id}",
-    response_model=GroupResponseSchema,
+    response_model=GroupUserResponseSchema,
     dependencies=[Depends(group_authorization(("admin", "editor", "viewer")))],
 )
 async def get_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(get_group_use_case)]):
@@ -57,7 +56,7 @@ async def get_group(group_id: int, use_case: Annotated[GroupUseCases, Depends(ge
 @router.patch(
     "/{group_id}",
     status_code=status.HTTP_201_CREATED,
-    response_model=GroupResponseSchema,
+    response_model=GroupUserResponseSchema,
     dependencies=[Depends(group_authorization(("admin",)))],
 )
 async def update_group(
