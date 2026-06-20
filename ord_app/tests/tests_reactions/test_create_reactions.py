@@ -114,3 +114,31 @@ async def test_create_reaction_with_character_limitations(api_client, mock_authe
 
     response = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+async def test_create_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+    # The cumulative attachment cap is enforced on the POST create path too. (#543)
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    pb_reaction = Reaction(reaction_id="test")
+    pb_reaction.observations.add().image.bytes_value = b"x" * (10 * 1024 * 1024 + 1)
+
+    payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
+    response = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "10 MB" in response.json()["detail"]
+
+
+async def test_upload_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+    # The cumulative attachment cap is enforced on the upload path too. (#543)
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    pb_reaction = Reaction(reaction_id="test")
+    pb_reaction.observations.add().image.bytes_value = b"x" * (10 * 1024 * 1024 + 1)
+
+    response = api_client.post(
+        f"/api/v1/datasets/{dataset.id}/reactions/upload",
+        files={"file": ("reaction.pb", pb_reaction.SerializeToString())},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "10 MB" in response.json()["detail"]

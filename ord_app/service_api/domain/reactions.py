@@ -84,7 +84,17 @@ class ReactionsUseCase:
         self.reaction_repo = ReactionsRepository(db)
         self.dataset_repo = DatasetsRepository(db)
 
+    @staticmethod
+    def _enforce_attachment_limit(pb_reaction: Reaction):
+        """Reject reactions whose cumulative file attachments exceed the size cap."""
+        if total_attachment_size(pb_reaction) > MAX_REACTION_ATTACHMENTS_SIZE:
+            raise UnprocessableEntityError(
+                f"Total file attachment size for a reaction must not exceed "
+                f"{MAX_REACTION_ATTACHMENTS_SIZE // (1024 * 1024)} MB"
+            )
+
     async def _create_reaction(self, dataset_id: int, pb_reaction: Reaction):
+        self._enforce_attachment_limit(pb_reaction)
         # validate reaction id
         if len(pb_reaction.reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
             raise UnprocessableEntityError(
@@ -175,11 +185,7 @@ class ReactionsUseCase:
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
-        if total_attachment_size(pb_reaction) > MAX_REACTION_ATTACHMENTS_SIZE:
-            raise UnprocessableEntityError(
-                f"Total file attachment size for a reaction must not exceed "
-                f"{MAX_REACTION_ATTACHMENTS_SIZE // (1024 * 1024)} MB"
-            )
+        self._enforce_attachment_limit(pb_reaction)
         pb_reaction_id = (pb_reaction.reaction_id or "").strip()
         if len(pb_reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
             raise UnprocessableEntityError(
