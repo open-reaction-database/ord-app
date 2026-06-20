@@ -73,3 +73,15 @@ repos:
         language: system
         files: ^ui/.*\.s?css$
         pass_filenames: false
+
+  # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
+  # Uses the jscpd binary installed under ui/ (run `npm ci` in ui/ first) with the
+  # root .jscpd.json; scans the configured trees rather than just the staged files.
+  - repo: local
+    hooks:
+      - id: jscpd
+        name: jscpd (duplication)
+        entry: ui/node_modules/.bin/jscpd --config .jscpd.json
+        language: system
+        files: ^(ord_app|ui/src)/.*\.(py|ts|tsx)$
+        pass_filenames: false

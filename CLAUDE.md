@@ -32,7 +32,7 @@ Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` 
 ## CI gates (a PR is not mergeable until these are green)
 
 - **Tests**: `test_python` (ubuntu + macos), `test_ui`, `test_e2e` (boots the full no-auth stack).
-- **Checks**: `check_python` (ruff / ruff-format / ty), `check_javascript` (clang-format), `lint_and_build_ui` (`lint:check` + `npm run build`), `check_license_headers`.
+- **Checks**: `check_python` (ruff / ruff-format / ty), `check_javascript` (clang-format), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `make duplication`), `lint_and_build_ui` (`lint:check` + `npm run build`), `check_license_headers`.
 - **SonarCloud quality gate** and **Greptile review** also gate merges — never merge over a red Sonar check; address Greptile findings (and read its PR-body summary for sub-threshold notes) before merging.
 
 ## Conventions

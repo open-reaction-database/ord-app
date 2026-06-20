@@ -67,3 +67,21 @@ jobs:
           sudo apt update && sudo apt install clang-format --yes
           # NOTE(kearnes): Run clang-format before installing anything with npm.
           find . -name '*.js' -exec clang-format -n -Werror {} +
+
+  # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
+  # jscpd is pinned as a ui/ devDependency; run from the repo root so it scans both
+  # ord_app/ (Python) and ui/src/ (TS/TSX) per .jscpd.json. Runs on every PR (not
+  # path-filtered) so Python-only changes are covered too.
+  check_duplication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install jscpd (via ui devDependencies)
+        run: npm --prefix ui ci
+      - name: jscpd
+        run: ui/node_modules/.bin/jscpd --config .jscpd.json
