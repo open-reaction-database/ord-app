@@ -17,6 +17,10 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  /* Let the card shrink below its content's intrinsic width so the preview can scroll horizontally
+     within it rather than overflowing the page. (#408) */
+  min-width: 0;
 }
 
 .topContainer {

@@ -34,6 +34,11 @@
 .content {
   flex: 0 1 1440px;
   max-width: 1440px;
+
+  /* Allow the content column to shrink below its intrinsic width so over-wide content (e.g. a
+     reaction with many inputs) scrolls within its own container instead of widening the whole page
+     and pushing its left edge off-screen. (#408) */
+  min-width: 0;
 }
 
 .footer {

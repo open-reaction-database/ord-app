@@ -17,4 +17,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  /* Allow this column to shrink below its content's intrinsic width so a wide reaction's preview
+     scrolls horizontally within its card instead of forcing the whole page wider. (#408) */
+  min-width: 0;
 }

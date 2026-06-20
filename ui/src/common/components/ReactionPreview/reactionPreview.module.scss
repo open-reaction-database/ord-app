@@ -28,6 +28,10 @@ $line-clamp: 4;
   align-items: center;
   padding-bottom: var(--mantine-spacing-md);
   min-height: $wrapper-height;
+
+  /* Shrink below the inputs' intrinsic width so overflow-x:auto actually scrolls them within the
+     card, instead of the row growing and pushing the page (and the reaction's start) off-screen. (#408) */
+  min-width: 0;
 }
 
 .inputCard {
