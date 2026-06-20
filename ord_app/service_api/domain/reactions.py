@@ -40,8 +40,10 @@ from ord_app.service_api.services.exceptions import (
     UnprocessableEntityError,
 )
 from ord_app.service_api.services.pb_utils import (
+    MAX_REACTION_ATTACHMENTS_SIZE,
     async_validate_pb_reaction,
     load_message,
+    total_attachment_size,
     write_message,
 )
 from ord_app.service_api.services.postgresql import get_db_session
@@ -173,6 +175,11 @@ class ReactionsUseCase:
 
     async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
         pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
+        if total_attachment_size(pb_reaction) > MAX_REACTION_ATTACHMENTS_SIZE:
+            raise UnprocessableEntityError(
+                f"Total file attachment size for a reaction must not exceed "
+                f"{MAX_REACTION_ATTACHMENTS_SIZE // (1024 * 1024)} MB"
+            )
         pb_reaction_id = (pb_reaction.reaction_id or "").strip()
         if len(pb_reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
             raise UnprocessableEntityError(

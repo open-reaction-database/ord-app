@@ -18,6 +18,7 @@ from typing import TypeVar
 
 from fastapi import HTTPException, UploadFile, status
 from google.protobuf import json_format, text_format
+from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.message import Message
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
@@ -27,6 +28,40 @@ from starlette.concurrency import run_in_threadpool
 # Constrained to the proto messages this module serializes; load_message returns
 # the same concrete type passed via message_type rather than the bare union.
 MessageT = TypeVar("MessageT", Dataset, Reaction)
+
+# Maximum cumulative size of uploaded file attachments (Data.bytes_value) in a single reaction. (#543)
+MAX_REACTION_ATTACHMENTS_SIZE = 10 * 1024 * 1024
+
+
+def total_attachment_size(message: Message) -> int:
+    """Sum the byte length of every Data.bytes_value attachment anywhere in a proto message.
+
+    Walks the message tree (including repeated and map fields) so attachments nested in observations,
+    analyses, compound features, etc. are all counted. Only set fields are visited, so empty
+    bytes_value fields contribute nothing.
+
+    Args:
+        message: The protobuf message to inspect (typically a Reaction).
+
+    Returns:
+        The total number of bytes across all populated ``bytes_value`` fields.
+    """
+    total = 0
+    for field, value in message.ListFields():
+        if field.name == "bytes_value" and field.type == FieldDescriptor.TYPE_BYTES:
+            total += len(value)
+        elif field.type == FieldDescriptor.TYPE_MESSAGE:
+            if field.label != FieldDescriptor.LABEL_REPEATED:
+                total += total_attachment_size(value)
+            elif field.message_type.GetOptions().map_entry:
+                if field.message_type.fields_by_name["value"].type == FieldDescriptor.TYPE_MESSAGE:
+                    for item in value.values():
+                        total += total_attachment_size(item)
+            else:
+                for item in value:
+                    total += total_attachment_size(item)
+    return total
+
 
 MAP_FILE_EXT_TO_PB_KIND = {
     ".json": "json",

@@ -47,6 +47,30 @@ async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, 
     assert status.HTTP_404_NOT_FOUND == response_data.status_code
 
 
+async def test_update_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+    # Cumulative file attachments over 10 MB are rejected at save time. (#543)
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+
+    pb_reaction = Reaction(reaction_id=faker.uuid4())
+    pb_reaction.observations.add().image.bytes_value = b"x" * (10 * 1024 * 1024 + 1)
+    payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
+    response = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload)
+
+    assert status.HTTP_422_UNPROCESSABLE_ENTITY == response.status_code
+    assert "10 MB" in response.json()["detail"]
+
+
+async def test_update_reaction_allows_attachments_under_limit(api_client, mock_authenticated_user, test_db_session):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+
+    pb_reaction = Reaction(reaction_id=faker.uuid4())
+    pb_reaction.observations.add().image.bytes_value = b"x" * (1024 * 1024)  # 1 MB, well under the 10 MB cap
+    payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
+    api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload).raise_for_status()
+
+
 async def test_update_reaction_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
