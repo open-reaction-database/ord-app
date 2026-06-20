@@ -39,13 +39,13 @@ import { DATE_FORMAT, DATE_TIME_FORMAT } from 'common/constants.ts';
 // 2025" into April 1 — see issue #544. Strict mode rejects anything that doesn't match a format.
 dayjs.extend(customParseFormat);
 
-// Strict ISO 8601 (the app's own output plus tz-aware inputs): date, optional time with optional
-// milliseconds, and an optional Z or ±HH:mm offset. Month/day ranges are bounded here because
-// dayjs's ISO parser would otherwise roll overflow values (e.g. 2025-13-45 → 2026-02-14). The 'Z'
-// offset token isn't honored by customParseFormat's strict mode, so ISO is gated by this regex and
-// parsed with dayjs's default (ISO) parser; non-ISO human formats go through the strict list below.
-const ISO_8601 =
-  /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])([T ]([01]\d|2[0-3]):[0-5]\d(:[0-5]\d(\.\d+)?)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)?)?$/;
+// ISO 8601 (the app's own output plus tz-aware inputs): date, optional time, optional Z/±HHMM
+// offset. Month/day ranges are bounded here because dayjs's ISO parser would otherwise silently
+// roll overflow values (e.g. 2025-13-45 → 2026-02-14); the time and offset are matched loosely and
+// left for dayjs to validate. The 'Z'/offset token isn't honored by customParseFormat's strict
+// mode, so ISO is gated by this regex and parsed with dayjs's default (ISO) parser; non-ISO human
+// formats go through the strict list below.
+const ISO_8601 = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])([T ][\d:.]+(Z|[+-]\d\d:?\d\d)?)?$/;
 
 // Non-ISO date formats accepted for enumeration CSV cells: common human-authored formats (US slash,
 // European dot, and named-month). Extend this list if a legitimate CSV format is rejected.
