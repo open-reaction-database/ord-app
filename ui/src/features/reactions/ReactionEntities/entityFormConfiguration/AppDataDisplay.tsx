@@ -19,10 +19,15 @@ import type { FileControlValue } from 'common/components/inputs/FileControl/file
 
 interface AppDataDisplayProps {
   appData: AppData;
+  // Overrides the base file name shown/downloaded (the extension is still derived from the data
+  // format). Observations have no name field, so the view passes the positional "Observation N"
+  // here, making the file read as a numbered name like Features do instead of the raw stored
+  // filename. (#613)
+  fileNameOverride?: string;
 }
 
-function AppDataFileDisplay({ appData }: Readonly<AppDataDisplayProps>) {
-  const { fileName, href } = useFileNameHref(appData.name, appData.data as FileControlValue);
+function AppDataFileDisplay({ appData, fileNameOverride }: Readonly<AppDataDisplayProps>) {
+  const { fileName, href } = useFileNameHref(fileNameOverride ?? appData.name, appData.data as FileControlValue);
   return appData.data.value ? (
     <a
       download={fileName}
@@ -35,7 +40,7 @@ function AppDataFileDisplay({ appData }: Readonly<AppDataDisplayProps>) {
   );
 }
 
-export function AppDataDisplay({ appData }: Readonly<AppDataDisplayProps>) {
+export function AppDataDisplay({ appData, fileNameOverride }: Readonly<AppDataDisplayProps>) {
   switch (appData.data.type) {
     case AppDataType.Url: {
       const url = (appData.data.value as string) || '';
@@ -53,6 +58,11 @@ export function AppDataDisplay({ appData }: Readonly<AppDataDisplayProps>) {
     case AppDataType.Number:
       return <span>{appData.data.value}</span>;
     case AppDataType.Upload:
-      return <AppDataFileDisplay appData={appData} />;
+      return (
+        <AppDataFileDisplay
+          appData={appData}
+          fileNameOverride={fileNameOverride}
+        />
+      );
   }
 }

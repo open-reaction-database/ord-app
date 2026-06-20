@@ -44,4 +44,16 @@ describe('AppDataDisplay', () => {
     );
     expect(screen.getByText('No file')).toBeInTheDocument();
   });
+
+  it('uses fileNameOverride for the file name, keeping the format extension (#613)', () => {
+    renderWithMantine(
+      <AppDataDisplay
+        appData={appData({ type: AppDataType.Upload, value: 'YWJj', format: 'json' }, 'f2f073f90dc84c60989affda5ab')}
+        fileNameOverride="Observation 1"
+      />,
+    );
+    const link = screen.getByRole('link', { name: 'Observation 1.json' });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('download', 'Observation 1.json');
+  });
 });

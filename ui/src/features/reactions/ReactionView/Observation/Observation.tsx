@@ -91,7 +91,14 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
               {
                 label: 'Data',
                 render: ({ image }) => {
-                  return <AppDataDisplay appData={image} />;
+                  // Observations have no name field; show the attached file under the positional
+                  // "Observation N" name so it reads as a numbered name like Features do. (#613)
+                  return (
+                    <AppDataDisplay
+                      appData={image}
+                      fileNameOverride={`Observation ${index + 1}`}
+                    />
+                  );
                 },
               },
             ]}
