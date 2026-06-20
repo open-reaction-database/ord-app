@@ -11,6 +11,8 @@
   ],
   "gitignore": true,
   "threshold": 2,
+  "minLines": 5,
+  "minTokens": 50,
   "reporters": ["console"],
   "absolute": false
 }
