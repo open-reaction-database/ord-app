@@ -17,6 +17,7 @@ from typing import Any
 from urllib.parse import quote
 
 from httpx import AsyncClient
+from loguru import logger
 from ord_schema import resolvers
 
 from ord_app.service_api.services.utils import alru_cache
@@ -56,7 +57,9 @@ async def name_resolve_cached(value_type: str, value: str) -> tuple[str, str] | 
                 if not t.done():
                     t.cancel()
             return response
-        except Exception:  # noqa: S112 -- intentional: try the next resolver; a failed/empty lookup is expected (returns None overall)
+        except Exception as e:
+            # A failed/empty lookup is expected; log at debug and try the next resolver.
+            logger.debug(f"resolver failed: {e}")
             continue
 
 
