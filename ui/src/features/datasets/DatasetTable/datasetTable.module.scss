@@ -54,6 +54,16 @@
 
 .sizeCell {
   display: flex;
+  align-items: center;
+}
+
+/* The dataset size sits in a grey pill so it reads as a distinct chip, with the invalid count
+   called out in red beside it. (#466) */
+.sizeBadge {
+  padding: 2px 8px;
+  border-radius: var(--mantine-spacing-xl);
+  background-color: var(--color-background-gray);
+  color: var(--color-text-primary);
 }
 
 .countDivider {
