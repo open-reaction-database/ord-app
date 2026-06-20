@@ -31,7 +31,7 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 
 class UserUseCase:
-    def __init__(self, db: AsyncSession, current_user: UserModel | None = None):
+    def __init__(self, db: AsyncSession, current_user: UserModel | None = None) -> None:
         self.db = db
         self.current_user = current_user
         self.user_repo = UserRepository(db)
@@ -45,7 +45,7 @@ class UserUseCase:
     async def get_user_by_auth0_id(self, auth0_id: str) -> UserModel | None:
         return await self.user_repo.get(auth0_id=auth0_id)
 
-    async def update(self, user_id: int, payload: UserUpdateSchema):
+    async def update(self, user_id: int, payload: UserUpdateSchema) -> UserModel:
         if self.current_user is None or self.current_user.id != user_id:
             raise ForbiddenError("Action prohibited")
         if user := await self.user_repo.update(payload.model_dump(exclude_unset=True), id=user_id):
@@ -96,7 +96,7 @@ async def _provision_e2e_user(db_session: AsyncSession) -> UserModel:
     return user
 
 
-async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema):
+async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema) -> UserModel | None:
     if e2e_auth_enabled():
         return await _provision_e2e_user(db_session)
 

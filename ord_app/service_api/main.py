@@ -13,11 +13,12 @@
 # limitations under the License.
 import asyncio
 import sys
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 
 import asyncpg
 import psycopg.errors
-from fastapi import APIRouter, FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from loguru import logger
@@ -42,13 +43,13 @@ match RuntimeSettings.app_env:
         logger.add(sys.stdout, level="INFO")
 
 
-async def run_background_task():
+async def run_background_task() -> None:
     async with db_session_maker() as db:
         await validate_dataset_reactions(db)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Keep a reference so the task isn't garbage-collected before it completes.
     app.state.background_task = asyncio.create_task(run_background_task())
     yield
@@ -62,7 +63,7 @@ app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled"
 
 
 @app.middleware("http")
-async def catch_errors(request: Request, call_next):
+async def catch_errors(request: Request, call_next) -> Response:
     try:
         return await call_next(request)
     except (DataError, DBAPIError) as err:
@@ -117,5 +118,5 @@ add_pagination(app)
 
 
 @app.get("/healthcheck")
-async def health_check():
+async def health_check() -> bool:
     return True

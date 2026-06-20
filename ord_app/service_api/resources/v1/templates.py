@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections.abc import Sequence
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
 from ord_app.service_api.domain.templates import TemplatesUseCase, get_templates_use_case
+from ord_app.service_api.models import TemplateModel
 from ord_app.service_api.schemas.templates import TemplateCreateModel, TemplateResponseModel, TemplateUpdateModel
 
 router = APIRouter(tags=["templates"], prefix="/templates")
@@ -25,14 +27,14 @@ router = APIRouter(tags=["templates"], prefix="/templates")
 async def create_template(
     payload: TemplateCreateModel,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
-):
+) -> TemplateModel:
     return await use_case.create(payload)
 
 
 @router.get("", response_model=list[TemplateResponseModel])
 async def get_all_templates(
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
-):
+) -> Sequence[TemplateModel]:
     return await use_case.all()
 
 
@@ -40,7 +42,7 @@ async def get_all_templates(
 async def get_template(
     template_id: int,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
-):
+) -> TemplateModel:
     return await use_case.get(template_id)
 
 
@@ -49,7 +51,7 @@ async def update_template(
     template_id: int,
     payload: TemplateUpdateModel,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
-):
+) -> TemplateModel:
     return await use_case.update(template_id, payload)
 
 
@@ -57,5 +59,6 @@ async def update_template(
 async def delete_template(
     template_id: int,
     use_case: Annotated[TemplatesUseCase, Depends(get_templates_use_case)],
-):
-    return await use_case.delete(template_id)
+) -> None:
+    # 204 No Content: delete raises if the template is missing; the returned count is unused.
+    await use_case.delete(template_id)

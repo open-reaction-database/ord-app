@@ -33,18 +33,18 @@ class TemplateResponseModel(BaseSchema):
 
     @model_validator(mode="before")
     @classmethod
-    def _fill_molblocks(cls, data: Any):
+    def _fill_molblocks(cls, data: Any) -> Any:
         data.molblocks = get_molblocks(load_message(data.binpb, Reaction, "binpb"))
         return data
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw):
+    def load_variables(cls, raw) -> bytes:
         return orjson.dumps(raw)
 
     @field_validator("binpb", mode="before")
     @classmethod
-    def load_binpb(cls, raw):
+    def load_binpb(cls, raw) -> bytes:
         return b64encode(raw)
 
 
@@ -55,12 +55,12 @@ class TemplateCreateModel(BaseSchema):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw):
+    def load_variables(cls, raw) -> bytes:
         return orjson.dumps(raw)
 
     @field_validator("binpb", mode="after")
     @classmethod
-    def load_binpb(cls, raw):
+    def load_binpb(cls, raw) -> Reaction:
         return load_message(b64decode(raw), Reaction, "binpb")
 
     def model_dump(self, *args, **kwargs) -> dict[str, Any]:
@@ -76,7 +76,7 @@ class TemplateUpdateModel(BaseSchema):
 
     @field_validator("binpb", mode="after")
     @classmethod
-    def load_binpb(cls, raw):
+    def load_binpb(cls, raw) -> Reaction | None:
         if raw is not None:
             return load_message(b64decode(raw), Reaction, "binpb")
 
@@ -88,5 +88,5 @@ class TemplateUpdateModel(BaseSchema):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def load_variables(cls, raw):
+    def load_variables(cls, raw) -> bytes:
         return orjson.dumps(raw)

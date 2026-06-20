@@ -75,7 +75,9 @@ target-version = "py312"
 [tool.ruff.lint]
 # Mirror ord-schema's ruleset: pycodestyle errors+warnings (E/W), pyflakes (F),
 # import sorting (I), bugbear (B), pyupgrade (UP), and flake8-simplify (SIM).
-select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+# Plus return-type annotations (ANN2xx) so type checkers can propagate types
+# through call sites; argument/Any rules (ANN0xx/ANN401) are intentionally off.
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ANN201", "ANN202", "ANN204", "ANN205", "ANN206"]
 # E501 (line length) is the formatter's job; SIM108 (ternaries aren't always
 # clearer); B008 (function calls in argument defaults are fine here, e.g. FastAPI Depends).
 ignore = ["E501", "SIM108", "B008"]
@@ -85,8 +87,10 @@ unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.per-file-ignores]
-# Tests redefine fixtures and use patterns bugbear dislikes (asserts, blind excepts).
-"ord_app/tests/**" = ["B011", "B017"]
+# Tests trip a couple of flake8-bugbear (the "B" rules) checks -- B011 (`assert False`)
+# and B017 (overly broad `pytest.raises(Exception)`); return-type annotations (ANN2xx)
+# also add little value on test functions. Skip both in tests.
+"ord_app/tests/**" = ["B011", "B017", "ANN201", "ANN202", "ANN204", "ANN205", "ANN206"]
 
 [tool.ruff.lint.isort]
 # ord_schema is an external dependency; pin its classification so import

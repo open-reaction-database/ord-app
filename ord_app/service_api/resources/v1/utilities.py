@@ -38,7 +38,7 @@ def adjust_error(error: str) -> str:
 
 
 @router.post("/validate/{message_type}")
-async def validate(message_type: str, request: Request):
+async def validate(message_type: str, request: Request) -> dict:
     """Validates a protocol buffer message."""
     message = create_message(message_type)
     message.ParseFromString(await request.body())
@@ -51,8 +51,8 @@ async def validate(message_type: str, request: Request):
     return {"errors": errors, "warnings": warnings}
 
 
-@router.get("/resolve_input")
-async def resolve_input(input_string: str):
+@router.get("/resolve_input", response_model=None)
+async def resolve_input(input_string: str) -> str | Response:
     """Resolves an input string into a ReactionInput message."""
     try:
         return send_message(resolvers.resolve_input(input_string))
@@ -61,7 +61,7 @@ async def resolve_input(input_string: str):
 
 
 @router.post("/resolve-compound", response_model=ResolveCompoundOutputs)
-async def resolve_compound(inputs: ResolveCompoundInputs):
+async def resolve_compound(inputs: ResolveCompoundInputs) -> dict | Response:
     """Resolves a compound identifier into a SMILES string."""
     try:
         resolver, smiles = await name_resolve_cached(inputs.identifier_type, inputs.identifier)
@@ -70,8 +70,8 @@ async def resolve_compound(inputs: ResolveCompoundInputs):
         return Response(str(error), status_code=400)
 
 
-@router.get("/canonicalize-smiles")
-async def canonicalize_smiles(smiles: str):
+@router.get("/canonicalize-smiles", response_model=None)
+async def canonicalize_smiles(smiles: str) -> str | Response:
     """Canonicalizes a SMILES string."""
     try:
         return resolvers.canonicalize_smiles(smiles)
@@ -79,8 +79,8 @@ async def canonicalize_smiles(smiles: str):
         return Response(str(error), status_code=400)
 
 
-@router.post("/get_molblock")
-async def get_molblock(request: Request):
+@router.post("/get_molblock", response_model=None)
+async def get_molblock(request: Request) -> str | Response:
     """Returns a MolBlock for the given Compound message."""
     compound = Compound.FromString(await request.body())
     try:

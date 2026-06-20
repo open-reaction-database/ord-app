@@ -77,7 +77,7 @@ MAP_FILE_EXT_TO_PB_KIND = {
 }
 
 
-def validate_pb_kind_by_file_ext(filename):
+def validate_pb_kind_by_file_ext(filename) -> str | None:
     suffixes = Path(filename).suffixes
     if suffixes and suffixes[-1] == ".gz" and len(suffixes) > 1:
         file_ext = suffixes[-2]
@@ -87,7 +87,7 @@ def validate_pb_kind_by_file_ext(filename):
     return MAP_FILE_EXT_TO_PB_KIND.get(file_ext)
 
 
-async def validate_uploaded_pb_file(file: UploadFile):
+async def validate_uploaded_pb_file(file: UploadFile) -> tuple[bytes, str]:
     kind = validate_pb_kind_by_file_ext(file.filename)
     if not kind:
         raise HTTPException(

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Callable
+
 from fastapi import Depends
 from sqlalchemy import exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,18 +31,20 @@ from ord_app.service_api.services.exceptions import EntityNotFoundError, Forbidd
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def authenticate(db_session: AsyncSession = Depends(get_db_session), token: dict = Depends(verify_access_token)):
+async def authenticate(
+    db_session: AsyncSession = Depends(get_db_session), token: dict = Depends(verify_access_token)
+) -> UserModel:
     if user := await UserRepository(db_session).get(auth0_id=token["sub"]):
         return user
     raise UnauthenticatedError(detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
 
-def group_authorization(allowed_roles: tuple[UserRolesList, ...]):
+def group_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
     async def _authorize(
         group_id: int | None,
         user: UserModel = Depends(authenticate),
         db_session: AsyncSession = Depends(get_db_session),
-    ):
+    ) -> None:
         stmt = select(
             exists().where(
                 UserGroupsMembershipModel.user_id == user.id,
@@ -54,12 +58,12 @@ def group_authorization(allowed_roles: tuple[UserRolesList, ...]):
     return _authorize
 
 
-def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]):
+def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
     async def _authorize(
         dataset_id: int | None,
         user: UserModel = Depends(authenticate),
         db_session: AsyncSession = Depends(get_db_session),
-    ):
+    ) -> None:
         membership = (
             DatasetGroupAssociationModel.dataset_id == dataset_id,
             DatasetGroupAssociationModel.dataset_id == DatasetModel.id,

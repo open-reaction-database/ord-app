@@ -30,7 +30,8 @@ class BaseModel(DeclarativeBase):
     modified_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     @declared_attr
-    def __tablename__(cls):
+    # @declared_attr's typing expects an ORM descriptor return, not a plain `-> str`.
+    def __tablename__(cls):  # noqa: ANN204
         return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__.removesuffix("Model")).lower()
 
 
@@ -51,7 +52,7 @@ class UserModel(BaseModel):
 
     templates: Mapped["TemplateModel"] = relationship("TemplateModel", back_populates="owner")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email})>"
 
 
@@ -73,7 +74,7 @@ class GroupModel(BaseModel):
         overlaps="groups_member",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Group(id={self.id}, name={self.name})>"
 
 
@@ -93,7 +94,7 @@ class UserGroupsMembershipModel(BaseModel):
         )
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<UserGroup(user_id={self.user_id}, group_id={self.group_id}, role={self.role})>"
 
 
@@ -117,7 +118,7 @@ class DatasetModel(BaseModel):
 
     __table_args__ = (Index("ix_dataset_owner_id", "owner_id", postgresql_using="hash"),)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Dataset(id={self.id}, name={self.name}, user_id={self.owner_id})>"
 
 
@@ -139,7 +140,7 @@ class DatasetGroupAssociationModel(BaseModel):
     # This flag indicates that this is the main group and that related dataset can be shared with another group.
     is_primary: Mapped[bool] = mapped_column(default=True)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "<DatasetGroupAssociation("
             f"dataset_id={self.dataset_id}, group_id={self.group_id}, is_primary={self.is_primary}"
@@ -157,7 +158,7 @@ class ReactionModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     pb_reaction_id: Mapped[str]
     binpb: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
-    is_valid: Mapped[bool] = mapped_column(nullable=True)
+    is_valid: Mapped[bool | None] = mapped_column(nullable=True)
 
     dataset_id: Mapped[int] = mapped_column(ForeignKey("dataset.id", ondelete="CASCADE"))
     dataset: Mapped[DatasetModel] = relationship(DatasetModel, back_populates="reactions")
@@ -172,7 +173,7 @@ class ReactionModel(BaseModel):
         Index("ix_reaction_owner_id", "owner_id", postgresql_using="hash"),
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Reaction(id={self.id}, dataset_id={self.dataset_id}, name={self.pb_reaction_id})>"
 
     @property
@@ -191,5 +192,5 @@ class TemplateModel(BaseModel):
 
     __table_args__ = (Index("ix_template_owner_id", "owner_id", postgresql_using="hash"),)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Template(id={self.id}, name={self.name})>"

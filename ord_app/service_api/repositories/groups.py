@@ -43,7 +43,7 @@ class GroupRepository(BaseRepository[GroupModel]):
 
         return group
 
-    async def get_user_groups(self, user_id: int):
+    async def get_user_groups(self, user_id: int) -> list[dict]:
         stmt = (
             select(GroupModel, UserGroupsMembershipModel)
             .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
@@ -62,7 +62,7 @@ class GroupRepository(BaseRepository[GroupModel]):
 
 
 class GroupMembersRepository:
-    def __init__(self, db: AsyncSession, autocommit: bool = True):
+    def __init__(self, db: AsyncSession, autocommit: bool = True) -> None:
         self.db = db
         self.autocommit = autocommit
 
@@ -87,7 +87,7 @@ class GroupMembersRepository:
         )
         return (await self.db.scalars(stmt)).all()
 
-    async def add_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+    async def add_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)
         if autocommit:
@@ -95,7 +95,7 @@ class GroupMembersRepository:
             await self.db.commit()
             logger.debug(f"Member {user_id} added to {group_id} with role: {role}")
 
-    async def update_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+    async def update_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
         stmt = (
             update(UserGroupsMembershipModel)
             .where(
@@ -108,7 +108,7 @@ class GroupMembersRepository:
             await self.db.execute(stmt)
             await self.db.commit()
 
-    async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True):
+    async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)
         stmt = stmt.on_conflict_do_update(
@@ -121,7 +121,7 @@ class GroupMembersRepository:
             await self.db.commit()
             logger.debug(f"Members upsert: {value}")
 
-    async def remove_members(self, group_id, members_ids: list[int]):
+    async def remove_members(self, group_id, members_ids: list[int]) -> None:
         stmt = delete(UserGroupsMembershipModel).where(
             UserGroupsMembershipModel.group_id == group_id,
             UserGroupsMembershipModel.user_id.in_(members_ids),

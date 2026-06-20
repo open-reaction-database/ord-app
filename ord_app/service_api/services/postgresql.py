@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from collections.abc import AsyncIterator
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -25,6 +27,6 @@ pg_engine = create_async_engine(
 db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
 
 
-async def get_db_session():
+async def get_db_session() -> AsyncIterator[AsyncSession]:
     async with db_session_maker() as session:
         yield session

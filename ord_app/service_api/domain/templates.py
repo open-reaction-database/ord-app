@@ -26,7 +26,7 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 
 class TemplatesUseCase:
-    def __init__(self, db: AsyncSession, current_user: UserModel):
+    def __init__(self, db: AsyncSession, current_user: UserModel) -> None:
         self.db = db
         self.current_user = current_user
         self.template_repo = TemplateRepository(db)
@@ -43,13 +43,13 @@ class TemplatesUseCase:
             return template
         raise EntityNotFoundError("Template not found")
 
-    async def update(self, template_id: int, payload: TemplateUpdateModel):
+    async def update(self, template_id: int, payload: TemplateUpdateModel) -> TemplateModel:
         data = payload.model_dump(exclude_none=True)
         if template := await self.template_repo.update(data, id=template_id, owner_id=self.current_user.id):
             return template
         raise EntityNotFoundError("Template not found")
 
-    async def delete(self, template_id: int):
+    async def delete(self, template_id: int) -> int:
         if count := await self.template_repo.delete(id=template_id, owner_id=self.current_user.id):
             return count
         raise EntityNotFoundError("Template not found")

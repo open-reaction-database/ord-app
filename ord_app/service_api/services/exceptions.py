@@ -15,30 +15,30 @@ from fastapi import HTTPException, status
 
 
 class ProtobufDecodeError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, detail=detail, **kwargs)
 
 
 class UnauthenticatedError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_401_UNAUTHORIZED, detail=detail, **kwargs)
 
 
 class ForbiddenError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_403_FORBIDDEN, detail=detail, **kwargs)
 
 
 class EntityNotFoundError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_404_NOT_FOUND, detail=detail, **kwargs)
 
 
 class ConflictError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_409_CONFLICT, detail=detail, **kwargs)
 
 
 class UnprocessableEntityError(HTTPException):
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs) -> None:
         super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, **kwargs)

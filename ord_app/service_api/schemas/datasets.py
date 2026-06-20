@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+
 from base64 import b64decode
 from datetime import datetime
 from typing import Annotated, Any, Literal
@@ -55,7 +57,7 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
 
     @model_validator(mode="before")
     @classmethod
-    def reaction_count(cls, data: Any):  # noqa: F811
+    def reaction_count(cls, data: Any) -> Any:  # noqa: F811
         if isinstance(data, Row | tuple):
             _, rct_total, rct_invalid, rct_valid, rct_none = data
             # first element of the data is Dataset ORM object
@@ -87,7 +89,7 @@ class DatasetEnumerateCreateSchema(BaseSchema):
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")
-    def load_reactions(cls, raw):
+    def load_reactions(cls, raw) -> map[bytes]:
         return map(b64decode, raw)
 
 
@@ -95,7 +97,7 @@ class DatasetEnumerateExtendSchema(BaseSchema):
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")
-    def load_reactions(cls, raw):
+    def load_reactions(cls, raw) -> map[bytes]:
         return map(b64decode, raw)
 
 

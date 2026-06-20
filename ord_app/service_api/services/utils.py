@@ -13,22 +13,24 @@
 # limitations under the License.
 import asyncio
 from collections import OrderedDict
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
 
 class LRUCacheDict:
-    def __init__(self, maxsize=None):
+    def __init__(self, maxsize=None) -> None:
         self.maxsize = maxsize
         self._data = OrderedDict()
 
-    def get(self, key):
+    def get(self, key) -> Any:
         if key in self._data:
             value = self._data.pop(key)
             self._data[key] = value
             return value
         return None
 
-    def set(self, key, value):
+    def set(self, key, value) -> None:
         if key in self._data:
             self._data.pop(key)
             self._data[key] = value
@@ -38,13 +40,13 @@ class LRUCacheDict:
                 self._data.popitem(last=False)
 
 
-def alru_cache(maxsize=None):
-    def decorator(func):
+def alru_cache(maxsize=None) -> Callable:
+    def decorator(func) -> Callable:
         lock = asyncio.Lock()
         cache = LRUCacheDict(maxsize=maxsize)
 
         @wraps(func)
-        async def wrapped(*args, **kwargs):
+        async def wrapped(*args, **kwargs) -> Any:
             key = (args, frozenset(kwargs.items()))
             cached = cache.get(key)
             if cached is not None:

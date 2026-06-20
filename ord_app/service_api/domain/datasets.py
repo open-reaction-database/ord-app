@@ -27,7 +27,7 @@ from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import DatasetModel, GroupModel, UserModel
+from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, GroupModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import (
@@ -48,7 +48,7 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 
 class DatasetUseCases:
-    def __init__(self, db: AsyncSession, current_user: UserModel):
+    def __init__(self, db: AsyncSession, current_user: UserModel) -> None:
         self.db = db
         self.current_user = current_user
         self.dataset_repository = DatasetsRepository(db)
@@ -61,7 +61,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def enumerate(self, group_id, payload: DatasetEnumerateCreateSchema):
+    async def enumerate(self, group_id, payload: DatasetEnumerateCreateSchema) -> DatasetModel:
         dataset_payload = {"name": payload.name, "description": payload.description}
         dataset = await self.dataset_repository.create(group_id, self.current_user.id, dataset_payload)
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
@@ -71,7 +71,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema):
+    async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema) -> DatasetModel:
         dataset = await self.dataset_repository.get(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
@@ -89,7 +89,7 @@ class DatasetUseCases:
     async def get_dataset_groups(self, dataset_id: int) -> list[GroupModel]:
         return await self.dataset_repository.get_dataset_groups(dataset_id)
 
-    async def extend(self, dataset_id: int, file_data, kind):
+    async def extend(self, dataset_id: int, file_data, kind) -> DatasetModel | None:
         try:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -102,7 +102,7 @@ class DatasetUseCases:
 
         return dataset
 
-    async def upload(self, group_id: int, file_data, kind):
+    async def upload(self, group_id: int, file_data, kind) -> DatasetModel:
         try:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -121,7 +121,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def add_reactions(self, dataset, reactions):
+    async def add_reactions(self, dataset, reactions) -> None:
         seen_ids = set()
         reactions_ids = []
 
@@ -163,7 +163,7 @@ class DatasetUseCases:
 
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
-    async def paginate_user_datasets(self):
+    async def paginate_user_datasets(self) -> Page[DatasetModel]:
         return await self.dataset_repository.datasets_stmt(self.current_user.id)
 
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
@@ -174,7 +174,7 @@ class DatasetUseCases:
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
-    async def delete(self, dataset_id: int):
+    async def delete(self, dataset_id: int) -> None:
         return await self.dataset_repository.delete(dataset_id)
 
     async def download(self, dataset_id: int, file_format: DownloadFileFormats) -> tuple[DatasetModel, bytes]:
@@ -192,7 +192,9 @@ class DatasetUseCases:
         data = await run_in_threadpool(write_message, dataset_pb, kind=file_format)
         return dataset, data
 
-    async def share(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+    async def share(
+        self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema
+    ) -> DatasetGroupAssociationModel:
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError("Cannot share datasets with the same secondary group")
 
@@ -204,7 +206,7 @@ class DatasetUseCases:
 
         raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
 
-    async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema):
+    async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema) -> None:
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError("Cannot unshare datasets with the same secondary group")
 

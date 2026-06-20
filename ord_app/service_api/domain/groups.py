@@ -26,39 +26,41 @@ from ord_app.service_api.services.postgresql import get_db_session
 
 
 class GroupUseCases:
-    def __init__(self, db: AsyncSession, current_user: UserModel):
+    def __init__(self, db: AsyncSession, current_user: UserModel) -> None:
         self.db = db
         self.current_user = current_user
         self.group_repository = GroupRepository(db)
 
-    async def create(self, payload: GroupCreateSchema):
+    async def create(self, payload: GroupCreateSchema) -> dict:
         group = await self.group_repository.create(self.current_user.id, payload.model_dump(exclude_unset=True))
         # The creator is added as the group's admin (see GroupRepository.create). (#569)
         return {"id": group.id, "name": group.name, "role": "admin"}
 
-    async def get(self, group_id: int):
+    async def get(self, group_id: int) -> dict:
         group = await self.group_repository.get(id=group_id)
         if group is None:
             raise EntityNotFoundError(f"Group {group_id} not found")
         role = await self.group_repository.get_user_role(self.current_user.id, group_id)
         return {"id": group.id, "name": group.name, "role": role}
 
-    async def user_groups(self):
+    async def user_groups(self) -> list[dict]:
         return await self.group_repository.get_user_groups(self.current_user.id)
 
-    async def update(self, group_id: int, payload: GroupCreateSchema):
+    async def update(self, group_id: int, payload: GroupCreateSchema) -> dict:
         group = await self.group_repository.update(payload.model_dump(), id=group_id)
         if group is None:
             raise EntityNotFoundError(f"Group {group_id} not found")
         role = await self.group_repository.get_user_role(self.current_user.id, group_id)
         return {"id": group.id, "name": group.name, "role": role}
 
-    async def delete(self, group_id: int):
+    async def delete(self, group_id: int) -> None:
         await self.group_repository.delete(id=group_id)
 
 
 class GroupMembersUseCases:
-    def __init__(self, db: AsyncSession = Depends(get_db_session), current_user: UserModel = Depends(authenticate)):
+    def __init__(
+        self, db: AsyncSession = Depends(get_db_session), current_user: UserModel = Depends(authenticate)
+    ) -> None:
         self.db = db
         self.current_user = current_user
         self.group_members_repository = GroupMembersRepository(db)
@@ -67,19 +69,19 @@ class GroupMembersUseCases:
     async def all(self, group_id: int) -> Sequence[UserGroupsMembershipModel]:
         return await self.group_members_repository.all(group_id)
 
-    async def add_member(self, group_id: int, payload: GroupAddMemberSchema):
+    async def add_member(self, group_id: int, payload: GroupAddMemberSchema) -> UserGroupsMembershipModel | None:
         if user := await self.user_repository.search_user_by_identity(payload.identity):
             await self.group_members_repository.add_member(user.id, group_id, payload.role)
             return await self.group_members_repository.get(user.id, group_id)
         raise EntityNotFoundError(f"<User(identity={payload.identity})> not found")
 
-    async def update_member(self, group_id: int, payload: GroupUpdateMemberSchema):
+    async def update_member(self, group_id: int, payload: GroupUpdateMemberSchema) -> UserGroupsMembershipModel | None:
         if user := await self.user_repository.get(id=payload.user_id):
             await self.group_members_repository.update_member(user.id, group_id, payload.role)
             return await self.group_members_repository.get(user.id, group_id)
         raise EntityNotFoundError(f"<User(identity={payload.user_id})> not found")
 
-    async def remove_members(self, group_id: int, members_ids: list[int]):
+    async def remove_members(self, group_id: int, members_ids: list[int]) -> None:
         await self.group_members_repository.remove_members(group_id, members_ids)
 
 

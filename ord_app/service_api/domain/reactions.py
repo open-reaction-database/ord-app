@@ -49,7 +49,7 @@ from ord_app.service_api.services.pb_utils import (
 from ord_app.service_api.services.postgresql import get_db_session
 
 
-async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = None):
+async def validate_dataset_reactions(db: AsyncSession, dataset_id: int | None = None) -> None:
     reaction_repo = ReactionsRepository(db)
     async for reactions in reaction_repo.stream_reactions(chunk_size=1000, dataset_id=dataset_id):
         update_values = []
@@ -78,14 +78,14 @@ class CreateReactionsUseCases:
 class ReactionsUseCase:
     model = ReactionModel
 
-    def __init__(self, db: AsyncSession, current_user: UserModel):
+    def __init__(self, db: AsyncSession, current_user: UserModel) -> None:
         self.db = db
         self.current_user = current_user
         self.reaction_repo = ReactionsRepository(db)
         self.dataset_repo = DatasetsRepository(db)
 
     @staticmethod
-    def _enforce_attachment_limit(pb_reaction: Reaction):
+    def _enforce_attachment_limit(pb_reaction: Reaction) -> None:
         """Reject reactions whose cumulative file attachments exceed the size cap."""
         if total_attachment_size(pb_reaction) > MAX_REACTION_ATTACHMENTS_SIZE:
             raise UnprocessableEntityError(
@@ -93,7 +93,7 @@ class ReactionsUseCase:
                 f"{MAX_REACTION_ATTACHMENTS_SIZE // (1024 * 1024)} MB"
             )
 
-    async def _create_reaction(self, dataset_id: int, pb_reaction: Reaction):
+    async def _create_reaction(self, dataset_id: int, pb_reaction: Reaction) -> ReactionModel:
         self._enforce_attachment_limit(pb_reaction)
         # validate reaction id
         if len(pb_reaction.reaction_id) > MAX_CRITICAL_FIELD_LENGTH:
@@ -116,7 +116,7 @@ class ReactionsUseCase:
         db_reaction.validation = {"errors": errors, "warnings": warnings}
         return db_reaction
 
-    async def create(self, dataset_id: int, payload: ReactionCreateSchema):
+    async def create(self, dataset_id: int, payload: ReactionCreateSchema) -> ReactionModel:
         try:
             pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -131,7 +131,7 @@ class ReactionsUseCase:
         await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
-    async def create_from_scratch(self, dataset_id: int):
+    async def create_from_scratch(self, dataset_id: int) -> ReactionModel:
         person = Person(
             username=self.current_user.external_id,
             name=self.current_user.name,
@@ -146,7 +146,7 @@ class ReactionsUseCase:
         await self.dataset_repo.update_modified_at(dataset_id)
         return reaction
 
-    async def upload(self, dataset_id: int, file_data, kind):
+    async def upload(self, dataset_id: int, file_data, kind) -> ReactionModel:
         try:
             pb_reaction = cast(Reaction, await run_in_threadpool(load_message, file_data, Reaction, kind))
         except (DecodeError, JsonParseError, TextParseError) as e:
@@ -171,19 +171,19 @@ class ReactionsUseCase:
             self.reaction_repo.all_reactions_stmt(dataset_id, is_valid_query.model_dump(exclude_unset=True)),
         )
 
-    async def get(self, dataset_id: int, reaction_id: int):
+    async def get(self, dataset_id: int, reaction_id: int) -> ReactionModel:
         if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
             _, errors, warning = await async_validate_pb_reaction(reaction.pb)
             reaction.validation = {"errors": errors, "warnings": warning}
             return reaction
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
-    async def search(self, **kwargs):
+    async def search(self, **kwargs) -> ReactionModel:
         if reaction := await self.reaction_repo.get(**kwargs):
             return reaction
         raise EntityNotFoundError(f"Reaction with {kwargs} not found")
 
-    async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema):
+    async def update(self, dataset_id: int, reaction_id: int, payload: ReactionUpdateSchema) -> ReactionModel:
         pb_reaction = cast(Reaction, await run_in_threadpool(load_message, payload.binpb, Reaction, "binpb"))
         self._enforce_attachment_limit(pb_reaction)
         pb_reaction_id = (pb_reaction.reaction_id or "").strip()
@@ -219,11 +219,13 @@ class ReactionsUseCase:
         reaction.validation = {"errors": errors, "warnings": warning}
         return reaction
 
-    async def delete(self, dataset_id: int, reaction_id: int):
+    async def delete(self, dataset_id: int, reaction_id: int) -> None:
         await self.reaction_repo.delete(dataset_id=dataset_id, id=reaction_id)
         await self.dataset_repo.update_modified_at(dataset_id)
 
-    async def download(self, dataset_id: int, reaction_id: int, file_format: DownloadFileFormats):
+    async def download(
+        self, dataset_id: int, reaction_id: int, file_format: DownloadFileFormats
+    ) -> tuple[ReactionModel, bytes]:
         if reaction := await self.reaction_repo.get(id=reaction_id, dataset_id=dataset_id):
             reaction_pb = await run_in_threadpool(write_message, Reaction.FromString(reaction.binpb), kind=file_format)
             return reaction, reaction_pb
