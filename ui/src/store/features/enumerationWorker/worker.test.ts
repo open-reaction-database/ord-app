@@ -157,11 +157,28 @@ describe('value coercion by VariableType', () => {
     expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00');
   });
 
-  it('accepts a plain ISO date and common human-authored formats', () => {
-    for (const input of ['2025-04-01', '04/01/2025', '4/1/2025', '01.04.2025', 'April 1, 2025', 'Apr 1 2025']) {
+  it('accepts a plain ISO date, single-digit European, and common human-authored formats', () => {
+    for (const input of [
+      '2025-04-01',
+      '04/01/2025',
+      '4/1/2025',
+      '1.4.2025',
+      '01.04.2025',
+      'April 1, 2025',
+      'Apr 1 2025',
+    ]) {
       const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
       expect(result.errors).toEqual([]);
       expect(lastMergedTemplate().valueField).toBe('2025-04-01');
+    }
+  });
+
+  it('accepts timezone-offset ISO 8601 datetimes for a Date variable', () => {
+    // Valid ISO with a Z/offset/milliseconds was previously accepted by lenient dayjs; it must still be.
+    for (const input of ['2025-04-01T12:00:00Z', '2025-04-01T12:00:00+05:30', '2025-04-01T00:30:00.123Z']) {
+      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+      expect(result.errors).toEqual([]);
+      expect(lastMergedTemplate().valueField).toMatch(/^2025-(03-31|04-01)$/);
     }
   });
 
@@ -171,8 +188,9 @@ describe('value coercion by VariableType', () => {
   });
 
   it('rejects a garbage date that the lenient parser would silently coerce (#544)', () => {
-    // dayjs(value) without strict mode parses these as April 1 / month-overflow; strict mode must not.
-    for (const input of ['Aprillllll, 2025', 'MayMayMay, 2025', '2025-13-45']) {
+    // dayjs(value) without strict mode parses these as April 1 / month-overflow; we must not. The
+    // ISO-shaped values have out-of-range month/day, which the ISO regex bounds reject.
+    for (const input of ['Aprillllll, 2025', 'MayMayMay, 2025', '2025-13-45', '2025-00-10', '2025-04-32']) {
       const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
       expect(result.reactions).toEqual([]);
       expect(result.errors[0].message).toBe('Expected date value for variable v1');

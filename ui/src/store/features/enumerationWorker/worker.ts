@@ -39,17 +39,22 @@ import { DATE_FORMAT, DATE_TIME_FORMAT } from 'common/constants.ts';
 // 2025" into April 1 — see issue #544. Strict mode rejects anything that doesn't match a format.
 dayjs.extend(customParseFormat);
 
-// Date/date-time formats accepted for enumeration CSV cells. Covers the app's own output
-// (YYYY-MM-DD / ISO date-time) plus common human-authored formats. Extend this list if a legitimate
-// CSV format is rejected.
+// Strict ISO 8601 (the app's own output plus tz-aware inputs): date, optional time with optional
+// milliseconds, and an optional Z or ±HH:mm offset. Month/day ranges are bounded here because
+// dayjs's ISO parser would otherwise roll overflow values (e.g. 2025-13-45 → 2026-02-14). The 'Z'
+// offset token isn't honored by customParseFormat's strict mode, so ISO is gated by this regex and
+// parsed with dayjs's default (ISO) parser; non-ISO human formats go through the strict list below.
+const ISO_8601 =
+  /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])([T ]([01]\d|2[0-3]):[0-5]\d(:[0-5]\d(\.\d+)?)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)?)?$/;
+
+// Non-ISO date formats accepted for enumeration CSV cells: common human-authored formats (US slash,
+// European dot, and named-month). Extend this list if a legitimate CSV format is rejected.
 const ACCEPTED_DATE_FORMATS = [
-  'YYYY-MM-DD',
-  'YYYY-MM-DDTHH:mm:ss',
-  'YYYY-MM-DDTHH:mm',
   'YYYY/MM/DD',
   'MM/DD/YYYY',
   'M/D/YYYY',
   'DD.MM.YYYY',
+  'D.M.YYYY',
   'MMMM D, YYYY',
   'MMMM D YYYY',
   'MMM D, YYYY',
@@ -67,7 +72,7 @@ function getDateOrError(value: ValueType, variable: Variable): string {
   if (typeof value !== 'string') {
     throw produceValueTypeError('date', variable);
   }
-  const date = dayjs(value, ACCEPTED_DATE_FORMATS, true);
+  const date = ISO_8601.test(value) ? dayjs(value) : dayjs(value, ACCEPTED_DATE_FORMATS, true);
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }
