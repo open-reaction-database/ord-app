@@ -37,7 +37,12 @@ from ord_app.service_api.schemas.datasets import (
     DatasetShareCreateSchema,
     DownloadFileFormats,
 )
-from ord_app.service_api.services.exceptions import ForbiddenError, ProtobufDecodeError, UnprocessableEntityError
+from ord_app.service_api.services.exceptions import (
+    EntityNotFoundError,
+    ForbiddenError,
+    ProtobufDecodeError,
+    UnprocessableEntityError,
+)
 from ord_app.service_api.services.pb_utils import load_message, write_message
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -68,7 +73,8 @@ class DatasetUseCases:
 
     async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema):
         dataset = await self.dataset_repository.get(dataset_id)
-        assert dataset is not None  # existence enforced upstream by dataset_authorization
+        if dataset is None:
+            raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
         return dataset
 
@@ -163,7 +169,8 @@ class DatasetUseCases:
     async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
         dataset = await self.dataset_repository.get(dataset_id)
-        assert dataset is not None  # existence enforced upstream by dataset_authorization
+        if dataset is None:
+            raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
         return dataset
 
