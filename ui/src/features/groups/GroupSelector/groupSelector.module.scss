@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 
-/* Truncate long group names to the dropdown width instead of wrapping. */
+/* Truncate long group names to the dropdown width instead of overflowing it. Mantine lays the
+   options out in a flex column that grows to the widest option, and renders each option as a flex
+   row with the label in a child <span>; the row is otherwise clipped (without an ellipsis) by the
+   dropdown. Cap the options column and each row to the dropdown width and let the label shrink and
+   ellipsize. (#355) */
+.options,
+.options * {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .option {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.option span {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
