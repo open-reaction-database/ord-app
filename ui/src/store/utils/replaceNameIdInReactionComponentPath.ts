@@ -31,6 +31,7 @@ const findEntityByName = (name: string, reactionPart: NamedEntityMap): NamedEnti
 const findEntityById = (id: string, reactionPart: NamedEntityMap): NamedEntity =>
   Object.values(reactionPart).find(item => item.id === id)!;
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- pre-existing id<->name path mapping; flagged for a future refactor, not changed here
 export function replaceNameIdInReactionComponentPath(
   path: ReactionPathComponents,
   reaction: AppReaction,

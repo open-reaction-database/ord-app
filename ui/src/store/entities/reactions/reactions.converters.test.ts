@@ -70,6 +70,7 @@ describe('convertReactionFloatsToDoubles', () => {
   it('rounds floats to 7 significant figures in place', () => {
     const part = { value: 1.123456789 };
     convertReactionFloatsToDoubles(part);
+    // eslint-disable-next-line sonarjs/no-floating-point-equality -- asserting the exact rounded output is the point of this test
     expect(part.value).toBe(1.123457);
   });
 
@@ -89,6 +90,7 @@ describe('convertReactionFloatsToDoubles', () => {
   it('leaves bare numeric array elements untouched (only object properties are rounded)', () => {
     const part = { values: [1.123456789] };
     convertReactionFloatsToDoubles(part);
+    // eslint-disable-next-line sonarjs/no-floating-point-equality -- asserting the value is left exactly untouched is the point of this test
     expect(part.values[0]).toBe(1.123456789);
   });
 

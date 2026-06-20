@@ -57,7 +57,7 @@ describe('selectOrderedInputs', () => {
   });
 
   it('returns an empty array when the reaction has no inputs', () => {
-    expect(selectOrderedInputsWrapper('missing')(buildState({})).length).toBe(0);
+    expect(selectOrderedInputsWrapper('missing')(buildState({}))).toEqual([]);
   });
 });
 
