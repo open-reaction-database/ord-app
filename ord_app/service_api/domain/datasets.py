@@ -98,7 +98,8 @@ class DatasetUseCases:
             raise ProtobufDecodeError("An error occurred while reading the file.") from e
 
         dataset = await self.dataset_repository.get(dataset_id)
-        assert dataset is not None  # existence enforced upstream by dataset_authorization
+        if dataset is None:
+            raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.add_reactions(dataset, dataset_pb.reactions)
         dataset = await self.dataset_repository.update_modified_at(dataset_id)
 
