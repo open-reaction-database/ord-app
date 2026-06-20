@@ -50,7 +50,7 @@ export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase
       </Flex>
       <Flex
         align="center"
-        justify="center"
+        justify="flex-start"
         className={clsx(classes.preview, classes.imagePreview)}
       >
         <ReactionComponentPreview previewState={previewState[component.id]} />

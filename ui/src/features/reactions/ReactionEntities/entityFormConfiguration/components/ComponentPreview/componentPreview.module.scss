@@ -15,7 +15,9 @@
  */
 .previewWrapper {
   display: flex;
-  justify-content: center;
+
+  /* Left-align so the structure isn't shifted right of the otherwise left-aligned sidebar form. (#605) */
+  justify-content: flex-start;
   align-items: center;
 
   &,
