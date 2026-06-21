@@ -19,12 +19,17 @@ import { ReactionEntityCustom } from './ReactionEntityCustom.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormCustom } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-const Custom = ({ name }: Readonly<{ name: string }>) => <div data-testid="custom">{name}</div>;
+const Custom = ({ name }: Readonly<{ name: string }>) => (
+  <div data-testid="custom">{name}</div>
+);
 const formMethods = {} as ReactionEntityNodeProps<ReactionFormCustom>['formMethods'];
 
 describe('ReactionEntityCustom', () => {
   it('renders the node-supplied Component with the node name', () => {
-    const node = { name: 'my-field', Component: Custom } as unknown as ReactionFormCustom;
+    const node = {
+      name: 'my-field',
+      Component: Custom,
+    } as unknown as ReactionFormCustom;
     const { getByTestId } = renderWithMantine(
       <ReactionEntityCustom
         node={node}

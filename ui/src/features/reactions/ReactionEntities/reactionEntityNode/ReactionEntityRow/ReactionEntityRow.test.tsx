@@ -60,6 +60,8 @@ describe('ReactionEntityRow', () => {
         formMethods={formMethods}
       />,
     );
-    expect(getByTestId('base-node').parentElement).toHaveStyle({ gridTemplateColumns: 'repeat(3, 1fr)' });
+    expect(getByTestId('base-node').parentElement).toHaveStyle({
+      gridTemplateColumns: 'repeat(3, 1fr)',
+    });
   });
 });

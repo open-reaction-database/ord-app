@@ -18,9 +18,11 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 
 const { createAction } = createActionFactory('reactionForm');
 
-export const setReactionPathComponentsList = createAction<Array<ReactionPathComponents>>('set_list');
+export const setReactionPathComponentsList =
+  createAction<Array<ReactionPathComponents>>('set_list');
 
-export const addReactionPathComponentToList = createAction<ReactionPathComponents>('add_to_list');
+export const addReactionPathComponentToList =
+  createAction<ReactionPathComponents>('add_to_list');
 
 export const popReactionPathComponents = createAction<void>('pop_from_list');
 

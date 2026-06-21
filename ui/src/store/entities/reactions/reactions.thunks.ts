@@ -28,7 +28,12 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type { AppReaction, ReactionId, ReactionResponse, UpdateReactionSuccessPayload } from './reactions.types.ts';
+import type {
+  AppReaction,
+  ReactionId,
+  ReactionResponse,
+  UpdateReactionSuccessPayload,
+} from './reactions.types.ts';
 import {
   selectActiveDatasetId,
   selectReactionById,
@@ -45,66 +50,91 @@ import { handleApiError } from 'store/utils/handleApiError.ts';
 import { getDataset } from '../datasets/datasets.thunks.ts';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
-import { getReactionPreviews, parseReaction, parseReactionList, parseValidation } from './reactions.utils.ts';
+import {
+  getReactionPreviews,
+  parseReaction,
+  parseReactionList,
+  parseValidation,
+} from './reactions.utils.ts';
 
-export const getReactionsList = createThunk(getReactionsListActions, datasetId => async (_d, getState) => {
-  try {
+export const getReactionsList = createThunk(
+  getReactionsListActions,
+  datasetId => async (_d, getState) => {
+    try {
+      const state = getState();
+      const currentPage = selectReactionsPagination(state);
+      const showInvalidOnly = state.entities.reactions.showInvalidOnly;
+      const params = {
+        page: currentPage.page,
+        size: currentPage.size,
+        is_valid: showInvalidOnly ? false : undefined,
+      };
+      const response = await axiosInstance.get<Pages<ReactionResponse>>(
+        `/datasets/${datasetId}/reactions`,
+        { params },
+      );
+
+      return getReactionsListActions.success(parseReactionList(response.data));
+    } catch (error) {
+      return getReactionsListActions.failure(handleApiError(error));
+    }
+  },
+);
+
+export const getReactionsPage = createThunk(
+  getReactionPageActions,
+  () => async (_d, getState) => {
     const state = getState();
     const currentPage = selectReactionsPagination(state);
+    const datasetId = selectActiveDatasetId(state);
     const showInvalidOnly = state.entities.reactions.showInvalidOnly;
+
     const params = {
       page: currentPage.page,
       size: currentPage.size,
       is_valid: showInvalidOnly ? false : undefined,
     };
-    const response = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
 
-    return getReactionsListActions.success(parseReactionList(response.data));
-  } catch (error) {
-    return getReactionsListActions.failure(handleApiError(error));
-  }
-});
-
-export const getReactionsPage = createThunk(getReactionPageActions, () => async (_d, getState) => {
-  const state = getState();
-  const currentPage = selectReactionsPagination(state);
-  const datasetId = selectActiveDatasetId(state);
-  const showInvalidOnly = state.entities.reactions.showInvalidOnly;
-
-  const params = {
-    page: currentPage.page,
-    size: currentPage.size,
-    is_valid: showInvalidOnly ? false : undefined,
-  };
-
-  const result = await axiosInstance.get<Pages<ReactionResponse>>(`/datasets/${datasetId}/reactions`, { params });
-  return getReactionPageActions.success(parseReactionList(result.data));
-});
+    const result = await axiosInstance.get<Pages<ReactionResponse>>(
+      `/datasets/${datasetId}/reactions`,
+      { params },
+    );
+    return getReactionPageActions.success(parseReactionList(result.data));
+  },
+);
 
 // TODO only update metadata when reaction is already in the store
-export const getReaction = createThunk(getReactionActions, ({ reactionId }) => async (dispatch, getState) => {
-  try {
-    const state = getState();
-    const datasetId = selectActiveDatasetId(state);
-    const dataset = selectDatasetById(datasetId)(getState());
+export const getReaction = createThunk(
+  getReactionActions,
+  ({ reactionId }) =>
+    async (dispatch, getState) => {
+      try {
+        const state = getState();
+        const datasetId = selectActiveDatasetId(state);
+        const dataset = selectDatasetById(datasetId)(getState());
 
-    if (!dataset) {
-      dispatch(getDataset(datasetId));
-    }
+        if (!dataset) {
+          dispatch(getDataset(datasetId));
+        }
 
-    const response = await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/${reactionId}`);
-    const parsedReaction = parseReaction(response.data);
-    return getReactionActions.success(parsedReaction);
-  } catch (error) {
-    return getReactionActions.failure(handleApiError(error));
-  }
-});
+        const response = await axiosInstance.get<ReactionResponse>(
+          `/datasets/${datasetId}/reactions/${reactionId}`,
+        );
+        const parsedReaction = parseReaction(response.data);
+        return getReactionActions.success(parsedReaction);
+      } catch (error) {
+        return getReactionActions.failure(handleApiError(error));
+      }
+    },
+);
 
 export const createEmptyReaction = createThunkWithExplicitResult(
   createEmptyReactionActions,
   () => async (dispatch, getState) => {
     const datasetId = selectActiveDatasetId(getState());
-    const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/from-scratch`);
+    const result = await axiosInstance.post<ReactionResponse>(
+      `/datasets/${datasetId}/reactions/from-scratch`,
+    );
     const reaction = parseReaction(result.data);
     dispatch(createEmptyReactionActions.success(reaction));
     navigate(`/datasets/${datasetId}/reactions/${reaction.id}`);
@@ -119,29 +149,42 @@ export const importReactionFromFile = createThunkWithExplicitResult(
       const formData = new FormData();
       formData.append('file', file);
 
-      const result = await axiosInstance.post<ReactionResponse>(`/datasets/${datasetId}/reactions/upload`, formData);
+      const result = await axiosInstance.post<ReactionResponse>(
+        `/datasets/${datasetId}/reactions/upload`,
+        formData,
+      );
       const reaction = parseReaction(result.data);
       dispatch(importReactionFromFileActions.success(reaction));
       navigate(`/datasets/${datasetId}/reactions/${reaction.id}`);
     },
 );
 
-async function updateReaction(reactionId: ReactionId, getState: () => AppState): Promise<UpdateReactionSuccessPayload> {
+async function updateReaction(
+  reactionId: ReactionId,
+  getState: () => AppState,
+): Promise<UpdateReactionSuccessPayload> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const ordReaction = reactionToOrdReaction(reaction.data);
-  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
+    'base64',
+  );
   const {
     binpb: _,
     molblocks,
     validation,
     ...reactionMetadata
   } = (
-    await axiosInstance.patch<ReactionResponse>(`datasets/${datasetId}/reactions/${reactionId}`, {
-      binpb: payload,
-    })
+    await axiosInstance.patch<ReactionResponse>(
+      `datasets/${datasetId}/reactions/${reactionId}`,
+      {
+        binpb: payload,
+      },
+    )
   ).data;
-  const updatedValidation = validation ? parseValidation(validation, reaction.data) : null;
+  const updatedValidation = validation
+    ? parseValidation(validation, reaction.data)
+    : null;
   return {
     ...reactionMetadata,
     previews: getReactionPreviews(reaction.data, molblocks),
@@ -149,17 +192,26 @@ async function updateReaction(reactionId: ReactionId, getState: () => AppState):
   };
 }
 
-export const renameReaction = createThunk(renameReactionActions, ({ reactionId, name }) => async (_d, getState) => {
-  const datasetId = selectActiveDatasetId(getState());
-  const reaction = selectReactionById(reactionId)(getState());
-  const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
-  const ordReaction = reactionToOrdReaction(updatedReaction);
-  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
-  await axiosInstance.patch<ReactionResponse>(`datasets/${datasetId}/reactions/${reactionId}`, {
-    binpb: payload,
-  });
-  return renameReactionActions.success({ reactionId, name });
-});
+export const renameReaction = createThunk(
+  renameReactionActions,
+  ({ reactionId, name }) =>
+    async (_d, getState) => {
+      const datasetId = selectActiveDatasetId(getState());
+      const reaction = selectReactionById(reactionId)(getState());
+      const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
+      const ordReaction = reactionToOrdReaction(updatedReaction);
+      const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
+        'base64',
+      );
+      await axiosInstance.patch<ReactionResponse>(
+        `datasets/${datasetId}/reactions/${reactionId}`,
+        {
+          binpb: payload,
+        },
+      );
+      return renameReactionActions.success({ reactionId, name });
+    },
+);
 
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
@@ -168,9 +220,15 @@ export const addUpdateReactionField = createThunkWithExplicitResult(
       try {
         const result = await updateReaction(reactionId, getState);
         dispatch(addUpdateReactionFieldActions.success(result));
-        showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+        showNotification({
+          message: 'Reaction updated.',
+          variant: NotificationVariant.SUCCESS,
+        });
       } catch (e) {
-        showNotification({ message: 'Failed to update reaction.', variant: NotificationVariant.ERROR });
+        showNotification({
+          message: 'Failed to update reaction.',
+          variant: NotificationVariant.ERROR,
+        });
         throw e;
       }
     },
@@ -182,7 +240,10 @@ export const deleteReactionField = createThunkWithExplicitResult(
     async (dispatch, getState) => {
       const result = await updateReaction(reactionId, getState);
       dispatch(deleteReactionFieldActions.success(result));
-      showNotification({ message: 'Reaction updated.', variant: NotificationVariant.SUCCESS });
+      showNotification({
+        message: 'Reaction updated.',
+        variant: NotificationVariant.SUCCESS,
+      });
     },
 );
 
@@ -212,9 +273,12 @@ export const searchReaction = createThunkWithExplicitResult(
     const datasetId = selectActiveDatasetId(getState());
     try {
       const result = (
-        await axiosInstance.get<ReactionResponse>(`/datasets/${datasetId}/reactions/search`, {
-          params: { pb_reaction_id: reactionPbId.trim() },
-        })
+        await axiosInstance.get<ReactionResponse>(
+          `/datasets/${datasetId}/reactions/search`,
+          {
+            params: { pb_reaction_id: reactionPbId.trim() },
+          },
+        )
       ).data;
       const parsedReaction = parseReaction(result);
       dispatch(searchReactionActions.success(parsedReaction));

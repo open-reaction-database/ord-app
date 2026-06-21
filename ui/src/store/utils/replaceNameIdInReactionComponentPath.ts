@@ -18,9 +18,19 @@ import type { ReactionPathComponents } from '../../common/types/reaction/reactio
 import type { WithIdName } from '../entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { getDeepReactionPart } from '../entities/reactions/reactions.utils.ts';
 
-const mapKeys = new Set(['inputs', 'analyses', 'features', 'analysisData', 'automationCode']);
+const mapKeys = new Set([
+  'inputs',
+  'analyses',
+  'features',
+  'analysisData',
+  'automationCode',
+]);
 
-const conditionsWithMeasurements = new Set(['temperature', 'electrochemistry', 'pressure']);
+const conditionsWithMeasurements = new Set([
+  'temperature',
+  'electrochemistry',
+  'pressure',
+]);
 
 type NamedEntity = WithIdName<unknown>;
 type NamedEntityMap = Record<string, NamedEntity>;

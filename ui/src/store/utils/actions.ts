@@ -16,9 +16,11 @@
 import { createAction } from '@reduxjs/toolkit';
 import type { AsyncAction, CreateActionFactory } from 'common/types';
 
-export function createAsyncAction<RequestPayload, SuccessPayload, FailurePayload = Error>(
-  type: string,
-): AsyncAction<RequestPayload, SuccessPayload, FailurePayload> {
+export function createAsyncAction<
+  RequestPayload,
+  SuccessPayload,
+  FailurePayload = Error,
+>(type: string): AsyncAction<RequestPayload, SuccessPayload, FailurePayload> {
   return {
     request: createAction<RequestPayload>(`${type}/request`),
     success: createAction<SuccessPayload>(`${type}/success`),

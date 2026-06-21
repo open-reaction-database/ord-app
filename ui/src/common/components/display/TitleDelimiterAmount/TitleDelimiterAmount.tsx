@@ -25,7 +25,11 @@ interface TitleDelimiterAmountProps {
   titleOrder?: TitleOrder;
 }
 
-export function TitleDelimiterAmount({ title, amount, titleOrder = 3 }: Readonly<TitleDelimiterAmountProps>) {
+export function TitleDelimiterAmount({
+  title,
+  amount,
+  titleOrder = 3,
+}: Readonly<TitleDelimiterAmountProps>) {
   return (
     <>
       <Title order={titleOrder}>{title}</Title>

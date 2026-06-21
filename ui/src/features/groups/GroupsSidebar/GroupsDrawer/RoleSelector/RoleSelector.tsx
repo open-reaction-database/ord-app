@@ -27,9 +27,15 @@ interface RoleSelectorProps {
   disabled?: boolean;
 }
 
-export function RoleSelector({ value, onChange, onRemove, disabled }: Readonly<RoleSelectorProps>) {
+export function RoleSelector({
+  value,
+  onChange,
+  onRemove,
+  disabled,
+}: Readonly<RoleSelectorProps>) {
   const [opened, { open, close }] = useDisclosure(false);
-  const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
+  const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
+    useDisclosure(false);
   const roles = Object.values(USER_ROLES);
 
   const handleMenuClose = () => {
@@ -81,7 +87,9 @@ export function RoleSelector({ value, onChange, onRemove, disabled }: Readonly<R
               className={isSelected ? classes.selectedOption : undefined}
               key={role}
               onClick={() => handleRoleChange(role)}
-              leftSection={isSelected ? <CheckIcon /> : <div className={classes.iconPlaceholder} />}
+              leftSection={
+                isSelected ? <CheckIcon /> : <div className={classes.iconPlaceholder} />
+              }
             >
               {role}
             </Menu.Item>

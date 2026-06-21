@@ -16,7 +16,10 @@
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { FC } from 'react';
 import type { ReactionEntityTitleProps } from 'features/reactions/ReactionEntities/ReactionEntityTitle/reactionEntityTitle.types.ts';
-import type { ReactionId, ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  ReactionId,
+  ReactionNodeEntity,
+} from 'store/entities/reactions/reactions.types.ts';
 
 export interface ReactionSidebarInfo {
   pathComponents: ReactionPathComponents;

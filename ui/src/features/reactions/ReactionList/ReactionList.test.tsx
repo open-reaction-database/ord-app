@@ -25,7 +25,13 @@ const stateWithPendingCount = (none: number) =>
     entities: {
       reactions: { activeDatasetId: 1 },
       datasets: {
-        datasetsById: { 1: { id: 1, groups: [], reactions_count: { total: 4, invalid: 1, valid: 3 - none, none } } },
+        datasetsById: {
+          1: {
+            id: 1,
+            groups: [],
+            reactions_count: { total: 4, invalid: 1, valid: 3 - none, none },
+          },
+        },
       },
     },
   }) as unknown as Partial<AppState>;

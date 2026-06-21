@@ -18,7 +18,8 @@ import { selectSelf } from './users.selectors.ts';
 import type { User } from './users.types.ts';
 import type { AppState } from '../../configureAppStore.ts';
 
-const buildState = (self: User | null): AppState => ({ entities: { users: { self } } }) as unknown as AppState;
+const buildState = (self: User | null): AppState =>
+  ({ entities: { users: { self } } }) as unknown as AppState;
 
 describe('selectSelf', () => {
   it('returns null when no user is authenticated', () => {

@@ -26,7 +26,10 @@ import {
 
 describe('temperature measurement converters', () => {
   it('assigns an id, maps the type to a name, and carries details', () => {
-    const result = ordTemperatureMeasurementToReaction({ type: undefined, details: 'thermocouple' });
+    const result = ordTemperatureMeasurementToReaction({
+      type: undefined,
+      details: 'thermocouple',
+    });
     expect(typeof result.id).toBe('string');
     expect(typeof result.type).toBe('string');
     expect(result.details).toBe('thermocouple');
@@ -44,7 +47,10 @@ describe('temperature measurement converters', () => {
 
 describe('pressure measurement converters', () => {
   it('round-trips type/details through ord', () => {
-    const reaction = ordPressureMeasurementToReaction({ type: undefined, details: 'gauge' });
+    const reaction = ordPressureMeasurementToReaction({
+      type: undefined,
+      details: 'gauge',
+    });
     expect(typeof reaction.id).toBe('string');
     const ord = reactionPressureMeasurementToOrd(reaction);
     expect(typeof ord.type).toBe('number');

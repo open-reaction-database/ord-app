@@ -37,7 +37,8 @@ import { ReactionNodeValidationResult } from 'features/reactions/ReactionInterac
 
 const useSelectData = buildUseSelectItems('components');
 
-const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
+const renderDetails = ({ amount }: ReactionInputComponent) =>
+  amount ? renderValuePrecisionUnit(amount) : '';
 
 export function InputsComponentList() {
   const dispatch = useAppDispatch();
@@ -47,9 +48,17 @@ export function InputsComponentList() {
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {
-    const newComponent = ordInputComponentToReaction(ord.Compound.toObject(new ord.Compound()));
+    const newComponent = ordInputComponentToReaction(
+      ord.Compound.toObject(new ord.Compound()),
+    );
     const newPath = [...pathComponents, 'components', length];
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newPath, newValue: newComponent }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: newPath,
+        newValue: newComponent,
+      }),
+    );
     dispatch(addReactionPathComponentToList(newPath));
   }, [dispatch, reactionId, pathComponents, length]);
 

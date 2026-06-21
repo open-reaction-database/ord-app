@@ -38,7 +38,10 @@ const renderItem = (input: ReactionInputWithoutName) =>
 
 describe('InputComponentsListItem', () => {
   it('shows the empty state when the input has no components', () => {
-    const { getByText } = renderItem({ id: 'in1', components: [] } as unknown as ReactionInputWithoutName);
+    const { getByText } = renderItem({
+      id: 'in1',
+      components: [],
+    } as unknown as ReactionInputWithoutName);
     expect(getByText('Input 1')).toBeInTheDocument();
     expect(getByText('There are no Components yet')).toBeInTheDocument();
   });

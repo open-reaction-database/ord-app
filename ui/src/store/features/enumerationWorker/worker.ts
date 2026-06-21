@@ -21,7 +21,10 @@ import type {
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import { type Variable, VariableType } from 'store/entities/templates/templates.types.ts';
+import {
+  type Variable,
+  VariableType,
+} from 'store/entities/templates/templates.types.ts';
 import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
@@ -86,7 +89,9 @@ function getDateOrError(value: ValueType, variable: Variable): string {
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }
-  return variable.type === VariableType.Date ? date.format(DATE_FORMAT) : date.format(DATE_TIME_FORMAT);
+  return variable.type === VariableType.Date
+    ? date.format(DATE_FORMAT)
+    : date.format(DATE_TIME_FORMAT);
 }
 
 function getSelectOrError(value: ValueType, variable: Variable): string {
@@ -115,7 +120,10 @@ function getNumberArrayOrError(value: ValueType, variable: Variable): Array<numb
   return values;
 }
 
-function getVariableValueOrError(variable: Variable, value: ValueType): string | number | Array<number> {
+function getVariableValueOrError(
+  variable: Variable,
+  value: ValueType,
+): string | number | Array<number> {
   switch (variable.type) {
     case VariableType.String: {
       if (typeof value !== 'string') {
@@ -150,10 +158,14 @@ function enumerateReaction(
   let updatedTemplate = structuredClone(template);
   variables.forEach((variable: Variable) => {
     const { name, path } = variable;
-    const columnName = matching.find(item => item.variable === name)!.csvColumn as string;
+    const columnName = matching.find(item => item.variable === name)!
+      .csvColumn as string;
     const value = getVariableValueOrError(variable, templateCSVRow[columnName]);
 
-    updatedTemplate = deepMergeWithArrayMerge(updatedTemplate, generateDeepPartialReactionByPath(path, value));
+    updatedTemplate = deepMergeWithArrayMerge(
+      updatedTemplate,
+      generateDeepPartialReactionByPath(path, value),
+    );
   });
   const ordReaction = reactionToOrdReaction(updatedTemplate);
   return Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
@@ -163,7 +175,13 @@ onmessage = event => {
   if (typeof event.data !== 'object') {
     return;
   }
-  const { data, variables, templateCSV, matching, index: baseIndex } = event.data as EnumerationBatchRequest;
+  const {
+    data,
+    variables,
+    templateCSV,
+    matching,
+    index: baseIndex,
+  } = event.data as EnumerationBatchRequest;
   const template = structuredClone(data);
   template.reactionId = null;
   const templateCSVRows = templateCSV.content;
@@ -172,7 +190,9 @@ onmessage = event => {
 
   for (let index = 0; index < templateCSVRows.length; index++) {
     try {
-      reactions = reactions.concat(enumerateReaction(template, variables, matching, templateCSVRows[index]));
+      reactions = reactions.concat(
+        enumerateReaction(template, variables, matching, templateCSVRows[index]),
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: Error | any) {
       errors = errors.concat({

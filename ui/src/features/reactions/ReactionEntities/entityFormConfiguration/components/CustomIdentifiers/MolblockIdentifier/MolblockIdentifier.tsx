@@ -29,7 +29,12 @@ interface MolblockIdentifierProps {
   onEdit: (index: number) => void;
 }
 
-export function MolblockIdentifier({ identifier, itemKey, index, onEdit }: Readonly<MolblockIdentifierProps>) {
+export function MolblockIdentifier({
+  identifier,
+  itemKey,
+  index,
+  onEdit,
+}: Readonly<MolblockIdentifierProps>) {
   const { ViewDeleteButtonsComponent } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
   return (

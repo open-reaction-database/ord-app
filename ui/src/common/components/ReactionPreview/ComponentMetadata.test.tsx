@@ -31,18 +31,26 @@ describe('ComponentMetadata', () => {
   });
 
   it('renders nothing identifying when there is no NAME identifier', () => {
-    const component = { identifiers: [{ type: 'SMILES', value: 'O' }] } as unknown as ReactionInputComponent;
+    const component = {
+      identifiers: [{ type: 'SMILES', value: 'O' }],
+    } as unknown as ReactionInputComponent;
     renderWithMantine(<ComponentMetadata component={component} />);
     expect(screen.queryByText('O')).toBeNull();
   });
 
   it('shows the "Limiting reactant" badge only when isLimiting is True (#487)', () => {
-    const limiting = { identifiers: [], isLimiting: 'True' } as unknown as ReactionInputComponent;
+    const limiting = {
+      identifiers: [],
+      isLimiting: 'True',
+    } as unknown as ReactionInputComponent;
     const { unmount } = renderWithMantine(<ComponentMetadata component={limiting} />);
     expect(screen.getByText('Limiting reactant')).toBeInTheDocument();
     unmount();
 
-    const notLimiting = { identifiers: [], isLimiting: 'False' } as unknown as ReactionInputComponent;
+    const notLimiting = {
+      identifiers: [],
+      isLimiting: 'False',
+    } as unknown as ReactionInputComponent;
     renderWithMantine(<ComponentMetadata component={notLimiting} />);
     expect(screen.queryByText('Limiting reactant')).toBeNull();
   });

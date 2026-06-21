@@ -38,7 +38,9 @@ interface ReactionNodeValidationTooltipContentProps {
   messages: Array<ErrorWarningMessageWithPath>;
 }
 
-function ReactionNodeValidationTooltipContent({ messages }: Readonly<ReactionNodeValidationTooltipContentProps>) {
+function ReactionNodeValidationTooltipContent({
+  messages,
+}: Readonly<ReactionNodeValidationTooltipContentProps>) {
   return (
     <Flex
       direction="column"
@@ -53,7 +55,9 @@ function ReactionNodeValidationTooltipContent({ messages }: Readonly<ReactionNod
           wrap="wrap"
           gap="xs"
         >
-          {message.path.length > 0 && <Text className={classes.path}>{message.path.join('.')}:</Text>}
+          {message.path.length > 0 && (
+            <Text className={classes.path}>{message.path.join('.')}:</Text>
+          )}
           <Text>{message.text}.</Text>
         </Flex>
       ))}
@@ -123,7 +127,9 @@ export function ReactionNodeValidationResultDisplay({
   ) : null;
 }
 
-export function ReactionNodeValidationResult({ pathComponents }: Readonly<ReactionNodeValidationResultProps>) {
+export function ReactionNodeValidationResult({
+  pathComponents,
+}: Readonly<ReactionNodeValidationResultProps>) {
   const { reactionId } = useContext(reactionContext);
   const reaction = useSelector(selectReactionById(reactionId));
 

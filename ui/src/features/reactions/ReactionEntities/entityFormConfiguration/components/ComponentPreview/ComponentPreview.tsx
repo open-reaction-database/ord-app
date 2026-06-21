@@ -26,7 +26,9 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 export function ComponentPreview() {
   const { reactionId } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const component: ReactionInputComponent = useSelector(selectReactionPartByPath(reactionId, pathComponents));
+  const component: ReactionInputComponent = useSelector(
+    selectReactionPartByPath(reactionId, pathComponents),
+  );
   const previewStates = useSelector(selectPreviewsByIdsWrapper([component.id]));
   return (
     <div className={classes.previewWrapper}>

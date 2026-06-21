@@ -18,7 +18,10 @@ import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import { ReactionEntityBaseNode } from '../ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 import type { ReactionFormGroup } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-export function ReactionEntityGroup({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormGroup>>) {
+export function ReactionEntityGroup({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormGroup>>) {
   return (
     <InputGroup>
       {node.fields.map((field, index) => (

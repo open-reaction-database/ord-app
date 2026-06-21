@@ -29,7 +29,9 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 const ENTITY_FIELD = 'setup';
 
 export function Setup({ reactionId }: ReactionViewSectionProps) {
-  const setup: ReactionSetup = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const setup: ReactionSetup = useSelector(
+    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
+  );
 
   return (
     <Flex direction="column">
@@ -68,7 +70,10 @@ export function Setup({ reactionId }: ReactionViewSectionProps) {
             title={item => `Automation Code ${item.name}`}
             requiredFields={[
               { label: 'Type', render: (entity: AppData) => entity.data.type },
-              { label: 'Value', render: (entity: AppData) => <AppDataDisplay appData={entity} /> },
+              {
+                label: 'Value',
+                render: (entity: AppData) => <AppDataDisplay appData={entity} />,
+              },
               { label: 'Description', render: (entity: AppData) => entity.description },
             ]}
             entity={automationCode}

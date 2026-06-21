@@ -46,7 +46,10 @@ import {
   reactionVesselAttachmentToOrd,
   reactionVesselPreparationToOrd,
 } from './reactionSetup/reactionSetup.converter.ts';
-import { ordNotesToReaction, reactionNotesToOrd } from './reactionNotes/reactionNotes.converters.ts';
+import {
+  ordNotesToReaction,
+  reactionNotesToOrd,
+} from './reactionNotes/reactionNotes.converters.ts';
 import {
   ordInputComponentToReaction,
   ordMeasurementToReaction,
@@ -57,7 +60,10 @@ import {
   reactionPreparationToOrd,
   reactionProductToOrd,
 } from './reactionComponent/reactionComponent.converters.ts';
-import { ordDataToReaction, reactionDataToOrd } from './reactionData/reactionData.converters.ts';
+import {
+  ordDataToReaction,
+  reactionDataToOrd,
+} from './reactionData/reactionData.converters.ts';
 import {
   ordObservationToReaction,
   reactionObservationToOrd,
@@ -78,13 +84,27 @@ import {
   reactionPressureMeasurementToOrd,
   reactionTemperatureMeasurementToOrd,
 } from './reactionConditions/reactionConditions.converter.ts';
-import { ordWorkupToReaction, reactionWorkupToOrd } from './reactionWorkups/reactionWorkups.converters.ts';
+import {
+  ordWorkupToReaction,
+  reactionWorkupToOrd,
+} from './reactionWorkups/reactionWorkups.converters.ts';
 
-const additionalEntityNames = ['analysisData', 'authenticStandard', 'molBlockIdentifiers', 'automationCode'];
+const additionalEntityNames = [
+  'analysisData',
+  'authenticStandard',
+  'molBlockIdentifiers',
+  'automationCode',
+];
 
-export const allowedNodeEntityNames: Array<string> = [...Object.values(ReactionNodeEntity), ...additionalEntityNames];
+export const allowedNodeEntityNames: Array<string> = [
+  ...Object.values(ReactionNodeEntity),
+  ...additionalEntityNames,
+];
 
-export const ordToReactionConvertersByNodeEntity: Record<ReactionNodeEntity, OrdToReactionEntityConverter> = {
+export const ordToReactionConvertersByNodeEntity: Record<
+  ReactionNodeEntity,
+  OrdToReactionEntityConverter
+> = {
   [ReactionNodeEntity.Inputs]: {
     hasName: true,
     convert: ordInputToReaction,
@@ -183,7 +203,10 @@ export const ordToReactionConvertersByNodeEntity: Record<ReactionNodeEntity, Ord
   },
 };
 
-export const reactionToOrdConvertersByNodeEntity: Record<ReactionNodeEntity, ReactionToOrdEntityConverter> = {
+export const reactionToOrdConvertersByNodeEntity: Record<
+  ReactionNodeEntity,
+  ReactionToOrdEntityConverter
+> = {
   [ReactionNodeEntity.Inputs]: reactionInputToOrd,
   [ReactionNodeEntity.Input]: reactionInputWithoutNameToOrd,
   [ReactionNodeEntity.Outcomes]: reactionOutcomeToOrd,
@@ -204,7 +227,8 @@ export const reactionToOrdConvertersByNodeEntity: Record<ReactionNodeEntity, Rea
   [ReactionNodeEntity.Conditions]: reactionConditionsToOrd,
   [ReactionNodeEntity.Workups]: reactionWorkupToOrd,
   [ReactionNodeEntity.TemperatureMeasurements]: reactionTemperatureMeasurementToOrd,
-  [ReactionNodeEntity.ElectrochemistryMeasurements]: reactionElectrochemistryMeasurementToOrd,
+  [ReactionNodeEntity.ElectrochemistryMeasurements]:
+    reactionElectrochemistryMeasurementToOrd,
   [ReactionNodeEntity.PressureMeasurements]: reactionPressureMeasurementToOrd,
   [ReactionNodeEntity.VesselPreparations]: reactionVesselPreparationToOrd,
   [ReactionNodeEntity.VesselAttachments]: reactionVesselAttachmentToOrd,

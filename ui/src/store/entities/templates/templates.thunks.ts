@@ -38,12 +38,16 @@ import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
-import { ordTemplateVariablesToReaction, reactionTemplateVariablesToOrd } from './templates.converters.ts';
+import {
+  ordTemplateVariablesToReaction,
+  reactionTemplateVariablesToOrd,
+} from './templates.converters.ts';
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
 import { getReactionPreviews } from '../reactions/reactions.utils.ts';
 
-const getTemplateIdNumber = (templateId: string): number => Number.parseInt(templateId.split('_')[1]);
+const getTemplateIdNumber = (templateId: string): number =>
+  Number.parseInt(templateId.split('_')[1]);
 const getTemplateIdString = (templateId: number): string => `template_${templateId}`;
 
 const parseTemplate = ({
@@ -87,13 +91,17 @@ export const createTemplate = createThunkWithExplicitResult(
   templateLoad => async (dispatch, getState) => {
     const baseReaction = selectReactionById(templateLoad.reactionId)(getState());
     const ordReaction = reactionToOrdReaction(baseReaction.data);
-    const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+    const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
+      'base64',
+    );
     const payload = {
       name: templateLoad.name,
       binpb: binpb,
       variables: JSON.stringify([]),
     };
-    const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
+    const templateData = (
+      await axiosInstance.post<TemplateResponse>(`/templates`, payload)
+    ).data;
     const template = parseTemplate(templateData);
 
     dispatch(createNewTemplateActions.success(template));
@@ -111,48 +119,84 @@ export const removeTemplate = createThunkWithExplicitResult(
   },
 );
 
-export const renameTemplate = createThunk(renameTemplateActions, ({ templateId, name }) => async () => {
-  const entityId = getTemplateIdNumber(templateId);
-  const result = await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, { name });
-  const template = parseTemplate(result.data);
-  showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
+export const renameTemplate = createThunk(
+  renameTemplateActions,
+  ({ templateId, name }) =>
+    async () => {
+      const entityId = getTemplateIdNumber(templateId);
+      const result = await axiosInstance.patch<TemplateResponse>(
+        `templates/${entityId}`,
+        { name },
+      );
+      const template = parseTemplate(result.data);
+      showNotification({
+        variant: NotificationVariant.SUCCESS,
+        message: 'Template updated.',
+      });
 
-  return renameTemplateActions.success(template);
-});
+      return renameTemplateActions.success(template);
+    },
+);
 
-const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> = templateId => async (_d, getState) => {
-  const { variables, data: reaction } = selectReactionById(templateId)(getState());
-  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-  const entityId = getTemplateIdNumber(templateId);
-  await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, { variables: JSON.stringify(variablesList) });
-  showNotification({ variant: NotificationVariant.SUCCESS, message: 'Template updated.' });
-};
+const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> =
+  templateId => async (_d, getState) => {
+    const { variables, data: reaction } = selectReactionById(templateId)(getState());
+    const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+    const entityId = getTemplateIdNumber(templateId);
+    await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, {
+      variables: JSON.stringify(variablesList),
+    });
+    showNotification({
+      variant: NotificationVariant.SUCCESS,
+      message: 'Template updated.',
+    });
+  };
 
-export const addUpdateVariable = createThunk(addUpdateVariableActions, ({ templateId }) => async (dispatch, _g) => {
-  await dispatch(syncVariablesWithBackend(templateId));
-  return addUpdateVariableActions.success();
-});
+export const addUpdateVariable = createThunk(
+  addUpdateVariableActions,
+  ({ templateId }) =>
+    async (dispatch, _g) => {
+      await dispatch(syncVariablesWithBackend(templateId));
+      return addUpdateVariableActions.success();
+    },
+);
 
-export const removeVariable = createThunk(removeVariableActions, ({ templateId }) => async (dispatch, _g) => {
-  await dispatch(syncVariablesWithBackend(templateId));
-  return removeVariableActions.success();
-});
+export const removeVariable = createThunk(
+  removeVariableActions,
+  ({ templateId }) =>
+    async (dispatch, _g) => {
+      await dispatch(syncVariablesWithBackend(templateId));
+      return removeVariableActions.success();
+    },
+);
 
-export const downloadTemplateCsv: ThunkCustomWrapper<string> = (templateId: string) => (_d, getState) => {
-  const { variables, data: reaction, name } = selectReactionById(templateId)(getState());
-  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-  const content = variablesList.map(variable => variable.name).join(';');
-  const blob = new Blob([content], { type: 'text/csv' });
-  downloadFile(blob, `${name}.csv`);
-};
+export const downloadTemplateCsv: ThunkCustomWrapper<string> =
+  (templateId: string) => (_d, getState) => {
+    const {
+      variables,
+      data: reaction,
+      name,
+    } = selectReactionById(templateId)(getState());
+    const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+    const content = variablesList.map(variable => variable.name).join(';');
+    const blob = new Blob([content], { type: 'text/csv' });
+    downloadFile(blob, `${name}.csv`);
+  };
 
-export const downloadTemplateInJSON: ThunkCustomWrapper<string> = (templateId: string) => (_d, getState) => {
-  const { variables, data: reaction, name } = selectReactionById(templateId)(getState());
-  const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-  const ordReaction = reactionToOrdReaction(reaction);
-  const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
-  downloadAsJson({ variables: variablesList, binpb }, `${name}.json`);
-};
+export const downloadTemplateInJSON: ThunkCustomWrapper<string> =
+  (templateId: string) => (_d, getState) => {
+    const {
+      variables,
+      data: reaction,
+      name,
+    } = selectReactionById(templateId)(getState());
+    const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+    const ordReaction = reactionToOrdReaction(reaction);
+    const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
+      'base64',
+    );
+    downloadAsJson({ variables: variablesList, binpb }, `${name}.json`);
+  };
 
 export const importFromFile = createThunkWithExplicitResult(
   importTemplateFromFileActions,
@@ -169,13 +213,17 @@ export const importFromFile = createThunkWithExplicitResult(
           binpb: binpb,
           variables: JSON.stringify(variables),
         };
-        const templateData = (await axiosInstance.post<TemplateResponse>(`/templates`, payload)).data;
+        const templateData = (
+          await axiosInstance.post<TemplateResponse>(`/templates`, payload)
+        ).data;
         const template = parseTemplate(templateData);
         navigate(`/templates/${templateData.id}`);
         dispatch(importTemplateFromFileActions.success(template));
       } catch (e: unknown) {
         console.error(e);
-        dispatch(importTemplateFromFileActions.failure('Incorrect template file provided'));
+        dispatch(
+          importTemplateFromFileActions.failure('Incorrect template file provided'),
+        );
       }
     },
 );

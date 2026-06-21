@@ -47,8 +47,12 @@ describe('copyReactionPart', () => {
   });
 
   it('swallows clipboard write failures instead of throwing', async () => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn(() => Promise.reject(new Error('denied'))) } });
-    await expect(copyReactionPart(ReactionNodeEntity.Notes, ordNotesToReaction(null))).resolves.toBeUndefined();
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn(() => Promise.reject(new Error('denied'))) },
+    });
+    await expect(
+      copyReactionPart(ReactionNodeEntity.Notes, ordNotesToReaction(null)),
+    ).resolves.toBeUndefined();
   });
 });
 
@@ -66,7 +70,9 @@ describe('pasteReactionPart', () => {
 
   it('rejects a chunk whose entity type does not match the target field', async () => {
     const clipboard = stubClipboard();
-    clipboard.setStored(JSON.stringify({ type: ReactionNodeEntity.Conditions, value: {} }));
+    clipboard.setStored(
+      JSON.stringify({ type: ReactionNodeEntity.Conditions, value: {} }),
+    );
     expect(await pasteReactionPart(ReactionNodeEntity.Notes)).toEqual([null, '']);
   });
 

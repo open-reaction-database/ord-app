@@ -18,7 +18,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { useCallback, type MutableRefObject } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'wouter';
-import { CheckListIcon, ChevronDownIcon, CopyImageIcon, DownloadIcon } from 'common/icons';
+import {
+  CheckListIcon,
+  ChevronDownIcon,
+  CopyImageIcon,
+  DownloadIcon,
+} from 'common/icons';
 import classes from './reactionCard.module.scss';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { fileDownloadOptions } from 'common/constants.ts';
@@ -33,14 +38,20 @@ interface ReactionHeaderActionsProps {
   previewRef: MutableRefObject<HTMLDivElement | null>;
 }
 
-export function ReactionHeaderActions({ reactionId, previewRef }: Readonly<ReactionHeaderActionsProps>) {
+export function ReactionHeaderActions({
+  reactionId,
+  previewRef,
+}: Readonly<ReactionHeaderActionsProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
   const datasetId = Number.parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(reactionId));
   const onPreviewSave = useCallback(() => {
     copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
-  const [saveAsTemplateOpened, { open: openSaveAsTemplate, close: closeSaveAsTemplate }] = useDisclosure();
+  const [
+    saveAsTemplateOpened,
+    { open: openSaveAsTemplate, close: closeSaveAsTemplate },
+  ] = useDisclosure();
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
 
   return (

@@ -21,14 +21,18 @@ import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
 describe('useAppUncontrolled', () => {
   it('is controlled when value is provided', () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() => useAppUncontrolled<string>({ value: 'controlled', onChange }));
+    const { result } = renderHook(() =>
+      useAppUncontrolled<string>({ value: 'controlled', onChange }),
+    );
     const [value, , isControlled] = result.current;
     expect(value).toBe('controlled');
     expect(isControlled).toBe(true);
   });
 
   it('falls back to defaultValue, then finalValue, when uncontrolled', () => {
-    const fromDefault = renderHook(() => useAppUncontrolled<string>({ defaultValue: 'd', finalValue: 'f' }));
+    const fromDefault = renderHook(() =>
+      useAppUncontrolled<string>({ defaultValue: 'd', finalValue: 'f' }),
+    );
     expect(fromDefault.result.current[0]).toBe('d');
     expect(fromDefault.result.current[2]).toBe(false);
 
@@ -38,7 +42,9 @@ describe('useAppUncontrolled', () => {
 
   it('updates the uncontrolled value and calls onChange for a raw value', () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() => useAppUncontrolled<string>({ defaultValue: 'a', onChange }));
+    const { result } = renderHook(() =>
+      useAppUncontrolled<string>({ defaultValue: 'a', onChange }),
+    );
     act(() => result.current[1]('b'));
     expect(result.current[0]).toBe('b');
     expect(onChange).toHaveBeenCalledWith('b');
@@ -46,9 +52,15 @@ describe('useAppUncontrolled', () => {
 
   it('reads value from a ChangeEvent target', () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() => useAppUncontrolled<string>({ defaultValue: 'a', onChange }));
-    const setValue = result.current[1] as unknown as (event: ChangeEvent<HTMLInputElement>) => void;
-    act(() => setValue({ target: { value: 'from-event' } } as ChangeEvent<HTMLInputElement>));
+    const { result } = renderHook(() =>
+      useAppUncontrolled<string>({ defaultValue: 'a', onChange }),
+    );
+    const setValue = result.current[1] as unknown as (
+      event: ChangeEvent<HTMLInputElement>,
+    ) => void;
+    act(() =>
+      setValue({ target: { value: 'from-event' } } as ChangeEvent<HTMLInputElement>),
+    );
     expect(result.current[0]).toBe('from-event');
     expect(onChange).toHaveBeenCalledWith('from-event');
   });

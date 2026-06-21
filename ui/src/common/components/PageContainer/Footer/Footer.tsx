@@ -24,7 +24,9 @@ export function Footer() {
     <Flex className={classes.root}>
       <div className={classes.copyright}>© Copyright {year} Open Reaction Database</div>
       <div>
-        <a href="mailto:help@open‑reaction-database.org">help@open‑reaction-database.org</a>
+        <a href="mailto:help@open‑reaction-database.org">
+          help@open‑reaction-database.org
+        </a>
       </div>
       <div className={classes.footerLinks}>
         <a

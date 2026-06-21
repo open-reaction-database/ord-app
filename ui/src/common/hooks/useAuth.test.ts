@@ -35,8 +35,9 @@ vi.mock('@auth0/auth0-react', () => ({ useAuth0: () => auth0.value }));
 // argument — and would catch a selector-path regression — without a Provider.
 const redux = vi.hoisted(() => ({ self: null as unknown }));
 vi.mock('react-redux', () => ({
-  useSelector: (selector: (state: { entities: { users: { self: unknown } } }) => unknown) =>
-    selector({ entities: { users: { self: redux.self } } }),
+  useSelector: (
+    selector: (state: { entities: { users: { self: unknown } } }) => unknown,
+  ) => selector({ entities: { users: { self: redux.self } } }),
 }));
 
 const mocks = vi.hoisted(() => ({
@@ -54,7 +55,9 @@ vi.mock('store/axiosInstance.ts', () => ({
   getAccessToken: undefined,
 }));
 vi.mock('store/entities/users/users.thunks', () => ({ createUser: mocks.createUser }));
-vi.mock('store/entities/groups/groups.thunks', () => ({ getGroupList: mocks.getGroupList }));
+vi.mock('store/entities/groups/groups.thunks', () => ({
+  getGroupList: mocks.getGroupList,
+}));
 
 import { useAuth } from './useAuth.ts';
 
@@ -102,7 +105,10 @@ describe('useAuth — no-auth dev/E2E bypass', () => {
     expect(mocks.setAccessTokenGetter).toHaveBeenCalledTimes(1);
     const getter = mocks.setAccessTokenGetter.mock.calls[0][0] as () => Promise<string>;
     await expect(getter()).resolves.toBe('dev-token');
-    expect(mocks.createUser).toHaveBeenCalledWith({ access_token: 'dev-token', id_token: 'dev-token' });
+    expect(mocks.createUser).toHaveBeenCalledWith({
+      access_token: 'dev-token',
+      id_token: 'dev-token',
+    });
     expect(mocks.dispatch).toHaveBeenCalledWith({
       type: 'users/createUser',
       payload: { access_token: 'dev-token', id_token: 'dev-token' },
@@ -124,7 +130,9 @@ describe('useAuth — Auth0 flow', () => {
     setAuth0({ isAuthenticated: false, isLoading: false });
     renderHook(() => useAuth());
     expect(loginWithRedirect).toHaveBeenCalledWith(
-      expect.objectContaining({ appState: expect.objectContaining({ returnTo: expect.any(String) }) }),
+      expect.objectContaining({
+        appState: expect.objectContaining({ returnTo: expect.any(String) }),
+      }),
     );
   });
 
@@ -145,7 +153,10 @@ describe('useAuth — Auth0 flow', () => {
     await act(async () => {
       renderHook(() => useAuth());
     });
-    expect(mocks.createUser).toHaveBeenCalledWith({ access_token: 'access-tok', id_token: 'id-raw' });
+    expect(mocks.createUser).toHaveBeenCalledWith({
+      access_token: 'access-tok',
+      id_token: 'id-raw',
+    });
     expect(mocks.dispatch).toHaveBeenCalledWith({
       type: 'users/createUser',
       payload: { access_token: 'access-tok', id_token: 'id-raw' },
@@ -161,7 +172,9 @@ describe('useAuth — Auth0 flow', () => {
     });
     expect(mocks.createUser).not.toHaveBeenCalled();
     expect(loginWithRedirect).toHaveBeenCalledWith(
-      expect.objectContaining({ appState: expect.objectContaining({ returnTo: expect.any(String) }) }),
+      expect.objectContaining({
+        appState: expect.objectContaining({ returnTo: expect.any(String) }),
+      }),
     );
   });
 });
@@ -186,7 +199,9 @@ describe('useAuth — permission re-gate on 403 (#617)', () => {
 
     // Hold the first refresh open so the in-flight guard is active for the re-entrant call.
     let settleRefresh: () => void = () => {};
-    mocks.dispatch.mockReturnValueOnce(new Promise<void>(resolve => (settleRefresh = resolve)));
+    mocks.dispatch.mockReturnValueOnce(
+      new Promise<void>(resolve => (settleRefresh = resolve)),
+    );
 
     handler();
     handler(); // re-entrant; must be ignored while the first refresh is pending

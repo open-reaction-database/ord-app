@@ -25,7 +25,9 @@ interface ComponentsListHeaderProps {
   detailsHeader: string;
 }
 
-interface ComponentsListProps<T extends ReactionComponentBase> extends ComponentsListHeaderProps {
+interface ComponentsListProps<
+  T extends ReactionComponentBase,
+> extends ComponentsListHeaderProps {
   rootPathComponents: ReactionPathComponents;
   onlyOpenOneSidebar?: boolean;
   components: Array<T>;
@@ -33,7 +35,9 @@ interface ComponentsListProps<T extends ReactionComponentBase> extends Component
   renderDetails: (component: T) => ReactNode;
 }
 
-export function ComponentsListHeader({ detailsHeader }: Readonly<ComponentsListHeaderProps>) {
+export function ComponentsListHeader({
+  detailsHeader,
+}: Readonly<ComponentsListHeaderProps>) {
   return (
     <div className={clsx(classes.grid, classes.row)}>
       <Text

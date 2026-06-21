@@ -22,7 +22,10 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
-export function ReactionEntitySelect({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
+export function ReactionEntitySelect({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormSelect>>) {
   const { isViewOnly } = useContext(reactionContext);
   const label = (
     <ReactionValueLabelWrapper

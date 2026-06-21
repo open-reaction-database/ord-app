@@ -16,9 +16,16 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
-from ord_app.service_api.domain.templates import TemplatesUseCase, get_templates_use_case
+from ord_app.service_api.domain.templates import (
+    TemplatesUseCase,
+    get_templates_use_case,
+)
 from ord_app.service_api.models import TemplateModel
-from ord_app.service_api.schemas.templates import TemplateCreateModel, TemplateResponseModel, TemplateUpdateModel
+from ord_app.service_api.schemas.templates import (
+    TemplateCreateModel,
+    TemplateResponseModel,
+    TemplateUpdateModel,
+)
 
 router = APIRouter(tags=["templates"], prefix="/templates")
 

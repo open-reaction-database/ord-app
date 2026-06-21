@@ -43,7 +43,8 @@ export function ReactionEntityDelete({
   onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const dispatch = useAppDispatch();
-  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
+  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
+    useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleRemove = useCallback(() => {
@@ -56,7 +57,14 @@ export function ReactionEntityDelete({
       dispatch(deleteReactionField({ reactionId, pathComponents }));
     }
     closeConfirmation();
-  }, [closeConfirmation, dispatch, onRemove, pathComponents, reactionId, shouldCloseSidebar]);
+  }, [
+    closeConfirmation,
+    dispatch,
+    onRemove,
+    pathComponents,
+    reactionId,
+    shouldCloseSidebar,
+  ]);
 
   return (
     <ConfirmPopover

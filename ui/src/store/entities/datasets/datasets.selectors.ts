@@ -23,14 +23,18 @@ export const selectDatasets = buildSelector(state => state.datasetsById);
 
 const selectDatasetsOrder = buildSelector(state => state.datasetsOrder);
 
-export const selectAreDatasetsLoading = buildSelector(state => state.areDatasetsLoading);
+export const selectAreDatasetsLoading = buildSelector(
+  state => state.areDatasetsLoading,
+);
 
-export const selectDatasetById = (id: number) => buildSelector(state => state.datasetsById[id]);
+export const selectDatasetById = (id: number) =>
+  buildSelector(state => state.datasetsById[id]);
 
 export const selectDatasetsPagination = buildSelector(state => state.pagination);
 
-export const selectOrderedDatasets = createSelector([selectDatasetsOrder, selectDatasets], (order, datasetsById) =>
-  order.map(id => datasetsById[id]),
+export const selectOrderedDatasets = createSelector(
+  [selectDatasetsOrder, selectDatasets],
+  (order, datasetsById) => order.map(id => datasetsById[id]),
 );
 
 export const selectIsDatasetCreating = buildSelector(state => state.isDatasetCreating);
@@ -39,4 +43,6 @@ export const selectIsDatasetOpened = buildSelector(state => state.isDatasetEditO
 
 export const selectDatasetGroups = buildSelector(state => state.datasetGroups);
 
-export const selectAreDatasetGroupsLoading = buildSelector(state => state.areDatasetGroupsLoading);
+export const selectAreDatasetGroupsLoading = buildSelector(
+  state => state.areDatasetGroupsLoading,
+);

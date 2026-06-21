@@ -19,7 +19,9 @@ import { ReactionContent } from './ReactionContent.tsx';
 
 // In "tabs" mode the content is the tabbed editor, which pulls in the Ketcher/d3 node registry;
 // stub it so this test exercises ReactionContent's own view-mode branching.
-vi.mock('./ReactionTabs', () => ({ ReactionTabs: () => <div data-testid="reaction-tabs" /> }));
+vi.mock('./ReactionTabs', () => ({
+  ReactionTabs: () => <div data-testid="reaction-tabs" />,
+}));
 
 describe('ReactionContent', () => {
   it('renders the tabbed editor in "tabs" mode', () => {

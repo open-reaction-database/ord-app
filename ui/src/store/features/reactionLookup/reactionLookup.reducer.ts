@@ -15,7 +15,10 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import { addIdentifierByNameActions } from 'store/entities/reactions/reactionsInputs/reactionInputs.actions.ts';
-import { setReactionLookupOpenedAction, resetReactionLookupErrorAction } from './reactionLookup.actions.ts';
+import {
+  setReactionLookupOpenedAction,
+  resetReactionLookupErrorAction,
+} from './reactionLookup.actions.ts';
 
 const isOpened = createReducer(false, builder => {
   builder.addCase(setReactionLookupOpenedAction, (_, action) => action.payload);
@@ -24,7 +27,10 @@ const isOpened = createReducer(false, builder => {
 
 const isLoading = createReducer(false, builder => {
   builder.addCase(addIdentifierByNameActions.request, () => true);
-  builder.addMatcher(isAnyOf(addIdentifierByNameActions.success, addIdentifierByNameActions.failure), () => false);
+  builder.addMatcher(
+    isAnyOf(addIdentifierByNameActions.success, addIdentifierByNameActions.failure),
+    () => false,
+  );
 });
 
 const hasError = createReducer(false, builder => {

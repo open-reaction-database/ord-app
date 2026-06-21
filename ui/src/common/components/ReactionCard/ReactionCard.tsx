@@ -64,7 +64,13 @@ interface ReactionCardProps {
   isInvalid?: boolean;
 }
 
-export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Readonly<ReactionCardProps>) {
+export function ReactionCard({
+  id,
+  title,
+  actions,
+  previewRef,
+  isInvalid,
+}: Readonly<ReactionCardProps>) {
   const reaction = useSelector(selectReactionById(id));
   if (!reaction) {
     return null;
@@ -77,7 +83,9 @@ export function ReactionCard({ id, title, actions, previewRef, isInvalid }: Read
       p="lg"
     >
       <div className={clsx(classes.topContainer, typographyClasses.oneLineTextWrapper)}>
-        <div className={clsx(classes.titleContainer, typographyClasses.oneLineTextWrapper)}>
+        <div
+          className={clsx(classes.titleContainer, typographyClasses.oneLineTextWrapper)}
+        >
           <Flex
             align="center"
             gap="4"

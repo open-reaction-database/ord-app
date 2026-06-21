@@ -26,15 +26,24 @@ export function buildUseInitialValues<Result extends object, Input extends Resul
     reactionId: ReactionId,
     pathComponents: ReactionPathComponents,
   ): [object, object, (values: object) => object] {
-    const { id: _, ...reactionPart } = useSelector(selectReactionPartByPath(reactionId, pathComponents));
+    const { id: _, ...reactionPart } = useSelector(
+      selectReactionPartByPath(reactionId, pathComponents),
+    );
 
-    const originalValue = useMemo((): Input => structuredClone(reactionPart), [reactionPart]);
+    const originalValue = useMemo(
+      (): Input => structuredClone(reactionPart),
+      [reactionPart],
+    );
 
     const valueWithoutNestedFields = useMemo(
       (): Result => structuredClone(filterInitialValues(originalValue)),
       [originalValue],
     );
 
-    return [valueWithoutNestedFields, originalValue, filterInitialValues as unknown as (values: object) => object];
+    return [
+      valueWithoutNestedFields,
+      originalValue,
+      filterInitialValues as unknown as (values: object) => object,
+    ];
   };
 }

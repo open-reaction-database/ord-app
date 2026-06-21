@@ -25,7 +25,14 @@ interface FormModalProps {
   loading?: boolean;
 }
 
-export function FormModal({ onClose, onSubmit, title, children, submitTitle, loading }: Readonly<FormModalProps>) {
+export function FormModal({
+  onClose,
+  onSubmit,
+  title,
+  children,
+  submitTitle,
+  loading,
+}: Readonly<FormModalProps>) {
   return (
     <Modal
       opened

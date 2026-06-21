@@ -48,10 +48,14 @@ class BaseRepository(AbstractRepository[T]):
         filters: list[BinaryExpression] = []
         for field_name, field_value in kwargs.items():
             if field_name not in model.__table__.columns:
-                raise AttributeError(f"Field '{model.__name__}.{field_name}' doesn't exist.")
+                raise AttributeError(
+                    f"Field '{model.__name__}.{field_name}' doesn't exist."
+                )
 
             attr = getattr(model, field_name)
-            ft = filters_map.get(type(field_value), lambda field, value: field == value)(attr, field_value)
+            ft = filters_map.get(
+                type(field_value), lambda field, value: field == value
+            )(attr, field_value)
 
             filters.append(ft)
         return filters
@@ -73,7 +77,9 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def update(self, payload: dict, autocommit: bool = True, **kwargs: Any) -> T | None:
+    async def update(
+        self, payload: dict, autocommit: bool = True, **kwargs: Any
+    ) -> T | None:
         stmt = (
             update(self.model)
             .where(*self._get_filter_stmt(self.model, **kwargs))
@@ -92,4 +98,5 @@ class BaseRepository(AbstractRepository[T]):
         result = await self.db.execute(stmt)
         await self.db.commit()
         logger.debug(f"<{self.model.__name__.title()}({kwargs})> was deleted")
-        return result.rowcount  # ty: ignore[unresolved-attribute]  # execute() returns a CursorResult here
+        # execute() returns a CursorResult here
+        return result.rowcount  # ty: ignore[unresolved-attribute]

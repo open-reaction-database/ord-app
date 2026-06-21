@@ -64,13 +64,26 @@ interface ReactionViewOptions extends Omit<RenderOptions, 'wrapper'> {
  * Renders a ReactionView-tree component with the reaction/entity contexts and a seeded reaction in
  * the store, so components that read `reactionContext`/`reactionEntityContext` mount correctly.
  */
-export function renderInReactionView(ui: ReactElement, options: ReactionViewOptions = {}) {
-  const { reactionId = 1, pathComponents = [], reaction, isViewOnly = false, ...renderOptions } = options;
+export function renderInReactionView(
+  ui: ReactElement,
+  options: ReactionViewOptions = {},
+) {
+  const {
+    reactionId = 1,
+    pathComponents = [],
+    reaction,
+    isViewOnly = false,
+    ...renderOptions
+  } = options;
   const store = configureStore({
     reducer: rootReducer,
     preloadedState: {
       entities: {
-        reactions: { reactionsById: { [reactionId]: { id: reactionId, data: reaction ?? emptyReactionData() } } },
+        reactions: {
+          reactionsById: {
+            [reactionId]: { id: reactionId, data: reaction ?? emptyReactionData() },
+          },
+        },
       },
     } as unknown as AppState,
   });

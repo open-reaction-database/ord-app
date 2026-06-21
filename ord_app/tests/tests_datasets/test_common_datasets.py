@@ -28,20 +28,36 @@ async def test_dataset_modified_at(api_client, mock_authenticated_user):
     *_, group = mock_authenticated_user
 
     payload = {"name": fake.company(), "description": fake.text(5)}
-    resp1 = api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload).raise_for_status().json()
+    resp1 = (
+        api_client.post(f"/api/v1/groups/{group.id}/datasets", json=payload)
+        .raise_for_status()
+        .json()
+    )
     dataset_id = resp1["id"]
 
-    resp2 = api_client.patch(f"/api/v1/datasets/{dataset_id}", json=payload).raise_for_status().json()
+    resp2 = (
+        api_client.patch(f"/api/v1/datasets/{dataset_id}", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert parse_dt(resp1["modified_at"]) < parse_dt(resp2["modified_at"])
 
     # create reaction
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    reaction_resp = api_client.post(f"/api/v1/datasets/{dataset_id}/reactions", json=payload).raise_for_status().json()
+    payload = {
+        "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()
+    }
+    reaction_resp = (
+        api_client.post(f"/api/v1/datasets/{dataset_id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     resp3 = api_client.get(f"/api/v1/datasets/{dataset_id}").raise_for_status().json()
     assert parse_dt(resp2["modified_at"]) < parse_dt(resp3["modified_at"])
 
     # update reaction
-    payload = {"binpb": b64encode(Reaction(reaction_id="updated").SerializeToString()).decode()}
+    payload = {
+        "binpb": b64encode(Reaction(reaction_id="updated").SerializeToString()).decode()
+    }
     api_client.patch(
         f"/api/v1/datasets/{dataset_id}/reactions/{reaction_resp['id']}", json=payload
     ).raise_for_status().json()

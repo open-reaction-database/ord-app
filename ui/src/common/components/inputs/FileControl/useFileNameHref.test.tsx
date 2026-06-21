@@ -19,7 +19,9 @@ import { useFileNameHref } from './useFileNameHref.ts';
 
 describe('useFileNameHref', () => {
   it('joins the name with the dot-stripped format and builds a base64 data href', () => {
-    const { result } = renderHook(() => useFileNameHref('molecule', { format: '.pb', value: 'YWJj' }));
+    const { result } = renderHook(() =>
+      useFileNameHref('molecule', { format: '.pb', value: 'YWJj' }),
+    );
     expect(result.current.fileName).toBe('molecule.pb');
     expect(result.current.href).toBe('data:application/octet-stream;base64,YWJj');
   });

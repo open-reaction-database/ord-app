@@ -23,7 +23,10 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-export class ErrorBoundary extends Component<React.PropsWithChildren<unknown>, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  React.PropsWithChildren<unknown>,
+  ErrorBoundaryState
+> {
   constructor(props: React.PropsWithChildren<unknown>) {
     super(props);
     this.state = { hasError: false };

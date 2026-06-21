@@ -16,4 +16,8 @@
 import type { SelectOptions } from 'common/types/selectOptions.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export const booleanOptions: SelectOptions = [ReactionBoolean.Unspecified, ReactionBoolean.True, ReactionBoolean.False];
+export const booleanOptions: SelectOptions = [
+  ReactionBoolean.Unspecified,
+  ReactionBoolean.True,
+  ReactionBoolean.False,
+];

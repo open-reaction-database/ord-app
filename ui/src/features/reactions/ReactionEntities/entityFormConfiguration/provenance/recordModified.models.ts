@@ -17,7 +17,10 @@ import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { createReactionPerson, createUpdatePersonInfoRow } from './reactionPerson.models.tsx';
+import {
+  createReactionPerson,
+  createUpdatePersonInfoRow,
+} from './reactionPerson.models.tsx';
 
 export const recordModified: Array<ReactionFormNode> = [
   {

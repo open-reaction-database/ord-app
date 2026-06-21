@@ -19,11 +19,17 @@ from ord_app.service_api.services.pb_utils import load_message
 from ord_app.tests.conftest import create_test_dataset
 
 
-async def test_create_reaction_from_scratch(api_client, mock_authenticated_user, test_db_session):
+async def test_create_reaction_from_scratch(
+    api_client, mock_authenticated_user, test_db_session
+):
     user, *_ = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions/from-scratch").raise_for_status().json()
+    response_data = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions/from-scratch")
+        .raise_for_status()
+        .json()
+    )
     reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
     assert reaction_pb.reaction_id == response_data["pb_reaction_id"]
 

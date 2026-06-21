@@ -21,10 +21,14 @@
  * bundle, regardless of the env var. Exported as a pure function so the guard is unit-testable.
  * Kept in its own (DOM-free) module so the guard can be tested without a browser environment.
  */
-export const isNoAuthEnabled = (env: { PROD: boolean; VITE_E2E_NO_AUTH?: string }): boolean =>
-  !env.PROD && env.VITE_E2E_NO_AUTH === 'TRUE';
+export const isNoAuthEnabled = (env: {
+  PROD: boolean;
+  VITE_E2E_NO_AUTH?: string;
+}): boolean => !env.PROD && env.VITE_E2E_NO_AUTH === 'TRUE';
 
 export const noAuth = isNoAuthEnabled(import.meta.env);
 
 // Gated on `noAuth` so the fallback literal is never the effective value in a production bundle.
-export const e2eDevToken = noAuth ? (import.meta.env.VITE_E2E_DEV_TOKEN as string) || 'e2e-dev-token' : '';
+export const e2eDevToken = noAuth
+  ? (import.meta.env.VITE_E2E_DEV_TOKEN as string) || 'e2e-dev-token'
+  : '';

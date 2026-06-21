@@ -20,11 +20,20 @@ import type { MouseEvent } from 'react';
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
 vi.mock('store/features/reactionForm/reactionForm.actions.ts', () => ({
-  addReactionPathComponentToList: (path: unknown) => ({ type: 'addReactionPathComponentToList', payload: path }),
-  setReactionPathComponentsList: (list: unknown) => ({ type: 'setReactionPathComponentsList', payload: list }),
+  addReactionPathComponentToList: (path: unknown) => ({
+    type: 'addReactionPathComponentToList',
+    payload: path,
+  }),
+  setReactionPathComponentsList: (list: unknown) => ({
+    type: 'setReactionPathComponentsList',
+    payload: list,
+  }),
 }));
 
-import { onViewDeleteButtonsWrapperClick, useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
+import {
+  onViewDeleteButtonsWrapperClick,
+  useOnViewEdit,
+} from './reactionViewDeleteButtons.utils.ts';
 
 afterEach(() => {
   dispatch.mockClear();
@@ -40,14 +49,22 @@ describe('onViewDeleteButtonsWrapperClick', () => {
 
 describe('useOnViewEdit', () => {
   it('appends the path to the list when there is no history', () => {
-    const { result } = renderHook(() => useOnViewEdit({ pathComponents: ['inputs', 0] }));
+    const { result } = renderHook(() =>
+      useOnViewEdit({ pathComponents: ['inputs', 0] }),
+    );
     result.current();
-    expect(dispatch).toHaveBeenCalledWith({ type: 'addReactionPathComponentToList', payload: ['inputs', 0] });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'addReactionPathComponentToList',
+      payload: ['inputs', 0],
+    });
   });
 
   it('replaces the list with history plus the current path when history is provided', () => {
     const { result } = renderHook(() =>
-      useOnViewEdit({ pathComponents: ['inputs', 0], historyPathComponents: [['setup'], ['conditions']] }),
+      useOnViewEdit({
+        pathComponents: ['inputs', 0],
+        historyPathComponents: [['setup'], ['conditions']],
+      }),
     );
     result.current();
     expect(dispatch).toHaveBeenCalledWith({

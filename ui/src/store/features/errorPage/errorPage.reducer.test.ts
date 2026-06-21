@@ -17,7 +17,10 @@ import { describe, it, expect } from 'vitest';
 import { errorPageReducer } from './errorPage.reducer.ts';
 import { resetErrorPageAction } from './errorPage.actions.ts';
 import { getDatasetActions } from 'store/entities/datasets/datasets.actions.ts';
-import { getReactionActions, getReactionsListActions } from 'store/entities/reactions/reactions.actions.ts';
+import {
+  getReactionActions,
+  getReactionsListActions,
+} from 'store/entities/reactions/reactions.actions.ts';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
 
 const reject: RejectValue = { errorCode: 404, errorMessage: 'Entity not found' };
@@ -30,9 +33,15 @@ describe('errorPageReducer', () => {
   });
 
   it('captures the failure payload from dataset, reaction, and reaction-list failures', () => {
-    expect(errorPageReducer(initialState(), getDatasetActions.failure(reject)).error).toEqual(reject);
-    expect(errorPageReducer(initialState(), getReactionActions.failure(reject)).error).toEqual(reject);
-    expect(errorPageReducer(initialState(), getReactionsListActions.failure(reject)).error).toEqual(reject);
+    expect(
+      errorPageReducer(initialState(), getDatasetActions.failure(reject)).error,
+    ).toEqual(reject);
+    expect(
+      errorPageReducer(initialState(), getReactionActions.failure(reject)).error,
+    ).toEqual(reject);
+    expect(
+      errorPageReducer(initialState(), getReactionsListActions.failure(reject)).error,
+    ).toEqual(reject);
   });
 
   it('clears the error on reset', () => {

@@ -49,8 +49,14 @@ function MeasurementPreview({ measurement }: Readonly<MeasurementPreviewProps>) 
       wrap="nowrap"
       className={classes.measurementWrapper}
     >
-      {measurement.type && <Text className={classes.measurementKeyType}>{measurement.type}</Text>}
-      {measurement?.analysis?.name && <Text className={classes.measurementKeyType}>{measurement?.analysis?.name}</Text>}
+      {measurement.type && (
+        <Text className={classes.measurementKeyType}>{measurement.type}</Text>
+      )}
+      {measurement?.analysis?.name && (
+        <Text className={classes.measurementKeyType}>
+          {measurement?.analysis?.name}
+        </Text>
+      )}
       {measurement.value && (
         <Tooltip label={valuePreview}>
           <Text className={classes.measurementValue}>{valuePreview}</Text>

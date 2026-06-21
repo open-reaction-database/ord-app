@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-// @ts-expect-error Either V generic will be resolved or we should fallback to string | number to prevent a bunch of unknowns in the code
-export const ordMapToKeyValueObject = <T extends object, K extends keyof T, V extends T[K] = number | string>(
+export const ordMapToKeyValueObject = <
+  T extends object,
+  K extends keyof T,
+  // @ts-expect-error Either V generic will be resolved or we should fallback to string | number to prevent a bunch of unknowns in the code
+  V extends T[K] = number | string,
+>(
   ordMap: Record<K, V>,
 ): Array<{ label: string; value: V }> =>
   Object.entries<V>(ordMap).map(([key, value]) => ({

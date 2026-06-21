@@ -43,7 +43,9 @@ const roleOrder = {
 const GroupNameRole = ({ name, role }: Readonly<GroupNameRoleProps>) => (
   <>
     <Tooltip label={name}>
-      <Text className={clsx(classes.groupName, typographyClasses.oneLineText)}>{name}: </Text>
+      <Text className={clsx(classes.groupName, typographyClasses.oneLineText)}>
+        {name}:{' '}
+      </Text>
     </Tooltip>
     <span className={classes.groupRole}>{role} </span>
   </>
@@ -54,7 +56,9 @@ export function GroupsListWithRoles({ data = [] }: Readonly<GroupsListWithRolesP
   const [opened, { close, open }] = useDisclosure(false);
   const sortedGroups = useMemo(() => {
     // Sort by role importance (Admin > Editor > Viewer), then alphabetically by group name.
-    return [...groupsList].sort((a, b) => roleOrder[a.role] - roleOrder[b.role] || a.name.localeCompare(b.name));
+    return [...groupsList].sort(
+      (a, b) => roleOrder[a.role] - roleOrder[b.role] || a.name.localeCompare(b.name),
+    );
   }, [groupsList]);
 
   const [firstGroup, ...remainingGroups] = sortedGroups;

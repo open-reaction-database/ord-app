@@ -24,7 +24,11 @@ const buildState = (isOpened: boolean): { preloadedState: AppState } => ({
     entities: {
       reactions: {
         reactionsById: {
-          template_1: { id: 1, data: {}, variables: { v1: { name: 'reagent', path: [] } } },
+          template_1: {
+            id: 1,
+            data: {},
+            variables: { v1: { name: 'reagent', path: [] } },
+          },
         },
       },
     },
@@ -33,13 +37,19 @@ const buildState = (isOpened: boolean): { preloadedState: AppState } => ({
 
 describe('VariablesSidebar', () => {
   it('lists the template variables when the drawer is open', () => {
-    const { getByText } = renderWithProviders(<VariablesSidebar templateId="template_1" />, buildState(true));
+    const { getByText } = renderWithProviders(
+      <VariablesSidebar templateId="template_1" />,
+      buildState(true),
+    );
     expect(getByText('Variables')).toBeInTheDocument();
     expect(getByText('@reagent')).toBeInTheDocument();
   });
 
   it('does not render the drawer title or the variable list while closed', () => {
-    const { queryByText } = renderWithProviders(<VariablesSidebar templateId="template_1" />, buildState(false));
+    const { queryByText } = renderWithProviders(
+      <VariablesSidebar templateId="template_1" />,
+      buildState(false),
+    );
     expect(queryByText('Variables')).not.toBeInTheDocument();
     expect(queryByText('@reagent')).not.toBeInTheDocument();
   });

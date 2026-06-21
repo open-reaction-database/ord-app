@@ -23,10 +23,16 @@ import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
 vi.mock('store/entities/reactions/reactions.thunks.ts', () => ({
-  addUpdateReactionField: (payload: unknown) => ({ type: 'addUpdateReactionField', payload }),
+  addUpdateReactionField: (payload: unknown) => ({
+    type: 'addUpdateReactionField',
+    payload,
+  }),
 }));
 vi.mock('store/features/reactionForm/reactionForm.actions.ts', () => ({
-  addReactionPathComponentToList: (payload: unknown) => ({ type: 'addReactionPathComponentToList', payload }),
+  addReactionPathComponentToList: (payload: unknown) => ({
+    type: 'addReactionPathComponentToList',
+    payload,
+  }),
 }));
 
 import { buildUseCreate } from './buildUseCreate.ts';
@@ -47,22 +53,33 @@ const reactionCtxValue: ReactionsContext = {
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <reactionContext.Provider value={reactionCtxValue}>
-      <reactionEntityContext.Provider value={{ reactionId: 7, pathComponents: ['inputs', 0] }}>
+      <reactionEntityContext.Provider
+        value={{ reactionId: 7, pathComponents: ['inputs', 0] }}
+      >
         {children}
       </reactionEntityContext.Provider>
     </reactionContext.Provider>
   );
 }
 
-const createKey = vi.fn((_index: number, _list: Array<NewEntity>, _info?: Partial<NewEntity>): [string, NewEntity] => [
-  'key1',
-  { entity: 'new' },
-]);
+const createKey = vi.fn(
+  (
+    _index: number,
+    _list: Array<NewEntity>,
+    _info?: Partial<NewEntity>,
+  ): [string, NewEntity] => ['key1', { entity: 'new' }],
+);
 
-function renderCreate(entityName: string | Array<string | number>, shouldOpenSidebar?: boolean) {
-  const { result } = renderHook(() => buildUseCreate<NewEntity>(entityName, createKey, shouldOpenSidebar)(), {
-    wrapper: ContextWrapper,
-  });
+function renderCreate(
+  entityName: string | Array<string | number>,
+  shouldOpenSidebar?: boolean,
+) {
+  const { result } = renderHook(
+    () => buildUseCreate<NewEntity>(entityName, createKey, shouldOpenSidebar)(),
+    {
+      wrapper: ContextWrapper,
+    },
+  );
   return result.current;
 }
 
@@ -79,7 +96,11 @@ describe('buildUseCreate', () => {
     expect(createKey).toHaveBeenCalledWith(0, [], { entity: 'seed' });
     expect(dispatch).toHaveBeenCalledWith({
       type: 'addUpdateReactionField',
-      payload: { reactionId: 7, pathComponents: ['inputs', 0, 'components', 'key1'], newValue: { entity: 'new' } },
+      payload: {
+        reactionId: 7,
+        pathComponents: ['inputs', 0, 'components', 'key1'],
+        newValue: { entity: 'new' },
+      },
     });
     expect(dispatch).toHaveBeenCalledWith({
       type: 'addReactionPathComponentToList',
@@ -106,6 +127,8 @@ describe('buildUseCreate', () => {
   it('does not open the sidebar when shouldOpenSidebar is false', () => {
     renderCreate('components', false)(0, []);
     expect(dispatch).toHaveBeenCalledTimes(1);
-    expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'addUpdateReactionField' }));
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'addUpdateReactionField' }),
+    );
   });
 });

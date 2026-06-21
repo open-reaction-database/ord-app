@@ -74,7 +74,7 @@ fail_under = 80
 # took precedence over [tool.ruff] and has been folded in.
 [tool.ruff]
 # Same as Black.
-line-length = 120
+line-length = 88
 indent-width = 4
 # Assume Python 3.12.
 target-version = "py312"

@@ -17,7 +17,10 @@ import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { buildUseSelectItems, buildUseSelectItemsListFromMap } from './buildUseSelectItems.ts';
+import {
+  buildUseSelectItems,
+  buildUseSelectItemsListFromMap,
+} from './buildUseSelectItems.ts';
 
 // selectReactionPartByPath builds the parameterized selector; capture its args
 // to assert the path the hook resolves, and drive the hook's return value
@@ -34,7 +37,9 @@ vi.mock('react-redux', () => ({ useSelector: () => selectorReturn }));
 
 function contextWrapper(reactionId: number, pathComponents: Array<string | number>) {
   const Wrapper = ({ children }: Readonly<{ children: ReactNode }>) => (
-    <reactionEntityContext.Provider value={{ reactionId, pathComponents }}>{children}</reactionEntityContext.Provider>
+    <reactionEntityContext.Provider value={{ reactionId, pathComponents }}>
+      {children}
+    </reactionEntityContext.Provider>
   );
   Wrapper.displayName = 'ContextWrapper';
   return Wrapper;
@@ -51,7 +56,11 @@ describe('buildUseSelectItems', () => {
     const { result } = renderHook(() => buildUseSelectItems('amount')(), {
       wrapper: contextWrapper(5, ['inputs', 0]),
     });
-    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, ['inputs', 0, 'amount']);
+    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, [
+      'inputs',
+      0,
+      'amount',
+    ]);
     expect(result.current).toBe('value-x');
   });
 
@@ -60,7 +69,11 @@ describe('buildUseSelectItems', () => {
     renderHook(() => buildUseSelectItems(['conditions', 'temperature'])(), {
       wrapper: contextWrapper(5, ['setup']),
     });
-    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, ['setup', 'conditions', 'temperature']);
+    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, [
+      'setup',
+      'conditions',
+      'temperature',
+    ]);
   });
 });
 
@@ -74,10 +87,16 @@ describe('buildUseSelectItemsListFromMap', () => {
 
   it('resolves the entity map under the context path and returns its values sorted', () => {
     selectorReturn = { x: { id: 'x', order: 2 }, y: { id: 'y', order: 1 } };
-    const { result } = renderHook(() => buildUseSelectItemsListFromMap<OrderedItem>('components', byOrder)(), {
-      wrapper: contextWrapper(5, ['inputs']),
-    });
-    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, ['inputs', 'components']);
+    const { result } = renderHook(
+      () => buildUseSelectItemsListFromMap<OrderedItem>('components', byOrder)(),
+      {
+        wrapper: contextWrapper(5, ['inputs']),
+      },
+    );
+    expect(selectReactionPartByPathMock).toHaveBeenCalledWith(5, [
+      'inputs',
+      'components',
+    ]);
     expect(result.current).toEqual([
       { id: 'y', order: 1 },
       { id: 'x', order: 2 },

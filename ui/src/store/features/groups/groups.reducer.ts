@@ -15,7 +15,10 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from './groups.actions.ts';
-import { addGroupMemberActions, createGroupActions } from 'store/entities/groups/groups.actions.ts';
+import {
+  addGroupMemberActions,
+  createGroupActions,
+} from 'store/entities/groups/groups.actions.ts';
 
 const activeGroupId = createReducer<number | null>(null, builder => {
   builder.addCase(setActiveGroupIdAction, (_, action) => action.payload);
@@ -28,7 +31,10 @@ const editingGroupId = createReducer<number | null>(null, builder => {
 
 const isAddingMember = createReducer<boolean>(false, builder => {
   builder.addMatcher(isAnyOf(addGroupMemberActions.request), () => true);
-  builder.addMatcher(isAnyOf(addGroupMemberActions.success, addGroupMemberActions.failure), () => false);
+  builder.addMatcher(
+    isAnyOf(addGroupMemberActions.success, addGroupMemberActions.failure),
+    () => false,
+  );
 });
 
 export const groupsSidebar = combineReducers({

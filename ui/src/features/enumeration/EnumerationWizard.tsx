@@ -20,11 +20,16 @@ import { useCallback } from 'react';
 import { interruptEnumerationAction } from '../../store/entities/enumeration/enumeration.actions.ts';
 import { setEnumerationSetupOpenedAction } from '../../store/features/enumerationSetup/enumerationSetup.actions.ts';
 import { selectIsEnumerationSetupOpened } from '../../store/features/enumerationSetup/enumerationSetup.selectors.ts';
-import { EnumerationSetup, type CreateDatasetFromEnumerationProps } from './EnumerationSetup/EnumerationSetup.tsx';
+import {
+  EnumerationSetup,
+  type CreateDatasetFromEnumerationProps,
+} from './EnumerationSetup/EnumerationSetup.tsx';
 import { EnumerationResult } from './EnumerationResult/EnumerationResult.tsx';
 import { EnumerationProgressDisplay } from './EnumerationProgress/EnumerationProgress.tsx';
 
-export function EnumerationWizard(setupProps: Readonly<Omit<CreateDatasetFromEnumerationProps, 'onClose'>>) {
+export function EnumerationWizard(
+  setupProps: Readonly<Omit<CreateDatasetFromEnumerationProps, 'onClose'>>,
+) {
   const dispatch = useAppDispatch();
   const enumerationProgress = useSelector(selectEnumerationProgress);
 

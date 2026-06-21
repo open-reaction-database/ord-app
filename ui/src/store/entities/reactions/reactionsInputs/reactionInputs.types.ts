@@ -28,14 +28,18 @@ import type {
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 
-export interface ReactionCrudeComponent extends WithId<Pick<ord.ICrudeComponent, 'reactionId'>> {
+export interface ReactionCrudeComponent extends WithId<
+  Pick<ord.ICrudeComponent, 'reactionId'>
+> {
   includesWorkup: ReactionBoolean;
   hasDerivedAmount: ReactionBoolean;
   amount: ReactionAmount;
   texture: ReactionTexture;
 }
 
-export interface ReactionInput extends WithIdName<Pick<ord.IReactionInput, 'additionOrder'>> {
+export interface ReactionInput extends WithIdName<
+  Pick<ord.IReactionInput, 'additionOrder'>
+> {
   crudeComponents: Array<ReactionCrudeComponent>;
   components: Array<ReactionInputComponent>;
   additionDuration: ReactionTime;

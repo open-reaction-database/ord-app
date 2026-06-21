@@ -20,7 +20,9 @@ import { CreateDatasetFromFile } from './CreateDatasetFromFile.tsx';
 
 describe('CreateDatasetFromFile', () => {
   it('renders the from-file form with a group selector and Save action', () => {
-    renderWithProviders(<CreateDatasetFromFile onClose={() => {}} />, { preloadedState: {} });
+    renderWithProviders(<CreateDatasetFromFile onClose={() => {}} />, {
+      preloadedState: {},
+    });
     expect(screen.getByText('Create Dataset from File')).toBeInTheDocument();
     expect(screen.getByText('Group')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();

@@ -39,46 +39,55 @@ export const startEnumeration: ThunkCustomWrapper<SetupEnumeration> =
     const template = selectReactionById(templateId)(getState());
     const variablesList = Object.values(template.variables);
 
-    dispatch(startEnumerationActions({ ...rest, data: template.data, variables: variablesList }));
+    dispatch(
+      startEnumerationActions({
+        ...rest,
+        data: template.data,
+        variables: variablesList,
+      }),
+    );
     dispatch(enumerateBatchResult({ reactions: [], errors: [] }));
   };
 
-export const enumerateBatchResult: ThunkCustomWrapper<ActionPayload<typeof enumerateBatchActions.success>> =
-  param => (dispatch, getState) => {
-    dispatch(enumerateBatchActions.success(param));
-    const state = getState();
-    const enumerationProgress = selectEnumerationProgress(state);
-    if (!enumerationProgress) {
-      return;
-    }
+export const enumerateBatchResult: ThunkCustomWrapper<
+  ActionPayload<typeof enumerateBatchActions.success>
+> = param => (dispatch, getState) => {
+  dispatch(enumerateBatchActions.success(param));
+  const state = getState();
+  const enumerationProgress = selectEnumerationProgress(state);
+  if (!enumerationProgress) {
+    return;
+  }
 
-    const { index, templateCSV, data, variables, matching } = enumerationProgress;
-    const hasEnumerationFinished = index >= templateCSV.content.length;
+  const { index, templateCSV, data, variables, matching } = enumerationProgress;
+  const hasEnumerationFinished = index >= templateCSV.content.length;
 
-    if (hasEnumerationFinished) {
-      dispatch(finishEnumeration());
-      return;
-    }
+  if (hasEnumerationFinished) {
+    dispatch(finishEnumeration());
+    return;
+  }
 
-    const templateCSVBatch = {
-      headers: templateCSV.headers,
-      content: templateCSV.content.slice(index, index + BATCH_SIZE),
-    };
-
-    dispatch(
-      enumerateBatchActions.request({
-        index: index,
-        templateCSV: templateCSVBatch,
-        matching,
-        data,
-        variables,
-      }),
-    );
+  const templateCSVBatch = {
+    headers: templateCSV.headers,
+    content: templateCSV.content.slice(index, index + BATCH_SIZE),
   };
+
+  dispatch(
+    enumerateBatchActions.request({
+      index: index,
+      templateCSV: templateCSVBatch,
+      matching,
+      data,
+      variables,
+    }),
+  );
+};
 
 const fakeDataset: CreateDatasetBase = { name: '', description: '' };
 
-function prepareDataset(enumerationProgress: EnumerationProgress): CreateDatasetBase & { reactions: Array<string> } {
+function prepareDataset(
+  enumerationProgress: EnumerationProgress,
+): CreateDatasetBase & { reactions: Array<string> } {
   const { dataset, reactions } = enumerationProgress;
   const isNewDataset = typeof dataset === 'object';
   const datasetForFile = isNewDataset
@@ -94,47 +103,51 @@ function prepareDataset(enumerationProgress: EnumerationProgress): CreateDataset
   };
 }
 
-export const finishEnumeration: ThunkCustomWrapper<void> = () => async (dispatch, getState) => {
-  const enumerationProgress = selectEnumerationProgress(getState());
-  if (!enumerationProgress) {
-    return;
-  }
-  const { dataset, reactions } = enumerationProgress;
-
-  if (reactions.length === 0) {
-    dispatch(finishEnumerationAction(null));
-    return;
-  }
-
-  const datasetEnumeration = prepareDataset(enumerationProgress);
-  const isNewDataset = typeof dataset === 'object';
-  // Capture the active group before the await so a group switch during the request can't
-  // retarget the refetch. We refetch the *active* group's list (which can be null = "All
-  // Groups") to match what the Datasets page shows, rather than the new dataset's own group. (#611)
-  const activeGroupId = selectActiveGroupId(getState());
-
-  try {
-    if (isNewDataset) {
-      const createdDataset = await axiosInstance.post<Dataset>(
-        `/groups/${dataset.groupId}/datasets/enumerate`,
-        datasetEnumeration,
-      );
-      dispatch(finishEnumerationAction(createdDataset.data.id));
-      // Refresh the datasets list so the newly created dataset appears without a manual
-      // page reload, including when the user dismisses the result modal with "Close". (#611)
-      dispatch(getInitialDatasetsList(activeGroupId));
-    } else {
-      const datasetId = dataset;
-      await axiosInstance.post<Dataset>(`/datasets/${datasetId}/enumerate/extend`, datasetEnumeration);
-      dispatch(finishEnumerationAction(datasetId));
-      dispatch(getDataset(datasetId));
-      dispatch(getReactionsPage({ page: 1 }));
+export const finishEnumeration: ThunkCustomWrapper<void> =
+  () => async (dispatch, getState) => {
+    const enumerationProgress = selectEnumerationProgress(getState());
+    if (!enumerationProgress) {
+      return;
     }
-  } catch (error) {
-    // The backend rejects the enumeration when the user no longer has edit access (role changed
-    // to viewer, removed from the group). Surface it and stop the enumeration instead of failing
-    // silently in the console. (#614)
-    notifyApiError(error);
-    dispatch(interruptEnumerationAction());
-  }
-};
+    const { dataset, reactions } = enumerationProgress;
+
+    if (reactions.length === 0) {
+      dispatch(finishEnumerationAction(null));
+      return;
+    }
+
+    const datasetEnumeration = prepareDataset(enumerationProgress);
+    const isNewDataset = typeof dataset === 'object';
+    // Capture the active group before the await so a group switch during the request can't
+    // retarget the refetch. We refetch the *active* group's list (which can be null = "All
+    // Groups") to match what the Datasets page shows, rather than the new dataset's own group. (#611)
+    const activeGroupId = selectActiveGroupId(getState());
+
+    try {
+      if (isNewDataset) {
+        const createdDataset = await axiosInstance.post<Dataset>(
+          `/groups/${dataset.groupId}/datasets/enumerate`,
+          datasetEnumeration,
+        );
+        dispatch(finishEnumerationAction(createdDataset.data.id));
+        // Refresh the datasets list so the newly created dataset appears without a manual
+        // page reload, including when the user dismisses the result modal with "Close". (#611)
+        dispatch(getInitialDatasetsList(activeGroupId));
+      } else {
+        const datasetId = dataset;
+        await axiosInstance.post<Dataset>(
+          `/datasets/${datasetId}/enumerate/extend`,
+          datasetEnumeration,
+        );
+        dispatch(finishEnumerationAction(datasetId));
+        dispatch(getDataset(datasetId));
+        dispatch(getReactionsPage({ page: 1 }));
+      }
+    } catch (error) {
+      // The backend rejects the enumeration when the user no longer has edit access (role changed
+      // to viewer, removed from the group). Surface it and stop the enumeration instead of failing
+      // silently in the console. (#614)
+      notifyApiError(error);
+      dispatch(interruptEnumerationAction());
+    }
+  };

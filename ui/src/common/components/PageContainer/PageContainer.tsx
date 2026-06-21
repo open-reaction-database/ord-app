@@ -27,7 +27,11 @@ interface PageContainerProps extends PropsWithChildren {
   badge?: ReactNode;
 }
 
-export function PageContainer({ children, breadcrumbs, badge }: Readonly<PageContainerProps>) {
+export function PageContainer({
+  children,
+  breadcrumbs,
+  badge,
+}: Readonly<PageContainerProps>) {
   return (
     <AppShell
       classNames={{

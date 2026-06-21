@@ -17,7 +17,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { configureStore, type UnknownAction } from '@reduxjs/toolkit';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
-import { addGroupMember, createGroup, getGroupList, removeGroupMembers, updateGroupMembers } from './groups.thunks.ts';
+import {
+  addGroupMember,
+  createGroup,
+  getGroupList,
+  removeGroupMembers,
+  updateGroupMembers,
+} from './groups.thunks.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
@@ -36,7 +42,10 @@ vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() 
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
 // cast to a plain record of mock fns instead.
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 
 function makeStore() {
   const actions: Array<UnknownAction> = [];
@@ -44,7 +53,10 @@ function makeStore() {
     actions.push(action as UnknownAction);
     return next(action);
   };
-  const store = configureStore({ reducer: rootReducer, middleware: getDefault => getDefault().concat(recorder) });
+  const store = configureStore({
+    reducer: rootReducer,
+    middleware: getDefault => getDefault().concat(recorder),
+  });
   return { store, actions, types: () => actions.map(action => action.type) };
 }
 
@@ -74,7 +86,10 @@ describe('createGroup', () => {
     await store.dispatch(createGroup('My group') as unknown as UnknownAction);
     expect(axiosMock.post).toHaveBeenCalledWith('/groups', { name: 'My group' });
     expect(types()).toEqual(
-      expect.arrayContaining([getGroupListActions.request.type, createGroupActions.success.type]),
+      expect.arrayContaining([
+        getGroupListActions.request.type,
+        createGroupActions.success.type,
+      ]),
     );
   });
 });
@@ -83,10 +98,21 @@ describe('updateGroupMembers', () => {
   it('patches the member, refetches the list, and dispatches success', async () => {
     const { store, types } = makeStore();
     store.dispatch(setEditingGroupIdAction(3));
-    await store.dispatch(updateGroupMembers({ user_id: 8, role: USER_ROLES.EDITOR }) as unknown as UnknownAction);
-    expect(axiosMock.patch).toHaveBeenCalledWith('/groups/3/members', { user_id: 8, role: USER_ROLES.EDITOR });
+    await store.dispatch(
+      updateGroupMembers({
+        user_id: 8,
+        role: USER_ROLES.EDITOR,
+      }) as unknown as UnknownAction,
+    );
+    expect(axiosMock.patch).toHaveBeenCalledWith('/groups/3/members', {
+      user_id: 8,
+      role: USER_ROLES.EDITOR,
+    });
     expect(types()).toEqual(
-      expect.arrayContaining([getGroupListActions.request.type, updateGroupMembersActions.success.type]),
+      expect.arrayContaining([
+        getGroupListActions.request.type,
+        updateGroupMembersActions.success.type,
+      ]),
     );
   });
 });
@@ -111,7 +137,9 @@ describe('addGroupMember', () => {
       identity: 'ann@example.com',
       role: USER_ROLES.VIEWER,
     });
-    expect(actions.some(action => action.type === addGroupMemberActions.success.type)).toBe(true);
+    expect(
+      actions.some(action => action.type === addGroupMemberActions.success.type),
+    ).toBe(true);
   });
 
   it.each([
@@ -123,9 +151,9 @@ describe('addGroupMember', () => {
     const { store, actions } = makeStore();
     store.dispatch(setEditingGroupIdAction(3));
     await store.dispatch(addGroupMember('ann@example.com') as unknown as UnknownAction);
-    const failure = actions.find(action => action.type === addGroupMemberActions.failure.type) as unknown as
-      | { payload: string }
-      | undefined;
+    const failure = actions.find(
+      action => action.type === addGroupMemberActions.failure.type,
+    ) as unknown as { payload: string } | undefined;
     expect(failure?.payload).toBe(expected);
   });
 });

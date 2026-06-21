@@ -32,7 +32,10 @@ interface OutcomeListItemHeaderProps {
   pathComponents: ReactionPathComponents;
 }
 
-export function OutcomeListItemHeader({ outcome, pathComponents }: Readonly<OutcomeListItemHeaderProps>) {
+export function OutcomeListItemHeader({
+  outcome,
+  pathComponents,
+}: Readonly<OutcomeListItemHeaderProps>) {
   const { ViewDeleteButtonsComponent } = useContext(reactionContext);
   return (
     <Accordion.Control
@@ -59,8 +62,12 @@ export function OutcomeListItemHeader({ outcome, pathComponents }: Readonly<Outc
           gap="xs"
         >
           <TimeIcon className={classes.shortInfoIcon} />
-          <Text className={clsx(classes.shortInfoText, typographyClasses.secondary2)}>Time: </Text>
-          <Text className={classes.shortInfoText}>{renderValuePrecisionUnit(outcome.reactionTime)}</Text>
+          <Text className={clsx(classes.shortInfoText, typographyClasses.secondary2)}>
+            Time:{' '}
+          </Text>
+          <Text className={classes.shortInfoText}>
+            {renderValuePrecisionUnit(outcome.reactionTime)}
+          </Text>
         </Flex>
       )}
       {outcome.conversion?.value && (

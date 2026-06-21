@@ -31,7 +31,12 @@ class TemplateResponseModel(BaseSchema):
     variables: Json
     molblocks: dict
     modified_at: datetime
-    summary: dict = Field(default_factory=lambda: {"provenance": {"doi": "foo"}, "summary": {"yield": 25.5}})
+    summary: dict = Field(
+        default_factory=lambda: {
+            "provenance": {"doi": "foo"},
+            "summary": {"yield": 25.5},
+        }
+    )
 
     @model_validator(mode="before")
     @classmethod
@@ -72,7 +77,9 @@ class TemplateCreateModel(BaseSchema):
 
 
 class TemplateUpdateModel(BaseSchema):
-    name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)] | None = None
+    name: (
+        Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)] | None
+    ) = None
     binpb: bytes | None = None
     variables: Json | None = None
 

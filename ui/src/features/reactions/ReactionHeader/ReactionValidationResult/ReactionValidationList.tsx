@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import { Anchor, Drawer, Flex, Text } from '@mantine/core';
-import type { ErrorWarningMessage, ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  ErrorWarningMessage,
+  ReactionValidation,
+} from 'store/entities/reactions/reactions.types.ts';
 import { CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
@@ -33,7 +36,11 @@ interface ErrorWarningMessageDisplayProps {
   type: 'warning' | 'error';
 }
 
-function ErrorWarningMessageDisplay({ message, type, onClose }: Readonly<ErrorWarningMessageDisplayProps>) {
+function ErrorWarningMessageDisplay({
+  message,
+  type,
+  onClose,
+}: Readonly<ErrorWarningMessageDisplayProps>) {
   const dispatch = useAppDispatch();
   const onClick = () => {
     if ('path' in message) {
@@ -47,16 +54,26 @@ function ErrorWarningMessageDisplay({ message, type, onClose }: Readonly<ErrorWa
       wrap="wrap"
       gap="xs"
     >
-      {type === 'warning' ? <WarningIcon className={classes.icon} /> : <CrossCircleIcon className={classes.icon} />}
+      {type === 'warning' ? (
+        <WarningIcon className={classes.icon} />
+      ) : (
+        <CrossCircleIcon className={classes.icon} />
+      )}
       <Text className={classes.path}>
-        {'path' in message && <Anchor onClick={onClick}>{message.originalPath}:</Anchor>}
+        {'path' in message && (
+          <Anchor onClick={onClick}>{message.originalPath}:</Anchor>
+        )}
       </Text>
       <Text>{message.text}</Text>
     </Flex>
   );
 }
 
-export function ReactionValidationList({ opened, onClose, validation }: Readonly<ReactionValidationListProps>) {
+export function ReactionValidationList({
+  opened,
+  onClose,
+  validation,
+}: Readonly<ReactionValidationListProps>) {
   return (
     <Drawer
       opened={opened}

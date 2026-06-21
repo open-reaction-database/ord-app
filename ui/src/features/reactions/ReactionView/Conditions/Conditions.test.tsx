@@ -21,7 +21,14 @@ describe('Conditions', () => {
   it('renders the conditions section with each condition-group heading', () => {
     const { getByText } = renderInReactionView(<Conditions reactionId={1} />);
     expect(getByText('Conditions')).toBeInTheDocument();
-    for (const heading of ['Temperature', 'Pressure', 'Stirring', 'Illumination', 'Electrochemistry', 'Flow']) {
+    for (const heading of [
+      'Temperature',
+      'Pressure',
+      'Stirring',
+      'Illumination',
+      'Electrochemistry',
+      'Flow',
+    ]) {
       expect(getByText(heading)).toBeInTheDocument();
     }
   });

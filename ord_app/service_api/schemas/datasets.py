@@ -21,7 +21,11 @@ from uuid import uuid4
 from pydantic import Field, StringConstraints, field_validator, model_validator
 from sqlalchemy import Row
 
-from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH, BaseSchema
+from ord_app.service_api.schemas.base import (
+    MAX_CRITICAL_FIELD_LENGTH,
+    MAX_FIELD_LENGTH,
+    BaseSchema,
+)
 from ord_app.service_api.schemas.groups import GroupUserResponseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
@@ -74,7 +78,9 @@ class DatasetWithReactionCountResponseSchema(DatasetResponseSchema):
 
 class DatasetCreateSchema(BaseSchema):
     name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)]
-    description: Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None = ""
+    description: (
+        Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None
+    ) = ""
 
     @field_validator("name", mode="before")
     def set_name_default(cls, value: str | None) -> str:
@@ -85,7 +91,9 @@ class DatasetCreateSchema(BaseSchema):
 
 class DatasetEnumerateCreateSchema(BaseSchema):
     name: Annotated[str, StringConstraints(max_length=MAX_CRITICAL_FIELD_LENGTH)]
-    description: Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None = ""
+    description: (
+        Annotated[str, StringConstraints(max_length=MAX_FIELD_LENGTH)] | None
+    ) = ""
     reactions: list[bytes]
 
     @field_validator("reactions", mode="before")

@@ -26,7 +26,8 @@ interface NotFoundPageProps {
 
 export function NotFoundPage({ rejectValue }: Readonly<NotFoundPageProps>) {
   const errorCode = rejectValue?.errorCode ?? 404;
-  const errorMessage = rejectValue?.errorMessage ?? 'The requested page or resource could not be found';
+  const errorMessage =
+    rejectValue?.errorMessage ?? 'The requested page or resource could not be found';
   return (
     <PageContainer breadcrumbs={[]}>
       <Flex className={classes.container}>

@@ -17,42 +17,62 @@ import { describe, it, expect } from 'vitest';
 import { replaceNameIdInReactionComponentPath } from './replaceNameIdInReactionComponentPath.ts';
 import type { AppReaction } from '../entities/reactions/reactions.types.ts';
 
-const reactionWithInput = { inputs: { 'uuid-1': { id: 'i1', name: 'reagent' } } } as unknown as AppReaction;
+const reactionWithInput = {
+  inputs: { 'uuid-1': { id: 'i1', name: 'reagent' } },
+} as unknown as AppReaction;
 
 describe('replaceNameIdInReactionComponentPath', () => {
   it('leaves a path without map keys or condition measurements unchanged', () => {
-    expect(replaceNameIdInReactionComponentPath(['setup', 'vessel'], {} as AppReaction, 'id')).toEqual([
-      'setup',
-      'vessel',
-    ]);
+    expect(
+      replaceNameIdInReactionComponentPath(
+        ['setup', 'vessel'],
+        {} as AppReaction,
+        'id',
+      ),
+    ).toEqual(['setup', 'vessel']);
   });
 
   it('replaces an input name with its id when resolving to id', () => {
-    expect(replaceNameIdInReactionComponentPath(['inputs', 'reagent'], reactionWithInput, 'id')).toEqual([
-      'inputs',
-      'i1',
-    ]);
+    expect(
+      replaceNameIdInReactionComponentPath(
+        ['inputs', 'reagent'],
+        reactionWithInput,
+        'id',
+      ),
+    ).toEqual(['inputs', 'i1']);
   });
 
   it('replaces an input id with its name when resolving to name', () => {
-    expect(replaceNameIdInReactionComponentPath(['inputs', 'i1'], reactionWithInput, 'name')).toEqual([
-      'inputs',
-      'reagent',
-    ]);
+    expect(
+      replaceNameIdInReactionComponentPath(['inputs', 'i1'], reactionWithInput, 'name'),
+    ).toEqual(['inputs', 'reagent']);
   });
 
   it('throws when the referenced input is not present in the reaction map', () => {
     // findEntityByName uses a non-null assertion, so a missing key throws on the subsequent access.
-    expect(() => replaceNameIdInReactionComponentPath(['inputs', 'missing-key'], reactionWithInput, 'id')).toThrow();
+    expect(() =>
+      replaceNameIdInReactionComponentPath(
+        ['inputs', 'missing-key'],
+        reactionWithInput,
+        'id',
+      ),
+    ).toThrow();
   });
 
   it('rewrites a condition `measurements` segment to its prefixed form and back', () => {
-    expect(replaceNameIdInReactionComponentPath(['temperature', 'measurements'], {} as AppReaction, 'id')).toEqual([
-      'temperature',
-      'temperatureMeasurements',
-    ]);
     expect(
-      replaceNameIdInReactionComponentPath(['temperature', 'temperatureMeasurements'], {} as AppReaction, 'name'),
+      replaceNameIdInReactionComponentPath(
+        ['temperature', 'measurements'],
+        {} as AppReaction,
+        'id',
+      ),
+    ).toEqual(['temperature', 'temperatureMeasurements']);
+    expect(
+      replaceNameIdInReactionComponentPath(
+        ['temperature', 'temperatureMeasurements'],
+        {} as AppReaction,
+        'name',
+      ),
     ).toEqual(['temperature', 'measurements']);
   });
 });

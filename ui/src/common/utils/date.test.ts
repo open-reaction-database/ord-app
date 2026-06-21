@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { convertUtcDateToUserTZ, convertUserTZDateToUtc, formatUtcDateToDisplay, formatDateToDisplay } from './date.ts';
+import {
+  convertUtcDateToUserTZ,
+  convertUserTZDateToUtc,
+  formatUtcDateToDisplay,
+  formatDateToDisplay,
+} from './date.ts';
 
 // DATE_TIME_HUMAN_FORMAT renders as e.g. "01.06.2024 02:00 pm" (DD.MM.YYYY hh:mm a).
 const humanFormat = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)$/;

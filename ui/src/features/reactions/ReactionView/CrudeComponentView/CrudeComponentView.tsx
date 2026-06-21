@@ -22,7 +22,9 @@ interface CrudeComponentViewProps {
   crudeComponent: ReactionCrudeComponent;
 }
 
-export function CrudeComponentView({ crudeComponent }: Readonly<CrudeComponentViewProps>) {
+export function CrudeComponentView({
+  crudeComponent,
+}: Readonly<CrudeComponentViewProps>) {
   const dispatch = useAppDispatch();
 
   const onClick = () => {

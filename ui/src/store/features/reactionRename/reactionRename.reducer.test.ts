@@ -25,11 +25,20 @@ describe('reactionRenameReducer', () => {
   });
 
   it('follows the open action', () => {
-    expect(reactionRenameReducer(false, setReactionRenameOpenedAction(true))).toBe(true);
-    expect(reactionRenameReducer(true, setReactionRenameOpenedAction(false))).toBe(false);
+    expect(reactionRenameReducer(false, setReactionRenameOpenedAction(true))).toBe(
+      true,
+    );
+    expect(reactionRenameReducer(true, setReactionRenameOpenedAction(false))).toBe(
+      false,
+    );
   });
 
   it('closes once a rename succeeds', () => {
-    expect(reactionRenameReducer(true, renameReactionActions.success({} as RenameReactionPayload))).toBe(false);
+    expect(
+      reactionRenameReducer(
+        true,
+        renameReactionActions.success({} as RenameReactionPayload),
+      ),
+    ).toBe(false);
   });
 });

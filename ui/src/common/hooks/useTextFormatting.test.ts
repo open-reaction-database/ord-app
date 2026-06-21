@@ -22,6 +22,8 @@ describe('getFormattedValue', () => {
   });
 
   it('returns the input unchanged when there is no mapping', () => {
-    expect(getFormattedValue('__not_a_formatting_key__')).toBe('__not_a_formatting_key__');
+    expect(getFormattedValue('__not_a_formatting_key__')).toBe(
+      '__not_a_formatting_key__',
+    );
   });
 });

@@ -18,11 +18,14 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
-const { buildSelector } = createSelectorFactory(state => state.entities.reactions.reactionsPreviews);
+const { buildSelector } = createSelectorFactory(
+  state => state.entities.reactions.reactionsPreviews,
+);
 
 export const selectReactionsPreviews = buildSelector(state => state.previewsByEntityId);
 
-export const selectPreviewsIds = (_state: unknown, entityIds: Array<string>) => entityIds;
+export const selectPreviewsIds = (_state: unknown, entityIds: Array<string>) =>
+  entityIds;
 
 export const selectPreviewsByIds = createSelector(
   [selectReactionsPreviews, selectPreviewsIds],
@@ -36,5 +39,6 @@ export const selectPreviewsByIds = createSelector(
     ),
 );
 
-export const selectPreviewsByIdsWrapper = (entityIds: Array<string>) => (state: AppState) =>
-  selectPreviewsByIds(state, entityIds);
+export const selectPreviewsByIdsWrapper =
+  (entityIds: Array<string>) => (state: AppState) =>
+    selectPreviewsByIds(state, entityIds);

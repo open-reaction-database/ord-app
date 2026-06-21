@@ -14,27 +14,47 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { AddUpdateRemoveVariablePayload, ImportTemplatePayload, TemplateCreator } from './templates.types.ts';
+import type {
+  AddUpdateRemoveVariablePayload,
+  ImportTemplatePayload,
+  TemplateCreator,
+} from './templates.types.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 const { createAsyncAction } = createActionFactory('templates');
 
 export const getTemplateActions = createAsyncAction<number, ReactionTemplate>('get');
 
-export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemplate>>('get_all_templates');
-
-export const createNewTemplateActions = createAsyncAction<TemplateCreator, ReactionTemplate>('create');
-
-export const removeTemplateActions = createAsyncAction<string, string>('remove_template');
-
-export const renameTemplateActions = createAsyncAction<{ templateId: string; name: string }, ReactionTemplate>(
-  'rename_template',
+export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemplate>>(
+  'get_all_templates',
 );
 
-export const addUpdateVariableActions = createAsyncAction<AddUpdateRemoveVariablePayload, void>('addUpdateVariable');
+export const createNewTemplateActions = createAsyncAction<
+  TemplateCreator,
+  ReactionTemplate
+>('create');
 
-export const removeVariableActions = createAsyncAction<AddUpdateRemoveVariablePayload, void>('removeVariable');
-
-export const importTemplateFromFileActions = createAsyncAction<ImportTemplatePayload, ReactionTemplate, string>(
-  'importFromFile',
+export const removeTemplateActions = createAsyncAction<string, string>(
+  'remove_template',
 );
+
+export const renameTemplateActions = createAsyncAction<
+  { templateId: string; name: string },
+  ReactionTemplate
+>('rename_template');
+
+export const addUpdateVariableActions = createAsyncAction<
+  AddUpdateRemoveVariablePayload,
+  void
+>('addUpdateVariable');
+
+export const removeVariableActions = createAsyncAction<
+  AddUpdateRemoveVariablePayload,
+  void
+>('removeVariable');
+
+export const importTemplateFromFileActions = createAsyncAction<
+  ImportTemplatePayload,
+  ReactionTemplate,
+  string
+>('importFromFile');

@@ -22,10 +22,16 @@ import { describe, it, expect, vi } from 'vitest';
 // Keep the real ord namespace (other modules read ord.ReactionRole etc. at load)
 // and override only the two decode helpers parseReaction calls.
 vi.mock('ord-schema-protobufjs', async importActual => {
-  const actual = (await importActual()) as { ord: Record<string, unknown> } & Record<string, unknown>;
+  const actual = (await importActual()) as { ord: Record<string, unknown> } & Record<
+    string,
+    unknown
+  >;
   return {
     ...actual,
-    ord: { ...actual.ord, Reaction: { decode: vi.fn(() => ({})), toObject: vi.fn(() => ({})) } },
+    ord: {
+      ...actual.ord,
+      Reaction: { decode: vi.fn(() => ({})), toObject: vi.fn(() => ({})) },
+    },
   };
 });
 vi.mock('./reactions.converters.ts', () => ({
@@ -45,7 +51,12 @@ import {
   reactionFlatPathToSidebars,
   removeDeepReactionPart,
 } from './reactions.utils.ts';
-import type { AppReaction, ReactionMolBlocks, OrdValidation, ReactionResponse } from './reactions.types.ts';
+import type {
+  AppReaction,
+  ReactionMolBlocks,
+  OrdValidation,
+  ReactionResponse,
+} from './reactions.types.ts';
 import type { Pages } from 'common/types';
 
 describe('generateDeepPartialReactionByPath', () => {
@@ -59,7 +70,9 @@ describe('generateDeepPartialReactionByPath', () => {
   });
 
   it('creates arrays for numeric path components', () => {
-    expect(generateDeepPartialReactionByPath(['inputs', 0], 'x')).toEqual({ inputs: ['x'] });
+    expect(generateDeepPartialReactionByPath(['inputs', 0], 'x')).toEqual({
+      inputs: ['x'],
+    });
   });
 });
 
@@ -89,11 +102,15 @@ describe('removeDeepReactionPart', () => {
   });
 
   it('removes a nested key without touching siblings', () => {
-    expect(removeDeepReactionPart({ a: { b: 1, c: 2 } }, ['a', 'b'])).toEqual({ a: { c: 2 } });
+    expect(removeDeepReactionPart({ a: { b: 1, c: 2 } }, ['a', 'b'])).toEqual({
+      a: { c: 2 },
+    });
   });
 
   it('removes a nested array element', () => {
-    expect(removeDeepReactionPart({ items: [10, 20, 30] }, ['items', 1])).toEqual({ items: [10, 30] });
+    expect(removeDeepReactionPart({ items: [10, 20, 30] }, ['items', 1])).toEqual({
+      items: [10, 30],
+    });
   });
 });
 
@@ -119,11 +136,17 @@ describe('convertObjectToNullIfEmpty', () => {
 
 describe('deepMergeWithArrayMerge', () => {
   it('deep-merges nested objects, keeping keys from both sides', () => {
-    expect(deepMergeWithArrayMerge({ a: { x: 1 }, b: 1 }, { a: { y: 2 } })).toEqual({ a: { x: 1, y: 2 }, b: 1 });
+    expect(deepMergeWithArrayMerge({ a: { x: 1 }, b: 1 }, { a: { y: 2 } })).toEqual({
+      a: { x: 1, y: 2 },
+      b: 1,
+    });
   });
 
   it('merges arrays element-wise by index rather than concatenating', () => {
-    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [{ b: 9 }])).toEqual([{ a: 1, b: 9 }, { a: 2 }]);
+    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [{ b: 9 }])).toEqual([
+      { a: 1, b: 9 },
+      { a: 2 },
+    ]);
   });
 
   it('replaces a primitive array element at the same index', () => {
@@ -131,7 +154,10 @@ describe('deepMergeWithArrayMerge', () => {
   });
 
   it('skips falsy source items, preserving the target element at that index', () => {
-    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [null, { b: 9 }])).toEqual([{ a: 1 }, { a: 2, b: 9 }]);
+    expect(deepMergeWithArrayMerge([{ a: 1 }, { a: 2 }], [null, { b: 9 }])).toEqual([
+      { a: 1 },
+      { a: 2, b: 9 },
+    ]);
   });
 
   it('appends a new element when the target has no value at that index', () => {
@@ -154,10 +180,9 @@ describe('reactionFlatPathToSidebars', () => {
   });
 
   it('treats collection-less entities (e.g. conditions) as a single segment with no index skip', () => {
-    expect(reactionFlatPathToSidebars(['conditions', 'temperatureMeasurements', 0])).toEqual([
-      ['conditions'],
-      ['conditions', 'temperatureMeasurements', 0],
-    ]);
+    expect(
+      reactionFlatPathToSidebars(['conditions', 'temperatureMeasurements', 0]),
+    ).toEqual([['conditions'], ['conditions', 'temperatureMeasurements', 0]]);
   });
 
   it('ignores path components that are neither collection-less entities nor known collections', () => {
@@ -169,13 +194,26 @@ describe('getReactionPreviews', () => {
   it('maps molblocks onto component/product/measurement/workup ids across inputs, outcomes, and workups', () => {
     const reaction = {
       inputs: { in1: { name: 'reagentA', components: [{ id: 'comp1' }] } },
-      outcomes: [{ products: [{ id: 'prod1', measurements: [{ authenticStandard: { id: 'auth1' } }] }] }],
+      outcomes: [
+        {
+          products: [
+            { id: 'prod1', measurements: [{ authenticStandard: { id: 'auth1' } }] },
+          ],
+        },
+      ],
       workups: [{ input: { components: [{ id: 'wcomp1' }] } }],
     } as unknown as AppReaction;
     const molblocks = {
       inputs: { reagentA: ['COMP1_MB'] },
       outcomes: [
-        { products: [{ molblock: 'PROD1_MB', measurements: [{ authentic_standard: { molblock: 'AUTH1_MB' } }] }] },
+        {
+          products: [
+            {
+              molblock: 'PROD1_MB',
+              measurements: [{ authentic_standard: { molblock: 'AUTH1_MB' } }],
+            },
+          ],
+        },
       ],
       workups: [['WCOMP1_MB']],
     } as unknown as ReactionMolBlocks;
@@ -191,12 +229,25 @@ describe('getReactionPreviews', () => {
   it('skips measurements without an authentic standard and workups whose input has no components', () => {
     const reaction = {
       inputs: {},
-      outcomes: [{ products: [{ id: 'prod1', measurements: [{ authenticStandard: undefined }] }] }],
+      outcomes: [
+        {
+          products: [{ id: 'prod1', measurements: [{ authenticStandard: undefined }] }],
+        },
+      ],
       workups: [{ input: undefined }],
     } as unknown as AppReaction;
     const molblocks = {
       inputs: {},
-      outcomes: [{ products: [{ molblock: 'PROD1_MB', measurements: [{ authentic_standard: { molblock: 'X' } }] }] }],
+      outcomes: [
+        {
+          products: [
+            {
+              molblock: 'PROD1_MB',
+              measurements: [{ authentic_standard: { molblock: 'X' } }],
+            },
+          ],
+        },
+      ],
       workups: [['UNUSED_MB']],
     } as unknown as ReactionMolBlocks;
 
@@ -210,7 +261,10 @@ describe('parseValidation', () => {
   } as unknown as AppReaction;
 
   it('returns plain text for a message with no path separator', () => {
-    const result = parseValidation({ errors: [], warnings: ['just a warning'] } as OrdValidation, reaction);
+    const result = parseValidation(
+      { errors: [], warnings: ['just a warning'] } as OrdValidation,
+      reaction,
+    );
     expect(result.warnings).toEqual([{ text: 'just a warning' }]);
     expect(result.errors).toEqual([]);
   });
@@ -221,19 +275,31 @@ describe('parseValidation', () => {
       warnings: [],
     } as OrdValidation;
     expect(parseValidation(validation, reaction).errors).toEqual([
-      { text: ' bad value', path: ['inputs', 'input-id-1', 'value'], originalPath: 'inputs.reagentA.value' },
+      {
+        text: ' bad value',
+        path: ['inputs', 'input-id-1', 'value'],
+        originalPath: 'inputs.reagentA.value',
+      },
     ]);
   });
 
   it('falls back to the raw text when the path cannot be resolved', () => {
-    const validation = { errors: ['inputs["ghost"].value: orphaned'], warnings: [] } as OrdValidation;
-    expect(parseValidation(validation, reaction).errors).toEqual([{ text: 'inputs["ghost"].value: orphaned' }]);
+    const validation = {
+      errors: ['inputs["ghost"].value: orphaned'],
+      warnings: [],
+    } as OrdValidation;
+    expect(parseValidation(validation, reaction).errors).toEqual([
+      { text: 'inputs["ghost"].value: orphaned' },
+    ]);
   });
 });
 
 // Real ReactionResponse field names so the pass-through assertions are a faithful
 // spec; binpb/molblocks/summary still need a cast (decode + render are stubbed).
-const reactionResponse = (id: number, validation: ReactionResponse['validation'] = null) =>
+const reactionResponse = (
+  id: number,
+  validation: ReactionResponse['validation'] = null,
+) =>
   ({
     id,
     pb_reaction_id: `rx${id}`,
@@ -256,8 +322,13 @@ describe('parseReaction', () => {
   });
 
   it('parses validation when present', () => {
-    const result = parseReaction(reactionResponse(2, { errors: ['plain error'], warnings: [] }));
-    expect(result.validation).toEqual({ errors: [{ text: 'plain error' }], warnings: [] });
+    const result = parseReaction(
+      reactionResponse(2, { errors: ['plain error'], warnings: [] }),
+    );
+    expect(result.validation).toEqual({
+      errors: [{ text: 'plain error' }],
+      warnings: [],
+    });
   });
 });
 

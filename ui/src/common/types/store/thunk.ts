@@ -19,7 +19,12 @@ import type { AppState } from 'store/configureAppStore.ts';
 
 export type AppThunk<T extends AnyAsyncAction = AnyAsyncAction> = (
   parameter: Parameters<T['request']>[0],
-) => ThunkAction<Promise<ReturnType<T['success']> | ReturnType<T['failure']>>, AppState, never, Action>;
+) => ThunkAction<
+  Promise<ReturnType<T['success']> | ReturnType<T['failure']>>,
+  AppState,
+  never,
+  Action
+>;
 
 export type AppVoidThunk<T extends AnyAsyncAction> = (
   parameter: Parameters<T['request']>[0],
@@ -29,4 +34,6 @@ export type ThunkWrapper<T extends AnyAsyncAction> = (
   extraParameter: Parameters<T['request']>[0],
 ) => ThunkAction<void, AppState, never, Action>;
 
-export type ThunkCustomWrapper<T, R = void> = (param: T) => ThunkAction<R, AppState, never, Action>;
+export type ThunkCustomWrapper<T, R = void> = (
+  param: T,
+) => ThunkAction<R, AppState, never, Action>;

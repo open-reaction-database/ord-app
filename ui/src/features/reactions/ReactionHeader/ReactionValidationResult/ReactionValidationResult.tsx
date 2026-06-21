@@ -25,10 +25,14 @@ interface ReactionValidationResultProps {
   reactionId: number;
 }
 
-export function ReactionValidationResult({ reactionId }: Readonly<ReactionValidationResultProps>) {
+export function ReactionValidationResult({
+  reactionId,
+}: Readonly<ReactionValidationResultProps>) {
   const [opened, { toggle, close }] = useDisclosure();
   const { is_valid, validation } = useSelector(selectReactionById(reactionId));
-  const hasErrorsWarnings = validation !== null && (validation.errors.length > 0 || validation.warnings.length > 0);
+  const hasErrorsWarnings =
+    validation !== null &&
+    (validation.errors.length > 0 || validation.warnings.length > 0);
 
   useEffect(() => {
     if (is_valid) {

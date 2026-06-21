@@ -28,12 +28,18 @@ import { compareNamedEntities } from 'features/reactions/ReactionEntities/entity
 import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { ProductsComponentsList } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/ProductComponentsList.tsx';
 
-const createEmptyAnalysis = (_: number, analyses: Array<unknown>): [string, ReactionAnalysis] => {
+const createEmptyAnalysis = (
+  _: number,
+  analyses: Array<unknown>,
+): [string, ReactionAnalysis] => {
   const uniqueName = findReactionEntityUniqueName(
     'Analysis',
     (analyses as Array<ReactionAnalysis>).map(({ name }) => name),
   );
-  const analysis = ordAnalysisToReaction(ord.Analysis.toObject(new ord.Analysis()), uniqueName);
+  const analysis = ordAnalysisToReaction(
+    ord.Analysis.toObject(new ord.Analysis()),
+    uniqueName,
+  );
   return [analysis.id, analysis];
 };
 

@@ -32,7 +32,9 @@ interface CreateReactionFromFileProps {
   onClose: () => void;
 }
 
-export function CreateReactionFromFile({ onClose }: Readonly<CreateReactionFromFileProps>) {
+export function CreateReactionFromFile({
+  onClose,
+}: Readonly<CreateReactionFromFileProps>) {
   const dispatch = useAppDispatch();
   const isReactionCreating = useSelector(selectIsReactionCreating);
 

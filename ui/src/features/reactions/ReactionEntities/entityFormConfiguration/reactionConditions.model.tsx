@@ -52,9 +52,15 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import type { FieldConfiguration } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
 import { renderValuePrecisionUnit } from '../../ReactionView/renderValuePrecisionUnit.ts';
 
-const temperatureMeasurementsPathComponents = ['temperature', 'temperatureMeasurements'];
+const temperatureMeasurementsPathComponents = [
+  'temperature',
+  'temperatureMeasurements',
+];
 
-const electrochemistryMeasurementsPathComponents = ['electrochemistry', 'electrochemistryMeasurements'];
+const electrochemistryMeasurementsPathComponents = [
+  'electrochemistry',
+  'electrochemistryMeasurements',
+];
 
 const pressureMeasurementsPathComponents = ['pressure', 'pressureMeasurements'];
 
@@ -303,7 +309,9 @@ export const reactionConditions: Array<ReactionFormNode> = [
         pressureMeasurementsPathComponents,
         () =>
           ordPressureMeasurementToReaction(
-            ord.PressureConditions.PressureMeasurement.toObject(new ord.PressureConditions.PressureMeasurement()),
+            ord.PressureConditions.PressureMeasurement.toObject(
+              new ord.PressureConditions.PressureMeasurement(),
+            ),
           ),
         [
           {

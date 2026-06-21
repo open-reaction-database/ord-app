@@ -92,7 +92,9 @@ export interface ReactionValuePrecision {
   precision: Optional<number>;
 }
 
-export interface ReactionValuePrecisionUnit<T extends string> extends ReactionValuePrecision {
+export interface ReactionValuePrecisionUnit<
+  T extends string,
+> extends ReactionValuePrecision {
   units: T;
 }
 
@@ -124,12 +126,17 @@ export type ReactionLength = ReactionValuePrecisionUnit<ReactionLengthType>;
 
 export type ReactionCurrent = ReactionValuePrecisionUnit<ReactionCurrentType>;
 
-export type ReactionMassSpec = Omit<ord.ProductMeasurement.IMassSpecMeasurementDetails, 'type' | 'eicMasses'> & {
+export type ReactionMassSpec = Omit<
+  ord.ProductMeasurement.IMassSpecMeasurementDetails,
+  'type' | 'eicMasses'
+> & {
   type: ReactionMassSpecType;
   eicMasses: Array<number>;
 };
 
-export interface ReactionCompoundIdentifier extends WithId<Omit<ord.ICompoundIdentifier, 'type'>> {
+export interface ReactionCompoundIdentifier extends WithId<
+  Omit<ord.ICompoundIdentifier, 'type'>
+> {
   type: CompoundIdentifierType;
 }
 
@@ -141,7 +148,10 @@ export type PressureControl = ReactionTypeDetails<PressureControlType>;
 
 export type ReactionAtmosphere = ReactionTypeDetails<ReactionAtmosphereType>;
 
-export interface StirringRate extends Pick<ord.StirringConditions.IStirringRate, 'details' | 'rpm'> {
+export interface StirringRate extends Pick<
+  ord.StirringConditions.IStirringRate,
+  'details' | 'rpm'
+> {
   type: StirringRateType;
 }
 

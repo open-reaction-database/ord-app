@@ -65,7 +65,9 @@ export const reactionAnalysisToOrd = ({
   withoutIdName({
     type: reactionAnalysisTypeToOrd(type),
     data: reactionDataMapToOrdDataMap(analysisData),
-    instrumentLastCalibrated: instrumentLastCalibrated ? { value: instrumentLastCalibrated } : null,
+    instrumentLastCalibrated: instrumentLastCalibrated
+      ? { value: instrumentLastCalibrated }
+      : null,
     isOfIsolatedSpecies: reactionBooleanToOrd(isOfIsolatedSpecies),
     ...rest,
   });
@@ -132,7 +134,9 @@ export const linkReactionOutcome = (outcome: ReactionOutcome): ReactionOutcome =
         if (updatedMeasurement.analysis) {
           const { name, id } = updatedMeasurement.analysis;
           const analysis = (id ? analysesById[id] : analysesByNames[name]) ?? null;
-          updatedMeasurement.analysis = analysis ? { name: analysis.name, id: analysis.id } : null;
+          updatedMeasurement.analysis = analysis
+            ? { name: analysis.name, id: analysis.id }
+            : null;
         }
         return updatedMeasurement;
       }),

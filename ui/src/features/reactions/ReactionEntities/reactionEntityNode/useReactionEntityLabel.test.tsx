@@ -18,7 +18,8 @@ import { isValidElement } from 'react';
 import { useReactionEntityLabel } from './useReactionEntityLabel.tsx';
 import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-const field = (label: unknown): ReactionFormStandaloneField => ({ label }) as ReactionFormStandaloneField;
+const field = (label: unknown): ReactionFormStandaloneField =>
+  ({ label }) as ReactionFormStandaloneField;
 
 describe('useReactionEntityLabel', () => {
   it('returns null when no config is provided', () => {

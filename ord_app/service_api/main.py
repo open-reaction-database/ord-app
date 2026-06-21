@@ -29,11 +29,20 @@ from starlette.responses import JSONResponse
 
 from ord_app.service_api.constants import AppEnvs
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
-from ord_app.service_api.resources.v1 import auth, datasets, group, reactions, templates, users, utilities
+from ord_app.service_api.resources.v1 import (
+    auth,
+    datasets,
+    group,
+    reactions,
+    templates,
+    users,
+    utilities,
+)
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
-RDLogger.DisableLog("rdApp.*")  # ty: ignore[unresolved-attribute]  # rdkit ships no type stubs
+# rdkit ships no type stubs
+RDLogger.DisableLog("rdApp.*")  # ty: ignore[unresolved-attribute]
 logger.remove()
 match RuntimeSettings.app_env:
     case AppEnvs.production:
@@ -60,15 +69,23 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await app.state.background_task
 
 
-app = FastAPI(root_path="/service_api", swagger_ui_parameters={"tryItOutEnabled": True}, lifespan=lifespan)
+app = FastAPI(
+    root_path="/service_api",
+    swagger_ui_parameters={"tryItOutEnabled": True},
+    lifespan=lifespan,
+)
 
 
 @app.middleware("http")
-async def catch_errors(request: Request, call_next: RequestResponseEndpoint) -> Response:
+async def catch_errors(
+    request: Request, call_next: RequestResponseEndpoint
+) -> Response:
     try:
         return await call_next(request)
     except (DataError, DBAPIError) as err:
-        context_err = (err.orig.__context__ or err.orig) if err.orig is not None else err
+        context_err = (
+            (err.orig.__context__ or err.orig) if err.orig is not None else err
+        )
         if isinstance(context_err, asyncpg.UniqueViolationError):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,

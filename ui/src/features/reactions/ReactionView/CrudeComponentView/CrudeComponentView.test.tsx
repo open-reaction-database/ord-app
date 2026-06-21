@@ -19,7 +19,10 @@ import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { CrudeComponentView } from './CrudeComponentView.tsx';
 import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
-const searchReaction = vi.fn((id: string) => ({ type: 'reactions/searchReaction/mock', payload: id }));
+const searchReaction = vi.fn((id: string) => ({
+  type: 'reactions/searchReaction/mock',
+  payload: id,
+}));
 vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   searchReaction: (id: string) => searchReaction(id),
@@ -28,7 +31,9 @@ vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
 describe('CrudeComponentView', () => {
   it('renders a link with the source reaction id and searches it on click', () => {
     const { getByText } = renderWithProviders(
-      <CrudeComponentView crudeComponent={{ reactionId: 'rxn-123' } as ReactionCrudeComponent} />,
+      <CrudeComponentView
+        crudeComponent={{ reactionId: 'rxn-123' } as ReactionCrudeComponent}
+      />,
     );
     const link = getByText('rxn-123');
     expect(link).toBeInTheDocument();

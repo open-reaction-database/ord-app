@@ -64,7 +64,11 @@ export function TemplatePage() {
   // Once the template list has loaded, an unknown id is genuinely missing — show a 404 instead of
   // a blank page. While templates are still loading we keep rendering so we don't flash a 404. (#496)
   if (areTemplatesLoaded && !template) {
-    return <NotFoundPage rejectValue={{ errorCode: 404, errorMessage: 'Template not found' }} />;
+    return (
+      <NotFoundPage
+        rejectValue={{ errorCode: 404, errorMessage: 'Template not found' }}
+      />
+    );
   }
 
   return (

@@ -41,51 +41,58 @@ const groupNameSearch = createReducer('', builder => {
 });
 
 const groupsById = createReducer<ItemsById<GroupItem>>({}, builder => {
-  builder.addCase(getGroupListActions.success, (_, action) => itemsById(action.payload, getGroupId));
+  builder.addCase(getGroupListActions.success, (_, action) =>
+    itemsById(action.payload, getGroupId),
+  );
 });
 
-const groupsMembersByGroupId = createReducer<ItemsById<Array<GroupMember>>>({}, builder => {
-  builder.addCase(getGroupMembersActions.success, (state, action) => {
-    const { groupId, members } = action.payload;
+const groupsMembersByGroupId = createReducer<ItemsById<Array<GroupMember>>>(
+  {},
+  builder => {
+    builder.addCase(getGroupMembersActions.success, (state, action) => {
+      const { groupId, members } = action.payload;
 
-    return {
-      ...state,
-      [groupId]: members,
-    };
-  });
-  builder.addCase(updateGroupMembersActions.success, (state, action) => {
-    const { groupId, member: updatedMember } = action.payload;
+      return {
+        ...state,
+        [groupId]: members,
+      };
+    });
+    builder.addCase(updateGroupMembersActions.success, (state, action) => {
+      const { groupId, member: updatedMember } = action.payload;
 
-    const updatedMembers = state[groupId].map(member =>
-      member.user.id === updatedMember.user.id ? updatedMember : member,
-    );
+      const updatedMembers = state[groupId].map(member =>
+        member.user.id === updatedMember.user.id ? updatedMember : member,
+      );
 
-    return {
-      ...state,
-      [groupId]: updatedMembers,
-    };
-  });
-  builder.addCase(removeGroupMembersActions.success, (state, action) => {
-    const { groupId, membersId } = action.payload;
+      return {
+        ...state,
+        [groupId]: updatedMembers,
+      };
+    });
+    builder.addCase(removeGroupMembersActions.success, (state, action) => {
+      const { groupId, membersId } = action.payload;
 
-    const updatedMembers = state[groupId].filter(member => !membersId.includes(member.user.id));
+      const updatedMembers = state[groupId].filter(
+        member => !membersId.includes(member.user.id),
+      );
 
-    return {
-      ...state,
-      [groupId]: updatedMembers,
-    };
-  });
-  builder.addCase(addGroupMemberActions.success, (state, action) => {
-    const { groupId, member } = action.payload;
+      return {
+        ...state,
+        [groupId]: updatedMembers,
+      };
+    });
+    builder.addCase(addGroupMemberActions.success, (state, action) => {
+      const { groupId, member } = action.payload;
 
-    const updatedMembers = [...state[groupId], member];
+      const updatedMembers = [...state[groupId], member];
 
-    return {
-      ...state,
-      [groupId]: updatedMembers,
-    };
-  });
-});
+      return {
+        ...state,
+        [groupId]: updatedMembers,
+      };
+    });
+  },
+);
 
 const addMemberInputValue = createReducer('', builder => {
   builder.addCase(setAddMemberInputValueAction, (_, action) => action.payload);

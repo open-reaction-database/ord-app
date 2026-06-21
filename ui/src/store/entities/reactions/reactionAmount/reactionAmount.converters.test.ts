@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { ordAmountToReaction, reactionAmountToOrd } from './reactionAmount.converters.ts';
+import {
+  ordAmountToReaction,
+  reactionAmountToOrd,
+} from './reactionAmount.converters.ts';
 import {
   appAmountUnspecified,
   massUnitNames,
@@ -22,7 +25,11 @@ import {
   volumeUnitNames,
   unitValueByName,
 } from './reactionAmount.models.ts';
-import type { AppMassUnit, AppMolesUnit, AppVolumeUnit } from './reactionAmount.types.ts';
+import type {
+  AppMassUnit,
+  AppMolesUnit,
+  AppVolumeUnit,
+} from './reactionAmount.types.ts';
 import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 // Object.keys() widens these to string[]; narrow back to the unit unions for the converters.
@@ -49,7 +56,11 @@ describe('reactionAmountToOrd', () => {
       units: massUnit,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     });
-    expect(result?.mass).toEqual({ value: 5, precision: 0.1, units: unitValueByName[massUnit] });
+    expect(result?.mass).toEqual({
+      value: 5,
+      precision: 0.1,
+      units: unitValueByName[massUnit],
+    });
     // A mass amount is not a volume, so volumeIncludesSolutes is set to null (present, not omitted).
     expect(result?.volumeIncludesSolutes).toBeNull();
     expect(result?.moles).toBeUndefined();
@@ -62,7 +73,11 @@ describe('reactionAmountToOrd', () => {
       units: molesUnit,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     });
-    expect(result?.moles).toEqual({ value: 3, precision: null, units: unitValueByName[molesUnit] });
+    expect(result?.moles).toEqual({
+      value: 3,
+      precision: null,
+      units: unitValueByName[molesUnit],
+    });
     expect(result?.mass).toBeUndefined();
     expect(result?.volume).toBeUndefined();
   });
@@ -74,7 +89,11 @@ describe('reactionAmountToOrd', () => {
       units: volumeUnit,
       volumeIncludesSolutes: ReactionBoolean.True,
     });
-    expect(result?.volume).toEqual({ value: 2, precision: null, units: unitValueByName[volumeUnit] });
+    expect(result?.volume).toEqual({
+      value: 2,
+      precision: null,
+      units: unitValueByName[volumeUnit],
+    });
     expect(result?.volumeIncludesSolutes).toBe(true);
   });
 });
@@ -92,7 +111,9 @@ describe('ordAmountToReaction', () => {
   });
 
   it('maps the dimension value back to its unit name', () => {
-    const result = ordAmountToReaction({ mass: { value: 5, precision: 0.1, units: unitValueByName[massUnit] } });
+    const result = ordAmountToReaction({
+      mass: { value: 5, precision: 0.1, units: unitValueByName[massUnit] },
+    });
     expect(result).toMatchObject({
       value: 5,
       precision: 0.1,
@@ -106,7 +127,11 @@ describe('ordAmountToReaction', () => {
       volume: { value: 2, precision: null, units: unitValueByName[volumeUnit] },
       volumeIncludesSolutes: true,
     });
-    expect(result).toMatchObject({ value: 2, units: volumeUnit, volumeIncludesSolutes: ReactionBoolean.True });
+    expect(result).toMatchObject({
+      value: 2,
+      units: volumeUnit,
+      volumeIncludesSolutes: ReactionBoolean.True,
+    });
   });
 });
 

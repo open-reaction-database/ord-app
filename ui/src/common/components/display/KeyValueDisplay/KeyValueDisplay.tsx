@@ -25,14 +25,20 @@ interface InlineKeyValueProps {
   multiline?: boolean;
 }
 
-export function KeyValueDisplay({ label, value, multiline }: Readonly<InlineKeyValueProps>) {
+export function KeyValueDisplay({
+  label,
+  value,
+  multiline,
+}: Readonly<InlineKeyValueProps>) {
   return (
     <Flex
       gap="xs"
       align="flex-start"
       className={clsx({ [classes.multilineWrapper]: !multiline })}
     >
-      <Text className={clsx(typographyClasses.secondary2, classes.label)}>{label}:</Text>
+      <Text className={clsx(typographyClasses.secondary2, classes.label)}>
+        {label}:
+      </Text>
       {multiline ? (
         <Text className={classes.multilineValue}>{value}</Text>
       ) : (

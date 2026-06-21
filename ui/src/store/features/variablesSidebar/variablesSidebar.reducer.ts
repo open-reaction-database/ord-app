@@ -15,11 +15,17 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import { setVariablesSidebarOpenedAction } from './variablesSidebar.actions.ts';
-import { addReactionPathComponentToList, setReactionPathComponentsList } from '../reactionForm/reactionForm.actions.ts';
+import {
+  addReactionPathComponentToList,
+  setReactionPathComponentsList,
+} from '../reactionForm/reactionForm.actions.ts';
 
 const isVariablesSidebarOpened = createReducer(false, builder => {
   builder.addCase(setVariablesSidebarOpenedAction, (_, action) => action.payload);
-  builder.addMatcher(isAnyOf(setReactionPathComponentsList, addReactionPathComponentToList), () => false);
+  builder.addMatcher(
+    isAnyOf(setReactionPathComponentsList, addReactionPathComponentToList),
+    () => false,
+  );
 });
 
 export const variablesSidebarReducer = combineReducers({

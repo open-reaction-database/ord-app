@@ -40,11 +40,16 @@ import {
   ordEnvironmentToReaction,
   reactionEnvironmentToOrd,
 } from '../reactionEntity/reactionEntity.converters';
-import { ordDataMapToReactionDataMap, reactionDataMapToOrdDataMap } from '../reactionData/reactionData.converters.ts';
+import {
+  ordDataMapToReactionDataMap,
+  reactionDataMapToOrdDataMap,
+} from '../reactionData/reactionData.converters.ts';
 import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
 import { setupTransform } from './reactionSetup.transform.ts';
 
-export const ordVesselSetupToReaction = (vessel: OrdOptional<ord.IVessel>): ReactionVessel => {
+export const ordVesselSetupToReaction = (
+  vessel: OrdOptional<ord.IVessel>,
+): ReactionVessel => {
   const { type, details, material, volume, preparations, attachments } = vessel ?? {};
   return {
     details,
@@ -70,25 +75,40 @@ export const reactionVesselSetupToOrd = ({
       type: reactionVesselTypeToOrd(type),
       volume: reactionVolumeConditionToOrd(volume),
       material: reactionVesselMaterialToOrd(material),
-      preparations: vesselPreparations.length > 0 ? vesselPreparations.map(reactionVesselPreparationToOrd) : null,
-      attachments: vesselAttachments.length > 0 ? vesselAttachments.map(reactionVesselAttachmentToOrd) : null,
+      preparations:
+        vesselPreparations.length > 0
+          ? vesselPreparations.map(reactionVesselPreparationToOrd)
+          : null,
+      attachments:
+        vesselAttachments.length > 0
+          ? vesselAttachments.map(reactionVesselAttachmentToOrd)
+          : null,
     },
     ['type'],
   );
 };
 
-export const ordVesselAttachmentToReaction = ({ type, details }: ord.IVesselAttachment): ReactionVesselAttachment =>
+export const ordVesselAttachmentToReaction = ({
+  type,
+  details,
+}: ord.IVesselAttachment): ReactionVesselAttachment =>
   withId({
     type: ordVesselAttachmentTypeToReaction(type),
     details,
   });
 
-export const reactionVesselAttachmentToOrd = ({ type, details }: ReactionVesselAttachment): ord.IVesselAttachment => ({
+export const reactionVesselAttachmentToOrd = ({
+  type,
+  details,
+}: ReactionVesselAttachment): ord.IVesselAttachment => ({
   type: reactionVesselAttachmentTypeToOrd(type),
   details,
 });
 
-export const ordVesselPreparationToReaction = ({ type, details }: ord.IVesselPreparation): ReactionVesselPreparation =>
+export const ordVesselPreparationToReaction = ({
+  type,
+  details,
+}: ord.IVesselPreparation): ReactionVesselPreparation =>
   withId({
     type: ordVesselPreparationsTypeToReaction(type),
     details,
@@ -102,8 +122,11 @@ export const reactionVesselPreparationToOrd = ({
   type: reactionVesselPreparationsTypeToOrd(type),
 });
 
-export const ordSetupToReactionSetup = (setup?: ord.IReactionSetup | null): ReactionSetup => {
-  const { isAutomated, vessel, environment, automationPlatform, automationCode } = setup ?? {};
+export const ordSetupToReactionSetup = (
+  setup?: ord.IReactionSetup | null,
+): ReactionSetup => {
+  const { isAutomated, vessel, environment, automationPlatform, automationCode } =
+    setup ?? {};
   return withId({
     isAutomated: ordBooleanToReaction(isAutomated),
     vessel: ordVesselSetupToReaction(vessel),
@@ -113,8 +136,11 @@ export const ordSetupToReactionSetup = (setup?: ord.IReactionSetup | null): Reac
   });
 };
 
-export const reactionSetupToOrd = (setup: ReactionSetup): Optional<ord.IReactionSetup> => {
-  const { isAutomated, vessel, environment, automationPlatform, automationCode } = setupTransform(setup);
+export const reactionSetupToOrd = (
+  setup: ReactionSetup,
+): Optional<ord.IReactionSetup> => {
+  const { isAutomated, vessel, environment, automationPlatform, automationCode } =
+    setupTransform(setup);
   return convertObjectToNullIfEmpty({
     isAutomated: reactionBooleanToOrd(isAutomated),
     vessel: reactionVesselSetupToOrd(vessel),

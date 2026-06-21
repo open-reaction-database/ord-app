@@ -82,7 +82,11 @@ export function InputModal({
   return (
     <Modal
       opened
-      classNames={{ content: classes.modal, header: classes.header, body: classes.body }}
+      classNames={{
+        content: classes.modal,
+        header: classes.header,
+        body: classes.body,
+      }}
       onClose={handleClose}
       title={title}
       centered

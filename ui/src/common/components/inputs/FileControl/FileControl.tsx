@@ -34,7 +34,13 @@ interface FileControlProps {
   onChange: (value: FileControlValue | null) => void;
 }
 
-export function FileControl({ name, value, disabled, onChange, label }: Readonly<FileControlProps>) {
+export function FileControl({
+  name,
+  value,
+  disabled,
+  onChange,
+  label,
+}: Readonly<FileControlProps>) {
   const { fileName, href } = useFileNameHref(name, value);
   const [file, setFile] = useState<File | null>(null);
 

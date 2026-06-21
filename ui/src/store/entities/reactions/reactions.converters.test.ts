@@ -19,15 +19,21 @@ import { describe, it, expect, vi } from 'vitest';
 // orchestrators delegating each field to a per-entity sub-converter. Stub every
 // sub-converter with a recognizable sentinel so the tests assert the field
 // wiring and the length-gated null branches without the sub-converters' logic.
-vi.mock('store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts', () => ({
-  ordInputsToReactionInputs: () => 'INPUTS',
-  reactionInputsToOrdInputs: () => 'ORD_INPUTS',
-}));
-vi.mock('store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts', () => ({
-  linkReactionOutcome: (outcome: unknown) => ({ linked: outcome }),
-  ordOutcomesListToReactionOutcomesList: () => 'OUTCOMES',
-  reactionOutcomesListToOrdOutcomesList: () => 'ORD_OUTCOMES',
-}));
+vi.mock(
+  'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts',
+  () => ({
+    ordInputsToReactionInputs: () => 'INPUTS',
+    reactionInputsToOrdInputs: () => 'ORD_INPUTS',
+  }),
+);
+vi.mock(
+  'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts',
+  () => ({
+    linkReactionOutcome: (outcome: unknown) => ({ linked: outcome }),
+    ordOutcomesListToReactionOutcomesList: () => 'OUTCOMES',
+    reactionOutcomesListToOrdOutcomesList: () => 'ORD_OUTCOMES',
+  }),
+);
 vi.mock('store/entities/reactions/reactionEntity/reactionEntity.converters.ts', () => ({
   ordReactionIdentifierToReaction: (identifier: unknown) => ({ id: identifier }),
   reactionIdentifierToOrd: (identifier: unknown) => ({ ordId: identifier }),
@@ -138,7 +144,9 @@ describe('ordReactionToReaction', () => {
   });
 
   it('defaults missing list fields to empty arrays', () => {
-    const result = ordReactionToReaction({ reactionId: 'r2' } as unknown as ord.IReaction);
+    const result = ordReactionToReaction({
+      reactionId: 'r2',
+    } as unknown as ord.IReaction);
     expect(result.identifiers).toEqual([]);
     expect(result.observations).toEqual([]);
     expect(result.workups).toEqual([]);

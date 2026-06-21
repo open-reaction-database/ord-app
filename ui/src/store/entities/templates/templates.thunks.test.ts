@@ -19,7 +19,10 @@ import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
 import { navigate } from 'wouter/use-browser-location';
 import { removeTemplate, importFromFile } from './templates.thunks.ts';
-import { removeTemplateActions, importTemplateFromFileActions } from './templates.actions.ts';
+import {
+  removeTemplateActions,
+  importTemplateFromFileActions,
+} from './templates.actions.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -27,7 +30,10 @@ vi.mock('store/axiosInstance.ts', () => ({
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -53,14 +59,22 @@ describe('importFromFile', () => {
   it('dispatches failure (and never POSTs) when the file variables are not an array', async () => {
     // The production catch logs the parse error; silence it so the failure test stays quiet in CI.
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const file = new File([JSON.stringify({ binpb: 'AA==', variables: 'not-an-array' })], 't.json', {
-      type: 'application/json',
-    });
+    const file = new File(
+      [JSON.stringify({ binpb: 'AA==', variables: 'not-an-array' })],
+      't.json',
+      {
+        type: 'application/json',
+      },
+    );
     const { store, actions, types } = makeRecordingStore();
-    await store.dispatch(importFromFile({ name: 'T', file }) as unknown as UnknownAction);
+    await store.dispatch(
+      importFromFile({ name: 'T', file }) as unknown as UnknownAction,
+    );
 
     expect(types()).toContain(importTemplateFromFileActions.failure.type);
-    const failure = actions().find(a => a.type === importTemplateFromFileActions.failure.type) as { payload?: string };
+    const failure = actions().find(
+      a => a.type === importTemplateFromFileActions.failure.type,
+    ) as { payload?: string };
     expect(failure?.payload).toBe('Incorrect template file provided');
     expect(axiosMock.post).not.toHaveBeenCalled();
   });

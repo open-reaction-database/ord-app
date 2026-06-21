@@ -38,9 +38,14 @@ describe('GroupsListWithRoles', () => {
   });
 
   it('renders nothing when the referenced groups are absent from the store', () => {
-    renderWithProviders(<GroupsListWithRoles data={[{ id: 99, name: 'Ghost', role: USER_ROLES.VIEWER }]} />, {
-      preloadedState: {},
-    });
+    renderWithProviders(
+      <GroupsListWithRoles
+        data={[{ id: 99, name: 'Ghost', role: USER_ROLES.VIEWER }]}
+      />,
+      {
+        preloadedState: {},
+      },
+    );
     expect(screen.queryByText('Ghost:')).toBeNull();
   });
 

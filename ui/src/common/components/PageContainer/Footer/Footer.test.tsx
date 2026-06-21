@@ -21,7 +21,9 @@ import { Footer } from './Footer.tsx';
 describe('Footer', () => {
   it('renders the dated copyright line and external links', () => {
     renderWithMantine(<Footer />);
-    expect(screen.getByText(/© Copyright \d{4} Open Reaction Database/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/© Copyright \d{4} Open Reaction Database/),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(2);
   });
 });

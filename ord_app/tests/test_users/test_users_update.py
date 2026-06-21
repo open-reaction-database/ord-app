@@ -26,7 +26,11 @@ async def test_update_user(api_client, mock_authenticated_user):
     ) = mock_authenticated_user
 
     payload = {"email": fake.email(), "orcid_id": fake.uuid4()}
-    response_data = api_client.patch(f"/api/v1/users/{user.id}", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.patch(f"/api/v1/users/{user.id}", json=payload)
+        .raise_for_status()
+        .json()
+    )
 
     assert response_data["email"] == payload["email"]
     assert response_data["orcid_id"] == payload["orcid_id"]
@@ -40,7 +44,9 @@ async def test_update_foreign_user(api_client, mock_authenticated_user):
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_update_duplicated_data(api_client, mock_authenticated_user, test_db_session):
+async def test_update_duplicated_data(
+    api_client, mock_authenticated_user, test_db_session
+):
     (
         user,
         *_,

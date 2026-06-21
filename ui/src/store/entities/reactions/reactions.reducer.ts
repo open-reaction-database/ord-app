@@ -36,7 +36,12 @@ import {
   importTemplateFromFileActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { itemsById } from 'common/utils';
-import type { ReactionOrTemplate, AppReaction, DatasetReaction, ReactionTemplate } from './reactions.types.ts';
+import type {
+  ReactionOrTemplate,
+  AppReaction,
+  DatasetReaction,
+  ReactionTemplate,
+} from './reactions.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {
@@ -65,7 +70,10 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, { payload: { reactionId, pathComponents, newValue } }) => {
       const reaction = state[reactionId];
       const updatedReaction: AppReaction = linkReactionEntities(
-        deepMergeWithArrayMerge(reaction.data, generateDeepPartialReactionByPath(pathComponents, newValue)),
+        deepMergeWithArrayMerge(
+          reaction.data,
+          generateDeepPartialReactionByPath(pathComponents, newValue),
+        ),
       );
       return {
         ...state,
@@ -79,20 +87,25 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       };
     },
   );
-  builder.addCase(deleteReactionFieldActions.request, (state, { payload: { reactionId, pathComponents } }) => {
-    const reaction = state[reactionId];
-    const updatedReaction: AppReaction = linkReactionEntities(removeDeepReactionPart(reaction.data, pathComponents));
-    return {
-      ...state,
-      [reactionId]: {
-        ...reaction,
-        // Snapshot the pre-edit data so the optimistic change can be rolled back if the backend
-        // rejects it; keep the earliest baseline if several edits queue up. (#615)
-        dataBeforeEdit: reaction.dataBeforeEdit ?? reaction.data,
-        data: updatedReaction,
-      },
-    };
-  });
+  builder.addCase(
+    deleteReactionFieldActions.request,
+    (state, { payload: { reactionId, pathComponents } }) => {
+      const reaction = state[reactionId];
+      const updatedReaction: AppReaction = linkReactionEntities(
+        removeDeepReactionPart(reaction.data, pathComponents),
+      );
+      return {
+        ...state,
+        [reactionId]: {
+          ...reaction,
+          // Snapshot the pre-edit data so the optimistic change can be rolled back if the backend
+          // rejects it; keep the earliest baseline if several edits queue up. (#615)
+          dataBeforeEdit: reaction.dataBeforeEdit ?? reaction.data,
+          data: updatedReaction,
+        },
+      };
+    },
+  );
   builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) => {
     const { [reactionId]: _, ...rest } = state;
     return rest;
@@ -114,31 +127,37 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       [action.payload.id]: action.payload,
     };
   });
-  builder.addCase(addUpdateVariableActions.request, (state, { payload: { templateId, variable } }) => {
-    const template = state[templateId] as ReactionTemplate;
-    return {
-      ...state,
-      [templateId]: {
-        ...template,
-        variables: {
-          ...template.variables,
-          [getVariableId(variable)]: variable,
+  builder.addCase(
+    addUpdateVariableActions.request,
+    (state, { payload: { templateId, variable } }) => {
+      const template = state[templateId] as ReactionTemplate;
+      return {
+        ...state,
+        [templateId]: {
+          ...template,
+          variables: {
+            ...template.variables,
+            [getVariableId(variable)]: variable,
+          },
         },
-      },
-    };
-  });
-  builder.addCase(removeVariableActions.request, (state, { payload: { templateId, variable } }) => {
-    const template = state[templateId] as ReactionTemplate;
-    const { [getVariableId(variable)]: _, ...variables } = template.variables;
+      };
+    },
+  );
+  builder.addCase(
+    removeVariableActions.request,
+    (state, { payload: { templateId, variable } }) => {
+      const template = state[templateId] as ReactionTemplate;
+      const { [getVariableId(variable)]: _, ...variables } = template.variables;
 
-    return {
-      ...state,
-      [templateId]: {
-        ...template,
-        variables,
-      },
-    };
-  });
+      return {
+        ...state,
+        [templateId]: {
+          ...template,
+          variables,
+        },
+      };
+    },
+  );
   builder.addCase(renameReactionActions.success, (state, action) => {
     const { reactionId, name } = action.payload;
     const reaction = state[reactionId];
@@ -182,23 +201,34 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       };
     },
   );
-  builder.addMatcher(isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure), state => {
-    // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
-    // the optimistic change by restoring the snapshot, so the UI never shows an unsaved edit as
-    // applied. Edits are issued one at a time, so at most one reaction is ever pending. (#615)
-    const restored = { ...state };
-    let didRollback = false;
-    for (const [id, reaction] of Object.entries(state)) {
-      if (reaction.dataBeforeEdit === undefined) {
-        continue;
-      }
-      restored[id] = { ...reaction, data: reaction.dataBeforeEdit, dataBeforeEdit: undefined };
-      didRollback = true;
-    }
-    return didRollback ? restored : state;
-  });
   builder.addMatcher(
-    isAnyOf(getReactionActions.success, createEmptyReactionActions.success, importReactionFromFileActions.success),
+    isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure),
+    state => {
+      // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
+      // the optimistic change by restoring the snapshot, so the UI never shows an unsaved edit as
+      // applied. Edits are issued one at a time, so at most one reaction is ever pending. (#615)
+      const restored = { ...state };
+      let didRollback = false;
+      for (const [id, reaction] of Object.entries(state)) {
+        if (reaction.dataBeforeEdit === undefined) {
+          continue;
+        }
+        restored[id] = {
+          ...reaction,
+          data: reaction.dataBeforeEdit,
+          dataBeforeEdit: undefined,
+        };
+        didRollback = true;
+      }
+      return didRollback ? restored : state;
+    },
+  );
+  builder.addMatcher(
+    isAnyOf(
+      getReactionActions.success,
+      createEmptyReactionActions.success,
+      importReactionFromFileActions.success,
+    ),
     (state, action) => ({
       ...state,
       [getReactionId(action.payload)]: {
@@ -207,13 +237,19 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       },
     }),
   );
-  builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (state, action) => ({
-    ...state,
-    ...itemsById(
-      action.payload.items.map(item => ({ ...item, data: linkReactionEntities(item.data) })),
-      getReactionId,
-    ),
-  }));
+  builder.addMatcher(
+    isAnyOf(getReactionsListActions.success, getReactionPageActions.success),
+    (state, action) => ({
+      ...state,
+      ...itemsById(
+        action.payload.items.map(item => ({
+          ...item,
+          data: linkReactionEntities(item.data),
+        })),
+        getReactionId,
+      ),
+    }),
+  );
 });
 
 const reactionsOrder = createReducer<Array<number>>([], builder => {
@@ -221,25 +257,38 @@ const reactionsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(removeReactionActions.success, (state, { payload: reactionId }) =>
     state.filter(id => id !== reactionId),
   );
-  builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => []);
-  builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (_, action) =>
-    action.payload.items.map(getReactionId),
+  builder.addMatcher(
+    isAnyOf(getReactionsListActions.request, getReactionPageActions.request),
+    () => [],
+  );
+  builder.addMatcher(
+    isAnyOf(getReactionsListActions.success, getReactionPageActions.success),
+    (_, action) => action.payload.items.map(getReactionId),
   );
 });
 
 const pagination = createReducer<Pagination>(emptyPagination, builder => {
   builder.addCase(getReactionsListActions.request, () => emptyPagination);
-  builder.addCase(getReactionPageActions.request, (state, action) => ({ ...state, ...action.payload }));
-  builder.addMatcher(isAnyOf(getReactionsListActions.success, getReactionPageActions.success), (state, action) => ({
+  builder.addCase(getReactionPageActions.request, (state, action) => ({
     ...state,
-    total: action.payload.total,
-    pages: action.payload.pages,
+    ...action.payload,
   }));
-  builder.addMatcher(isAnyOf(createEmptyReactionActions.success, importReactionFromFileActions.success), state => ({
-    ...state,
-    total: state.total + 1,
-    pages: Math.ceil((state.total + 1) / state.size),
-  }));
+  builder.addMatcher(
+    isAnyOf(getReactionsListActions.success, getReactionPageActions.success),
+    (state, action) => ({
+      ...state,
+      total: action.payload.total,
+      pages: action.payload.pages,
+    }),
+  );
+  builder.addMatcher(
+    isAnyOf(createEmptyReactionActions.success, importReactionFromFileActions.success),
+    state => ({
+      ...state,
+      total: state.total + 1,
+      pages: Math.ceil((state.total + 1) / state.size),
+    }),
+  );
   builder.addMatcher(isAnyOf(removeReactionActions.success), state => ({
     ...state,
     total: state.total - 1,
@@ -248,7 +297,10 @@ const pagination = createReducer<Pagination>(emptyPagination, builder => {
 });
 
 const isReactionCreating = createReducer<boolean>(false, builder => {
-  builder.addMatcher(isAnyOf(createEmptyReactionActions.request, importReactionFromFileActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(createEmptyReactionActions.request, importReactionFromFileActions.request),
+    () => true,
+  );
   builder.addMatcher(
     isAnyOf(
       createEmptyReactionActions.success,
@@ -261,7 +313,10 @@ const isReactionCreating = createReducer<boolean>(false, builder => {
 });
 
 const areReactionsLoading = createReducer<boolean>(false, builder => {
-  builder.addMatcher(isAnyOf(getReactionsListActions.request, getReactionPageActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(getReactionsListActions.request, getReactionPageActions.request),
+    () => true,
+  );
   builder.addMatcher(
     isAnyOf(
       getReactionsListActions.success,

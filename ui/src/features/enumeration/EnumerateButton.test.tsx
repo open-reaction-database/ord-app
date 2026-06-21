@@ -28,6 +28,8 @@ describe('EnumerateButton', () => {
   it('opens the enumeration setup in the store when clicked', () => {
     const { store } = renderWithProviders(<EnumerateButton />);
     fireEvent.click(screen.getByRole('button'));
-    expect(store.getState().features.enumerationSetup.isEnumerationSetupOpened).toBe(true);
+    expect(store.getState().features.enumerationSetup.isEnumerationSetupOpened).toBe(
+      true,
+    );
   });
 });

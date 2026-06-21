@@ -23,12 +23,18 @@ import { useSelector } from 'react-redux';
 import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import clsx from 'clsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addUpdateVariable, removeVariable } from 'store/entities/templates/templates.thunks.ts';
+import {
+  addUpdateVariable,
+  removeVariable,
+} from 'store/entities/templates/templates.thunks.ts';
 import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 import { findReactionEntityUniqueName } from '../../ReactionEntities/findReactionEntityUniqueName.ts';
 
-type ReactionValueLabelPropsMandatoryLabel = Omit<ReactionValueLabelProps, 'wrapperConfig'> & {
+type ReactionValueLabelPropsMandatoryLabel = Omit<
+  ReactionValueLabelProps,
+  'wrapperConfig'
+> & {
   label: string;
 };
 
@@ -39,7 +45,11 @@ const labelToVariableName = (label: string) => {
     .join('');
 };
 
-function TemplateReactionValueLabel({ label, name, type }: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
+function TemplateReactionValueLabel({
+  label,
+  name,
+  type,
+}: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
   const templateId = reactionId as string;
   const dispatch = useAppDispatch();
@@ -130,7 +140,11 @@ function TemplateReactionValueLabel({ label, name, type }: Readonly<ReactionValu
   );
 }
 
-export function TemplateReactionValueLabelWrapper({ wrapperConfig, type, name }: Readonly<ReactionValueLabelProps>) {
+export function TemplateReactionValueLabelWrapper({
+  wrapperConfig,
+  type,
+  name,
+}: Readonly<ReactionValueLabelProps>) {
   const label = wrapperConfig?.label ?? wrapperConfig?.templateLabel;
   if (!label) {
     return null;

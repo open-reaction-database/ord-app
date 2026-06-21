@@ -25,7 +25,11 @@ from ord_app.service_api.repositories.groups import GroupRepository
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.schemas.auth import Auth0CreateSchema
 from ord_app.service_api.schemas.users import UserCreateSchema, UserUpdateSchema
-from ord_app.service_api.services.auth0 import E2E_USER_AUTH0_ID, e2e_auth_enabled, verify_access_token
+from ord_app.service_api.services.auth0 import (
+    E2E_USER_AUTH0_ID,
+    e2e_auth_enabled,
+    verify_access_token,
+)
 from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError
 from ord_app.service_api.services.postgresql import get_db_session
 
@@ -48,7 +52,9 @@ class UserUseCase:
     async def update(self, user_id: int, payload: UserUpdateSchema) -> UserModel:
         if self.current_user is None or self.current_user.id != user_id:
             raise ForbiddenError("Action prohibited")
-        if user := await self.user_repo.update(payload.model_dump(exclude_unset=True), id=user_id):
+        if user := await self.user_repo.update(
+            payload.model_dump(exclude_unset=True), id=user_id
+        ):
             return user
         raise EntityNotFoundError(f"User {user_id} not found")
 
@@ -96,7 +102,9 @@ async def _provision_e2e_user(db_session: AsyncSession) -> UserModel:
     return user
 
 
-async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema) -> UserModel | None:
+async def jit_provisioning(
+    db_session: AsyncSession, payload: Auth0CreateSchema
+) -> UserModel | None:
     if e2e_auth_enabled():
         return await _provision_e2e_user(db_session)
 
@@ -112,7 +120,9 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     if user_info_api is None:
         raise ForbiddenError("userinfo endpoint not found in token audience")
     async with httpx.AsyncClient() as client:
-        response = await client.get(user_info_api, headers={"Authorization": f"Bearer {payload.access_token}"})
+        response = await client.get(
+            user_info_api, headers={"Authorization": f"Bearer {payload.access_token}"}
+        )
         user_info = response.raise_for_status().json()
 
     logger.debug(f"user_info: {user_info}")
@@ -122,7 +132,9 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
     external_id = user_info["sub"]
     orcid_id = None
     if "orcid" in user_info["sub"]:
-        orcid_id = user_info["sub"].split("|")[-1] if "orcid" in user_info["sub"] else None
+        orcid_id = (
+            user_info["sub"].split("|")[-1] if "orcid" in user_info["sub"] else None
+        )
     elif "github" in user_info["sub"]:
         external_id = user_info["nickname"]
 
@@ -137,7 +149,9 @@ async def jit_provisioning(db_session: AsyncSession, payload: Auth0CreateSchema)
 
     if user := await user_use_case.get_user_by_auth0_id(user_info["sub"]):
         logger.debug(f"<User(id={user.id})> already exists")
-        return await user_use_case.user_repo.update(payload=user_payload.model_dump(exclude_unset=True), id=user.id)
+        return await user_use_case.user_repo.update(
+            payload=user_payload.model_dump(exclude_unset=True), id=user.id
+        )
 
     user = UserModel(**user_payload.model_dump(exclude_unset=True))
     group = GroupModel(name="default", owner=user)

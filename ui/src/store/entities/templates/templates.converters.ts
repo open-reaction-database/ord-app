@@ -24,10 +24,17 @@ type VariableMap = Record<string, Variable>;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
-export function ordTemplateVariablesToReaction(variables: Array<Variable>, reaction: AppReaction): VariableMap {
+export function ordTemplateVariablesToReaction(
+  variables: Array<Variable>,
+  reaction: AppReaction,
+): VariableMap {
   return variables.reduce((acc: VariableMap, variable) => {
     try {
-      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(variable.path, reaction, 'id');
+      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(
+        variable.path,
+        reaction,
+        'id',
+      );
       const appVariable: Variable = {
         ...variable,
         path: updatedPath,
@@ -38,16 +45,26 @@ export function ordTemplateVariablesToReaction(variables: Array<Variable>, react
       };
     } catch (e) {
       console.info(e);
-      showNotification({ variant: NotificationVariant.ERROR, message: `Variable ${variable.name} is invalid` });
+      showNotification({
+        variant: NotificationVariant.ERROR,
+        message: `Variable ${variable.name} is invalid`,
+      });
       return acc;
     }
   }, {});
 }
 
-export function reactionTemplateVariablesToOrd(variables: VariableMap, reaction: AppReaction): Array<Variable> {
+export function reactionTemplateVariablesToOrd(
+  variables: VariableMap,
+  reaction: AppReaction,
+): Array<Variable> {
   return Object.values(variables).reduce((acc: Array<Variable>, variable) => {
     try {
-      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(variable.path, reaction, 'name');
+      const updatedPath: ReactionPathComponents = replaceNameIdInReactionComponentPath(
+        variable.path,
+        reaction,
+        'name',
+      );
       const ordVariable: Variable = {
         ...variable,
         path: updatedPath,
@@ -55,7 +72,10 @@ export function reactionTemplateVariablesToOrd(variables: VariableMap, reaction:
       return acc.concat(ordVariable);
     } catch (e) {
       console.info(e);
-      showNotification({ variant: NotificationVariant.ERROR, message: `Variable ${variable.name} is invalid` });
+      showNotification({
+        variant: NotificationVariant.ERROR,
+        message: `Variable ${variable.name} is invalid`,
+      });
       return acc;
     }
   }, []);

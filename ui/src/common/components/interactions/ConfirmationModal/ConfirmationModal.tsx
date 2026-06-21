@@ -20,7 +20,11 @@ interface ConfirmationModalProps extends ModalProps {
   text?: string;
 }
 
-export function ConfirmationModal({ onConfirm, text, ...props }: Readonly<ConfirmationModalProps>) {
+export function ConfirmationModal({
+  onConfirm,
+  text,
+  ...props
+}: Readonly<ConfirmationModalProps>) {
   return (
     <Modal {...props}>
       <Modal.Body>

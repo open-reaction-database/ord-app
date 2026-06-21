@@ -16,14 +16,21 @@
 import { describe, it, expect } from 'vitest';
 import { groupsSidebar } from './groups.reducer.ts';
 import { setActiveGroupIdAction, setEditingGroupIdAction } from './groups.actions.ts';
-import { addGroupMemberActions, createGroupActions } from 'store/entities/groups/groups.actions.ts';
+import {
+  addGroupMemberActions,
+  createGroupActions,
+} from 'store/entities/groups/groups.actions.ts';
 import type { GroupMember } from 'store/entities/groups/groups.types.ts';
 
 const initialState = () => groupsSidebar(undefined, { type: '@@INIT' });
 
 describe('groupsSidebar reducer', () => {
   it('returns the initial state', () => {
-    expect(initialState()).toEqual({ activeGroupId: null, editingGroupId: null, isAddingMember: false });
+    expect(initialState()).toEqual({
+      activeGroupId: null,
+      editingGroupId: null,
+      isAddingMember: false,
+    });
   });
 
   describe('activeGroupId', () => {
@@ -46,9 +53,15 @@ describe('groupsSidebar reducer', () => {
 
   describe('isAddingMember', () => {
     it('toggles around the add-member request', () => {
-      let state = groupsSidebar(initialState(), addGroupMemberActions.request('a@b.com'));
+      let state = groupsSidebar(
+        initialState(),
+        addGroupMemberActions.request('a@b.com'),
+      );
       expect(state.isAddingMember).toBe(true);
-      state = groupsSidebar(state, addGroupMemberActions.success({ groupId: 1, member: {} as GroupMember }));
+      state = groupsSidebar(
+        state,
+        addGroupMemberActions.success({ groupId: 1, member: {} as GroupMember }),
+      );
       expect(state.isAddingMember).toBe(false);
 
       state = groupsSidebar(initialState(), addGroupMemberActions.request('a@b.com'));

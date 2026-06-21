@@ -25,7 +25,12 @@ interface ReactionEntityPasteProps {
   onSave: (reactionPart: object) => void;
 }
 
-export function ReactionEntityPaste({ onClose, name, entityField, onSave }: Readonly<ReactionEntityPasteProps>) {
+export function ReactionEntityPaste({
+  onClose,
+  name,
+  entityField,
+  onSave,
+}: Readonly<ReactionEntityPasteProps>) {
   const onPaste = useCallback(async () => {
     const [result] = await pasteReactionPart(entityField);
     if (result) {
@@ -44,7 +49,9 @@ export function ReactionEntityPaste({ onClose, name, entityField, onSave }: Read
         direction="column"
         gap="md"
       >
-        <Text>Your current {name} will be replaced with the value from your clipboard</Text>
+        <Text>
+          Your current {name} will be replaced with the value from your clipboard
+        </Text>
         <Flex
           justify="flex-end"
           align="center"

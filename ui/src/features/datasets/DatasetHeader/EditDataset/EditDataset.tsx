@@ -21,7 +21,10 @@ import { type EditDatasetFormValues, editDatasetSchema } from './editDataset.sch
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { updateDataset } from 'store/entities/datasets/datasets.thunks.ts';
-import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
+import {
+  MAX_CRITICAL_FIELD_LENGTH,
+  MAX_FIELD_LENGTH,
+} from 'common/constants/fieldLimits.ts';
 
 interface EditDatasetProps {
   datasetId: number;

@@ -21,145 +21,156 @@ const generateOptionsAndByValue = <T extends string>(entities: Record<T, number>
   byValue: reversePrimitiveRecord<T, number>(entities),
 });
 
-export const { options: reactionRoleOptions, byValue: reactionRoleByValue } = generateOptionsAndByValue(
-  ord.ReactionRole.ReactionRoleType,
+export const { options: reactionRoleOptions, byValue: reactionRoleByValue } =
+  generateOptionsAndByValue(ord.ReactionRole.ReactionRoleType);
+
+export const { options: preparationTypeOptions, byValue: preparationTypeByValue } =
+  generateOptionsAndByValue(ord.CompoundPreparation.CompoundPreparationType);
+
+export const { options: timeUnitOptions, byValue: timeUnitByValue } =
+  generateOptionsAndByValue(ord.Time.TimeUnit);
+
+export const {
+  options: additionDeviceTypeOptions,
+  byValue: reactionAdditionDeviceByValue,
+} = generateOptionsAndByValue(ord.ReactionInput.AdditionDevice.AdditionDeviceType);
+
+export const { options: additionSpeedTypeOptions, byValue: additionSpeedTypeByValue } =
+  generateOptionsAndByValue(ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
+
+export const { options: flowRateOptions, byValue: flowRateTypeByValue } =
+  generateOptionsAndByValue(ord.FlowRate.FlowRateUnit);
+
+export const { options: temperatureOptions, byValue: temperatureTypeByValue } =
+  generateOptionsAndByValue(ord.Temperature.TemperatureUnit);
+
+export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } =
+  generateOptionsAndByValue(ord.StirringConditions.StirringRate.StirringRateType);
+
+export const { options: pressureUnitOptions, byValue: pressureByValue } =
+  generateOptionsAndByValue(ord.Pressure.PressureUnit);
+
+export const { options: atmosphereTypeOptions, byValue: atmosphereTypeByValue } =
+  generateOptionsAndByValue(ord.PressureConditions.Atmosphere.AtmosphereType);
+
+export const {
+  options: temperatureControlTypeOptions,
+  byValue: temperatureControlTypeByValue,
+} = generateOptionsAndByValue(
+  ord.TemperatureConditions.TemperatureControl.TemperatureControlType,
 );
 
-export const { options: preparationTypeOptions, byValue: preparationTypeByValue } = generateOptionsAndByValue(
-  ord.CompoundPreparation.CompoundPreparationType,
+export const { options: textureTypeOptions, byValue: textureTypeByValue } =
+  generateOptionsAndByValue(ord.Texture.TextureType);
+
+export const { options: analysisOptions, byValue: analysisTypeByValue } =
+  generateOptionsAndByValue(ord.Analysis.AnalysisType);
+
+export const {
+  options: reactionIdentifierTypeOptions,
+  byValue: reactionIdentifierTypeByValue,
+} = generateOptionsAndByValue(ord.ReactionIdentifier.ReactionIdentifierType);
+
+export const { options: measurementsTypeOptions, byValue: measurementTypeByValue } =
+  generateOptionsAndByValue(ord.ProductMeasurement.ProductMeasurementType);
+
+export const { options: selectivityTypeOptions, byValue: selectivityTypeByValue } =
+  generateOptionsAndByValue(ord.ProductMeasurement.Selectivity.SelectivityType);
+
+export const { options: waveLengthTypeOptions, byValue: waveLengthTypeByValue } =
+  generateOptionsAndByValue(ord.Wavelength.WavelengthUnit);
+
+export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } =
+  generateOptionsAndByValue(
+    ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
+  );
+
+export const {
+  options: compoundIdentifierTypeOptions,
+  byValue: compoundIdentifierTypeByValue,
+} = generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
+
+export const {
+  options: stirringMethodTypeOptions,
+  byValue: stirringMethodTypeByValue,
+} = generateOptionsAndByValue(ord.StirringConditions.StirringMethodType);
+
+export const { options: illuminationTypeOptions, byValue: illuminationTypeByValue } =
+  generateOptionsAndByValue(ord.IlluminationConditions.IlluminationType);
+
+export const { options: lengthTypeOptions, byValue: lengthTypeByValue } =
+  generateOptionsAndByValue(ord.Length.LengthUnit);
+
+export const {
+  options: electrochemistryTypeOptions,
+  byValue: electrochemistryTypeByValue,
+} = generateOptionsAndByValue(ord.ElectrochemistryConditions.ElectrochemistryType);
+
+export const { options: currentTypeOptions, byValue: currentTypeByValue } =
+  generateOptionsAndByValue(ord.Current.CurrentUnit);
+
+export const {
+  options: electrochemistryCellTypeOptions,
+  byValue: electrochemistryCellTypeByValue,
+} = generateOptionsAndByValue(
+  ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType,
 );
 
-export const { options: timeUnitOptions, byValue: timeUnitByValue } = generateOptionsAndByValue(ord.Time.TimeUnit);
+export const { options: flowTypeOptions, byValue: flowTypeByValue } =
+  generateOptionsAndByValue(ord.FlowConditions.FlowType);
 
-export const { options: additionDeviceTypeOptions, byValue: reactionAdditionDeviceByValue } = generateOptionsAndByValue(
-  ord.ReactionInput.AdditionDevice.AdditionDeviceType,
+export const { options: tubingTypeOptions, byValue: tubingTypeByValue } =
+  generateOptionsAndByValue(ord.FlowConditions.Tubing.TubingType);
+
+export const { options: workupTypeOptions, byValue: workupTypeByValue } =
+  generateOptionsAndByValue(ord.ReactionWorkup.ReactionWorkupType);
+
+export const {
+  options: temperatureMeasurementTypeOptions,
+  byValue: temperatureMeasurementTypeByValue,
+} = generateOptionsAndByValue(
+  ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType,
 );
 
-export const { options: additionSpeedTypeOptions, byValue: additionSpeedTypeByValue } = generateOptionsAndByValue(
-  ord.ReactionInput.AdditionSpeed.AdditionSpeedType,
-);
-
-export const { options: flowRateOptions, byValue: flowRateTypeByValue } = generateOptionsAndByValue(
-  ord.FlowRate.FlowRateUnit,
-);
-
-export const { options: temperatureOptions, byValue: temperatureTypeByValue } = generateOptionsAndByValue(
-  ord.Temperature.TemperatureUnit,
-);
-
-export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } = generateOptionsAndByValue(
-  ord.StirringConditions.StirringRate.StirringRateType,
-);
-
-export const { options: pressureUnitOptions, byValue: pressureByValue } = generateOptionsAndByValue(
-  ord.Pressure.PressureUnit,
-);
-
-export const { options: atmosphereTypeOptions, byValue: atmosphereTypeByValue } = generateOptionsAndByValue(
-  ord.PressureConditions.Atmosphere.AtmosphereType,
-);
-
-export const { options: temperatureControlTypeOptions, byValue: temperatureControlTypeByValue } =
-  generateOptionsAndByValue(ord.TemperatureConditions.TemperatureControl.TemperatureControlType);
-
-export const { options: textureTypeOptions, byValue: textureTypeByValue } = generateOptionsAndByValue(
-  ord.Texture.TextureType,
-);
-
-export const { options: analysisOptions, byValue: analysisTypeByValue } = generateOptionsAndByValue(
-  ord.Analysis.AnalysisType,
-);
-
-export const { options: reactionIdentifierTypeOptions, byValue: reactionIdentifierTypeByValue } =
-  generateOptionsAndByValue(ord.ReactionIdentifier.ReactionIdentifierType);
-
-export const { options: measurementsTypeOptions, byValue: measurementTypeByValue } = generateOptionsAndByValue(
-  ord.ProductMeasurement.ProductMeasurementType,
-);
-
-export const { options: selectivityTypeOptions, byValue: selectivityTypeByValue } = generateOptionsAndByValue(
-  ord.ProductMeasurement.Selectivity.SelectivityType,
-);
-
-export const { options: waveLengthTypeOptions, byValue: waveLengthTypeByValue } = generateOptionsAndByValue(
-  ord.Wavelength.WavelengthUnit,
-);
-
-export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } = generateOptionsAndByValue(
-  ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
-);
-
-export const { options: compoundIdentifierTypeOptions, byValue: compoundIdentifierTypeByValue } =
-  generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
-
-export const { options: stirringMethodTypeOptions, byValue: stirringMethodTypeByValue } = generateOptionsAndByValue(
-  ord.StirringConditions.StirringMethodType,
-);
-
-export const { options: illuminationTypeOptions, byValue: illuminationTypeByValue } = generateOptionsAndByValue(
-  ord.IlluminationConditions.IlluminationType,
-);
-
-export const { options: lengthTypeOptions, byValue: lengthTypeByValue } = generateOptionsAndByValue(
-  ord.Length.LengthUnit,
-);
-
-export const { options: electrochemistryTypeOptions, byValue: electrochemistryTypeByValue } = generateOptionsAndByValue(
-  ord.ElectrochemistryConditions.ElectrochemistryType,
-);
-
-export const { options: currentTypeOptions, byValue: currentTypeByValue } = generateOptionsAndByValue(
-  ord.Current.CurrentUnit,
-);
-
-export const { options: electrochemistryCellTypeOptions, byValue: electrochemistryCellTypeByValue } =
-  generateOptionsAndByValue(ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType);
-
-export const { options: flowTypeOptions, byValue: flowTypeByValue } = generateOptionsAndByValue(
-  ord.FlowConditions.FlowType,
-);
-
-export const { options: tubingTypeOptions, byValue: tubingTypeByValue } = generateOptionsAndByValue(
-  ord.FlowConditions.Tubing.TubingType,
-);
-
-export const { options: workupTypeOptions, byValue: workupTypeByValue } = generateOptionsAndByValue(
-  ord.ReactionWorkup.ReactionWorkupType,
-);
-
-export const { options: temperatureMeasurementTypeOptions, byValue: temperatureMeasurementTypeByValue } =
-  generateOptionsAndByValue(ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType);
-
-export const { options: pressureControlTypeOptions, byValue: pressureControlTypeByValue } = generateOptionsAndByValue(
+export const {
+  options: pressureControlTypeOptions,
+  byValue: pressureControlTypeByValue,
+} = generateOptionsAndByValue(
   ord.PressureConditions.PressureControl.PressureControlType,
 );
 
-export const { options: voltageUnitOptions, byValue: voltageUnitByValue } = generateOptionsAndByValue(
-  ord.Voltage.VoltageUnit,
+export const { options: voltageUnitOptions, byValue: voltageUnitByValue } =
+  generateOptionsAndByValue(ord.Voltage.VoltageUnit);
+
+export const {
+  options: pressureMeasurementTypeOptions,
+  byValue: pressureMeasurementTypeByValue,
+} = generateOptionsAndByValue(
+  ord.PressureConditions.PressureMeasurement.PressureMeasurementType,
 );
 
-export const { options: pressureMeasurementTypeOptions, byValue: pressureMeasurementTypeByValue } =
-  generateOptionsAndByValue(ord.PressureConditions.PressureMeasurement.PressureMeasurementType);
+export const { options: vesselTypeOptions, byValue: vesselTypeByValue } =
+  generateOptionsAndByValue(ord.Vessel.VesselType);
 
-export const { options: vesselTypeOptions, byValue: vesselTypeByValue } = generateOptionsAndByValue(
-  ord.Vessel.VesselType,
-);
+export const {
+  options: vesselMaterialTypeOptions,
+  byValue: vesselMaterialTypeByValue,
+} = generateOptionsAndByValue(ord.VesselMaterial.VesselMaterialType);
 
-export const { options: vesselMaterialTypeOptions, byValue: vesselMaterialTypeByValue } = generateOptionsAndByValue(
-  ord.VesselMaterial.VesselMaterialType,
-);
+export const { options: volumeTypeOptions, byValue: volumeTypeByValue } =
+  generateOptionsAndByValue(ord.Volume.VolumeUnit);
 
-export const { options: volumeTypeOptions, byValue: volumeTypeByValue } = generateOptionsAndByValue(
-  ord.Volume.VolumeUnit,
-);
+export const { options: environmentTypeOptions, byValue: environmentTypeByValue } =
+  generateOptionsAndByValue(
+    ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
+  );
 
-export const { options: environmentTypeOptions, byValue: environmentTypeByValue } = generateOptionsAndByValue(
-  ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
-);
+export const {
+  options: vesselPreparationTypeOptions,
+  byValue: vesselPreparationTypeByValue,
+} = generateOptionsAndByValue(ord.VesselPreparation.VesselPreparationType);
 
-export const { options: vesselPreparationTypeOptions, byValue: vesselPreparationTypeByValue } =
-  generateOptionsAndByValue(ord.VesselPreparation.VesselPreparationType);
-
-export const { options: vesselAttachmentTypeOptions, byValue: vesselAttachmentTypeByValue } = generateOptionsAndByValue(
-  ord.VesselAttachment.VesselAttachmentType,
-);
+export const {
+  options: vesselAttachmentTypeOptions,
+  byValue: vesselAttachmentTypeByValue,
+} = generateOptionsAndByValue(ord.VesselAttachment.VesselAttachmentType);

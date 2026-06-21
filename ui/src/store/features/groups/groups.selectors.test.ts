@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { selectActiveGroupId, selectEditingGroupId, selectIsAddingMember } from './groups.selectors.ts';
+import {
+  selectActiveGroupId,
+  selectEditingGroupId,
+  selectIsAddingMember,
+} from './groups.selectors.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
 interface SidebarState {
@@ -23,18 +27,27 @@ interface SidebarState {
   isAddingMember?: boolean;
 }
 
-const buildState = (groupsSidebar: SidebarState): AppState => ({ features: { groupsSidebar } }) as unknown as AppState;
+const buildState = (groupsSidebar: SidebarState): AppState =>
+  ({ features: { groupsSidebar } }) as unknown as AppState;
 
 describe('groups sidebar selectors', () => {
   it('reads activeGroupId, editingGroupId, and isAddingMember from the slice', () => {
-    const state = buildState({ activeGroupId: 3, editingGroupId: 7, isAddingMember: true });
+    const state = buildState({
+      activeGroupId: 3,
+      editingGroupId: 7,
+      isAddingMember: true,
+    });
     expect(selectActiveGroupId(state)).toBe(3);
     expect(selectEditingGroupId(state)).toBe(7);
     expect(selectIsAddingMember(state)).toBe(true);
   });
 
   it('passes through nullish/false defaults', () => {
-    const state = buildState({ activeGroupId: null, editingGroupId: null, isAddingMember: false });
+    const state = buildState({
+      activeGroupId: null,
+      editingGroupId: null,
+      isAddingMember: false,
+    });
     expect(selectActiveGroupId(state)).toBeNull();
     expect(selectEditingGroupId(state)).toBeNull();
     expect(selectIsAddingMember(state)).toBe(false);

@@ -26,7 +26,9 @@ vi.mock('features/datasets/CreateNewDataset/CreateNewDataset.tsx', () => ({
 vi.mock('features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx', () => ({
   CreateDatasetFromFile: () => <div data-testid="create-from-file" />,
 }));
-vi.mock('features/enumeration/EnumerationWizard.tsx', () => ({ EnumerationWizard: () => <div /> }));
+vi.mock('features/enumeration/EnumerationWizard.tsx', () => ({
+  EnumerationWizard: () => <div />,
+}));
 
 describe('DatasetsListTopActions', () => {
   it('renders the three dataset-creation entry points', () => {
@@ -37,14 +39,18 @@ describe('DatasetsListTopActions', () => {
   });
 
   it('opens the create-from-scratch modal when "New Dataset" is clicked', () => {
-    const { getByText, queryByTestId } = renderWithProviders(<DatasetsListTopActions />);
+    const { getByText, queryByTestId } = renderWithProviders(
+      <DatasetsListTopActions />,
+    );
     expect(queryByTestId('create-new-dataset')).not.toBeInTheDocument();
     fireEvent.click(getByText('New Dataset'));
     expect(queryByTestId('create-new-dataset')).toBeInTheDocument();
   });
 
   it('opens the create-from-file modal when "From File" is clicked', () => {
-    const { getByText, queryByTestId } = renderWithProviders(<DatasetsListTopActions />);
+    const { getByText, queryByTestId } = renderWithProviders(
+      <DatasetsListTopActions />,
+    );
     expect(queryByTestId('create-from-file')).not.toBeInTheDocument();
     fireEvent.click(getByText('From File'));
     expect(queryByTestId('create-from-file')).toBeInTheDocument();

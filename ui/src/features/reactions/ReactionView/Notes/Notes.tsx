@@ -50,7 +50,9 @@ export function Notes() {
     const notes: ReactionNotes = notesOrNull || {};
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
-      .filter(([, value]) => value && value !== ReactionBoolean.Unspecified) as Array<[string, NotEmptyValueType]>;
+      .filter(([, value]) => value && value !== ReactionBoolean.Unspecified) as Array<
+      [string, NotEmptyValueType]
+    >;
   }, [notesOrNull]);
 
   return (

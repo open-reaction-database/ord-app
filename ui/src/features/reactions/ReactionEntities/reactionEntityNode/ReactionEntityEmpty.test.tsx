@@ -34,7 +34,9 @@ const formMethods = {} as ReactionEntityNodeProps<ReactionFormEmpty>['formMethod
 
 describe('ReactionEntityEmpty', () => {
   it('renders one base node for each of its fields, with no wrapper of its own', () => {
-    const node = { fields: [{ type: 'x' }, { type: 'y' }, { type: 'z' }] } as unknown as ReactionFormEmpty;
+    const node = {
+      fields: [{ type: 'x' }, { type: 'y' }, { type: 'z' }],
+    } as unknown as ReactionFormEmpty;
     const { getAllByTestId } = renderWithMantine(
       <ReactionEntityEmpty
         node={node}

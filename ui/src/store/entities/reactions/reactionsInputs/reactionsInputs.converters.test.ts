@@ -26,7 +26,11 @@ import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 describe('crude component converters', () => {
   it('maps booleans to the tri-state enum and assigns an id', () => {
-    const result = ordCrudeComponentToReaction({ reactionId: 'r1', includesWorkup: true, hasDerivedAmount: false });
+    const result = ordCrudeComponentToReaction({
+      reactionId: 'r1',
+      includesWorkup: true,
+      hasDerivedAmount: false,
+    });
     expect(typeof result.id).toBe('string');
     expect(result.reactionId).toBe('r1');
     expect(result.includesWorkup).toBe(ReactionBoolean.True);
@@ -34,7 +38,11 @@ describe('crude component converters', () => {
   });
 
   it('maps the tri-state enum back to ord booleans', () => {
-    const reaction = ordCrudeComponentToReaction({ reactionId: 'r1', includesWorkup: true, hasDerivedAmount: false });
+    const reaction = ordCrudeComponentToReaction({
+      reactionId: 'r1',
+      includesWorkup: true,
+      hasDerivedAmount: false,
+    });
     const ord = reactionCrudeComponentToOrd(reaction);
     expect(ord.reactionId).toBe('r1');
     expect(ord.includesWorkup).toBe(true);
@@ -69,8 +77,13 @@ describe('input map converters', () => {
     const result = ordInputsToReactionInputs({ reagent: {}, solvent: {} });
     const entries = Object.values(result);
     expect(entries).toHaveLength(2);
-    expect(entries.map(input => input.name).sort(byString)).toEqual(['reagent', 'solvent']);
-    expect(Object.keys(result).sort(byString)).toEqual(entries.map(input => input.id).sort(byString));
+    expect(entries.map(input => input.name).sort(byString)).toEqual([
+      'reagent',
+      'solvent',
+    ]);
+    expect(Object.keys(result).sort(byString)).toEqual(
+      entries.map(input => input.id).sort(byString),
+    );
   });
 
   it('round-trips a single input back to an ord map keyed by name', () => {

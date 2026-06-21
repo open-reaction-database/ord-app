@@ -39,7 +39,9 @@ const ENTITY_FIELD = 'products';
 
 const useSelectData = buildUseSelectItems(ENTITY_FIELD);
 
-const renderDetails = (product: ReactionProduct) => <MeasurementsPreview product={product} />;
+const renderDetails = (product: ReactionProduct) => (
+  <MeasurementsPreview product={product} />
+);
 
 export function ProductsComponentsList() {
   const dispatch = useAppDispatch();
@@ -49,9 +51,17 @@ export function ProductsComponentsList() {
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {
-    const newComponent = ordProductToReaction(ord.ProductCompound.toObject(new ord.ProductCompound()));
+    const newComponent = ordProductToReaction(
+      ord.ProductCompound.toObject(new ord.ProductCompound()),
+    );
     const newPath = [...pathComponents, ENTITY_FIELD, length];
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newPath, newValue: newComponent }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: newPath,
+        newValue: newComponent,
+      }),
+    );
     dispatch(addReactionPathComponentToList(newPath));
   }, [dispatch, reactionId, pathComponents, length]);
 
@@ -105,7 +115,9 @@ export function ProductsComponentsList() {
           gap="8"
         >
           <EmptyIcon />
-          <Text className={typographyClasses.secondary1}>There are no Products yet</Text>
+          <Text className={typographyClasses.secondary1}>
+            There are no Products yet
+          </Text>
         </Flex>
       )}
     </ReactionEntityBlock>

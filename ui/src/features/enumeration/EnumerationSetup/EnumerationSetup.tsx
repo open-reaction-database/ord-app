@@ -22,17 +22,27 @@ import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
-import type { EnumerationForm, EnumerationFormTransform, EnumerationSetupForm } from './enumerationSetup.types.ts';
+import type {
+  EnumerationForm,
+  EnumerationFormTransform,
+  EnumerationSetupForm,
+} from './enumerationSetup.types.ts';
 import { TemplateFileSelector } from './TemplateFileSelector/TemplateFileSelector.tsx';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { useCallback } from 'react';
-import { enumerationSetupExistingDatasetSchema, enumerationSetupNewDatasetSchema } from './enumerationSetup.schema.ts';
+import {
+  enumerationSetupExistingDatasetSchema,
+  enumerationSetupNewDatasetSchema,
+} from './enumerationSetup.schema.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { startEnumeration } from 'store/entities/enumeration/enumeration.thunks.ts';
 import type { SetupEnumeration } from 'store/entities/enumeration/enumeration.types.ts';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
-import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
+import {
+  MAX_CRITICAL_FIELD_LENGTH,
+  MAX_FIELD_LENGTH,
+} from 'common/constants/fieldLimits.ts';
 
 export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
@@ -46,7 +56,8 @@ export function EnumerationSetup({
   onClose,
 }: Readonly<CreateDatasetFromEnumerationProps>) {
   const dispatch = useAppDispatch();
-  const [cancelConfirmOpened, { open: openCancelConfirm, close: closeCancelConfirm }] = useDisclosure(false);
+  const [cancelConfirmOpened, { open: openCancelConfirm, close: closeCancelConfirm }] =
+    useDisclosure(false);
   const handleSubmit = useCallback(
     (data: SetupEnumeration) => {
       dispatch(startEnumeration(data));
@@ -55,38 +66,42 @@ export function EnumerationSetup({
   );
   const activeGroupId = useSelector(selectActiveGroupId);
   const doesDatasetExist = !!datasetId;
-  const schema = doesDatasetExist ? enumerationSetupExistingDatasetSchema : enumerationSetupNewDatasetSchema;
+  const schema = doesDatasetExist
+    ? enumerationSetupExistingDatasetSchema
+    : enumerationSetupNewDatasetSchema;
   const title = doesDatasetExist
     ? 'Update Dataset from Reaction Enumeration'
     : 'Create Dataset from Reaction Enumeration';
 
   const saveText = doesDatasetExist ? 'Update' : 'Create';
 
-  const form: EnumerationForm = useForm<EnumerationSetupForm, EnumerationFormTransform>({
-    initialValues: {
-      dataset: datasetId ?? {
-        groupId: activeGroupId ? activeGroupId.toString() : '',
-        name: '',
-        description: '',
+  const form: EnumerationForm = useForm<EnumerationSetupForm, EnumerationFormTransform>(
+    {
+      initialValues: {
+        dataset: datasetId ?? {
+          groupId: activeGroupId ? activeGroupId.toString() : '',
+          name: '',
+          description: '',
+        },
+        templateId: initialTemplateId ?? '',
+        csvFile: null,
+        templateCSV: null,
+        matching: [],
       },
-      templateId: initialTemplateId ?? '',
-      csvFile: null,
-      templateCSV: null,
-      matching: [],
+      transformValues: ({ csvFile, dataset, ...values }: EnumerationSetupForm) =>
+        ({
+          ...values,
+          dataset:
+            typeof dataset === 'number'
+              ? dataset
+              : {
+                  ...dataset,
+                  groupId: Number.parseInt(dataset.groupId ?? ''),
+                },
+        }) as SetupEnumeration,
+      validate: yupResolver(schema),
     },
-    transformValues: ({ csvFile, dataset, ...values }: EnumerationSetupForm) =>
-      ({
-        ...values,
-        dataset:
-          typeof dataset === 'number'
-            ? dataset
-            : {
-                ...dataset,
-                groupId: Number.parseInt(dataset.groupId ?? ''),
-              },
-      }) as SetupEnumeration,
-    validate: yupResolver(schema),
-  });
+  );
 
   const template = useSelector(selectReactionById(form.values.templateId));
 
@@ -96,7 +111,12 @@ export function EnumerationSetup({
       onClose={openCancelConfirm}
       position="right"
       title={title}
-      classNames={{ content: classes.content, header: classes.header, title: classes.title, body: classes.body }}
+      classNames={{
+        content: classes.content,
+        header: classes.header,
+        title: classes.title,
+        body: classes.body,
+      }}
     >
       <form
         className={classes.form}

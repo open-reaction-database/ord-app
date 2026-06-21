@@ -21,7 +21,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
-from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, GroupModel
+from ord_app.service_api.models import (
+    DatasetGroupAssociationModel,
+    DatasetModel,
+    GroupModel,
+)
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
     DatasetEnumerateCreateSchema,
@@ -135,7 +139,12 @@ async def download_dataset(
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> Response:
     dataset, data = await use_case.download(dataset_id, file_format)
-    return Response(data, headers={"Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'})
+    return Response(
+        data,
+        headers={
+            "Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'
+        },
+    )
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountResponseSchema])
@@ -158,7 +167,9 @@ async def update_dataset(
     return await use_case.update(dataset_id, payload)
 
 
-@router.delete("/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))])
+@router.delete(
+    "/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))]
+)
 async def delete_dataset(
     dataset_id: int,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],

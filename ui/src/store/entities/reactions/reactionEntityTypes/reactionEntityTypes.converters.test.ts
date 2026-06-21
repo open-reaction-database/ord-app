@@ -24,7 +24,9 @@ import {
 
 // The first enum member with a non-zero numeric value (i.e. not UNSPECIFIED).
 const firstNonZeroValue = (enumObject: Record<string, unknown>): number => {
-  const value = Object.values(enumObject).find((value): value is number => typeof value === 'number' && value !== 0);
+  const value = Object.values(enumObject).find(
+    (value): value is number => typeof value === 'number' && value !== 0,
+  );
   if (value === undefined) {
     throw new Error('expected the enum to have a non-zero numeric member');
   }

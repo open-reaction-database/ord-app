@@ -54,20 +54,31 @@ describe('previewsWorkerMiddleware', () => {
   it('merges previews across items for a reactions-list action', () => {
     const { invoke, worker } = setup();
     invoke(
-      action(getReactionsListActions.success.type, { items: [{ previews: { a: '1' } }, { previews: { b: '2' } }] }),
+      action(getReactionsListActions.success.type, {
+        items: [{ previews: { a: '1' } }, { previews: { b: '2' } }],
+      }),
     );
     expect(worker.postMessage).toHaveBeenCalledWith({ a: '1', b: '2' });
   });
 
   it('merges previews across items for a reaction-page action', () => {
     const { invoke, worker } = setup();
-    invoke(action(getReactionPageActions.success.type, { items: [{ previews: { p: '9' } }] }));
+    invoke(
+      action(getReactionPageActions.success.type, {
+        items: [{ previews: { p: '9' } }],
+      }),
+    );
     expect(worker.postMessage).toHaveBeenCalledWith({ p: '9' });
   });
 
   it('merges previews across templates for a get-all-templates action', () => {
     const { invoke, worker } = setup();
-    invoke(action(getAllTemplatesActions.success.type, [{ previews: { t1: 'x' } }, { previews: { t2: 'y' } }]));
+    invoke(
+      action(getAllTemplatesActions.success.type, [
+        { previews: { t1: 'x' } },
+        { previews: { t2: 'y' } },
+      ]),
+    );
     expect(worker.postMessage).toHaveBeenCalledWith({ t1: 'x', t2: 'y' });
   });
 

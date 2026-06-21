@@ -30,15 +30,23 @@ async def test_update_templates(api_client, mock_authenticated_user, test_db_ses
     template = await create_template(test_db_session, user.id)
 
     payload = {
-        "binpb": b64encode(Reaction(reaction_id=fake.name()).SerializeToString()).decode(),
+        "binpb": b64encode(
+            Reaction(reaction_id=fake.name()).SerializeToString()
+        ).decode(),
         "name": fake.name(),
         "variables": fake.json(),
     }
-    response_data = api_client.patch(f"/api/v1/templates/{template.id}", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.patch(f"/api/v1/templates/{template.id}", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert response_data["name"] == payload["name"]
 
 
-async def test_update_foreign_template(api_client, mock_authenticated_user, test_db_session):
+async def test_update_foreign_template(
+    api_client, mock_authenticated_user, test_db_session
+):
     (
         user,
         *_,
@@ -48,7 +56,9 @@ async def test_update_foreign_template(api_client, mock_authenticated_user, test
     template2 = await create_template(test_db_session, user2.id)
 
     payload = {
-        "binpb": b64encode(Reaction(reaction_id=fake.name()).SerializeToString()).decode(),
+        "binpb": b64encode(
+            Reaction(reaction_id=fake.name()).SerializeToString()
+        ).decode(),
         "name": fake.name(),
         "variables": fake.json(),
     }
@@ -56,9 +66,13 @@ async def test_update_foreign_template(api_client, mock_authenticated_user, test
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_get_non_existent_template(api_client, mock_authenticated_user, test_db_session):
+async def test_get_non_existent_template(
+    api_client, mock_authenticated_user, test_db_session
+):
     payload = {
-        "binpb": b64encode(Reaction(reaction_id=fake.name()).SerializeToString()).decode(),
+        "binpb": b64encode(
+            Reaction(reaction_id=fake.name()).SerializeToString()
+        ).decode(),
         "name": fake.name(),
         "variables": fake.json(),
     }

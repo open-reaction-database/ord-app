@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type Action, type Middleware, type ThunkDispatch, isAnyOf } from '@reduxjs/toolkit';
+import {
+  type Action,
+  type Middleware,
+  type ThunkDispatch,
+  isAnyOf,
+} from '@reduxjs/toolkit';
 import type { AppState } from '../../configureAppStore.ts';
 import type { EnumerationBatchResult } from '../../entities/enumeration/enumeration.types.ts';
 import { enumerateBatchResult } from '../../entities/enumeration/enumeration.thunks.ts';
@@ -24,7 +29,9 @@ export const enumerationWorkerMiddleware: Middleware<
   AppState,
   ThunkDispatch<AppState, never, Action>
 > = api => {
-  const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+  const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+    type: 'module',
+  });
 
   worker.onerror = function (err) {
     console.info('Error in WebWorker', err);

@@ -40,9 +40,18 @@ import {
   ordProvenanceToReaction,
   reactionProvenanceToOrd,
 } from './reactionProvenance/reactionProvenance.converters.ts';
-import { ordConditionsToReaction, reactionConditionsToOrd } from './reactionConditions/reactionConditions.converter';
-import { ordWorkupToReaction, reactionWorkupToOrd } from './reactionWorkups/reactionWorkups.converters.ts';
-import { ordSetupToReactionSetup, reactionSetupToOrd } from './reactionSetup/reactionSetup.converter.ts';
+import {
+  ordConditionsToReaction,
+  reactionConditionsToOrd,
+} from './reactionConditions/reactionConditions.converter';
+import {
+  ordWorkupToReaction,
+  reactionWorkupToOrd,
+} from './reactionWorkups/reactionWorkups.converters.ts';
+import {
+  ordSetupToReactionSetup,
+  reactionSetupToOrd,
+} from './reactionSetup/reactionSetup.converter.ts';
 
 export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
   return {
@@ -75,9 +84,11 @@ export function reactionToOrdReaction({
     reactionId,
     inputs: reactionInputsToOrdInputs(inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(outcomes),
-    identifiers: identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : null,
+    identifiers:
+      identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : null,
     setup: reactionSetupToOrd(setup),
-    observations: observations.length > 0 ? observations.map(reactionObservationToOrd) : null,
+    observations:
+      observations.length > 0 ? observations.map(reactionObservationToOrd) : null,
     conditions: reactionConditionsToOrd(conditions),
     notes: reactionNotesToOrd(notes),
     provenance: reactionProvenanceToOrd(provenance),

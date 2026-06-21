@@ -23,7 +23,10 @@ interface ReactionComponentPreviewProps {
   alt?: string;
 }
 
-export function ReactionComponentPreview({ previewState, alt }: Readonly<ReactionComponentPreviewProps>) {
+export function ReactionComponentPreview({
+  previewState,
+  alt,
+}: Readonly<ReactionComponentPreviewProps>) {
   if (previewState?.isLoading === true) {
     return <Loader />;
   }

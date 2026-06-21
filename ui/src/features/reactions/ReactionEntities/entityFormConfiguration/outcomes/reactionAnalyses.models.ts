@@ -102,7 +102,10 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
   {
     type: ReactionFormNodeType.list,
     name: 'analysisData',
-    useSelectItems: buildUseSelectItemsListFromMap('analysisData', compareNamedEntities),
+    useSelectItems: buildUseSelectItemsListFromMap(
+      'analysisData',
+      compareNamedEntities,
+    ),
     getKey: (item: AppData) => item.id,
     title: {
       label: 'Analytical Data',

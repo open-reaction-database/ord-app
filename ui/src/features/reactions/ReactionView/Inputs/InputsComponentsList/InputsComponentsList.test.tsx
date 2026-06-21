@@ -18,11 +18,15 @@ import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { InputsComponentsList } from './InputsComponentsList.tsx';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 
-const inputs = [{ id: 'in1', name: 'Input 1', components: [] }] as unknown as Array<ReactionInput>;
+const inputs = [
+  { id: 'in1', name: 'Input 1', components: [] },
+] as unknown as Array<ReactionInput>;
 
 describe('InputsComponentsList', () => {
   it('renders the column headers and one accordion item per input', () => {
-    const { getByText } = renderInReactionView(<InputsComponentsList inputs={inputs} />);
+    const { getByText } = renderInReactionView(
+      <InputsComponentsList inputs={inputs} />,
+    );
     for (const header of ['Input', 'Identifiers', 'Preview', 'Role', 'Amount']) {
       expect(getByText(header)).toBeInTheDocument();
     }

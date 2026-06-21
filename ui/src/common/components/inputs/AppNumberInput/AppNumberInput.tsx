@@ -17,13 +17,21 @@ import { NumberInput, type NumberInputProps } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 import { useCallback } from 'react';
 
-interface AppNumberInputProps extends Omit<NumberInputProps, 'value' | 'defaultValue' | 'onChange'> {
+interface AppNumberInputProps extends Omit<
+  NumberInputProps,
+  'value' | 'defaultValue' | 'onChange'
+> {
   value?: number | null;
   defaultValue?: number | null;
   onChange?: (value: number | null) => void;
 }
 
-export function AppNumberInput({ value, defaultValue, onChange, ...rest }: Readonly<AppNumberInputProps>) {
+export function AppNumberInput({
+  value,
+  defaultValue,
+  onChange,
+  ...rest
+}: Readonly<AppNumberInputProps>) {
   const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled({
     value,
     defaultValue,

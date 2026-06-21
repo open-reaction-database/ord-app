@@ -16,7 +16,13 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { importTemplateFromFileActions } from '../../entities/templates/templates.actions.ts';
 
-export const templateFromFileErrorReducer = createReducer<string | null>(null, builder => {
-  builder.addCase(importTemplateFromFileActions.failure, (_, action) => action.payload);
-  builder.addCase(importTemplateFromFileActions.request, () => null);
-});
+export const templateFromFileErrorReducer = createReducer<string | null>(
+  null,
+  builder => {
+    builder.addCase(
+      importTemplateFromFileActions.failure,
+      (_, action) => action.payload,
+    );
+    builder.addCase(importTemplateFromFileActions.request, () => null);
+  },
+);

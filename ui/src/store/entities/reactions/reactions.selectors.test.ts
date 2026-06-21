@@ -53,7 +53,12 @@ describe('selectOrderedInputs', () => {
         },
       },
     });
-    expect(selectOrderedInputsWrapper('r')(state).map(input => input.name)).toEqual(['c', 'a', 'b', 'z']);
+    expect(selectOrderedInputsWrapper('r')(state).map(input => input.name)).toEqual([
+      'c',
+      'a',
+      'b',
+      'z',
+    ]);
   });
 
   it('returns an empty array when the reaction has no inputs', () => {
@@ -62,13 +67,21 @@ describe('selectOrderedInputs', () => {
 });
 
 describe('template variable selectors', () => {
-  const state = buildState({ t: { variables: { v1: { name: 'v1', value: 1 }, v2: { name: 'v2', value: 2 } } } });
+  const state = buildState({
+    t: { variables: { v1: { name: 'v1', value: 1 }, v2: { name: 'v2', value: 2 } } },
+  });
 
   it('selectTemplateVariables returns the whole variables map', () => {
-    expect(Object.keys(selectTemplateVariablesWrapper('t')(state))).toEqual(['v1', 'v2']);
+    expect(Object.keys(selectTemplateVariablesWrapper('t')(state))).toEqual([
+      'v1',
+      'v2',
+    ]);
   });
 
   it('selectTemplateVariable returns a single named variable', () => {
-    expect(selectTemplateVariableWrapper('t', 'v2')(state)).toEqual({ name: 'v2', value: 2 });
+    expect(selectTemplateVariableWrapper('t', 'v2')(state)).toEqual({
+      name: 'v2',
+      value: 2,
+    });
   });
 });

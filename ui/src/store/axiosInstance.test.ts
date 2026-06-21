@@ -35,11 +35,14 @@ describe('handleResponseError', () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it.each([401, 404, 409, 500])('re-rejects without re-gating on a %i', async status => {
-    const error = axiosError(status);
-    await expect(handleResponseError(error)).rejects.toBe(error);
-    expect(handler).not.toHaveBeenCalled();
-  });
+  it.each([401, 404, 409, 500])(
+    're-rejects without re-gating on a %i',
+    async status => {
+      const error = axiosError(status);
+      await expect(handleResponseError(error)).rejects.toBe(error);
+      expect(handler).not.toHaveBeenCalled();
+    },
+  );
 
   it('does not re-gate for a non-axios error (e.g. a network failure with no response)', async () => {
     const error = new Error('network down');

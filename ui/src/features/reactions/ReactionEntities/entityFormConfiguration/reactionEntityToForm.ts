@@ -16,7 +16,10 @@
 import { type ReactionFormNode } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { reactionNotes } from './reactionNotes.model.ts';
 import { reactionData } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
-import { reactionInputs, reactionInputWithoutName } from './inputs/reactionInputs.model.tsx';
+import {
+  reactionInputs,
+  reactionInputWithoutName,
+} from './inputs/reactionInputs.model.tsx';
 import { reactionIdentifiers } from './reactionIdentifiers.ts';
 import { reactionProvenance } from './provenance/reactionProvenance.models.ts';
 import { recordModified } from './provenance/recordModified.models.ts';
@@ -39,7 +42,10 @@ import { reactionSetup } from './setup/reactionSetup.model.ts';
 import { reactionVesselPreparations } from './setup/reactionPreparationSetup.model.ts';
 import { reactionVesselAttachments } from './setup/reactionAttachmentSetup.model.ts';
 
-export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionFormNode>> = {
+export const reactionEntityToForm: Record<
+  ReactionNodeEntity,
+  Array<ReactionFormNode>
+> = {
   [ReactionNodeEntity.Inputs]: reactionInputs,
   [ReactionNodeEntity.Input]: reactionInputWithoutName,
   [ReactionNodeEntity.Notes]: reactionNotes,
@@ -60,7 +66,8 @@ export const reactionEntityToForm: Record<ReactionNodeEntity, Array<ReactionForm
   [ReactionNodeEntity.Conditions]: reactionConditions,
   [ReactionNodeEntity.Workups]: reactionWorkups,
   [ReactionNodeEntity.TemperatureMeasurements]: reactionTemperatureMeasurements,
-  [ReactionNodeEntity.ElectrochemistryMeasurements]: reactionElectrochemistryMeasurements,
+  [ReactionNodeEntity.ElectrochemistryMeasurements]:
+    reactionElectrochemistryMeasurements,
   [ReactionNodeEntity.PressureMeasurements]: reactionPressureMeasurements,
   [ReactionNodeEntity.VesselPreparations]: reactionVesselPreparations,
   [ReactionNodeEntity.VesselAttachments]: reactionVesselAttachments,

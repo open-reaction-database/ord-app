@@ -32,7 +32,13 @@ const stateWithVariables = (variables: object): { preloadedState: AppState } => 
     entities: {
       reactions: {
         reactionsById: {
-          template_1: { id: 1, data: {}, name: 'My Template', variables, modified_at: '2025-06-15T14:30:00Z' },
+          template_1: {
+            id: 1,
+            data: {},
+            name: 'My Template',
+            variables,
+            modified_at: '2025-06-15T14:30:00Z',
+          },
         },
       },
     },
@@ -41,7 +47,10 @@ const stateWithVariables = (variables: object): { preloadedState: AppState } => 
 
 describe('TemplateHeader', () => {
   it('shows the template name and a not-ready badge when there are no variables', () => {
-    const { getByText } = renderWithProviders(<TemplateHeader templateId="template_1" />, stateWithVariables({}));
+    const { getByText } = renderWithProviders(
+      <TemplateHeader templateId="template_1" />,
+      stateWithVariables({}),
+    );
     expect(getByText('My Template')).toBeInTheDocument();
     expect(getByText('Not Ready for Enumeration: No Variables')).toBeInTheDocument();
   });
@@ -55,7 +64,10 @@ describe('TemplateHeader', () => {
   });
 
   it('shows the last-modified date formatted in the user timezone (#619)', () => {
-    const { getByText } = renderWithProviders(<TemplateHeader templateId="template_1" />, stateWithVariables({}));
+    const { getByText } = renderWithProviders(
+      <TemplateHeader templateId="template_1" />,
+      stateWithVariables({}),
+    );
     expect(getByText('Last Modified')).toBeInTheDocument();
     // DD.MM.YYYY hh:mm a (DATE_TIME_HUMAN_FORMAT); exact value is timezone-dependent, so match the shape.
     expect(getByText(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)/)).toBeInTheDocument();

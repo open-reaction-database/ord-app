@@ -40,10 +40,21 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
   const observations = reaction.data.observations || [];
 
   const onObservationsCreate = useCallback(() => {
-    const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, observations.length];
-    const newObservation = ordObservationToReaction(ord.ReactionObservation.toObject(new ord.ReactionObservation()));
+    const newIdentifierPath: ReactionPathComponents = [
+      ENTITY_FIELD,
+      observations.length,
+    ];
+    const newObservation = ordObservationToReaction(
+      ord.ReactionObservation.toObject(new ord.ReactionObservation()),
+    );
 
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newObservation }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: newIdentifierPath,
+        newValue: newObservation,
+      }),
+    );
     dispatch(setReactionPathComponentsList([newIdentifierPath]));
   }, [reactionId, observations.length, dispatch]);
 
@@ -69,7 +80,10 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
           </Button>
         )}
       </Flex>
-      <span>Observations are time-stamped comments, images, etc. that are recorded during the reaction</span>
+      <span>
+        Observations are time-stamped comments, images, etc. that are recorded during
+        the reaction
+      </span>
       <Flex
         direction="column"
         gap="sm"

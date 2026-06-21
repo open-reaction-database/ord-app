@@ -15,7 +15,11 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axiosInstance from '../axiosInstance.ts';
-import { downloadFile, downloadFileFromUrl, downloadAsJson } from './downloadFile.thunks.ts';
+import {
+  downloadFile,
+  downloadFileFromUrl,
+  downloadAsJson,
+} from './downloadFile.thunks.ts';
 import { notifyApiError } from './notifyApiError.ts';
 
 vi.mock('../axiosInstance.ts', () => ({ default: { get: vi.fn() } }));
@@ -34,7 +38,10 @@ beforeEach(() => {
   createObjectURL = vi.fn(() => 'blob:mock-url');
   revokeObjectURL = vi.fn();
   // happy-dom doesn't implement object URLs; stub the two methods used here.
-  vi.stubGlobal('URL', Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }));
+  vi.stubGlobal(
+    'URL',
+    Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }),
+  );
   const realCreate = document.createElement.bind(document);
   vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
     const el = realCreate(tag);
@@ -65,17 +72,27 @@ describe('downloadFileFromUrl', () => {
   it('fetches the blob and downloads it using the content-disposition filename', async () => {
     axiosMock.get.mockResolvedValueOnce({
       data: 'payload',
-      headers: { 'content-type': 'application/json', 'content-disposition': 'attachment; filename="report.json"' },
+      headers: {
+        'content-type': 'application/json',
+        'content-disposition': 'attachment; filename="report.json"',
+      },
     });
     await downloadFileFromUrl('/datasets/5/download')(vi.fn(), vi.fn(), undefined);
-    expect(axiosMock.get).toHaveBeenCalledWith('/datasets/5/download', { responseType: 'blob' });
+    expect(axiosMock.get).toHaveBeenCalledWith('/datasets/5/download', {
+      responseType: 'blob',
+    });
     expect(lastAnchor?.download).toBe('report.json');
     expect(clickSpy).toHaveBeenCalledTimes(1);
   });
 
   it('notifies the user (no throw, no download) when the request fails (#616)', async () => {
-    axiosMock.get.mockRejectedValueOnce({ isAxiosError: true, response: { status: 404 } });
-    await expect(downloadFileFromUrl('/bad')(vi.fn(), vi.fn(), undefined)).resolves.toBeUndefined();
+    axiosMock.get.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 404 },
+    });
+    await expect(
+      downloadFileFromUrl('/bad')(vi.fn(), vi.fn(), undefined),
+    ).resolves.toBeUndefined();
     expect(clickSpy).not.toHaveBeenCalled();
     expect(notifyApiError).toHaveBeenCalledTimes(1);
   });

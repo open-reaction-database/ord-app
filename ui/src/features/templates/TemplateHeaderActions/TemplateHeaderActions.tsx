@@ -20,7 +20,10 @@ import { selectReactionById } from 'store/entities/reactions/reactions.selectors
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { downloadTemplateCsv, downloadTemplateInJSON } from 'store/entities/templates/templates.thunks.ts';
+import {
+  downloadTemplateCsv,
+  downloadTemplateInJSON,
+} from 'store/entities/templates/templates.thunks.ts';
 import { EnumerationWizard } from '../../enumeration/EnumerationWizard.tsx';
 import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';
 
@@ -29,7 +32,10 @@ interface TemplateHeaderActionsProps {
   showEnumeration?: boolean;
 }
 
-export function TemplateHeaderActions({ templateId, showEnumeration }: Readonly<TemplateHeaderActionsProps>) {
+export function TemplateHeaderActions({
+  templateId,
+  showEnumeration,
+}: Readonly<TemplateHeaderActionsProps>) {
   const template = useSelector(selectReactionById(templateId));
   const dispatch = useAppDispatch();
   const { variables } = template;

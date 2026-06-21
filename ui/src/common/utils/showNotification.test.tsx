@@ -31,7 +31,12 @@ describe('showNotification', () => {
     showNotification({ variant: NotificationVariant.SUCCESS, message: 'Saved' });
     expect(showMock).toHaveBeenCalledTimes(1);
     expect(showMock).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'Saved', autoClose: 4000, color: 'transparent', withBorder: false }),
+      expect.objectContaining({
+        message: 'Saved',
+        autoClose: 4000,
+        color: 'transparent',
+        withBorder: false,
+      }),
     );
   });
 

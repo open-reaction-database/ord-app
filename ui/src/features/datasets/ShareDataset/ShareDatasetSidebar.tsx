@@ -15,13 +15,25 @@
  */
 import { useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { ActionIcon, Button, Divider, Drawer, Flex, Loader, NumberInput, Title } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Divider,
+  Drawer,
+  Flex,
+  Loader,
+  NumberInput,
+  Title,
+} from '@mantine/core';
 import {
   getDatasetGroups,
   shareDatasetWithGroup,
   unshareDatasetWithGroup,
 } from 'store/entities/datasets/datasets.thunks.ts';
-import { selectAreDatasetGroupsLoading, selectDatasetGroups } from 'store/entities/datasets/datasets.selectors.ts';
+import {
+  selectAreDatasetGroupsLoading,
+  selectDatasetGroups,
+} from 'store/entities/datasets/datasets.selectors.ts';
 import { useSelector } from 'react-redux';
 import { useField } from '@mantine/form';
 import classes from './shareDataset.module.scss';
@@ -87,7 +99,10 @@ function GroupListItem({ group, onUnshareWithGroup }: Readonly<GroupsListItemPro
   );
 }
 
-export function ShareDatasetSidebar({ datasetId, onClose }: Readonly<ShareDatasetSidebarProps>) {
+export function ShareDatasetSidebar({
+  datasetId,
+  onClose,
+}: Readonly<ShareDatasetSidebarProps>) {
   const dispatch = useAppDispatch();
   const groups = useSelector(selectDatasetGroups);
   const areGroupsLoading = useSelector(selectAreDatasetGroupsLoading);

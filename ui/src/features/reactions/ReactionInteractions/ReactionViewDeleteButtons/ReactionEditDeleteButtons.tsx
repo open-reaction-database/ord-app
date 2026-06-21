@@ -18,7 +18,10 @@ import { EditButton } from 'common/components/interactions/EditButton/EditButton
 import { Divider, Flex } from '@mantine/core';
 import classes from './reactionViewDeleteButtons.module.scss';
 import { ReactionEntityDelete } from '../../ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-import { onViewDeleteButtonsWrapperClick, useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
+import {
+  onViewDeleteButtonsWrapperClick,
+  useOnViewEdit,
+} from './reactionViewDeleteButtons.utils.ts';
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
 

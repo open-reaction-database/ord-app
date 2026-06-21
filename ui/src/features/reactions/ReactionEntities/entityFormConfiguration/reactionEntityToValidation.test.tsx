@@ -29,17 +29,28 @@ const store = configureStore({
     entities: {
       reactions: {
         reactionsById: {
-          1: { id: 1, data: { inputs: { in1: { id: 'in1', name: 'Existing' }, in2: { id: 'in2', name: 'Other' } } } },
+          1: {
+            id: 1,
+            data: {
+              inputs: {
+                in1: { id: 'in1', name: 'Existing' },
+                in2: { id: 'in2', name: 'Other' },
+              },
+            },
+          },
         },
       },
     },
   } as unknown as AppState,
 });
 
-const wrapper = ({ children }: Readonly<{ children: ReactNode }>) => <Provider store={store}>{children}</Provider>;
+const wrapper = ({ children }: Readonly<{ children: ReactNode }>) => (
+  <Provider store={store}>{children}</Provider>
+);
 
 const renderValidate = (entity: ReactionNodeEntity, pathComponents: Array<string>) =>
-  renderHook(() => useReactionEntityValidation(1, pathComponents, entity), { wrapper }).result.current;
+  renderHook(() => useReactionEntityValidation(1, pathComponents, entity), { wrapper })
+    .result.current;
 
 describe('useReactionEntityValidation', () => {
   it('rejects a name that duplicates another sibling entity', () => {

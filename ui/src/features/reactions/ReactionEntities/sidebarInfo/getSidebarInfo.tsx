@@ -18,7 +18,9 @@ import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { reactionSidebarInfo } from './sidebarInfo.models.ts';
 import { allowedNodeEntityNames } from 'store/entities/reactions/reactions.models.ts';
 
-function getEntityPathComponent(pathComponents: ReactionPathComponents): [ReactionPathComponents, string] {
+function getEntityPathComponent(
+  pathComponents: ReactionPathComponents,
+): [ReactionPathComponents, string] {
   const [entity, ...rest] = pathComponents;
   if (typeof entity === 'number' || !allowedNodeEntityNames.includes(entity)) {
     return getEntityPathComponent(rest);
@@ -45,5 +47,9 @@ export function getSidebarInfo(
   } else if (filteredSidebarInfoCandidates.length === 0) {
     throw new Error('Invalid path');
   }
-  return getSidebarInfo(updatedPathComponents, index + 1, filteredSidebarInfoCandidates);
+  return getSidebarInfo(
+    updatedPathComponents,
+    index + 1,
+    filteredSidebarInfoCandidates,
+  );
 }

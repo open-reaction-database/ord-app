@@ -22,13 +22,23 @@ from ord_app.tests.conftest import create_test_dataset
 async def test_delete_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    payload = {
+        "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()
+    }
+    response_data = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     reaction_id = response_data["id"]
 
-    response = api_client.delete(f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}")
+    response = api_client.delete(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}"
+    )
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}")
+    response_data = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction_id}"
+    )
 
     assert response_data.status_code == status.HTTP_404_NOT_FOUND

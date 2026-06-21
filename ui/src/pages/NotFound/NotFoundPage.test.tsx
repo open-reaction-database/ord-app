@@ -21,7 +21,9 @@ import { NotFoundPage } from './NotFoundPage.tsx';
 // PageContainer pulls in the auth-aware UserMenu; stub it to a passthrough so this test stays
 // focused on the not-found content.
 vi.mock('common/components/PageContainer/PageContainer.tsx', () => ({
-  PageContainer: ({ children }: Readonly<{ children: ReactNode }>) => <div>{children}</div>,
+  PageContainer: ({ children }: Readonly<{ children: ReactNode }>) => (
+    <div>{children}</div>
+  ),
 }));
 
 describe('NotFoundPage', () => {
@@ -34,7 +36,9 @@ describe('NotFoundPage', () => {
 
   it('shows the provided error code and message', () => {
     const { getByText } = renderWithMantine(
-      <NotFoundPage rejectValue={{ errorCode: 403, errorMessage: 'You do not have access' }} />,
+      <NotFoundPage
+        rejectValue={{ errorCode: 403, errorMessage: 'You do not have access' }}
+      />,
     );
     expect(getByText('403')).toBeInTheDocument();
     expect(getByText('You do not have access')).toBeInTheDocument();

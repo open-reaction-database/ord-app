@@ -42,15 +42,18 @@ beforeEach(() => {
 
 describe('createThunk', () => {
   it('dispatches request, runs the inner thunk, dispatches and returns its result action', async () => {
-    const inner: AppThunk<typeof testActions> = arg => async () => testActions.success({ value: `got-${arg}` });
+    const inner: AppThunk<typeof testActions> = arg => async () =>
+      testActions.success({ value: `got-${arg}` });
     const { store, types, actions } = makeRecordingStore();
 
-    const result = (await store.dispatch(createThunk(testActions, inner)(5) as unknown as UnknownAction)) as ReturnType<
-      typeof testActions.success
-    >;
+    const result = (await store.dispatch(
+      createThunk(testActions, inner)(5) as unknown as UnknownAction,
+    )) as ReturnType<typeof testActions.success>;
 
     expect(types()).toEqual([testActions.request.type, testActions.success.type]);
-    const request = actions().find(a => a.type === testActions.request.type) as { payload?: number };
+    const request = actions().find(a => a.type === testActions.request.type) as {
+      payload?: number;
+    };
     expect(request?.payload).toBe(5);
     expect(result).toEqual(testActions.success({ value: 'got-5' }));
     expect(notifyMock).not.toHaveBeenCalled();
@@ -62,13 +65,20 @@ describe('createThunk', () => {
     };
     const { store, types, actions } = makeRecordingStore();
 
-    const result = await store.dispatch(createThunk(testActions, inner)(1) as unknown as UnknownAction);
+    const result = await store.dispatch(
+      createThunk(testActions, inner)(1) as unknown as UnknownAction,
+    );
 
     expect(types()).toEqual([testActions.request.type, testActions.failure.type]);
     expect(types()).not.toContain(testActions.success.type);
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBe('boom');
-    expect(notifyMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'boom' });
+    expect(notifyMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'boom',
+    });
     expect(result).toBeUndefined();
   });
 
@@ -78,9 +88,13 @@ describe('createThunk', () => {
     };
     const { store, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunk(testActions, inner)(1) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunk(testActions, inner)(1) as unknown as UnknownAction,
+    );
 
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBeNull();
     expect(notifyMock).not.toHaveBeenCalled();
   });
@@ -91,10 +105,14 @@ describe('createThunk', () => {
     };
     const { store, types, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunk(testActions, inner)(1) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunk(testActions, inner)(1) as unknown as UnknownAction,
+    );
 
     expect(types()).toContain(testActions.failure.type);
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBeNull();
     expect(notifyMock).not.toHaveBeenCalled();
   });
@@ -107,11 +125,15 @@ describe('createThunkWithExplicitResult', () => {
     };
     const { store, types, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(9) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunkWithExplicitResult(testActions, inner)(9) as unknown as UnknownAction,
+    );
 
     // request then the inner thunk's own success — exactly one success action, not a re-dispatched result.
     expect(types()).toEqual([testActions.request.type, testActions.success.type]);
-    const success = actions().find(a => a.type === testActions.success.type) as { payload?: { value: string } };
+    const success = actions().find(a => a.type === testActions.success.type) as {
+      payload?: { value: string };
+    };
     expect(success?.payload).toEqual({ value: 'explicit-9' });
   });
 
@@ -121,12 +143,19 @@ describe('createThunkWithExplicitResult', () => {
     };
     const { store, types, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction,
+    );
 
     expect(types()).toEqual([testActions.request.type, testActions.failure.type]);
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBe('explicit-boom');
-    expect(notifyMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'explicit-boom' });
+    expect(notifyMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'explicit-boom',
+    });
   });
 
   it('on an axios error without a string detail: dispatches failure with null, no toast', async () => {
@@ -135,9 +164,13 @@ describe('createThunkWithExplicitResult', () => {
     };
     const { store, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction,
+    );
 
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBeNull();
     expect(notifyMock).not.toHaveBeenCalled();
   });
@@ -148,10 +181,14 @@ describe('createThunkWithExplicitResult', () => {
     };
     const { store, types, actions } = makeRecordingStore();
 
-    await store.dispatch(createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction);
+    await store.dispatch(
+      createThunkWithExplicitResult(testActions, inner)(0) as unknown as UnknownAction,
+    );
 
     expect(types()).toContain(testActions.failure.type);
-    const failure = actions().find(a => a.type === testActions.failure.type) as { payload?: unknown };
+    const failure = actions().find(a => a.type === testActions.failure.type) as {
+      payload?: unknown;
+    };
     expect(failure?.payload).toBeNull();
     expect(notifyMock).not.toHaveBeenCalled();
   });

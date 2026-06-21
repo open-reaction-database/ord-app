@@ -18,7 +18,9 @@ import {
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-export function wrapInputsWithGrid(...inputs: Array<ReactionFormNode>): ReactionFormNode {
+export function wrapInputsWithGrid(
+  ...inputs: Array<ReactionFormNode>
+): ReactionFormNode {
   const inputsAmount = inputs.length;
   return {
     type: ReactionFormNodeType.wrapper,

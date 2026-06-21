@@ -18,21 +18,23 @@ import { editDatasetSchema } from 'features/datasets/DatasetHeader/EditDataset/e
 
 describe('editDatasetSchema', () => {
   it('accepts a name and description', async () => {
-    await expect(editDatasetSchema.validate({ name: 'My dataset', description: 'notes' })).resolves.toEqual({
+    await expect(
+      editDatasetSchema.validate({ name: 'My dataset', description: 'notes' }),
+    ).resolves.toEqual({
       name: 'My dataset',
       description: 'notes',
     });
   });
 
   it('requires the name', async () => {
-    await expect(editDatasetSchema.validate({ name: '', description: 'notes' })).rejects.toThrow(
-      'Dataset name should not be empty',
-    );
+    await expect(
+      editDatasetSchema.validate({ name: '', description: 'notes' }),
+    ).rejects.toThrow('Dataset name should not be empty');
   });
 
   it('requires the description', async () => {
-    await expect(editDatasetSchema.validate({ name: 'My dataset', description: '   ' })).rejects.toThrow(
-      'Description should not be empty',
-    );
+    await expect(
+      editDatasetSchema.validate({ name: 'My dataset', description: '   ' }),
+    ).rejects.toThrow('Description should not be empty');
   });
 });

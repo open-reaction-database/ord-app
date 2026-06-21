@@ -37,7 +37,9 @@ export function EnumerationProgressDisplay({
   }, [setCloseConfirmationOpened]);
 
   const progress = useMemo(() => {
-    const enumerationPercent = (enumerationProgress.index / enumerationProgress.templateCSV.content.length) * 100;
+    const enumerationPercent =
+      (enumerationProgress.index / enumerationProgress.templateCSV.content.length) *
+      100;
     return enumerationPercent * 0.85;
   }, [enumerationProgress]);
 
@@ -83,7 +85,9 @@ export function EnumerationProgressDisplay({
             align="center"
             justify="space-between"
           >
-            <Text className={classes.text}>{isUploading ? 'Uploading...' : 'Enumerating...'}</Text>
+            <Text className={classes.text}>
+              {isUploading ? 'Uploading...' : 'Enumerating...'}
+            </Text>
             <Text className={classes.text}>{progress.toFixed(0)}%</Text>
           </Flex>
           <Progress
@@ -92,8 +96,8 @@ export function EnumerationProgressDisplay({
             radius="md"
           />
           <Alert title="Please note">
-            Dataset enumeration progress will interrupt if you close this modal of browser tab. Large datasets
-            enumeration may take a few minutes
+            Dataset enumeration progress will interrupt if you close this modal of
+            browser tab. Large datasets enumeration may take a few minutes
           </Alert>
         </Flex>
       )}

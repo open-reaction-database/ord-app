@@ -56,7 +56,12 @@ describe('record event converters', () => {
   });
 
   it('maps a record event back to ord shape, dropping a null time', () => {
-    const result = reactionRecordEventToOrd({ id: 'x', time: null, details: 'edited', person: { name: 'Ada' } });
+    const result = reactionRecordEventToOrd({
+      id: 'x',
+      time: null,
+      details: 'edited',
+      person: { name: 'Ada' },
+    });
     expect(result.time).toBeNull();
     expect(result.details).toBe('edited');
     expect(result.person).toEqual({ name: 'Ada' });

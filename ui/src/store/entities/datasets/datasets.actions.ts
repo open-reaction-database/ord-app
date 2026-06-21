@@ -28,26 +28,47 @@ const { createAsyncAction, createAction } = createActionFactory('datasets');
 
 export const getDatasetActions = createAsyncAction<number, Dataset, RejectValue>('get');
 
-export const getGroupsInitialDatasetListActions = createAsyncAction<number | null, Pages<Dataset>>('list_initial');
+export const getGroupsInitialDatasetListActions = createAsyncAction<
+  number | null,
+  Pages<Dataset>
+>('list_initial');
 
-export const getDatasetPageActions = createAsyncAction<Partial<CurrentPage>, Pages<Dataset>>('page');
+export const getDatasetPageActions = createAsyncAction<
+  Partial<CurrentPage>,
+  Pages<Dataset>
+>('page');
 
-export const createNewDatasetActions = createAsyncAction<CreateNewDatasetPayload, Dataset>('create_empty');
+export const createNewDatasetActions = createAsyncAction<
+  CreateNewDatasetPayload,
+  Dataset
+>('create_empty');
 
-export const createDatasetFromFileActions = createAsyncAction<CreateDatasetFromFilePayload, Dataset>(
-  'create_from_file',
-);
+export const createDatasetFromFileActions = createAsyncAction<
+  CreateDatasetFromFilePayload,
+  Dataset
+>('create_from_file');
 
 export const setDatasetEditOpenedAction = createAction<boolean>('set_edit_opened');
 
-export const updateDatasetActions = createAsyncAction<Pick<Dataset, 'id' | 'name' | 'description'>, Dataset>('update');
+export const updateDatasetActions = createAsyncAction<
+  Pick<Dataset, 'id' | 'name' | 'description'>,
+  Dataset
+>('update');
 
 export const removeDatasetActions = createAsyncAction<number>('remove_dataset');
 
-export const getDatasetGroupsActions = createAsyncAction<number, Array<DatasetGroup>>('get_groups');
+export const getDatasetGroupsActions = createAsyncAction<number, Array<DatasetGroup>>(
+  'get_groups',
+);
 
 export const clearDatasetGroupsListAction = createAction('clear_groups_list');
 
-export const shareDatasetWithGroupActions = createAsyncAction<DatasetShareUnsharePayload, void>('share_dataset');
+export const shareDatasetWithGroupActions = createAsyncAction<
+  DatasetShareUnsharePayload,
+  void
+>('share_dataset');
 
-export const unshareDatasetWithGroupActions = createAsyncAction<DatasetShareUnsharePayload, number>('unshare_dataset');
+export const unshareDatasetWithGroupActions = createAsyncAction<
+  DatasetShareUnsharePayload,
+  number
+>('unshare_dataset');

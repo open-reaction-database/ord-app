@@ -21,7 +21,9 @@ from ord_app.service_api.constants import AppEnvs
 
 class Settings(BaseSettings):
     base_dir: PosixPath = PosixPath(__file__).parent
-    model_config = SettingsConfigDict(env_file=str(base_dir.parent / ".env"), case_sensitive=False)
+    model_config = SettingsConfigDict(
+        env_file=str(base_dir.parent / ".env"), case_sensitive=False
+    )
 
     # app
     app_env: str = AppEnvs.production

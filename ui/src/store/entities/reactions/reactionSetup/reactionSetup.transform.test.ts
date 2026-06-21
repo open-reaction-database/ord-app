@@ -23,12 +23,18 @@ const makeSetup = (isAutomated: ReactionBoolean): ReactionSetup =>
 
 describe('setupTransform', () => {
   it('keeps automationPlatform when the setup is automated', () => {
-    expect(setupTransform(makeSetup(ReactionBoolean.True)).automationPlatform).toBe('platform-x');
+    expect(setupTransform(makeSetup(ReactionBoolean.True)).automationPlatform).toBe(
+      'platform-x',
+    );
   });
 
   it('clears automationPlatform when the setup is not automated', () => {
-    expect(setupTransform(makeSetup(ReactionBoolean.False)).automationPlatform).toBeNull();
-    expect(setupTransform(makeSetup(ReactionBoolean.Unspecified)).automationPlatform).toBeNull();
+    expect(
+      setupTransform(makeSetup(ReactionBoolean.False)).automationPlatform,
+    ).toBeNull();
+    expect(
+      setupTransform(makeSetup(ReactionBoolean.Unspecified)).automationPlatform,
+    ).toBeNull();
   });
 
   it('does not mutate the input setup', () => {

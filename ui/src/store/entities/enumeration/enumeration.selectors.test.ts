@@ -27,7 +27,11 @@ describe('selectEnumerationProgress', () => {
   });
 
   it('returns the current progress object', () => {
-    const progress = { index: 5, finished: false, resultDatasetId: null } as EnumerationProgress;
+    const progress = {
+      index: 5,
+      finished: false,
+      resultDatasetId: null,
+    } as EnumerationProgress;
     expect(selectEnumerationProgress(buildState(progress))).toBe(progress);
   });
 });

@@ -19,6 +19,10 @@ faker = Faker()
 async def test_update_group(api_client, mock_authenticated_user):
     *_, group = mock_authenticated_user
     payload = {"name": faker.company()}
-    response_data = api_client.patch(f"/api/v1/groups/{group.id}", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.patch(f"/api/v1/groups/{group.id}", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert payload["name"] == response_data["name"]
     assert response_data["role"] == "admin"  # (#569)

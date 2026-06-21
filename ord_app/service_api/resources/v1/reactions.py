@@ -50,7 +50,8 @@ async def create_reaction(
     response_model=ReactionResponseSchema,
 )
 async def create_reaction_from_scratch(
-    dataset_id: int, use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)]
+    dataset_id: int,
+    use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ) -> ReactionModel:
     return await use_case.create_from_scratch(dataset_id)
 

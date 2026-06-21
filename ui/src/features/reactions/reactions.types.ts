@@ -35,4 +35,5 @@ interface DatasetReactionContext {
   reactionId: number;
 }
 
-export type ReactionsContext = ReactionContextBase & (TemplateReactionContext | DatasetReactionContext);
+export type ReactionsContext = ReactionContextBase &
+  (TemplateReactionContext | DatasetReactionContext);

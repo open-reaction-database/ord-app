@@ -22,4 +22,8 @@ export const requiredTextField = (label: string) =>
     .string()
     .label(label)
     .required(emptyFieldMessage(label))
-    .test('no-only-spaces', emptyFieldMessage(label), value => value?.trim().length > 0);
+    .test(
+      'no-only-spaces',
+      emptyFieldMessage(label),
+      value => value?.trim().length > 0,
+    );

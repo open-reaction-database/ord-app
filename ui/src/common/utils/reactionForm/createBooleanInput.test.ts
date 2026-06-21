@@ -23,7 +23,9 @@ import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormCo
 
 describe('createBooleanInput', () => {
   it('builds a segmented select node from the shared boolean options', () => {
-    const wrapperConfig = { label: 'Exothermic?' } as ReactionFormSelect['wrapperConfig'];
+    const wrapperConfig = {
+      label: 'Exothermic?',
+    } as ReactionFormSelect['wrapperConfig'];
     expect(createBooleanInput('isExothermic', wrapperConfig)).toEqual({
       type: ReactionFormNodeType.select,
       name: 'isExothermic',

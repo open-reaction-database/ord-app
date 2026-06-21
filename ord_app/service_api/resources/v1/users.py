@@ -24,17 +24,23 @@ router = APIRouter(tags=["users"], prefix="/users")
 
 
 @router.get("/me", response_model=UserResponseSchema)
-async def read_users_me(current_user: Annotated[UserModel, Depends(authenticate)]) -> UserModel:
+async def read_users_me(
+    current_user: Annotated[UserModel, Depends(authenticate)],
+) -> UserModel:
     return current_user
 
 
 @router.get("/{user_id}", response_model=UserResponseSchema)
-async def get_user(user_id: int, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]) -> UserModel:
+async def get_user(
+    user_id: int, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]
+) -> UserModel:
     return await use_case.get(user_id)
 
 
 @router.patch("/{user_id}", response_model=UserResponseSchema)
 async def update_user(
-    user_id: int, payload: UserUpdateSchema, use_case: Annotated[UserUseCase, Depends(get_user_use_case)]
+    user_id: int,
+    payload: UserUpdateSchema,
+    use_case: Annotated[UserUseCase, Depends(get_user_use_case)],
 ) -> UserModel:
     return await use_case.update(user_id, payload)

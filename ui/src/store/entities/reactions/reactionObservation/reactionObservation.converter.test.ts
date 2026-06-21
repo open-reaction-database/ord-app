@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { ordObservationToReaction, reactionObservationToOrd } from './reactionObservation.converter.ts';
+import {
+  ordObservationToReaction,
+  reactionObservationToOrd,
+} from './reactionObservation.converter.ts';
 import { AppDataType } from '../reactionData/reactionData.types.ts';
 
 describe('ordObservationToReaction', () => {
   it('assigns an id, the comment, a time, and the named image data', () => {
-    const result = ordObservationToReaction({ comment: 'gas evolved', image: { url: 'https://img' } });
+    const result = ordObservationToReaction({
+      comment: 'gas evolved',
+      image: { url: 'https://img' },
+    });
     expect(typeof result.id).toBe('string');
     expect(result.comment).toBe('gas evolved');
     expect(result.image.name).toBe('Observation');
-    expect(result.image.data).toMatchObject({ type: AppDataType.Url, value: 'https://img' });
+    expect(result.image.data).toMatchObject({
+      type: AppDataType.Url,
+      value: 'https://img',
+    });
     expect(result.time).toBeDefined();
   });
 
@@ -34,7 +43,10 @@ describe('ordObservationToReaction', () => {
 
 describe('reactionObservationToOrd', () => {
   it('round-trips the comment and image back to ord shape', () => {
-    const observation = ordObservationToReaction({ comment: 'precipitate', image: { stringValue: 'note' } });
+    const observation = ordObservationToReaction({
+      comment: 'precipitate',
+      image: { stringValue: 'note' },
+    });
     const result = reactionObservationToOrd(observation);
     expect(result.comment).toBe('precipitate');
     expect(result.image?.stringValue).toBe('note');

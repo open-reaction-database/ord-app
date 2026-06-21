@@ -43,7 +43,9 @@ describe('createUser', () => {
 
     expect(axiosMock.post).toHaveBeenCalledWith('/auth/jit-provisioning', tokens);
     expect(types()).toContain(createUserActions.success.type);
-    const success = actions().find(a => a.type === createUserActions.success.type) as { payload?: typeof user };
+    const success = actions().find(a => a.type === createUserActions.success.type) as {
+      payload?: typeof user;
+    };
     expect(success?.payload).toEqual(user);
   });
 

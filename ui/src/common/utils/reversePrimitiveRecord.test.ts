@@ -26,7 +26,10 @@ describe('reversePrimitiveRecord', () => {
   });
 
   it('reverses string-to-string records', () => {
-    expect(reversePrimitiveRecord({ celsius: 'c', fahrenheit: 'f' })).toEqual({ c: 'celsius', f: 'fahrenheit' });
+    expect(reversePrimitiveRecord({ celsius: 'c', fahrenheit: 'f' })).toEqual({
+      c: 'celsius',
+      f: 'fahrenheit',
+    });
   });
 
   it('keeps the last key when two keys share a value', () => {

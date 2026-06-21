@@ -15,7 +15,9 @@
  */
 import type { AppState } from '../configureAppStore.ts';
 
-export function createSelectorFactory<RootState>(selectRoot: (state: AppState) => RootState) {
+export function createSelectorFactory<RootState>(
+  selectRoot: (state: AppState) => RootState,
+) {
   const buildSelector =
     <Result>(selectState: (state: RootState) => Result) =>
     (state: AppState) =>

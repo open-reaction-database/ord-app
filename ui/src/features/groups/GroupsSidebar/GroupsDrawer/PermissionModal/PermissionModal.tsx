@@ -28,15 +28,51 @@ interface Permission {
 
 const permissionsList: Array<Permission> = [
   { feature: 'Read', admin: true, editor: true, viewer: true, category: 'Groups' },
-  { feature: 'Add Users', admin: true, editor: false, viewer: false, category: 'Groups' },
-  { feature: 'Manage Users', admin: true, editor: false, viewer: false, category: 'Groups' },
-  { feature: 'Edit Group Name', admin: true, editor: false, viewer: false, category: 'Groups' },
+  {
+    feature: 'Add Users',
+    admin: true,
+    editor: false,
+    viewer: false,
+    category: 'Groups',
+  },
+  {
+    feature: 'Manage Users',
+    admin: true,
+    editor: false,
+    viewer: false,
+    category: 'Groups',
+  },
+  {
+    feature: 'Edit Group Name',
+    admin: true,
+    editor: false,
+    viewer: false,
+    category: 'Groups',
+  },
   { feature: 'Read', admin: true, editor: true, viewer: true, category: 'Datasets' },
-  { feature: 'Download', admin: true, editor: true, viewer: true, category: 'Datasets' },
-  { feature: 'Copy ID & Dataset Hyperlink', admin: true, editor: true, viewer: true, category: 'Datasets' },
+  {
+    feature: 'Download',
+    admin: true,
+    editor: true,
+    viewer: true,
+    category: 'Datasets',
+  },
+  {
+    feature: 'Copy ID & Dataset Hyperlink',
+    admin: true,
+    editor: true,
+    viewer: true,
+    category: 'Datasets',
+  },
   { feature: 'Create', admin: true, editor: true, viewer: false, category: 'Datasets' },
   { feature: 'Edit', admin: true, editor: true, viewer: false, category: 'Datasets' },
-  { feature: 'Delete', admin: true, editor: false, viewer: false, category: 'Datasets' },
+  {
+    feature: 'Delete',
+    admin: true,
+    editor: false,
+    viewer: false,
+    category: 'Datasets',
+  },
   { feature: 'Share', admin: true, editor: false, viewer: false, category: 'Datasets' },
 ];
 
@@ -49,7 +85,11 @@ interface FeatureIconProps {
 }
 
 function FeatureIcon({ hasAccess }: Readonly<FeatureIconProps>) {
-  return <Flex className={classes.icon}>{hasAccess ? <CheckCircleIcon /> : <CrossCircleIcon />}</Flex>;
+  return (
+    <Flex className={classes.icon}>
+      {hasAccess ? <CheckCircleIcon /> : <CrossCircleIcon />}
+    </Flex>
+  );
 }
 
 export function PermissionsModal({ opened, onClose }: Readonly<PermissionsModalProps>) {
@@ -73,9 +113,12 @@ export function PermissionsModal({ opened, onClose }: Readonly<PermissionsModalP
         </Table.Thead>
         <Table.Tbody className={classes.tableBody}>
           {permissionsList.map((row, index) => {
-            const isRowWithHeader = index === 0 || (index > 0 && row.category !== permissionsList[index - 1].category);
+            const isRowWithHeader =
+              index === 0 ||
+              (index > 0 && row.category !== permissionsList[index - 1].category);
             const lastRowInCategory =
-              permissionsList[index + 1] && row.category !== permissionsList[index + 1].category;
+              permissionsList[index + 1] &&
+              row.category !== permissionsList[index + 1].category;
 
             return (
               <React.Fragment key={`${row.category}_${row.feature}`}>

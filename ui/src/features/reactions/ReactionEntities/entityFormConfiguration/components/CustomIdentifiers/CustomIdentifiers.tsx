@@ -65,7 +65,10 @@ export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const [componentsEditorOpened, { open: openComponentsEditor, close: closeComponentsEditor }] = useDisclosure();
+  const [
+    componentsEditorOpened,
+    { open: openComponentsEditor, close: closeComponentsEditor },
+  ] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
   const createNewMolblockIdentifier = useCreateNewMolblockIdentifier();
   const isReactionLookupOpened = useSelector(selectIsReactionLookupOpen);
@@ -97,13 +100,20 @@ export function CustomIdentifiers() {
         ...value,
       };
       const newPathComponents = [...pathComponents, ENTITY_FIELD, editedMolblock];
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: newPathComponents, newValue: identifier }));
+      dispatch(
+        addUpdateReactionField({
+          reactionId,
+          pathComponents: newPathComponents,
+          newValue: identifier,
+        }),
+      );
     } else {
       createNewMolblockIdentifier(identifiers.length, identifiers, value);
     }
   };
 
-  const selectedMolblockIdentifier = editedMolblock !== null ? identifiers[editedMolblock] : null;
+  const selectedMolblockIdentifier =
+    editedMolblock !== null ? identifiers[editedMolblock] : null;
 
   return (
     <>
@@ -134,7 +144,11 @@ export function CustomIdentifiers() {
         </Grid>
       )}
       <ReactionEntityBlock
-        renderedTitle={<ReactionEntityBlockTitle leftSection={<Title order={3}>Molblock Identifiers</Title>} />}
+        renderedTitle={
+          <ReactionEntityBlockTitle
+            leftSection={<Title order={3}>Molblock Identifiers</Title>}
+          />
+        }
       >
         {identifiers.map((identifier, index) => (
           <MolblockIdentifier
@@ -154,7 +168,9 @@ export function CustomIdentifiers() {
         identifier={selectedMolblockIdentifier}
       />
 
-      {isReactionLookupOpened && <ComponentsLookup onClose={closeAddCustomIdentifier} />}
+      {isReactionLookupOpened && (
+        <ComponentsLookup onClose={closeAddCustomIdentifier} />
+      )}
     </>
   );
 }

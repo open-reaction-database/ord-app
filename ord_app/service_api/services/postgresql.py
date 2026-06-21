@@ -24,7 +24,9 @@ pg_engine = create_async_engine(
     pool_timeout=30,
     pool_recycle=1800,
 )
-db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
+db_session_maker = async_sessionmaker(
+    pg_engine, expire_on_commit=False, autoflush=False, autocommit=False
+)
 
 
 async def get_db_session() -> AsyncIterator[AsyncSession]:

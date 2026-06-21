@@ -132,7 +132,9 @@ export function ReactionList() {
             gap="sm"
           >
             <EmptyIcon />
-            <div className={classes.emptyText}>There are no reactions in the dataset yet</div>
+            <div className={classes.emptyText}>
+              There are no reactions in the dataset yet
+            </div>
           </Flex>
         </Flex>
       ) : (

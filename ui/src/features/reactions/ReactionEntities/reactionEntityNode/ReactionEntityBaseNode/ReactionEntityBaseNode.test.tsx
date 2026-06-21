@@ -18,10 +18,15 @@ import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { ReactionEntityBaseNode } from './ReactionEntityBaseNode.tsx';
 import { nodeToComponentContext } from '../reactionEntityNode.context.ts';
 import { ReactionFormNodeType } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import type { ReactionNodeToComponent, ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
+import type {
+  ReactionNodeToComponent,
+  ReactionEntityNodeProps,
+} from '../reactionEntityNode.types.ts';
 
 const Stub = () => <div data-testid="mapped">mapped</div>;
-const nodeToComponent = { [ReactionFormNodeType.value]: Stub } as unknown as ReactionNodeToComponent;
+const nodeToComponent = {
+  [ReactionFormNodeType.value]: Stub,
+} as unknown as ReactionNodeToComponent;
 const formMethods = {} as ReactionEntityNodeProps['formMethods'];
 
 const renderNode = (type: ReactionFormNodeType) =>

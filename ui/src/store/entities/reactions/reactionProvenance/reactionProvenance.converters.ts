@@ -20,19 +20,29 @@ import {
   ordDateTimeToReaction,
   reactionDateTimeToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type { ReactionProvenance, ReactionRecordEvent } from './reactionProvenance.types.ts';
+import type {
+  ReactionProvenance,
+  ReactionRecordEvent,
+} from './reactionProvenance.types.ts';
 import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
-export const ordPersonToReactionPerson = (person: OrdOptional<ord.IPerson>): ord.IPerson => {
+export const ordPersonToReactionPerson = (
+  person: OrdOptional<ord.IPerson>,
+): ord.IPerson => {
   return person ?? ord.Person.toObject(new ord.Person());
 };
 
-export const reactionPersonToOrdPerson = (person: ord.IPerson): Optional<ord.IPerson> => {
+export const reactionPersonToOrdPerson = (
+  person: ord.IPerson,
+): Optional<ord.IPerson> => {
   return person;
 };
 
-export const ordRecordEventToReaction = (recordEvent: OrdOptional<ord.IRecordEvent>): ReactionRecordEvent => {
-  const { person, time, details }: ord.IRecordEvent = recordEvent ?? ord.RecordEvent.toObject(new ord.RecordEvent());
+export const ordRecordEventToReaction = (
+  recordEvent: OrdOptional<ord.IRecordEvent>,
+): ReactionRecordEvent => {
+  const { person, time, details }: ord.IRecordEvent =
+    recordEvent ?? ord.RecordEvent.toObject(new ord.RecordEvent());
   return withId({
     time: ordDateTimeToReaction(time),
     details: details,
@@ -40,16 +50,23 @@ export const ordRecordEventToReaction = (recordEvent: OrdOptional<ord.IRecordEve
   });
 };
 
-export const reactionRecordEventToOrd = ({ person, time, details }: ReactionRecordEvent): ord.IRecordEvent => ({
+export const reactionRecordEventToOrd = ({
+  person,
+  time,
+  details,
+}: ReactionRecordEvent): ord.IRecordEvent => ({
   time: reactionDateTimeToOrd(time),
   details: details,
   person: reactionPersonToOrdPerson(person),
 });
 
-export const ordProvenanceToReaction = (provenance: OrdOptional<ord.IReactionProvenance>): ReactionProvenance => {
+export const ordProvenanceToReaction = (
+  provenance: OrdOptional<ord.IReactionProvenance>,
+): ReactionProvenance => {
   const existingProvenance: ord.IReactionProvenance =
     provenance ?? ord.ReactionProvenance.toObject(new ord.ReactionProvenance());
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } = existingProvenance;
+  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
+    existingProvenance;
 
   return withId({
     experimentStart: ordDateTimeToReaction(experimentStart),
@@ -60,8 +77,11 @@ export const ordProvenanceToReaction = (provenance: OrdOptional<ord.IReactionPro
   });
 };
 
-export const reactionProvenanceToOrd = (provenance: ReactionProvenance): ord.IReactionProvenance => {
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } = withoutId(provenance);
+export const reactionProvenanceToOrd = (
+  provenance: ReactionProvenance,
+): ord.IReactionProvenance => {
+  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
+    withoutId(provenance);
 
   return {
     experimentStart: reactionDateTimeToOrd(experimentStart),

@@ -20,13 +20,21 @@ async def test_paginate_reactions(api_client, mock_authenticated_user, test_db_s
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["total"] == 1
 
 
-async def test_paginate_query_reactions(api_client, mock_authenticated_user, test_db_session):
+async def test_paginate_query_reactions(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction_is_valid_none = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction_is_valid_none = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
     reaction_is_valid_true = await create_test_reaction(
         test_db_session, mock_authenticated_user, dataset, is_valid=True
     )
@@ -34,26 +42,44 @@ async def test_paginate_query_reactions(api_client, mock_authenticated_user, tes
         test_db_session, mock_authenticated_user, dataset, is_valid=False
     )
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["total"] == 3
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=true").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=true")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["total"] == 1
     assert response_data["items"][0]["id"] == reaction_is_valid_true.id
     assert response_data["items"][0]["is_valid"] is True
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=false").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=false")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["total"] == 1
     assert response_data["items"][0]["id"] == reaction_is_valid_false.id
     assert response_data["items"][0]["is_valid"] is False
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=null").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=null")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["total"] == 1
     assert response_data["items"][0]["id"] == reaction_is_valid_none.id
     assert response_data["items"][0]["is_valid"] is None
 
     response_data = (
-        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions?is_valid=false&is_valid=null")
+        api_client.get(
+            f"/api/v1/datasets/{dataset.id}/reactions?is_valid=false&is_valid=null"
+        )
         .raise_for_status()
         .json()
     )
@@ -66,18 +92,28 @@ async def test_paginate_query_reactions(api_client, mock_authenticated_user, tes
 
 async def test_get_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
-    response_data = api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}")
+        .raise_for_status()
+        .json()
+    )
     assert response_data["id"] == reaction.id
 
 
 async def test_search_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
     response_data = (
-        api_client.get(f"/api/v1/datasets/{dataset.id}/reactions/search?pb_reaction_id={reaction.pb_reaction_id}")
+        api_client.get(
+            f"/api/v1/datasets/{dataset.id}/reactions/search?pb_reaction_id={reaction.pb_reaction_id}"
+        )
         .raise_for_status()
         .json()
     )
@@ -86,7 +122,9 @@ async def test_search_reaction(api_client, mock_authenticated_user, test_db_sess
 
 async def test_download_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
     response_data = api_client.get(
         f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}/download?file_format=json"

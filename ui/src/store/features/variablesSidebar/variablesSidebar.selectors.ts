@@ -15,6 +15,10 @@
  */
 import { createSelectorFactory } from '../../utils';
 
-const { buildSelector } = createSelectorFactory(state => state.features.variablesSidebar);
+const { buildSelector } = createSelectorFactory(
+  state => state.features.variablesSidebar,
+);
 
-export const selectIsVariablesSidebarOpened = buildSelector(state => state.isVariablesSidebarOpened);
+export const selectIsVariablesSidebarOpened = buildSelector(
+  state => state.isVariablesSidebarOpened,
+);

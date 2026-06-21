@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionEntityTitleConstructorProps, ReactionEntityTitleProps } from './reactionEntityTitle.types.ts';
+import type {
+  ReactionEntityTitleConstructorProps,
+  ReactionEntityTitleProps,
+} from './reactionEntityTitle.types.ts';
 import { ReactionEntityTitle } from './ReactionEntityTitle.tsx';
 
-export const createReactionEntityTitle = (constructorProps: ReactionEntityTitleConstructorProps) =>
+export const createReactionEntityTitle = (
+  constructorProps: ReactionEntityTitleConstructorProps,
+) =>
   function ReactionEntityTitleWithProps(props: ReactionEntityTitleProps) {
     return (
       <ReactionEntityTitle

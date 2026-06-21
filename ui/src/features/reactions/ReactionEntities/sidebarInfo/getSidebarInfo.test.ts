@@ -34,6 +34,8 @@ describe('getSidebarInfo', () => {
   it('skips numeric indices interleaved in a concrete reaction path', () => {
     // Same ambiguous-first-segment path, but with numeric ids between entities — they must be
     // skipped at each recursion step to still resolve to the component-identifiers entry.
-    expect(getSidebarInfo(['identifiers', 0, 'products', 1, 'outcomes']).label).toBe('Identifiers');
+    expect(getSidebarInfo(['identifiers', 0, 'products', 1, 'outcomes']).label).toBe(
+      'Identifiers',
+    );
   });
 });

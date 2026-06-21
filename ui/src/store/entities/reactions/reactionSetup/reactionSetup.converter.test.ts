@@ -26,7 +26,10 @@ import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 describe('vessel attachment converters', () => {
   it('assigns an id and maps the type to a name, then back to a number', () => {
-    const reaction = ordVesselAttachmentToReaction({ type: undefined, details: 'reflux condenser' });
+    const reaction = ordVesselAttachmentToReaction({
+      type: undefined,
+      details: 'reflux condenser',
+    });
     expect(typeof reaction.id).toBe('string');
     expect(reaction.details).toBe('reflux condenser');
     expect(typeof reaction.type).toBe('string');
@@ -39,7 +42,10 @@ describe('vessel attachment converters', () => {
 
 describe('vessel preparation converters', () => {
   it('round-trips type and details', () => {
-    const reaction = ordVesselPreparationToReaction({ type: undefined, details: 'oven dried' });
+    const reaction = ordVesselPreparationToReaction({
+      type: undefined,
+      details: 'oven dried',
+    });
     expect(typeof reaction.id).toBe('string');
     expect(reaction.details).toBe('oven dried');
 

@@ -34,7 +34,10 @@ import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
-export type OrdComponentBase = Pick<ord.ICompound, 'identifiers' | 'reactionRole' | 'texture' | 'features'> &
+export type OrdComponentBase = Pick<
+  ord.ICompound,
+  'identifiers' | 'reactionRole' | 'texture' | 'features'
+> &
   Pick<ord.IProductCompound, 'identifiers' | 'reactionRole' | 'texture' | 'features'>;
 
 export type ReactionComponentBase = WithId<{
@@ -45,7 +48,9 @@ export type ReactionComponentBase = WithId<{
   features: Record<string, AppData>;
 }>;
 
-export interface ReactionComponentPreparation extends WithId<Omit<ord.ICompoundPreparation, 'type'>> {
+export interface ReactionComponentPreparation extends WithId<
+  Omit<ord.ICompoundPreparation, 'type'>
+> {
   type: CompoundPreparationType;
 }
 
@@ -91,7 +96,9 @@ export type ReactionMeasurementValue =
   | ReactionMeasurementValueString
   | ReactionMeasurementValueMass;
 
-export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement, 'details'>> {
+export interface ReactionMeasurement extends WithId<
+  Pick<ord.IProductMeasurement, 'details'>
+> {
   analysis: Optional<ReactionMeasurementAnalysis>;
   type: ReactionMeasurementType;
   usesAuthenticStandard: ReactionBoolean;
@@ -105,7 +112,8 @@ export interface ReactionMeasurement extends WithId<Pick<ord.IProductMeasurement
   authenticStandard: Optional<ReactionInputComponent>;
 }
 
-export interface ReactionProduct extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {
+export interface ReactionProduct
+  extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {
   isDesiredProduct: ReactionBoolean;
   measurements: Array<ReactionMeasurement>;
 }

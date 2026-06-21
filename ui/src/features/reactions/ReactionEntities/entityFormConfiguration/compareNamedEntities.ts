@@ -15,4 +15,5 @@
  */
 import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export const compareNamedEntities = <T = unknown>(a: WithIdName<T>, b: WithIdName<T>) => a.name.localeCompare(b.name);
+export const compareNamedEntities = <T = unknown>(a: WithIdName<T>, b: WithIdName<T>) =>
+  a.name.localeCompare(b.name);

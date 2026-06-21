@@ -18,7 +18,10 @@ import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { Link, useParams } from 'wouter';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { CopyButton, type CopyButtonOptions } from 'common/components/interactions/CopyButton/CopyButton.tsx';
+import {
+  CopyButton,
+  type CopyButtonOptions,
+} from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { Flex, Tooltip } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
@@ -79,7 +82,10 @@ interface DatasetReactionCardProps {
   index: number;
 }
 
-export function DatasetReactionCard({ reactionId, index }: Readonly<DatasetReactionCardProps>) {
+export function DatasetReactionCard({
+  reactionId,
+  index,
+}: Readonly<DatasetReactionCardProps>) {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const reaction = useSelector(selectReactionById(reactionId));
   return (

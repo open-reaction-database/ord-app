@@ -19,7 +19,11 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ord_app.service_api.models import GroupModel, UserGroupsMembershipModel, UserRolesList
+from ord_app.service_api.models import (
+    GroupModel,
+    UserGroupsMembershipModel,
+    UserRolesList,
+)
 from ord_app.service_api.repositories.base import BaseRepository
 
 
@@ -32,7 +36,9 @@ class GroupRepository(BaseRepository[GroupModel]):
         self, owner_id: int, payload: dict, autocommit: bool = True
     ) -> GroupModel:
         group = GroupModel(
-            owner_id=owner_id, groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")], **payload
+            owner_id=owner_id,
+            groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")],
+            **payload,
         )
 
         if autocommit:
@@ -46,11 +52,17 @@ class GroupRepository(BaseRepository[GroupModel]):
     async def get_user_groups(self, user_id: int) -> list[dict]:
         stmt = (
             select(GroupModel, UserGroupsMembershipModel)
-            .join(UserGroupsMembershipModel, UserGroupsMembershipModel.group_id == GroupModel.id)
+            .join(
+                UserGroupsMembershipModel,
+                UserGroupsMembershipModel.group_id == GroupModel.id,
+            )
             .where(UserGroupsMembershipModel.user_id == user_id)
         )
         rows = (await self.db.execute(stmt)).all()
-        groups = [dict(id=group.id, name=group.name, role=user_group.role) for group, user_group in rows]
+        groups = [
+            dict(id=group.id, name=group.name, role=user_group.role)
+            for group, user_group in rows
+        ]
         return groups
 
     async def get_user_role(self, user_id: int, group_id: int) -> UserRolesList | None:
@@ -66,7 +78,9 @@ class GroupMembersRepository:
         self.db = db
         self.autocommit = autocommit
 
-    async def get(self, user_id: int, group_id: int) -> UserGroupsMembershipModel | None:
+    async def get(
+        self, user_id: int, group_id: int
+    ) -> UserGroupsMembershipModel | None:
         stmt = (
             select(UserGroupsMembershipModel)
             .where(
@@ -87,7 +101,9 @@ class GroupMembersRepository:
         )
         return (await self.db.scalars(stmt)).all()
 
-    async def add_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
+    async def add_member(
+        self, user_id: int, group_id: int, role: str, autocommit: bool = True
+    ) -> None:
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)
         if autocommit:
@@ -95,7 +111,9 @@ class GroupMembersRepository:
             await self.db.commit()
             logger.debug(f"Member {user_id} added to {group_id} with role: {role}")
 
-    async def update_member(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
+    async def update_member(
+        self, user_id: int, group_id: int, role: str, autocommit: bool = True
+    ) -> None:
         stmt = (
             update(UserGroupsMembershipModel)
             .where(
@@ -108,11 +126,16 @@ class GroupMembersRepository:
             await self.db.execute(stmt)
             await self.db.commit()
 
-    async def upsert(self, user_id: int, group_id: int, role: str, autocommit: bool = True) -> None:
+    async def upsert(
+        self, user_id: int, group_id: int, role: str, autocommit: bool = True
+    ) -> None:
         value = {"user_id": user_id, "group_id": group_id, "role": role}
         stmt = insert(UserGroupsMembershipModel).values(value)
         stmt = stmt.on_conflict_do_update(
-            index_elements=[UserGroupsMembershipModel.user_id, UserGroupsMembershipModel.group_id],
+            index_elements=[
+                UserGroupsMembershipModel.user_id,
+                UserGroupsMembershipModel.group_id,
+            ],
             set_={"role": stmt.excluded.role},
         )
 

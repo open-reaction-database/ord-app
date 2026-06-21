@@ -35,7 +35,10 @@ vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
   addUpdateReactionField: (arg: unknown) => addUpdateReactionField(arg),
 }));
 
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 const makeStore = makeRecordingStore;
 const pathComponents = ['inputs', 0, 'components', 0, 'identifiers'];
 
@@ -48,7 +51,11 @@ describe('addIdentifierByName', () => {
   it('resolves the name to a SMILES identifier and appends it at the next index', async () => {
     const { store, types } = makeStore();
     await store.dispatch(
-      addIdentifierByName({ reactionId: 99, pathComponents, name: 'water' }) as unknown as UnknownAction,
+      addIdentifierByName({
+        reactionId: 99,
+        pathComponents,
+        name: 'water',
+      }) as unknown as UnknownAction,
     );
 
     expect(axiosMock.post).toHaveBeenCalledWith('/resolve-compound', {
@@ -75,7 +82,11 @@ describe('addIdentifierByName', () => {
     axiosMock.post.mockRejectedValueOnce(new Error('not found'));
     const { store, types } = makeStore();
     await store.dispatch(
-      addIdentifierByName({ reactionId: 99, pathComponents, name: 'bogus' }) as unknown as UnknownAction,
+      addIdentifierByName({
+        reactionId: 99,
+        pathComponents,
+        name: 'bogus',
+      }) as unknown as UnknownAction,
     );
 
     expect(types()).toContain(addIdentifierByNameActions.failure.type);

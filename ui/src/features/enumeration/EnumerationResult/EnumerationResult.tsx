@@ -24,7 +24,10 @@ interface EnumerationResultProps {
   onClose: () => void;
 }
 
-export function EnumerationResult({ enumerationProgress, onClose }: Readonly<EnumerationResultProps>) {
+export function EnumerationResult({
+  enumerationProgress,
+  onClose,
+}: Readonly<EnumerationResultProps>) {
   const { resultDatasetId, reactions, errors } = enumerationProgress;
   const [, navigate] = useLocation();
   const onNavigate = useCallback(() => {
@@ -39,7 +42,11 @@ export function EnumerationResult({ enumerationProgress, onClose }: Readonly<Enu
       title="Enumeration Result"
     >
       <Flex direction="column">
-        <Title order={3}>{resultDatasetId ? `Reactions created: ${reactions.length}` : 'No reactions created'}</Title>
+        <Title order={3}>
+          {resultDatasetId
+            ? `Reactions created: ${reactions.length}`
+            : 'No reactions created'}
+        </Title>
         {errors.length > 0 && (
           <>
             <Title order={3}>Failed to create lines:</Title>

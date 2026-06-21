@@ -17,4 +17,6 @@ import { createActionFactory } from '../../utils';
 
 const { createAction } = createActionFactory('enumerationSetup');
 
-export const setEnumerationSetupOpenedAction = createAction<boolean>('enumerationSetupOpened');
+export const setEnumerationSetupOpenedAction = createAction<boolean>(
+  'enumerationSetupOpened',
+);

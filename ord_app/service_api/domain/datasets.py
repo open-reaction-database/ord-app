@@ -28,7 +28,12 @@ from starlette.concurrency import run_in_threadpool
 
 from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.domain.exceptions import EntityDoesNotExist
-from ord_app.service_api.models import DatasetGroupAssociationModel, DatasetModel, GroupModel, UserModel
+from ord_app.service_api.models import (
+    DatasetGroupAssociationModel,
+    DatasetModel,
+    GroupModel,
+    UserModel,
+)
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import (
@@ -56,46 +61,74 @@ class DatasetUseCases:
         self.reaction_repository = ReactionsRepository(db)
 
     async def create(self, group_id: int, payload: DatasetCreateSchema) -> DatasetModel:
-        dataset = await self.dataset_repository.create(group_id, self.current_user.id, payload.model_dump())
+        dataset = await self.dataset_repository.create(
+            group_id, self.current_user.id, payload.model_dump()
+        )
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
-        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        # just created above; type-narrowing guard
+        assert dataset is not None  # noqa: S101
+        await self.dataset_repository.enrich_datasets_with_user_roles(
+            [dataset], self.current_user.id
+        )
         return dataset
 
-    async def enumerate(self, group_id: int, payload: DatasetEnumerateCreateSchema) -> DatasetModel:
+    async def enumerate(
+        self, group_id: int, payload: DatasetEnumerateCreateSchema
+    ) -> DatasetModel:
         dataset_payload = {"name": payload.name, "description": payload.description}
-        dataset = await self.dataset_repository.create(group_id, self.current_user.id, dataset_payload)
-        await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
+        dataset = await self.dataset_repository.create(
+            group_id, self.current_user.id, dataset_payload
+        )
+        await self.add_reactions(
+            dataset, [Reaction.FromString(i) for i in payload.reactions]
+        )
 
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
-        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        # just created above; type-narrowing guard
+        assert dataset is not None  # noqa: S101
+        await self.dataset_repository.enrich_datasets_with_user_roles(
+            [dataset], self.current_user.id
+        )
         return dataset
 
-    async def extend_enumerate(self, dataset_id: int, payload: DatasetEnumerateExtendSchema) -> DatasetModel:
+    async def extend_enumerate(
+        self, dataset_id: int, payload: DatasetEnumerateExtendSchema
+    ) -> DatasetModel:
         dataset = await self.dataset_repository.get(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
-        await self.add_reactions(dataset, [Reaction.FromString(i) for i in payload.reactions])
+        await self.add_reactions(
+            dataset, [Reaction.FromString(i) for i in payload.reactions]
+        )
         return dataset
 
     async def get(self, dataset_id: int) -> DatasetModel:
-        dataset = await self.dataset_repository.get_with_sharable_info(dataset_id, self.current_user.id)
-        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        dataset = await self.dataset_repository.get_with_sharable_info(
+            dataset_id, self.current_user.id
+        )
+        await self.dataset_repository.enrich_datasets_with_user_roles(
+            [dataset], self.current_user.id
+        )
         return dataset
 
     async def paginate_group_datasets(self, group_id: int) -> Page[DatasetModel]:
-        return await self.dataset_repository.datasets_stmt(self.current_user.id, group_id)
+        return await self.dataset_repository.datasets_stmt(
+            self.current_user.id, group_id
+        )
 
     async def get_dataset_groups(self, dataset_id: int) -> list[GroupModel]:
         return await self.dataset_repository.get_dataset_groups(dataset_id)
 
-    async def extend(self, dataset_id: int, file_data: bytes, kind: str) -> DatasetModel | None:
+    async def extend(
+        self, dataset_id: int, file_data: bytes, kind: str
+    ) -> DatasetModel | None:
         try:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
-            raise ProtobufDecodeError("An error occurred while reading the file.") from e
+            raise ProtobufDecodeError(
+                "An error occurred while reading the file."
+            ) from e
 
         dataset = await self.dataset_repository.get(dataset_id)
         if dataset is None:
@@ -110,9 +143,13 @@ class DatasetUseCases:
             dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
         except (DecodeError, JsonParseError, TextParseError) as e:
             logger.error(e)
-            raise ProtobufDecodeError("An error occurred while reading the file.") from e
+            raise ProtobufDecodeError(
+                "An error occurred while reading the file."
+            ) from e
 
-        dataset_payload = DatasetCreateSchema(name=dataset_pb.name, description=dataset_pb.description)
+        dataset_payload = DatasetCreateSchema(
+            name=dataset_pb.name, description=dataset_pb.description
+        )
         dataset = await self.dataset_repository.create(
             group_id,
             self.current_user.id,
@@ -120,8 +157,11 @@ class DatasetUseCases:
         )
         await self.add_reactions(dataset, dataset_pb.reactions)
         dataset = await self.dataset_repository.get(dataset.id)
-        assert dataset is not None  # just created above  # noqa: S101 (type-narrowing guard)
-        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        # just created above; type-narrowing guard
+        assert dataset is not None  # noqa: S101
+        await self.dataset_repository.enrich_datasets_with_user_roles(
+            [dataset], self.current_user.id
+        )
         return dataset
 
     async def add_reactions(self, dataset: DatasetModel, reactions: Any) -> None:
@@ -141,10 +181,16 @@ class DatasetUseCases:
             seen_ids.add(reaction.reaction_id)
             reactions_ids.append(reaction.reaction_id)
 
-        logger.debug(f"Start processing <Dataset(id={dataset.id})> Reactions. Count={len(reactions_ids)}")
-        async for item in self.reaction_repository.get_by_reaction_ids_gen(dataset.id, reactions_ids):
+        logger.debug(
+            f"Start processing <Dataset(id={dataset.id})> Reactions. Count={len(reactions_ids)}"
+        )
+        async for item in self.reaction_repository.get_by_reaction_ids_gen(
+            dataset.id, reactions_ids
+        ):
             pb_reaction_idx = reactions_ids.index(item.pb_reaction_id)
-            reactions[pb_reaction_idx].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
+            reactions[
+                pb_reaction_idx
+            ].reaction_id = f"duplicate-{item.pb_reaction_id}-{uuid4().hex}"
 
         reactions_payload = [
             {
@@ -156,70 +202,110 @@ class DatasetUseCases:
             for reaction in reactions
         ]
 
-        logger.debug(f"Reactions <Dataset(id={dataset.id})> are going to write to database")
+        logger.debug(
+            f"Reactions <Dataset(id={dataset.id})> are going to write to database"
+        )
 
         # Recording in chunks of 30k is due to the fact that there are restrictions
         # on the maximum number of elements that can be written to the database at a time
         chunk_size = 1_000
         for i in range(0, len(reactions_payload), chunk_size):
-            await self.reaction_repository.bulk_create(reactions_payload[i : i + chunk_size])
+            await self.reaction_repository.bulk_create(
+                reactions_payload[i : i + chunk_size]
+            )
 
         logger.debug(f"Finished processing <Dataset(id={dataset.id})> Reactions.")
 
     async def paginate_user_datasets(self) -> Page[DatasetModel]:
         return await self.dataset_repository.datasets_stmt(self.current_user.id)
 
-    async def update(self, dataset_id: int, payload: DatasetCreateSchema) -> DatasetModel:
-        await self.dataset_repository.update(dataset_id, payload.model_dump(exclude_unset=True))
+    async def update(
+        self, dataset_id: int, payload: DatasetCreateSchema
+    ) -> DatasetModel:
+        await self.dataset_repository.update(
+            dataset_id, payload.model_dump(exclude_unset=True)
+        )
         dataset = await self.dataset_repository.get(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
-        await self.dataset_repository.enrich_datasets_with_user_roles([dataset], self.current_user.id)
+        await self.dataset_repository.enrich_datasets_with_user_roles(
+            [dataset], self.current_user.id
+        )
         return dataset
 
     async def delete(self, dataset_id: int) -> None:
         return await self.dataset_repository.delete(dataset_id)
 
-    async def download(self, dataset_id: int, file_format: DownloadFileFormats) -> tuple[DatasetModel, bytes]:
+    async def download(
+        self, dataset_id: int, file_format: DownloadFileFormats
+    ) -> tuple[DatasetModel, bytes]:
         dataset = await self.dataset_repository.get_with_reactions(dataset_id)
 
         if not dataset:
             raise EntityDoesNotExist("Dataset not found")
 
         dataset_pb = load_message(
-            orjson.dumps({"name": dataset.name, "description": dataset.description}), Dataset, "json"
+            orjson.dumps({"name": dataset.name, "description": dataset.description}),
+            Dataset,
+            "json",
         )
 
-        dataset_pb.reactions.extend([Reaction.FromString(reaction.binpb) for reaction in dataset.reactions])
+        dataset_pb.reactions.extend(
+            [Reaction.FromString(reaction.binpb) for reaction in dataset.reactions]
+        )
 
         data = await run_in_threadpool(write_message, dataset_pb, kind=file_format)
         return dataset, data
 
     async def share(
-        self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema
+        self,
+        primary_group_id: int,
+        primary_dataset_id: int,
+        payload: DatasetShareCreateSchema,
     ) -> DatasetGroupAssociationModel:
         if primary_group_id == payload.secondary_group_id:
-            raise UnprocessableEntityError("Cannot share datasets with the same secondary group")
+            raise UnprocessableEntityError(
+                "Cannot share datasets with the same secondary group"
+            )
 
-        dataset_group_association = await self.dataset_repository.get_dataset_group_association(
-            primary_group_id, primary_dataset_id
+        dataset_group_association = (
+            await self.dataset_repository.get_dataset_group_association(
+                primary_group_id, primary_dataset_id
+            )
         )
         if dataset_group_association:
-            return await self.dataset_repository.share_dataset(primary_dataset_id, payload.secondary_group_id)
+            return await self.dataset_repository.share_dataset(
+                primary_dataset_id, payload.secondary_group_id
+            )
 
-        raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
+        raise ForbiddenError(
+            f"Dataset {primary_dataset_id} not owned by {primary_group_id}"
+        )
 
-    async def unshare(self, primary_group_id: int, primary_dataset_id: int, payload: DatasetShareCreateSchema) -> None:
+    async def unshare(
+        self,
+        primary_group_id: int,
+        primary_dataset_id: int,
+        payload: DatasetShareCreateSchema,
+    ) -> None:
         if primary_group_id == payload.secondary_group_id:
-            raise UnprocessableEntityError("Cannot unshare datasets with the same secondary group")
+            raise UnprocessableEntityError(
+                "Cannot unshare datasets with the same secondary group"
+            )
 
-        dataset_group_association = await self.dataset_repository.get_dataset_group_association(
-            primary_group_id, primary_dataset_id
+        dataset_group_association = (
+            await self.dataset_repository.get_dataset_group_association(
+                primary_group_id, primary_dataset_id
+            )
         )
         if dataset_group_association:
-            return await self.dataset_repository.unshare_dataset(primary_dataset_id, payload.secondary_group_id)
+            return await self.dataset_repository.unshare_dataset(
+                primary_dataset_id, payload.secondary_group_id
+            )
 
-        raise ForbiddenError(f"Dataset {primary_dataset_id} not owned by {primary_group_id}")
+        raise ForbiddenError(
+            f"Dataset {primary_dataset_id} not owned by {primary_group_id}"
+        )
 
 
 def get_dataset_use_case(

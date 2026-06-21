@@ -37,7 +37,12 @@ import { ordPreparationToReaction } from 'store/entities/reactions/reactionCompo
 import type { ReactionComponentPreparation } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 const emptyPreparation = (newIndex: number): [number, ReactionComponentPreparation] => {
-  return [newIndex, ordPreparationToReaction(ord.CompoundPreparation.toObject(new ord.CompoundPreparation()))];
+  return [
+    newIndex,
+    ordPreparationToReaction(
+      ord.CompoundPreparation.toObject(new ord.CompoundPreparation()),
+    ),
+  ];
 };
 
 export const reactionComponents: Array<ReactionFormNode> = [

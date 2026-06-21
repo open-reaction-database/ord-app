@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppDataType, type AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  AppDataType,
+  type AppData,
+} from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
 
@@ -26,8 +29,14 @@ interface AppDataDisplayProps {
   fileNameOverride?: string;
 }
 
-function AppDataFileDisplay({ appData, fileNameOverride }: Readonly<AppDataDisplayProps>) {
-  const { fileName, href } = useFileNameHref(fileNameOverride ?? appData.name, appData.data as FileControlValue);
+function AppDataFileDisplay({
+  appData,
+  fileNameOverride,
+}: Readonly<AppDataDisplayProps>) {
+  const { fileName, href } = useFileNameHref(
+    fileNameOverride ?? appData.name,
+    appData.data as FileControlValue,
+  );
   return appData.data.value ? (
     <a
       download={fileName}
@@ -40,7 +49,10 @@ function AppDataFileDisplay({ appData, fileNameOverride }: Readonly<AppDataDispl
   );
 }
 
-export function AppDataDisplay({ appData, fileNameOverride }: Readonly<AppDataDisplayProps>) {
+export function AppDataDisplay({
+  appData,
+  fileNameOverride,
+}: Readonly<AppDataDisplayProps>) {
   switch (appData.data.type) {
     case AppDataType.Url: {
       const url = (appData.data.value as string) || '';

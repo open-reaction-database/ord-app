@@ -15,7 +15,10 @@
  */
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import { setAccessTokenGetter, setPermissionDeniedHandler } from 'store/axiosInstance.ts';
+import {
+  setAccessTokenGetter,
+  setPermissionDeniedHandler,
+} from 'store/axiosInstance.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { useSelector } from 'react-redux';
 import { createUser } from 'store/entities/users/users.thunks';
@@ -27,7 +30,14 @@ import type { GetAccessToken } from 'common/types/auth.ts';
 export function useAuth() {
   const auth0 = useAuth0();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading, loginWithRedirect, user, getAccessTokenSilently, getIdTokenClaims } = auth0;
+  const {
+    isAuthenticated,
+    isLoading,
+    loginWithRedirect,
+    user,
+    getAccessTokenSilently,
+    getIdTokenClaims,
+  } = auth0;
   const isUserCreated = useSelector(selectSelf);
 
   const isAppLoading = !isUserCreated;
@@ -91,8 +101,13 @@ export function useAuth() {
 
     const provisionUser = async () => {
       try {
-        const [idToken, accessToken] = await Promise.all([getIdTokenClaims(), getAccessTokenSilently()]);
-        dispatch(createUser({ access_token: accessToken, id_token: idToken?.__raw as string }));
+        const [idToken, accessToken] = await Promise.all([
+          getIdTokenClaims(),
+          getAccessTokenSilently(),
+        ]);
+        dispatch(
+          createUser({ access_token: accessToken, id_token: idToken?.__raw as string }),
+        );
       } catch (_: unknown) {
         loginWithRedirect({
           appState: {

@@ -20,7 +20,8 @@ import {
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-const node = (name: string): ReactionFormNode => ({ type: ReactionFormNodeType.value, name }) as ReactionFormNode;
+const node = (name: string): ReactionFormNode =>
+  ({ type: ReactionFormNodeType.value, name }) as ReactionFormNode;
 
 describe('wrapInputsWithGrid', () => {
   it('wraps inputs in a grid whose column count is the number of fields', () => {

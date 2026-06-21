@@ -22,10 +22,14 @@ import {
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
 import type { PreviewsById } from './reactionsPreviews.types.ts';
-import type { DatasetReaction, UpdateReactionSuccessPayload } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  DatasetReaction,
+  UpdateReactionSuccessPayload,
+} from 'store/entities/reactions/reactions.types.ts';
 import type { Pages } from 'common/types';
 
-const reactionWithPreviews = (previews: PreviewsById) => ({ previews }) as DatasetReaction;
+const reactionWithPreviews = (previews: PreviewsById) =>
+  ({ previews }) as DatasetReaction;
 
 const initialState = () => reactionsPreviewsReducer(undefined, { type: '@@INIT' });
 
@@ -36,7 +40,10 @@ describe('reactionsPreviewsReducer', () => {
 
   describe('setPreviewsByIds', () => {
     it('stores resolved (not loading) previews, keyed by id, with null svgs preserved', () => {
-      const state = reactionsPreviewsReducer(initialState(), setPreviewsByIds({ a: '<svg-a>', b: null }));
+      const state = reactionsPreviewsReducer(
+        initialState(),
+        setPreviewsByIds({ a: '<svg-a>', b: null }),
+      );
       expect(state.previewsByEntityId).toEqual({
         a: { isLoading: false, svg: '<svg-a>' },
         b: { isLoading: false, svg: null },
@@ -47,16 +54,27 @@ describe('reactionsPreviewsReducer', () => {
   describe('updatePreviewState (get reaction / add-update field success)', () => {
     it('marks non-null previews loading while preserving any existing svg, and clears null previews', () => {
       // seed an already-rendered preview for "a"
-      let state = reactionsPreviewsReducer(initialState(), setPreviewsByIds({ a: '<svg-a>' }));
-      state = reactionsPreviewsReducer(state, getReactionActions.success(reactionWithPreviews({ a: 'ref', b: null })));
+      let state = reactionsPreviewsReducer(
+        initialState(),
+        setPreviewsByIds({ a: '<svg-a>' }),
+      );
+      state = reactionsPreviewsReducer(
+        state,
+        getReactionActions.success(reactionWithPreviews({ a: 'ref', b: null })),
+      );
       // "a" keeps its previously rendered svg but flips to loading; "b" resets to empty
       expect(state.previewsByEntityId.a).toEqual({ isLoading: true, svg: '<svg-a>' });
       expect(state.previewsByEntityId.b).toEqual({ isLoading: false, svg: null });
     });
 
     it('handles the add-update-field success payload the same way', () => {
-      const payload = { previews: { c: 'ref' } } as unknown as UpdateReactionSuccessPayload;
-      const state = reactionsPreviewsReducer(initialState(), addUpdateReactionFieldActions.success(payload));
+      const payload = {
+        previews: { c: 'ref' },
+      } as unknown as UpdateReactionSuccessPayload;
+      const state = reactionsPreviewsReducer(
+        initialState(),
+        addUpdateReactionFieldActions.success(payload),
+      );
       expect(state.previewsByEntityId.c).toEqual({ isLoading: true });
     });
   });
@@ -70,7 +88,10 @@ describe('reactionsPreviewsReducer', () => {
         total: 2,
         pages: 1,
       } as Pages<DatasetReaction>;
-      const state = reactionsPreviewsReducer(initialState(), getReactionsListActions.success(page));
+      const state = reactionsPreviewsReducer(
+        initialState(),
+        getReactionsListActions.success(page),
+      );
       expect(state.previewsByEntityId).toEqual({
         a: { isLoading: true },
         b: { isLoading: false, svg: null },

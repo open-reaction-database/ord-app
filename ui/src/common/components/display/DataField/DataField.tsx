@@ -20,7 +20,10 @@ interface DataFieldProps {
   label: string;
 }
 
-export function DataField({ label, children }: PropsWithChildren<Readonly<DataFieldProps>>) {
+export function DataField({
+  label,
+  children,
+}: PropsWithChildren<Readonly<DataFieldProps>>) {
   return (
     <div className={classes.container}>
       <div className={classes.label}>{label}</div>

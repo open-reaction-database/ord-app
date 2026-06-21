@@ -50,7 +50,10 @@ interface ReactionEntityBlockTitleProps {
   rightSection?: ReactNode;
 }
 
-export function ReactionEntityBlockTitle({ leftSection, rightSection }: Readonly<ReactionEntityBlockTitleProps>) {
+export function ReactionEntityBlockTitle({
+  leftSection,
+  rightSection,
+}: Readonly<ReactionEntityBlockTitleProps>) {
   return (
     <Flex
       className={classes.wrapper}
@@ -74,7 +77,10 @@ export function ReactionEntityBlockTitle({ leftSection, rightSection }: Readonly
   );
 }
 
-export function ReactionEntityBlockNode({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormBlock>>) {
+export function ReactionEntityBlockNode({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormBlock>>) {
   const { pathComponents } = useContext(reactionEntityContext);
   const blockPathComponents = useMemo(() => {
     return pathComponents.concat(node.name.split('.'));

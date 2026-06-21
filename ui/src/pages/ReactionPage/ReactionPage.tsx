@@ -19,7 +19,12 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { type SegmentedControlItem, Flex, Paper, SegmentedControl } from '@mantine/core';
+import {
+  type SegmentedControlItem,
+  Flex,
+  Paper,
+  SegmentedControl,
+} from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
@@ -75,7 +80,9 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
       reactionId,
       isTemplate: false,
       isViewOnly,
-      ViewDeleteButtonsComponent: isViewOnly ? ReactionViewButton : ReactionEditDeleteButtons,
+      ViewDeleteButtonsComponent: isViewOnly
+        ? ReactionViewButton
+        : ReactionEditDeleteButtons,
       ValueLabelComponent: DatasetReactionValueLabel,
       ViewOnlyLabelComponent: DatasetReactionValueLabel,
     }),

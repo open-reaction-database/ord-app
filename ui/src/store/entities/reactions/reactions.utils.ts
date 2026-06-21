@@ -31,7 +31,10 @@ import type { ReactionInput } from './reactionsInputs/reactionInputs.types.ts';
 import type { Pages } from 'common/types';
 import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
-import { convertReactionFloatsToDoubles, ordReactionToReaction } from './reactions.converters.ts';
+import {
+  convertReactionFloatsToDoubles,
+  ordReactionToReaction,
+} from './reactions.converters.ts';
 import type { OrdOptional } from './reactionEntity/reactionEntity.types.ts';
 import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 
@@ -43,7 +46,8 @@ function mergeArray({ isMergeableObject, deepmerge, clone }: MergeArrayOptions) 
     const targetClone = clone(target);
     source.forEach((item, index) => {
       if (item) {
-        const isMergeable = isMergeableObject(targetClone[index]) && isMergeableObject(item);
+        const isMergeable =
+          isMergeableObject(targetClone[index]) && isMergeableObject(item);
         targetClone[index] = isMergeable ? deepmerge(targetClone[index], item) : item;
       }
     });
@@ -53,7 +57,10 @@ function mergeArray({ isMergeableObject, deepmerge, clone }: MergeArrayOptions) 
 
 export const deepMergeWithArrayMerge = deepmergeFactory({ mergeArray });
 
-export function generateDeepPartialReactionByPath(pathComponents: ReactionPathComponents, value: any): any {
+export function generateDeepPartialReactionByPath(
+  pathComponents: ReactionPathComponents,
+  value: any,
+): any {
   if (pathComponents.length === 0) {
     return value;
   }
@@ -86,11 +93,16 @@ function iterateReactionPart(
   };
 }
 
-export function removeDeepReactionPart(reactionPart: any, pathComponents: ReactionPathComponents): any {
+export function removeDeepReactionPart(
+  reactionPart: any,
+  pathComponents: ReactionPathComponents,
+): any {
   if (pathComponents.length === 1) {
     const [currentPathComponent] = pathComponents;
     if (typeof currentPathComponent === 'number') {
-      return reactionPart.slice(0, currentPathComponent).concat(reactionPart.slice(currentPathComponent + 1));
+      return reactionPart
+        .slice(0, currentPathComponent)
+        .concat(reactionPart.slice(currentPathComponent + 1));
     }
 
     const { [currentPathComponent]: _, ...value } = reactionPart;
@@ -100,7 +112,10 @@ export function removeDeepReactionPart(reactionPart: any, pathComponents: Reacti
   }
 }
 
-export function getDeepReactionPart(reaction: any, pathComponents: ReactionPathComponents): any {
+export function getDeepReactionPart(
+  reaction: any,
+  pathComponents: ReactionPathComponents,
+): any {
   try {
     // If the path is incorrect we will get an error
     return pathComponents.reduce((reactionPart: any, key) => {
@@ -120,7 +135,9 @@ const nodeEntitiesNamesWithoutCollection = new Set([
   'setup',
 ]);
 
-export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponents): Array<ReactionPathComponents> {
+export function reactionFlatPathToSidebars(
+  pathComponents: ReactionPathComponents,
+): Array<ReactionPathComponents> {
   const result: Array<ReactionPathComponents> = [];
   for (let i = 0; i < pathComponents.length; i++) {
     const pathComponent = pathComponents[i];
@@ -136,13 +153,18 @@ export function reactionFlatPathToSidebars(pathComponents: ReactionPathComponent
   return result;
 }
 
-export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMolBlocks): PreviewsById => {
+export const getReactionPreviews = (
+  reaction: AppReaction,
+  molblocks: ReactionMolBlocks,
+): PreviewsById => {
   const inputsArray = Object.values(reaction.inputs);
   const inputsPreviews: PreviewsById = Object.entries(molblocks.inputs).reduce(
     (acc: PreviewsById, [inputName, input]) => ({
       ...acc,
       ...input.reduce((acc: PreviewsById, item, index) => {
-        const component = (inputsArray.find(item => item.name === inputName) as ReactionInput).components[index];
+        const component = (
+          inputsArray.find(item => item.name === inputName) as ReactionInput
+        ).components[index];
         return {
           ...acc,
           [component.id]: item,
@@ -160,39 +182,46 @@ export const getReactionPreviews = (reaction: AppReaction, molblocks: ReactionMo
         return {
           ...acc,
           [product.id]: item.molblock,
-          ...item.measurements.reduce((acc: PreviewsById, measurementMolblock, index) => {
-            const measurement = product.measurements[index];
-            return measurement.authenticStandard
-              ? {
-                  ...acc,
-                  [measurement.authenticStandard.id]: measurementMolblock.authentic_standard.molblock,
-                }
-              : acc;
-          }, {}),
+          ...item.measurements.reduce(
+            (acc: PreviewsById, measurementMolblock, index) => {
+              const measurement = product.measurements[index];
+              return measurement.authenticStandard
+                ? {
+                    ...acc,
+                    [measurement.authenticStandard.id]:
+                      measurementMolblock.authentic_standard.molblock,
+                  }
+                : acc;
+            },
+            {},
+          ),
         };
       }, {}),
     }),
     {},
   );
 
-  const workupsPreviews = molblocks.workups.reduce((acc: PreviewsById, item, workupIndex) => {
-    const components = reaction.workups[workupIndex].input?.components;
+  const workupsPreviews = molblocks.workups.reduce(
+    (acc: PreviewsById, item, workupIndex) => {
+      const components = reaction.workups[workupIndex].input?.components;
 
-    if (!components) {
-      return acc;
-    }
+      if (!components) {
+        return acc;
+      }
 
-    return {
-      ...acc,
-      ...item.reduce((acc: PreviewsById, componentMolblock, componentIndex) => {
-        const component = components[componentIndex];
-        return {
-          ...acc,
-          [component.id]: componentMolblock,
-        };
-      }, {}),
-    };
-  }, {});
+      return {
+        ...acc,
+        ...item.reduce((acc: PreviewsById, componentMolblock, componentIndex) => {
+          const component = components[componentIndex];
+          return {
+            ...acc,
+            [component.id]: componentMolblock,
+          };
+        }, {}),
+      };
+    },
+    {},
+  );
 
   return { ...inputsPreviews, ...outcomesPreviews, ...workupsPreviews };
 };
@@ -212,19 +241,34 @@ function parseErrorWarning(text: string, reaction: AppReaction): ErrorWarningMes
   });
   const updatedText = rest.join(':');
   try {
-    const convertedPath = replaceNameIdInReactionComponentPath(reactionComponentPath, reaction, 'id');
+    const convertedPath = replaceNameIdInReactionComponentPath(
+      reactionComponentPath,
+      reaction,
+      'id',
+    );
     return { text: updatedText, path: convertedPath, originalPath: path };
   } catch (_: unknown) {
     return { text };
   }
 }
 
-export const parseValidation = (validation: OrdValidation, reaction: AppReaction): ReactionValidation => {
-  const errorsWithoutClassNames = validation.errors.map(item => item.replace(protobufClassRegExp, ''));
-  const warningsWithoutClassNames = validation.warnings.map(item => item.replace(protobufClassRegExp, ''));
+export const parseValidation = (
+  validation: OrdValidation,
+  reaction: AppReaction,
+): ReactionValidation => {
+  const errorsWithoutClassNames = validation.errors.map(item =>
+    item.replace(protobufClassRegExp, ''),
+  );
+  const warningsWithoutClassNames = validation.warnings.map(item =>
+    item.replace(protobufClassRegExp, ''),
+  );
 
-  const parsedErrors = errorsWithoutClassNames.map(item => parseErrorWarning(item, reaction));
-  const parsedWarnings = warningsWithoutClassNames.map(item => parseErrorWarning(item, reaction));
+  const parsedErrors = errorsWithoutClassNames.map(item =>
+    parseErrorWarning(item, reaction),
+  );
+  const parsedWarnings = warningsWithoutClassNames.map(item =>
+    parseErrorWarning(item, reaction),
+  );
 
   return {
     errors: parsedErrors,
@@ -232,12 +276,19 @@ export const parseValidation = (validation: OrdValidation, reaction: AppReaction
   };
 };
 
-export const parseReaction = ({ binpb, molblocks, validation, ...rest }: ReactionResponse): DatasetReaction => {
+export const parseReaction = ({
+  binpb,
+  molblocks,
+  validation,
+  ...rest
+}: ReactionResponse): DatasetReaction => {
   const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
   const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
   convertReactionFloatsToDoubles(appReaction);
   const previews = getReactionPreviews(appReaction, molblocks);
-  const updatedValidation = validation ? parseValidation(validation, appReaction) : null;
+  const updatedValidation = validation
+    ? parseValidation(validation, appReaction)
+    : null;
 
   return {
     ...rest,
@@ -247,7 +298,9 @@ export const parseReaction = ({ binpb, molblocks, validation, ...rest }: Reactio
   };
 };
 
-export const parseReactionList = (pages: Pages<ReactionResponse>): Pages<DatasetReaction> => {
+export const parseReactionList = (
+  pages: Pages<ReactionResponse>,
+): Pages<DatasetReaction> => {
   const { items, ...pagination } = pages;
   const wrappedItems = items.map(parseReaction);
   return { ...pagination, items: wrappedItems };
