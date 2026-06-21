@@ -38,5 +38,5 @@ Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` 
 ## Conventions
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
-- Coverage is reported to Codecov (`codecov.yml`); each `codecov-action` must set an explicit `slug`.
+- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `ui/vite.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.

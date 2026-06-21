@@ -61,22 +61,6 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      # Codecov merges this lcov upload (ui flag) with the Python coverage.xml
-      # (python flag) into one PR comment with project (total) + patch (delta) coverage.
-      - name: Upload coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
-        with:
-          files: ui/coverage/lcov.info
-          flags: ui
-          # CODECOV_TOKEN is an org-wide token, so the repo slug must be explicit.
-          slug: open-reaction-database/ord-app
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # Best-effort: don't fail CI on Codecov uploader flakes (e.g. transient GPG
-          # signature-verification / keyserver outages). The Codecov status check and the
-          # SonarCloud gate still surface coverage regressions.
-          fail_ci_if_error: false
-
       - name: Upload UI coverage report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -22,6 +22,7 @@ import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader
 import {
   type SegmentedControlItem,
   Flex,
+  Loader,
   Paper,
   SegmentedControl,
 } from '@mantine/core';
@@ -103,7 +104,14 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
       <reactionContext.Provider value={reactionContextValue}>
-        {reaction && (
+        {!reaction ? (
+          <Flex
+            justify="center"
+            align="center"
+          >
+            <Loader size="xl" />
+          </Flex>
+        ) : (
           <Flex
             direction="column"
             gap="sm"
