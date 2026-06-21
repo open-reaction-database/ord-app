@@ -43,4 +43,4 @@ class ConflictError(HTTPException):
 
 class UnprocessableEntityError(HTTPException):
     def __init__(self, detail: str, **kwargs: Any) -> None:
-        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, **kwargs)
+        super().__init__(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail, **kwargs)
