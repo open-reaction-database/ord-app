@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { type SegmentedControlItem, Flex, Paper, SegmentedControl } from '@mantine/core';
+import { type SegmentedControlItem, Flex, Loader, Paper, SegmentedControl } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
@@ -96,7 +96,14 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
       <reactionContext.Provider value={reactionContextValue}>
-        {reaction && (
+        {!reaction ? (
+          <Flex
+            justify="center"
+            align="center"
+          >
+            <Loader size="xl" />
+          </Flex>
+        ) : (
           <Flex
             direction="column"
             gap="sm"
