@@ -41,9 +41,9 @@ export const downloadFileFromUrl =
       });
 
       const blob = new Blob([response.data], {
-        type: response.headers['content-type'],
+        type: (response.headers['content-type'] as string) ?? undefined,
       });
-      const header = response.headers['content-disposition'];
+      const header = response.headers['content-disposition'] as string;
       const fileName = header.replace(/^.*filename="(.*)"/, '$1');
       downloadFile(blob, fileName);
     } catch (error) {
