@@ -26,7 +26,7 @@ vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() 
 const toBlobMock = vi.mocked(htmlToImage.toBlob);
 const notifyMock = vi.mocked(showNotification);
 const clipboardWrite = vi.fn().mockResolvedValue(undefined);
-const node = { scrollWidth: 120 } as HTMLDivElement;
+const node = { scrollWidth: 120, scrollHeight: 90 } as HTMLDivElement;
 
 const expectNotified = (variant: NotificationVariant) =>
   expect(notifyMock).toHaveBeenCalledWith(expect.objectContaining({ variant }));
@@ -55,6 +55,15 @@ describe('copyPreviewAsImage', () => {
     await copyPreviewAsImage(node);
     expect(clipboardWrite).toHaveBeenCalledTimes(1);
     expectNotified(NotificationVariant.SUCCESS);
+  });
+
+  it('captures the full scroll extent in both axes so labels are not clipped (#587)', async () => {
+    toBlobMock.mockResolvedValue(new Blob(['x'], { type: 'image/png' }));
+    await copyPreviewAsImage(node);
+    expect(toBlobMock).toHaveBeenCalledWith(
+      node,
+      expect.objectContaining({ width: 120, height: 90 }),
+    );
   });
 
   it('notifies an error when rendering produces no blob', async () => {

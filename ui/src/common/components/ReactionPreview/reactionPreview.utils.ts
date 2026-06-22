@@ -63,7 +63,10 @@ export async function copyPreviewAsImage(node?: HTMLDivElement | null) {
   try {
     const blob = await htmlToImage.toBlob(node, {
       skipFonts: true,
+      // Capture the full scrollable extent in both axes; pinning only width let labels that
+      // overflow the default capture height clip in the copied PNG (Chrome). (#587)
       width: node.scrollWidth,
+      height: node.scrollHeight,
       backgroundColor: 'white',
     });
 
