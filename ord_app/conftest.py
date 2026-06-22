@@ -43,7 +43,8 @@ fake = Faker()
 
 
 def _testdata_path(filename: str):
-    return RuntimeSettings.base_dir.parent / "tests" / "testdata" / filename
+    # base_dir is ord_app/service_api; testdata lives at ord_app/testdata.
+    return RuntimeSettings.base_dir.parent / "testdata" / filename
 
 
 def read_testdata_text(filename: str) -> str:
