@@ -25,7 +25,11 @@ from ord_app.service_api.services.postgresql import get_db_session
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 
-@router.post("/jit-provisioning", status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
+@router.post(
+    "/jit-provisioning",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserResponseSchema,
+)
 async def _jit_provisioning(
     payload: Auth0CreateSchema,
     db_session: Annotated[AsyncSession, Depends(get_db_session)],

@@ -20,9 +20,14 @@ import type {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { FC } from 'react';
 
-export interface ReactionEntityNodeProps<T extends ReactionFormNode = ReactionFormNode> {
+export interface ReactionEntityNodeProps<
+  T extends ReactionFormNode = ReactionFormNode,
+> {
   node: T;
   formMethods: ReactionFormMethods;
 }
 
-export type ReactionNodeToComponent = Record<ReactionFormNodeType, FC<ReactionEntityNodeProps>>;
+export type ReactionNodeToComponent = Record<
+  ReactionFormNodeType,
+  FC<ReactionEntityNodeProps>
+>;

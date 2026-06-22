@@ -39,7 +39,8 @@ export function ComponentMetadata({ component }: Readonly<ComponentMetadataProps
     [component],
   );
   const amount = 'amount' in component ? component.amount : undefined;
-  const isLimiting = 'isLimiting' in component && component.isLimiting === ReactionBoolean.True;
+  const isLimiting =
+    'isLimiting' in component && component.isLimiting === ReactionBoolean.True;
 
   return (
     <Flex

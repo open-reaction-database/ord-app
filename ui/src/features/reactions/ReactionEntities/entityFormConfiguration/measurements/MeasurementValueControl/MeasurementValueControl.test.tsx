@@ -21,7 +21,10 @@ import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntitie
 
 const formMethods = {
   getInputProps: () => ({
-    value: { type: ReactionMeasurementValueType.Number, value: { value: null, precision: null } },
+    value: {
+      type: ReactionMeasurementValueType.Number,
+      value: { value: null, precision: null },
+    },
     onChange: vi.fn(),
   }),
 } as unknown as ReactionEntityNodeProps['formMethods'];

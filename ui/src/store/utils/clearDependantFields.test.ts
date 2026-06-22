@@ -23,12 +23,16 @@ interface Sample {
 
 describe('clearDependantFields', () => {
   it('nulls a field whose predicate is false', () => {
-    const result = clearDependantFields<Sample>({ keep: 'v', dependant: 'x' }, [['dependant', () => false]]);
+    const result = clearDependantFields<Sample>({ keep: 'v', dependant: 'x' }, [
+      ['dependant', () => false],
+    ]);
     expect(result).toEqual({ keep: 'v', dependant: null });
   });
 
   it('leaves a field whose predicate is true', () => {
-    const result = clearDependantFields<Sample>({ keep: 'v', dependant: 'x' }, [['dependant', () => true]]);
+    const result = clearDependantFields<Sample>({ keep: 'v', dependant: 'x' }, [
+      ['dependant', () => true],
+    ]);
     expect(result).toEqual({ keep: 'v', dependant: 'x' });
   });
 

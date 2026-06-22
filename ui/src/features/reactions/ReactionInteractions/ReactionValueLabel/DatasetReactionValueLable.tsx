@@ -23,7 +23,10 @@ import { reactionEntityContext } from '../../ReactionEntities/reactionEntity.con
 import { ReactionNodeValidationResult } from '../ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
-export function DatasetReactionValueLabel({ wrapperConfig, name }: Readonly<ReactionValueLabelProps>) {
+export function DatasetReactionValueLabel({
+  wrapperConfig,
+  name,
+}: Readonly<ReactionValueLabelProps>) {
   const { pathComponents } = useContext(reactionEntityContext);
 
   const fieldPathComponents = useMemo((): ReactionPathComponents => {

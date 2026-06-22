@@ -13,11 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MantineReactTable, useMantineReactTable, type MRT_RowData, type MRT_TableOptions } from 'mantine-react-table';
+import {
+  MantineReactTable,
+  useMantineReactTable,
+  type MRT_RowData,
+  type MRT_TableOptions,
+} from 'mantine-react-table';
 import { IconChevronDown, IconChevronUp, IconSelector } from '@tabler/icons-react';
 import classes from './DataTable.module.scss';
 
-export function DataTable<T extends MRT_RowData>({ columns, data, ...rest }: MRT_TableOptions<T>) {
+export function DataTable<T extends MRT_RowData>({
+  columns,
+  data,
+  ...rest
+}: MRT_TableOptions<T>) {
   const table = useMantineReactTable<T>({
     columns,
     layoutMode: 'semantic',

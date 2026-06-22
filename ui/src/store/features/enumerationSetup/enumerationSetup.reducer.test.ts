@@ -21,15 +21,27 @@ import type { StartEnumeration } from '../../entities/enumeration/enumeration.ty
 
 describe('enumerationSetupReducer', () => {
   it('toggles the opened flag via setEnumerationSetupOpenedAction', () => {
-    const opened = enumerationSetupReducer(undefined, setEnumerationSetupOpenedAction(true));
+    const opened = enumerationSetupReducer(
+      undefined,
+      setEnumerationSetupOpenedAction(true),
+    );
     expect(opened.isEnumerationSetupOpened).toBe(true);
-    const closed = enumerationSetupReducer(opened, setEnumerationSetupOpenedAction(false));
+    const closed = enumerationSetupReducer(
+      opened,
+      setEnumerationSetupOpenedAction(false),
+    );
     expect(closed.isEnumerationSetupOpened).toBe(false);
   });
 
   it('closes the setup when enumeration starts', () => {
-    const opened = enumerationSetupReducer(undefined, setEnumerationSetupOpenedAction(true));
-    const result = enumerationSetupReducer(opened, startEnumerationActions({} as unknown as StartEnumeration));
+    const opened = enumerationSetupReducer(
+      undefined,
+      setEnumerationSetupOpenedAction(true),
+    );
+    const result = enumerationSetupReducer(
+      opened,
+      startEnumerationActions({} as unknown as StartEnumeration),
+    );
     expect(result.isEnumerationSetupOpened).toBe(false);
   });
 });

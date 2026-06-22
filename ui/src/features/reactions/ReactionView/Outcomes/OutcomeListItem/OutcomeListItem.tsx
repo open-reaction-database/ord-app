@@ -16,7 +16,10 @@
 import { Accordion, Flex, Text } from '@mantine/core';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types';
 import { useMemo } from 'react';
-import { ComponentDisplayRow, componentsListClasses } from 'features/reactions/ReactionView/ComponentsList';
+import {
+  ComponentDisplayRow,
+  componentsListClasses,
+} from 'features/reactions/ReactionView/ComponentsList';
 import clsx from 'clsx';
 import classes from './outcomeListItem.module.scss';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
@@ -41,10 +44,19 @@ const headers = [
   { label: 'Measurements', className: componentsListClasses.details },
 ];
 
-const renderDetails = (product: ReactionProduct) => <MeasurementsPreview product={product} />;
+const renderDetails = (product: ReactionProduct) => (
+  <MeasurementsPreview product={product} />
+);
 
-export function OutcomeListItem({ reactionId, outcome, outcomeIndex }: Readonly<OutcomeListItemProps>) {
-  const outcomePathComponents = useMemo(() => [ENTITY_NAME, outcomeIndex], [outcomeIndex]);
+export function OutcomeListItem({
+  reactionId,
+  outcome,
+  outcomeIndex,
+}: Readonly<OutcomeListItemProps>) {
+  const outcomePathComponents = useMemo(
+    () => [ENTITY_NAME, outcomeIndex],
+    [outcomeIndex],
+  );
 
   const orderedAnalyses = useMemo(() => {
     return Object.values(outcome.analyses).sort(compareNamedEntities);

@@ -15,6 +15,8 @@
  */
 import { createSelectorFactory } from '../../utils';
 
-const { buildSelector } = createSelectorFactory(state => state.features.templateFromFileError);
+const { buildSelector } = createSelectorFactory(
+  state => state.features.templateFromFileError,
+);
 
 export const selectTemplateFromFileError = buildSelector(state => state);

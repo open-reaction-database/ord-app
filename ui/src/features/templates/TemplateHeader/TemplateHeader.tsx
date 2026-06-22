@@ -95,7 +95,9 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
               </ActionIcon>
             </Flex>
           </Flex>
-          <DataField label="Last Modified">{formatUtcDateToDisplay(template.modified_at)}</DataField>
+          <DataField label="Last Modified">
+            {formatUtcDateToDisplay(template.modified_at)}
+          </DataField>
           <ReactionPreview reaction={template} />
         </Flex>
         {opened && (

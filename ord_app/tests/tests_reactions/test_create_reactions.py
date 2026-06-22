@@ -25,16 +25,24 @@ from ord_app.tests.conftest import create_test_dataset, read_testdata_bytes
 fake = Faker()
 
 
-async def test_create_reaction_with_pb(api_client, mock_authenticated_user, test_db_session):
+async def test_create_reaction_with_pb(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
-    pb_dataset = load_message(read_testdata_bytes("ord-nielsen-example.txtpb"), Dataset, "txtpb")
+    pb_dataset = load_message(
+        read_testdata_bytes("ord-nielsen-example.txtpb"), Dataset, "txtpb"
+    )
     pb_reaction = pb_dataset.reactions[0]
     pb_reaction.reaction_id = "test"
 
     payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
 
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     reaction_pb = load_message(b64decode(response_data["binpb"]), Reaction, "binpb")
     assert reaction_pb.reaction_id == response_data["pb_reaction_id"] == "test"
     assert response_data["is_valid"] is True
@@ -56,7 +64,9 @@ async def test_upload_reaction(api_client, mock_authenticated_user, test_db_sess
     assert response_data["pb_reaction_id"] == pb_reaction.reaction_id
 
 
-async def test_upload_reaction_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
+async def test_upload_reaction_with_duplicate_reaction_id(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     pb_reaction = Reaction(reaction_id="test")
 
@@ -81,33 +91,60 @@ async def test_upload_reaction_with_duplicate_reaction_id(api_client, mock_authe
     assert response_data["pb_reaction_id"].startswith("duplicate-test")
 
 
-async def test_create_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
+async def test_create_with_duplicate_reaction_id(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
+    payload = {
+        "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()
+    }
 
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert response_data["pb_reaction_id"] == "test"
 
-    response_data = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert response_data["pb_reaction_id"].startswith("duplicate-test")
 
 
-async def test_create_duplicate_reaction_without_reaction_id(api_client, mock_authenticated_user, test_db_session):
+async def test_create_duplicate_reaction_without_reaction_id(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     payload = {"binpb": b64encode(Reaction().SerializeToString()).decode()}
 
-    response_data1 = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
-    response_data2 = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    response_data1 = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
+    response_data2 = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert response_data1["id"] != response_data2["id"]
     assert response_data1["pb_reaction_id"] != response_data2["pb_reaction_id"]
 
 
-async def test_create_reaction_with_character_limitations(api_client, mock_authenticated_user, test_db_session):
+async def test_create_reaction_with_character_limitations(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     payload = {
         "binpb": b64encode(
             Reaction(
-                reaction_id=fake.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH + 1, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)
+                reaction_id=fake.pystr(
+                    min_chars=MAX_CRITICAL_FIELD_LENGTH + 1,
+                    max_chars=MAX_CRITICAL_FIELD_LENGTH * 2,
+                )
             ).SerializeToString()
         ).decode()
     }
@@ -116,7 +153,9 @@ async def test_create_reaction_with_character_limitations(api_client, mock_authe
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_create_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+async def test_create_reaction_rejects_oversized_attachments(
+    api_client, mock_authenticated_user, test_db_session
+):
     # The cumulative attachment cap is enforced on the POST create path too. (#543)
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     pb_reaction = Reaction(reaction_id="test")
@@ -129,7 +168,9 @@ async def test_create_reaction_rejects_oversized_attachments(api_client, mock_au
     assert "10 MB" in response.json()["detail"]
 
 
-async def test_upload_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+async def test_upload_reaction_rejects_oversized_attachments(
+    api_client, mock_authenticated_user, test_db_session
+):
     # The cumulative attachment cap is enforced on the upload path too. (#543)
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
     pb_reaction = Reaction(reaction_id="test")

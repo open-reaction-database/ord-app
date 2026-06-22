@@ -45,7 +45,10 @@ const makeDataset = (id: number, overrides: Partial<Dataset> = {}): Dataset => (
   ...overrides,
 });
 
-const makePage = (items: Array<Dataset>, overrides: Partial<Pages<Dataset>> = {}): Pages<Dataset> => ({
+const makePage = (
+  items: Array<Dataset>,
+  overrides: Partial<Pages<Dataset>> = {},
+): Pages<Dataset> => ({
   items,
   page: 1,
   size: 10,
@@ -82,7 +85,11 @@ describe('datasetsReducer', () => {
       let state = datasetsReducer(initialState(), getDatasetActions.success(dataset));
       state = datasetsReducer(
         state,
-        updateDatasetActions.success({ ...dataset, name: 'new', description: 'new desc' }),
+        updateDatasetActions.success({
+          ...dataset,
+          name: 'new',
+          description: 'new desc',
+        }),
       );
       expect(state.datasetsById[1].name).toBe('new');
       expect(state.datasetsById[1].description).toBe('new desc');
@@ -93,7 +100,10 @@ describe('datasetsReducer', () => {
     it('adds newly created datasets (empty and from-file)', () => {
       const created = makeDataset(2);
       const fromFile = makeDataset(3);
-      let state = datasetsReducer(initialState(), createNewDatasetActions.success(created));
+      let state = datasetsReducer(
+        initialState(),
+        createNewDatasetActions.success(created),
+      );
       state = datasetsReducer(state, createDatasetFromFileActions.success(fromFile));
       expect(Object.keys(state.datasetsById)).toEqual(['2', '3']);
     });
@@ -112,7 +122,10 @@ describe('datasetsReducer', () => {
   describe('datasetsOrder', () => {
     it('records the order of ids from a successful list', () => {
       const page = makePage([makeDataset(5), makeDataset(2), makeDataset(9)]);
-      const state = datasetsReducer(initialState(), getGroupsInitialDatasetListActions.success(page));
+      const state = datasetsReducer(
+        initialState(),
+        getGroupsInitialDatasetListActions.success(page),
+      );
       expect(state.datasetsOrder).toEqual([5, 2, 9]);
     });
 
@@ -127,7 +140,10 @@ describe('datasetsReducer', () => {
     it('clears the order while a page request is in flight', () => {
       const page = makePage([makeDataset(5)]);
       let state = datasetsReducer(initialState(), getDatasetPageActions.success(page));
-      state = datasetsReducer(state, getDatasetPageActions.request({ page: 2, size: 10 }));
+      state = datasetsReducer(
+        state,
+        getDatasetPageActions.request({ page: 2, size: 10 }),
+      );
       expect(state.datasetsOrder).toEqual([]);
     });
   });
@@ -140,7 +156,10 @@ describe('datasetsReducer', () => {
       expect(state.areDatasetsLoading).toBe(false);
       state = datasetsReducer(state, getGroupsInitialDatasetListActions.request(1));
       expect(state.areDatasetsLoading).toBe(true);
-      state = datasetsReducer(state, getGroupsInitialDatasetListActions.failure(new Error('x')));
+      state = datasetsReducer(
+        state,
+        getGroupsInitialDatasetListActions.failure(new Error('x')),
+      );
       expect(state.areDatasetsLoading).toBe(false);
     });
   });
@@ -159,14 +178,28 @@ describe('datasetsReducer', () => {
 
   describe('pagination', () => {
     it('updates page params on request and totals on success', () => {
-      let state = datasetsReducer(initialState(), getDatasetPageActions.request({ page: 3, size: 25 }));
+      let state = datasetsReducer(
+        initialState(),
+        getDatasetPageActions.request({ page: 3, size: 25 }),
+      );
       expect(state.pagination).toMatchObject({ page: 3, size: 25 });
-      state = datasetsReducer(state, getDatasetPageActions.success(makePage([], { total: 42, pages: 5 })));
-      expect(state.pagination).toMatchObject({ page: 3, size: 25, total: 42, pages: 5 });
+      state = datasetsReducer(
+        state,
+        getDatasetPageActions.success(makePage([], { total: 42, pages: 5 })),
+      );
+      expect(state.pagination).toMatchObject({
+        page: 3,
+        size: 25,
+        total: 42,
+        pages: 5,
+      });
     });
 
     it('resets to empty pagination on active-group change', () => {
-      let state = datasetsReducer(initialState(), getDatasetPageActions.request({ page: 3, size: 25 }));
+      let state = datasetsReducer(
+        initialState(),
+        getDatasetPageActions.request({ page: 3, size: 25 }),
+      );
       state = datasetsReducer(state, setActiveGroupIdAction(1));
       expect(state.pagination).toEqual(emptyPagination);
     });
@@ -188,20 +221,29 @@ describe('datasetsReducer', () => {
     ];
 
     it('stores fetched groups and clears them on the clear action', () => {
-      let state = datasetsReducer(initialState(), getDatasetGroupsActions.success(groups));
+      let state = datasetsReducer(
+        initialState(),
+        getDatasetGroupsActions.success(groups),
+      );
       expect(state.datasetGroups).toEqual(groups);
       state = datasetsReducer(state, clearDatasetGroupsListAction());
       expect(state.datasetGroups).toBeNull();
     });
 
     it('removes the unshared group from the list', () => {
-      let state = datasetsReducer(initialState(), getDatasetGroupsActions.success(groups));
+      let state = datasetsReducer(
+        initialState(),
+        getDatasetGroupsActions.success(groups),
+      );
       state = datasetsReducer(state, unshareDatasetWithGroupActions.success(1));
       expect(state.datasetGroups).toEqual([{ id: 2, name: 'g2', is_primary: false }]);
     });
 
     it('stays null when unshare success arrives without a loaded list', () => {
-      const state = datasetsReducer(initialState(), unshareDatasetWithGroupActions.success(1));
+      const state = datasetsReducer(
+        initialState(),
+        unshareDatasetWithGroupActions.success(1),
+      );
       expect(state.datasetGroups).toBeNull();
     });
   });
@@ -210,7 +252,10 @@ describe('datasetsReducer', () => {
     const sharePayload = { datasetId: 1, groupId: 2, primaryGroupId: 3 };
 
     it('is true while share/unshare/get requests are pending', () => {
-      const state = datasetsReducer(initialState(), shareDatasetWithGroupActions.request(sharePayload));
+      const state = datasetsReducer(
+        initialState(),
+        shareDatasetWithGroupActions.request(sharePayload),
+      );
       expect(state.areDatasetGroupsLoading).toBe(true);
     });
 
@@ -234,12 +279,18 @@ describe('datasetsReducer', () => {
     // getDatasetGroupsActions.request -> .success cycle, keeping the spinner up across
     // the refetch. This test pins that cascaded-request design.
     it('stays true after share success alone (reset by the follow-up refetch)', () => {
-      let state = datasetsReducer(initialState(), shareDatasetWithGroupActions.request(sharePayload));
+      let state = datasetsReducer(
+        initialState(),
+        shareDatasetWithGroupActions.request(sharePayload),
+      );
       expect(state.areDatasetGroupsLoading).toBe(true);
       state = datasetsReducer(state, shareDatasetWithGroupActions.success());
       expect(state.areDatasetGroupsLoading).toBe(true);
       // the thunk's follow-up getDatasetGroups request/success is what clears it
-      state = datasetsReducer(state, getDatasetGroupsActions.request(sharePayload.datasetId));
+      state = datasetsReducer(
+        state,
+        getDatasetGroupsActions.request(sharePayload.datasetId),
+      );
       state = datasetsReducer(state, getDatasetGroupsActions.success([]));
       expect(state.areDatasetGroupsLoading).toBe(false);
     });

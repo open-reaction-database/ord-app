@@ -30,7 +30,9 @@ const ENTITY_FIELD = 'provenance';
 
 export function Provenance() {
   const { reactionId } = useContext(reactionContext);
-  const provenance: ReactionProvenance = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const provenance: ReactionProvenance = useSelector(
+    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
+  );
 
   return (
     <Flex
@@ -51,7 +53,8 @@ export function Provenance() {
         <OpenSingleEntityButton pathComponents={[ENTITY_FIELD]} />
       </Flex>
       <span className={classes.text}>
-        Additional metadata about how this reaction was performed and originally reported
+        Additional metadata about how this reaction was performed and originally
+        reported
       </span>
 
       <Flex
@@ -74,7 +77,10 @@ export function Provenance() {
         <RequiredOptionalFields
           entity={provenance.recordCreated}
           requiredFields={[
-            { label: 'Time', render: ({ time }) => (time ? formatDateToDisplay(time) : '') },
+            {
+              label: 'Time',
+              render: ({ time }) => (time ? formatDateToDisplay(time) : ''),
+            },
             { label: 'E-mail', render: ({ person }) => person.email },
             { label: 'ORCID ID', render: ({ person }) => person.orcid },
             { label: 'Username', render: ({ person }) => person.username },
@@ -94,7 +100,10 @@ export function Provenance() {
             entityField={[ENTITY_FIELD, 'recordModified']}
             title="Record Modification"
             requiredFields={[
-              { label: 'Time', render: ({ time }) => (time ? formatDateToDisplay(time) : '') },
+              {
+                label: 'Time',
+                render: ({ time }) => (time ? formatDateToDisplay(time) : ''),
+              },
               { label: 'Person Email', render: ({ person }) => person.email },
               { label: 'Details', render: ({ details }) => details },
             ]}

@@ -25,7 +25,10 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
 
     async def get_by_reaction_ids_gen(
-        self, dataset_id: int, pb_reaction_ids: list[str], max_num_query_args: int = 10_000
+        self,
+        dataset_id: int,
+        pb_reaction_ids: list[str],
+        max_num_query_args: int = 10_000,
     ) -> AsyncIterator[ReactionModel]:
         for batch in batched(pb_reaction_ids, max_num_query_args):
             for item in await self.filter(dataset_id=dataset_id, pb_reaction_id=batch):
@@ -44,7 +47,9 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
                 select(ReactionModel)
                 .where(
                     ReactionModel.id > last_id if last_id is not None else true(),
-                    ReactionModel.dataset_id == dataset_id if dataset_id is not None else true(),
+                    ReactionModel.dataset_id == dataset_id
+                    if dataset_id is not None
+                    else true(),
                     ReactionModel.is_valid.is_(None),
                 )
                 .order_by(ReactionModel.id)
@@ -71,8 +76,14 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
 
         return reaction
 
-    def all_reactions_stmt(self, dataset_id: int, is_valid_query: dict | None = None) -> Select:
-        stmt = select(ReactionModel).where(ReactionModel.dataset_id == dataset_id).order_by(ReactionModel.id)
+    def all_reactions_stmt(
+        self, dataset_id: int, is_valid_query: dict | None = None
+    ) -> Select:
+        stmt = (
+            select(ReactionModel)
+            .where(ReactionModel.dataset_id == dataset_id)
+            .order_by(ReactionModel.id)
+        )
 
         if is_valid_query is not None:
             or_stmt = []

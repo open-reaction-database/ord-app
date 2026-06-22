@@ -22,7 +22,9 @@ const buildState = (templateFromFileError: unknown): AppState =>
 
 describe('selectTemplateFromFileError', () => {
   it('returns the whole templateFromFileError slice', () => {
-    expect(selectTemplateFromFileError(buildState('parse failed'))).toBe('parse failed');
+    expect(selectTemplateFromFileError(buildState('parse failed'))).toBe(
+      'parse failed',
+    );
     expect(selectTemplateFromFileError(buildState(null))).toBeNull();
   });
 });

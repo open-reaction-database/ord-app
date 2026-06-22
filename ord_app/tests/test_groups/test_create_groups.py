@@ -21,13 +21,22 @@ faker = Faker()
 
 async def test_create_group(api_client, mock_authenticated_user):
     payload = {"name": faker.company()}
-    response_data = api_client.post("/api/v1/groups", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.post("/api/v1/groups", json=payload).raise_for_status().json()
+    )
     assert payload["name"] == response_data["name"]
     # The creator is the group's admin; the response includes their role. (#569)
     assert response_data["role"] == "admin"
 
 
-async def test_create_group_with_character_limitations(api_client, mock_authenticated_user):
-    payload = {"name": faker.pystr(min_chars=MAX_CRITICAL_FIELD_LENGTH + 1, max_chars=MAX_CRITICAL_FIELD_LENGTH * 2)}
+async def test_create_group_with_character_limitations(
+    api_client, mock_authenticated_user
+):
+    payload = {
+        "name": faker.pystr(
+            min_chars=MAX_CRITICAL_FIELD_LENGTH + 1,
+            max_chars=MAX_CRITICAL_FIELD_LENGTH * 2,
+        )
+    }
     response = api_client.post("/api/v1/groups", json=payload)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

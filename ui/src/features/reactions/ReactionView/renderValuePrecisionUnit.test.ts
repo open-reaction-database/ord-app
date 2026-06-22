@@ -17,17 +17,23 @@ import { describe, it, expect, vi } from 'vitest';
 
 // getFormattedValue (unit-symbol formatting) is the dependency, not the unit
 // under test; stub it so the composition logic is asserted deterministically.
-vi.mock('common/hooks/useTextFormatting', () => ({ getFormattedValue: (units: string) => `fmt:${units}` }));
+vi.mock('common/hooks/useTextFormatting', () => ({
+  getFormattedValue: (units: string) => `fmt:${units}`,
+}));
 
 import { renderValuePrecisionUnit } from './renderValuePrecisionUnit.ts';
 
 describe('renderValuePrecisionUnit', () => {
   it('joins value, ± precision, and formatted units', () => {
-    expect(renderValuePrecisionUnit({ value: 5, precision: 0.1, units: 'CELSIUS' })).toBe('5 ± 0.1 fmt:CELSIUS');
+    expect(
+      renderValuePrecisionUnit({ value: 5, precision: 0.1, units: 'CELSIUS' }),
+    ).toBe('5 ± 0.1 fmt:CELSIUS');
   });
 
   it('omits the precision segment when precision is falsy', () => {
-    expect(renderValuePrecisionUnit({ value: 5, precision: 0, units: 'CELSIUS' })).toBe('5 fmt:CELSIUS');
+    expect(renderValuePrecisionUnit({ value: 5, precision: 0, units: 'CELSIUS' })).toBe(
+      '5 fmt:CELSIUS',
+    );
   });
 
   it('omits units entirely when the units key is absent', () => {

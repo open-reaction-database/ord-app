@@ -22,7 +22,9 @@ interface ReactionEntityLabelProps {
   wrapperConfig?: ReactionFormStandaloneField;
 }
 
-export function ReactionEntityLabel({ wrapperConfig }: Readonly<ReactionEntityLabelProps>) {
+export function ReactionEntityLabel({
+  wrapperConfig,
+}: Readonly<ReactionEntityLabelProps>) {
   if (!wrapperConfig?.label) {
     return null;
   }

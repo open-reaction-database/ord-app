@@ -33,9 +33,13 @@ from ord_app.service_api.models import (
 SELECT_STMT = (
     DatasetModel,
     func.count(ReactionModel.id).label("reaction_count"),
-    func.count().filter(ReactionModel.is_valid.is_(False)).label("invalid_reaction_count"),
+    func.count()
+    .filter(ReactionModel.is_valid.is_(False))
+    .label("invalid_reaction_count"),
     func.count().filter(ReactionModel.is_valid.is_(True)).label("valid_reaction_count"),
-    func.count().filter(ReactionModel.id.isnot(None), ReactionModel.is_valid.is_(None)).label("none_reaction_count"),
+    func.count()
+    .filter(ReactionModel.id.isnot(None), ReactionModel.is_valid.is_(None))
+    .label("none_reaction_count"),
 )
 
 
@@ -54,9 +58,13 @@ class DatasetsRepository:
         await self.db.commit()
         return dataset
 
-    async def create(self, group_id: int, owner_id: int, payload: dict, autocommit: bool = True) -> DatasetModel:
+    async def create(
+        self, group_id: int, owner_id: int, payload: dict, autocommit: bool = True
+    ) -> DatasetModel:
         dataset = DatasetModel(owner_id=owner_id, **payload)
-        dataset_group_association = DatasetGroupAssociationModel(dataset=dataset, group_id=group_id)
+        dataset_group_association = DatasetGroupAssociationModel(
+            dataset=dataset, group_id=group_id
+        )
         self.db.add_all([dataset, dataset_group_association])
 
         if autocommit:
@@ -78,7 +86,9 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
-    async def get_with_sharable_info(self, dataset_id: int, user_id: int) -> DatasetModel:
+    async def get_with_sharable_info(
+        self, dataset_id: int, user_id: int
+    ) -> DatasetModel:
         stmt = (
             select(*SELECT_STMT)
             .outerjoin(DatasetModel.reactions)
@@ -97,7 +107,8 @@ class DatasetsRepository:
             .group_by(DatasetModel.id)
         )
         row = (await self.db.execute(stmt)).first()
-        assert row is not None  # enforced upstream by dataset_authorization  # noqa: S101 (type-narrowing guard)
+        # enforced upstream by dataset_authorization; type-narrowing guard
+        assert row is not None  # noqa: S101
         dataset, rct_total, rct_invalid, rct_valid, rct_none = row
         dataset.reactions_count = {
             "total": rct_total,
@@ -107,10 +118,14 @@ class DatasetsRepository:
         }
 
         dataset_associations_stmt = select(DatasetGroupAssociationModel).where(
-            DatasetGroupAssociationModel.group_id.in_({group.id for group in dataset.groups}),
+            DatasetGroupAssociationModel.group_id.in_(
+                {group.id for group in dataset.groups}
+            ),
             DatasetGroupAssociationModel.dataset_id == dataset.id,
             DatasetGroupAssociationModel.is_primary.is_(True),
-            DatasetGroupAssociationModel.group.has(GroupModel.members.any(UserModel.id == user_id)),
+            DatasetGroupAssociationModel.group.has(
+                GroupModel.members.any(UserModel.id == user_id)
+            ),
         )
 
         dataset.is_sharable = False
@@ -126,22 +141,34 @@ class DatasetsRepository:
             .options(joinedload(DatasetGroupAssociationModel.group))
         )
         assocs = (await self.db.scalars(stmt)).all()
-        return [setattr(assoc.group, "is_primary", assoc.is_primary) or assoc.group for assoc in assocs]
+        return [
+            setattr(assoc.group, "is_primary", assoc.is_primary) or assoc.group
+            for assoc in assocs
+        ]
 
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel | None:
-        stmt = select(DatasetModel).where(DatasetModel.id == dataset_id).options(selectinload(DatasetModel.reactions))
+        stmt = (
+            select(DatasetModel)
+            .where(DatasetModel.id == dataset_id)
+            .options(selectinload(DatasetModel.reactions))
+        )
         return await self.db.scalar(stmt)
 
-    async def enrich_datasets_with_user_roles(self, datasets: Sequence[DatasetModel], user_id: int) -> None:
+    async def enrich_datasets_with_user_roles(
+        self, datasets: Sequence[DatasetModel], user_id: int
+    ) -> None:
         # Collect all group IDs from the paginated datasets
         group_ids = {group.id for dataset in datasets for group in dataset.groups}
 
         # Query memberships for the specific user and the collected groups
         membership_stmt = select(UserGroupsMembershipModel).where(
-            UserGroupsMembershipModel.group_id.in_(group_ids), UserGroupsMembershipModel.user_id == user_id
+            UserGroupsMembershipModel.group_id.in_(group_ids),
+            UserGroupsMembershipModel.user_id == user_id,
         )
         memberships = await self.db.scalars(membership_stmt)
-        membership_by_group = {membership.group_id: membership for membership in memberships.all()}
+        membership_by_group = {
+            membership.group_id: membership for membership in memberships.all()
+        }
 
         # Annotate each group in the paginated datasets with the user role
         for dataset in datasets:
@@ -149,10 +176,16 @@ class DatasetsRepository:
                 membership = membership_by_group.get(group.id)
                 group.role = membership.role if membership else None
             # filter out groups that the user is not a member of
-            dataset.groups = [group for group in dataset.groups if group.role is not None]
+            dataset.groups = [
+                group for group in dataset.groups if group.role is not None
+            ]
 
-    async def datasets_stmt(self, user_id: int, group_id: int | None = None) -> Page[DatasetModel]:
-        filters = [DatasetModel.groups.any(GroupModel.members.any(UserModel.id == user_id))]
+    async def datasets_stmt(
+        self, user_id: int, group_id: int | None = None
+    ) -> Page[DatasetModel]:
+        filters = [
+            DatasetModel.groups.any(GroupModel.members.any(UserModel.id == user_id))
+        ]
 
         if group_id is not None:
             filters.append(DatasetModel.groups.any(GroupModel.id == group_id))
@@ -170,8 +203,12 @@ class DatasetsRepository:
 
         return paginated_datasets
 
-    async def update(self, dataset_id: int, payload: dict, autocommit: bool = True) -> None:
-        stmt = update(DatasetModel).where(DatasetModel.id == dataset_id).values(**payload)
+    async def update(
+        self, dataset_id: int, payload: dict, autocommit: bool = True
+    ) -> None:
+        stmt = (
+            update(DatasetModel).where(DatasetModel.id == dataset_id).values(**payload)
+        )
 
         if autocommit:
             await self.db.execute(stmt)
@@ -194,7 +231,9 @@ class DatasetsRepository:
         )
         return await self.db.scalar(dataset_group_association_stmt)
 
-    async def share_dataset(self, primary_dataset_id: int, secondary_group_id: int) -> DatasetGroupAssociationModel:
+    async def share_dataset(
+        self, primary_dataset_id: int, secondary_group_id: int
+    ) -> DatasetGroupAssociationModel:
         dataset_group_association = DatasetGroupAssociationModel(
             dataset_id=primary_dataset_id, group_id=secondary_group_id, is_primary=False
         )
@@ -203,7 +242,9 @@ class DatasetsRepository:
         await self.db.refresh(dataset_group_association)
         return dataset_group_association
 
-    async def unshare_dataset(self, primary_dataset_id: int, secondary_group_id: int) -> None:
+    async def unshare_dataset(
+        self, primary_dataset_id: int, secondary_group_id: int
+    ) -> None:
         stmt = delete(DatasetGroupAssociationModel).where(
             DatasetGroupAssociationModel.dataset_id == primary_dataset_id,
             DatasetGroupAssociationModel.group_id == secondary_group_id,

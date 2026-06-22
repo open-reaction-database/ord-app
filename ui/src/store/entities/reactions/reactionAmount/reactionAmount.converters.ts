@@ -34,7 +34,9 @@ import {
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-const amountOptions: Array<['moles' | 'mass' | 'volume', Record<number, ReactionAmountType>]> = [
+const amountOptions: Array<
+  ['moles' | 'mass' | 'volume', Record<number, ReactionAmountType>]
+> = [
   ['moles', molesUnitByValue],
   ['mass', massUnitByValue],
   ['volume', volumeUnitByValue],
@@ -42,16 +44,21 @@ const amountOptions: Array<['moles' | 'mass' | 'volume', Record<number, Reaction
 
 export function ordAmountToReaction(ordAmount?: ord.IAmount | null): ReactionAmount {
   const requiredOrdAmount = ordAmount ?? ({} as ord.IAmount);
-  const volumeIncludesSolutes = ordBooleanToReaction(requiredOrdAmount.volumeIncludesSolutes);
+  const volumeIncludesSolutes = ordBooleanToReaction(
+    requiredOrdAmount.volumeIncludesSolutes,
+  );
 
-  const result = amountOptions.reduce((acc: ReactionAmount | null, [key, unitsByValue]) => {
-    const currentValue = requiredOrdAmount[key];
-    const units = unitsByValue[currentValue?.units ?? 0];
-    if (currentValue?.units && units) {
-      return { ...currentValue, units: units, volumeIncludesSolutes };
-    }
-    return acc;
-  }, null);
+  const result = amountOptions.reduce(
+    (acc: ReactionAmount | null, [key, unitsByValue]) => {
+      const currentValue = requiredOrdAmount[key];
+      const units = unitsByValue[currentValue?.units ?? 0];
+      if (currentValue?.units && units) {
+        return { ...currentValue, units: units, volumeIncludesSolutes };
+      }
+      return acc;
+    },
+    null,
+  );
 
   return (
     result ?? {

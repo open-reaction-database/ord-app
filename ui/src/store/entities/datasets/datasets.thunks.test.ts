@@ -44,7 +44,10 @@ vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
 // cast to a plain record of mock fns instead.
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 
 const makeStore = makeRecordingStore;
 
@@ -76,10 +79,17 @@ describe('getDataset', () => {
 
 describe('getDatasetsPage', () => {
   it('requests the unscoped datasets list when no active group is set', async () => {
-    axiosMock.get.mockResolvedValueOnce({ data: { items: [], page: 1, size: 10, total: 0, pages: 0 } });
+    axiosMock.get.mockResolvedValueOnce({
+      data: { items: [], page: 1, size: 10, total: 0, pages: 0 },
+    });
     const { store, types } = makeStore();
-    await store.dispatch(getDatasetsPage({ page: 1, size: 10 }) as unknown as UnknownAction);
-    expect(axiosMock.get).toHaveBeenCalledWith('/datasets', expect.objectContaining({ params: expect.any(Object) }));
+    await store.dispatch(
+      getDatasetsPage({ page: 1, size: 10 }) as unknown as UnknownAction,
+    );
+    expect(axiosMock.get).toHaveBeenCalledWith(
+      '/datasets',
+      expect.objectContaining({ params: expect.any(Object) }),
+    );
     expect(types()).toContain(getDatasetPageActions.success.type);
   });
 });
@@ -87,8 +97,17 @@ describe('getDatasetsPage', () => {
 describe('createEmptyDataset', () => {
   it('creates the dataset and navigates to it', async () => {
     const { store, types } = makeStore();
-    await store.dispatch(createEmptyDataset({ groupId: 7, name: 'n', description: '' }) as unknown as UnknownAction);
-    expect(axiosMock.post).toHaveBeenCalledWith('/groups/7/datasets', { name: 'n', description: '' });
+    await store.dispatch(
+      createEmptyDataset({
+        groupId: 7,
+        name: 'n',
+        description: '',
+      }) as unknown as UnknownAction,
+    );
+    expect(axiosMock.post).toHaveBeenCalledWith('/groups/7/datasets', {
+      name: 'n',
+      description: '',
+    });
     expect(types()).toContain(createNewDatasetActions.success.type);
     expect(navigate).toHaveBeenCalledWith('/datasets/1');
   });
@@ -119,9 +138,15 @@ describe('shareDatasetWithGroup', () => {
     axiosMock.get.mockResolvedValue({ data: [] });
     const { store, types } = makeStore();
     await store.dispatch(
-      shareDatasetWithGroup({ groupId: 2, datasetId: 1, primaryGroupId: 9 }) as unknown as UnknownAction,
+      shareDatasetWithGroup({
+        groupId: 2,
+        datasetId: 1,
+        primaryGroupId: 9,
+      }) as unknown as UnknownAction,
     );
-    expect(axiosMock.post).toHaveBeenCalledWith('/groups/9/datasets/1/share', { secondary_group_id: 2 });
+    expect(axiosMock.post).toHaveBeenCalledWith('/groups/9/datasets/1/share', {
+      secondary_group_id: 2,
+    });
     // The follow-up refetch is the cache-invalidation contract: success then both getters re-run.
     expect(types()).toEqual(
       expect.arrayContaining([
@@ -137,11 +162,20 @@ describe('unshareDatasetWithGroup', () => {
   it('unshares then refetches the dataset', async () => {
     const { store, types } = makeStore();
     await store.dispatch(
-      unshareDatasetWithGroup({ groupId: 2, datasetId: 1, primaryGroupId: 9 }) as unknown as UnknownAction,
+      unshareDatasetWithGroup({
+        groupId: 2,
+        datasetId: 1,
+        primaryGroupId: 9,
+      }) as unknown as UnknownAction,
     );
-    expect(axiosMock.post).toHaveBeenCalledWith('/groups/9/datasets/1/unshare', { secondary_group_id: 2 });
+    expect(axiosMock.post).toHaveBeenCalledWith('/groups/9/datasets/1/unshare', {
+      secondary_group_id: 2,
+    });
     expect(types()).toEqual(
-      expect.arrayContaining([unshareDatasetWithGroupActions.success.type, getDatasetActions.request.type]),
+      expect.arrayContaining([
+        unshareDatasetWithGroupActions.success.type,
+        getDatasetActions.request.type,
+      ]),
     );
   });
 });

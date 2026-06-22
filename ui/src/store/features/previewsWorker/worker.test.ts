@@ -69,7 +69,10 @@ describe('previews worker', () => {
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
     expect(renderSvgMock).toHaveBeenCalledWith('molA');
     expect(renderSvgMock).toHaveBeenCalledWith('molB');
-    expect(postMessageMock).toHaveBeenCalledWith({ a: '<svg>molA</svg>', b: '<svg>molB</svg>' });
+    expect(postMessageMock).toHaveBeenCalledWith({
+      a: '<svg>molA</svg>',
+      b: '<svg>molB</svg>',
+    });
   });
 
   it('posts an empty object for an empty preview map', async () => {

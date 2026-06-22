@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-const nameWithSpace = (entityName: string, counter: number): string => `${entityName} ${counter}`;
+const nameWithSpace = (entityName: string, counter: number): string =>
+  `${entityName} ${counter}`;
 
-const nameWithoutSpace = (entityName: string, counter: number): string => `${entityName}${counter}`;
+const nameWithoutSpace = (entityName: string, counter: number): string =>
+  `${entityName}${counter}`;
 
 export function findReactionEntityUniqueName(
   entityName: string,

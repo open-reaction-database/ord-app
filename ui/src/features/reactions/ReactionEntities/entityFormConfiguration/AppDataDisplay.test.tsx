@@ -17,30 +17,49 @@ import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { AppDataDisplay } from './AppDataDisplay.tsx';
-import { AppDataType, type AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  AppDataType,
+  type AppData,
+} from 'store/entities/reactions/reactionData/reactionData.types.ts';
 
-const appData = (data: AppData['data'], name = 'field'): AppData => ({ id: 'x', name, data }) as AppData;
+const appData = (data: AppData['data'], name = 'field'): AppData =>
+  ({ id: 'x', name, data }) as AppData;
 
 describe('AppDataDisplay', () => {
   it('renders a URL value as an external link', () => {
-    renderWithMantine(<AppDataDisplay appData={appData({ type: AppDataType.Url, value: 'https://example.com' })} />);
-    expect(screen.getByRole('link', { name: 'https://example.com' })).toBeInTheDocument();
+    renderWithMantine(
+      <AppDataDisplay
+        appData={appData({ type: AppDataType.Url, value: 'https://example.com' })}
+      />,
+    );
+    expect(
+      screen.getByRole('link', { name: 'https://example.com' }),
+    ).toBeInTheDocument();
   });
 
   it('renders a text value as plain text', () => {
-    renderWithMantine(<AppDataDisplay appData={appData({ type: AppDataType.Text, value: 'hello' })} />);
+    renderWithMantine(
+      <AppDataDisplay appData={appData({ type: AppDataType.Text, value: 'hello' })} />,
+    );
     expect(screen.getByText('hello')).toBeInTheDocument();
   });
 
   it('renders an uploaded file as a download link, or "No file" when empty', () => {
     const { unmount } = renderWithMantine(
-      <AppDataDisplay appData={appData({ type: AppDataType.Upload, value: 'YWJj', format: 'pb' }, 'mol')} />,
+      <AppDataDisplay
+        appData={appData(
+          { type: AppDataType.Upload, value: 'YWJj', format: 'pb' },
+          'mol',
+        )}
+      />,
     );
     expect(screen.getByRole('link', { name: 'mol.pb' })).toBeInTheDocument();
     unmount();
 
     renderWithMantine(
-      <AppDataDisplay appData={appData({ type: AppDataType.Upload, value: '', format: 'pb' }, 'mol')} />,
+      <AppDataDisplay
+        appData={appData({ type: AppDataType.Upload, value: '', format: 'pb' }, 'mol')}
+      />,
     );
     expect(screen.getByText('No file')).toBeInTheDocument();
   });
@@ -48,7 +67,10 @@ describe('AppDataDisplay', () => {
   it('uses fileNameOverride for the file name, keeping the format extension (#613)', () => {
     renderWithMantine(
       <AppDataDisplay
-        appData={appData({ type: AppDataType.Upload, value: 'YWJj', format: 'json' }, 'f2f073f90dc84c60989affda5ab')}
+        appData={appData(
+          { type: AppDataType.Upload, value: 'YWJj', format: 'json' },
+          'f2f073f90dc84c60989affda5ab',
+        )}
         fileNameOverride="Observation 1"
       />,
     );

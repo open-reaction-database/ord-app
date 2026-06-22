@@ -24,7 +24,8 @@ interface Slice {
 
 const slice: Slice = { count: 3, name: 'set' };
 const state = { features: { errorPage: slice } } as unknown as AppState;
-const selectRoot = (s: AppState) => (s as unknown as { features: { errorPage: Slice } }).features.errorPage;
+const selectRoot = (s: AppState) =>
+  (s as unknown as { features: { errorPage: Slice } }).features.errorPage;
 
 describe('createSelectorFactory', () => {
   const { buildSelector } = createSelectorFactory(selectRoot);

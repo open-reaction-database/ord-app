@@ -19,24 +19,40 @@ from ord_app.tests.conftest import create_test_dataset, create_test_user_with_gr
 fake = Faker()
 
 
-async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, test_db_session):
+async def test_share_and_unshare_dataset(
+    api_client, mock_authenticated_user, test_db_session
+):
     primary_user, set_user_auth, primary_group = mock_authenticated_user
-    primary_dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    primary_dataset = await create_test_dataset(
+        test_db_session, mock_authenticated_user
+    )
 
     # get the primary dataset, there is should be one which is created above
-    primary_group_datasets = api_client.get(f"/api/v1/groups/{primary_group.id}/datasets").raise_for_status().json()
+    primary_group_datasets = (
+        api_client.get(f"/api/v1/groups/{primary_group.id}/datasets")
+        .raise_for_status()
+        .json()
+    )
     assert primary_group_datasets["total"] == 1
     assert primary_group_datasets["items"][0]["id"] == primary_dataset.id
 
     # can the current user share the dataset?
-    primary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
+    primary_user_dataset = (
+        api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
+        .raise_for_status()
+        .json()
+    )
     assert primary_dataset.id == primary_user_dataset["id"]
     assert True is primary_user_dataset["is_sharable"]
 
     # secondary user should have 0 datasets
     secondary_user, secondary_group = await create_test_user_with_group(test_db_session)
     set_user_auth(secondary_user)
-    primary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    primary_group_datasets = (
+        api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets")
+        .raise_for_status()
+        .json()
+    )
     assert primary_group_datasets["total"] == 0
 
     # share primary dataset by primary user to the secondary user
@@ -49,17 +65,28 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
         .raise_for_status()
         .json()
     )
-    assert share_response_data == {"dataset_id": primary_dataset.id, "group_id": secondary_group.id}
+    assert share_response_data == {
+        "dataset_id": primary_dataset.id,
+        "group_id": secondary_group.id,
+    }
 
     # now secondary user should have 1 dataset with the primary id
     set_user_auth(secondary_user)
-    secondary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    secondary_group_datasets = (
+        api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets")
+        .raise_for_status()
+        .json()
+    )
     assert secondary_group_datasets["total"] == 1
     assert secondary_group_datasets["items"][0]["id"] == primary_dataset.id
 
     # And secondary user cannot share that dataset
     _, foreign_group = await create_test_user_with_group(test_db_session)
-    secondary_user_dataset = api_client.get(f"/api/v1/datasets/{primary_dataset.id}").raise_for_status().json()
+    secondary_user_dataset = (
+        api_client.get(f"/api/v1/datasets/{primary_dataset.id}")
+        .raise_for_status()
+        .json()
+    )
     assert primary_dataset.id == secondary_user_dataset["id"]
     assert False is secondary_user_dataset["is_sharable"]
     secondary_share_response = api_client.post(
@@ -75,13 +102,21 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
 
     # But he can update primary dataset
     payload = {"name": "updated name", "description": "updated description"}
-    response_data = api_client.patch(f"/api/v1/datasets/{primary_dataset.id}", json=payload).raise_for_status().json()
+    response_data = (
+        api_client.patch(f"/api/v1/datasets/{primary_dataset.id}", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert response_data["name"] == payload["name"]
     assert response_data["description"] == payload["description"]
 
     # check if the dataset is not duplicated
     set_user_auth(primary_user)
-    primary_group_datasets = api_client.get(f"/api/v1/groups/{primary_group.id}/datasets").raise_for_status().json()
+    primary_group_datasets = (
+        api_client.get(f"/api/v1/groups/{primary_group.id}/datasets")
+        .raise_for_status()
+        .json()
+    )
     assert primary_group_datasets["total"] == 1
     assert primary_group_datasets["items"][0]["id"] == primary_dataset.id
 
@@ -93,7 +128,11 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
 
     # check how many datasets secondary user has now
     set_user_auth(secondary_user)
-    secondary_group_datasets = api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets").raise_for_status().json()
+    secondary_group_datasets = (
+        api_client.get(f"/api/v1/groups/{secondary_group.id}/datasets")
+        .raise_for_status()
+        .json()
+    )
     assert secondary_group_datasets["total"] == 0
     # Having been unshared, the secondary user has lost access: a 404 (not 403) so we don't reveal
     # that the dataset still exists. (#446)
@@ -101,11 +140,14 @@ async def test_share_and_unshare_dataset(api_client, mock_authenticated_user, te
     assert secondary_user_response.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_share_dataset_to_the_same_group(api_client, mock_authenticated_user, test_db_session):
+async def test_share_dataset_to_the_same_group(
+    api_client, mock_authenticated_user, test_db_session
+):
     *_, group = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
 
     response = api_client.post(
-        f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share", json={"secondary_group_id": group.id}
+        f"/api/v1/groups/{group.id}/datasets/{dataset.id}/share",
+        json={"secondary_group_id": group.id},
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

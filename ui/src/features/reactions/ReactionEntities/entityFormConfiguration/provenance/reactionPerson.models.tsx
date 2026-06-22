@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types.ts';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from '../../reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import type { FC } from 'react';
 import { UpdatePersonInfo, type UpdatePersonInfoProps } from './UpdatePersonInfo.tsx';
@@ -29,7 +32,10 @@ function createUpdatePersonInfo(text: string): FC<Omit<UpdatePersonInfoProps, 't
   };
 }
 
-export const createUpdatePersonInfoRow = (fieldName: string, text: string): ReactionFormNode => ({
+export const createUpdatePersonInfoRow = (
+  fieldName: string,
+  text: string,
+): ReactionFormNode => ({
   type: ReactionFormNodeType.wrapper,
   grid: 4,
   fields: [

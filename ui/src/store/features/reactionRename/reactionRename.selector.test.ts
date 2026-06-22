@@ -17,11 +17,14 @@ import { describe, it, expect } from 'vitest';
 import { selectIsReactionRenameOpened } from './reactionRename.selector.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
-const buildState = (reactionRename: unknown): AppState => ({ features: { reactionRename } }) as unknown as AppState;
+const buildState = (reactionRename: unknown): AppState =>
+  ({ features: { reactionRename } }) as unknown as AppState;
 
 describe('selectIsReactionRenameOpened', () => {
   it('returns the whole reactionRename slice', () => {
-    expect(selectIsReactionRenameOpened(buildState({ reactionId: 5 }))).toEqual({ reactionId: 5 });
+    expect(selectIsReactionRenameOpened(buildState({ reactionId: 5 }))).toEqual({
+      reactionId: 5,
+    });
     expect(selectIsReactionRenameOpened(buildState(null))).toBeNull();
   });
 });

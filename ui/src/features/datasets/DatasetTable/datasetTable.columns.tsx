@@ -41,7 +41,9 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
       const datasetName = row.original.name ?? `Dataset ${row.original.id}`;
       return (
         <Tooltip label={datasetName}>
-          <div className={clsx(typographyClasses.oneLineText, classes.datasetName)}>{datasetName}</div>
+          <div className={clsx(typographyClasses.oneLineText, classes.datasetName)}>
+            {datasetName}
+          </div>
         </Tooltip>
       );
     },
@@ -58,7 +60,9 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
         <Tooltip label={tooltipText}>
           <div className={classes.sizeCell}>
             {row.original.reactions_count?.total != null && (
-              <span className={classes.sizeBadge}>{row.original.reactions_count.total}</span>
+              <span className={classes.sizeBadge}>
+                {row.original.reactions_count.total}
+              </span>
             )}
             {hasInvalidReactions && (
               <div className={classes.invalidIcon}>
@@ -115,7 +119,9 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     Cell: ({ row }) => {
       return (
         <Tooltip label={row.original.description}>
-          <div className={typographyClasses.oneLineText}>{row.original.description}</div>
+          <div className={typographyClasses.oneLineText}>
+            {row.original.description}
+          </div>
         </Tooltip>
       );
     },

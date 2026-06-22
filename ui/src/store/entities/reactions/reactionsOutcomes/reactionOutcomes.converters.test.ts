@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { ordAnalysisToReaction, reactionAnalysisToOrd } from './reactionOutcomes.converters.ts';
+import {
+  ordAnalysisToReaction,
+  reactionAnalysisToOrd,
+} from './reactionOutcomes.converters.ts';
 import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 describe('ordAnalysisToReaction', () => {
   it('assigns an id/name and unwraps instrumentLastCalibrated + isOfIsolatedSpecies', () => {
     const result = ordAnalysisToReaction(
-      { isOfIsolatedSpecies: true, instrumentLastCalibrated: { value: '2024-01-01' }, data: {}, details: 'NMR run' },
+      {
+        isOfIsolatedSpecies: true,
+        instrumentLastCalibrated: { value: '2024-01-01' },
+        data: {},
+        details: 'NMR run',
+      },
       'NMR',
     );
     expect(typeof result.id).toBe('string');
@@ -39,7 +47,11 @@ describe('ordAnalysisToReaction', () => {
 describe('reactionAnalysisToOrd', () => {
   it('strips id/name and re-wraps instrumentLastCalibrated as a DateTime', () => {
     const analysis = ordAnalysisToReaction(
-      { isOfIsolatedSpecies: true, instrumentLastCalibrated: { value: '2024-01-01' }, details: 'd' },
+      {
+        isOfIsolatedSpecies: true,
+        instrumentLastCalibrated: { value: '2024-01-01' },
+        details: 'd',
+      },
       'NMR',
     );
     const result = reactionAnalysisToOrd(analysis);

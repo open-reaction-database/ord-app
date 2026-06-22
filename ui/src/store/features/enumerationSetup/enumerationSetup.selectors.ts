@@ -15,6 +15,10 @@
  */
 import { createSelectorFactory } from '../../utils';
 
-const { buildSelector } = createSelectorFactory(state => state.features.enumerationSetup);
+const { buildSelector } = createSelectorFactory(
+  state => state.features.enumerationSetup,
+);
 
-export const selectIsEnumerationSetupOpened = buildSelector(state => state.isEnumerationSetupOpened);
+export const selectIsEnumerationSetupOpened = buildSelector(
+  state => state.isEnumerationSetupOpened,
+);

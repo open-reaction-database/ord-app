@@ -20,4 +20,5 @@ export const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE as string;
 export const auth0Issuer = import.meta.env.VITE_AUTH0_ISSUER as string;
 export const auth0Scope = import.meta.env.VITE_AUTH0_SCOPE as string;
 export const domain = globalThis.location.origin;
-export const showReactionPreviewDetails = import.meta.env.VITE_SHOW_REACTION_PREVIEW_DETAILS === 'TRUE';
+export const showReactionPreviewDetails =
+  import.meta.env.VITE_SHOW_REACTION_PREVIEW_DETAILS === 'TRUE';

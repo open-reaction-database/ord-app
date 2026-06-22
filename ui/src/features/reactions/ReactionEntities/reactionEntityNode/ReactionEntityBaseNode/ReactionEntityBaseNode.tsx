@@ -18,7 +18,10 @@ import { useContext } from 'react';
 import { nodeToComponentContext } from '../reactionEntityNode.context.ts';
 import { useIsHidden } from 'features/reactions/ReactionEntities/reactionEntityNode/useIsHidden.ts';
 
-export function ReactionEntityBaseNode({ node, formMethods }: Readonly<ReactionEntityNodeProps>) {
+export function ReactionEntityBaseNode({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps>) {
   const isHidden = useIsHidden(node.condition, formMethods);
   const nodeToComponent = useContext(nodeToComponentContext)!;
   if (isHidden) return null;

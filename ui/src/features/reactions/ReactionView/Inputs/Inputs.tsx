@@ -31,14 +31,17 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 
 const ENTITY_FIELD = 'inputs';
 
-const useCreate = buildUseCreate<ReactionInput>(ENTITY_FIELD, (_, list): [string, ReactionInput] => {
-  const newInputName = findReactionEntityUniqueName(
-    'Input',
-    list.map(input => input.name),
-  );
-  const appReactionInput = createEmptyReactionInput(newInputName);
-  return [appReactionInput.id, appReactionInput];
-});
+const useCreate = buildUseCreate<ReactionInput>(
+  ENTITY_FIELD,
+  (_, list): [string, ReactionInput] => {
+    const newInputName = findReactionEntityUniqueName(
+      'Input',
+      list.map(input => input.name),
+    );
+    const appReactionInput = createEmptyReactionInput(newInputName);
+    return [appReactionInput.id, appReactionInput];
+  },
+);
 
 export function Inputs() {
   const { isViewOnly, reactionId } = useContext(reactionContext);

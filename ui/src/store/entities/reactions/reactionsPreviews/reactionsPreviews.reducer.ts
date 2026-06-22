@@ -22,7 +22,10 @@ import {
 } from 'store/entities/reactions/reactions.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 
-const updatePreviewState = (state: PreviewStatesById, previewsById: PreviewsById): PreviewStatesById => ({
+const updatePreviewState = (
+  state: PreviewStatesById,
+  previewsById: PreviewsById,
+): PreviewStatesById => ({
   ...state,
   ...Object.entries(previewsById).reduce(
     (acc: PreviewStatesById, [key, value]) => ({
@@ -55,12 +58,16 @@ const previewsByEntityId = createReducer<PreviewStatesById>({}, builder => {
   }));
 
   builder.addCase(getReactionsListActions.success, (state, { payload }) => {
-    const previewsByIds = payload.items.reduce((acc, item) => ({ ...acc, ...item.previews }), {});
+    const previewsByIds = payload.items.reduce(
+      (acc, item) => ({ ...acc, ...item.previews }),
+      {},
+    );
     return updatePreviewState(state, previewsByIds);
   });
 
-  builder.addMatcher(isAnyOf(getReactionActions.success, addUpdateReactionFieldActions.success), (state, { payload }) =>
-    updatePreviewState(state, payload.previews),
+  builder.addMatcher(
+    isAnyOf(getReactionActions.success, addUpdateReactionFieldActions.success),
+    (state, { payload }) => updatePreviewState(state, payload.previews),
   );
 });
 

@@ -57,11 +57,18 @@ describe('reactionNotesToOrd', () => {
       isExothermic: ReactionBoolean.True,
       offgasses: ReactionBoolean.False,
     });
-    expect(result).toMatchObject({ isExothermic: true, offgasses: false, isHeterogeneous: null });
+    expect(result).toMatchObject({
+      isExothermic: true,
+      offgasses: false,
+      isHeterogeneous: null,
+    });
   });
 
   it('keeps the object when only free-text fields are set', () => {
-    const result = reactionNotesToOrd({ ...unspecifiedNotes, safetyNotes: 'handle with care' });
+    const result = reactionNotesToOrd({
+      ...unspecifiedNotes,
+      safetyNotes: 'handle with care',
+    });
     expect(result?.safetyNotes).toBe('handle with care');
   });
 });

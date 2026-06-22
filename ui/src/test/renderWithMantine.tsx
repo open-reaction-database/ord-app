@@ -24,6 +24,9 @@ function Providers({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 /** Renders a component inside a MantineProvider, required by any component using Mantine primitives. */
-export function renderWithMantine(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+export function renderWithMantine(
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
+) {
   return render(ui, { wrapper: Providers, ...options });
 }

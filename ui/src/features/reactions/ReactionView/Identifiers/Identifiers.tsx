@@ -37,10 +37,19 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
   const reaction = useSelector(selectReactionById(reactionId));
   const identifiers = reaction.data.identifiers || [];
   const onIdentifierCreate = useCallback(() => {
-    const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, identifiers.length];
+    const newIdentifierPath: ReactionPathComponents = [
+      ENTITY_FIELD,
+      identifiers.length,
+    ];
     const newIdentifier = ord.ReactionIdentifier.toObject(new ord.ReactionIdentifier());
 
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newIdentifier }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: newIdentifierPath,
+        newValue: newIdentifier,
+      }),
+    );
     dispatch(setReactionPathComponentsList([newIdentifierPath]));
   }, [reactionId, identifiers.length, dispatch]);
 
@@ -72,7 +81,9 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
           </Button>
         )}
       </Flex>
-      <span className={classes.text}>Reaction identifiers define descriptions of the overall reaction</span>
+      <span className={classes.text}>
+        Reaction identifiers define descriptions of the overall reaction
+      </span>
 
       <Flex
         direction="column"

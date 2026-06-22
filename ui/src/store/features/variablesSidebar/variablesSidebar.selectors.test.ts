@@ -18,7 +18,9 @@ import { selectIsVariablesSidebarOpened } from './variablesSidebar.selectors.ts'
 import type { AppState } from 'store/configureAppStore.ts';
 
 const buildState = (isVariablesSidebarOpened: boolean): AppState =>
-  ({ features: { variablesSidebar: { isVariablesSidebarOpened } } }) as unknown as AppState;
+  ({
+    features: { variablesSidebar: { isVariablesSidebarOpened } },
+  }) as unknown as AppState;
 
 describe('selectIsVariablesSidebarOpened', () => {
   it('reads the open flag from the slice', () => {

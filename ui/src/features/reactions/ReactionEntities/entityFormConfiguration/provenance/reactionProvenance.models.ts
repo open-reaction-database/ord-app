@@ -25,10 +25,16 @@ import { formatDateToDisplay } from 'common/utils';
 import { ordRecordEventToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
 import type { ReactionRecordEvent } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { createReactionPerson, createUpdatePersonInfoRow } from './reactionPerson.models.tsx';
+import {
+  createReactionPerson,
+  createUpdatePersonInfoRow,
+} from './reactionPerson.models.tsx';
 
 const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
-  return [newIndex, ordRecordEventToReaction(ord.RecordEvent.toObject(new ord.RecordEvent()))];
+  return [
+    newIndex,
+    ordRecordEventToReaction(ord.RecordEvent.toObject(new ord.RecordEvent())),
+  ];
 };
 
 export const reactionProvenance: Array<ReactionFormNode> = [

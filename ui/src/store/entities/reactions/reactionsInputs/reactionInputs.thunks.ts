@@ -27,14 +27,21 @@ export const addIdentifierByName = createThunkWithExplicitResult(
   ({ reactionId, pathComponents, name }) =>
     async (dispatch, getState) => {
       try {
-        const result = await axiosInstance.post<{ smiles: string }>('/resolve-compound', {
-          identifier_type: 'name',
-          identifier: name,
-        });
+        const result = await axiosInstance.post<{ smiles: string }>(
+          '/resolve-compound',
+          {
+            identifier_type: 'name',
+            identifier: name,
+          },
+        );
         const identifierValue = result.data.smiles;
         const newIdentifier = ordCompoundIdentifierToReaction(
           ord.CompoundIdentifier.toObject(
-            new ord.CompoundIdentifier({ type: CompoundIdentifierType.SMILES, value: identifierValue, details: name }),
+            new ord.CompoundIdentifier({
+              type: CompoundIdentifierType.SMILES,
+              value: identifierValue,
+              details: name,
+            }),
           ),
         );
         dispatch(addIdentifierByNameActions.success());

@@ -30,7 +30,9 @@ const formMethods = {} as ReactionEntityNodeProps<ReactionFormGroup>['formMethod
 
 describe('ReactionEntityGroup', () => {
   it('renders one base node per grouped field', () => {
-    const node = { fields: [{ type: 'a' }, { type: 'b' }] } as unknown as ReactionFormGroup;
+    const node = {
+      fields: [{ type: 'a' }, { type: 'b' }],
+    } as unknown as ReactionFormGroup;
     const { getAllByTestId } = renderWithMantine(
       <ReactionEntityGroup
         node={node}

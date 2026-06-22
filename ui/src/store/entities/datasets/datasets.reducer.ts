@@ -36,7 +36,10 @@ const getDatasetId = (dataset: Dataset) => dataset.id;
 
 const areDatasetsLoading = createReducer<boolean>(false, builder => {
   builder.addCase(setActiveGroupIdAction, () => true);
-  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request),
+    () => true,
+  );
   builder.addMatcher(
     isAnyOf(
       getGroupsInitialDatasetListActions.success,
@@ -49,7 +52,10 @@ const areDatasetsLoading = createReducer<boolean>(false, builder => {
 });
 
 const isDatasetCreating = createReducer<boolean>(false, builder => {
-  builder.addMatcher(isAnyOf(createNewDatasetActions.request, createDatasetFromFileActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(createNewDatasetActions.request, createDatasetFromFileActions.request),
+    () => true,
+  );
   builder.addMatcher(
     isAnyOf(
       createNewDatasetActions.success,
@@ -100,15 +106,22 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
 
 const datasetsOrder = createReducer<Array<number>>([], builder => {
   builder.addCase(setActiveGroupIdAction, () => []);
-  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request), () => []);
-  builder.addMatcher(isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success), (_, action) =>
-    action.payload.items.map(item => item.id),
+  builder.addMatcher(
+    isAnyOf(getGroupsInitialDatasetListActions.request, getDatasetPageActions.request),
+    () => [],
+  );
+  builder.addMatcher(
+    isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success),
+    (_, action) => action.payload.items.map(item => item.id),
   );
 });
 
 const pagination = createReducer<Pagination>(emptyPagination, builder => {
   builder.addCase(setActiveGroupIdAction, () => emptyPagination);
-  builder.addCase(getDatasetPageActions.request, (state, action) => ({ ...state, ...action.payload }));
+  builder.addCase(getDatasetPageActions.request, (state, action) => ({
+    ...state,
+    ...action.payload,
+  }));
   builder.addMatcher(
     isAnyOf(getGroupsInitialDatasetListActions.success, getDatasetPageActions.success),
     (state, action) => ({

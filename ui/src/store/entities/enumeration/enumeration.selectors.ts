@@ -17,4 +17,6 @@ import { createSelectorFactory } from '../../utils';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.enumeration);
 
-export const selectEnumerationProgress = buildSelector(state => state.enumerationProgress);
+export const selectEnumerationProgress = buildSelector(
+  state => state.enumerationProgress,
+);

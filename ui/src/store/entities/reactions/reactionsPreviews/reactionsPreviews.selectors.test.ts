@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { selectPreviewsByIds, selectPreviewsByIdsWrapper } from './reactionsPreviews.selectors.ts';
+import {
+  selectPreviewsByIds,
+  selectPreviewsByIdsWrapper,
+} from './reactionsPreviews.selectors.ts';
 import type { PreviewStatesById } from './reactionsPreviews.types.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
 const buildState = (previewsByEntityId: PreviewStatesById): AppState =>
-  ({ entities: { reactions: { reactionsPreviews: { previewsByEntityId } } } }) as unknown as AppState;
+  ({
+    entities: { reactions: { reactionsPreviews: { previewsByEntityId } } },
+  }) as unknown as AppState;
 
 const previews: PreviewStatesById = {
   a: { isLoading: false, svg: '<svg-a>' },
@@ -44,6 +49,8 @@ describe('selectPreviewsByIds', () => {
 describe('selectPreviewsByIdsWrapper', () => {
   it('binds the entity ids and reads from state', () => {
     const state = buildState(previews);
-    expect(selectPreviewsByIdsWrapper(['b'])(state)).toEqual({ b: { isLoading: true, svg: null } });
+    expect(selectPreviewsByIdsWrapper(['b'])(state)).toEqual({
+      b: { isLoading: true, svg: null },
+    });
   });
 });

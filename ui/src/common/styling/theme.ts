@@ -16,7 +16,9 @@
 import { colorsTuple, createTheme } from '@mantine/core';
 
 type MantineColorsTuple = ReturnType<typeof colorsTuple>;
-type MutableMantineColorsTuple = { -readonly [K in keyof MantineColorsTuple]: MantineColorsTuple[K] };
+type MutableMantineColorsTuple = {
+  -readonly [K in keyof MantineColorsTuple]: MantineColorsTuple[K];
+};
 
 const primaryColors = colorsTuple('#3C78D8') as MutableMantineColorsTuple;
 primaryColors[9] = '#001926';

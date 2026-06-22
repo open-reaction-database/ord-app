@@ -21,7 +21,9 @@ from ord_app.tests.conftest import create_template, create_test_user_with_group
 fake = Faker()
 
 
-async def test_get_all_user_templates(api_client, mock_authenticated_user, test_db_session):
+async def test_get_all_user_templates(
+    api_client, mock_authenticated_user, test_db_session
+):
     (
         user,
         *_,
@@ -33,7 +35,11 @@ async def test_get_all_user_templates(api_client, mock_authenticated_user, test_
     response_data = api_client.get("/api/v1/templates").raise_for_status().json()
     assert len(response_data) == 1
     assert response_data[0]["id"] == template.id
-    assert response_data[0]["molblocks"] == {"inputs": {}, "outcomes": [], "workups": []}
+    assert response_data[0]["molblocks"] == {
+        "inputs": {},
+        "outcomes": [],
+        "workups": [],
+    }
 
 
 async def test_get_template(api_client, mock_authenticated_user, test_db_session):
@@ -43,7 +49,9 @@ async def test_get_template(api_client, mock_authenticated_user, test_db_session
     ) = mock_authenticated_user
     template = await create_template(test_db_session, user.id)
 
-    response_data = api_client.get(f"/api/v1/templates/{template.id}").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/templates/{template.id}").raise_for_status().json()
+    )
     assert response_data["id"] == template.id
     # The server-managed last-modified timestamp must be serialized and match the stored value (#619).
     returned_modified_at = datetime.fromisoformat(response_data["modified_at"])
@@ -52,7 +60,9 @@ async def test_get_template(api_client, mock_authenticated_user, test_db_session
     assert abs(returned_modified_at - template.modified_at) < timedelta(seconds=1)
 
 
-async def test_get_foreign_template(api_client, mock_authenticated_user, test_db_session):
+async def test_get_foreign_template(
+    api_client, mock_authenticated_user, test_db_session
+):
     (
         user,
         *_,
@@ -61,8 +71,14 @@ async def test_get_foreign_template(api_client, mock_authenticated_user, test_db
     await create_template(test_db_session, user.id)
     template2 = await create_template(test_db_session, user2.id)
 
-    assert api_client.get(f"/api/v1/templates/{template2.id}").status_code == status.HTTP_404_NOT_FOUND
+    assert (
+        api_client.get(f"/api/v1/templates/{template2.id}").status_code
+        == status.HTTP_404_NOT_FOUND
+    )
 
 
 async def test_get_non_existent_template(api_client, mock_authenticated_user):
-    assert api_client.get("/api/v1/templates/100500").status_code == status.HTTP_404_NOT_FOUND
+    assert (
+        api_client.get("/api/v1/templates/100500").status_code
+        == status.HTTP_404_NOT_FOUND
+    )

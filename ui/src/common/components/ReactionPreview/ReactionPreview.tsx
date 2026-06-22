@@ -29,10 +29,10 @@ interface ReactionPreviewProps {
   reaction: ReactionOrTemplate;
 }
 
-export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPreviewProps>>(function ReactionPreview(
-  { reaction },
-  ref,
-) {
+export const ReactionPreview = forwardRef<
+  HTMLDivElement,
+  Readonly<ReactionPreviewProps>
+>(function ReactionPreview({ reaction }, ref) {
   const reactionId = reaction.id;
   const inputs = useSelector(selectOrderedInputsWrapper(reactionId));
   const outcomes = reaction.data.outcomes;
@@ -48,7 +48,9 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
     >
       {inputs.map((input, index) => (
         <Fragment key={input.id}>
-          {index > 0 && index < inputs.length && <span className={classes.plus}>+</span>}
+          {index > 0 && index < inputs.length && (
+            <span className={classes.plus}>+</span>
+          )}
           <ReactionInputPreview
             reactionId={reactionId}
             key={input.id}
@@ -86,7 +88,9 @@ export const ReactionPreview = forwardRef<HTMLDivElement, Readonly<ReactionPrevi
         className={classes.emptyPreviewWrapper}
       >
         <EmptyPreview className={classes.emptyPreviewIcon} />
-        <Text className={typographyClasses.secondary1}>There are no Inputs and Outcomes yet</Text>
+        <Text className={typographyClasses.secondary1}>
+          There are no Inputs and Outcomes yet
+        </Text>
       </Flex>
     </div>
   );

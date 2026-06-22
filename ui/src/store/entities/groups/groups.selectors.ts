@@ -26,25 +26,39 @@ export const selectGroupSearch = buildSelector(state => state.groupNameSearch);
 
 export const selectGroupsByIds = buildSelector(state => state.groupsById);
 
-export const selectGroupById = (id: number) => (state: AppState) => selectGroupsByIds(state)[id];
+export const selectGroupById = (id: number) => (state: AppState) =>
+  selectGroupsByIds(state)[id];
 
-export const selectHaveAnyGroups = createSelector([selectGroupsByIds], groups => Object.keys(groups).length > 0);
+export const selectHaveAnyGroups = createSelector(
+  [selectGroupsByIds],
+  groups => Object.keys(groups).length > 0,
+);
 
 export const selectGroupsByIdsList = (groupIds: Array<number>) =>
-  createSelector([selectGroupsByIds], groups => groupIds.map(id => groups[id]).filter(Boolean));
+  createSelector([selectGroupsByIds], groups =>
+    groupIds.map(id => groups[id]).filter(Boolean),
+  );
 
-export const selectOrderedGroupsList = createSelector([selectGroupSearch, selectGroupsByIds], (search, groups) => {
-  const lowerCaseSearch = search.toLowerCase();
-  const filteredList =
-    search !== ''
-      ? Object.values(groups).filter(group => group.name.toLowerCase().includes(lowerCaseSearch))
-      : Object.values(groups);
-  return filteredList.sort((a, b) => a.name.localeCompare(b.name));
-});
+export const selectOrderedGroupsList = createSelector(
+  [selectGroupSearch, selectGroupsByIds],
+  (search, groups) => {
+    const lowerCaseSearch = search.toLowerCase();
+    const filteredList =
+      search !== ''
+        ? Object.values(groups).filter(group =>
+            group.name.toLowerCase().includes(lowerCaseSearch),
+          )
+        : Object.values(groups);
+    return filteredList.sort((a, b) => a.name.localeCompare(b.name));
+  },
+);
 
-export const selectGroupMembersByGroupId = (id: number) => buildSelector(state => state.groupsMembersByGroupId[id]);
+export const selectGroupMembersByGroupId = (id: number) =>
+  buildSelector(state => state.groupsMembersByGroupId[id]);
 
-export const selectAddMemberInputValue = buildSelector(state => state.addMemberInputValue);
+export const selectAddMemberInputValue = buildSelector(
+  state => state.addMemberInputValue,
+);
 
 export const selectAddMemberError = buildSelector(state => state.addMemberError);
 
@@ -53,14 +67,23 @@ export const selectIsGroupUpdating = buildSelector(state => state.isGroupUpdatin
 export const selectMemberRoles = createSelector(
   [selectEditingGroupId, (state: AppState) => state, selectSelf],
   (editingGroupId, state, currentUser) => {
-    const groupMembers = selectGroupMembersByGroupId(Number(editingGroupId))(state) || [];
-    const isAdmin = groupMembers.find(member => member.user.id === currentUser?.id)?.role === USER_ROLES.ADMIN;
-    const hasTwoAdmins = groupMembers.filter(member => member.role === USER_ROLES.ADMIN).length >= 2;
+    const groupMembers =
+      selectGroupMembersByGroupId(Number(editingGroupId))(state) || [];
+    const isAdmin =
+      groupMembers.find(member => member.user.id === currentUser?.id)?.role ===
+      USER_ROLES.ADMIN;
+    const hasTwoAdmins =
+      groupMembers.filter(member => member.role === USER_ROLES.ADMIN).length >= 2;
 
     return { isAdmin, hasTwoAdmins };
   },
 );
 
-export const selectAdminGroupsList = createSelector([selectOrderedGroupsList], orderedGroups => {
-  return orderedGroups.filter(group => [USER_ROLES.ADMIN, USER_ROLES.EDITOR].includes(group.role));
-});
+export const selectAdminGroupsList = createSelector(
+  [selectOrderedGroupsList],
+  orderedGroups => {
+    return orderedGroups.filter(group =>
+      [USER_ROLES.ADMIN, USER_ROLES.EDITOR].includes(group.role),
+    );
+  },
+);

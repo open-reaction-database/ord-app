@@ -19,7 +19,10 @@ import classes from './reactionEntityForm.module.scss';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { ReactionEntityBaseNode, reactionEntityToForm } from 'features/reactions/ReactionEntities';
+import {
+  ReactionEntityBaseNode,
+  reactionEntityToForm,
+} from 'features/reactions/ReactionEntities';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -64,12 +67,14 @@ export function ReactionEntityForm({
   );
 
   const formEntity = sidebarInfo.entityName;
-  const validate = useReactionEntityValidation(reactionId, reactionPathComponents, formEntity);
-
-  const [initialValues, reactionPartWithNestedEntities, filterValues] = sidebarInfo.useInitialValues(
+  const validate = useReactionEntityValidation(
     reactionId,
     reactionPathComponents,
+    formEntity,
   );
+
+  const [initialValues, reactionPartWithNestedEntities, filterValues] =
+    sidebarInfo.useInitialValues(reactionId, reactionPathComponents);
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -102,9 +107,22 @@ export function ReactionEntityForm({
       if (isViewOnly) return;
       formMethods.resetDirty();
       onSetFormDirty(reactionPathComponents, false);
-      dispatch(addUpdateReactionField({ reactionId, pathComponents: reactionPathComponents, newValue: values }));
+      dispatch(
+        addUpdateReactionField({
+          reactionId,
+          pathComponents: reactionPathComponents,
+          newValue: values,
+        }),
+      );
     },
-    [dispatch, formMethods, isViewOnly, onSetFormDirty, reactionId, reactionPathComponents],
+    [
+      dispatch,
+      formMethods,
+      isViewOnly,
+      onSetFormDirty,
+      reactionId,
+      reactionPathComponents,
+    ],
   );
 
   const onPasteChunk = useCallback(
@@ -157,7 +175,12 @@ export function ReactionEntityForm({
           >
             {!isTemplate && (
               <Button
-                onClick={() => copyReactionPart(sidebarInfo.entityName, reactionPartWithNestedEntities)}
+                onClick={() =>
+                  copyReactionPart(
+                    sidebarInfo.entityName,
+                    reactionPartWithNestedEntities,
+                  )
+                }
                 disabled={isDirty}
               >
                 Copy Chunk

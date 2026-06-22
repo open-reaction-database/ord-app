@@ -27,16 +27,23 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.services.auth0 import verify_access_token
-from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError, UnauthenticatedError
+from ord_app.service_api.services.exceptions import (
+    EntityNotFoundError,
+    ForbiddenError,
+    UnauthenticatedError,
+)
 from ord_app.service_api.services.postgresql import get_db_session
 
 
 async def authenticate(
-    db_session: AsyncSession = Depends(get_db_session), token: dict = Depends(verify_access_token)
+    db_session: AsyncSession = Depends(get_db_session),
+    token: dict = Depends(verify_access_token),
 ) -> UserModel:
     if user := await UserRepository(db_session).get(auth0_id=token["sub"]):
         return user
-    raise UnauthenticatedError(detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    raise UnauthenticatedError(
+        detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"}
+    )
 
 
 def group_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
@@ -53,7 +60,9 @@ def group_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
             )
         )
         if not await db_session.scalar(stmt):
-            raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
+            raise ForbiddenError(
+                detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"}
+            )
 
     return _authorize
 
@@ -75,11 +84,15 @@ def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
         # False when the user is a member but has no allowed role -> 403 (lets the UI re-gate to
         # read-only on the next write), and True when an allowed role is present. (#446)
         authorized = await db_session.scalar(
-            select(func.bool_or(UserGroupsMembershipModel.role.in_(allowed_roles))).where(*membership)
+            select(
+                func.bool_or(UserGroupsMembershipModel.role.in_(allowed_roles))
+            ).where(*membership)
         )
         if authorized is None:
             raise EntityNotFoundError(detail="Dataset not found")
         if not authorized:
-            raise ForbiddenError(detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"})
+            raise ForbiddenError(
+                detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"}
+            )
 
     return _authorize

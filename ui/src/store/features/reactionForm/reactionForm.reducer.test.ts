@@ -33,30 +33,45 @@ describe('reactionFormReducer', () => {
   });
 
   it('replaces the list with set', () => {
-    const state = reactionFormReducer(initialState(), setReactionPathComponentsList([['inputs', 0]]));
+    const state = reactionFormReducer(
+      initialState(),
+      setReactionPathComponentsList([['inputs', 0]]),
+    );
     expect(state.reactionPathComponentsList).toEqual([['inputs', 0]]);
   });
 
   it('appends with add', () => {
-    let state = reactionFormReducer(initialState(), setReactionPathComponentsList([['a']]));
+    let state = reactionFormReducer(
+      initialState(),
+      setReactionPathComponentsList([['a']]),
+    );
     state = reactionFormReducer(state, addReactionPathComponentToList(['b', 1]));
     expect(state.reactionPathComponentsList).toEqual([['a'], ['b', 1]]);
   });
 
   it('drops the last entry with pop', () => {
-    let state = reactionFormReducer(initialState(), setReactionPathComponentsList([['a'], ['b'], ['c']]));
+    let state = reactionFormReducer(
+      initialState(),
+      setReactionPathComponentsList([['a'], ['b'], ['c']]),
+    );
     state = reactionFormReducer(state, popReactionPathComponents());
     expect(state.reactionPathComponentsList).toEqual([['a'], ['b']]);
   });
 
   it('truncates to the given index (inclusive) with slice', () => {
-    let state = reactionFormReducer(initialState(), setReactionPathComponentsList([['a'], ['b'], ['c'], ['d']]));
+    let state = reactionFormReducer(
+      initialState(),
+      setReactionPathComponentsList([['a'], ['b'], ['c'], ['d']]),
+    );
     state = reactionFormReducer(state, sliceReactionPathComponentsList(1));
     expect(state.reactionPathComponentsList).toEqual([['a'], ['b']]);
   });
 
   it('resets on clear and on a successful reaction search', () => {
-    let state = reactionFormReducer(initialState(), setReactionPathComponentsList([['a'], ['b']]));
+    let state = reactionFormReducer(
+      initialState(),
+      setReactionPathComponentsList([['a'], ['b']]),
+    );
     state = reactionFormReducer(state, clearReactionPathComponentsList());
     expect(state.reactionPathComponentsList).toEqual([]);
 

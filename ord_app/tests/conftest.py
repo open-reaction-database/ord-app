@@ -71,7 +71,9 @@ def _worker_test_dsn() -> str:
     """
     url = make_url(RuntimeSettings.pg_test_dsn)
     if url.database is None:
-        raise RuntimeError(f"pg_test_dsn must name a database: {RuntimeSettings.pg_test_dsn!r}")
+        raise RuntimeError(
+            f"pg_test_dsn must name a database: {RuntimeSettings.pg_test_dsn!r}"
+        )
     worker = os.getenv("PYTEST_XDIST_WORKER")
     if worker:
         url = url.set(database=f"{url.database}_{worker}")
@@ -110,13 +112,17 @@ def _recreate_test_database(dsn: str, attempts: int = 5, delay: float = 0.5) -> 
 TEST_DSN = _worker_test_dsn()
 
 pg_engine = create_async_engine(TEST_DSN)
-db_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autocommit=False, autoflush=False)
+db_session_maker = async_sessionmaker(
+    pg_engine, expire_on_commit=False, autocommit=False, autoflush=False
+)
 
 # Reused across every clear_database call instead of building a new engine per test.
 sync_engine = create_engine(TEST_DSN)
 # Single statement clears every table once per test; CASCADE handles FK order.
 _truncate_all_tables = text(
-    "TRUNCATE TABLE " + ", ".join(f'"{table.name}"' for table in BaseModel.metadata.sorted_tables) + " CASCADE"
+    "TRUNCATE TABLE "
+    + ", ".join(f'"{table.name}"' for table in BaseModel.metadata.sorted_tables)
+    + " CASCADE"
 )
 
 
@@ -138,15 +144,20 @@ async def mock_validate_reactions_task(*args, **kwargs):
 @pytest.fixture(autouse=True)
 def override_validate_reactions_task(monkeypatch):
     monkeypatch.setattr(
-        "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions", mock_validate_reactions_task
+        "ord_app.service_api.resources.v1.datasets.validate_dataset_reactions",
+        mock_validate_reactions_task,
     )
 
 
 @pytest.fixture(autouse=True)
 async def override_engine(monkeypatch):
     monkeypatch.setattr("ord_app.service_api.services.postgresql.pg_engine", pg_engine)
-    test_session_maker = async_sessionmaker(pg_engine, expire_on_commit=False, autoflush=False, autocommit=False)
-    monkeypatch.setattr("ord_app.service_api.services.postgresql.db_session_maker", test_session_maker)
+    test_session_maker = async_sessionmaker(
+        pg_engine, expire_on_commit=False, autoflush=False, autocommit=False
+    )
+    monkeypatch.setattr(
+        "ord_app.service_api.services.postgresql.db_session_maker", test_session_maker
+    )
 
 
 @pytest.fixture
@@ -161,7 +172,9 @@ def create_test_database():
     _recreate_test_database(TEST_DSN)
 
     alembic_cfg = Config(str(RuntimeSettings.base_dir.parent.parent / "alembic.ini"))
-    alembic_cfg.set_main_option("script_location", str(RuntimeSettings.base_dir.parent.parent / "migrations"))
+    alembic_cfg.set_main_option(
+        "script_location", str(RuntimeSettings.base_dir.parent.parent / "migrations")
+    )
     alembic_cfg.set_main_option("sqlalchemy.url", TEST_DSN)
     command.upgrade(alembic_cfg, "head")
 
@@ -183,7 +196,11 @@ def clear_database():
 
 @pytest.fixture
 async def test_user(test_db_session):
-    user = UserModel(email="utest@unit.com", external_id="utest_external_id", auth0_id="utest_auth0_id")
+    user = UserModel(
+        email="utest@unit.com",
+        external_id="utest_external_id",
+        auth0_id="utest_auth0_id",
+    )
     test_db_session.add(user)
     await test_db_session.commit()
     await test_db_session.refresh(user)

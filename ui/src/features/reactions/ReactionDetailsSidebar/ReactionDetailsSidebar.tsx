@@ -40,12 +40,20 @@ interface EditSidebarProps {
 function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarProps>) {
   const dispatch = useAppDispatch();
   const reactionPathComponentsList = useSelector(selectReactionPathComponentsList);
-  const [isOpenedCloseAll, { open: openCloseAllConfirmation, close: closeCloseAllConfirmation }] = useDisclosure();
-  const [isOpenedClose, { open: openCloseConfirmation, close: closeCloseConfirmation }] = useDisclosure();
+  const [
+    isOpenedCloseAll,
+    { open: openCloseAllConfirmation, close: closeCloseAllConfirmation },
+  ] = useDisclosure();
+  const [
+    isOpenedClose,
+    { open: openCloseConfirmation, close: closeCloseConfirmation },
+  ] = useDisclosure();
 
   const currentIndex = reactionPathComponentsList.length - 1;
 
-  const [areSidebarFormsDirty, setAreSidebarFormsDirty] = useState<Record<string, boolean>>({});
+  const [areSidebarFormsDirty, setAreSidebarFormsDirty] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     const reactionPaths = reactionPathComponentsList.map(item => item.join(''));
@@ -109,11 +117,15 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
   }, [currentSidebarInfo]);
 
   const onActualFormClose = useMemo(() => {
-    return areSidebarFormsDirty[currentPath?.join('')] ? openCloseConfirmation : onFormClose;
+    return areSidebarFormsDirty[currentPath?.join('')]
+      ? openCloseConfirmation
+      : onFormClose;
   }, [areSidebarFormsDirty, currentPath, onFormClose, openCloseConfirmation]);
 
   const onActualSidebarClose = useMemo(() => {
-    return Object.values(areSidebarFormsDirty).some(item => item) ? openCloseAllConfirmation : onSidebarClose;
+    return Object.values(areSidebarFormsDirty).some(item => item)
+      ? openCloseAllConfirmation
+      : onSidebarClose;
   }, [areSidebarFormsDirty, onSidebarClose, openCloseAllConfirmation]);
 
   const onSetFormDirty = useCallback(
@@ -132,7 +144,11 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
         opened={isOpened}
         onClose={onActualSidebarClose}
         position="right"
-        classNames={{ header: classes.header, content: classes.sidebar, body: classes.body }}
+        classNames={{
+          header: classes.header,
+          content: classes.sidebar,
+          body: classes.body,
+        }}
       >
         <Drawer.Overlay />
         <Drawer.Content>

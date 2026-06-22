@@ -30,13 +30,20 @@ import {
 import { USER_ROLES } from 'common/types';
 import type { GroupItem, GroupMember } from './groups.types.ts';
 
-const makeGroupItem = (id: number, name: string, role: USER_ROLES = USER_ROLES.ADMIN): GroupItem => ({
+const makeGroupItem = (
+  id: number,
+  name: string,
+  role: USER_ROLES = USER_ROLES.ADMIN,
+): GroupItem => ({
   id,
   name,
   role,
 });
 
-const makeMember = (userId: number, role: USER_ROLES = USER_ROLES.VIEWER): GroupMember => ({
+const makeMember = (
+  userId: number,
+  role: USER_ROLES = USER_ROLES.VIEWER,
+): GroupMember => ({
   id: userId * 10,
   role,
   user: {
@@ -88,30 +95,54 @@ describe('groupsReducer', () => {
   describe('groupsMembersByGroupId', () => {
     it('stores members for a group', () => {
       const members = [makeMember(1), makeMember(2)];
-      const state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 7, members }));
+      const state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 7, members }),
+      );
       expect(state.groupsMembersByGroupId[7]).toEqual(members);
     });
 
     it('replaces a single member on update success', () => {
-      const members = [makeMember(1, USER_ROLES.VIEWER), makeMember(2, USER_ROLES.VIEWER)];
-      let state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 7, members }));
+      const members = [
+        makeMember(1, USER_ROLES.VIEWER),
+        makeMember(2, USER_ROLES.VIEWER),
+      ];
+      let state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 7, members }),
+      );
       const promoted = makeMember(2, USER_ROLES.EDITOR);
-      state = groupsReducer(state, updateGroupMembersActions.success({ groupId: 7, member: promoted }));
+      state = groupsReducer(
+        state,
+        updateGroupMembersActions.success({ groupId: 7, member: promoted }),
+      );
       expect(state.groupsMembersByGroupId[7]).toEqual([members[0], promoted]);
     });
 
     it('removes members by user id', () => {
       const members = [makeMember(1), makeMember(2), makeMember(3)];
-      let state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 7, members }));
-      state = groupsReducer(state, removeGroupMembersActions.success({ groupId: 7, membersId: [1, 3] }));
+      let state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 7, members }),
+      );
+      state = groupsReducer(
+        state,
+        removeGroupMembersActions.success({ groupId: 7, membersId: [1, 3] }),
+      );
       expect(state.groupsMembersByGroupId[7]).toEqual([members[1]]);
     });
 
     it('appends an added member', () => {
       const members = [makeMember(1)];
-      let state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 7, members }));
+      let state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 7, members }),
+      );
       const added = makeMember(2);
-      state = groupsReducer(state, addGroupMemberActions.success({ groupId: 7, member: added }));
+      state = groupsReducer(
+        state,
+        addGroupMemberActions.success({ groupId: 7, member: added }),
+      );
       expect(state.groupsMembersByGroupId[7]).toEqual([members[0], added]);
     });
 
@@ -120,8 +151,14 @@ describe('groupsReducer', () => {
         initialState(),
         getGroupMembersActions.success({ groupId: 1, members: [makeMember(1)] }),
       );
-      state = groupsReducer(state, getGroupMembersActions.success({ groupId: 2, members: [makeMember(2)] }));
-      state = groupsReducer(state, removeGroupMembersActions.success({ groupId: 1, membersId: [1] }));
+      state = groupsReducer(
+        state,
+        getGroupMembersActions.success({ groupId: 2, members: [makeMember(2)] }),
+      );
+      state = groupsReducer(
+        state,
+        removeGroupMembersActions.success({ groupId: 1, membersId: [1] }),
+      );
       expect(state.groupsMembersByGroupId[1]).toEqual([]);
       expect(state.groupsMembersByGroupId[2]).toHaveLength(1);
     });
@@ -130,20 +167,32 @@ describe('groupsReducer', () => {
   describe('addMemberInputValue', () => {
     it('tracks input and clears it when a member is added', () => {
       // seed members so the shared addGroupMember success handler has a list to append to
-      let state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 1, members: [] }));
+      let state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 1, members: [] }),
+      );
       state = groupsReducer(state, setAddMemberInputValueAction('alice@example.com'));
       expect(state.addMemberInputValue).toBe('alice@example.com');
-      state = groupsReducer(state, addGroupMemberActions.success({ groupId: 1, member: makeMember(1) }));
+      state = groupsReducer(
+        state,
+        addGroupMemberActions.success({ groupId: 1, member: makeMember(1) }),
+      );
       expect(state.addMemberInputValue).toBe('');
     });
   });
 
   describe('addMemberError', () => {
     it('records the failure payload and clears on success or reset', () => {
-      let state = groupsReducer(initialState(), getGroupMembersActions.success({ groupId: 1, members: [] }));
+      let state = groupsReducer(
+        initialState(),
+        getGroupMembersActions.success({ groupId: 1, members: [] }),
+      );
       state = groupsReducer(state, addGroupMemberActions.failure('ALREADY_MEMBER'));
       expect(state.addMemberError).toBe('ALREADY_MEMBER');
-      state = groupsReducer(state, addGroupMemberActions.success({ groupId: 1, member: makeMember(1) }));
+      state = groupsReducer(
+        state,
+        addGroupMemberActions.success({ groupId: 1, member: makeMember(1) }),
+      );
       expect(state.addMemberError).toBeNull();
 
       state = groupsReducer(state, addGroupMemberActions.failure('NOT_FOUND'));
@@ -155,7 +204,10 @@ describe('groupsReducer', () => {
 
   describe('isGroupUpdating', () => {
     it('toggles around rename and member-mutation requests', () => {
-      let state = groupsReducer(initialState(), renameGroupActions.request({ id: 1, name: 'x' }));
+      let state = groupsReducer(
+        initialState(),
+        renameGroupActions.request({ id: 1, name: 'x' }),
+      );
       expect(state.isGroupUpdating).toBe(true);
       state = groupsReducer(state, renameGroupActions.success());
       expect(state.isGroupUpdating).toBe(false);

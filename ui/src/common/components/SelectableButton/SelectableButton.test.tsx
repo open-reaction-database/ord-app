@@ -42,7 +42,10 @@ describe('SelectableButton', () => {
         Toggle
       </SelectableButton>,
     );
-    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute('data-variant', 'filled');
+    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute(
+      'data-variant',
+      'filled',
+    );
 
     rerender(
       <SelectableButton
@@ -52,6 +55,9 @@ describe('SelectableButton', () => {
         Toggle
       </SelectableButton>,
     );
-    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute('data-variant', 'transparent');
+    expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute(
+      'data-variant',
+      'transparent',
+    );
   });
 });

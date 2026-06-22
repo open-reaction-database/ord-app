@@ -35,11 +35,13 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 
-const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
+const renderDetails = ({ amount }: ReactionInputComponent) =>
+  amount ? renderValuePrecisionUnit(amount) : '';
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } = useContext(reactionContext);
+  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } =
+    useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
   const currentPath = useMemo(() => {
     return pathComponents.concat(name);
@@ -49,12 +51,26 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   );
 
   const onRemove = useCallback(() => {
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: null }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: currentPath,
+        newValue: null,
+      }),
+    );
   }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
-    const authenticStandard = ordInputComponentToReaction(ord.Compound.toObject(new ord.Compound()));
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: authenticStandard }));
+    const authenticStandard = ordInputComponentToReaction(
+      ord.Compound.toObject(new ord.Compound()),
+    );
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: currentPath,
+        newValue: authenticStandard,
+      }),
+    );
   }, [currentPath, dispatch, reactionId]);
 
   return !!authenticStandard || !isViewOnly ? (

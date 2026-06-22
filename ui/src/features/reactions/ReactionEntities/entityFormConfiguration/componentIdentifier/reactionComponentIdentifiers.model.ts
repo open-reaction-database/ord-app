@@ -20,7 +20,9 @@ import {
 import { compoundIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import type { SelectOptions } from 'common/types/selectOptions.ts';
 
-const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(item => item !== 'MOLBLOCK');
+const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(
+  item => item !== 'MOLBLOCK',
+);
 
 const typeOptions = typeOptionsWithoutMolBlock.concat({
   label: 'MOLBLOCK',

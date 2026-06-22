@@ -25,12 +25,20 @@ faker = Faker()
 
 async def test_update_reaction(api_client, mock_authenticated_user, test_db_session):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
     reaction_id = faker.uuid4()
-    payload = {"binpb": b64encode(Reaction(reaction_id=reaction_id).SerializeToString()).decode()}
+    payload = {
+        "binpb": b64encode(
+            Reaction(reaction_id=reaction_id).SerializeToString()
+        ).decode()
+    }
     response_data = (
-        api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload)
+        api_client.patch(
+            f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
+        )
         .raise_for_status()
         .json()
     )
@@ -39,51 +47,89 @@ async def test_update_reaction(api_client, mock_authenticated_user, test_db_sess
     assert reaction_pb.reaction_id == reaction_id
 
 
-async def test_update_nonexistent_reaction(api_client, mock_authenticated_user, test_db_session):
+async def test_update_nonexistent_reaction(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    payload = {"binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()}
-    response_data = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{100500}", json=payload)
+    payload = {
+        "binpb": b64encode(Reaction(reaction_id="test").SerializeToString()).decode()
+    }
+    response_data = api_client.patch(
+        f"/api/v1/datasets/{dataset.id}/reactions/{100500}", json=payload
+    )
 
     assert response_data.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_update_reaction_rejects_oversized_attachments(api_client, mock_authenticated_user, test_db_session):
+async def test_update_reaction_rejects_oversized_attachments(
+    api_client, mock_authenticated_user, test_db_session
+):
     # Cumulative file attachments over 10 MB are rejected at save time. (#543)
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
     pb_reaction = Reaction(reaction_id=faker.uuid4())
     pb_reaction.observations.add().image.bytes_value = b"x" * (10 * 1024 * 1024 + 1)
     payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
-    response = api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload)
+    response = api_client.patch(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
+    )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "10 MB" in response.json()["detail"]
 
 
-async def test_update_reaction_allows_attachments_under_limit(api_client, mock_authenticated_user, test_db_session):
+async def test_update_reaction_allows_attachments_under_limit(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
     pb_reaction = Reaction(reaction_id=faker.uuid4())
-    pb_reaction.observations.add().image.bytes_value = b"x" * (1024 * 1024)  # 1 MB, well under the 10 MB cap
+    pb_reaction.observations.add().image.bytes_value = b"x" * (
+        1024 * 1024
+    )  # 1 MB, well under the 10 MB cap
     payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
-    api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload).raise_for_status()
+    api_client.patch(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
+    ).raise_for_status()
 
 
-async def test_update_reaction_with_duplicate_reaction_id(api_client, mock_authenticated_user, test_db_session):
+async def test_update_reaction_with_duplicate_reaction_id(
+    api_client, mock_authenticated_user, test_db_session
+):
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
-    reaction = await create_test_reaction(test_db_session, mock_authenticated_user, dataset)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
 
-    payload = {"binpb": b64encode(Reaction(reaction_id=reaction.pb_reaction_id).SerializeToString()).decode()}
+    payload = {
+        "binpb": b64encode(
+            Reaction(reaction_id=reaction.pb_reaction_id).SerializeToString()
+        ).decode()
+    }
     response_data = (
-        api_client.patch(f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload)
+        api_client.patch(
+            f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
+        )
         .raise_for_status()
         .json()
     )
     assert reaction.pb_reaction_id in response_data["pb_reaction_id"]
 
     # try to create new reaction with the reaction_id="updated"
-    payload = {"binpb": b64encode(Reaction(reaction_id=response_data["pb_reaction_id"]).SerializeToString()).decode()}
-    response = api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload).raise_for_status().json()
+    payload = {
+        "binpb": b64encode(
+            Reaction(reaction_id=response_data["pb_reaction_id"]).SerializeToString()
+        ).decode()
+    }
+    response = (
+        api_client.post(f"/api/v1/datasets/{dataset.id}/reactions", json=payload)
+        .raise_for_status()
+        .json()
+    )
     assert f"duplicate-{reaction.pb_reaction_id}" in response["pb_reaction_id"]

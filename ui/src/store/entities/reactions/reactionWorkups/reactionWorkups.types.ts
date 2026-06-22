@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { Optional, ReactionBoolean, ReactionTime, WithId } from '../reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  ReactionBoolean,
+  ReactionTime,
+  WithId,
+} from '../reactionEntity/reactionEntity.types.ts';
 import type { WorkupType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ReactionInputWithoutName } from '../reactionsInputs/reactionInputs.types.ts';
 import type { ReactionAmount } from '../reactionAmount/reactionAmount.types.ts';
@@ -23,7 +28,9 @@ import type {
   ReactionTemperatureCondition,
 } from '../reactionConditions/reactionConditions.types.ts';
 
-export interface ReactionWorkup extends WithId<Pick<ord.IReactionWorkup, 'details' | 'keepPhase' | 'targetPh'>> {
+export interface ReactionWorkup extends WithId<
+  Pick<ord.IReactionWorkup, 'details' | 'keepPhase' | 'targetPh'>
+> {
   type: WorkupType;
   duration: Optional<ReactionTime>;
   input: Optional<ReactionInputWithoutName>;

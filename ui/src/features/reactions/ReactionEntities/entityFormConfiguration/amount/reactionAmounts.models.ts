@@ -18,7 +18,10 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { amountTypeOptions, volumeUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
+import {
+  amountTypeOptions,
+  volumeUnitNames,
+} from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 
@@ -41,7 +44,8 @@ export const reactionAmounts: Array<ReactionFormNode> = [
       },
       condition: {
         name: 'amount',
-        isHidden: (item: unknown) => !volumeUnitNames.includes((item as ReactionAmount).units),
+        isHidden: (item: unknown) =>
+          !volumeUnitNames.includes((item as ReactionAmount).units),
       },
       options: booleanOptions,
       selectType: 'dropdown',

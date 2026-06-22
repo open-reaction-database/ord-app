@@ -40,8 +40,13 @@ export const downloadFileFromUrl =
         responseType: 'blob',
       });
 
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
-      const header = response.headers['content-disposition'];
+      const blob = new Blob([response.data], {
+        type: (response.headers['content-type'] as string | null) ?? undefined,
+      });
+      const header = response.headers['content-disposition'] as string | undefined;
+      if (header === undefined) {
+        throw new Error('Missing Content-Disposition header');
+      }
       const fileName = header.replace(/^.*filename="(.*)"/, '$1');
       downloadFile(blob, fileName);
     } catch (error) {

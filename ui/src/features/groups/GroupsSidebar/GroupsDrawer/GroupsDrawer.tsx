@@ -22,9 +22,16 @@ import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 import { getGroupMembers, renameGroup } from 'store/entities/groups/groups.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { selectGroupById, selectIsGroupUpdating, selectMemberRoles } from 'store/entities/groups/groups.selectors.ts';
+import {
+  selectGroupById,
+  selectIsGroupUpdating,
+  selectMemberRoles,
+} from 'store/entities/groups/groups.selectors.ts';
 import { GroupMembersList } from './GroupMembersList/GroupMembersList.tsx';
-import { resetAddMemberErrorAction, setAddMemberInputValueAction } from 'store/entities/groups/groups.actions.ts';
+import {
+  resetAddMemberErrorAction,
+  setAddMemberInputValueAction,
+} from 'store/entities/groups/groups.actions.ts';
 import { AddMemberInput } from './AddMemberInput/AddMemberInput.tsx';
 import classes from './GroupsDrawer.module.scss';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
@@ -59,7 +66,10 @@ export function GroupsDrawer() {
     dispatch(setEditingGroupIdAction(null));
   };
 
-  const copyButtonOptions = useMemo(() => (group ? [{ label: 'Copy ID', value: group.id.toString() }] : []), [group]);
+  const copyButtonOptions = useMemo(
+    () => (group ? [{ label: 'Copy ID', value: group.id.toString() }] : []),
+    [group],
+  );
 
   return (
     <>
@@ -87,7 +97,9 @@ export function GroupsDrawer() {
                   label={group?.name}
                   disabled={!group?.name}
                 >
-                  <Drawer.Title className={clsx(classes.title, typographyClasses.oneLineText)}>
+                  <Drawer.Title
+                    className={clsx(classes.title, typographyClasses.oneLineText)}
+                  >
                     {group?.name}
                   </Drawer.Title>
                 </Tooltip>

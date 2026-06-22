@@ -16,7 +16,10 @@
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormCustom } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-export function ReactionEntityCustom({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormCustom>>) {
+export function ReactionEntityCustom({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormCustom>>) {
   const { Component } = node;
   return (
     <Component

@@ -25,11 +25,17 @@ type Condition = ReactionFormConditionalRendering['condition'];
 type WatchCallback = (payload: { value: unknown }) => void;
 
 const condition = (isHiddenFor: unknown): Condition =>
-  ({ name: 'fieldA', isHidden: (value: unknown) => value === isHiddenFor }) as unknown as Condition;
+  ({
+    name: 'fieldA',
+    isHidden: (value: unknown) => value === isHiddenFor,
+  }) as unknown as Condition;
 
 function formMethods(currentValue: unknown) {
   const watch = vi.fn();
-  const methods = { getValues: () => ({ fieldA: currentValue }), watch } as unknown as ReactionFormMethods;
+  const methods = {
+    getValues: () => ({ fieldA: currentValue }),
+    watch,
+  } as unknown as ReactionFormMethods;
   return { methods, watch };
 }
 

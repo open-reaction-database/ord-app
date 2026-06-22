@@ -19,7 +19,10 @@ import type { ReactionMeasurement } from '../reactionComponent/reactionComponent
 import type { ReactionMeasurementType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
-const makeMeasurement = (type: ReactionMeasurementType, usesAuthenticStandard: ReactionBoolean): ReactionMeasurement =>
+const makeMeasurement = (
+  type: ReactionMeasurementType,
+  usesAuthenticStandard: ReactionBoolean,
+): ReactionMeasurement =>
   ({
     id: 'm1',
     type,
@@ -34,7 +37,9 @@ const makeMeasurement = (type: ReactionMeasurementType, usesAuthenticStandard: R
 
 describe('measurementTransform', () => {
   it('keeps only the SELECTIVITY-compatible fields for a SELECTIVITY measurement', () => {
-    const result = measurementTransform(makeMeasurement('SELECTIVITY', ReactionBoolean.True));
+    const result = measurementTransform(
+      makeMeasurement('SELECTIVITY', ReactionBoolean.True),
+    );
     expect(result.selectivity).not.toBeNull();
     expect(result.value).not.toBeNull();
     expect(result.authenticStandard).not.toBeNull(); // usesAuthenticStandard === True
@@ -44,7 +49,9 @@ describe('measurementTransform', () => {
   });
 
   it('keeps all type-dependent fields for CUSTOM but clears authenticStandard when not used', () => {
-    const result = measurementTransform(makeMeasurement('CUSTOM', ReactionBoolean.False));
+    const result = measurementTransform(
+      makeMeasurement('CUSTOM', ReactionBoolean.False),
+    );
     expect(result.retentionTime).not.toBeNull();
     expect(result.selectivity).not.toBeNull();
     expect(result.waveLength).not.toBeNull();

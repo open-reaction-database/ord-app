@@ -39,7 +39,9 @@ const useCreate = buildUseCreate('outcomes', newIndex => [
 const ENTITY_FIELD = 'outcomes';
 
 export function Outcomes({ reactionId }: ReactionViewSectionProps) {
-  const outcomes: Array<ReactionOutcome> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const outcomes: Array<ReactionOutcome> = useSelector(
+    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
+  );
   const onCreateNew = useCreate();
   const { isViewOnly } = useContext(reactionContext);
   const handleCreate = () => {
@@ -49,7 +51,10 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
   const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
   // Display outcomes ordered by reaction time when available, else stored order. The original
   // stored index is preserved for each so the edit path stays correct. (#599)
-  const orderedOutcomes = useMemo(() => sortOutcomesByReactionTime(outcomes ?? []), [outcomes]);
+  const orderedOutcomes = useMemo(
+    () => sortOutcomesByReactionTime(outcomes ?? []),
+    [outcomes],
+  );
 
   return (
     <Flex direction="column">
@@ -71,7 +76,9 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           </Button>
         )}
       </Flex>
-      <span>Outcomes record timestamped analyses and, optionally, product characterization</span>
+      <span>
+        Outcomes record timestamped analyses and, optionally, product characterization
+      </span>
       {outcomes?.length > 0 ? (
         <Accordion
           variant="separated"
@@ -96,7 +103,9 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <NoData className={classes.icon} />
-          <span className={typographyClasses.secondary1}>There are no Outcomes yet</span>
+          <span className={typographyClasses.secondary1}>
+            There are no Outcomes yet
+          </span>
         </Flex>
       )}
     </Flex>

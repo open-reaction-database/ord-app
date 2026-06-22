@@ -153,7 +153,9 @@ export const ordTemperatureConditionToReaction = (
   return {
     control: ordTemperatureControlToReaction(control),
     setpoint: ordTemperatureToReaction(setpoint),
-    temperatureMeasurements: (measurements || []).map(ordTemperatureMeasurementToReaction),
+    temperatureMeasurements: (measurements || []).map(
+      ordTemperatureMeasurementToReaction,
+    ),
   };
 };
 
@@ -166,10 +168,14 @@ export const reactionTemperatureConditionToOrd = ({
     control: reactionTemperatureControlToOrd(control),
     setpoint: reactionTemperatureToOrd(setpoint),
     measurements:
-      temperatureMeasurements.length > 0 ? temperatureMeasurements.map(reactionTemperatureMeasurementToOrd) : null,
+      temperatureMeasurements.length > 0
+        ? temperatureMeasurements.map(reactionTemperatureMeasurementToOrd)
+        : null,
   });
 
-const ordPressureConditionToReaction = (pressure: OrdOptional<ord.IPressureConditions>): ReactionPressureCondition => {
+const ordPressureConditionToReaction = (
+  pressure: OrdOptional<ord.IPressureConditions>,
+): ReactionPressureCondition => {
   const { setpoint, atmosphere, control, measurements } = pressure ?? {};
   return {
     control: ordPressureControlToReaction(control),
@@ -189,7 +195,10 @@ const reactionPressureConditionToOrd = ({
     control: reactionPressureControlToOrd(control),
     setpoint: reactionPressureToOrd(setpoint),
     atmosphere: reactionAtmosphereToOrd(atmosphere),
-    measurements: pressureMeasurements.length > 0 ? pressureMeasurements.map(reactionPressureMeasurementToOrd) : null,
+    measurements:
+      pressureMeasurements.length > 0
+        ? pressureMeasurements.map(reactionPressureMeasurementToOrd)
+        : null,
   });
 };
 
@@ -252,7 +261,8 @@ export const reactionIlluminationConditionToOrd = ({
 const ordElectrochemistryConditionToReaction = (
   electrochemistry: OrdOptional<ord.IElectrochemistryConditions>,
 ): ReactionElectrochemistryCondition => {
-  const { type, current, voltage, electrodeSeparation, cell, measurements, ...rest } = electrochemistry ?? {};
+  const { type, current, voltage, electrodeSeparation, cell, measurements, ...rest } =
+    electrochemistry ?? {};
 
   return {
     type: convertElectrochemistryTypeToOrd(type),
@@ -260,7 +270,9 @@ const ordElectrochemistryConditionToReaction = (
     voltage: ordVoltageToReaction(voltage),
     electrodeSeparation: ordLengthToReaction(electrodeSeparation),
     cell: ordElectrochemistryCellToReaction(cell),
-    electrochemistryMeasurements: (measurements || []).map(ordElectrochemistryMeasurementToReaction),
+    electrochemistryMeasurements: (measurements || []).map(
+      ordElectrochemistryMeasurementToReaction,
+    ),
     ...rest,
   };
 };
@@ -291,7 +303,9 @@ export const reactionElectrochemistryConditionToOrd = ({
   );
 };
 
-const ordFlowConditionToReaction = (flow: OrdOptional<ord.IFlowConditions>): ReactionFlowCondition => {
+const ordFlowConditionToReaction = (
+  flow: OrdOptional<ord.IFlowConditions>,
+): ReactionFlowCondition => {
   const { type, tubing, ...rest } = flow ?? {};
 
   return {
@@ -316,7 +330,9 @@ export const reactionFlowConditionToOrd = ({
   );
 };
 
-export const ordConditionsToReaction = (conditions: OrdOptional<ord.IReactionConditions>): ReactionConditions => {
+export const ordConditionsToReaction = (
+  conditions: OrdOptional<ord.IReactionConditions>,
+): ReactionConditions => {
   const {
     temperature,
     reflux,
@@ -327,7 +343,11 @@ export const ordConditionsToReaction = (conditions: OrdOptional<ord.IReactionCon
     electrochemistry,
     flow,
     ...rest
-  } = conditions ?? (ord.ReactionConditions.toObject(new ord.ReactionConditions()) as ord.IReactionConditions);
+  } =
+    conditions ??
+    (ord.ReactionConditions.toObject(
+      new ord.ReactionConditions(),
+    ) as ord.IReactionConditions);
 
   return withId({
     temperature: ordTemperatureConditionToReaction(temperature),

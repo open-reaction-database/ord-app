@@ -39,10 +39,10 @@ interface ValuePrecisionUnitControlProps {
 const useValuePrecisionUnitsUncontrolledValues = ({
   options,
   ...props
-}: Pick<ValuePrecisionUnitControlProps, 'value' | 'defaultValue' | 'onChange' | 'options'>): [
-  ValuePrecisionUnit,
-  (value: ValuePrecisionUnit) => void,
-] => {
+}: Pick<
+  ValuePrecisionUnitControlProps,
+  'value' | 'defaultValue' | 'onChange' | 'options'
+>): [ValuePrecisionUnit, (value: ValuePrecisionUnit) => void] => {
   const [uncontrolledValue, uncontrolledOnChange] = useUncontrolled(props);
 
   return [
@@ -62,9 +62,13 @@ export function ValuePrecisionUnitControl({
   disabled,
   ...rest
 }: Readonly<ValuePrecisionUnitControlProps>) {
-  const [uncontrolledValue, uncontrolledOnChange] = useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
+  const [uncontrolledValue, uncontrolledOnChange] =
+    useValuePrecisionUnitsUncontrolledValues({ options, ...rest });
 
-  const handleChange = (name: keyof ValuePrecisionUnit, newValue: string | number | null) => {
+  const handleChange = (
+    name: keyof ValuePrecisionUnit,
+    newValue: string | number | null,
+  ) => {
     const previousValue = uncontrolledValue ?? {};
     uncontrolledOnChange({ ...previousValue, [name]: newValue });
   };
@@ -73,7 +77,11 @@ export function ValuePrecisionUnitControl({
 
   return (
     <Input.Wrapper label={label}>
-      <div className={clsx(classes.wrapper, { [classes.inline]: select === 'native-inline' })}>
+      <div
+        className={clsx(classes.wrapper, {
+          [classes.inline]: select === 'native-inline',
+        })}
+      >
         <InputGroup>
           <AppNumberInput
             value={uncontrolledValue.value}

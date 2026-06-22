@@ -24,8 +24,12 @@ import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 
 export function DatasetsListTopActions() {
-  const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] = useDisclosure();
-  const [createFromFileOpened, { open: openCreateFromFile, close: closeCreateFromFile }] = useDisclosure();
+  const [createNewOpened, { open: openCreateNew, close: closeCreateNew }] =
+    useDisclosure();
+  const [
+    createFromFileOpened,
+    { open: openCreateFromFile, close: closeCreateFromFile },
+  ] = useDisclosure();
 
   return (
     <>

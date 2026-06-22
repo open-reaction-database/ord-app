@@ -24,11 +24,24 @@ export namespace MeasurementConstants {
     'INTENSITY',
   ];
 
-  export const selectivityCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'SELECTIVITY'];
+  export const selectivityCompatibleTypes: Array<ReactionMeasurementType> = [
+    'CUSTOM',
+    'SELECTIVITY',
+  ];
 
-  export const waveLengthCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'PURITY', 'AREA', 'INTENSITY'];
+  export const waveLengthCompatibleTypes: Array<ReactionMeasurementType> = [
+    'CUSTOM',
+    'PURITY',
+    'AREA',
+    'INTENSITY',
+  ];
 
-  export const massSpecCompatibleTypes: Array<ReactionMeasurementType> = ['CUSTOM', 'AREA', 'COUNTS', 'INTENSITY'];
+  export const massSpecCompatibleTypes: Array<ReactionMeasurementType> = [
+    'CUSTOM',
+    'AREA',
+    'COUNTS',
+    'INTENSITY',
+  ];
 
   export const valueCompatibleTypes: Array<ReactionMeasurementType> = [
     'CUSTOM',

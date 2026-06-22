@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import { onViewDeleteButtonsWrapperClick, useOnViewEdit } from './reactionViewDeleteButtons.utils.ts';
+import {
+  onViewDeleteButtonsWrapperClick,
+  useOnViewEdit,
+} from './reactionViewDeleteButtons.utils.ts';
 import { ViewIcon } from 'common/icons';
 import classes from './reactionViewDeleteButtons.module.scss';
 import { Button } from '@mantine/core';

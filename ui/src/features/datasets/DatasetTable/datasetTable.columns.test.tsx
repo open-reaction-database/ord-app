@@ -23,20 +23,29 @@ import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 const renderCell = (columnId: string, original: Partial<Dataset>) => {
   const column = columns.find(c => c.id === columnId);
   if (!column?.Cell) throw new Error(`no Cell for column ${columnId}`);
-  const Cell = column.Cell as (props: { row: { original: Partial<Dataset> } }) => JSX.Element;
+  const Cell = column.Cell as (props: {
+    row: { original: Partial<Dataset> };
+  }) => JSX.Element;
   return renderWithMantine(<Cell row={{ original }} />);
 };
 
 describe('datasetTable.columns', () => {
   it('renders the dataset name, falling back to "Dataset <id>" when unnamed', () => {
-    expect(renderCell('datasetName', { name: 'My Dataset', id: 1 }).getByText('My Dataset')).toBeInTheDocument();
-    expect(renderCell('datasetName', { id: 7 }).getByText('Dataset 7')).toBeInTheDocument();
+    expect(
+      renderCell('datasetName', { name: 'My Dataset', id: 1 }).getByText('My Dataset'),
+    ).toBeInTheDocument();
+    expect(
+      renderCell('datasetName', { id: 7 }).getByText('Dataset 7'),
+    ).toBeInTheDocument();
   });
 });
 
 describe('handleMenu', () => {
   it('stops propagation and prevents default so the row click does not fire', () => {
-    const event = { stopPropagation: vi.fn(), preventDefault: vi.fn() } as unknown as MouseEvent;
+    const event = {
+      stopPropagation: vi.fn(),
+      preventDefault: vi.fn(),
+    } as unknown as MouseEvent;
     handleMenu(event);
     expect(event.stopPropagation).toHaveBeenCalledTimes(1);
     expect(event.preventDefault).toHaveBeenCalledTimes(1);

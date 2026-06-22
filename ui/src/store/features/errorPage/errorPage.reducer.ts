@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
-import { getReactionActions, getReactionsListActions } from 'store/entities/reactions/reactions.actions.ts';
+import {
+  getReactionActions,
+  getReactionsListActions,
+} from 'store/entities/reactions/reactions.actions.ts';
 import { getDatasetActions } from 'store/entities/datasets/datasets.actions.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
@@ -23,7 +26,11 @@ const error = createReducer<null | RejectValue>(null, builder => {
   builder.addCase(resetErrorPageAction, () => null);
 
   builder.addMatcher(
-    isAnyOf(getReactionActions.failure, getReactionsListActions.failure, getDatasetActions.failure),
+    isAnyOf(
+      getReactionActions.failure,
+      getReactionsListActions.failure,
+      getDatasetActions.failure,
+    ),
     (_, action) => {
       return action.payload;
     },

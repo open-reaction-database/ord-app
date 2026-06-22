@@ -26,7 +26,9 @@ interface UserDataFieldProps {
 export function UserDataField({ fieldName, value }: Readonly<UserDataFieldProps>) {
   return (
     <div className={typographyClasses.oneLineTextWrapperWithContent}>
-      <span className={clsx(classes.category, typographyClasses.fitContentText)}>{fieldName}:</span>
+      <span className={clsx(classes.category, typographyClasses.fitContentText)}>
+        {fieldName}:
+      </span>
       <Tooltip label={value ?? 'Unavailable'}>
         <span className={typographyClasses.oneLineText}>{value ?? 'Unavailable'}</span>
       </Tooltip>

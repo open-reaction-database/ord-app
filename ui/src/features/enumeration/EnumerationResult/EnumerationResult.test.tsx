@@ -19,7 +19,12 @@ import { EnumerationResult } from './EnumerationResult.tsx';
 import type { EnumerationProgress } from 'store/entities/enumeration/enumeration.types.ts';
 
 const progress = (overrides: object) =>
-  ({ resultDatasetId: null, reactions: [], errors: [], ...overrides }) as unknown as Required<EnumerationProgress>;
+  ({
+    resultDatasetId: null,
+    reactions: [],
+    errors: [],
+    ...overrides,
+  }) as unknown as Required<EnumerationProgress>;
 
 describe('EnumerationResult', () => {
   it('reports the number of reactions created on success', () => {
@@ -35,7 +40,9 @@ describe('EnumerationResult', () => {
   it('lists failed lines and shows "No reactions created" when none succeeded', () => {
     const { getByText } = renderWithMantine(
       <EnumerationResult
-        enumerationProgress={progress({ errors: [{ line: 3, message: 'invalid SMILES' }] })}
+        enumerationProgress={progress({
+          errors: [{ line: 3, message: 'invalid SMILES' }],
+        })}
         onClose={vi.fn()}
       />,
     );

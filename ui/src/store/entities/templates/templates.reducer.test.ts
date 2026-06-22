@@ -25,24 +25,35 @@ import {
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 
 // The reducer only reads `template.id`, so a minimal stub keeps the test focused.
-const makeTemplate = (id: string): ReactionTemplate => ({ id, name: `template-${id}` }) as ReactionTemplate;
+const makeTemplate = (id: string): ReactionTemplate =>
+  ({ id, name: `template-${id}` }) as ReactionTemplate;
 
 const initialState = () => templatesReducer(undefined, { type: '@@INIT' });
 
 describe('templatesReducer', () => {
   it('returns the initial state', () => {
-    expect(initialState()).toEqual({ templatesOrder: [], isTemplateCreating: false, areTemplatesLoaded: false });
+    expect(initialState()).toEqual({
+      templatesOrder: [],
+      isTemplateCreating: false,
+      areTemplatesLoaded: false,
+    });
   });
 
   describe('areTemplatesLoaded', () => {
     it('is false initially and flips to true once the full list is fetched (#496)', () => {
       expect(initialState().areTemplatesLoaded).toBe(false);
-      const state = templatesReducer(initialState(), getAllTemplatesActions.success([makeTemplate('a')]));
+      const state = templatesReducer(
+        initialState(),
+        getAllTemplatesActions.success([makeTemplate('a')]),
+      );
       expect(state.areTemplatesLoaded).toBe(true);
     });
 
     it('also settles to true when the fetch fails, so the 404 path still reaches the user (#496)', () => {
-      const state = templatesReducer(initialState(), getAllTemplatesActions.failure(new Error('network')));
+      const state = templatesReducer(
+        initialState(),
+        getAllTemplatesActions.failure(new Error('network')),
+      );
       expect(state.areTemplatesLoaded).toBe(true);
     });
   });
@@ -51,7 +62,11 @@ describe('templatesReducer', () => {
     it('records the order of ids from a full fetch', () => {
       const state = templatesReducer(
         initialState(),
-        getAllTemplatesActions.success([makeTemplate('a'), makeTemplate('b'), makeTemplate('c')]),
+        getAllTemplatesActions.success([
+          makeTemplate('a'),
+          makeTemplate('b'),
+          makeTemplate('c'),
+        ]),
       );
       expect(state.templatesOrder).toEqual(['a', 'b', 'c']);
     });
@@ -66,9 +81,18 @@ describe('templatesReducer', () => {
     });
 
     it('prepends newly created and imported templates', () => {
-      let state = templatesReducer(initialState(), getAllTemplatesActions.success([makeTemplate('a')]));
-      state = templatesReducer(state, createNewTemplateActions.success(makeTemplate('b')));
-      state = templatesReducer(state, importTemplateFromFileActions.success(makeTemplate('c')));
+      let state = templatesReducer(
+        initialState(),
+        getAllTemplatesActions.success([makeTemplate('a')]),
+      );
+      state = templatesReducer(
+        state,
+        createNewTemplateActions.success(makeTemplate('b')),
+      );
+      state = templatesReducer(
+        state,
+        importTemplateFromFileActions.success(makeTemplate('c')),
+      );
       expect(state.templatesOrder).toEqual(['c', 'b', 'a']);
     });
   });
@@ -77,14 +101,23 @@ describe('templatesReducer', () => {
   // independently covered (create success, create failure, get success, get failure).
   describe('isTemplateCreating', () => {
     it('toggles around the create flow (request -> success)', () => {
-      let state = templatesReducer(initialState(), createNewTemplateActions.request({} as never));
+      let state = templatesReducer(
+        initialState(),
+        createNewTemplateActions.request({} as never),
+      );
       expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, createNewTemplateActions.success(makeTemplate('a')));
+      state = templatesReducer(
+        state,
+        createNewTemplateActions.success(makeTemplate('a')),
+      );
       expect(state.isTemplateCreating).toBe(false);
     });
 
     it('toggles around the create flow (request -> failure)', () => {
-      let state = templatesReducer(initialState(), createNewTemplateActions.request({} as never));
+      let state = templatesReducer(
+        initialState(),
+        createNewTemplateActions.request({} as never),
+      );
       expect(state.isTemplateCreating).toBe(true);
       state = templatesReducer(state, createNewTemplateActions.failure(new Error('x')));
       expect(state.isTemplateCreating).toBe(false);

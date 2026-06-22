@@ -66,7 +66,9 @@ import { measurementTransform } from '../reactionsMeasurement/reactionMeasuremen
 
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
 
-const ordCompoundSourceToReaction = (compoundSource: OrdOptional<ord.Compound.ISource>): ord.Compound.ISource => {
+const ordCompoundSourceToReaction = (
+  compoundSource: OrdOptional<ord.Compound.ISource>,
+): ord.Compound.ISource => {
   const { vendor, lot, catalogId } = compoundSource ?? {};
   return {
     vendor: vendor ?? null,
@@ -75,13 +77,18 @@ const ordCompoundSourceToReaction = (compoundSource: OrdOptional<ord.Compound.IS
   };
 };
 
-const reactionCompoundSourceToOrd = (compoundSource: ord.Compound.ISource): Optional<ord.Compound.ISource> => {
+const reactionCompoundSourceToOrd = (
+  compoundSource: ord.Compound.ISource,
+): Optional<ord.Compound.ISource> => {
   const { vendor, lot, catalogId } = compoundSource;
   const hasAnyValues = !!vendor || !!lot || !!catalogId;
   return hasAnyValues ? compoundSource : null;
 };
 
-export const ordPreparationToReaction = ({ type, ...rest }: ord.ICompoundPreparation): ReactionComponentPreparation => {
+export const ordPreparationToReaction = ({
+  type,
+  ...rest
+}: ord.ICompoundPreparation): ReactionComponentPreparation => {
   return withId({
     type: ordPreparationTypeToReaction(type),
     ...rest,
@@ -100,7 +107,9 @@ export const reactionPreparationToOrd = ({
   };
 };
 
-const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Optional<ReactionMeasurementValue> => {
+const ordMeasurementValueToReaction = (
+  measurement: ord.IProductMeasurement,
+): Optional<ReactionMeasurementValue> => {
   if (measurement.amount) {
     return {
       type: ReactionMeasurementValueType.Mass,
@@ -128,7 +137,10 @@ const ordMeasurementValueToReaction = (measurement: ord.IProductMeasurement): Op
   return null;
 };
 
-const reactionMeasurementValueToOrd = ({ type, value }: ReactionMeasurementValue): Partial<ord.IProductMeasurement> => {
+const reactionMeasurementValueToOrd = ({
+  type,
+  value,
+}: ReactionMeasurementValue): Partial<ord.IProductMeasurement> => {
   switch (type) {
     case ReactionMeasurementValueType.Mass:
       return {
@@ -149,7 +161,9 @@ const reactionMeasurementValueToOrd = ({ type, value }: ReactionMeasurementValue
   }
 };
 
-export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): ReactionMeasurement => {
+export const ordMeasurementToReaction = (
+  measurement: ord.IProductMeasurement,
+): ReactionMeasurement => {
   const {
     type,
     details,
@@ -175,11 +189,15 @@ export const ordMeasurementToReaction = (measurement: ord.IProductMeasurement): 
     selectivity: ordSelectivityToReaction(selectivity),
     waveLength: ordWaveLengthToReaction(wavelength),
     massSpecDetails: ordMassSpecToReaction(massSpecDetails),
-    authenticStandard: authenticStandard ? ordInputComponentToReaction(authenticStandard) : null,
+    authenticStandard: authenticStandard
+      ? ordInputComponentToReaction(authenticStandard)
+      : null,
   });
 };
 
-export const reactionMeasurementToOrd = (measurement: ReactionMeasurement): ord.IProductMeasurement => {
+export const reactionMeasurementToOrd = (
+  measurement: ReactionMeasurement,
+): ord.IProductMeasurement => {
   const {
     type,
     details,
@@ -206,7 +224,9 @@ export const reactionMeasurementToOrd = (measurement: ReactionMeasurement): ord.
     selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : null,
     wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : null,
     massSpecDetails: massSpecDetails ? reactionMassSpecToOrd(massSpecDetails) : null,
-    authenticStandard: authenticStandard ? reactionInputComponentToOrd(authenticStandard) : null,
+    authenticStandard: authenticStandard
+      ? reactionInputComponentToOrd(authenticStandard)
+      : null,
     ...(value ? reactionMeasurementValueToOrd(value) : {}),
   };
 };
@@ -224,11 +244,18 @@ function ordComponentBaseToReaction({
       const isMolblock = item.type === 'MOLBLOCK';
 
       return {
-        nonMolBlockIdentifiers: isMolblock ? nonMolBlockIdentifiers : nonMolBlockIdentifiers.concat(item),
-        molBlockIdentifiers: isMolblock ? molBlockIdentifiers.concat(item) : molBlockIdentifiers,
+        nonMolBlockIdentifiers: isMolblock
+          ? nonMolBlockIdentifiers
+          : nonMolBlockIdentifiers.concat(item),
+        molBlockIdentifiers: isMolblock
+          ? molBlockIdentifiers.concat(item)
+          : molBlockIdentifiers,
       };
     },
-    { nonMolBlockIdentifiers: emptyIdentifiersArray, molBlockIdentifiers: emptyIdentifiersArray },
+    {
+      nonMolBlockIdentifiers: emptyIdentifiersArray,
+      molBlockIdentifiers: emptyIdentifiersArray,
+    },
   );
   return withId({
     reactionRole: ordReactionRoleToReaction(reactionRole),
@@ -246,7 +273,9 @@ function reactionComponentBaseToOrd({
   texture,
   features,
 }: ReactionComponentBase): OrdComponentBase {
-  const ordIdentifiers = [...molBlockIdentifiers, ...identifiers].map(reactionCompoundIdentifierToOrd);
+  const ordIdentifiers = [...molBlockIdentifiers, ...identifiers].map(
+    reactionCompoundIdentifierToOrd,
+  );
   return {
     reactionRole: reactionReactionRoleToOrd(reactionRole),
     texture: reactionTextureToOrd(texture),
@@ -255,7 +284,9 @@ function reactionComponentBaseToOrd({
   };
 }
 
-export function ordInputComponentToReaction(inputComponent: ord.ICompound): ReactionInputComponent {
+export function ordInputComponentToReaction(
+  inputComponent: ord.ICompound,
+): ReactionInputComponent {
   const { amount, preparations, isLimiting, source } = inputComponent;
 
   return {
@@ -267,10 +298,14 @@ export function ordInputComponentToReaction(inputComponent: ord.ICompound): Reac
   };
 }
 
-export function reactionInputComponentToOrd(inputComponent: ReactionInputComponent): ord.ICompound {
+export function reactionInputComponentToOrd(
+  inputComponent: ReactionInputComponent,
+): ord.ICompound {
   const { amount, preparations, source } = inputComponent;
   const isLimiting =
-    inputComponent.reactionRole === 'REACTANT' ? reactionBooleanToOrd(inputComponent.isLimiting) : null;
+    inputComponent.reactionRole === 'REACTANT'
+      ? reactionBooleanToOrd(inputComponent.isLimiting)
+      : null;
   return {
     ...reactionComponentBaseToOrd(inputComponent),
     isLimiting,

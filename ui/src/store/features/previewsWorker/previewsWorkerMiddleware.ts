@@ -47,7 +47,9 @@ const multipleReactionsActionsMatcher = isAnyOf(
 );
 
 export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
-  const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+  const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+    type: 'module',
+  });
 
   worker.onmessage = event => {
     const previews: PreviewsById = event.data;
@@ -66,9 +68,15 @@ export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
     if (multipleReactionsActionsMatcher(action)) {
       let previews: PreviewsById = {};
       if (getAllTemplatesActions.success.match(action)) {
-        previews = action.payload.reduce((acc, template) => ({ ...acc, ...template.previews }), {});
+        previews = action.payload.reduce(
+          (acc, template) => ({ ...acc, ...template.previews }),
+          {},
+        );
       } else {
-        previews = action.payload.items.reduce((acc, reaction) => ({ ...acc, ...reaction.previews }), {});
+        previews = action.payload.items.reduce(
+          (acc, reaction) => ({ ...acc, ...reaction.previews }),
+          {},
+        );
       }
       worker.postMessage(previews);
     }

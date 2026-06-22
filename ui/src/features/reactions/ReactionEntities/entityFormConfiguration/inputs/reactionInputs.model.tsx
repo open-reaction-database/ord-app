@@ -35,7 +35,9 @@ import { ord } from 'ord-schema-protobufjs';
 import { CrudeComponentView } from 'features/reactions/ReactionView/CrudeComponentView/CrudeComponentView.tsx';
 
 const createEmptyCrudeComponent = buildUseCreate('crudeComponents', index => {
-  const newCrudeComponent = ordCrudeComponentToReaction(ord.CrudeComponent.toObject(new ord.CrudeComponent()));
+  const newCrudeComponent = ordCrudeComponentToReaction(
+    ord.CrudeComponent.toObject(new ord.CrudeComponent()),
+  );
   return [index, newCrudeComponent];
 });
 

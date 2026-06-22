@@ -39,7 +39,8 @@ export function EntityListItem<T>({
   }, [entityField, entityKey, pathComponents]);
 
   const titleText = useMemo(() => {
-    const humanFriendlyKey = typeof entityKey === 'string' ? entityKey : `${entityKey + 1}`;
+    const humanFriendlyKey =
+      typeof entityKey === 'string' ? entityKey : `${entityKey + 1}`;
     return typeof title === 'function' ? title(entity) : `${title} ${humanFriendlyKey}`;
   }, [title, entity, entityKey]);
 

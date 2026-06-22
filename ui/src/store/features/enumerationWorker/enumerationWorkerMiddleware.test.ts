@@ -24,7 +24,10 @@ import { createWorkerHarness, itForwardsNonWorkerActions } from 'test/workerStub
 // reference equality); stub it to a plain action so the dispatch assertion can
 // check both the data it was built from and that exact value reaching dispatch.
 vi.mock('store/entities/enumeration/enumeration.thunks.ts', () => ({
-  enumerateBatchResult: vi.fn((batch: unknown) => ({ type: 'enumeration/batch-result', payload: batch })),
+  enumerateBatchResult: vi.fn((batch: unknown) => ({
+    type: 'enumeration/batch-result',
+    payload: batch,
+  })),
 }));
 
 function setup() {
@@ -33,7 +36,13 @@ function setup() {
   return { dispatch, next, invoke, worker: workers[0] };
 }
 
-const batchRequest = { index: 0, data: {}, variables: [], matching: [], templateCSV: { headers: [], content: [] } };
+const batchRequest = {
+  index: 0,
+  data: {},
+  variables: [],
+  matching: [],
+  templateCSV: { headers: [], content: [] },
+};
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -57,7 +66,10 @@ describe('enumerationWorkerMiddleware', () => {
     const result: EnumerationBatchResult = { reactions: ['enc'], errors: [] };
     worker.onmessage?.({ data: result });
     expect(enumerateBatchResult).toHaveBeenCalledWith(result);
-    expect(dispatch).toHaveBeenCalledWith({ type: 'enumeration/batch-result', payload: result });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'enumeration/batch-result',
+      payload: result,
+    });
   });
 
   it('logs worker errors without throwing', () => {

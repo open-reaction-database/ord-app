@@ -19,13 +19,22 @@ import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactio
 import type { ReactionMeasurementType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 import { clearDependantFields } from 'store/utils/clearDependantFields.ts';
 
-const createPredicate = (types: Array<ReactionMeasurementType>) => (workup: ReactionMeasurement) =>
-  types.includes(workup.type);
+const createPredicate =
+  (types: Array<ReactionMeasurementType>) => (workup: ReactionMeasurement) =>
+    types.includes(workup.type);
 
-export const measurementTransform = (measurement: ReactionMeasurement): ReactionMeasurement => {
+export const measurementTransform = (
+  measurement: ReactionMeasurement,
+): ReactionMeasurement => {
   return clearDependantFields<ReactionMeasurement>(measurement, [
-    ['authenticStandard', measurement => measurement.usesAuthenticStandard === ReactionBoolean.True],
-    ['retentionTime', createPredicate(MeasurementConstants.retentionTimeCompatibleTypes)],
+    [
+      'authenticStandard',
+      measurement => measurement.usesAuthenticStandard === ReactionBoolean.True,
+    ],
+    [
+      'retentionTime',
+      createPredicate(MeasurementConstants.retentionTimeCompatibleTypes),
+    ],
     ['selectivity', createPredicate(MeasurementConstants.selectivityCompatibleTypes)],
     ['waveLength', createPredicate(MeasurementConstants.waveLengthCompatibleTypes)],
     ['massSpecDetails', createPredicate(MeasurementConstants.massSpecCompatibleTypes)],

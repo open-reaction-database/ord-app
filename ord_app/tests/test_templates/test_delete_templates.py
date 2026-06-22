@@ -35,7 +35,9 @@ async def test_delete_template(api_client, mock_authenticated_user, test_db_sess
     assert result is None
 
 
-async def test_delete_foreign_template(api_client, mock_authenticated_user, test_db_session):
+async def test_delete_foreign_template(
+    api_client, mock_authenticated_user, test_db_session
+):
     (
         user,
         *_,

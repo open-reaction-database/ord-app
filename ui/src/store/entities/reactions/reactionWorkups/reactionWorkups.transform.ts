@@ -18,7 +18,8 @@ import { WorkupConstants } from './reactionWorkups.constants.ts';
 import { clearDependantFields } from 'store/utils/clearDependantFields.ts';
 import type { WorkupType } from '../reactionEntityTypes/reactionEntityTypes.types.ts';
 
-const createPredicate = (types: Array<WorkupType>) => (workup: ReactionWorkup) => types.includes(workup.type);
+const createPredicate = (types: Array<WorkupType>) => (workup: ReactionWorkup) =>
+  types.includes(workup.type);
 
 export const workupTransform = (workup: ReactionWorkup): ReactionWorkup => {
   return clearDependantFields<ReactionWorkup>(workup, [

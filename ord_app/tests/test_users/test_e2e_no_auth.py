@@ -36,14 +36,24 @@ def test_jit_provisioning_creates_dev_user_without_real_token(api_client, e2e_mo
 
 
 def test_jit_provisioning_is_idempotent(api_client, e2e_mode):
-    first = api_client.post(JIT_URL, json={"access_token": "dev", "id_token": "dev"}).raise_for_status().json()
-    second = api_client.post(JIT_URL, json={"access_token": "dev", "id_token": "dev"}).raise_for_status().json()
+    first = (
+        api_client.post(JIT_URL, json={"access_token": "dev", "id_token": "dev"})
+        .raise_for_status()
+        .json()
+    )
+    second = (
+        api_client.post(JIT_URL, json={"access_token": "dev", "id_token": "dev"})
+        .raise_for_status()
+        .json()
+    )
 
     assert first["id"] == second["id"]
 
 
 def test_authenticate_resolves_to_dev_user(api_client, e2e_mode):
-    api_client.post(JIT_URL, json={"access_token": "dev", "id_token": "dev"}).raise_for_status()
+    api_client.post(
+        JIT_URL, json={"access_token": "dev", "id_token": "dev"}
+    ).raise_for_status()
 
     response = api_client.get(ME_URL, headers={"Authorization": "Bearer dev"})
 
@@ -51,7 +61,9 @@ def test_authenticate_resolves_to_dev_user(api_client, e2e_mode):
     assert response.json()["email"] == E2E_EMAIL
 
 
-@pytest.mark.parametrize("app_env", ["production", "Production", "PRODUCTION", "staging", ""])
+@pytest.mark.parametrize(
+    "app_env", ["production", "Production", "PRODUCTION", "staging", ""]
+)
 def test_bypass_is_disabled_outside_localhost(monkeypatch, app_env):
     # The bypass is allowlisted to localhost, so even with e2e set it stays off everywhere else
     # (including case variants of "production" and any unknown environment).

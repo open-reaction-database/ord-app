@@ -18,7 +18,12 @@ import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
 import { navigate } from 'wouter/use-browser-location';
-import { createEmptyReaction, getReactionsList, getReactionsPage, removeReaction } from './reactions.thunks.ts';
+import {
+  createEmptyReaction,
+  getReactionsList,
+  getReactionsPage,
+  removeReaction,
+} from './reactions.thunks.ts';
 import {
   createEmptyReactionActions,
   getReactionPageActions,
@@ -36,7 +41,13 @@ vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() 
 // and keep the rest of the module (merge helpers used by the reducer) intact.
 vi.mock('./reactions.utils.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
-  parseReaction: () => ({ id: 99, pb_reaction_id: 'pb-99', data: {}, previews: {}, validation: null }),
+  parseReaction: () => ({
+    id: 99,
+    pb_reaction_id: 'pb-99',
+    data: {},
+    previews: {},
+    validation: null,
+  }),
   parseReactionList: (pages: unknown) => pages,
 }));
 vi.mock('./reactions.converters.ts', async importActual => ({
@@ -46,7 +57,10 @@ vi.mock('./reactions.converters.ts', async importActual => ({
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
 // cast to a plain record of mock fns instead.
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 
 const makeStore = makeRecordingStore;
@@ -140,7 +154,9 @@ describe('removeReaction', () => {
 
 describe('createEmptyReaction', () => {
   it('creates a reaction and navigates to it without refetching the list', async () => {
-    axiosMock.post.mockResolvedValueOnce({ data: { binpb: '', molblocks: {}, validation: null } });
+    axiosMock.post.mockResolvedValueOnce({
+      data: { binpb: '', molblocks: {}, validation: null },
+    });
     const { store, types } = makeStore();
     store.dispatch(getReactionsListActions.request(5));
     await store.dispatch(createEmptyReaction() as unknown as UnknownAction);

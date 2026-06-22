@@ -38,22 +38,33 @@ import {
 
 type ReactionsState = ReturnType<typeof reactionsReducer>;
 
-const initialState = (): ReactionsState => reactionsReducer(undefined, { type: '@@INIT' } as UnknownAction);
+const initialState = (): ReactionsState =>
+  reactionsReducer(undefined, { type: '@@INIT' } as UnknownAction);
 
 // Helper to dispatch an action creator's output against (optionally seeded) state.
-function reduce(state: Partial<ReactionsState> | undefined, action: unknown): ReactionsState {
+function reduce(
+  state: Partial<ReactionsState> | undefined,
+  action: unknown,
+): ReactionsState {
   const base = { ...initialState(), ...state };
   return reactionsReducer(base, action as UnknownAction);
 }
 
 // Minimal reaction whose data linkReactionEntities can traverse (it maps over outcomes).
-const reaction = (id: number, data: Record<string, unknown> = {}) => ({ id, data: { outcomes: [], ...data } });
+const reaction = (id: number, data: Record<string, unknown> = {}) => ({
+  id,
+  data: { outcomes: [], ...data },
+});
 
 // reactionsById entries are a Reaction|Template union; read nested fields through
 // a single cast from unknown for assertions (not narrowable from the union).
 interface EntryShape {
   pb_reaction_id?: string;
-  data: { notes?: Record<string, unknown>; reactionId?: string; outcomes?: Array<unknown> };
+  data: {
+    notes?: Record<string, unknown>;
+    reactionId?: string;
+    outcomes?: Array<unknown>;
+  };
   dataBeforeEdit?: { notes?: Record<string, unknown> };
   variables: Record<string, unknown>;
 }
@@ -61,7 +72,10 @@ const asEntry = (entry: unknown): EntryShape => entry as EntryShape;
 
 describe('reactions.reducer — activeDatasetId', () => {
   it('tracks the datasetId from a single-reaction request', () => {
-    const state = reduce(undefined, getReactionActions.request({ datasetId: 5, reactionId: 9 }));
+    const state = reduce(
+      undefined,
+      getReactionActions.request({ datasetId: 5, reactionId: 9 }),
+    );
     expect(state.activeDatasetId).toBe(5);
   });
 
@@ -85,8 +99,17 @@ describe('reactions.reducer — list/page lifecycle', () => {
   });
 
   it('populates order, pagination, byId, and clears loading on a list success', () => {
-    const payload = { items: [reaction(1), reaction(2)], total: 2, pages: 1, page: 1, size: 10 };
-    const state = reduce({ areReactionsLoading: true }, getReactionsListActions.success(payload as never));
+    const payload = {
+      items: [reaction(1), reaction(2)],
+      total: 2,
+      pages: 1,
+      page: 1,
+      size: 10,
+    };
+    const state = reduce(
+      { areReactionsLoading: true },
+      getReactionsListActions.success(payload as never),
+    );
     expect(state.reactionsOrder).toEqual([1, 2]);
     expect(state.pagination).toMatchObject({ total: 2, pages: 1 });
     expect(Object.keys(state.reactionsById)).toEqual(['1', '2']);
@@ -94,7 +117,10 @@ describe('reactions.reducer — list/page lifecycle', () => {
   });
 
   it('merges the requested page into pagination and flags loading on a page request', () => {
-    const state = reduce(undefined, getReactionPageActions.request({ page: 3, size: 20 } as never));
+    const state = reduce(
+      undefined,
+      getReactionPageActions.request({ page: 3, size: 20 } as never),
+    );
     expect(state.pagination).toMatchObject({ page: 3, size: 20 });
     expect(state.areReactionsLoading).toBe(true);
   });
@@ -102,7 +128,9 @@ describe('reactions.reducer — list/page lifecycle', () => {
 
 describe('reactions.reducer — create/remove', () => {
   it('flags creating on an empty-reaction request', () => {
-    expect(reduce(undefined, createEmptyReactionActions.request()).isReactionCreating).toBe(true);
+    expect(
+      reduce(undefined, createEmptyReactionActions.request()).isReactionCreating,
+    ).toBe(true);
   });
 
   it('clears creating and bumps pagination total on an empty-reaction success', () => {
@@ -116,9 +144,15 @@ describe('reactions.reducer — create/remove', () => {
   });
 
   it('flags creating on an import request and clears it (bumping pagination total) on import success', () => {
-    expect(reduce(undefined, importReactionFromFileActions.request({} as never)).isReactionCreating).toBe(true);
+    expect(
+      reduce(undefined, importReactionFromFileActions.request({} as never))
+        .isReactionCreating,
+    ).toBe(true);
     const state = reduce(
-      { isReactionCreating: true, pagination: { ...initialState().pagination, total: 4, size: 10 } },
+      {
+        isReactionCreating: true,
+        pagination: { ...initialState().pagination, total: 4, size: 10 },
+      },
       importReactionFromFileActions.success(reaction(99) as never),
     );
     expect(state.isReactionCreating).toBe(false);
@@ -151,38 +185,66 @@ describe('reactions.reducer — reactionsById field edits', () => {
   });
 
   it('removes the value at a path on a delete field request', () => {
-    const seeded = { reactionsById: { 1: reaction(1, { notes: { text: 'x' } }) } as never };
-    const action = deleteReactionFieldActions.request({ reactionId: 1, pathComponents: ['notes', 'text'] } as never);
+    const seeded = {
+      reactionsById: { 1: reaction(1, { notes: { text: 'x' } }) } as never,
+    };
+    const action = deleteReactionFieldActions.request({
+      reactionId: 1,
+      pathComponents: ['notes', 'text'],
+    } as never);
     const state = reduce(seeded, action);
     expect(asEntry(state.reactionsById[1]).data.notes).toEqual({});
   });
 
   it('renames a reaction, updating both pb_reaction_id and data.reactionId', () => {
-    const seeded = { reactionsById: { 1: { ...reaction(1), pb_reaction_id: 'old' } } as never };
-    const state = reduce(seeded, renameReactionActions.success({ reactionId: 1, name: 'new-name' } as never));
-    expect(state.reactionsById[1]).toMatchObject({ pb_reaction_id: 'new-name', data: { reactionId: 'new-name' } });
+    const seeded = {
+      reactionsById: { 1: { ...reaction(1), pb_reaction_id: 'old' } } as never,
+    };
+    const state = reduce(
+      seeded,
+      renameReactionActions.success({ reactionId: 1, name: 'new-name' } as never),
+    );
+    expect(state.reactionsById[1]).toMatchObject({
+      pb_reaction_id: 'new-name',
+      data: { reactionId: 'new-name' },
+    });
   });
 });
 
 describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
-  const seedNotes = (text: string) => ({ reactionsById: { 1: reaction(1, { notes: { text } }) } as never });
+  const seedNotes = (text: string) => ({
+    reactionsById: { 1: reaction(1, { notes: { text } }) } as never,
+  });
 
   it('snapshots the pre-edit data when an edit is dispatched', () => {
     const state = reduce(
       seedNotes('original'),
-      deleteReactionFieldActions.request({ reactionId: 1, pathComponents: ['notes', 'text'] } as never),
+      deleteReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+      } as never),
     );
     expect(asEntry(state.reactionsById[1]).data.notes).toEqual({});
-    expect(asEntry(state.reactionsById[1]).dataBeforeEdit?.notes).toEqual({ text: 'original' });
+    expect(asEntry(state.reactionsById[1]).dataBeforeEdit?.notes).toEqual({
+      text: 'original',
+    });
   });
 
   it('restores the snapshot and clears it when the backend rejects the edit', () => {
     const afterEdit = reduce(
       seedNotes('original'),
-      deleteReactionFieldActions.request({ reactionId: 1, pathComponents: ['notes', 'text'] } as never),
+      deleteReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+      } as never),
     );
-    const afterFailure = reduce(afterEdit, deleteReactionFieldActions.failure('Access denied' as never));
-    expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({ text: 'original' });
+    const afterFailure = reduce(
+      afterEdit,
+      deleteReactionFieldActions.failure('Access denied' as never),
+    );
+    expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({
+      text: 'original',
+    });
     expect(asEntry(afterFailure.reactionsById[1]).dataBeforeEdit).toBeUndefined();
   });
 
@@ -198,9 +260,14 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     expect(asEntry(afterEdit.reactionsById[1]).dataBeforeEdit).toBeDefined();
     // The real success payload (Omit<DatasetReaction, 'data'>) carries previews; the
     // reactionsPreviews slice also handles this action and indexes them.
-    const afterSuccess = reduce(afterEdit, addUpdateReactionFieldActions.success({ id: 1, previews: {} } as never));
+    const afterSuccess = reduce(
+      afterEdit,
+      addUpdateReactionFieldActions.success({ id: 1, previews: {} } as never),
+    );
     expect(asEntry(afterSuccess.reactionsById[1]).dataBeforeEdit).toBeUndefined();
-    expect(asEntry(afterSuccess.reactionsById[1]).data.notes).toEqual({ text: 'edited' });
+    expect(asEntry(afterSuccess.reactionsById[1]).data.notes).toEqual({
+      text: 'edited',
+    });
   });
 
   it('keeps the earliest baseline across successive edits so a rollback reverts all the way', () => {
@@ -221,7 +288,9 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
       } as never),
     );
     expect(asEntry(edit2.reactionsById[1]).data.notes).toEqual({ text: 'second' });
-    expect(asEntry(edit2.reactionsById[1]).dataBeforeEdit?.notes).toEqual({ text: 'original' });
+    expect(asEntry(edit2.reactionsById[1]).dataBeforeEdit?.notes).toEqual({
+      text: 'original',
+    });
   });
 
   it('is a no-op on failure when no edit is pending', () => {
@@ -243,7 +312,12 @@ describe('reactions.reducer — templates', () => {
   });
 
   it('removes the template_<id> entry on a remove-template success', () => {
-    const seeded = { reactionsById: { template_5: { id: 'template_5' }, template_6: { id: 'template_6' } } as never };
+    const seeded = {
+      reactionsById: {
+        template_5: { id: 'template_5' },
+        template_6: { id: 'template_6' },
+      } as never,
+    };
     const state = reduce(seeded, removeTemplateActions.success(5 as never));
     expect(Object.keys(state.reactionsById)).toEqual(['template_6']);
   });
@@ -258,14 +332,26 @@ describe('reactions.reducer — templates', () => {
   it('adds a variable keyed by its dotted path on an add-variable request', () => {
     const seeded = { reactionsById: { t1: { id: 't1', variables: {} } } as never };
     const variable = { path: ['conditions', 'temperature'], name: 'temp' };
-    const state = reduce(seeded, addUpdateVariableActions.request({ templateId: 't1', variable } as never));
-    expect(asEntry(state.reactionsById.t1).variables).toHaveProperty('conditions.temperature');
+    const state = reduce(
+      seeded,
+      addUpdateVariableActions.request({ templateId: 't1', variable } as never),
+    );
+    expect(asEntry(state.reactionsById.t1).variables).toHaveProperty(
+      'conditions.temperature',
+    );
   });
 
   it('removes a variable by its dotted path on a remove-variable request', () => {
     const variable = { path: ['conditions', 'temperature'], name: 'temp' };
-    const seeded = { reactionsById: { t1: { id: 't1', variables: { 'conditions.temperature': variable } } } as never };
-    const state = reduce(seeded, removeVariableActions.request({ templateId: 't1', variable } as never));
+    const seeded = {
+      reactionsById: {
+        t1: { id: 't1', variables: { 'conditions.temperature': variable } },
+      } as never,
+    };
+    const state = reduce(
+      seeded,
+      removeVariableActions.request({ templateId: 't1', variable } as never),
+    );
     expect(asEntry(state.reactionsById.t1).variables).toEqual({});
   });
 });
@@ -273,7 +359,9 @@ describe('reactions.reducer — templates', () => {
 describe('reactions.reducer — showInvalidOnly', () => {
   it('reflects the setShowInvalidOnly payload', () => {
     expect(reduce(undefined, setShowInvalidOnly(true)).showInvalidOnly).toBe(true);
-    expect(reduce({ showInvalidOnly: true }, setShowInvalidOnly(false)).showInvalidOnly).toBe(false);
+    expect(
+      reduce({ showInvalidOnly: true }, setShowInvalidOnly(false)).showInvalidOnly,
+    ).toBe(false);
   });
 
   it('resets to the default when a dataset loads, so the filter is per-dataset (#591)', () => {

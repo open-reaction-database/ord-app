@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { selectAreTemplatesLoaded, selectTemplates, selectTemplatesOrder } from './templates.selectors.ts';
+import {
+  selectAreTemplatesLoaded,
+  selectTemplates,
+  selectTemplatesOrder,
+} from './templates.selectors.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
 import type { AppState } from '../../configureAppStore.ts';
 
-const makeTemplate = (id: string): ReactionTemplate => ({ id, name: `template-${id}` }) as ReactionTemplate;
+const makeTemplate = (id: string): ReactionTemplate =>
+  ({ id, name: `template-${id}` }) as ReactionTemplate;
 
-const buildState = (templatesOrder: Array<string>, reactionsById: Record<string, ReactionTemplate>): AppState =>
+const buildState = (
+  templatesOrder: Array<string>,
+  reactionsById: Record<string, ReactionTemplate>,
+): AppState =>
   ({
     entities: {
       templates: { templatesOrder },
@@ -37,7 +45,9 @@ describe('selectTemplatesOrder', () => {
 describe('selectAreTemplatesLoaded', () => {
   it('reflects the templates-loaded flag (#496)', () => {
     const state = (loaded: boolean) =>
-      ({ entities: { templates: { areTemplatesLoaded: loaded } } }) as unknown as AppState;
+      ({
+        entities: { templates: { areTemplatesLoaded: loaded } },
+      }) as unknown as AppState;
     expect(selectAreTemplatesLoaded(state(false))).toBe(false);
     expect(selectAreTemplatesLoaded(state(true))).toBe(true);
   });

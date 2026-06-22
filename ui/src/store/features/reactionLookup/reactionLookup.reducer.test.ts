@@ -15,19 +15,29 @@
  */
 import { describe, it, expect } from 'vitest';
 import { reactionLookupReducer } from './reactionLookup.reducer.ts';
-import { resetReactionLookupErrorAction, setReactionLookupOpenedAction } from './reactionLookup.actions.ts';
+import {
+  resetReactionLookupErrorAction,
+  setReactionLookupOpenedAction,
+} from './reactionLookup.actions.ts';
 import { addIdentifierByNameActions } from 'store/entities/reactions/reactionsInputs/reactionInputs.actions.ts';
 
 const initialState = () => reactionLookupReducer(undefined, { type: '@@INIT' });
 
 describe('reactionLookupReducer', () => {
   it('starts closed, not loading, without error', () => {
-    expect(initialState()).toEqual({ isOpened: false, isLoading: false, hasError: false });
+    expect(initialState()).toEqual({
+      isOpened: false,
+      isLoading: false,
+      hasError: false,
+    });
   });
 
   describe('isOpened', () => {
     it('follows the open action and closes once an identifier is added', () => {
-      let state = reactionLookupReducer(initialState(), setReactionLookupOpenedAction(true));
+      let state = reactionLookupReducer(
+        initialState(),
+        setReactionLookupOpenedAction(true),
+      );
       expect(state.isOpened).toBe(true);
       state = reactionLookupReducer(state, addIdentifierByNameActions.success());
       expect(state.isOpened).toBe(false);
@@ -36,12 +46,18 @@ describe('reactionLookupReducer', () => {
 
   describe('isLoading', () => {
     it('is true while the lookup request is pending', () => {
-      let state = reactionLookupReducer(initialState(), addIdentifierByNameActions.request({} as never));
+      let state = reactionLookupReducer(
+        initialState(),
+        addIdentifierByNameActions.request({} as never),
+      );
       expect(state.isLoading).toBe(true);
       state = reactionLookupReducer(state, addIdentifierByNameActions.success());
       expect(state.isLoading).toBe(false);
 
-      state = reactionLookupReducer(initialState(), addIdentifierByNameActions.request({} as never));
+      state = reactionLookupReducer(
+        initialState(),
+        addIdentifierByNameActions.request({} as never),
+      );
       state = reactionLookupReducer(state, addIdentifierByNameActions.failure());
       expect(state.isLoading).toBe(false);
     });
@@ -49,7 +65,10 @@ describe('reactionLookupReducer', () => {
 
   describe('hasError', () => {
     it('is set on failure and cleared on reset', () => {
-      let state = reactionLookupReducer(initialState(), addIdentifierByNameActions.failure());
+      let state = reactionLookupReducer(
+        initialState(),
+        addIdentifierByNameActions.failure(),
+      );
       expect(state.hasError).toBe(true);
       state = reactionLookupReducer(state, resetReactionLookupErrorAction());
       expect(state.hasError).toBe(false);

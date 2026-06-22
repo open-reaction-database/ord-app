@@ -20,9 +20,15 @@ from ord_schema.message_helpers import create_message, molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
 
-from ord_app.service_api.schemas.utilites import ResolveCompoundInputs, ResolveCompoundOutputs
+from ord_app.service_api.schemas.utilites import (
+    ResolveCompoundInputs,
+    ResolveCompoundOutputs,
+)
 from ord_app.service_api.services.pb_utils import send_message
-from ord_app.service_api.services.resolvers import canonicalize_smiles_cached, name_resolve_cached
+from ord_app.service_api.services.resolvers import (
+    canonicalize_smiles_cached,
+    name_resolve_cached,
+)
 
 router = APIRouter(tags=["utilities"])
 
@@ -64,7 +70,9 @@ async def resolve_input(input_string: str) -> str | Response:
 async def resolve_compound(inputs: ResolveCompoundInputs) -> dict | Response:
     """Resolves a compound identifier into a SMILES string."""
     try:
-        resolver, smiles = await name_resolve_cached(inputs.identifier_type, inputs.identifier)
+        resolver, smiles = await name_resolve_cached(
+            inputs.identifier_type, inputs.identifier
+        )
         return {"smiles": canonicalize_smiles_cached(smiles), "resolver": resolver}
     except ValueError as error:
         return Response(str(error), status_code=400)

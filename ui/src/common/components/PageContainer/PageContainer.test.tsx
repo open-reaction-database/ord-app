@@ -19,9 +19,13 @@ import { PageContainer } from './PageContainer.tsx';
 
 // The shell's chrome pulls in the auth-aware UserMenu, the router-aware Breadcrumbs, and the Footer;
 // stub them so this test focuses on PageContainer's own layout (logo, badge, children).
-vi.mock('./UserMenu/UserMenu', () => ({ default: () => <div data-testid="user-menu" /> }));
+vi.mock('./UserMenu/UserMenu', () => ({
+  default: () => <div data-testid="user-menu" />,
+}));
 vi.mock('./Breadcrumbs/Breadcrumbs', () => ({
-  Breadcrumbs: ({ items }: Readonly<{ items: Array<unknown> }>) => <nav data-testid="breadcrumbs">{items.length}</nav>,
+  Breadcrumbs: ({ items }: Readonly<{ items: Array<unknown> }>) => (
+    <nav data-testid="breadcrumbs">{items.length}</nav>
+  ),
 }));
 vi.mock('./Footer/Footer', () => ({ Footer: () => <div data-testid="footer" /> }));
 

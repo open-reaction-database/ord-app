@@ -34,7 +34,10 @@ vi.mock('store/axiosInstance.ts', () => ({
 }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
-const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 'delete', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 
 // Seed an in-progress enumeration that targets a NEW dataset (dataset is an object, not an id),
@@ -48,7 +51,9 @@ function seedNewDatasetProgress(store: ReturnType<typeof makeRecordingStore>['st
     variables: [],
   };
   store.dispatch(startEnumerationActions(startPayload));
-  store.dispatch(enumerateBatchActions.success({ reactions: ['serialized-reaction'], errors: [] }));
+  store.dispatch(
+    enumerateBatchActions.success({ reactions: ['serialized-reaction'], errors: [] }),
+  );
 }
 
 beforeEach(() => {
@@ -64,7 +69,10 @@ describe('finishEnumeration (new dataset)', () => {
 
     await store.dispatch(finishEnumeration() as unknown as UnknownAction);
 
-    expect(axiosMock.post).toHaveBeenCalledWith('/groups/3/datasets/enumerate', expect.any(Object));
+    expect(axiosMock.post).toHaveBeenCalledWith(
+      '/groups/3/datasets/enumerate',
+      expect.any(Object),
+    );
     expect(types()).toContain(finishEnumerationAction.type);
     // The new dataset is created server-side but isn't in the list store yet; refetch the list. (#611)
     expect(types()).toContain(getGroupsInitialDatasetListActions.request.type);
@@ -75,12 +83,18 @@ describe('finishEnumeration (backend rejects the request)', () => {
   it('notifies the user and stops the enumeration instead of failing silently (#614)', async () => {
     const { store, types } = makeRecordingStore();
     seedNewDatasetProgress(store);
-    axiosMock.post.mockRejectedValueOnce({ isAxiosError: true, response: { status: 403 } });
+    axiosMock.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 403 },
+    });
 
     await store.dispatch(finishEnumeration() as unknown as UnknownAction);
 
     // The user gets feedback rather than a console-only error...
-    expect(showNotification).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'Access denied' });
+    expect(showNotification).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Access denied',
+    });
     // ...and the enumeration is stopped (progress reset), with no success result dispatched.
     expect(types()).toContain(interruptEnumerationAction.type);
     expect(types()).not.toContain(finishEnumerationAction.type);

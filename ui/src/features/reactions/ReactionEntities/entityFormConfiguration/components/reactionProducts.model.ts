@@ -95,7 +95,9 @@ export const reactionProducts: Array<ReactionFormNode> = [
     addItem: {
       label: 'Measurement',
       useCreate: buildUseCreate('measurements', index => {
-        const newMeasurement = ordMeasurementToReaction(ord.ProductMeasurement.toObject(new ord.ProductMeasurement()));
+        const newMeasurement = ordMeasurementToReaction(
+          ord.ProductMeasurement.toObject(new ord.ProductMeasurement()),
+        );
         return [index, newMeasurement];
       }),
     },

@@ -22,7 +22,10 @@ interface FieldConfiguration<T> {
   render: (entity: T) => ReactNode;
 }
 
-export interface EntityListItemRuntimeProps<T> extends Pick<RequiredOptionalFieldsProps<T>, 'entity'> {
+export interface EntityListItemRuntimeProps<T> extends Pick<
+  RequiredOptionalFieldsProps<T>,
+  'entity'
+> {
   entityKey: string | number;
 }
 
@@ -37,4 +40,5 @@ export interface EntityListItemStaticProps<T> extends Pick<
   optionalFields?: Array<FieldConfiguration<T>>;
 }
 
-export type EntityListItemProps<T> = EntityListItemStaticProps<T> & EntityListItemRuntimeProps<T>;
+export type EntityListItemProps<T> = EntityListItemStaticProps<T> &
+  EntityListItemRuntimeProps<T>;

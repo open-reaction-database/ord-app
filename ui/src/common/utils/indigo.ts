@@ -23,7 +23,9 @@ let indigoModule: ReturnType<indigoInit>;
 let indigoPromise: Promise<void>;
 
 export function initIndigo() {
-  indigoPromise = indigoInit().then((result: typeof indigoModule) => (indigoModule = result));
+  indigoPromise = indigoInit().then(
+    (result: typeof indigoModule) => (indigoModule = result),
+  );
 }
 
 export function waitForIndigo() {
@@ -44,7 +46,9 @@ export function renderSvg(component: string | null, size: number = 120) {
   options.set('ignore-stereochemistry-errors', 'true');
   options.set('render-coloring', 'true');
   try {
-    return Buffer.from(indigoModule.render(component, options), 'base64').toString('base64');
+    return Buffer.from(indigoModule.render(component, options), 'base64').toString(
+      'base64',
+    );
   } catch (e) {
     console.error(e);
     return null;

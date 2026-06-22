@@ -16,7 +16,11 @@
 async def test_get_group_members(api_client, mock_authenticated_user):
     user, _, group = mock_authenticated_user
 
-    response_data = api_client.get(f"/api/v1/groups/{group.id}/members").raise_for_status().json()[0]
+    response_data = (
+        api_client.get(f"/api/v1/groups/{group.id}/members")
+        .raise_for_status()
+        .json()[0]
+    )
 
     assert response_data["user"]["id"] == user.id
     assert response_data["role"] == "admin"
@@ -25,7 +29,9 @@ async def test_get_group_members(api_client, mock_authenticated_user):
 async def test_get_group_returns_role(api_client, mock_authenticated_user):
     # GET /groups/{id} returns the current user's role for the group. (#569)
     *_, group = mock_authenticated_user
-    response_data = api_client.get(f"/api/v1/groups/{group.id}").raise_for_status().json()
+    response_data = (
+        api_client.get(f"/api/v1/groups/{group.id}").raise_for_status().json()
+    )
     assert response_data["id"] == group.id
     assert response_data["name"] == group.name
     assert response_data["role"] == "admin"

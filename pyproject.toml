@@ -23,17 +23,17 @@ dependencies = [
     "loguru>=0.7.3,<0.8",
     "freezegun>=1.5.1,<2",
     "asyncpg>=0.30.0,<0.31",
-    "fastapi>=0.115.8,<0.116",
+    "fastapi>=0.138.0,<0.200",
     "gunicorn>=23.0.0,<24",
-    "ord-schema>=0.6.23,<0.7",
-    "protobuf>=4.22,<5",
+    "ord-schema>=0.6.31,<0.7",
+    "protobuf>=5.29.6,<6",
     "rdkit>=2024.9.5,<2025",
     "uvicorn>=0.34.0,<0.35",
-    "python-multipart>=0.0.20,<0.0.21",
+    "python-multipart>=0.0.31,<0.1",
     "alembic>=1.14.1,<2",
     "sqlalchemy>=2.0.38,<3",
     "pydantic-settings>=2.7.1,<3",
-    "fastapi-pagination>=0.12.34,<0.13",
+    "fastapi-pagination>=0.14.0,<0.16",
     "pydantic[email]>=2.10.6,<3",
     "greenlet>=3",
     "httpx>=0.28.1,<0.29",
@@ -42,13 +42,13 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.4,<9",
+    "pytest>=9.0.3,<10",
     "faker>=36.1.1,<37",
     "sqlalchemy-utils>=0.41.2,<0.42",
     "coverage>=7.6.12,<8",
     "pytest-cov>=6.0.0,<7",
     "ty>=0.0.28",
-    "pytest-asyncio>=0.25.3,<0.26",
+    "pytest-asyncio>=1.0,<2",
     "pytest-xdist>=3.6,<4",
     "ruff>=0.9.9,<0.10",
     "pre-commit>=4.0,<5",
@@ -63,10 +63,9 @@ package = false
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
-# Local total-coverage floor (a regression backstop; the per-PR new-code gate is
-# Codecov's patch status). pytest-cov honors this on every `pytest --cov` run. Set a
-# few points below current (~83% total, which includes the test modules) so routine
-# churn doesn't trip it; ratchet up over time.
+# Total-coverage floor enforced in CI (a regression backstop). pytest-cov honors this on
+# every `pytest --cov` run. Set a few points below current (~83% total, which includes the
+# test modules) so routine churn doesn't trip it; ratchet up over time.
 [tool.coverage.report]
 fail_under = 80
 
@@ -74,7 +73,7 @@ fail_under = 80
 # took precedence over [tool.ruff] and has been folded in.
 [tool.ruff]
 # Same as Black.
-line-length = 120
+line-length = 88
 indent-width = 4
 # Assume Python 3.12.
 target-version = "py312"

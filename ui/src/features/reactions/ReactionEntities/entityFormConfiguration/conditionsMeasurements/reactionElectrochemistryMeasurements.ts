@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types.ts';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from '../../reactionEntities.types.ts';
 import {
   currentTypeOptions,
   timeUnitOptions,

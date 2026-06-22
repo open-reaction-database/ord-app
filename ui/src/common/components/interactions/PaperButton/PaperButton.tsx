@@ -25,7 +25,13 @@ interface PaperButtonProps extends Omit<ButtonProps, 'classNames' | 'children'> 
   onClick?: () => void;
 }
 
-export function PaperButton({ title, description, icon, color, ...props }: Readonly<PaperButtonProps>) {
+export function PaperButton({
+  title,
+  description,
+  icon,
+  color,
+  ...props
+}: Readonly<PaperButtonProps>) {
   return (
     <Button
       variant="default"

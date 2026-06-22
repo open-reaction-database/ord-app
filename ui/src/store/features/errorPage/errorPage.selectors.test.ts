@@ -17,7 +17,8 @@ import { describe, it, expect } from 'vitest';
 import { selectErrorPage } from './errorPage.selectors.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
-const buildState = (error: unknown): AppState => ({ features: { errorPage: { error } } }) as unknown as AppState;
+const buildState = (error: unknown): AppState =>
+  ({ features: { errorPage: { error } } }) as unknown as AppState;
 
 describe('selectErrorPage', () => {
   it('returns the error slice value', () => {

@@ -22,8 +22,13 @@ const { buildSelector } = createSelectorFactory(state => state.entities.template
 
 export const selectTemplatesOrder = buildSelector(state => state.templatesOrder);
 
-export const selectAreTemplatesLoaded = buildSelector(state => state.areTemplatesLoaded);
+export const selectAreTemplatesLoaded = buildSelector(
+  state => state.areTemplatesLoaded,
+);
 
-export const selectTemplates = createSelector([selectTemplatesOrder, selectReactions], (order, templates) => {
-  return order.map(id => templates[id] as ReactionTemplate);
-});
+export const selectTemplates = createSelector(
+  [selectTemplatesOrder, selectReactions],
+  (order, templates) => {
+    return order.map(id => templates[id] as ReactionTemplate);
+  },
+);

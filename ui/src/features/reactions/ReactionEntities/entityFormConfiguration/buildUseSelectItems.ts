@@ -22,15 +22,23 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 export const buildUseSelectItems = (entityPath: ReactionPathComponents | string) =>
   function useSelectItems() {
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
-    const entityPathComponents: ReactionPathComponents = typeof entityPath === 'string' ? [entityPath] : entityPath;
+    const entityPathComponents: ReactionPathComponents =
+      typeof entityPath === 'string' ? [entityPath] : entityPath;
 
-    return useSelector(selectReactionPartByPath(reactionId, pathComponents.concat(entityPathComponents)));
+    return useSelector(
+      selectReactionPartByPath(reactionId, pathComponents.concat(entityPathComponents)),
+    );
   };
 
-export const buildUseSelectItemsListFromMap = <T>(entityName: string, compareFn: (a: T, b: T) => number) =>
+export const buildUseSelectItemsListFromMap = <T>(
+  entityName: string,
+  compareFn: (a: T, b: T) => number,
+) =>
   function useSelectItems() {
     const { reactionId, pathComponents } = useContext(reactionEntityContext);
-    const map = useSelector(selectReactionPartByPath(reactionId, [...pathComponents, entityName]));
+    const map = useSelector(
+      selectReactionPartByPath(reactionId, [...pathComponents, entityName]),
+    );
 
     return useMemo(() => {
       return (Object.values(map) as Array<T>).sort(compareFn);

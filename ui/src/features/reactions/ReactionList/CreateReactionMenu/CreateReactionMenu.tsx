@@ -28,12 +28,18 @@ import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 
 export function CreateReactionMenu() {
   const dispatch = useAppDispatch();
-  const [importFromFileOpened, { open: openImportFromFile, close: closeImportFromFile }] = useDisclosure(false);
+  const [
+    importFromFileOpened,
+    { open: openImportFromFile, close: closeImportFromFile },
+  ] = useDisclosure(false);
   const datasetId = useSelector(selectActiveDatasetId);
   const openEnumerationSetup = useCallback(() => {
     dispatch(setEnumerationSetupOpenedAction(true));
   }, [dispatch]);
-  const handleReactionCreate = useCallback(() => dispatch(createEmptyReaction()), [dispatch]);
+  const handleReactionCreate = useCallback(
+    () => dispatch(createEmptyReaction()),
+    [dispatch],
+  );
 
   return (
     <>

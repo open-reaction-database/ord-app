@@ -21,7 +21,9 @@ from ord_app.service_api.constants import AppEnvs
 from ord_app.service_api.services.exceptions import ForbiddenError, UnauthenticatedError
 from ord_app.service_api.settings import RuntimeSettings
 
-jwks_client = jwt.PyJWKClient(f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json")
+jwks_client = jwt.PyJWKClient(
+    f"https://{RuntimeSettings.auth0_domain}/.well-known/jwks.json"
+)
 
 # Identity used for the dev/test no-auth bypass (see ``e2e_auth_enabled``).
 E2E_USER_AUTH0_ID = "e2e|local-dev"
@@ -36,7 +38,9 @@ def e2e_auth_enabled() -> bool:
     return RuntimeSettings.e2e and RuntimeSettings.app_env.lower() == AppEnvs.localhost
 
 
-async def verify_access_token(token: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> dict:
+async def verify_access_token(
+    token: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
+) -> dict:
     if e2e_auth_enabled():
         return {"sub": E2E_USER_AUTH0_ID}
     return await _verify_token(
@@ -56,13 +60,19 @@ async def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
     )
 
 
-async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str) -> dict:
+async def _verify_token(
+    token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str
+) -> dict:
     if token is None:
         logger.error("token is missing")
         raise UnauthenticatedError
 
     try:
-        signing_key = (await run_in_threadpool(jwks_client.get_signing_key_from_jwt, token.credentials)).key
+        signing_key = (
+            await run_in_threadpool(
+                jwks_client.get_signing_key_from_jwt, token.credentials
+            )
+        ).key
     except jwt.exceptions.PyJWKClientError as error:
         logger.error(error)
         raise ForbiddenError(str(error)) from error
@@ -72,7 +82,12 @@ async def _verify_token(token: HTTPAuthorizationCredentials, algorithms: str, au
 
     try:
         payload = jwt.decode(
-            token.credentials, signing_key, algorithms=algorithms, audience=audience, issuer=issuer, leeway=10
+            token.credentials,
+            signing_key,
+            algorithms=algorithms,
+            audience=audience,
+            issuer=issuer,
+            leeway=10,
         )
     except Exception as error:
         logger.error(error)

@@ -33,4 +33,6 @@ export const createReactionFromFileSchema = yup.object({
     }),
 });
 
-export type CreateReactionFromFileFormValues = yup.InferType<typeof createReactionFromFileSchema>;
+export type CreateReactionFromFileFormValues = yup.InferType<
+  typeof createReactionFromFileSchema
+>;

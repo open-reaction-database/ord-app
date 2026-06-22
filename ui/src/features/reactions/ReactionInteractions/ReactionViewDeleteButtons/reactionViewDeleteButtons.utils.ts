@@ -32,7 +32,9 @@ export const useOnViewEdit = ({
   const dispatch = useAppDispatch();
   return useCallback(() => {
     if (historyPathComponents) {
-      dispatch(setReactionPathComponentsList(historyPathComponents.concat([pathComponents])));
+      dispatch(
+        setReactionPathComponentsList(historyPathComponents.concat([pathComponents])),
+      );
     } else {
       dispatch(addReactionPathComponentToList(pathComponents));
     }

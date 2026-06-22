@@ -23,11 +23,17 @@ vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => 
 }));
 
 const reactionWith = (outcome: object) =>
-  ({ ...emptyReactionData(), outcomes: [{ id: 'o1', products: [], ...outcome }] }) as unknown as AppReaction;
+  ({
+    ...emptyReactionData(),
+    outcomes: [{ id: 'o1', products: [], ...outcome }],
+  }) as unknown as AppReaction;
 
 describe('ReactionOutcomePreview', () => {
   it('labels the outcome with its reaction time and conversion when present', () => {
-    const reaction = reactionWith({ reactionTime: { value: 5, units: 'HOUR' }, conversion: { value: 90 } });
+    const reaction = reactionWith({
+      reactionTime: { value: 5, units: 'HOUR' },
+      conversion: { value: 90 },
+    });
     const { getByText } = renderInReactionView(
       <ReactionOutcomePreview
         reactionId={1}

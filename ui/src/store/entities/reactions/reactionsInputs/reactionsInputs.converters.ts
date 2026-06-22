@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionInput, ReactionCrudeComponent, ReactionInputWithoutName } from './reactionInputs.types.ts';
+import type {
+  ReactionInput,
+  ReactionCrudeComponent,
+  ReactionInputWithoutName,
+} from './reactionInputs.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
   ordAdditionDeviceToReaction,
@@ -75,7 +79,9 @@ export function reactionCrudeComponentToOrd({
   };
 }
 
-export function ordInputWithoutNameToReaction(ordInput: ord.IReactionInput): ReactionInputWithoutName {
+export function ordInputWithoutNameToReaction(
+  ordInput: ord.IReactionInput,
+): ReactionInputWithoutName {
   const {
     components,
     additionDuration,
@@ -102,7 +108,9 @@ export function ordInputWithoutNameToReaction(ordInput: ord.IReactionInput): Rea
   });
 }
 
-export function reactionInputWithoutNameToOrd(input: ReactionInputWithoutName): ord.IReactionInput {
+export function reactionInputWithoutNameToOrd(
+  input: ReactionInputWithoutName,
+): ord.IReactionInput {
   const {
     components,
     crudeComponents,
@@ -129,18 +137,26 @@ export function reactionInputWithoutNameToOrd(input: ReactionInputWithoutName): 
   };
 }
 
-export function ordInputToReaction(ordInput: ord.IReactionInput, name: string): ReactionInput {
+export function ordInputToReaction(
+  ordInput: ord.IReactionInput,
+  name: string,
+): ReactionInput {
   return {
     name,
     ...ordInputWithoutNameToReaction(ordInput),
   };
 }
 
-export function reactionInputToOrd({ name: _, ...input }: ReactionInput): ord.IReactionInput {
+export function reactionInputToOrd({
+  name: _,
+  ...input
+}: ReactionInput): ord.IReactionInput {
   return reactionInputWithoutNameToOrd(input);
 }
 
-export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): AppReaction['inputs'] {
+export function ordInputsToReactionInputs(
+  ordInputs: ord.IReaction['inputs'],
+): AppReaction['inputs'] {
   return Object.entries(ordInputs || {}).reduce((acc, [name, ordInput]) => {
     const reactionInput = ordInputToReaction(ordInput, name);
     return {
@@ -150,7 +166,9 @@ export function ordInputsToReactionInputs(ordInputs: ord.IReaction['inputs']): A
   }, {});
 }
 
-export function reactionInputsToOrdInputs(reactionInputs: AppReaction['inputs']): ord.IReaction['inputs'] {
+export function reactionInputsToOrdInputs(
+  reactionInputs: AppReaction['inputs'],
+): ord.IReaction['inputs'] {
   return Object.values(reactionInputs).reduce(
     (acc, item) => ({
       ...acc,

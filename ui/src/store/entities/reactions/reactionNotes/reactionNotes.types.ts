@@ -16,7 +16,10 @@
 import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export interface ReactionNotes extends Pick<ord.IReactionNotes, 'procedureDetails' | 'safetyNotes'> {
+export interface ReactionNotes extends Pick<
+  ord.IReactionNotes,
+  'procedureDetails' | 'safetyNotes'
+> {
   isHeterogeneous: ReactionBoolean;
   formsPrecipitate: ReactionBoolean;
   isExothermic: ReactionBoolean;

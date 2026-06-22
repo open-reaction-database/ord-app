@@ -20,7 +20,10 @@ const writeText = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
-  Object.defineProperty(globalThis, 'navigator', { value: { clipboard: { writeText } }, configurable: true });
+  Object.defineProperty(globalThis, 'navigator', {
+    value: { clipboard: { writeText } },
+    configurable: true,
+  });
 });
 
 describe('copyToClipboard', () => {

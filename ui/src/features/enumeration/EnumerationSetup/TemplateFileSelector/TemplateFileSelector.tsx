@@ -59,13 +59,19 @@ function cast(value: string, context: CastingContext): string | number | boolean
 function validateHeaders(headers: Array<string>): boolean {
   const namesSet = new Set(headers);
   if (namesSet.size !== headers.length) {
-    showNotification({ variant: NotificationVariant.ERROR, message: 'Duplicate column names are not allowed' });
+    showNotification({
+      variant: NotificationVariant.ERROR,
+      message: 'Duplicate column names are not allowed',
+    });
     return false;
   }
   return true;
 }
 
-export function TemplateFileSelector({ form, templateDisabled }: Readonly<TemplateFileSelectorProps>) {
+export function TemplateFileSelector({
+  form,
+  templateDisabled,
+}: Readonly<TemplateFileSelectorProps>) {
   const dispatch = useAppDispatch();
   const templates = useSelector(selectTemplates);
   const [isCsvFileParsing, setIsCsvFileParsing] = useState(false);
@@ -146,13 +152,18 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
           content,
         });
 
-        const matching: Array<VariableMatch> = Object.values(template.variables).map((variable): VariableMatch => {
-          const csvColumn = headers.includes(variable.name) ? variable.name : null;
-          return { variable: variable.name, csvColumn };
-        });
+        const matching: Array<VariableMatch> = Object.values(template.variables).map(
+          (variable): VariableMatch => {
+            const csvColumn = headers.includes(variable.name) ? variable.name : null;
+            return { variable: variable.name, csvColumn };
+          },
+        );
         form.setFieldValue('matching', matching);
       } catch (_e: unknown) {
-        showNotification({ variant: NotificationVariant.ERROR, message: 'Invalid CSV file' });
+        showNotification({
+          variant: NotificationVariant.ERROR,
+          message: 'Invalid CSV file',
+        });
         form.setFieldValue('csvFile', null);
         form.setFieldValue('templateCSV', null);
         form.setFieldValue('matching', []);
@@ -171,7 +182,9 @@ export function TemplateFileSelector({ form, templateDisabled }: Readonly<Templa
 
   return (
     <>
-      <ReactionEntityBlockTitle leftSection={<Title order={3}> Template and file </Title>} />
+      <ReactionEntityBlockTitle
+        leftSection={<Title order={3}> Template and file </Title>}
+      />
       <Flex
         direction="column"
         gap="sm"

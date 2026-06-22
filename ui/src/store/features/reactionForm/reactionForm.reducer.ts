@@ -26,16 +26,25 @@ import { searchReactionActions } from 'store/entities/reactions/reactions.action
 
 const defaultReactionPathComponentsList: Array<ReactionPathComponents> = [];
 
-const reactionPathComponentsList = createReducer(defaultReactionPathComponentsList, builder => {
-  builder.addCase(setReactionPathComponentsList, (_, action) => action.payload);
-  builder.addCase(addReactionPathComponentToList, (state, action) => state.concat([action.payload]));
-  builder.addCase(popReactionPathComponents, state => state.slice(0, state.length - 1));
-  builder.addCase(sliceReactionPathComponentsList, (state, action) => state.slice(0, action.payload + 1));
-  builder.addMatcher(
-    isAnyOf(clearReactionPathComponentsList, searchReactionActions.success),
-    () => defaultReactionPathComponentsList,
-  );
-});
+const reactionPathComponentsList = createReducer(
+  defaultReactionPathComponentsList,
+  builder => {
+    builder.addCase(setReactionPathComponentsList, (_, action) => action.payload);
+    builder.addCase(addReactionPathComponentToList, (state, action) =>
+      state.concat([action.payload]),
+    );
+    builder.addCase(popReactionPathComponents, state =>
+      state.slice(0, state.length - 1),
+    );
+    builder.addCase(sliceReactionPathComponentsList, (state, action) =>
+      state.slice(0, action.payload + 1),
+    );
+    builder.addMatcher(
+      isAnyOf(clearReactionPathComponentsList, searchReactionActions.success),
+      () => defaultReactionPathComponentsList,
+    );
+  },
+);
 
 export const reactionFormReducer = combineReducers({
   reactionPathComponentsList,

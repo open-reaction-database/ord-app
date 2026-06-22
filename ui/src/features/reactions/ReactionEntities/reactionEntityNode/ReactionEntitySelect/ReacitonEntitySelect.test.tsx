@@ -26,7 +26,13 @@ const formMethods = {
 const renderSelect = (selectType: string, isViewOnly = false) =>
   renderInReactionView(
     <ReactionEntitySelect
-      node={{ name: 'field', selectType, options: ['A', 'B'] } as unknown as ReactionFormSelect}
+      node={
+        {
+          name: 'field',
+          selectType,
+          options: ['A', 'B'],
+        } as unknown as ReactionFormSelect
+      }
       formMethods={formMethods}
     />,
     { isViewOnly },

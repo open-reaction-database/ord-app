@@ -23,7 +23,9 @@ describe('FormModal', () => {
     const onClose = vi.fn();
     // FormModal types onSubmit as () => void but wires it to the form's onSubmit; preventDefault
     // via an optional event param keeps it type-compatible while avoiding a jsdom navigation.
-    const onSubmit = vi.fn((event?: { preventDefault: () => void }) => event?.preventDefault());
+    const onSubmit = vi.fn((event?: { preventDefault: () => void }) =>
+      event?.preventDefault(),
+    );
     renderWithMantine(
       <FormModal
         title="New dataset"

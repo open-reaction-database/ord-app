@@ -43,10 +43,14 @@ export interface ReactionVessel extends Pick<ord.IVessel, 'details'> {
   vesselAttachments: Array<ReactionVesselAttachment>;
 }
 
-export interface ReactionVesselPreparation extends WithId<Pick<ord.IVesselPreparation, 'details'>> {
+export interface ReactionVesselPreparation extends WithId<
+  Pick<ord.IVesselPreparation, 'details'>
+> {
   type: ReactionVesselPreparationType;
 }
 
-export interface ReactionVesselAttachment extends WithId<Pick<ord.IVesselAttachment, 'details'>> {
+export interface ReactionVesselAttachment extends WithId<
+  Pick<ord.IVesselAttachment, 'details'>
+> {
   type: ReactionVesselAttachmentType;
 }

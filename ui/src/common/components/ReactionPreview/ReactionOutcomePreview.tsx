@@ -31,16 +31,26 @@ interface ReactionInputPreviewProps {
   outcomeIndex: number;
 }
 
-export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<ReactionInputPreviewProps>) {
-  const outcome: ReactionOutcome = useSelector(selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]));
+export function ReactionOutcomePreview({
+  reactionId,
+  outcomeIndex,
+}: Readonly<ReactionInputPreviewProps>) {
+  const outcome: ReactionOutcome = useSelector(
+    selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]),
+  );
   const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
   const outcomeTime = useMemo(() => {
-    return outcome.reactionTime?.value ? renderValuePrecisionUnit(outcome.reactionTime) : '';
+    return outcome.reactionTime?.value
+      ? renderValuePrecisionUnit(outcome.reactionTime)
+      : '';
   }, [outcome.reactionTime]);
   // Top label: reaction time and the limiting-reactant conversion %, when available. (#598)
   const outcomeLabel = useMemo(() => {
-    const conversion = outcome.conversion?.value != null ? `${outcome.conversion.value}% conversion` : '';
+    const conversion =
+      outcome.conversion?.value != null
+        ? `${outcome.conversion.value}% conversion`
+        : '';
     const parts = [outcomeTime, conversion].filter(Boolean);
     return parts.length > 0 ? ` (${parts.join(', ')})` : '';
   }, [outcomeTime, outcome.conversion]);
@@ -74,7 +84,12 @@ export function ReactionOutcomePreview({ reactionId, outcomeIndex }: Readonly<Re
                   <ReactionComponentPreview previewState={componentsPreviews[id]} />
                 </div>
                 {product?.isDesiredProduct === ReactionBoolean.True && (
-                  <Badge classNames={{ root: classes.desiredProductBadge, label: classes.badgeLabel }}>
+                  <Badge
+                    classNames={{
+                      root: classes.desiredProductBadge,
+                      label: classes.badgeLabel,
+                    }}
+                  >
                     ✨ Desired
                   </Badge>
                 )}

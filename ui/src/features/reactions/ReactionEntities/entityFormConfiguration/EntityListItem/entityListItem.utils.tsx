@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { EntityListItemStaticProps, EntityListItemRuntimeProps } from './entityListItem.types.ts';
+import type {
+  EntityListItemStaticProps,
+  EntityListItemRuntimeProps,
+} from './entityListItem.types.ts';
 import { EntityListItem } from './EntityListItem.tsx';
 
-export function createEntityListItemComponent<T>(staticProps: EntityListItemStaticProps<T>) {
+export function createEntityListItemComponent<T>(
+  staticProps: EntityListItemStaticProps<T>,
+) {
   return function EntityListItemComponent(runtimeProps: EntityListItemRuntimeProps<T>) {
     return (
       <EntityListItem

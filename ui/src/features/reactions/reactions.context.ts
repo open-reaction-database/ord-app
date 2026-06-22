@@ -18,7 +18,8 @@ import type { ReactionViewDeleteButtonsProps } from './ReactionInteractions/Reac
 import type { ReactionsContext } from './reactions.types.ts';
 import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
 
-const viewDeleteButtonsDefaultValue = null as unknown as FC<ReactionViewDeleteButtonsProps>;
+const viewDeleteButtonsDefaultValue =
+  null as unknown as FC<ReactionViewDeleteButtonsProps>;
 const valueLabelDefaultValue = null as unknown as FC<ReactionValueLabelProps>;
 
 const defaultContextValue: ReactionsContext = {

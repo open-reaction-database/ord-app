@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { selectCanDatasetBeDeleted, selectCanDatasetBeEdited } from './canDatasetBeEdited.selectors.ts';
+import {
+  selectCanDatasetBeDeleted,
+  selectCanDatasetBeEdited,
+} from './canDatasetBeEdited.selectors.ts';
 import { USER_ROLES } from 'common/types';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
-const datasetWithGroups = (groupIds: Array<number>): Dataset => ({ groups: groupIds.map(id => ({ id })) }) as Dataset;
+const datasetWithGroups = (groupIds: Array<number>): Dataset =>
+  ({ groups: groupIds.map(id => ({ id })) }) as Dataset;
 
-const group = (id: number, role: USER_ROLES): GroupItem => ({ id, name: `g${id}`, role });
+const group = (id: number, role: USER_ROLES): GroupItem => ({
+  id,
+  name: `g${id}`,
+  role,
+});
 
 const buildState = (
   activeDatasetId: number,
@@ -52,12 +60,20 @@ describe('selectCanDatasetBeEdited', () => {
   });
 
   it('is true when the user is an admin in any of the dataset groups', () => {
-    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.ADMIN) });
+    const state = buildState(
+      1,
+      { 1: datasetWithGroups([10]) },
+      { 10: group(10, USER_ROLES.ADMIN) },
+    );
     expect(selectCanDatasetBeEdited(state)).toBe(true);
   });
 
   it('is false when the user is only a viewer across the dataset groups', () => {
-    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.VIEWER) });
+    const state = buildState(
+      1,
+      { 1: datasetWithGroups([10]) },
+      { 10: group(10, USER_ROLES.VIEWER) },
+    );
     expect(selectCanDatasetBeEdited(state)).toBe(false);
   });
 
@@ -69,17 +85,29 @@ describe('selectCanDatasetBeEdited', () => {
 
 describe('selectCanDatasetBeDeleted (Admin-only, #610)', () => {
   it('is true only when the user is an admin in one of the dataset groups', () => {
-    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.ADMIN) });
+    const state = buildState(
+      1,
+      { 1: datasetWithGroups([10]) },
+      { 10: group(10, USER_ROLES.ADMIN) },
+    );
     expect(selectCanDatasetBeDeleted(state)).toBe(true);
   });
 
   it('is false for an editor (editors can edit but not delete)', () => {
-    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.EDITOR) });
+    const state = buildState(
+      1,
+      { 1: datasetWithGroups([10]) },
+      { 10: group(10, USER_ROLES.EDITOR) },
+    );
     expect(selectCanDatasetBeDeleted(state)).toBe(false);
   });
 
   it('is false for a viewer', () => {
-    const state = buildState(1, { 1: datasetWithGroups([10]) }, { 10: group(10, USER_ROLES.VIEWER) });
+    const state = buildState(
+      1,
+      { 1: datasetWithGroups([10]) },
+      { 10: group(10, USER_ROLES.VIEWER) },
+    );
     expect(selectCanDatasetBeDeleted(state)).toBe(false);
   });
 

@@ -29,8 +29,14 @@ interface ProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
  * Renders a store-connected component inside a fresh Redux store + MantineProvider. Seed only the
  * slices the component reads via `preloadedState`; the rest fall back to their reducer defaults.
  */
-export function renderWithProviders(ui: ReactElement, { preloadedState, ...options }: ProvidersOptions = {}) {
-  const store = configureStore({ reducer: rootReducer, preloadedState: preloadedState as AppState });
+export function renderWithProviders(
+  ui: ReactElement,
+  { preloadedState, ...options }: ProvidersOptions = {},
+) {
+  const store = configureStore({
+    reducer: rootReducer,
+    preloadedState: preloadedState as AppState,
+  });
   function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <Provider store={store}>

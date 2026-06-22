@@ -19,10 +19,15 @@ import {
   ordBooleanToReaction,
   reactionBooleanToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type { Optional, OrdOptional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  OrdOptional,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
 
-export const ordNotesToReaction = (notes: OrdOptional<ord.IReactionNotes>): ReactionNotes => {
+export const ordNotesToReaction = (
+  notes: OrdOptional<ord.IReactionNotes>,
+): ReactionNotes => {
   const {
     isHeterogeneous,
     formsPrecipitate,

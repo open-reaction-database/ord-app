@@ -20,7 +20,9 @@ import { CreateNewDataset } from './CreateNewDataset.tsx';
 
 describe('CreateNewDataset', () => {
   it('renders the create-from-scratch form with a group selector and Save action', () => {
-    renderWithProviders(<CreateNewDataset onClose={() => {}} />, { preloadedState: {} });
+    renderWithProviders(<CreateNewDataset onClose={() => {}} />, {
+      preloadedState: {},
+    });
     expect(screen.getByText('Create Dataset from Scratch')).toBeInTheDocument();
     expect(screen.getByText('Group')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();

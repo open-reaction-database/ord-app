@@ -22,18 +22,26 @@ describe('findReactionEntityUniqueName', () => {
   });
 
   it('skips taken names and returns the next available counter', () => {
-    expect(findReactionEntityUniqueName('Reagent', ['Reagent 1', 'Reagent 2'])).toBe('Reagent 3');
+    expect(findReactionEntityUniqueName('Reagent', ['Reagent 1', 'Reagent 2'])).toBe(
+      'Reagent 3',
+    );
   });
 
   it('fills the first gap rather than always appending at the end', () => {
-    expect(findReactionEntityUniqueName('Reagent', ['Reagent 2', 'Reagent 3'])).toBe('Reagent 1');
+    expect(findReactionEntityUniqueName('Reagent', ['Reagent 2', 'Reagent 3'])).toBe(
+      'Reagent 1',
+    );
   });
 
   it('ignores unrelated names', () => {
-    expect(findReactionEntityUniqueName('Reagent', ['Solvent 1', 'Catalyst 1'])).toBe('Reagent 1');
+    expect(findReactionEntityUniqueName('Reagent', ['Solvent 1', 'Catalyst 1'])).toBe(
+      'Reagent 1',
+    );
   });
 
   it('omits the space when includeSpace is false', () => {
-    expect(findReactionEntityUniqueName('Reagent', ['Reagent1'], false)).toBe('Reagent2');
+    expect(findReactionEntityUniqueName('Reagent', ['Reagent1'], false)).toBe(
+      'Reagent2',
+    );
   });
 });

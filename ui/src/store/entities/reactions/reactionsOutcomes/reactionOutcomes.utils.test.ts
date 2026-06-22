@@ -21,12 +21,19 @@ const outcome = (id: number, value?: number, units?: string): ReactionOutcome =>
   ({ id, reactionTime: { value, units } }) as unknown as ReactionOutcome;
 
 const order = (outcomes: Array<ReactionOutcome>) =>
-  sortOutcomesByReactionTime(outcomes).map(({ outcome, index }) => ({ id: outcome.id, index }));
+  sortOutcomesByReactionTime(outcomes).map(({ outcome, index }) => ({
+    id: outcome.id,
+    index,
+  }));
 
 describe('sortOutcomesByReactionTime (#599)', () => {
   it('orders by ascending reaction time while preserving each outcome’s stored index', () => {
     // stored order ids: 1 (2h), 2 (30min), 3 (1h)
-    const result = order([outcome(1, 2, 'HOUR'), outcome(2, 30, 'MINUTE'), outcome(3, 1, 'HOUR')]);
+    const result = order([
+      outcome(1, 2, 'HOUR'),
+      outcome(2, 30, 'MINUTE'),
+      outcome(3, 1, 'HOUR'),
+    ]);
     expect(result.map(r => r.id)).toEqual([2, 3, 1]); // 30min < 1h < 2h
     // The original stored index travels with each outcome (for the edit path).
     expect(result).toEqual([
@@ -37,7 +44,11 @@ describe('sortOutcomesByReactionTime (#599)', () => {
   });
 
   it('normalizes across units (DAY/HOUR/MINUTE/SECOND)', () => {
-    const result = order([outcome(1, 1, 'DAY'), outcome(2, 90, 'MINUTE'), outcome(3, 5000, 'SECOND')]);
+    const result = order([
+      outcome(1, 1, 'DAY'),
+      outcome(2, 90, 'MINUTE'),
+      outcome(3, 5000, 'SECOND'),
+    ]);
     // 90min = 5400s, 5000s, 1day = 86400s
     expect(result.map(r => r.id)).toEqual([3, 2, 1]);
   });

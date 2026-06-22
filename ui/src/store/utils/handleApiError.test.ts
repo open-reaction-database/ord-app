@@ -25,7 +25,10 @@ const axiosErrorWith = (status: number, data: unknown = {}): AxiosError =>
 
 describe('handleApiError', () => {
   it('maps a known HTTP status to its default message', () => {
-    expect(handleApiError(axiosErrorWith(404))).toEqual({ errorCode: 404, errorMessage: 'Entity not found' });
+    expect(handleApiError(axiosErrorWith(404))).toEqual({
+      errorCode: 404,
+      errorMessage: 'Entity not found',
+    });
   });
 
   it('prefers a backend-provided message over the default', () => {
@@ -36,10 +39,16 @@ describe('handleApiError', () => {
   });
 
   it('falls back to the 500 message for an unmapped status', () => {
-    expect(handleApiError(axiosErrorWith(418))).toEqual({ errorCode: 418, errorMessage: 'Unknown error' });
+    expect(handleApiError(axiosErrorWith(418))).toEqual({
+      errorCode: 418,
+      errorMessage: 'Unknown error',
+    });
   });
 
   it('returns a 500 RejectValue for non-axios errors', () => {
-    expect(handleApiError(new Error('boom'))).toEqual({ errorCode: 500, errorMessage: 'Unknown error' });
+    expect(handleApiError(new Error('boom'))).toEqual({
+      errorCode: 500,
+      errorMessage: 'Unknown error',
+    });
   });
 });

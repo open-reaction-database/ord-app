@@ -18,14 +18,23 @@ import type { SelectOptions } from 'common/types/selectOptions';
 import { useUncontrolled } from '@mantine/hooks';
 import { useCallback, type ChangeEvent } from 'react';
 
-interface AppNativeSelectProps extends Omit<NativeSelectProps, 'onChange' | 'data' | 'value' | 'defaultValue'> {
+interface AppNativeSelectProps extends Omit<
+  NativeSelectProps,
+  'onChange' | 'data' | 'value' | 'defaultValue'
+> {
   value?: string;
   defaultValue?: string;
   options: SelectOptions;
   onChange: (value: string) => void;
 }
 
-export function AppNativeSelect({ value, defaultValue, onChange, options, ...rest }: Readonly<AppNativeSelectProps>) {
+export function AppNativeSelect({
+  value,
+  defaultValue,
+  onChange,
+  options,
+  ...rest
+}: Readonly<AppNativeSelectProps>) {
   const [controlledValue, controlledOnChange] = useUncontrolled({
     value,
     defaultValue,

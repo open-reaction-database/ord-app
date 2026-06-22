@@ -20,7 +20,10 @@ import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import { ReactionEntityBaseNode } from '../ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 import { useReactionEntityLabel } from 'features/reactions/ReactionEntities/reactionEntityNode/useReactionEntityLabel.tsx';
 
-export function ReactionEntityRow({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormWrapper>>) {
+export function ReactionEntityRow({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormWrapper>>) {
   const label = useReactionEntityLabel(node.wrapperConfig);
   return (
     <Input.Wrapper label={label}>

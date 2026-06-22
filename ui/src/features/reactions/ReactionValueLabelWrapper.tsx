@@ -17,8 +17,13 @@ import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionVal
 import { useContext } from 'react';
 import { reactionContext } from './reactions.context.ts';
 
-export function ReactionValueLabelWrapper({ wrapperConfig, name, type }: Readonly<ReactionValueLabelProps>) {
-  const { isTemplate, ValueLabelComponent, ViewOnlyLabelComponent } = useContext(reactionContext);
+export function ReactionValueLabelWrapper({
+  wrapperConfig,
+  name,
+  type,
+}: Readonly<ReactionValueLabelProps>) {
+  const { isTemplate, ValueLabelComponent, ViewOnlyLabelComponent } =
+    useContext(reactionContext);
 
   return isTemplate && wrapperConfig?.cannotBeVariable ? (
     <ViewOnlyLabelComponent

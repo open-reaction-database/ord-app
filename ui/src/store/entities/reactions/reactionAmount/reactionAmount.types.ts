@@ -18,15 +18,28 @@ import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/re
 
 export type AppAmountUnspecified = 'UNSPECIFIED';
 
-export type AppMolesUnit = Exclude<keyof typeof ord.Moles.MolesUnit, AppAmountUnspecified>;
+export type AppMolesUnit = Exclude<
+  keyof typeof ord.Moles.MolesUnit,
+  AppAmountUnspecified
+>;
 
 export type AppMassUnit = Exclude<keyof typeof ord.Mass.MassUnit, AppAmountUnspecified>;
 
-export type AppVolumeUnit = Exclude<keyof typeof ord.Volume.VolumeUnit, AppAmountUnspecified>;
+export type AppVolumeUnit = Exclude<
+  keyof typeof ord.Volume.VolumeUnit,
+  AppAmountUnspecified
+>;
 
-export type ReactionAmountType = AppMolesUnit | AppMassUnit | AppVolumeUnit | AppAmountUnspecified;
+export type ReactionAmountType =
+  | AppMolesUnit
+  | AppMassUnit
+  | AppVolumeUnit
+  | AppAmountUnspecified;
 
-type ReactionAmountValuePrecision = Pick<NonNullable<Required<ord.IAmount>['mass']>, 'value' | 'precision'>;
+type ReactionAmountValuePrecision = Pick<
+  NonNullable<Required<ord.IAmount>['mass']>,
+  'value' | 'precision'
+>;
 
 export interface ReactionAmount extends ReactionAmountValuePrecision {
   volumeIncludesSolutes: ReactionBoolean;

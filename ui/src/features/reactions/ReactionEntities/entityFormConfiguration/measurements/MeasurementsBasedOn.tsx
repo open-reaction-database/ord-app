@@ -26,7 +26,10 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
-export function MeasurementsBasedOn({ formMethods, name }: Readonly<ReactionFormCustomProps>) {
+export function MeasurementsBasedOn({
+  formMethods,
+  name,
+}: Readonly<ReactionFormCustomProps>) {
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
 
@@ -40,10 +43,15 @@ export function MeasurementsBasedOn({ formMethods, name }: Readonly<ReactionForm
 
   const outcomePath = pathComponents.slice(0, 2);
   const analysesPath = [...outcomePath, 'analyses'];
-  const analyses: ReactionOutcome['analyses'] = useSelector(selectReactionPartByPath(reactionId, analysesPath));
+  const analyses: ReactionOutcome['analyses'] = useSelector(
+    selectReactionPartByPath(reactionId, analysesPath),
+  );
   const [basedOnOptions, analysesByNames] = useMemo(() => {
     const analysesArray = Object.values(analyses);
-    return [analysesArray.map(analysis => analysis.name), itemsById(analysesArray, analysis => analysis.name)];
+    return [
+      analysesArray.map(analysis => analysis.name),
+      itemsById(analysesArray, analysis => analysis.name),
+    ];
   }, [analyses]);
 
   const [value, onChange] = useUncontrolled({

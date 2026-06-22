@@ -26,11 +26,15 @@ import {
 } from 'store/entities/groups/groups.selectors.ts';
 import { addGroupMember } from 'store/entities/groups/groups.thunks.ts';
 import { ADD_MEMBER_ERROR } from 'store/entities/groups/groups.types.ts';
-import { resetAddMemberErrorAction, setAddMemberInputValueAction } from 'store/entities/groups/groups.actions.ts';
+import {
+  resetAddMemberErrorAction,
+  setAddMemberInputValueAction,
+} from 'store/entities/groups/groups.actions.ts';
 import classes from './AddMemberInput.module.scss';
 
 const ADD_MEMBER_ERROR_MESSAGE: Record<string, string> = {
-  [ADD_MEMBER_ERROR.ALREADY_MEMBER]: 'User with this identifier is already added to this group',
+  [ADD_MEMBER_ERROR.ALREADY_MEMBER]:
+    'User with this identifier is already added to this group',
   [ADD_MEMBER_ERROR.NOT_FOUND]: 'There is no user in ORD with this identifier yet',
   [ADD_MEMBER_ERROR.GENERIC]: 'Failed to add the user. Please try again.',
 };
@@ -76,7 +80,8 @@ export function AddMemberInput() {
                 color="red"
                 className={classes.icon}
               />
-              {ADD_MEMBER_ERROR_MESSAGE[inputError] ?? ADD_MEMBER_ERROR_MESSAGE[ADD_MEMBER_ERROR.GENERIC]}
+              {ADD_MEMBER_ERROR_MESSAGE[inputError] ??
+                ADD_MEMBER_ERROR_MESSAGE[ADD_MEMBER_ERROR.GENERIC]}
             </Group>
           )
         }

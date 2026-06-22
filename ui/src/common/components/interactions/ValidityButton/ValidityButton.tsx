@@ -37,7 +37,11 @@ export function ValidityButton({
       variant="outline"
       size="lg"
       radius="md"
-      classNames={{ root: classes.button, section: classes.section, label: classes.label }}
+      classNames={{
+        root: classes.button,
+        section: classes.section,
+        label: classes.label,
+      }}
       leftSection={isValid ? <CheckCircleIcon /> : <CrossCircleIcon />}
     >
       {isValid ? validText : invalidText}
@@ -49,7 +53,11 @@ export function ValidityButton({
       radius="md"
       onClick={onClick}
       leftSection={isValid ? <CheckCircleIcon /> : <CrossCircleIcon />}
-      classNames={{ root: classes.button, section: classes.section, label: classes.label }}
+      classNames={{
+        root: classes.button,
+        section: classes.section,
+        label: classes.label,
+      }}
       className={classes.enumerationBadge}
     >
       {isValid ? validText : invalidText}

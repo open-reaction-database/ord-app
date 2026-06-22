@@ -16,4 +16,6 @@
 import { createContext } from 'react';
 import type { ReactionNodeToComponent } from './reactionEntityNode.types.ts';
 
-export const nodeToComponentContext = createContext<ReactionNodeToComponent | null>(null);
+export const nodeToComponentContext = createContext<ReactionNodeToComponent | null>(
+  null,
+);

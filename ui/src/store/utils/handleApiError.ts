@@ -29,7 +29,8 @@ const ERROR_MESSAGES: Record<number, string> = {
 export function getErrorDetails(error: unknown): RejectValue {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 500;
-    const message = error.response?.data?.message ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
+    const message =
+      error.response?.data?.message ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
     return { errorCode: status, errorMessage: message };
   }
   return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };

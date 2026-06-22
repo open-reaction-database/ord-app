@@ -31,11 +31,14 @@ const startPayload: StartEnumeration = {
   variables: [],
 };
 
-const start = () => enumerationReducer(undefined, startEnumerationActions(startPayload));
+const start = () =>
+  enumerationReducer(undefined, startEnumerationActions(startPayload));
 
 describe('enumerationReducer', () => {
   it('starts with no progress', () => {
-    expect(enumerationReducer(undefined, { type: '@@INIT' })).toEqual({ enumerationProgress: null });
+    expect(enumerationReducer(undefined, { type: '@@INIT' })).toEqual({
+      enumerationProgress: null,
+    });
   });
 
   it('initializes progress on start', () => {
@@ -55,7 +58,10 @@ describe('enumerationReducer', () => {
       let state = start();
       state = enumerationReducer(
         state,
-        enumerateBatchActions.success({ reactions: ['r1', 'r2'], errors: [{ line: 3, message: 'bad' }] }),
+        enumerateBatchActions.success({
+          reactions: ['r1', 'r2'],
+          errors: [{ line: 3, message: 'bad' }],
+        }),
       );
       expect(state.enumerationProgress).toMatchObject({
         reactions: ['r1', 'r2'],
@@ -63,13 +69,19 @@ describe('enumerationReducer', () => {
         index: 3,
       });
 
-      state = enumerationReducer(state, enumerateBatchActions.success({ reactions: ['r3'], errors: [] }));
+      state = enumerationReducer(
+        state,
+        enumerateBatchActions.success({ reactions: ['r3'], errors: [] }),
+      );
       expect(state.enumerationProgress?.reactions).toEqual(['r1', 'r2', 'r3']);
       expect(state.enumerationProgress?.index).toBe(4);
     });
 
     it('is a no-op when there is no active progress', () => {
-      const state = enumerationReducer(undefined, enumerateBatchActions.success({ reactions: ['r1'], errors: [] }));
+      const state = enumerationReducer(
+        undefined,
+        enumerateBatchActions.success({ reactions: ['r1'], errors: [] }),
+      );
       expect(state.enumerationProgress).toBeNull();
     });
   });
@@ -78,7 +90,10 @@ describe('enumerationReducer', () => {
     it('marks progress finished and records the result dataset id', () => {
       let state = start();
       state = enumerationReducer(state, finishEnumerationAction(42));
-      expect(state.enumerationProgress).toMatchObject({ finished: true, resultDatasetId: 42 });
+      expect(state.enumerationProgress).toMatchObject({
+        finished: true,
+        resultDatasetId: 42,
+      });
     });
 
     it('is a no-op when there is no active progress', () => {

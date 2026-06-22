@@ -46,7 +46,8 @@ type TemplateInformation = Pick<ReactionTemplate, 'data'> & {
 
 export type StartEnumeration = EnumerationBase & TemplateInformation;
 
-export interface EnumerationBatchRequest extends TemplateInformation, Pick<EnumerationBase, 'matching'> {
+export interface EnumerationBatchRequest
+  extends TemplateInformation, Pick<EnumerationBase, 'matching'> {
   templateCSV: TemplateCSV;
   index: number;
 }

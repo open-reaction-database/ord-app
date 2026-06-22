@@ -32,7 +32,8 @@ interface InputComponentsListItemProps {
   historyPathComponents: Array<ReactionPathComponents>;
 }
 
-const renderDetails = ({ amount }: ReactionInputComponent) => renderValuePrecisionUnit(amount);
+const renderDetails = ({ amount }: ReactionInputComponent) =>
+  renderValuePrecisionUnit(amount);
 
 export function InputComponentsListItem({
   input,

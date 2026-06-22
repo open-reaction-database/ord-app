@@ -19,20 +19,27 @@ import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { ShareDataset } from './ShareDataset.tsx';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 
-vi.mock('./ShareDatasetSidebar.tsx', () => ({ ShareDatasetSidebar: () => <div data-testid="share-sidebar" /> }));
+vi.mock('./ShareDatasetSidebar.tsx', () => ({
+  ShareDatasetSidebar: () => <div data-testid="share-sidebar" />,
+}));
 
-const dataset = (is_sharable: boolean) => ({ id: 1, is_sharable }) as unknown as Dataset;
+const dataset = (is_sharable: boolean) =>
+  ({ id: 1, is_sharable }) as unknown as Dataset;
 
 describe('ShareDataset', () => {
   it('shows the Share button for a sharable dataset and opens the sidebar on click', () => {
-    const { getByText, queryByTestId } = renderWithMantine(<ShareDataset dataset={dataset(true)} />);
+    const { getByText, queryByTestId } = renderWithMantine(
+      <ShareDataset dataset={dataset(true)} />,
+    );
     expect(queryByTestId('share-sidebar')).not.toBeInTheDocument();
     fireEvent.click(getByText('Share'));
     expect(queryByTestId('share-sidebar')).toBeInTheDocument();
   });
 
   it('hides the Share button when the dataset is not sharable', () => {
-    const { queryByText } = renderWithMantine(<ShareDataset dataset={dataset(false)} />);
+    const { queryByText } = renderWithMantine(
+      <ShareDataset dataset={dataset(false)} />,
+    );
     expect(queryByText('Share')).not.toBeInTheDocument();
   });
 });

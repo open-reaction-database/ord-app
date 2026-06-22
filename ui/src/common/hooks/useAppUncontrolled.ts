@@ -63,7 +63,9 @@ export function useAppUncontrolled<T>({
   finalValue,
   onChange = () => {},
 }: UseUncontrolledInput<T>): [T, (value: T, ...payload: Array<any>) => void, boolean] {
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue !== undefined ? defaultValue : finalValue);
+  const [uncontrolledValue, setUncontrolledValue] = useState(
+    defaultValue !== undefined ? defaultValue : finalValue,
+  );
 
   const handleUncontrolledChange = (val: T | ChangeEvent, ...payload: Array<any>) => {
     if (typeof val === 'object' && val && 'target' in val && 'value' in val.target) {

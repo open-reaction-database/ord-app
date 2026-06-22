@@ -21,7 +21,10 @@ import type {
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import { type Variable, VariableType } from 'store/entities/templates/templates.types.ts';
+import {
+  type Variable,
+  VariableType,
+} from 'store/entities/templates/templates.types.ts';
 
 // reactionToOrdReaction (and the protobuf encode it feeds) is the heavy tail of
 // enumerateReaction; mocking it lets us capture the *coerced & merged* template
@@ -70,7 +73,10 @@ function run({
 
 /** The merged template handed to reactionToOrdReaction for the most recent reaction. */
 function lastMergedTemplate(): Record<string, unknown> {
-  return reactionToOrdReactionMock.mock.calls.at(-1)?.[0] as unknown as Record<string, unknown>;
+  return reactionToOrdReactionMock.mock.calls.at(-1)?.[0] as unknown as Record<
+    string,
+    unknown
+  >;
 }
 
 let postMessageMock: ReturnType<typeof vi.fn>;
@@ -111,7 +117,9 @@ describe('enumeration worker onmessage', () => {
     });
     expect(result.reactions).toHaveLength(1);
     // baseIndex (10) + row index (1) + 2 (1-based + header row) = 13.
-    expect(result.errors).toEqual([{ line: 13, message: 'Expected number value for variable v1' }]);
+    expect(result.errors).toEqual([
+      { line: 13, message: 'Expected number value for variable v1' },
+    ]);
   });
 });
 
@@ -127,13 +135,19 @@ describe('value coercion by VariableType', () => {
   });
 
   it('throws for a Number variable given a non-number', () => {
-    const result = run({ variables: [makeVariable(VariableType.Number)], rows: [{ col1: 'x' }] });
+    const result = run({
+      variables: [makeVariable(VariableType.Number)],
+      rows: [{ col1: 'x' }],
+    });
     expect(result.reactions).toEqual([]);
     expect(result.errors[0].message).toBe('Expected number value for variable v1');
   });
 
   it('upper-cases a string option for a Select variable', () => {
-    run({ variables: [makeVariable(VariableType.Select)], rows: [{ col1: 'aqueous' }] });
+    run({
+      variables: [makeVariable(VariableType.Select)],
+      rows: [{ col1: 'aqueous' }],
+    });
     expect(lastMergedTemplate().valueField).toBe('AQUEOUS');
   });
 
@@ -143,17 +157,28 @@ describe('value coercion by VariableType', () => {
   });
 
   it('rejects a numeric Select value', () => {
-    const result = run({ variables: [makeVariable(VariableType.Select)], rows: [{ col1: 3 }] });
-    expect(result.errors[0].message).toBe('Expected string option value for variable v1');
+    const result = run({
+      variables: [makeVariable(VariableType.Select)],
+      rows: [{ col1: 3 }],
+    });
+    expect(result.errors[0].message).toBe(
+      'Expected string option value for variable v1',
+    );
   });
 
   it('formats a Date variable to YYYY-MM-DD', () => {
-    run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: '2024-01-15T08:30:00' }] });
+    run({
+      variables: [makeVariable(VariableType.Date)],
+      rows: [{ col1: '2024-01-15T08:30:00' }],
+    });
     expect(lastMergedTemplate().valueField).toBe('2024-01-15');
   });
 
   it('formats a DateTime variable with the time component', () => {
-    run({ variables: [makeVariable(VariableType.DateTime)], rows: [{ col1: '2024-01-15T08:30:00' }] });
+    run({
+      variables: [makeVariable(VariableType.DateTime)],
+      rows: [{ col1: '2024-01-15T08:30:00' }],
+    });
     expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00');
   });
 
@@ -167,7 +192,10 @@ describe('value coercion by VariableType', () => {
       'April 1, 2025',
       'Apr 1 2025',
     ]) {
-      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+      const result = run({
+        variables: [makeVariable(VariableType.Date)],
+        rows: [{ col1: input }],
+      });
       expect(result.errors).toEqual([]);
       expect(lastMergedTemplate().valueField).toBe('2025-04-01');
     }
@@ -175,30 +203,52 @@ describe('value coercion by VariableType', () => {
 
   it('accepts timezone-offset ISO 8601 datetimes for a Date variable', () => {
     // Valid ISO with a Z/offset/milliseconds was previously accepted by lenient dayjs; it must still be.
-    for (const input of ['2025-04-01T12:00:00Z', '2025-04-01T12:00:00+05:30', '2025-04-01T00:30:00.123Z']) {
-      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+    for (const input of [
+      '2025-04-01T12:00:00Z',
+      '2025-04-01T12:00:00+05:30',
+      '2025-04-01T00:30:00.123Z',
+    ]) {
+      const result = run({
+        variables: [makeVariable(VariableType.Date)],
+        rows: [{ col1: input }],
+      });
       expect(result.errors).toEqual([]);
       expect(lastMergedTemplate().valueField).toMatch(/^2025-(03-31|04-01)$/);
     }
   });
 
   it('rejects an invalid date', () => {
-    const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: 'not-a-date' }] });
+    const result = run({
+      variables: [makeVariable(VariableType.Date)],
+      rows: [{ col1: 'not-a-date' }],
+    });
     expect(result.errors[0].message).toBe('Expected date value for variable v1');
   });
 
   it('rejects a garbage date that the lenient parser would silently coerce (#544)', () => {
     // dayjs(value) without strict mode parses these as April 1 / month-overflow; we must not. The
     // ISO-shaped values have out-of-range month/day, which the ISO regex bounds reject.
-    for (const input of ['Aprillllll, 2025', 'MayMayMay, 2025', '2025-13-45', '2025-00-10', '2025-04-32']) {
-      const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: input }] });
+    for (const input of [
+      'Aprillllll, 2025',
+      'MayMayMay, 2025',
+      '2025-13-45',
+      '2025-00-10',
+      '2025-04-32',
+    ]) {
+      const result = run({
+        variables: [makeVariable(VariableType.Date)],
+        rows: [{ col1: input }],
+      });
       expect(result.reactions).toEqual([]);
       expect(result.errors[0].message).toBe('Expected date value for variable v1');
     }
   });
 
   it('rejects a non-string date value', () => {
-    const result = run({ variables: [makeVariable(VariableType.Date)], rows: [{ col1: 123 }] });
+    const result = run({
+      variables: [makeVariable(VariableType.Date)],
+      rows: [{ col1: 123 }],
+    });
     expect(result.errors[0].message).toBe('Expected date value for variable v1');
   });
 
@@ -208,17 +258,30 @@ describe('value coercion by VariableType', () => {
   });
 
   it('splits a comma-separated string for a NumberArray variable', () => {
-    run({ variables: [makeVariable(VariableType.NumberArray)], rows: [{ col1: '1.5,2,3' }] });
+    run({
+      variables: [makeVariable(VariableType.NumberArray)],
+      rows: [{ col1: '1.5,2,3' }],
+    });
     expect(lastMergedTemplate().valueField).toEqual([1.5, 2, 3]);
   });
 
   it('rejects a NumberArray string with a non-numeric entry', () => {
-    const result = run({ variables: [makeVariable(VariableType.NumberArray)], rows: [{ col1: '1,x,3' }] });
-    expect(result.errors[0].message).toBe('Expected number array value for variable v1');
+    const result = run({
+      variables: [makeVariable(VariableType.NumberArray)],
+      rows: [{ col1: '1,x,3' }],
+    });
+    expect(result.errors[0].message).toBe(
+      'Expected number array value for variable v1',
+    );
   });
 
   it('rejects a non-string, non-number NumberArray value', () => {
-    const result = run({ variables: [makeVariable(VariableType.NumberArray)], rows: [{ col1: true }] });
-    expect(result.errors[0].message).toBe('Expected number array value for variable v1');
+    const result = run({
+      variables: [makeVariable(VariableType.NumberArray)],
+      rows: [{ col1: true }],
+    });
+    expect(result.errors[0].message).toBe(
+      'Expected number array value for variable v1',
+    );
   });
 });

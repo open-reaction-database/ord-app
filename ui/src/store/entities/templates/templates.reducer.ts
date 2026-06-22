@@ -41,7 +41,10 @@ const templatesOrder = createReducer<Array<string>>([], builder => {
 });
 
 const isTemplateCreating = createReducer<boolean>(false, builder => {
-  builder.addMatcher(isAnyOf(createNewTemplateActions.request, getTemplateActions.request), () => true);
+  builder.addMatcher(
+    isAnyOf(createNewTemplateActions.request, getTemplateActions.request),
+    () => true,
+  );
   builder.addMatcher(
     isAnyOf(
       createNewTemplateActions.success,
@@ -58,7 +61,10 @@ const isTemplateCreating = createReducer<boolean>(false, builder => {
 // flashing the 404 during the initial load. Set on failure too, so a failed fetch still reaches the
 // 404 path instead of leaving a permanently blank page. (#496)
 const areTemplatesLoaded = createReducer<boolean>(false, builder => {
-  builder.addMatcher(isAnyOf(getAllTemplatesActions.success, getAllTemplatesActions.failure), () => true);
+  builder.addMatcher(
+    isAnyOf(getAllTemplatesActions.success, getAllTemplatesActions.failure),
+    () => true,
+  );
 });
 
 export const templatesReducer = combineReducers({

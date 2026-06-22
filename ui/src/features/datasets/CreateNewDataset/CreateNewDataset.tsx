@@ -17,7 +17,10 @@ import { Textarea, TextInput } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { useForm, yupResolver } from '@mantine/form';
-import { type CreateNewDatasetFormValues, createNewDatasetSchema } from './createNewDataset.schema.ts';
+import {
+  type CreateNewDatasetFormValues,
+  createNewDatasetSchema,
+} from './createNewDataset.schema.ts';
 import type { CreateNewDatasetPayload } from 'store/entities/datasets/datasets.types.ts';
 import { createEmptyDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -25,7 +28,10 @@ import { selectIsDatasetCreating } from 'store/entities/datasets/datasets.select
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 import { GroupSelector } from 'features/groups/GroupSelector/GroupSelector.tsx';
-import { MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
+import {
+  MAX_CRITICAL_FIELD_LENGTH,
+  MAX_FIELD_LENGTH,
+} from 'common/constants/fieldLimits.ts';
 
 interface CreateNewDatasetProps {
   onClose: () => void;
@@ -36,7 +42,10 @@ export function CreateNewDataset({ onClose }: Readonly<CreateNewDatasetProps>) {
   const activeGroupId = useSelector(selectActiveGroupId);
   const isLoading = useSelector(selectIsDatasetCreating);
 
-  const form = useForm<CreateNewDatasetFormValues, (values: CreateNewDatasetFormValues) => CreateNewDatasetPayload>({
+  const form = useForm<
+    CreateNewDatasetFormValues,
+    (values: CreateNewDatasetFormValues) => CreateNewDatasetPayload
+  >({
     mode: 'controlled',
     initialValues: {
       groupId: activeGroupId ? activeGroupId.toString() : '',

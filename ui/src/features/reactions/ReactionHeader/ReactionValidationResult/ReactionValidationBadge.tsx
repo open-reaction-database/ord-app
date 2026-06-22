@@ -19,7 +19,8 @@ import { CheckCircleIcon, CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
 import { Badge, Flex, Text, Button, type ButtonProps } from '@mantine/core';
 
-const amountText = (count: number, singleLabel: string) => `${count} ${singleLabel}${count === 1 ? '' : 's'}`;
+const amountText = (count: number, singleLabel: string) =>
+  `${count} ${singleLabel}${count === 1 ? '' : 's'}`;
 
 interface ReactionValidationBadgeProps {
   isValid: boolean;
@@ -38,8 +39,13 @@ const badgeCommonProps: Pick<ButtonProps, 'variant' | 'size' | 'radius'> & {
   },
 };
 
-export function ReactionValidationBadge({ isValid, validation, onClick }: Readonly<ReactionValidationBadgeProps>) {
-  const hasDataToDisplay = validation && (validation.errors.length > 0 || validation.warnings.length > 0);
+export function ReactionValidationBadge({
+  isValid,
+  validation,
+  onClick,
+}: Readonly<ReactionValidationBadgeProps>) {
+  const hasDataToDisplay =
+    validation && (validation.errors.length > 0 || validation.warnings.length > 0);
 
   if (hasDataToDisplay) {
     return (
@@ -56,14 +62,18 @@ export function ReactionValidationBadge({ isValid, validation, onClick }: Readon
             gap="xs"
           >
             <CrossCircleIcon className={classes.icon} />
-            <Text className={classes.text}>{amountText(validation.errors.length, 'error')}</Text>
+            <Text className={classes.text}>
+              {amountText(validation.errors.length, 'error')}
+            </Text>
           </Flex>
           <Flex
             align="center"
             gap="xs"
           >
             <WarningIcon className={classes.icon} />
-            <Text className={classes.text}>{amountText(validation.warnings.length, 'warning')}</Text>
+            <Text className={classes.text}>
+              {amountText(validation.warnings.length, 'warning')}
+            </Text>
           </Flex>
         </Flex>
       </Button>

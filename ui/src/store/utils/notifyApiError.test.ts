@@ -32,12 +32,18 @@ beforeEach(() => {
 describe('notifyApiError', () => {
   it('shows an error toast with the mapped message for a 403 (#614/#616)', () => {
     notifyApiError(axiosError(403));
-    expect(showMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'Access denied' });
+    expect(showMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Access denied',
+    });
   });
 
   it('maps 404 to "Entity not found"', () => {
     notifyApiError(axiosError(404));
-    expect(showMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'Entity not found' });
+    expect(showMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Entity not found',
+    });
   });
 
   it('prefers the backend-provided message when present', () => {
@@ -50,6 +56,9 @@ describe('notifyApiError', () => {
 
   it('falls back to the generic message for a non-axios error', () => {
     notifyApiError(new Error('boom'));
-    expect(showMock).toHaveBeenCalledWith({ variant: NotificationVariant.ERROR, message: 'Unknown error' });
+    expect(showMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Unknown error',
+    });
   });
 });

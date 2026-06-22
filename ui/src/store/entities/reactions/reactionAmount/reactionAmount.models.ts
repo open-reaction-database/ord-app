@@ -26,15 +26,26 @@ import type { SelectOptions } from 'common/types/selectOptions.ts';
 
 export const appAmountUnspecified: AppAmountUnspecified = 'UNSPECIFIED';
 
-const withoutUnspecified = <T extends AppAmountUnitUnspecified>(record: T): Omit<T, 'UNSPECIFIED'> => {
+const withoutUnspecified = <T extends AppAmountUnitUnspecified>(
+  record: T,
+): Omit<T, 'UNSPECIFIED'> => {
   const { UNSPECIFIED: _, ...rest } = record;
   return rest;
 };
 
 // Sadly typescript do not want to properly infer type of enum
-const molesUnitByName = withoutUnspecified(ord.Moles.MolesUnit) as Record<AppMolesUnit, number>;
-const massUnitByName = withoutUnspecified(ord.Mass.MassUnit) as Record<AppMassUnit, number>;
-const volumeUnitByName = withoutUnspecified(ord.Volume.VolumeUnit) as Record<AppVolumeUnit, number>;
+const molesUnitByName = withoutUnspecified(ord.Moles.MolesUnit) as Record<
+  AppMolesUnit,
+  number
+>;
+const massUnitByName = withoutUnspecified(ord.Mass.MassUnit) as Record<
+  AppMassUnit,
+  number
+>;
+const volumeUnitByName = withoutUnspecified(ord.Volume.VolumeUnit) as Record<
+  AppVolumeUnit,
+  number
+>;
 
 export const unitValueByName = {
   ...molesUnitByName,

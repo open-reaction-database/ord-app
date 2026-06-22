@@ -26,7 +26,9 @@ interface OpenSingleEntityButtonProps {
   pathComponents: ReactionPathComponents;
 }
 
-export function OpenSingleEntityButton({ pathComponents }: Readonly<OpenSingleEntityButtonProps>) {
+export function OpenSingleEntityButton({
+  pathComponents,
+}: Readonly<OpenSingleEntityButtonProps>) {
   const dispatch = useAppDispatch();
   const { isViewOnly, isTemplate } = useContext(reactionContext);
 

@@ -48,7 +48,9 @@ export interface TemperatureMeasurement extends WithId<
   temperature: ReactionTemperature;
 }
 
-export interface PressureMeasurement extends WithId<Pick<ord.PressureConditions.IPressureMeasurement, 'details'>> {
+export interface PressureMeasurement extends WithId<
+  Pick<ord.PressureConditions.IPressureMeasurement, 'details'>
+> {
   type: PressureMeasurementType;
   time: ReactionTime;
   pressure: ReactionPressure;
@@ -73,12 +75,18 @@ export interface ReactionPressureCondition {
   pressureMeasurements: Array<PressureMeasurement>;
 }
 
-export interface ReactionStirringCondition extends Pick<ord.IStirringConditions, 'details'> {
+export interface ReactionStirringCondition extends Pick<
+  ord.IStirringConditions,
+  'details'
+> {
   type: ReactionStirringMethodType;
   rate: StirringRate;
 }
 
-export interface ReactionIlluminationCondition extends Pick<ord.IIlluminationConditions, 'details' | 'color'> {
+export interface ReactionIlluminationCondition extends Pick<
+  ord.IIlluminationConditions,
+  'details' | 'color'
+> {
   type: ReactionIlluminationType;
   peakWavelength: ReactionWaveLength;
   distanceToVessel: ReactionLength;
@@ -96,12 +104,17 @@ export interface ReactionElectrochemistryCondition extends Pick<
   electrochemistryMeasurements: Array<ElectrochemistryMeasurement>;
 }
 
-export interface ReactionFlowCondition extends Pick<ord.IFlowConditions, 'details' | 'pumpType'> {
+export interface ReactionFlowCondition extends Pick<
+  ord.IFlowConditions,
+  'details' | 'pumpType'
+> {
   type: ReactionFlowType;
   tubing: Tubing;
 }
 
-export interface ReactionConditions extends WithId<Pick<ord.IReactionConditions, 'details' | 'ph'>> {
+export interface ReactionConditions extends WithId<
+  Pick<ord.IReactionConditions, 'details' | 'ph'>
+> {
   temperature: ReactionTemperatureCondition;
   pressure: ReactionPressureCondition;
   stirring: ReactionStirringCondition;

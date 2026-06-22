@@ -27,7 +27,10 @@ import {
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Input, TextInput } from '@mantine/core';
 import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisionUnitControl/ValuePrecisionUnitControl.tsx';
-import { appAmountUnspecified, massUnitNames } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
+import {
+  appAmountUnspecified,
+  massUnitNames,
+} from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import { type ChangeEvent, useContext, useMemo } from 'react';
@@ -126,11 +129,17 @@ const typeToComponent = {
 const typeToDefaultValue = {
   [ReactionMeasurementValueType.Number]: { value: null, precision: null },
   [ReactionMeasurementValueType.Percent]: { value: null, precision: null },
-  [ReactionMeasurementValueType.Mass]: { value: null, precision: null, units: appAmountUnspecified },
+  [ReactionMeasurementValueType.Mass]: {
+    value: null,
+    precision: null,
+    units: appAmountUnspecified,
+  },
   [ReactionMeasurementValueType.String]: '',
 };
 
-function optionalStringNumberToNumber(value: Optional<number | string>): Optional<number> {
+function optionalStringNumberToNumber(
+  value: Optional<number | string>,
+): Optional<number> {
   if (!value) {
     return null;
   }
@@ -175,7 +184,10 @@ const defaultMeasurementValue: ReactionMeasurementValueNumber = {
   value: typeToDefaultValue[defaultValueType],
 };
 
-export function MeasurementValueControl({ name, formMethods }: Readonly<ReactionFormCustomProps>) {
+export function MeasurementValueControl({
+  name,
+  formMethods,
+}: Readonly<ReactionFormCustomProps>) {
   const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
   const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
@@ -211,7 +223,12 @@ export function MeasurementValueControl({ name, formMethods }: Readonly<Reaction
   };
 
   const handleTypeChange = (newType: string) => {
-    onChange(handleMeasurementTypeChange(activeMeasurementValue, newType as ReactionMeasurementValueType));
+    onChange(
+      handleMeasurementTypeChange(
+        activeMeasurementValue,
+        newType as ReactionMeasurementValueType,
+      ),
+    );
   };
 
   // Cannot produce correct type because of the map

@@ -24,14 +24,20 @@ describe('emptyFieldMessage', () => {
 
 describe('requiredTextField', () => {
   it('accepts a non-empty value', async () => {
-    await expect(requiredTextField('Name').validate('ethanol')).resolves.toBe('ethanol');
+    await expect(requiredTextField('Name').validate('ethanol')).resolves.toBe(
+      'ethanol',
+    );
   });
 
   it('rejects an empty string with the empty-field message', async () => {
-    await expect(requiredTextField('Name').validate('')).rejects.toThrow('Name should not be empty');
+    await expect(requiredTextField('Name').validate('')).rejects.toThrow(
+      'Name should not be empty',
+    );
   });
 
   it('rejects a whitespace-only value with the empty-field message', async () => {
-    await expect(requiredTextField('Name').validate('   ')).rejects.toThrow('Name should not be empty');
+    await expect(requiredTextField('Name').validate('   ')).rejects.toThrow(
+      'Name should not be empty',
+    );
   });
 });

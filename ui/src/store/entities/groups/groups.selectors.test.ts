@@ -27,7 +27,11 @@ import type { GroupItem, GroupMember } from './groups.types.ts';
 import type { User } from '../users/users.types.ts';
 import type { AppState } from '../../configureAppStore.ts';
 
-const makeGroupItem = (id: number, name: string, role: USER_ROLES): GroupItem => ({ id, name, role });
+const makeGroupItem = (id: number, name: string, role: USER_ROLES): GroupItem => ({
+  id,
+  name,
+  role,
+});
 
 const makeUser = (id: number): User => ({
   id,
@@ -70,7 +74,9 @@ const buildState = ({
 
 describe('selectGroupById', () => {
   it('returns the matching group or undefined', () => {
-    const state = buildState({ groupsById: { 1: makeGroupItem(1, 'Alpha', USER_ROLES.ADMIN) } });
+    const state = buildState({
+      groupsById: { 1: makeGroupItem(1, 'Alpha', USER_ROLES.ADMIN) },
+    });
     expect(selectGroupById(1)(state)?.name).toBe('Alpha');
     expect(selectGroupById(99)(state)).toBeUndefined();
   });
@@ -79,14 +85,21 @@ describe('selectGroupById', () => {
 describe('selectHaveAnyGroups', () => {
   it('is false with no groups and true once present', () => {
     expect(selectHaveAnyGroups(buildState())).toBe(false);
-    expect(selectHaveAnyGroups(buildState({ groupsById: { 1: makeGroupItem(1, 'A', USER_ROLES.VIEWER) } }))).toBe(true);
+    expect(
+      selectHaveAnyGroups(
+        buildState({ groupsById: { 1: makeGroupItem(1, 'A', USER_ROLES.VIEWER) } }),
+      ),
+    ).toBe(true);
   });
 });
 
 describe('selectGroupsByIdsList', () => {
   it('maps ids to groups and drops unknown ids', () => {
     const state = buildState({
-      groupsById: { 1: makeGroupItem(1, 'A', USER_ROLES.ADMIN), 2: makeGroupItem(2, 'B', USER_ROLES.VIEWER) },
+      groupsById: {
+        1: makeGroupItem(1, 'A', USER_ROLES.ADMIN),
+        2: makeGroupItem(2, 'B', USER_ROLES.VIEWER),
+      },
     });
     const result = selectGroupsByIdsList([2, 99, 1])(state);
     expect(result.map(g => g.id)).toEqual([2, 1]);
@@ -106,11 +119,15 @@ describe('selectOrderedGroupsList', () => {
   });
 
   it('filters by the (case-insensitive) search term before sorting', () => {
-    const result = selectOrderedGroupsList(buildState({ groupsById, groupNameSearch: 'A' }));
+    const result = selectOrderedGroupsList(
+      buildState({ groupsById, groupNameSearch: 'A' }),
+    );
     // 'alpha', 'Bravo', and 'Charlie' all contain an 'a'
     expect(result.map(g => g.name)).toEqual(['alpha', 'Bravo', 'Charlie']);
 
-    const narrow = selectOrderedGroupsList(buildState({ groupsById, groupNameSearch: 'bra' }));
+    const narrow = selectOrderedGroupsList(
+      buildState({ groupsById, groupNameSearch: 'bra' }),
+    );
     expect(narrow.map(g => g.name)).toEqual(['Bravo']);
   });
 });
@@ -133,7 +150,11 @@ describe('selectMemberRoles', () => {
       editingGroupId: 7,
       self: makeUser(1),
       groupsMembersByGroupId: {
-        7: [makeMember(1, USER_ROLES.ADMIN), makeMember(2, USER_ROLES.ADMIN), makeMember(3, USER_ROLES.VIEWER)],
+        7: [
+          makeMember(1, USER_ROLES.ADMIN),
+          makeMember(2, USER_ROLES.ADMIN),
+          makeMember(3, USER_ROLES.VIEWER),
+        ],
       },
     });
     expect(selectMemberRoles(state)).toEqual({ isAdmin: true, hasTwoAdmins: true });

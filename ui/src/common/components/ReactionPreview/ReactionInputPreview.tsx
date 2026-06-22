@@ -29,8 +29,13 @@ interface ReactionInputPreviewProps {
   inputId: string;
 }
 
-export function ReactionInputPreview({ reactionId, inputId }: Readonly<ReactionInputPreviewProps>) {
-  const input: ReactionInput = useSelector(selectReactionPartByPath(reactionId, ['inputs', inputId]));
+export function ReactionInputPreview({
+  reactionId,
+  inputId,
+}: Readonly<ReactionInputPreviewProps>) {
+  const input: ReactionInput = useSelector(
+    selectReactionPartByPath(reactionId, ['inputs', inputId]),
+  );
   const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
   const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
 

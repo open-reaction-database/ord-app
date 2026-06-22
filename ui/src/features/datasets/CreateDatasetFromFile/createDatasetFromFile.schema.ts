@@ -34,4 +34,6 @@ export const createDatasetFromFileSchema = yup.object({
     }),
 });
 
-export type CreateDatasetFromFileFormValues = yup.InferType<typeof createDatasetFromFileSchema>;
+export type CreateDatasetFromFileFormValues = yup.InferType<
+  typeof createDatasetFromFileSchema
+>;

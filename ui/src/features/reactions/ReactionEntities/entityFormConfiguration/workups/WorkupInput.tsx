@@ -43,11 +43,13 @@ const ENTITY_NAME = 'Input';
 
 const COMPONENTS_FIELD = 'components';
 
-const renderDetails = ({ amount }: ReactionInputComponent) => (amount ? renderValuePrecisionUnit(amount) : '');
+const renderDetails = ({ amount }: ReactionInputComponent) =>
+  amount ? renderValuePrecisionUnit(amount) : '';
 
 export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } = useContext(reactionContext);
+  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } =
+    useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
 
   const currentPath = useMemo(() => {
@@ -57,20 +59,38 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
       dispatch(addReactionPathComponentToList(currentPath));
-      dispatch(addReactionPathComponentToList(currentPath.concat([COMPONENTS_FIELD, index])));
+      dispatch(
+        addReactionPathComponentToList(currentPath.concat([COMPONENTS_FIELD, index])),
+      );
     },
     [currentPath, dispatch],
   );
 
-  const input: Optional<ReactionInputWithoutName> = useSelector(selectReactionPartByPath(reactionId, currentPath));
+  const input: Optional<ReactionInputWithoutName> = useSelector(
+    selectReactionPartByPath(reactionId, currentPath),
+  );
 
   const onRemove = useCallback(() => {
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: null }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: currentPath,
+        newValue: null,
+      }),
+    );
   }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
-    const input = ordInputWithoutNameToReaction(ord.ReactionInput.toObject(new ord.ReactionInput()));
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: currentPath, newValue: input }));
+    const input = ordInputWithoutNameToReaction(
+      ord.ReactionInput.toObject(new ord.ReactionInput()),
+    );
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: currentPath,
+        newValue: input,
+      }),
+    );
   }, [currentPath, dispatch, reactionId]);
 
   return !!input || !isViewOnly ? (

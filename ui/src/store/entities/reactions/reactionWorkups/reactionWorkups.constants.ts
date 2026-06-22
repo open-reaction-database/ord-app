@@ -25,9 +25,17 @@ export namespace WorkupConstants {
 
   export const aliquotCompatibleTypes: Array<WorkupType> = ['ALIQUOT', 'CUSTOM'];
 
-  export const keepPhaseCompatibleTypes: Array<WorkupType> = ['EXTRACTION', 'FILTRATION', 'CUSTOM'];
+  export const keepPhaseCompatibleTypes: Array<WorkupType> = [
+    'EXTRACTION',
+    'FILTRATION',
+    'CUSTOM',
+  ];
 
-  export const targetPhCompatibleTypes: Array<WorkupType> = ['PH_ADJUST', 'ADDITION', 'CUSTOM'];
+  export const targetPhCompatibleTypes: Array<WorkupType> = [
+    'PH_ADJUST',
+    'ADDITION',
+    'CUSTOM',
+  ];
 
   export const inputCompatibleTypes: Array<WorkupType> = [
     'SCAVENGING',

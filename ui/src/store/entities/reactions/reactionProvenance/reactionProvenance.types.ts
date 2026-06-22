@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionDateTime, WithId } from '../reactionEntity/reactionEntity.types.ts';
+import type {
+  ReactionDateTime,
+  WithId,
+} from '../reactionEntity/reactionEntity.types.ts';
 
 export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'details'>> {
   time: ReactionDateTime;

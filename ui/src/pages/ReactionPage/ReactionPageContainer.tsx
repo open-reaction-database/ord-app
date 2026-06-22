@@ -17,7 +17,10 @@ import { useParams } from 'wouter';
 import { ReactionPage } from './ReactionPage';
 
 export const ReactionPageContainer = () => {
-  const { reactionId, datasetId } = useParams<{ reactionId: string; datasetId: string }>();
+  const { reactionId, datasetId } = useParams<{
+    reactionId: string;
+    datasetId: string;
+  }>();
 
   return (
     <ReactionPage

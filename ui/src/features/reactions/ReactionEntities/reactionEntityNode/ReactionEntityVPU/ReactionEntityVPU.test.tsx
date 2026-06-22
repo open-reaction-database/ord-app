@@ -26,7 +26,12 @@ const formMethods = {
 const renderVPU = (isViewOnly = false) =>
   renderInReactionView(
     <ReactionEntityVPU
-      node={{ name: 'amount', options: ['mL', 'L'] } as unknown as ReactionFormValuePrecisionUnit}
+      node={
+        {
+          name: 'amount',
+          options: ['mL', 'L'],
+        } as unknown as ReactionFormValuePrecisionUnit
+      }
       formMethods={formMethods}
     />,
     { isViewOnly },

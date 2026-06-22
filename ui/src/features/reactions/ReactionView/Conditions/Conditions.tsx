@@ -27,7 +27,9 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 const ENTITY_FIELD = 'conditions';
 
 export function Conditions({ reactionId }: ReactionViewSectionProps) {
-  const conditions: ReactionConditions = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const conditions: ReactionConditions = useSelector(
+    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
+  );
 
   return (
     <Flex direction="column">
@@ -50,7 +52,10 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             { label: 'Reflux', render: conditions => conditions.reflux },
             { label: 'pH', render: conditions => conditions.ph },
-            { label: 'Dynamic conditions', render: conditions => conditions.conditionsAreDynamic },
+            {
+              label: 'Dynamic conditions',
+              render: conditions => conditions.conditionsAreDynamic,
+            },
           ]}
         />
         <span className={classes.conditionsLabel}>Temperature</span>
@@ -59,7 +64,8 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             {
               label: 'Setpoint',
-              render: ({ temperature }) => temperature.setpoint && renderValuePrecisionUnit(temperature.setpoint),
+              render: ({ temperature }) =>
+                temperature.setpoint && renderValuePrecisionUnit(temperature.setpoint),
             },
           ]}
           optionalFields={[
@@ -79,7 +85,8 @@ export function Conditions({ reactionId }: ReactionViewSectionProps) {
           requiredFields={[
             {
               label: 'Setpoint',
-              render: ({ pressure }) => pressure.setpoint && renderValuePrecisionUnit(pressure.setpoint),
+              render: ({ pressure }) =>
+                pressure.setpoint && renderValuePrecisionUnit(pressure.setpoint),
             },
             {
               label: 'Control',

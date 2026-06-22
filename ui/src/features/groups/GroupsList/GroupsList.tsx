@@ -21,10 +21,19 @@ import {
   selectHaveAnyGroups,
   selectOrderedGroupsList,
 } from 'store/entities/groups/groups.selectors.ts';
-import { EmptyIcon, GridViewIcon, GroupArrowIcon, SearchIcon, SettingsIcon } from 'common/icons';
+import {
+  EmptyIcon,
+  GridViewIcon,
+  GroupArrowIcon,
+  SearchIcon,
+  SettingsIcon,
+} from 'common/icons';
 import { setGroupSearchAction } from 'store/entities/groups/groups.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { setActiveGroupIdAction, setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
+import {
+  setActiveGroupIdAction,
+  setEditingGroupIdAction,
+} from 'store/features/groups/groups.actions.ts';
 import classes from './GroupsList.module.scss';
 import { selectActiveGroupId } from 'store/features/groups/groups.selectors.ts';
 import { SelectableButton } from 'common/components/SelectableButton/SelectableButton.tsx';
@@ -65,7 +74,8 @@ export function GroupsList() {
     };
   }, [appDispatch]);
 
-  const scrollAreaHeight = groups.length > 4 ? GROUP_BUTTON_HEIGHT * 4 : GROUP_BUTTON_HEIGHT * groups.length;
+  const scrollAreaHeight =
+    groups.length > 4 ? GROUP_BUTTON_HEIGHT * 4 : GROUP_BUTTON_HEIGHT * groups.length;
 
   return haveAnyGroups ? (
     <>

@@ -19,7 +19,10 @@ import { Buffer } from 'buffer';
 import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
-export function ordDataToReaction(dataWrapper: OrdOptional<ord.IData>, name: string): AppData {
+export function ordDataToReaction(
+  dataWrapper: OrdOptional<ord.IData>,
+  name: string,
+): AppData {
   const { description, format, ...data } = dataWrapper || {};
   let type: AppData['data']['type'];
   let value: AppData['data']['value'];
@@ -76,7 +79,9 @@ export function reactionDataToOrd({ description, data }: AppData): ord.IData {
   return ordData;
 }
 
-export function ordDataMapToReactionDataMap(ordDataMap: Record<string, ord.IData>): Record<string, AppData> {
+export function ordDataMapToReactionDataMap(
+  ordDataMap: Record<string, ord.IData>,
+): Record<string, AppData> {
   return Object.entries(ordDataMap).reduce((acc, [name, ordData]) => {
     const reactionData = ordDataToReaction(ordData, name);
     return {

@@ -48,7 +48,11 @@ export function sortOutcomesByReactionTime(
   outcomes: Array<ReactionOutcome>,
 ): Array<{ outcome: ReactionOutcome; index: number }> {
   return outcomes
-    .map((outcome, index) => ({ outcome, index, seconds: reactionTimeInSeconds(outcome.reactionTime) }))
+    .map((outcome, index) => ({
+      outcome,
+      index,
+      seconds: reactionTimeInSeconds(outcome.reactionTime),
+    }))
     .sort((a, b) => {
       if (a.seconds === undefined && b.seconds === undefined) return a.index - b.index;
       if (a.seconds === undefined) return 1;

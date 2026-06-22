@@ -79,7 +79,9 @@ export interface ReactionFormValue extends ReactionFormField, ReactionFormNodeBa
   type: ReactionFormNodeType.value;
   name: string;
   inputType: 'string' | 'number' | 'textarea';
-  inputConfig?: Pick<InputProps, 'leftSection' | 'rightSection'> & { placeholder?: string };
+  inputConfig?: Pick<InputProps, 'leftSection' | 'rightSection'> & {
+    placeholder?: string;
+  };
 }
 
 export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeBase {
@@ -89,7 +91,8 @@ export interface ReactionFormSelect extends ReactionFormField, ReactionFormNodeB
   selectType: 'segmented' | 'dropdown';
 }
 
-export interface ReactionFormValuePrecisionUnit extends ReactionFormField, ReactionFormNodeBase {
+export interface ReactionFormValuePrecisionUnit
+  extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.vpu;
   name: string;
   options: SelectOptions;

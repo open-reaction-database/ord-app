@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from '../../reactionEntities.types';
 import { vesselPreparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
 
 export const reactionVesselPreparations: Array<ReactionFormNode> = [

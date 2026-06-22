@@ -19,10 +19,16 @@ import {
   vesselTypeOptions,
   volumeTypeOptions,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
-import { ReactionFormNodeType, type ReactionFormNode } from '../../reactionEntities.types';
+import {
+  ReactionFormNodeType,
+  type ReactionFormNode,
+} from '../../reactionEntities.types';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid';
 import { booleanOptions } from '../booleanOptions';
-import { buildUseSelectItems, buildUseSelectItemsListFromMap } from '../buildUseSelectItems';
+import {
+  buildUseSelectItems,
+  buildUseSelectItemsListFromMap,
+} from '../buildUseSelectItems';
 import { createEntityListItemComponent } from '../EntityListItem/entityListItem.utils';
 import { buildUseCreate } from '../buildUseCreate';
 import { ord } from 'ord-schema-protobufjs';
@@ -37,11 +43,20 @@ import {
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { compareNamedEntities } from '../compareNamedEntities.ts';
-import { createReactionDataAddItem, reactionDataDisplay } from '../data/reactionData.models.tsx';
+import {
+  createReactionDataAddItem,
+  reactionDataDisplay,
+} from '../data/reactionData.models.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export const vesselPreparationEntityPath: ReactionPathComponents = ['vessel', 'vesselPreparations'];
-export const vesselAttachmentEntityPath: ReactionPathComponents = ['vessel', 'vesselAttachments'];
+export const vesselPreparationEntityPath: ReactionPathComponents = [
+  'vessel',
+  'vesselPreparations',
+];
+export const vesselAttachmentEntityPath: ReactionPathComponents = [
+  'vessel',
+  'vesselAttachments',
+];
 
 export const automationCodeEntityPath = 'automationCode';
 
@@ -143,7 +158,10 @@ export const reactionSetup: Array<ReactionFormNode> = [
       label: 'Automation code',
       hint: 'Details of the exact automation procedure required to perform the reaction',
     },
-    useSelectItems: buildUseSelectItemsListFromMap(automationCodeEntityPath, compareNamedEntities),
+    useSelectItems: buildUseSelectItemsListFromMap(
+      automationCodeEntityPath,
+      compareNamedEntities,
+    ),
     ItemDisplay: reactionDataDisplay(automationCodeEntityPath),
     addItem: createReactionDataAddItem(automationCodeEntityPath, 'Automation code'),
   },
@@ -172,7 +190,12 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Preparation',
       useCreate: buildUseCreate(vesselPreparationEntityPath, index => {
-        return [index, ordVesselPreparationToReaction(ord.VesselPreparation.toObject(new ord.VesselPreparation()))];
+        return [
+          index,
+          ordVesselPreparationToReaction(
+            ord.VesselPreparation.toObject(new ord.VesselPreparation()),
+          ),
+        ];
       }),
     },
   },
@@ -201,7 +224,12 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Attachment',
       useCreate: buildUseCreate(vesselAttachmentEntityPath, index => {
-        return [index, ordVesselAttachmentToReaction(ord.VesselAttachment.toObject(new ord.VesselAttachment()))];
+        return [
+          index,
+          ordVesselAttachmentToReaction(
+            ord.VesselAttachment.toObject(new ord.VesselAttachment()),
+          ),
+        ];
       }),
     },
   },

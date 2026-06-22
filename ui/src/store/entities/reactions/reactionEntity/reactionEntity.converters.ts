@@ -112,7 +112,9 @@ export function withIdName<T>(entity: T, name: string): WithIdName<T> {
   };
 }
 
-export function withoutIdName<T extends ReactionNamedEntity>(entity: T): WithoutIdName<T> {
+export function withoutIdName<T extends ReactionNamedEntity>(
+  entity: T,
+): WithoutIdName<T> {
   const { id: _i, name: _n, ...rest } = entity;
   return rest;
 }
@@ -135,7 +137,9 @@ export function reactionBooleanToOrd(value: ReactionBoolean): boolean | null {
   }
 }
 
-export function ordValuePrecisionToReaction(ordValue: OrdOptional<OrdValuePrecision>): ReactionValuePrecision {
+export function ordValuePrecisionToReaction(
+  ordValue: OrdOptional<OrdValuePrecision>,
+): ReactionValuePrecision {
   const { value, precision } = ordValue ?? {};
   return {
     value: value ?? null,
@@ -143,7 +147,10 @@ export function ordValuePrecisionToReaction(ordValue: OrdOptional<OrdValuePrecis
   };
 }
 
-export function reactionValuePrecisionToOrd({ value, precision }: ReactionValuePrecision): Optional<OrdValuePrecision> {
+export function reactionValuePrecisionToOrd({
+  value,
+  precision,
+}: ReactionValuePrecision): Optional<OrdValuePrecision> {
   if (value === null && precision === null) {
     return null;
   }
@@ -154,7 +161,9 @@ const generateValuePrecisionUnitConverter = <T extends string>(
   typeFromOrd: (value: OrdOptional<number>) => T,
   typeToOrd: (value: T) => OrdOptional<number>,
 ) => ({
-  fromOrd: (ordValue: OrdOptional<OrdValuePrecisionUnit>): ReactionValuePrecisionUnit<T> => {
+  fromOrd: (
+    ordValue: OrdOptional<OrdValuePrecisionUnit>,
+  ): ReactionValuePrecisionUnit<T> => {
     const { value, precision, units } = ordValue ?? {};
     return {
       value: value ?? null,
@@ -162,14 +171,17 @@ const generateValuePrecisionUnitConverter = <T extends string>(
       units: typeFromOrd(units),
     };
   },
-  toOrd: (vpu: Optional<ReactionValuePrecisionUnit<T>>): Optional<OrdValuePrecisionUnit> => {
+  toOrd: (
+    vpu: Optional<ReactionValuePrecisionUnit<T>>,
+  ): Optional<OrdValuePrecisionUnit> => {
     if (!vpu) {
       return null;
     }
     const { units, ...rest } = vpu;
 
     const unitsOrd = typeToOrd(units);
-    const isDefault = unitsOrd === 0 && Object.values(rest).every(value => value === null);
+    const isDefault =
+      unitsOrd === 0 && Object.values(rest).every(value => value === null);
     return isDefault ? null : { units: unitsOrd, ...rest };
   },
 });
@@ -196,75 +208,102 @@ const generateTypeDetailsConverter = <T extends string>(
   },
 });
 
-export const { fromOrd: ordTimeToReaction, toOrd: reactionTimeToOrd } = generateValuePrecisionUnitConverter(
-  ordTimeTypeToReaction,
-  reactionTimeTypeToOrd,
+export const { fromOrd: ordTimeToReaction, toOrd: reactionTimeToOrd } =
+  generateValuePrecisionUnitConverter(ordTimeTypeToReaction, reactionTimeTypeToOrd);
+
+export const {
+  fromOrd: ordAdditionDeviceToReaction,
+  toOrd: reactionAdditionDeviceToOrd,
+} = generateTypeDetailsConverter(
+  ordAdditionDeviceTypeToReaction,
+  reactionAdditionDeviceTypeToOrd,
 );
 
-export const { fromOrd: ordAdditionDeviceToReaction, toOrd: reactionAdditionDeviceToOrd } =
-  generateTypeDetailsConverter(ordAdditionDeviceTypeToReaction, reactionAdditionDeviceTypeToOrd);
-
-export const { fromOrd: ordAdditionSpeedToReaction, toOrd: reactionAdditionSpeedToOrd } = generateTypeDetailsConverter(
+export const {
+  fromOrd: ordAdditionSpeedToReaction,
+  toOrd: reactionAdditionSpeedToOrd,
+} = generateTypeDetailsConverter(
   ordAdditionSpeedTypeToReaction,
   reactionAdditionSpeedTypeToOrd,
 );
 
-export const { fromOrd: ordFlowRateToReaction, toOrd: reactionFlowRateToOrd } = generateValuePrecisionUnitConverter(
-  ordFlowRateTypeToReaction,
-  reactionFlowRateTypeToOrd,
-);
+export const { fromOrd: ordFlowRateToReaction, toOrd: reactionFlowRateToOrd } =
+  generateValuePrecisionUnitConverter(
+    ordFlowRateTypeToReaction,
+    reactionFlowRateTypeToOrd,
+  );
 
 export const { fromOrd: ordTemperatureToReaction, toOrd: reactionTemperatureToOrd } =
-  generateValuePrecisionUnitConverter(ordTemperatureTypeToReaction, reactionTemperatureTypeToOrd);
+  generateValuePrecisionUnitConverter(
+    ordTemperatureTypeToReaction,
+    reactionTemperatureTypeToOrd,
+  );
 
-export const { fromOrd: ordPressureToReaction, toOrd: reactionPressureToOrd } = generateValuePrecisionUnitConverter(
-  ordPressureTypeToReaction,
-  reactionPressureTypeToOrd,
+export const { fromOrd: ordPressureToReaction, toOrd: reactionPressureToOrd } =
+  generateValuePrecisionUnitConverter(
+    ordPressureTypeToReaction,
+    reactionPressureTypeToOrd,
+  );
+
+export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } =
+  generateTypeDetailsConverter(ordTextureTypeToReaction, reactionTextureTypeToOrd);
+
+export const { fromOrd: ordSelectivityToReaction, toOrd: reactionSelectivityToOrd } =
+  generateTypeDetailsConverter(
+    ordSelectivityTypeToReaction,
+    reactionSelectivityTypeToOrd,
+  );
+
+export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd } =
+  generateValuePrecisionUnitConverter(
+    ordWaveLengthTypeToReaction,
+    reactionWaveLengthTypeToOrd,
+  );
+
+export const { fromOrd: ordLengthToReaction, toOrd: reactionLengthToOrd } =
+  generateValuePrecisionUnitConverter(ordLengthTypeToReaction, reactionLengthTypeToOrd);
+
+export const { fromOrd: ordCurrentToReaction, toOrd: reactionCurrentToOrd } =
+  generateValuePrecisionUnitConverter(
+    ordCurrentTypeToReaction,
+    reactionCurrentTypeToOrd,
+  );
+
+export const {
+  fromOrd: ordTemperatureControlToReaction,
+  toOrd: reactionTemperatureControlToOrd,
+} = generateTypeDetailsConverter(
+  ordTemperatureControlTypeToReaction,
+  reactionTemperatureControlTypeToOrd,
 );
 
-export const { fromOrd: ordTextureToReaction, toOrd: reactionTextureToOrd } = generateTypeDetailsConverter(
-  ordTextureTypeToReaction,
-  reactionTextureTypeToOrd,
+export const {
+  fromOrd: ordPressureControlToReaction,
+  toOrd: reactionPressureControlToOrd,
+} = generateTypeDetailsConverter(
+  ordPressureControlTypeToReaction,
+  reactionPressureControlTypeToOrd,
 );
 
-export const { fromOrd: ordSelectivityToReaction, toOrd: reactionSelectivityToOrd } = generateTypeDetailsConverter(
-  ordSelectivityTypeToReaction,
-  reactionSelectivityTypeToOrd,
+export const { fromOrd: ordAtmosphereToReaction, toOrd: reactionAtmosphereToOrd } =
+  generateTypeDetailsConverter(
+    ordAtmosphereTypeToReaction,
+    reactionAtmosphereTypeToOrd,
+  );
+
+export const { fromOrd: ordVoltageToReaction, toOrd: reactionVoltageToOrd } =
+  generateValuePrecisionUnitConverter(
+    ordVoltageUnitToReaction,
+    reactionVoltageUnitToOrd,
+  );
+
+export const {
+  fromOrd: ordElectrochemistryCellToReaction,
+  toOrd: reactionElectrochemistryCellToOrd,
+} = generateTypeDetailsConverter(
+  ordElectrochemistryCellTypeToReaction,
+  reactionElectrochemistryCellTypeToOrd,
 );
-
-export const { fromOrd: ordWaveLengthToReaction, toOrd: reactionWaveLengthToOrd } = generateValuePrecisionUnitConverter(
-  ordWaveLengthTypeToReaction,
-  reactionWaveLengthTypeToOrd,
-);
-
-export const { fromOrd: ordLengthToReaction, toOrd: reactionLengthToOrd } = generateValuePrecisionUnitConverter(
-  ordLengthTypeToReaction,
-  reactionLengthTypeToOrd,
-);
-
-export const { fromOrd: ordCurrentToReaction, toOrd: reactionCurrentToOrd } = generateValuePrecisionUnitConverter(
-  ordCurrentTypeToReaction,
-  reactionCurrentTypeToOrd,
-);
-
-export const { fromOrd: ordTemperatureControlToReaction, toOrd: reactionTemperatureControlToOrd } =
-  generateTypeDetailsConverter(ordTemperatureControlTypeToReaction, reactionTemperatureControlTypeToOrd);
-
-export const { fromOrd: ordPressureControlToReaction, toOrd: reactionPressureControlToOrd } =
-  generateTypeDetailsConverter(ordPressureControlTypeToReaction, reactionPressureControlTypeToOrd);
-
-export const { fromOrd: ordAtmosphereToReaction, toOrd: reactionAtmosphereToOrd } = generateTypeDetailsConverter(
-  ordAtmosphereTypeToReaction,
-  reactionAtmosphereTypeToOrd,
-);
-
-export const { fromOrd: ordVoltageToReaction, toOrd: reactionVoltageToOrd } = generateValuePrecisionUnitConverter(
-  ordVoltageUnitToReaction,
-  reactionVoltageUnitToOrd,
-);
-
-export const { fromOrd: ordElectrochemistryCellToReaction, toOrd: reactionElectrochemistryCellToOrd } =
-  generateTypeDetailsConverter(ordElectrochemistryCellTypeToReaction, reactionElectrochemistryCellTypeToOrd);
 
 export const ordReactionIdentifierToReaction = ({
   type,
@@ -321,7 +360,9 @@ export const reactionCompoundIdentifierToOrd = ({
   ...rest,
 });
 
-export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): ReactionDateTime => {
+export const ordDateTimeToReaction = (
+  dateTime: OrdOptional<ord.IDateTime>,
+): ReactionDateTime => {
   if (!dateTime?.value) {
     return null;
   }
@@ -329,7 +370,9 @@ export const ordDateTimeToReaction = (dateTime: OrdOptional<ord.IDateTime>): Rea
   return date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime.value;
 };
 
-export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.IDateTime> => {
+export const reactionDateTimeToOrd = (
+  dateTime: ReactionDateTime,
+): Optional<ord.IDateTime> => {
   if (!dateTime) {
     return null;
   }
@@ -337,7 +380,9 @@ export const reactionDateTimeToOrd = (dateTime: ReactionDateTime): Optional<ord.
   return { value: date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime };
 };
 
-export const ordTubingToReaction = (tubing: OrdOptional<ord.FlowConditions.ITubing>): Tubing => {
+export const ordTubingToReaction = (
+  tubing: OrdOptional<ord.FlowConditions.ITubing>,
+): Tubing => {
   const { type, details, diameter } = tubing ?? {};
   return {
     type: ordTubingTypeToReaction(type),
@@ -346,7 +391,11 @@ export const ordTubingToReaction = (tubing: OrdOptional<ord.FlowConditions.ITubi
   };
 };
 
-export const reactionTubingToOrd = ({ type, details, diameter }: Tubing): Optional<ord.FlowConditions.ITubing> => {
+export const reactionTubingToOrd = ({
+  type,
+  details,
+  diameter,
+}: Tubing): Optional<ord.FlowConditions.ITubing> => {
   const diameterOrd = reactionLengthToOrd(diameter);
   const typeOrd = reactionTubingTypeToOrd(type);
 
@@ -393,13 +442,24 @@ export const convertElectrochemistryTypeToOrd = (
     : ordElectrochemistryTypeToReaction(0);
 };
 
-export const { fromOrd: ordVolumeConditionToReaction, toOrd: reactionVolumeConditionToOrd } =
-  generateValuePrecisionUnitConverter(ordVolumeTypeToReaction, reactionVolumeTypeToOrd);
-
-export const { fromOrd: ordVesselMaterialToReaction, toOrd: reactionVesselMaterialToOrd } =
-  generateTypeDetailsConverter(ordVesselMaterialTypeToReaction, reactionVesselMaterialTypeToOrd);
-
-export const { fromOrd: ordEnvironmentToReaction, toOrd: reactionEnvironmentToOrd } = generateTypeDetailsConverter(
-  ordEnvironmentTypeToReaction,
-  reactionEnvironmentTypeToOrd,
+export const {
+  fromOrd: ordVolumeConditionToReaction,
+  toOrd: reactionVolumeConditionToOrd,
+} = generateValuePrecisionUnitConverter(
+  ordVolumeTypeToReaction,
+  reactionVolumeTypeToOrd,
 );
+
+export const {
+  fromOrd: ordVesselMaterialToReaction,
+  toOrd: reactionVesselMaterialToOrd,
+} = generateTypeDetailsConverter(
+  ordVesselMaterialTypeToReaction,
+  reactionVesselMaterialTypeToOrd,
+);
+
+export const { fromOrd: ordEnvironmentToReaction, toOrd: reactionEnvironmentToOrd } =
+  generateTypeDetailsConverter(
+    ordEnvironmentTypeToReaction,
+    reactionEnvironmentTypeToOrd,
+  );

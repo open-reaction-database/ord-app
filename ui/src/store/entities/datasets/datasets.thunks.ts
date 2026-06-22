@@ -43,31 +43,41 @@ export const getDataset = createThunk(getDatasetActions, datasetId => async () =
   }
 });
 
-export const getInitialDatasetsList = createThunk(getGroupsInitialDatasetListActions, groupId => async () => {
-  const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
-  const params = { page: 1, size: 10 };
+export const getInitialDatasetsList = createThunk(
+  getGroupsInitialDatasetListActions,
+  groupId => async () => {
+    const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
+    const params = { page: 1, size: 10 };
 
-  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
-  return getGroupsInitialDatasetListActions.success(datasetsPages);
-});
+    const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params }))
+      .data;
+    return getGroupsInitialDatasetListActions.success(datasetsPages);
+  },
+);
 
-export const getDatasetsPage = createThunk(getDatasetPageActions, () => async (_d, getState) => {
-  const state = getState();
-  const activeGroupId = selectActiveGroupId(state);
-  const currentPage = selectDatasetsPagination(state);
+export const getDatasetsPage = createThunk(
+  getDatasetPageActions,
+  () => async (_d, getState) => {
+    const state = getState();
+    const activeGroupId = selectActiveGroupId(state);
+    const currentPage = selectDatasetsPagination(state);
 
-  const url = activeGroupId ? `/groups/${activeGroupId}/datasets` : '/datasets';
-  const params = { page: currentPage.page, size: currentPage.size };
+    const url = activeGroupId ? `/groups/${activeGroupId}/datasets` : '/datasets';
+    const params = { page: currentPage.page, size: currentPage.size };
 
-  const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params })).data;
-  return getDatasetPageActions.success(datasetsPages);
-});
+    const datasetsPages = (await axiosInstance.get<Pages<Dataset>>(url, { params }))
+      .data;
+    return getDatasetPageActions.success(datasetsPages);
+  },
+);
 
 export const createEmptyDataset = createThunkWithExplicitResult(
   createNewDatasetActions,
   ({ groupId, ...payload }) =>
     async dispatch => {
-      const dataset = (await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)).data;
+      const dataset = (
+        await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets`, payload)
+      ).data;
       dispatch(createNewDatasetActions.success(dataset));
       navigate(`/datasets/${dataset.id}`);
     },
@@ -76,7 +86,10 @@ export const createEmptyDataset = createThunkWithExplicitResult(
 export async function createDatasetFromFileOperation(groupId: number, file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  return await axiosInstance.post<Dataset>(`/groups/${groupId}/datasets/upload`, formData);
+  return await axiosInstance.post<Dataset>(
+    `/groups/${groupId}/datasets/upload`,
+    formData,
+  );
 }
 
 export const createDatasetFromFile = createThunkWithExplicitResult(
@@ -89,29 +102,46 @@ export const createDatasetFromFile = createThunkWithExplicitResult(
     },
 );
 
-export const updateDataset = createThunk(updateDatasetActions, ({ id, ...payload }) => async () => {
-  const updatedDataset = (await axiosInstance.patch<Dataset>(`datasets/${id}`, payload)).data;
-  return updateDatasetActions.success(updatedDataset);
-});
+export const updateDataset = createThunk(
+  updateDatasetActions,
+  ({ id, ...payload }) =>
+    async () => {
+      const updatedDataset = (
+        await axiosInstance.patch<Dataset>(`datasets/${id}`, payload)
+      ).data;
+      return updateDatasetActions.success(updatedDataset);
+    },
+);
 
-export const removeDataset = createThunkWithExplicitResult(removeDatasetActions, datasetId => async dispatch => {
-  await axiosInstance.delete(`/datasets/${datasetId}`);
-  dispatch(removeDatasetActions.success());
-  navigate(`/`);
-});
+export const removeDataset = createThunkWithExplicitResult(
+  removeDatasetActions,
+  datasetId => async dispatch => {
+    await axiosInstance.delete(`/datasets/${datasetId}`);
+    dispatch(removeDatasetActions.success());
+    navigate(`/`);
+  },
+);
 
-export const getDatasetGroups = createThunk(getDatasetGroupsActions, datasetId => async () => {
-  const response = await axiosInstance.get<Array<DatasetGroup>>(`/datasets/${datasetId}/groups`);
-  return getDatasetGroupsActions.success(response.data);
-});
+export const getDatasetGroups = createThunk(
+  getDatasetGroupsActions,
+  datasetId => async () => {
+    const response = await axiosInstance.get<Array<DatasetGroup>>(
+      `/datasets/${datasetId}/groups`,
+    );
+    return getDatasetGroupsActions.success(response.data);
+  },
+);
 
 export const shareDatasetWithGroup = createThunkWithExplicitResult(
   shareDatasetWithGroupActions,
   ({ groupId, datasetId, primaryGroupId }) =>
     async dispatch => {
-      await axiosInstance.post(`/groups/${primaryGroupId}/datasets/${datasetId}/share`, {
-        secondary_group_id: groupId,
-      });
+      await axiosInstance.post(
+        `/groups/${primaryGroupId}/datasets/${datasetId}/share`,
+        {
+          secondary_group_id: groupId,
+        },
+      );
       dispatch(shareDatasetWithGroupActions.success());
       dispatch(getDataset(datasetId));
       dispatch(getDatasetGroups(datasetId));
@@ -122,9 +152,12 @@ export const unshareDatasetWithGroup = createThunkWithExplicitResult(
   unshareDatasetWithGroupActions,
   ({ groupId, datasetId, primaryGroupId }) =>
     async dispatch => {
-      await axiosInstance.post(`/groups/${primaryGroupId}/datasets/${datasetId}/unshare`, {
-        secondary_group_id: groupId,
-      });
+      await axiosInstance.post(
+        `/groups/${primaryGroupId}/datasets/${datasetId}/unshare`,
+        {
+          secondary_group_id: groupId,
+        },
+      );
       dispatch(unshareDatasetWithGroupActions.success(groupId));
       dispatch(getDataset(datasetId));
     },

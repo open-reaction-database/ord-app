@@ -37,19 +37,29 @@ const keys: Array<[keyof ord.IPerson, keyof User]> = [
   ['orcid', 'orcid_id'],
 ];
 
-export function UpdatePersonInfo({ name, formMethods, text }: Readonly<UpdatePersonInfoProps>) {
+export function UpdatePersonInfo({
+  name,
+  formMethods,
+  text,
+}: Readonly<UpdatePersonInfoProps>) {
   const { isViewOnly } = useContext(reactionContext);
   const user = useSelector(selectSelf)!;
   const { setValues } = formMethods;
 
   const updateFields = useCallback(() => {
-    const person: Partial<ord.IPerson> = keys.reduce((acc: Partial<ord.IPerson>, [personKey, userKey]) => {
-      const value = user[userKey];
-      return value ? { ...acc, [personKey]: value } : acc;
-    }, {});
+    const person: Partial<ord.IPerson> = keys.reduce(
+      (acc: Partial<ord.IPerson>, [personKey, userKey]) => {
+        const value = user[userKey];
+        return value ? { ...acc, [personKey]: value } : acc;
+      },
+      {},
+    );
     const pathComponents: ReactionPathComponents = name.split('.');
     setValues(prevValues =>
-      deepMergeWithArrayMerge(prevValues, generateDeepPartialReactionByPath(pathComponents, person)),
+      deepMergeWithArrayMerge(
+        prevValues,
+        generateDeepPartialReactionByPath(pathComponents, person),
+      ),
     );
   }, [user, name, setValues]);
 

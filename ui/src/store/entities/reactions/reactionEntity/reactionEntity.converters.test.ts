@@ -74,12 +74,21 @@ describe('reactionBooleanToOrd', () => {
 
 describe('ordValuePrecisionToReaction', () => {
   it('passes through value and precision', () => {
-    expect(ordValuePrecisionToReaction({ value: 1, precision: 2 })).toEqual({ value: 1, precision: 2 });
+    expect(ordValuePrecisionToReaction({ value: 1, precision: 2 })).toEqual({
+      value: 1,
+      precision: 2,
+    });
   });
 
   it('defaults missing fields to null', () => {
-    expect(ordValuePrecisionToReaction(undefined)).toEqual({ value: null, precision: null });
-    expect(ordValuePrecisionToReaction({ value: 5 })).toEqual({ value: 5, precision: null });
+    expect(ordValuePrecisionToReaction(undefined)).toEqual({
+      value: null,
+      precision: null,
+    });
+    expect(ordValuePrecisionToReaction({ value: 5 })).toEqual({
+      value: 5,
+      precision: null,
+    });
   });
 });
 
@@ -89,6 +98,9 @@ describe('reactionValuePrecisionToOrd', () => {
   });
 
   it('returns the value/precision pair otherwise', () => {
-    expect(reactionValuePrecisionToOrd({ value: 1, precision: null })).toEqual({ value: 1, precision: null });
+    expect(reactionValuePrecisionToOrd({ value: 1, precision: null })).toEqual({
+      value: 1,
+      precision: null,
+    });
   });
 });

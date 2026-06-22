@@ -56,19 +56,26 @@ def get_molblocks(pb: Reaction) -> dict:
             for measurement in product.measurements:
                 product_item["measurements"].append(
                     {
-                        "authentic_standard": {"molblock": safe_molblock(measurement.authentic_standard)},
+                        "authentic_standard": {
+                            "molblock": safe_molblock(measurement.authentic_standard)
+                        },
                     }
                 )
 
             outcome_item.append(product_item)
         outcomes.append({"products": outcome_item})
 
-    inputs = {key: [safe_molblock(component) for component in value.components] for key, value in pb.inputs.items()}
+    inputs = {
+        key: [safe_molblock(component) for component in value.components]
+        for key, value in pb.inputs.items()
+    }
 
     workups = []
     for workup in pb.workups:
         if hasattr(workup, "input") and hasattr(workup.input, "components"):
-            workups.append([safe_molblock(component) for component in workup.input.components])
+            workups.append(
+                [safe_molblock(component) for component in workup.input.components]
+            )
         else:
             workups.append([])
 

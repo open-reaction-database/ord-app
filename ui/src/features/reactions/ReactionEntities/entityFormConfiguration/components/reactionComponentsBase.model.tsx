@@ -80,7 +80,9 @@ export const identifiersList: ReactionFormNode = {
   addItem: {
     label: 'Identifier',
     useCreate: buildUseCreate('identifiers', index => {
-      const emptyItem = ordCompoundIdentifierToReaction(ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier()));
+      const emptyItem = ordCompoundIdentifierToReaction(
+        ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier()),
+      );
       return [index, emptyItem];
     }),
   },

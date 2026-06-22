@@ -17,4 +17,6 @@ import { createSelectorFactory } from '../../utils';
 
 const { buildSelector } = createSelectorFactory(state => state.features.reactionForm);
 
-export const selectReactionPathComponentsList = buildSelector(state => state.reactionPathComponentsList);
+export const selectReactionPathComponentsList = buildSelector(
+  state => state.reactionPathComponentsList,
+);

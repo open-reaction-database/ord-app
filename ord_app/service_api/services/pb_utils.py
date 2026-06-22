@@ -93,7 +93,8 @@ async def validate_uploaded_pb_file(file: UploadFile) -> tuple[bytes, str]:
     kind = validate_pb_kind_by_file_ext(file.filename)
     if not kind:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, f"Invalid file extension. Please use: {MAP_FILE_EXT_TO_PB_KIND.keys()}"
+            status.HTTP_400_BAD_REQUEST,
+            f"Invalid file extension. Please use: {MAP_FILE_EXT_TO_PB_KIND.keys()}",
         )
 
     file_data = await file.read()
@@ -122,10 +123,15 @@ async def validate_pb_reaction(
         return None, [], []
 
     try:
-        output = validate_message(reaction, raise_on_error=raise_on_error, options=options)
+        output = validate_message(
+            reaction, raise_on_error=raise_on_error, options=options
+        )
     except Exception as err:
         return False, [str(err)], []
-    errors, warnings = list(map(_adjust_error, output.errors)), list(map(_adjust_error, output.warnings))
+    errors, warnings = (
+        list(map(_adjust_error, output.errors)),
+        list(map(_adjust_error, output.warnings)),
+    )
     if errors:
         return False, errors, warnings
     return True, errors, warnings
@@ -147,11 +153,16 @@ async def async_validate_pb_reaction(
         return None, [], []
 
     try:
-        output = await run_in_threadpool(validate_message, reaction, raise_on_error=raise_on_error, options=options)
+        output = await run_in_threadpool(
+            validate_message, reaction, raise_on_error=raise_on_error, options=options
+        )
     except Exception as err:
         return False, [str(err)], []
 
-    errors, warnings = list(map(_adjust_error, output.errors)), list(map(_adjust_error, output.warnings))
+    errors, warnings = (
+        list(map(_adjust_error, output.errors)),
+        list(map(_adjust_error, output.warnings)),
+    )
     if errors:
         return False, errors, warnings
     return True, errors, warnings

@@ -17,7 +17,10 @@ import { TextInput } from '@mantine/core';
 import { useCallback } from 'react';
 import { useForm, yupResolver } from '@mantine/form';
 import { FormModal } from 'common/components/FormModal/FormModal.tsx';
-import { type SaveAsTemplateSchemaFormValues, saveAsTemplateSchema } from './SaveAsTemplate.schema.ts';
+import {
+  type SaveAsTemplateSchemaFormValues,
+  saveAsTemplateSchema,
+} from './SaveAsTemplate.schema.ts';
 import type { SaveAsTemplatePayload } from 'store/entities/templates/templates.types.ts';
 import { createTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -29,7 +32,11 @@ interface SaveAsTemplateProps {
   onClose: () => void;
 }
 
-export function SaveAsTemplate({ onClose, reactionPbId, reactionId }: Readonly<SaveAsTemplateProps>) {
+export function SaveAsTemplate({
+  onClose,
+  reactionPbId,
+  reactionId,
+}: Readonly<SaveAsTemplateProps>) {
   const dispatch = useAppDispatch();
 
   const form = useForm<

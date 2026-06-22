@@ -30,7 +30,8 @@ interface RemoveReactionProps {
 
 export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
   const dispatch = useAppDispatch();
-  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] = useDisclosure();
+  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
+    useDisclosure();
   const isTemplate = typeof reactionId === 'string';
   const entityToRemove = isTemplate ? 'template' : 'reaction';
 

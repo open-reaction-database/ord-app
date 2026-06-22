@@ -17,6 +17,10 @@ import { createActionFactory } from 'store/utils';
 
 const { createAction } = createActionFactory('groupFeature');
 
-export const setActiveGroupIdAction = createAction<number | null>('set_active_group_id');
+export const setActiveGroupIdAction = createAction<number | null>(
+  'set_active_group_id',
+);
 
-export const setEditingGroupIdAction = createAction<number | null>('set_editing_group_id');
+export const setEditingGroupIdAction = createAction<number | null>(
+  'set_editing_group_id',
+);

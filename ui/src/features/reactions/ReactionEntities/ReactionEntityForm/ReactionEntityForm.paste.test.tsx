@@ -41,7 +41,9 @@ vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
   addUpdateReactionField: (arg: unknown) => addUpdateReactionFieldMock(arg),
 }));
 
-const provenanceSidebarInfo = reactionSidebarInfo.find(info => info.entityName === ReactionNodeEntity.Provenance)!;
+const provenanceSidebarInfo = reactionSidebarInfo.find(
+  info => info.entityName === ReactionNodeEntity.Provenance,
+)!;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -71,7 +73,9 @@ describe('ReactionEntityForm — Paste Chunk filtering', () => {
 
     await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalled());
 
-    const { newValue } = addUpdateReactionFieldMock.mock.calls[0][0] as { newValue: Record<string, unknown> };
+    const { newValue } = addUpdateReactionFieldMock.mock.calls[0][0] as {
+      newValue: Record<string, unknown>;
+    };
     // The bug submitted the raw chunk, leaking recordModified into the merge; the fix submits filtered values.
     expect(newValue).not.toHaveProperty('recordModified');
     expect(newValue).toHaveProperty('doi', '10.0000/paste-test');

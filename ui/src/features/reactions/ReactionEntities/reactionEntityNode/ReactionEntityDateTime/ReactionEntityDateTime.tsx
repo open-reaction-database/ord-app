@@ -19,7 +19,14 @@ import { useUncontrolled } from '@mantine/hooks';
 import { type DateValue, DateTimePicker } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Anchor, Flex, Input, TextInput } from '@mantine/core';
-import { useCallback, useState, type FocusEvent, type MouseEvent, useContext, useMemo } from 'react';
+import {
+  useCallback,
+  useState,
+  type FocusEvent,
+  type MouseEvent,
+  useContext,
+  useMemo,
+} from 'react';
 import dayjs from 'dayjs';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
@@ -31,11 +38,17 @@ function formatDate(inputDate: string | Date): string {
   return dayjs(inputDate).format(DATE_TIME_FORMAT);
 }
 
-interface ReactionEntityDateTimeLabelProps extends Omit<ReactionEntityNodeProps<ReactionFormDateTime>, 'formMethods'> {
+interface ReactionEntityDateTimeLabelProps extends Omit<
+  ReactionEntityNodeProps<ReactionFormDateTime>,
+  'formMethods'
+> {
   onChange: (value: string) => void;
 }
 
-function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntityDateTimeLabelProps>) {
+function ReactionEntityDateTimeLabel({
+  node,
+  onChange,
+}: Readonly<ReactionEntityDateTimeLabelProps>) {
   const { isViewOnly } = useContext(reactionContext);
   const baseLabel = (
     <ReactionValueLabelWrapper
@@ -67,7 +80,10 @@ function ReactionEntityDateTimeLabel({ node, onChange }: Readonly<ReactionEntity
   );
 }
 
-export function ReactionEntityDateTime({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDateTime>>) {
+export function ReactionEntityDateTime({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormDateTime>>) {
   const { isViewOnly } = useContext(reactionContext);
 
   const [value, onChange] = useUncontrolled<string>({

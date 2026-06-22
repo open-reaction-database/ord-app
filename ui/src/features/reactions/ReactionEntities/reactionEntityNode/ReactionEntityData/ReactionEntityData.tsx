@@ -16,7 +16,10 @@
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormData } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
-import { type AppData, AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  type AppData,
+  AppDataType,
+} from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
 import { type ChangeEvent, type ReactNode, useCallback, useContext } from 'react';
 import { NumberInput, TextInput } from '@mantine/core';
@@ -40,7 +43,13 @@ interface ReactionEntityValueProps {
   disabled?: boolean;
 }
 
-function ReactionEntityDataValue({ name, value, onChange, label, disabled }: Readonly<ReactionEntityValueProps>) {
+function ReactionEntityDataValue({
+  name,
+  value,
+  onChange,
+  label,
+  disabled,
+}: Readonly<ReactionEntityValueProps>) {
   switch (value.type) {
     case AppDataType.Number:
       return (
@@ -76,7 +85,10 @@ function ReactionEntityDataValue({ name, value, onChange, label, disabled }: Rea
   }
 }
 
-export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
+export function ReactionEntityData({
+  formMethods,
+  node,
+}: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
   const { isViewOnly } = useContext(reactionContext);
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
@@ -86,7 +98,8 @@ export function ReactionEntityData({ formMethods, node }: Readonly<ReactionEntit
     ...getInputProps(node.nameFieldName),
   });
 
-  const labelType = dataValue.type === AppDataType.Number ? VariableType.Number : VariableType.String;
+  const labelType =
+    dataValue.type === AppDataType.Number ? VariableType.Number : VariableType.String;
 
   const label = (
     <ReactionValueLabelWrapper

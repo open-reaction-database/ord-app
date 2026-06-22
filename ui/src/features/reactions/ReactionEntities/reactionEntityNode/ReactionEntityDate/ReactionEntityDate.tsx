@@ -26,7 +26,10 @@ import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { DATE_FORMAT } from 'common/constants.ts';
 
-export function ReactionEntityDate({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
+export function ReactionEntityDate({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
   const { isViewOnly } = useContext(reactionContext);
   const label = (
     <ReactionValueLabelWrapper

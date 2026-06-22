@@ -15,7 +15,10 @@
  */
 import { notifications } from '@mantine/notifications';
 import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
-import { NotificationVariant, type AppNotification } from 'common/types/notification.ts';
+import {
+  NotificationVariant,
+  type AppNotification,
+} from 'common/types/notification.ts';
 import type { ReactNode } from 'react';
 
 const iconByVariant: Record<NotificationVariant, ReactNode> = {

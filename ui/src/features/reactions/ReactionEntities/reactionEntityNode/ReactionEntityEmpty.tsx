@@ -17,7 +17,10 @@ import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntitie
 import type { ReactionFormEmpty } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { ReactionEntityBaseNode } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 
-export function ReactionEntityEmpty({ node, formMethods }: Readonly<ReactionEntityNodeProps<ReactionFormEmpty>>) {
+export function ReactionEntityEmpty({
+  node,
+  formMethods,
+}: Readonly<ReactionEntityNodeProps<ReactionFormEmpty>>) {
   return node.fields.map((node, index) => (
     <ReactionEntityBaseNode
       key={`${node.type}-${index}`}

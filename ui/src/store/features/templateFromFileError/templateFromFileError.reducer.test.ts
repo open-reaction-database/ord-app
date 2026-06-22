@@ -23,10 +23,20 @@ describe('templateFromFileErrorReducer', () => {
   });
 
   it('records the failure message', () => {
-    expect(templateFromFileErrorReducer(null, importTemplateFromFileActions.failure('bad file'))).toBe('bad file');
+    expect(
+      templateFromFileErrorReducer(
+        null,
+        importTemplateFromFileActions.failure('bad file'),
+      ),
+    ).toBe('bad file');
   });
 
   it('clears the error when a new import starts', () => {
-    expect(templateFromFileErrorReducer('bad file', importTemplateFromFileActions.request({} as never))).toBeNull();
+    expect(
+      templateFromFileErrorReducer(
+        'bad file',
+        importTemplateFromFileActions.request({} as never),
+      ),
+    ).toBeNull();
   });
 });

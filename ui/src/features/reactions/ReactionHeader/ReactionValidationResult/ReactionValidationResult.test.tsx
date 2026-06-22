@@ -28,7 +28,13 @@ describe('ReactionValidationResult', () => {
   it('shows pluralized error and warning counts when the reaction is invalid', () => {
     const { getByText } = renderWithProviders(
       <ReactionValidationResult reactionId={1} />,
-      stateWith({ is_valid: false, validation: { errors: [{ text: 'a' }, { text: 'b' }], warnings: [{ text: 'c' }] } }),
+      stateWith({
+        is_valid: false,
+        validation: {
+          errors: [{ text: 'a' }, { text: 'b' }],
+          warnings: [{ text: 'c' }],
+        },
+      }),
     );
     expect(getByText('2 errors')).toBeInTheDocument();
     expect(getByText('1 warning')).toBeInTheDocument();

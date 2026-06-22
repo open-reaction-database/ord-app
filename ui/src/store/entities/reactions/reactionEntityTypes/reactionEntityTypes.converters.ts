@@ -70,70 +70,132 @@ const generateEntityTypeToFromOrd = <T extends string>(
   },
 });
 
-export const { ordEntityToEntity: ordPreparationTypeToReaction, entityToOrdEntity: reactionPreparationTypeToOrd } =
-  generateEntityTypeToFromOrd(preparationTypeByValue, ord.CompoundPreparation.CompoundPreparationType);
+export const {
+  ordEntityToEntity: ordPreparationTypeToReaction,
+  entityToOrdEntity: reactionPreparationTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  preparationTypeByValue,
+  ord.CompoundPreparation.CompoundPreparationType,
+);
 
-export const { ordEntityToEntity: ordReactionRoleToReaction, entityToOrdEntity: reactionReactionRoleToOrd } =
-  generateEntityTypeToFromOrd(reactionRoleByValue, ord.ReactionRole.ReactionRoleType);
+export const {
+  ordEntityToEntity: ordReactionRoleToReaction,
+  entityToOrdEntity: reactionReactionRoleToOrd,
+} = generateEntityTypeToFromOrd(reactionRoleByValue, ord.ReactionRole.ReactionRoleType);
 
-export const { ordEntityToEntity: ordTimeTypeToReaction, entityToOrdEntity: reactionTimeTypeToOrd } =
-  generateEntityTypeToFromOrd(timeUnitByValue, ord.Time.TimeUnit);
+export const {
+  ordEntityToEntity: ordTimeTypeToReaction,
+  entityToOrdEntity: reactionTimeTypeToOrd,
+} = generateEntityTypeToFromOrd(timeUnitByValue, ord.Time.TimeUnit);
 
 export const {
   ordEntityToEntity: ordAdditionDeviceTypeToReaction,
   entityToOrdEntity: reactionAdditionDeviceTypeToOrd,
-} = generateEntityTypeToFromOrd(reactionAdditionDeviceByValue, ord.ReactionInput.AdditionDevice.AdditionDeviceType);
+} = generateEntityTypeToFromOrd(
+  reactionAdditionDeviceByValue,
+  ord.ReactionInput.AdditionDevice.AdditionDeviceType,
+);
 
-export const { ordEntityToEntity: ordAdditionSpeedTypeToReaction, entityToOrdEntity: reactionAdditionSpeedTypeToOrd } =
-  generateEntityTypeToFromOrd(additionSpeedTypeByValue, ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
+export const {
+  ordEntityToEntity: ordAdditionSpeedTypeToReaction,
+  entityToOrdEntity: reactionAdditionSpeedTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  additionSpeedTypeByValue,
+  ord.ReactionInput.AdditionSpeed.AdditionSpeedType,
+);
 
-export const { ordEntityToEntity: ordFlowRateTypeToReaction, entityToOrdEntity: reactionFlowRateTypeToOrd } =
-  generateEntityTypeToFromOrd(flowRateTypeByValue, ord.FlowRate.FlowRateUnit);
+export const {
+  ordEntityToEntity: ordFlowRateTypeToReaction,
+  entityToOrdEntity: reactionFlowRateTypeToOrd,
+} = generateEntityTypeToFromOrd(flowRateTypeByValue, ord.FlowRate.FlowRateUnit);
 
-export const { ordEntityToEntity: ordTemperatureTypeToReaction, entityToOrdEntity: reactionTemperatureTypeToOrd } =
-  generateEntityTypeToFromOrd(temperatureTypeByValue, ord.Temperature.TemperatureUnit);
+export const {
+  ordEntityToEntity: ordTemperatureTypeToReaction,
+  entityToOrdEntity: reactionTemperatureTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  temperatureTypeByValue,
+  ord.Temperature.TemperatureUnit,
+);
 
-export const { ordEntityToEntity: ordTextureTypeToReaction, entityToOrdEntity: reactionTextureTypeToOrd } =
-  generateEntityTypeToFromOrd(textureTypeByValue, ord.Texture.TextureType);
+export const {
+  ordEntityToEntity: ordTextureTypeToReaction,
+  entityToOrdEntity: reactionTextureTypeToOrd,
+} = generateEntityTypeToFromOrd(textureTypeByValue, ord.Texture.TextureType);
 
 export const {
   ordEntityToEntity: ordReactionIdentifierTypeToReaction,
   entityToOrdEntity: reactionIdentifierTypeToOrd,
-} = generateEntityTypeToFromOrd(reactionIdentifierTypeByValue, ord.ReactionIdentifier.ReactionIdentifierType);
+} = generateEntityTypeToFromOrd(
+  reactionIdentifierTypeByValue,
+  ord.ReactionIdentifier.ReactionIdentifierType,
+);
 
-export const { ordEntityToEntity: ordAnalysisTypeToReaction, entityToOrdEntity: reactionAnalysisTypeToOrd } =
-  generateEntityTypeToFromOrd(analysisTypeByValue, ord.Analysis.AnalysisType);
+export const {
+  ordEntityToEntity: ordAnalysisTypeToReaction,
+  entityToOrdEntity: reactionAnalysisTypeToOrd,
+} = generateEntityTypeToFromOrd(analysisTypeByValue, ord.Analysis.AnalysisType);
 
-export const { ordEntityToEntity: ordMeasurementTypeToReaction, entityToOrdEntity: reactionMeasurementTypeToOrd } =
-  generateEntityTypeToFromOrd(measurementTypeByValue, ord.ProductMeasurement.ProductMeasurementType);
+export const {
+  ordEntityToEntity: ordMeasurementTypeToReaction,
+  entityToOrdEntity: reactionMeasurementTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  measurementTypeByValue,
+  ord.ProductMeasurement.ProductMeasurementType,
+);
 
-export const { ordEntityToEntity: ordSelectivityTypeToReaction, entityToOrdEntity: reactionSelectivityTypeToOrd } =
-  generateEntityTypeToFromOrd(selectivityTypeByValue, ord.ProductMeasurement.Selectivity.SelectivityType);
+export const {
+  ordEntityToEntity: ordSelectivityTypeToReaction,
+  entityToOrdEntity: reactionSelectivityTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  selectivityTypeByValue,
+  ord.ProductMeasurement.Selectivity.SelectivityType,
+);
 
-export const { ordEntityToEntity: ordWaveLengthTypeToReaction, entityToOrdEntity: reactionWaveLengthTypeToOrd } =
-  generateEntityTypeToFromOrd(waveLengthTypeByValue, ord.Wavelength.WavelengthUnit);
+export const {
+  ordEntityToEntity: ordWaveLengthTypeToReaction,
+  entityToOrdEntity: reactionWaveLengthTypeToOrd,
+} = generateEntityTypeToFromOrd(waveLengthTypeByValue, ord.Wavelength.WavelengthUnit);
 
-export const { ordEntityToEntity: ordLengthTypeToReaction, entityToOrdEntity: reactionLengthTypeToOrd } =
-  generateEntityTypeToFromOrd(lengthTypeByValue, ord.Length.LengthUnit);
+export const {
+  ordEntityToEntity: ordLengthTypeToReaction,
+  entityToOrdEntity: reactionLengthTypeToOrd,
+} = generateEntityTypeToFromOrd(lengthTypeByValue, ord.Length.LengthUnit);
 
-export const { ordEntityToEntity: ordMassSpecTypeToReaction, entityToOrdEntity: reactionMassSpecTypeToOrd } =
-  generateEntityTypeToFromOrd(
-    massSpecTypeByValue,
-    ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
-  );
-export const { ordEntityToEntity: ordPressureTypeToReaction, entityToOrdEntity: reactionPressureTypeToOrd } =
-  generateEntityTypeToFromOrd(pressureByValue, ord.Pressure.PressureUnit);
+export const {
+  ordEntityToEntity: ordMassSpecTypeToReaction,
+  entityToOrdEntity: reactionMassSpecTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  massSpecTypeByValue,
+  ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
+);
+export const {
+  ordEntityToEntity: ordPressureTypeToReaction,
+  entityToOrdEntity: reactionPressureTypeToOrd,
+} = generateEntityTypeToFromOrd(pressureByValue, ord.Pressure.PressureUnit);
 
 export const {
   ordEntityToEntity: ordCompoundIdentifierTypeToReaction,
   entityToOrdEntity: reactionCompoundIdentifierTypeToOrd,
-} = generateEntityTypeToFromOrd(compoundIdentifierTypeByValue, ord.CompoundIdentifier.CompoundIdentifierType);
+} = generateEntityTypeToFromOrd(
+  compoundIdentifierTypeByValue,
+  ord.CompoundIdentifier.CompoundIdentifierType,
+);
 
-export const { ordEntityToEntity: ordWorkupTypeToReaction, entityToOrdEntity: reactionWorkupTypeToOrd } =
-  generateEntityTypeToFromOrd(workupTypeByValue, ord.ReactionWorkup.ReactionWorkupType);
+export const {
+  ordEntityToEntity: ordWorkupTypeToReaction,
+  entityToOrdEntity: reactionWorkupTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  workupTypeByValue,
+  ord.ReactionWorkup.ReactionWorkupType,
+);
 
-export const { ordEntityToEntity: ordAtmosphereTypeToReaction, entityToOrdEntity: reactionAtmosphereTypeToOrd } =
-  generateEntityTypeToFromOrd(atmosphereTypeByValue, ord.PressureConditions.Atmosphere.AtmosphereType);
+export const {
+  ordEntityToEntity: ordAtmosphereTypeToReaction,
+  entityToOrdEntity: reactionAtmosphereTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  atmosphereTypeByValue,
+  ord.PressureConditions.Atmosphere.AtmosphereType,
+);
 
 export const {
   ordEntityToEntity: ordTemperatureControlTypeToReaction,
@@ -146,18 +208,34 @@ export const {
 export const {
   ordEntityToEntity: ordStirringMethodTypeToReaction,
   entityToOrdEntity: reactionStirringMethodTypeToOrd,
-} = generateEntityTypeToFromOrd(stirringMethodTypeByValue, ord.StirringConditions.StirringMethodType);
+} = generateEntityTypeToFromOrd(
+  stirringMethodTypeByValue,
+  ord.StirringConditions.StirringMethodType,
+);
 
-export const { ordEntityToEntity: ordIlluminationTypeToReaction, entityToOrdEntity: reactionIlluminationTypeToOrd } =
-  generateEntityTypeToFromOrd(illuminationTypeByValue, ord.IlluminationConditions.IlluminationType);
+export const {
+  ordEntityToEntity: ordIlluminationTypeToReaction,
+  entityToOrdEntity: reactionIlluminationTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  illuminationTypeByValue,
+  ord.IlluminationConditions.IlluminationType,
+);
 
-export const { ordEntityToEntity: ordStirringRateTypeToReaction, entityToOrdEntity: reactionStirringRateTypeToOrd } =
-  generateEntityTypeToFromOrd(stirringRateTypeByValue, ord.StirringConditions.StirringRate.StirringRateType);
+export const {
+  ordEntityToEntity: ordStirringRateTypeToReaction,
+  entityToOrdEntity: reactionStirringRateTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  stirringRateTypeByValue,
+  ord.StirringConditions.StirringRate.StirringRateType,
+);
 
 export const {
   ordEntityToEntity: ordElectrochemistryTypeToReaction,
   entityToOrdEntity: reactionElectrochemistryTypeToOrd,
-} = generateEntityTypeToFromOrd(electrochemistryTypeByValue, ord.ElectrochemistryConditions.ElectrochemistryType);
+} = generateEntityTypeToFromOrd(
+  electrochemistryTypeByValue,
+  ord.ElectrochemistryConditions.ElectrochemistryType,
+);
 
 export const {
   ordEntityToEntity: ordElectrochemistryCellTypeToReaction,
@@ -167,14 +245,23 @@ export const {
   ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType,
 );
 
-export const { ordEntityToEntity: ordFlowTypeToReaction, entityToOrdEntity: reactionFlowTypeToOrd } =
-  generateEntityTypeToFromOrd(flowTypeByValue, ord.FlowConditions.FlowType);
+export const {
+  ordEntityToEntity: ordFlowTypeToReaction,
+  entityToOrdEntity: reactionFlowTypeToOrd,
+} = generateEntityTypeToFromOrd(flowTypeByValue, ord.FlowConditions.FlowType);
 
-export const { ordEntityToEntity: ordTubingTypeToReaction, entityToOrdEntity: reactionTubingTypeToOrd } =
-  generateEntityTypeToFromOrd(tubingTypeByValue, ord.FlowConditions.Tubing.TubingType);
+export const {
+  ordEntityToEntity: ordTubingTypeToReaction,
+  entityToOrdEntity: reactionTubingTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  tubingTypeByValue,
+  ord.FlowConditions.Tubing.TubingType,
+);
 
-export const { ordEntityToEntity: ordCurrentTypeToReaction, entityToOrdEntity: reactionCurrentTypeToOrd } =
-  generateEntityTypeToFromOrd(currentTypeByValue, ord.Current.CurrentUnit);
+export const {
+  ordEntityToEntity: ordCurrentTypeToReaction,
+  entityToOrdEntity: reactionCurrentTypeToOrd,
+} = generateEntityTypeToFromOrd(currentTypeByValue, ord.Current.CurrentUnit);
 
 export const {
   ordEntityToEntity: ordTemperatureMeasurementTypeToReaction,
@@ -187,10 +274,15 @@ export const {
 export const {
   ordEntityToEntity: ordPressureControlTypeToReaction,
   entityToOrdEntity: reactionPressureControlTypeToOrd,
-} = generateEntityTypeToFromOrd(pressureControlTypeByValue, ord.PressureConditions.PressureControl.PressureControlType);
+} = generateEntityTypeToFromOrd(
+  pressureControlTypeByValue,
+  ord.PressureConditions.PressureControl.PressureControlType,
+);
 
-export const { ordEntityToEntity: ordVoltageUnitToReaction, entityToOrdEntity: reactionVoltageUnitToOrd } =
-  generateEntityTypeToFromOrd(voltageUnitByValue, ord.Voltage.VoltageUnit);
+export const {
+  ordEntityToEntity: ordVoltageUnitToReaction,
+  entityToOrdEntity: reactionVoltageUnitToOrd,
+} = generateEntityTypeToFromOrd(voltageUnitByValue, ord.Voltage.VoltageUnit);
 
 export const {
   ordEntityToEntity: ordPressureMeasurementTypeToReaction,
@@ -200,26 +292,44 @@ export const {
   ord.PressureConditions.PressureMeasurement.PressureMeasurementType,
 );
 
-export const { ordEntityToEntity: ordVesselTypeToReaction, entityToOrdEntity: reactionVesselTypeToOrd } =
-  generateEntityTypeToFromOrd(vesselTypeByValue, ord.Vessel.VesselType);
+export const {
+  ordEntityToEntity: ordVesselTypeToReaction,
+  entityToOrdEntity: reactionVesselTypeToOrd,
+} = generateEntityTypeToFromOrd(vesselTypeByValue, ord.Vessel.VesselType);
 
 export const {
   ordEntityToEntity: ordVesselMaterialTypeToReaction,
   entityToOrdEntity: reactionVesselMaterialTypeToOrd,
-} = generateEntityTypeToFromOrd(vesselMaterialTypeByValue, ord.VesselMaterial.VesselMaterialType);
+} = generateEntityTypeToFromOrd(
+  vesselMaterialTypeByValue,
+  ord.VesselMaterial.VesselMaterialType,
+);
 
-export const { ordEntityToEntity: ordEnvironmentTypeToReaction, entityToOrdEntity: reactionEnvironmentTypeToOrd } =
-  generateEntityTypeToFromOrd(environmentTypeByValue, ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType);
+export const {
+  ordEntityToEntity: ordEnvironmentTypeToReaction,
+  entityToOrdEntity: reactionEnvironmentTypeToOrd,
+} = generateEntityTypeToFromOrd(
+  environmentTypeByValue,
+  ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
+);
 
-export const { ordEntityToEntity: ordVolumeTypeToReaction, entityToOrdEntity: reactionVolumeTypeToOrd } =
-  generateEntityTypeToFromOrd(volumeTypeByValue, ord.Volume.VolumeUnit);
+export const {
+  ordEntityToEntity: ordVolumeTypeToReaction,
+  entityToOrdEntity: reactionVolumeTypeToOrd,
+} = generateEntityTypeToFromOrd(volumeTypeByValue, ord.Volume.VolumeUnit);
 
 export const {
   ordEntityToEntity: ordVesselAttachmentTypeToReaction,
   entityToOrdEntity: reactionVesselAttachmentTypeToOrd,
-} = generateEntityTypeToFromOrd(vesselAttachmentTypeByValue, ord.VesselAttachment.VesselAttachmentType);
+} = generateEntityTypeToFromOrd(
+  vesselAttachmentTypeByValue,
+  ord.VesselAttachment.VesselAttachmentType,
+);
 
 export const {
   ordEntityToEntity: ordVesselPreparationsTypeToReaction,
   entityToOrdEntity: reactionVesselPreparationsTypeToOrd,
-} = generateEntityTypeToFromOrd(vesselPreparationTypeByValue, ord.VesselPreparation.VesselPreparationType);
+} = generateEntityTypeToFromOrd(
+  vesselPreparationTypeByValue,
+  ord.VesselPreparation.VesselPreparationType,
+);

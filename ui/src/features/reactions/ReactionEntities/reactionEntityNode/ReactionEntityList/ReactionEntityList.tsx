@@ -28,12 +28,18 @@ import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import { reactionEntityContext } from '../../reactionEntity.context.ts';
 
-interface ReactionEntityAddButtonProps extends Required<Pick<ReactionFormList, 'addItem'>> {
+interface ReactionEntityAddButtonProps extends Required<
+  Pick<ReactionFormList, 'addItem'>
+> {
   items: Array<unknown>;
   nextIndex: number;
 }
 
-function ReactionEntityAddButton({ items, addItem, nextIndex }: Readonly<ReactionEntityAddButtonProps>) {
+function ReactionEntityAddButton({
+  items,
+  addItem,
+  nextIndex,
+}: Readonly<ReactionEntityAddButtonProps>) {
   const { label, useCreate } = addItem;
   const onCreate = useCreate();
 
@@ -52,7 +58,9 @@ function ReactionEntityAddButton({ items, addItem, nextIndex }: Readonly<Reactio
   );
 }
 
-export function ReactionEntityList({ node }: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
+export function ReactionEntityList({
+  node,
+}: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
   const items = node.useSelectItems() ?? [];
   const { isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);

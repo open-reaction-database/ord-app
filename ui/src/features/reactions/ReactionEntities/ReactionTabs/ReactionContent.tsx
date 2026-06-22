@@ -31,23 +31,25 @@ interface ReactionContentProps {
   viewMode: 'tabs' | 'list';
 }
 
-export const ReactionContent = React.memo(({ reactionId, viewMode }: Readonly<ReactionContentProps>) => {
-  if (viewMode === 'tabs') {
-    return <ReactionTabs reactionId={reactionId} />;
-  }
-  return (
-    <Stack gap="xl">
-      <Inputs />
-      <Outcomes reactionId={reactionId} />
-      <Conditions reactionId={reactionId} />
-      <Identifiers reactionId={reactionId} />
-      <Setup reactionId={reactionId} />
-      <Notes />
-      <Observation reactionId={reactionId} />
-      <Workups />
-      <Provenance />
-    </Stack>
-  );
-});
+export const ReactionContent = React.memo(
+  ({ reactionId, viewMode }: Readonly<ReactionContentProps>) => {
+    if (viewMode === 'tabs') {
+      return <ReactionTabs reactionId={reactionId} />;
+    }
+    return (
+      <Stack gap="xl">
+        <Inputs />
+        <Outcomes reactionId={reactionId} />
+        <Conditions reactionId={reactionId} />
+        <Identifiers reactionId={reactionId} />
+        <Setup reactionId={reactionId} />
+        <Notes />
+        <Observation reactionId={reactionId} />
+        <Workups />
+        <Provenance />
+      </Stack>
+    );
+  },
+);
 
 ReactionContent.displayName = 'ReactionContent';

@@ -37,16 +37,22 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 
 const ENTITY_FIELD = 'workups';
 
-const workupRequiredFields: Array<FieldConfiguration<ReactionWorkup>> = [{ label: 'Type', render: item => item.type }];
+const workupRequiredFields: Array<FieldConfiguration<ReactionWorkup>> = [
+  { label: 'Type', render: item => item.type },
+];
 
 const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
   {
     label: 'Keep Phase',
-    render: item => (WorkupConstants.keepPhaseCompatibleTypes.includes(item.type) ? item.keepPhase : ''),
+    render: item =>
+      WorkupConstants.keepPhaseCompatibleTypes.includes(item.type)
+        ? item.keepPhase
+        : '',
   },
   {
     label: 'Target PH',
-    render: item => (WorkupConstants.targetPhCompatibleTypes.includes(item.type) ? item.targetPh : ''),
+    render: item =>
+      WorkupConstants.targetPhCompatibleTypes.includes(item.type) ? item.targetPh : '',
   },
   {
     label: 'Duration',
@@ -55,7 +61,11 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
         ? renderValuePrecisionUnit(item.duration)
         : '',
   },
-  { label: 'Automated', render: item => (item.isAutomated === ReactionBoolean.Unspecified ? '' : item.isAutomated) },
+  {
+    label: 'Automated',
+    render: item =>
+      item.isAutomated === ReactionBoolean.Unspecified ? '' : item.isAutomated,
+  },
   { label: 'Details', render: item => item.details },
   {
     label: 'Aliqout Amount',
@@ -73,7 +83,8 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
           requiredFields={[
             {
               label: 'Setpoint',
-              render: ({ temperature }) => temperature?.setpoint && renderValuePrecisionUnit(temperature.setpoint),
+              render: ({ temperature }) =>
+                temperature?.setpoint && renderValuePrecisionUnit(temperature.setpoint),
             },
           ]}
           optionalFields={[
@@ -129,14 +140,25 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
 
 export function Workups() {
   const dispatch = useAppDispatch();
-  const { isViewOnly, reactionId, ViewDeleteButtonsComponent } = useContext(reactionContext);
-  const workups: Array<ReactionWorkup> = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const { isViewOnly, reactionId, ViewDeleteButtonsComponent } =
+    useContext(reactionContext);
+  const workups: Array<ReactionWorkup> = useSelector(
+    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
+  );
 
   const onWorkupCreate = () => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, workups.length];
-    const newWorkup = ordWorkupToReaction(ord.ReactionWorkup.toObject(new ord.ReactionWorkup()));
+    const newWorkup = ordWorkupToReaction(
+      ord.ReactionWorkup.toObject(new ord.ReactionWorkup()),
+    );
 
-    dispatch(addUpdateReactionField({ reactionId, pathComponents: newIdentifierPath, newValue: newWorkup }));
+    dispatch(
+      addUpdateReactionField({
+        reactionId,
+        pathComponents: newIdentifierPath,
+        newValue: newWorkup,
+      }),
+    );
     dispatch(setReactionPathComponentsList([newIdentifierPath]));
   };
 
@@ -164,8 +186,8 @@ export function Workups() {
         )}
       </Flex>
       <span>
-        Workup steps refer to any additions, purifications, or other operations after the ‘reaction’ stage prior to
-        analysis
+        Workup steps refer to any additions, purifications, or other operations after
+        the ‘reaction’ stage prior to analysis
       </span>
       <Flex
         direction="column"
@@ -188,21 +210,22 @@ export function Workups() {
               requiredFields={workupRequiredFields}
               optionalFields={workupOptionalFields}
             />
-            {WorkupConstants.inputCompatibleTypes.includes(workup.type) && workup.input && (
-              <Accordion
-                variant="separated"
-                chevronPosition="left"
-                multiple={true}
-                defaultValue={[workup.input.id]}
-              >
-                <InputComponentsListItem
-                  input={workup.input}
-                  name="Input"
-                  pathComponents={[ENTITY_FIELD, index, 'input']}
-                  historyPathComponents={[[ENTITY_FIELD, index]]}
-                />
-              </Accordion>
-            )}
+            {WorkupConstants.inputCompatibleTypes.includes(workup.type) &&
+              workup.input && (
+                <Accordion
+                  variant="separated"
+                  chevronPosition="left"
+                  multiple={true}
+                  defaultValue={[workup.input.id]}
+                >
+                  <InputComponentsListItem
+                    input={workup.input}
+                    name="Input"
+                    pathComponents={[ENTITY_FIELD, index, 'input']}
+                    historyPathComponents={[[ENTITY_FIELD, index]]}
+                  />
+                </Accordion>
+              )}
           </Flex>
         ))}
       </Flex>

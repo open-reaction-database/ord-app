@@ -23,7 +23,10 @@ interface ComponentsListOrEmptyProps {
   componentsAmount: number;
 }
 
-export function ComponentsListOrEmpty({ children, componentsAmount }: Readonly<ComponentsListOrEmptyProps>) {
+export function ComponentsListOrEmpty({
+  children,
+  componentsAmount,
+}: Readonly<ComponentsListOrEmptyProps>) {
   return componentsAmount > 0 ? (
     children
   ) : (

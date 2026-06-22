@@ -18,7 +18,9 @@ import { selectReactionPathComponentsList } from './reactionForm.selectors.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 
 const buildState = (reactionPathComponentsList: unknown): AppState =>
-  ({ features: { reactionForm: { reactionPathComponentsList } } }) as unknown as AppState;
+  ({
+    features: { reactionForm: { reactionPathComponentsList } },
+  }) as unknown as AppState;
 
 describe('selectReactionPathComponentsList', () => {
   it('returns the path-components list from the slice', () => {

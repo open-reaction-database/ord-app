@@ -17,7 +17,11 @@ import { createSelectorFactory } from 'store/utils';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { DatasetReaction, ReactionTemplate, ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  DatasetReaction,
+  ReactionTemplate,
+  ReactionId,
+} from 'store/entities/reactions/reactions.types.ts';
 import { getDeepReactionPart } from './reactions.utils.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
@@ -30,9 +34,13 @@ export const selectShowInvalidOnly = buildSelector(state => state.showInvalidOnl
 
 export function selectReactionById(id: string): (state: AppState) => ReactionTemplate;
 export function selectReactionById(id: number): (state: AppState) => DatasetReaction;
-export function selectReactionById(id: ReactionId): (state: AppState) => DatasetReaction | ReactionTemplate;
+export function selectReactionById(
+  id: ReactionId,
+): (state: AppState) => DatasetReaction | ReactionTemplate;
 
-export function selectReactionById(id: ReactionId): (state: AppState) => DatasetReaction | ReactionTemplate {
+export function selectReactionById(
+  id: ReactionId,
+): (state: AppState) => DatasetReaction | ReactionTemplate {
   return (state: AppState) => state.entities.reactions.reactionsById[id];
 }
 
@@ -40,12 +48,15 @@ export const selectReactionsPagination = buildSelector(state => state.pagination
 
 export const selectActiveDatasetId = buildSelector(state => state.activeDatasetId);
 
-export const selectIsReactionCreating = buildSelector(state => state.isReactionCreating);
+export const selectIsReactionCreating = buildSelector(
+  state => state.isReactionCreating,
+);
 
 export const selectReactionsLoading = buildSelector(state => state.areReactionsLoading);
 
 export const selectReactionPartByPath =
-  (reactionId: ReactionId, pathComponents: ReactionPathComponents) => (state: AppState) => {
+  (reactionId: ReactionId, pathComponents: ReactionPathComponents) =>
+  (state: AppState) => {
     const reaction = selectReactionById(reactionId)(state);
     if (!reaction) {
       return null;
@@ -55,25 +66,34 @@ export const selectReactionPartByPath =
 
 const selectReactionId = (_state: unknown, id: ReactionId) => id;
 
-export const selectOrderedInputs = createSelector([selectReactions, selectReactionId], (reactions, id) => {
-  const inputsMap = reactions[id]?.data?.inputs || {};
-  return Object.values(inputsMap).sort((a, b) => {
-    const aOrder = a.additionOrder ?? Infinity;
-    const bOrder = b.additionOrder ?? Infinity;
-    return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
-  });
-});
+export const selectOrderedInputs = createSelector(
+  [selectReactions, selectReactionId],
+  (reactions, id) => {
+    const inputsMap = reactions[id]?.data?.inputs || {};
+    return Object.values(inputsMap).sort((a, b) => {
+      const aOrder = a.additionOrder ?? Infinity;
+      const bOrder = b.additionOrder ?? Infinity;
+      return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
+    });
+  },
+);
 
-export const selectOrderedInputsWrapper = (id: ReactionId) => (state: AppState) => selectOrderedInputs(state, id);
+export const selectOrderedInputsWrapper = (id: ReactionId) => (state: AppState) =>
+  selectOrderedInputs(state, id);
 
-const selectVariableName = (_state: unknown, _id: unknown, variableName: string) => variableName;
+const selectVariableName = (_state: unknown, _id: unknown, variableName: string) =>
+  variableName;
 
-export const selectTemplateVariables = createSelector([selectReactions, selectReactionId], (reactions, id) => {
-  const reaction = reactions[id] as ReactionTemplate;
-  return reaction.variables;
-});
+export const selectTemplateVariables = createSelector(
+  [selectReactions, selectReactionId],
+  (reactions, id) => {
+    const reaction = reactions[id] as ReactionTemplate;
+    return reaction.variables;
+  },
+);
 
-export const selectTemplateVariablesWrapper = (id: string) => (state: AppState) => selectTemplateVariables(state, id);
+export const selectTemplateVariablesWrapper = (id: string) => (state: AppState) =>
+  selectTemplateVariables(state, id);
 
 export const selectTemplateVariable = createSelector(
   [selectTemplateVariables, selectVariableName],
@@ -82,5 +102,6 @@ export const selectTemplateVariable = createSelector(
   },
 );
 
-export const selectTemplateVariableWrapper = (id: string, variableName: string) => (state: AppState) =>
-  selectTemplateVariable(state, id, variableName);
+export const selectTemplateVariableWrapper =
+  (id: string, variableName: string) => (state: AppState) =>
+    selectTemplateVariable(state, id, variableName);

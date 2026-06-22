@@ -27,9 +27,16 @@ import type { RejectValue } from 'store/utils/handleApiError.ts';
 
 const { createAsyncAction, createAction } = createActionFactory('reactions');
 
-export const getReactionsListActions = createAsyncAction<number, Pages<DatasetReaction>, RejectValue>('get_list');
+export const getReactionsListActions = createAsyncAction<
+  number,
+  Pages<DatasetReaction>,
+  RejectValue
+>('get_list');
 
-export const getReactionPageActions = createAsyncAction<Partial<CurrentPage>, Pages<DatasetReaction>>('get_page');
+export const getReactionPageActions = createAsyncAction<
+  Partial<CurrentPage>,
+  Pages<DatasetReaction>
+>('get_page');
 
 export const getReactionActions = createAsyncAction<
   { datasetId: number; reactionId: number },
@@ -37,25 +44,36 @@ export const getReactionActions = createAsyncAction<
   RejectValue
 >('get');
 
-export const createEmptyReactionActions = createAsyncAction<void, DatasetReaction>('create_empty');
-
-export const importReactionFromFileActions = createAsyncAction<ImportReactionFromFilePayload, DatasetReaction>(
-  'import_from_file',
+export const createEmptyReactionActions = createAsyncAction<void, DatasetReaction>(
+  'create_empty',
 );
 
-export const renameReactionActions = createAsyncAction<RenameReactionPayload, RenameReactionPayload>('rename');
+export const importReactionFromFileActions = createAsyncAction<
+  ImportReactionFromFilePayload,
+  DatasetReaction
+>('import_from_file');
+
+export const renameReactionActions = createAsyncAction<
+  RenameReactionPayload,
+  RenameReactionPayload
+>('rename');
 
 export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
   UpdateReactionSuccessPayload
 >('addUpdateField');
 
-export const searchReactionActions = createAsyncAction<string, DatasetReaction>('search');
-
-export const deleteReactionFieldActions = createAsyncAction<UpdateReactionPayload, UpdateReactionSuccessPayload>(
-  'deleteField',
+export const searchReactionActions = createAsyncAction<string, DatasetReaction>(
+  'search',
 );
 
-export const removeReactionActions = createAsyncAction<number, number>('remove_dataset');
+export const deleteReactionFieldActions = createAsyncAction<
+  UpdateReactionPayload,
+  UpdateReactionSuccessPayload
+>('deleteField');
+
+export const removeReactionActions = createAsyncAction<number, number>(
+  'remove_dataset',
+);
 
 export const setShowInvalidOnly = createAction<boolean>('setShowInvalidOnly');

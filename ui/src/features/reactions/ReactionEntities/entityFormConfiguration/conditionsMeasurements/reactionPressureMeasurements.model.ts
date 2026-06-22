@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type ReactionFormNode, ReactionFormNodeType } from '../../reactionEntities.types.ts';
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from '../../reactionEntities.types.ts';
 import {
   pressureMeasurementTypeOptions,
   pressureUnitOptions,

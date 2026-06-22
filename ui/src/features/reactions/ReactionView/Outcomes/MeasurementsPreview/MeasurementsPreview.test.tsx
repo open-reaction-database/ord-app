@@ -20,8 +20,18 @@ import type { ReactionProduct } from 'store/entities/reactions/reactionComponent
 
 const product = {
   measurements: [
-    { id: 'm1', type: 'IDENTITY', analysis: { name: 'NMR' }, value: { type: 'String', value: 'clear liquid' } },
-    { id: 'm2', type: 'AREA', analysis: { name: 'HPLC' }, value: { type: '%', value: { value: 90 } } },
+    {
+      id: 'm1',
+      type: 'IDENTITY',
+      analysis: { name: 'NMR' },
+      value: { type: 'String', value: 'clear liquid' },
+    },
+    {
+      id: 'm2',
+      type: 'AREA',
+      analysis: { name: 'HPLC' },
+      value: { type: '%', value: { value: 90 } },
+    },
   ],
 } as unknown as ReactionProduct;
 

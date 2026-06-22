@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type ReactionFormNode, ReactionFormNodeType } from '../../reactionEntities.types.ts';
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from '../../reactionEntities.types.ts';
 import {
   timeUnitOptions,
   workupTypeOptions,
@@ -22,7 +25,10 @@ import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid
 import { booleanOptions } from '../booleanOptions.ts';
 import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import { WorkupInput } from './WorkupInput.tsx';
-import { reactionStirringCondition, reactionTemperatureCondition } from '../reactionConditions.model.tsx';
+import {
+  reactionStirringCondition,
+  reactionTemperatureCondition,
+} from '../reactionConditions.model.tsx';
 import { createConditionFactory } from '../../reactionEntities.utils.ts';
 import type { WorkupType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
@@ -107,6 +113,12 @@ export const reactionWorkups: Array<ReactionFormNode> = [
     Component: WorkupInput,
     condition: createCondition(WorkupConstants.inputCompatibleTypes),
   },
-  { ...reactionTemperatureCondition, condition: createCondition(WorkupConstants.temperatureCompatibleTypes) },
-  { ...reactionStirringCondition, condition: createCondition(WorkupConstants.stirringCompatibleTypes) },
+  {
+    ...reactionTemperatureCondition,
+    condition: createCondition(WorkupConstants.temperatureCompatibleTypes),
+  },
+  {
+    ...reactionStirringCondition,
+    condition: createCondition(WorkupConstants.stirringCompatibleTypes),
+  },
 ];

@@ -18,7 +18,9 @@ import { selectIsEnumerationSetupOpened } from './enumerationSetup.selectors.ts'
 import type { AppState } from 'store/configureAppStore.ts';
 
 const buildState = (isEnumerationSetupOpened: boolean): AppState =>
-  ({ features: { enumerationSetup: { isEnumerationSetupOpened } } }) as unknown as AppState;
+  ({
+    features: { enumerationSetup: { isEnumerationSetupOpened } },
+  }) as unknown as AppState;
 
 describe('selectIsEnumerationSetupOpened', () => {
   it('reads the open flag from the slice', () => {

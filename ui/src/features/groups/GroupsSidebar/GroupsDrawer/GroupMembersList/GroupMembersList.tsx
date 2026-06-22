@@ -24,13 +24,19 @@ import {
   selectMemberRoles,
 } from 'store/entities/groups/groups.selectors.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { removeGroupMembers, updateGroupMembers } from 'store/entities/groups/groups.thunks.ts';
+import {
+  removeGroupMembers,
+  updateGroupMembers,
+} from 'store/entities/groups/groups.thunks.ts';
 import { USER_ROLES } from 'common/types';
 import { PermissionsModal } from '../PermissionModal/PermissionModal.tsx';
 import { InfoCircleIcon } from 'common/icons';
 import classes from './GroupMembersList.module.scss';
 import { UserDataField } from './UserDataField/UserDataField.tsx';
-import { selectEditingGroupId, selectIsAddingMember } from 'store/features/groups/groups.selectors.ts';
+import {
+  selectEditingGroupId,
+  selectIsAddingMember,
+} from 'store/features/groups/groups.selectors.ts';
 import { typographyClasses } from 'common/styling';
 
 const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
@@ -56,7 +62,8 @@ export function GroupMembersList() {
     if (!groupMembers || groupMembers.length === 0) return [];
 
     return [...groupMembers].sort((memberA, memberB) => {
-      const roleDiff = roleOrder.indexOf(memberA.role) - roleOrder.indexOf(memberB.role);
+      const roleDiff =
+        roleOrder.indexOf(memberA.role) - roleOrder.indexOf(memberB.role);
       if (roleDiff !== 0) return roleDiff;
 
       const nameA = memberA.user?.name || '';
@@ -76,7 +83,11 @@ export function GroupMembersList() {
           gap="8"
         >
           <div className={classes.title}>Members</div>
-          {isAddingMember ? <Loader size="sm" /> : <div className={classes.counter}>{groupMembers?.length}</div>}
+          {isAddingMember ? (
+            <Loader size="sm" />
+          ) : (
+            <div className={classes.counter}>{groupMembers?.length}</div>
+          )}
         </Flex>
         <Group
           className={classes.rolesButton}
@@ -93,55 +104,57 @@ export function GroupMembersList() {
           <Loader />
         </Flex>
       ) : (
-        sortedGroupMembers.map(({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
-          <div
-            key={external_id}
-            className={classes.userInfoContainer}
-          >
-            <Flex
-              align="center"
-              gap="12"
-              className={typographyClasses.oneLineTextWrapper}
+        sortedGroupMembers.map(
+          ({ role, user: { id, avatar_url, name, email, external_id, orcid_id } }) => (
+            <div
+              key={external_id}
+              className={classes.userInfoContainer}
             >
-              <Avatar
-                radius="xl"
-                src={avatar_url}
-                size="32px"
-              />
               <Flex
-                direction="column"
-                gap="4"
+                align="center"
+                gap="12"
                 className={typographyClasses.oneLineTextWrapper}
               >
-                <Tooltip label={name}>
-                  <div className={typographyClasses.oneLineText}>{name}</div>
-                </Tooltip>
-                <Flex gap="8">
-                  <UserDataField
-                    fieldName="ORCID"
-                    value={orcid_id}
-                  />
+                <Avatar
+                  radius="xl"
+                  src={avatar_url}
+                  size="32px"
+                />
+                <Flex
+                  direction="column"
+                  gap="4"
+                  className={typographyClasses.oneLineTextWrapper}
+                >
+                  <Tooltip label={name}>
+                    <div className={typographyClasses.oneLineText}>{name}</div>
+                  </Tooltip>
+                  <Flex gap="8">
+                    <UserDataField
+                      fieldName="ORCID"
+                      value={orcid_id}
+                    />
 
-                  <UserDataField
-                    fieldName="e-mail"
-                    value={email}
-                  />
+                    <UserDataField
+                      fieldName="e-mail"
+                      value={email}
+                    />
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
 
-            {isAdmin && (role !== USER_ROLES.ADMIN || hasTwoAdmins) ? (
-              <RoleSelector
-                value={role}
-                onChange={role => handleRoleChange(id, role)}
-                onRemove={() => handleMemberRemove(id)}
-                disabled={isGroupUpdating}
-              />
-            ) : (
-              <Text className={classes.role}>{role}</Text>
-            )}
-          </div>
-        ))
+              {isAdmin && (role !== USER_ROLES.ADMIN || hasTwoAdmins) ? (
+                <RoleSelector
+                  value={role}
+                  onChange={role => handleRoleChange(id, role)}
+                  onRemove={() => handleMemberRemove(id)}
+                  disabled={isGroupUpdating}
+                />
+              ) : (
+                <Text className={classes.role}>{role}</Text>
+              )}
+            </div>
+          ),
+        )
       )}
 
       <PermissionsModal

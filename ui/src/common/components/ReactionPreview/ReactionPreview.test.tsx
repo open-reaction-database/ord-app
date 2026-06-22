@@ -16,7 +16,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
 import { ReactionPreview } from './ReactionPreview.tsx';
-import type { AppReaction, ReactionOrTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  AppReaction,
+  ReactionOrTemplate,
+} from 'store/entities/reactions/reactions.types.ts';
 
 vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => ({
   ReactionComponentPreview: () => <div data-testid="component-preview" />,
@@ -25,11 +28,18 @@ vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => 
 describe('ReactionPreview', () => {
   it('shows the empty placeholder when the reaction has no inputs or outcomes', () => {
     const data = emptyReactionData();
-    const reaction = { id: 1, data, summary: { conditions: '' } } as unknown as ReactionOrTemplate;
-    const { getByText } = renderInReactionView(<ReactionPreview reaction={reaction} />, {
-      reactionId: 1,
-      reaction: data,
-    });
+    const reaction = {
+      id: 1,
+      data,
+      summary: { conditions: '' },
+    } as unknown as ReactionOrTemplate;
+    const { getByText } = renderInReactionView(
+      <ReactionPreview reaction={reaction} />,
+      {
+        reactionId: 1,
+        reaction: data,
+      },
+    );
     expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
   });
 
@@ -38,11 +48,18 @@ describe('ReactionPreview', () => {
       ...emptyReactionData(),
       inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
     } as unknown as AppReaction;
-    const reaction = { id: 1, data, summary: { conditions: '' } } as unknown as ReactionOrTemplate;
-    const { getByText } = renderInReactionView(<ReactionPreview reaction={reaction} />, {
-      reactionId: 1,
-      reaction: data,
-    });
+    const reaction = {
+      id: 1,
+      data,
+      summary: { conditions: '' },
+    } as unknown as ReactionOrTemplate;
+    const { getByText } = renderInReactionView(
+      <ReactionPreview reaction={reaction} />,
+      {
+        reactionId: 1,
+        reaction: data,
+      },
+    );
     expect(getByText('Input A')).toBeInTheDocument();
   });
 });

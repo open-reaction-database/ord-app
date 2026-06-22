@@ -16,7 +16,10 @@
 import { describe, it, expect } from 'vitest';
 import { variablesSidebarReducer } from './variablesSidebar.reducer.ts';
 import { setVariablesSidebarOpenedAction } from './variablesSidebar.actions.ts';
-import { addReactionPathComponentToList, setReactionPathComponentsList } from '../reactionForm/reactionForm.actions.ts';
+import {
+  addReactionPathComponentToList,
+  setReactionPathComponentsList,
+} from '../reactionForm/reactionForm.actions.ts';
 
 const initialState = () => variablesSidebarReducer(undefined, { type: '@@INIT' });
 
@@ -26,12 +29,18 @@ describe('variablesSidebarReducer', () => {
   });
 
   it('follows the open action', () => {
-    const state = variablesSidebarReducer(initialState(), setVariablesSidebarOpenedAction(true));
+    const state = variablesSidebarReducer(
+      initialState(),
+      setVariablesSidebarOpenedAction(true),
+    );
     expect(state.isVariablesSidebarOpened).toBe(true);
   });
 
   it('closes when the reaction path changes (set or add)', () => {
-    let state = variablesSidebarReducer(initialState(), setVariablesSidebarOpenedAction(true));
+    let state = variablesSidebarReducer(
+      initialState(),
+      setVariablesSidebarOpenedAction(true),
+    );
     state = variablesSidebarReducer(state, setReactionPathComponentsList([['a']]));
     expect(state.isVariablesSidebarOpened).toBe(false);
 

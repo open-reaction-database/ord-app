@@ -27,7 +27,10 @@ import {
   ordWorkupTypeToReaction,
   reactionWorkupTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters.ts';
-import { ordAmountToReaction, reactionAmountToOrd } from '../reactionAmount/reactionAmount.converters.ts';
+import {
+  ordAmountToReaction,
+  reactionAmountToOrd,
+} from '../reactionAmount/reactionAmount.converters.ts';
 import {
   ordInputWithoutNameToReaction,
   reactionInputWithoutNameToOrd,
@@ -62,16 +65,17 @@ export const ordWorkupToReaction = ({
   });
 
 export const reactionWorkupToOrd = (workup: ReactionWorkup): ord.IReactionWorkup => {
-  const { type, duration, amount, input, temperature, stirring, isAutomated, ...rest } = withoutId(
-    workupTransform(workup),
-  );
+  const { type, duration, amount, input, temperature, stirring, isAutomated, ...rest } =
+    withoutId(workupTransform(workup));
 
   return {
     type: reactionWorkupTypeToOrd(type),
     duration: reactionTimeToOrd(duration),
     amount: amount ? reactionAmountToOrd(amount) : amount,
     input: input ? reactionInputWithoutNameToOrd(input) : null,
-    temperature: temperature ? reactionTemperatureConditionToOrd(temperature) : temperature,
+    temperature: temperature
+      ? reactionTemperatureConditionToOrd(temperature)
+      : temperature,
     stirring: stirring ? reactionStirringConditionToOrd(stirring) : stirring,
     isAutomated: reactionBooleanToOrd(isAutomated),
     ...rest,

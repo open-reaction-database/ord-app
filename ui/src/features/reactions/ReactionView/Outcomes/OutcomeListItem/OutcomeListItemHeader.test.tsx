@@ -47,7 +47,9 @@ describe('OutcomeListItemHeader', () => {
   });
 
   it('omits the time and conversion rows when those values are absent', () => {
-    const { queryByText } = renderHeader({ products: [] } as unknown as ReactionOutcome);
+    const { queryByText } = renderHeader({
+      products: [],
+    } as unknown as ReactionOutcome);
     expect(queryByText('Time:')).not.toBeInTheDocument();
     expect(queryByText(/Limiting reactant conversion:/)).not.toBeInTheDocument();
   });

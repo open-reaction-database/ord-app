@@ -21,7 +21,11 @@ import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes
 
 describe('OutcomeListItem', () => {
   it('renders the outcome header within the accordion', () => {
-    const outcome = { id: 'o1', products: [], analyses: {} } as unknown as ReactionOutcome;
+    const outcome = {
+      id: 'o1',
+      products: [],
+      analyses: {},
+    } as unknown as ReactionOutcome;
     const { getByText } = renderInReactionView(
       <Accordion defaultValue="o1">
         <OutcomeListItem
