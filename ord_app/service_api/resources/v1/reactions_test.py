@@ -28,7 +28,9 @@ from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.services.pb_utils import load_message
 
 fake = Faker()
-faker = Faker()
+# Both names are used across the test functions merged into this file; alias rather than
+# instantiate a second Faker.
+faker = fake
 
 
 async def test_create_reaction_with_pb(

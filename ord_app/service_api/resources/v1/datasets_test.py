@@ -40,7 +40,9 @@ from ord_app.service_api.models import (
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH
 
 fake = Faker()
-faker = Faker()
+# Both names are used across the test functions merged into this file; alias rather than
+# instantiate a second Faker.
+faker = fake
 
 
 def parse_dt(dt):
