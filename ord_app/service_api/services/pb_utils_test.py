@@ -18,6 +18,7 @@ import pytest
 from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
 
+from ord_app.conftest import read_testdata_text
 from ord_app.service_api.services.pb_utils import (
     MAP_FILE_EXT_TO_DATASET_KIND,
     MAP_FILE_EXT_TO_PB_KIND,
@@ -25,7 +26,6 @@ from ord_app.service_api.services.pb_utils import (
     validate_pb_kind_by_file_ext,
     write_dataset_message,
 )
-from ord_app.tests.conftest import read_testdata_text
 
 
 def _example_dataset() -> Dataset:

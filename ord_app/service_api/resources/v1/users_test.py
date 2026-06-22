@@ -14,7 +14,7 @@
 from faker import Faker
 from fastapi import status
 
-from ord_app.tests.conftest import create_test_user_with_group
+from ord_app.conftest import create_test_user_with_group
 
 fake = Faker()
 
