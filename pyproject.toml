@@ -62,6 +62,11 @@ package = false
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+# Tests are colocated next to the code they exercise (e.g. resources/v1/datasets.py +
+# resources/v1/datasets_test.py), so collect the `*_test.py` suffix and scope discovery to the
+# package. Shared fixtures/helpers live in ord_app/conftest.py.
+testpaths = ["ord_app"]
+python_files = ["*_test.py"]
 
 # Total-coverage floor enforced in CI (a regression backstop). pytest-cov honors this on
 # every `pytest --cov` run. Set a few points below current (~83% total, which includes the
@@ -99,8 +104,10 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Tests trip a couple of flake8-bugbear (the "B" rules) checks -- B011 (`assert False`)
 # and B017 (overly broad `pytest.raises(Exception)`); type annotations (ANN) also add
 # little value on test functions. S101 (flake8-bandit) flags `assert`, which is exactly
-# how pytest expresses checks, so it is pure noise in tests. Skip all of these in tests.
-"ord_app/tests/**" = ["B011", "B017", "ANN", "S101"]
+# how pytest expresses checks, so it is pure noise in tests. Tests are colocated as
+# `<module>_test.py`; the shared fixtures/helpers live in conftest.py. Skip all of these there.
+"**/*_test.py" = ["B011", "B017", "ANN", "S101"]
+"**/conftest.py" = ["B011", "B017", "ANN", "S101"]
 
 [tool.ruff.lint.isort]
 # ord_schema is an external dependency; pin its classification so import
