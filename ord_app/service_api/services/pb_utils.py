@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import gzip
+import os
 import tempfile
 from base64 import b64encode
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import TypeVar
 
@@ -227,6 +230,27 @@ def load_message(data: bytes, message_type: type[MessageT], kind: str) -> Messag
     return message
 
 
+@contextmanager
+def _staged_parquet_path() -> Iterator[str]:
+    """Yield a private, tempfile-generated path for staging a Parquet dataset on disk.
+
+    ord-schema reads and writes Parquet from a filesystem path (via pyarrow), so dataset bytes
+    must be staged on disk rather than handled in memory. The path comes straight from
+    ``tempfile`` -- it is never derived from user input, so it cannot be used for path traversal --
+    and the file is always removed on exit. The handle is closed before yielding so a subsequent
+    open-by-name (pyarrow) does not alias it.
+
+    Yields:
+        The path to an empty temporary ``.parquet`` file.
+    """
+    fd, name = tempfile.mkstemp(suffix=".parquet")
+    os.close(fd)
+    try:
+        yield name
+    finally:
+        os.unlink(name)
+
+
 def load_dataset_message(file_data: bytes, kind: str) -> Dataset:
     """Deserialize an uploaded dataset file into a Dataset proto.
 
@@ -244,13 +268,9 @@ def load_dataset_message(file_data: bytes, kind: str) -> Dataset:
         ValueError: If ``kind`` is unknown, or if a Parquet file is not a valid ORD dataset.
     """
     if kind == "parquet":
-        # pyarrow reads Parquet from a seekable path, so stage the upload bytes on disk. A temp
-        # directory (rather than NamedTemporaryFile) avoids aliasing our open handle with the one
-        # pyarrow opens by name.
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "dataset.parquet"
-            path.write_bytes(file_data)
-            return parquet_dataset.load_dataset(path)
+        with _staged_parquet_path() as tmp_path:
+            Path(tmp_path).write_bytes(file_data)
+            return parquet_dataset.load_dataset(tmp_path)
     return load_message(file_data, Dataset, kind)
 
 
@@ -269,10 +289,9 @@ def write_dataset_message(dataset: Dataset, kind: str) -> bytes:
             missing the name/description/reactions that ord-schema requires for Parquet.
     """
     if kind == "parquet":
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "dataset.parquet"
-            parquet_dataset.save_dataset(dataset, path)
-            return path.read_bytes()
+        with _staged_parquet_path() as tmp_path:
+            parquet_dataset.save_dataset(dataset, tmp_path)
+            return Path(tmp_path).read_bytes()
     return write_message(dataset, kind)
 
 
