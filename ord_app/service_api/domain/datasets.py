@@ -280,7 +280,9 @@ class DatasetUseCases:
                 raise UnprocessableEntityError(
                     "Parquet export requires at least one reaction in the dataset."
                 )
-            if not dataset_pb.description:
+            if not dataset_pb.description.strip():
+                # .strip() so a whitespace-only description is treated as missing rather than
+                # exported as a meaningless value.
                 raise UnprocessableEntityError(
                     "Parquet export requires a dataset description. "
                     "Add a description and try again."

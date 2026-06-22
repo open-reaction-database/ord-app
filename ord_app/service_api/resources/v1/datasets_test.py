@@ -779,12 +779,15 @@ async def test_download_dataset_as_parquet_round_trips(
     assert [r.reaction_id for r in loaded.reactions] == [reaction_id]
 
 
+@pytest.mark.parametrize("description", (None, "", "   "))
 async def test_download_parquet_requires_description(
-    api_client, mock_authenticated_user, test_db_session
+    description, api_client, mock_authenticated_user, test_db_session
 ):
-    # create_test_dataset has no description; Parquet export must reject it with a clear 422.
+    # A missing, empty, or whitespace-only description must reject Parquet export with a clear 422.
     user, *_ = mock_authenticated_user
     dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    if description is not None:
+        dataset.description = description
     await _add_reaction(test_db_session, user, dataset)
 
     response = api_client.get(
