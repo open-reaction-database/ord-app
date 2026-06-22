@@ -25,7 +25,7 @@ import clsx from 'clsx';
 import classes from './datasetTable.module.scss';
 import { DotsIcon, AlertCircleIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
-import { fileDownloadOptions } from 'common/constants.ts';
+import { datasetFileDownloadOptions } from 'common/constants.ts';
 
 export const handleMenu = (event: MouseEvent) => {
   event.stopPropagation();
@@ -132,7 +132,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     Cell: ({ row }) => {
       return (
         <DownloadMenu
-          options={fileDownloadOptions}
+          options={datasetFileDownloadOptions}
           url={`/datasets/${row.original.id}/download`}
           target={
             <ActionIcon

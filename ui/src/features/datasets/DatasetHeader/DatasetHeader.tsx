@@ -31,7 +31,7 @@ import { useSelector } from 'react-redux';
 import { selectIsDatasetOpened } from 'store/entities/datasets/datasets.selectors.ts';
 import { setDatasetEditOpenedAction } from 'store/entities/datasets/datasets.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { fileDownloadOptions } from 'common/constants.ts';
+import { datasetFileDownloadOptions } from 'common/constants.ts';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
@@ -171,7 +171,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         )}
         <ShareDataset dataset={dataset} />
         <DownloadMenu
-          options={fileDownloadOptions}
+          options={datasetFileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}
           target={
             <Button

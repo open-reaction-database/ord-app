@@ -23,6 +23,7 @@ from google.protobuf.text_format import ParseError as TextParseError
 from loguru import logger
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
+from pyarrow import ArrowException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
 
@@ -38,10 +39,10 @@ from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
+    DatasetDownloadFileFormats,
     DatasetEnumerateCreateSchema,
     DatasetEnumerateExtendSchema,
     DatasetShareCreateSchema,
-    DownloadFileFormats,
 )
 from ord_app.service_api.services.exceptions import (
     EntityNotFoundError,
@@ -49,7 +50,11 @@ from ord_app.service_api.services.exceptions import (
     ProtobufDecodeError,
     UnprocessableEntityError,
 )
-from ord_app.service_api.services.pb_utils import load_message, write_message
+from ord_app.service_api.services.pb_utils import (
+    load_dataset_message,
+    load_message,
+    write_dataset_message,
+)
 from ord_app.service_api.services.postgresql import get_db_session
 
 
@@ -123,8 +128,15 @@ class DatasetUseCases:
         self, dataset_id: int, file_data: bytes, kind: str
     ) -> DatasetModel | None:
         try:
-            dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
-        except (DecodeError, JsonParseError, TextParseError) as e:
+            dataset_pb = await run_in_threadpool(load_dataset_message, file_data, kind)
+        except (
+            DecodeError,
+            JsonParseError,
+            TextParseError,
+            # Malformed Parquet (pyarrow) or a valid Parquet file that is not an ORD dataset.
+            ArrowException,
+            ValueError,
+        ) as e:
             logger.error(e)
             raise ProtobufDecodeError(
                 "An error occurred while reading the file."
@@ -140,8 +152,15 @@ class DatasetUseCases:
 
     async def upload(self, group_id: int, file_data: bytes, kind: str) -> DatasetModel:
         try:
-            dataset_pb = await run_in_threadpool(load_message, file_data, Dataset, kind)
-        except (DecodeError, JsonParseError, TextParseError) as e:
+            dataset_pb = await run_in_threadpool(load_dataset_message, file_data, kind)
+        except (
+            DecodeError,
+            JsonParseError,
+            TextParseError,
+            # Malformed Parquet (pyarrow) or a valid Parquet file that is not an ORD dataset.
+            ArrowException,
+            ValueError,
+        ) as e:
             logger.error(e)
             raise ProtobufDecodeError(
                 "An error occurred while reading the file."
@@ -237,7 +256,7 @@ class DatasetUseCases:
         return await self.dataset_repository.delete(dataset_id)
 
     async def download(
-        self, dataset_id: int, file_format: DownloadFileFormats
+        self, dataset_id: int, file_format: DatasetDownloadFileFormats
     ) -> tuple[DatasetModel, bytes]:
         dataset = await self.dataset_repository.get_with_reactions(dataset_id)
 
@@ -254,7 +273,22 @@ class DatasetUseCases:
             [Reaction.FromString(reaction.binpb) for reaction in dataset.reactions]
         )
 
-        data = await run_in_threadpool(write_message, dataset_pb, kind=file_format)
+        if file_format == "parquet":
+            # ord-schema's Parquet writer requires a non-empty description and at least one
+            # reaction; surface a clear 422 rather than letting it raise a bare ValueError.
+            if not dataset_pb.reactions:
+                raise UnprocessableEntityError(
+                    "Parquet export requires at least one reaction in the dataset."
+                )
+            if not dataset_pb.description:
+                raise UnprocessableEntityError(
+                    "Parquet export requires a dataset description. "
+                    "Add a description and try again."
+                )
+
+        data = await run_in_threadpool(
+            write_dataset_message, dataset_pb, kind=file_format
+        )
         return dataset, data
 
     async def share(

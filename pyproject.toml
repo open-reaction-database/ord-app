@@ -38,6 +38,7 @@ dependencies = [
     "greenlet>=3",
     "httpx>=0.28.1,<0.29",
     "psycopg>=3.2.5,<4",
+    "pyarrow>=24,<25",
 ]
 
 [dependency-groups]

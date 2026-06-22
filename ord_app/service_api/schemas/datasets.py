@@ -29,7 +29,10 @@ from ord_app.service_api.schemas.base import (
 from ord_app.service_api.schemas.groups import GroupUserResponseSchema
 from ord_app.service_api.schemas.users import UserResponseSchema
 
+# Per-message serializations, valid for both single-reaction and whole-dataset downloads.
 DownloadFileFormats = Literal["binpb", "json", "txtpb"]
+# Datasets additionally export to Parquet, a dataset-level (multi-reaction) columnar format.
+DatasetDownloadFileFormats = Literal["binpb", "json", "txtpb", "parquet"]
 
 
 class DatasetResponseSchema(BaseSchema):

@@ -24,6 +24,13 @@ export const fileDownloadOptions: Array<DownloadMenuOptions> = [
   { label: '.json', format: 'json' },
 ];
 
+// Datasets additionally export to Parquet, a dataset-level (multi-reaction) format. It is not
+// offered for single-reaction downloads, so it lives here rather than in fileDownloadOptions.
+export const datasetFileDownloadOptions: Array<DownloadMenuOptions> = [
+  ...fileDownloadOptions,
+  { label: '.parquet', format: 'parquet' },
+];
+
 export const DOT_DELIMITER = '·';
 
 export const DATE_FORMAT = 'YYYY-MM-DD';

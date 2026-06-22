@@ -28,6 +28,7 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
+    DatasetDownloadFileFormats,
     DatasetEnumerateCreateSchema,
     DatasetEnumerateExtendSchema,
     DatasetResponseSchema,
@@ -35,11 +36,11 @@ from ord_app.service_api.schemas.datasets import (
     DatasetShareCreateSchema,
     DatasetShareSchema,
     DatasetWithReactionCountResponseSchema,
-    DownloadFileFormats,
 )
 from ord_app.service_api.schemas.groups import GroupShareSchema
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.pb_utils import (
+    MAP_FILE_EXT_TO_DATASET_KIND,
     validate_uploaded_pb_file,
 )
 from ord_app.service_api.services.postgresql import get_db_session
@@ -86,7 +87,9 @@ async def upload_dataset(
     db: Annotated[AsyncSession, Depends(get_db_session)],
     background_tasks: BackgroundTasks,
 ) -> DatasetModel:
-    file_data, kind = await validate_uploaded_pb_file(file)
+    file_data, kind = await validate_uploaded_pb_file(
+        file, MAP_FILE_EXT_TO_DATASET_KIND
+    )
     dataset = await use_case.upload(group_id, file_data, kind)
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
     return dataset
@@ -135,7 +138,7 @@ async def extend_enumerate_dataset(
 )
 async def download_dataset(
     dataset_id: int,
-    file_format: DownloadFileFormats,
+    file_format: DatasetDownloadFileFormats,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> Response:
     dataset, data = await use_case.download(dataset_id, file_format)
@@ -205,7 +208,9 @@ async def extend_dataset(
     db: Annotated[AsyncSession, Depends(get_db_session)],
     background_tasks: BackgroundTasks,
 ) -> DatasetModel | None:
-    file_data, kind = await validate_uploaded_pb_file(file)
+    file_data, kind = await validate_uploaded_pb_file(
+        file, MAP_FILE_EXT_TO_DATASET_KIND
+    )
     response = await use_case.extend(dataset_id, file_data, kind)
     background_tasks.add_task(validate_dataset_reactions, db)
     return response

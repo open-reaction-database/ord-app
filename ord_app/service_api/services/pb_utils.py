@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import gzip
+import tempfile
 from base64 import b64encode
 from pathlib import Path
 from typing import TypeVar
@@ -20,6 +21,7 @@ from fastapi import HTTPException, UploadFile, status
 from google.protobuf import json_format, text_format
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.message import Message
+from ord_schema import parquet as parquet_dataset
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
 from ord_schema.validations import ValidationOptions, validate_message
@@ -68,6 +70,7 @@ def total_attachment_size(message: Message) -> int:
     return total
 
 
+# Per-message protobuf serializations; valid for single-Reaction uploads and dataset uploads alike.
 MAP_FILE_EXT_TO_PB_KIND = {
     ".json": "json",
     ".binpb": "binpb",
@@ -76,8 +79,16 @@ MAP_FILE_EXT_TO_PB_KIND = {
     ".pbtxt": "txtpb",
 }
 
+# Dataset uploads additionally accept Parquet, a dataset-level (multi-reaction) columnar format
+# that ord-schema reads from a file path rather than as a single serialized message. It is not a
+# valid kind for single-Reaction uploads, so it is excluded from MAP_FILE_EXT_TO_PB_KIND above.
+MAP_FILE_EXT_TO_DATASET_KIND = {**MAP_FILE_EXT_TO_PB_KIND, ".parquet": "parquet"}
 
-def validate_pb_kind_by_file_ext(filename: str | None) -> str | None:
+
+def validate_pb_kind_by_file_ext(
+    filename: str | None,
+    ext_to_kind: dict[str, str] = MAP_FILE_EXT_TO_PB_KIND,
+) -> str | None:
     if filename is None:
         return None
     suffixes = Path(filename).suffixes
@@ -86,15 +97,18 @@ def validate_pb_kind_by_file_ext(filename: str | None) -> str | None:
     else:
         file_ext = suffixes[-1] if suffixes else ""
 
-    return MAP_FILE_EXT_TO_PB_KIND.get(file_ext)
+    return ext_to_kind.get(file_ext)
 
 
-async def validate_uploaded_pb_file(file: UploadFile) -> tuple[bytes, str]:
-    kind = validate_pb_kind_by_file_ext(file.filename)
+async def validate_uploaded_pb_file(
+    file: UploadFile,
+    ext_to_kind: dict[str, str] = MAP_FILE_EXT_TO_PB_KIND,
+) -> tuple[bytes, str]:
+    kind = validate_pb_kind_by_file_ext(file.filename, ext_to_kind)
     if not kind:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
-            f"Invalid file extension. Please use: {MAP_FILE_EXT_TO_PB_KIND.keys()}",
+            f"Invalid file extension. Please use: {ext_to_kind.keys()}",
         )
 
     file_data = await file.read()
@@ -211,6 +225,55 @@ def load_message(data: bytes, message_type: type[MessageT], kind: str) -> Messag
         case _:
             raise ValueError(kind)
     return message
+
+
+def load_dataset_message(file_data: bytes, kind: str) -> Dataset:
+    """Deserialize an uploaded dataset file into a Dataset proto.
+
+    Handles the dataset-level Parquet format (which ord-schema reads from a file path) in
+    addition to the per-message protobuf serializations dispatched by ``load_message``.
+
+    Args:
+        file_data: Raw (already gunzipped) file contents.
+        kind: Serialization kind; one of the values in ``MAP_FILE_EXT_TO_DATASET_KIND``.
+
+    Returns:
+        The parsed Dataset proto.
+
+    Raises:
+        ValueError: If ``kind`` is unknown, or if a Parquet file is not a valid ORD dataset.
+    """
+    if kind == "parquet":
+        # pyarrow reads Parquet from a seekable path, so stage the upload bytes on disk. A temp
+        # directory (rather than NamedTemporaryFile) avoids aliasing our open handle with the one
+        # pyarrow opens by name.
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "dataset.parquet"
+            path.write_bytes(file_data)
+            return parquet_dataset.load_dataset(path)
+    return load_message(file_data, Dataset, kind)
+
+
+def write_dataset_message(dataset: Dataset, kind: str) -> bytes:
+    """Serialize a Dataset proto, including the dataset-level Parquet format.
+
+    Args:
+        dataset: Dataset proto to serialize.
+        kind: Serialization kind; one of the values in ``MAP_FILE_EXT_TO_DATASET_KIND``.
+
+    Returns:
+        The serialized dataset bytes.
+
+    Raises:
+        ValueError: If ``kind`` is unknown, or if ``kind`` is ``"parquet"`` and the dataset is
+            missing the name/description/reactions that ord-schema requires for Parquet.
+    """
+    if kind == "parquet":
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "dataset.parquet"
+            parquet_dataset.save_dataset(dataset, path)
+            return path.read_bytes()
+    return write_message(dataset, kind)
 
 
 def send_message(message: Message) -> str:

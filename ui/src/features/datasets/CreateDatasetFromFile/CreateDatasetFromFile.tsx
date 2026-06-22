@@ -78,8 +78,8 @@ export function CreateDatasetFromFile({
       <FileInput
         label="Dataset file"
         withAsterisk
-        accept=".binpb,.txtpb,application/json"
-        description=".binpb, .txtpb or .json | Max: 100 MB"
+        accept=".binpb,.txtpb,.parquet,application/json"
+        description=".binpb, .txtpb, .json or .parquet | Max: 100 MB"
         {...form.getInputProps('file')}
       />
     </FormModal>

@@ -16,6 +16,7 @@ from datetime import datetime
 
 from faker import Faker
 from fastapi import status
+from ord_schema.proto.reaction_pb2 import Reaction
 
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
@@ -23,6 +24,7 @@ from ord_app.service_api.models import (
     ReactionModel,
     UserModel,
 )
+from ord_app.service_api.services.pb_utils import load_dataset_message
 from ord_app.tests.conftest import create_test_dataset
 
 faker = Faker()
@@ -139,6 +141,55 @@ async def test_download_dataset(api_client, mock_authenticated_user, test_db_ses
 
     response_data = json.loads(response.content)
     assert response_data["name"] == dataset.name
+
+
+async def _add_reaction(test_db_session, user, dataset):
+    reaction_id = faker.uuid4()
+    test_db_session.add(
+        ReactionModel(
+            owner=user,
+            pb_reaction_id=reaction_id,
+            dataset=dataset,
+            binpb=Reaction(reaction_id=reaction_id).SerializeToString(),
+        )
+    )
+    await test_db_session.commit()
+    return reaction_id
+
+
+async def test_download_dataset_as_parquet_round_trips(
+    api_client, mock_authenticated_user, test_db_session
+):
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    dataset.description = "A downloadable dataset"
+    reaction_id = await _add_reaction(test_db_session, user, dataset)
+
+    response = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format=parquet"
+    ).raise_for_status()
+    assert response.headers["content-disposition"].endswith('.parquet"')
+
+    # The downloaded bytes round-trip back into a Dataset with the same reaction.
+    loaded = load_dataset_message(response.content, "parquet")
+    assert loaded.name == dataset.name
+    assert loaded.description == dataset.description
+    assert [r.reaction_id for r in loaded.reactions] == [reaction_id]
+
+
+async def test_download_parquet_requires_description(
+    api_client, mock_authenticated_user, test_db_session
+):
+    # create_test_dataset has no description; Parquet export must reject it with a clear 422.
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    await _add_reaction(test_db_session, user, dataset)
+
+    response = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format=parquet"
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert "description" in response.json()["detail"]
 
 
 async def test_order_datasets(api_client, mock_authenticated_user, test_db_session):
