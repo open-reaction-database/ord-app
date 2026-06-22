@@ -19,6 +19,17 @@
   grid-gap: var(--mantine-spacing-sm);
 }
 
+/* Lays the view/delete buttons beside Accordion.Control (siblings, to avoid a nested
+   <button>); the control fills the remaining width so its chevron stays right-aligned. */
+.controlRow {
+  display: flex;
+  align-items: center;
+}
+
+.control {
+  flex: 1;
+}
+
 .analysesItem {
   border: 1px solid var(--color-border-1);
   border-radius: 8px;

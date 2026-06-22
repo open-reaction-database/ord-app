@@ -46,6 +46,30 @@
   margin-right: 8px;
 }
 
+/* The group select button and its "Edit group" ActionIcon are siblings (a <button>
+   cannot nest inside another <button> without a hydration error). The icon overlays the
+   right edge of the full-width select button and reveals on row hover. */
+.groupRow {
+  position: relative;
+}
+
+.editIcon {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+
+.groupRow:hover .editIcon {
+  opacity: 1;
+}
+
+.selectedRow .editIcon svg {
+  color: var(--color-background-white);
+}
+
 .emptyContainer {
   display: flex;
   align-items: center;

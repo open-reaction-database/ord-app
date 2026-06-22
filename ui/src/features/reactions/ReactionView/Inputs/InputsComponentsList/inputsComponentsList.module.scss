@@ -19,6 +19,17 @@
   grid-template-columns: repeat(5, 1fr) 120px;
 }
 
+/* Lays the view/delete buttons beside Accordion.Control (siblings, to avoid a nested
+   <button>); the control fills the remaining width so its chevron stays right-aligned. */
+.controlRow {
+  display: flex;
+  align-items: center;
+}
+
+.control {
+  flex: 1;
+}
+
 .input {
   grid-area: input;
 }

@@ -52,17 +52,17 @@ export function InputComponentsListItem({
       key={input.id}
       value={input.id}
     >
-      <Accordion.Control
-        icon={
-          <ViewDeleteButtonsComponent
-            pathComponents={pathComponents}
-            historyPathComponents={historyPathComponents}
-            entityName="Input"
-          />
-        }
-      >
-        {name}
-      </Accordion.Control>
+      {/* The view/delete buttons sit beside Accordion.Control rather than in its `icon`
+          slot: Accordion.Control renders a <button>, and a nested <button> triggers a
+          hydration error. */}
+      <div className={classes.controlRow}>
+        <ViewDeleteButtonsComponent
+          pathComponents={pathComponents}
+          historyPathComponents={historyPathComponents}
+          entityName="Input"
+        />
+        <Accordion.Control className={classes.control}>{name}</Accordion.Control>
+      </div>
       <Accordion.Panel>
         <ComponentsListOrEmpty componentsAmount={input.components.length}>
           {input.components.map((component, index) => (

@@ -28,6 +28,7 @@ import {
   SearchIcon,
   SettingsIcon,
 } from 'common/icons';
+import clsx from 'clsx';
 import { setGroupSearchAction } from 'store/entities/groups/groups.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import {
@@ -108,26 +109,36 @@ export function GroupsList() {
           type="auto"
         >
           {groups.map(group => (
-            <SelectableButton
+            <div
               key={group.id}
-              isSelected={selectedGroupId === group.id}
-              onClick={() => selectGroup(group.id)}
+              className={clsx(
+                classes.groupRow,
+                selectedGroupId === group.id && classes.selectedRow,
+              )}
             >
-              <div className={classes.buttonName}>
-                <GroupArrowIcon />
-                <Tooltip label={group.name}>
-                  <div>{group.name}</div>
-                </Tooltip>
-              </div>
+              <SelectableButton
+                isSelected={selectedGroupId === group.id}
+                onClick={() => selectGroup(group.id)}
+              >
+                <div className={classes.buttonName}>
+                  <GroupArrowIcon />
+                  <Tooltip label={group.name}>
+                    <div>{group.name}</div>
+                  </Tooltip>
+                </div>
+              </SelectableButton>
 
+              {/* Sibling of the button, not a child: a <button> cannot nest inside the
+                  SelectableButton's <button> without a hydration error. */}
               <ActionIcon
+                className={classes.editIcon}
                 onClick={e => openGroupInformation(e, group.id)}
                 variant="transparent"
                 title="Edit group"
               >
                 <SettingsIcon />
               </ActionIcon>
-            </SelectableButton>
+            </div>
           ))}
         </ScrollArea>
       </Flex>

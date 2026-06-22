@@ -39,13 +39,4 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  & button {
-    transition: opacity 0.15s ease-out;
-    opacity: 0;
-  }
-
-  &:hover button {
-    opacity: 1;
-  }
 }
