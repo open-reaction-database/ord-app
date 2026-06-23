@@ -21,11 +21,12 @@ import { reactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebar
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
 // The real form registry eagerly imports every node form, including the Ketcher/d3 structure
-// editor (a CJS/ESM break under vitest). Stub the registry to an empty form — the field nodes
-// aren't what's under test here; the save-and-close wiring is.
+// editor (a CJS/ESM break under vitest). Stub the registry to a single plain text field — the
+// field nodes aren't what's under test here; the save-and-close wiring is. A real input gives
+// the keyboard-shortcut test a realistic focus target (a field, not the button).
 vi.mock('features/reactions/ReactionEntities', () => ({
-  ReactionEntityBaseNode: () => null,
-  reactionEntityToForm: new Proxy({}, { get: () => [] }),
+  ReactionEntityBaseNode: () => <input aria-label="Field" />,
+  reactionEntityToForm: new Proxy({}, { get: () => [{ name: 'field' }] }),
 }));
 
 const addUpdateReactionFieldMock = vi.fn((_arg: unknown) => ({ type: 'test/noop' }));
@@ -66,13 +67,15 @@ describe('ReactionEntityForm — Save and Close (#550)', () => {
     expect(onFormClose).toHaveBeenCalledTimes(1);
   });
 
-  it('saves and closes on Cmd/Ctrl+Enter', async () => {
+  it.each([
+    { label: 'Ctrl+Enter', mods: { ctrlKey: true } },
+    { label: 'Cmd+Enter', mods: { metaKey: true } },
+  ])('saves and closes on $label from a focused field', async ({ mods }) => {
     renderForm();
 
-    fireEvent.keyDown(screen.getByRole('button', { name: 'Save and Close' }), {
-      key: 'Enter',
-      ctrlKey: true,
-    });
+    // Fire from a real form field (where a user would be typing), not the button — the handler
+    // lives on the parent <form> and catches the bubbling keydown.
+    fireEvent.keyDown(screen.getByLabelText('Field'), { key: 'Enter', ...mods });
 
     await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalledTimes(1));
     expect(onFormClose).toHaveBeenCalledTimes(1);
