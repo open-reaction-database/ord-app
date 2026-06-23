@@ -139,6 +139,12 @@ export const reactionTemperatureCondition: ReactionFormNode = {
           label: 'Type',
           render: item => item.type,
         },
+        {
+          // Show the measured value so multiple records are distinguishable. (#603)
+          label: 'Temperature',
+          render: item =>
+            item.temperature ? renderValuePrecisionUnit(item.temperature) : '',
+        },
       ],
     ),
   ],
@@ -318,6 +324,12 @@ export const reactionConditions: Array<ReactionFormNode> = [
             label: 'Type',
             render: item => item.type,
           },
+          {
+            // Show the measured value so multiple records are distinguishable. (#603)
+            label: 'Pressure',
+            render: item =>
+              item.pressure ? renderValuePrecisionUnit(item.pressure) : '',
+          },
         ],
       ),
     ],
@@ -486,6 +498,17 @@ export const reactionConditions: Array<ReactionFormNode> = [
           {
             label: 'Time',
             render: item => (item.time ? renderValuePrecisionUnit(item.time) : ''),
+          },
+          {
+            // Show the measured values so multiple records are distinguishable. (#603)
+            label: 'Voltage',
+            render: item =>
+              item.voltage ? renderValuePrecisionUnit(item.voltage) : '',
+          },
+          {
+            label: 'Current',
+            render: item =>
+              item.current ? renderValuePrecisionUnit(item.current) : '',
           },
         ],
       ),
