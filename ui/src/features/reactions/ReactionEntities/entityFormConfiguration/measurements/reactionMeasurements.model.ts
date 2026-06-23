@@ -50,6 +50,9 @@ export const reactionMeasurements: Array<ReactionFormNode> = [
         name: 'type',
         wrapperConfig: {
           label: 'Type',
+          // A measurement's Type drives which sub-fields appear; it isn't a templatable value,
+          // so don't offer "Set Variables" for it (matches Component Identifier Type / Analysis). (#513)
+          cannotBeVariable: true,
         },
       },
     ],
