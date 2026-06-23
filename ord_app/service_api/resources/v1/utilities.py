@@ -68,11 +68,25 @@ async def resolve_input(input_string: str) -> str | Response:
 
 @router.post("/resolve-compound", response_model=ResolveCompoundOutputs)
 async def resolve_compound(inputs: ResolveCompoundInputs) -> dict | Response:
-    """Resolves a compound identifier into a SMILES string."""
+    """Resolves a compound identifier (name/SMILES/InChI) into a canonical SMILES string.
+
+    A SMILES is already a structure, so it is canonicalized locally without a remote lookup;
+    other identifier types (name, InChI) are resolved via the external services, with the type
+    threaded through so e.g. PubChem searches by InChI rather than treating it as a name. (#465)
+    """
     try:
-        resolver, smiles = await name_resolve_cached(
-            inputs.identifier_type, inputs.identifier
-        )
+        if inputs.identifier_type == "smiles":
+            return {
+                "smiles": canonicalize_smiles_cached(inputs.identifier),
+                "resolver": "RDKit",
+            }
+        result = await name_resolve_cached(inputs.identifier_type, inputs.identifier)
+        if result is None:
+            # Every resolver failed/returned nothing -- a clean 400, not a 500 from unpacking None.
+            return Response(
+                "Could not resolve the compound identifier.", status_code=400
+            )
+        resolver, smiles = result
         return {"smiles": canonicalize_smiles_cached(smiles), "resolver": resolver}
     except ValueError as error:
         return Response(str(error), status_code=400)

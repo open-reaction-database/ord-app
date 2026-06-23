@@ -55,6 +55,7 @@ describe('addIdentifierByName', () => {
         reactionId: 99,
         pathComponents,
         name: 'water',
+        identifierType: 'name',
       }) as unknown as UnknownAction,
     );
 
@@ -78,6 +79,23 @@ describe('addIdentifierByName', () => {
     expect(arg.newValue.details).toBe('water');
   });
 
+  it('passes the chosen identifier type through to the resolver (#465)', async () => {
+    const { store } = makeStore();
+    await store.dispatch(
+      addIdentifierByName({
+        reactionId: 99,
+        pathComponents,
+        name: 'InChI=1S/H2O/h1H2',
+        identifierType: 'inchi',
+      }) as unknown as UnknownAction,
+    );
+
+    expect(axiosMock.post).toHaveBeenCalledWith('/resolve-compound', {
+      identifier_type: 'inchi',
+      identifier: 'InChI=1S/H2O/h1H2',
+    });
+  });
+
   it('dispatches failure and does not update the reaction when resolution rejects', async () => {
     axiosMock.post.mockRejectedValueOnce(new Error('not found'));
     const { store, types } = makeStore();
@@ -86,6 +104,7 @@ describe('addIdentifierByName', () => {
         reactionId: 99,
         pathComponents,
         name: 'bogus',
+        identifierType: 'name',
       }) as unknown as UnknownAction,
     );
 

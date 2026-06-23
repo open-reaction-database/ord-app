@@ -20,7 +20,13 @@ import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 const { createAsyncAction } = createActionFactory('reactionInputs');
 
 export const addIdentifierByNameActions = createAsyncAction<
-  { reactionId: ReactionId; pathComponents: ReactionPathComponents; name: string },
+  {
+    reactionId: ReactionId;
+    pathComponents: ReactionPathComponents;
+    name: string;
+    // Resolver identifier type — 'name' | 'smiles' | 'inchi' (#465).
+    identifierType: string;
+  },
   void,
   void
 >('add_identifier_by_name');
