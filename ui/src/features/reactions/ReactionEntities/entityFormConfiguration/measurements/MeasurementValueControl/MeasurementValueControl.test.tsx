@@ -19,20 +19,28 @@ import { MeasurementValueControl } from './MeasurementValueControl.tsx';
 import { ReactionMeasurementValueType } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 
-const formMethods = {
-  getInputProps: () => ({
-    value: {
-      type: ReactionMeasurementValueType.Number,
-      value: { value: null, precision: null },
-    },
-    onChange: vi.fn(),
-  }),
-} as unknown as ReactionEntityNodeProps['formMethods'];
+// formMethods with a configurable measurement `type` (sibling field) and optional existing value.
+const makeFormMethods = (
+  measurementType?: string,
+  value?: unknown,
+): ReactionEntityNodeProps['formMethods'] =>
+  ({
+    getInputProps: () => ({ value, onChange: vi.fn() }),
+    getValues: () => ({ type: measurementType }),
+  }) as unknown as ReactionEntityNodeProps['formMethods'];
 
-const renderControl = (isViewOnly = false) =>
+const numericValue = {
+  type: ReactionMeasurementValueType.Number,
+  value: { value: null, precision: null },
+};
+
+const renderControl = (
+  formMethods: ReactionEntityNodeProps['formMethods'],
+  isViewOnly = false,
+) =>
   renderInReactionView(
     <MeasurementValueControl
-      name="measurement"
+      name="value"
       formMethods={formMethods}
     />,
     { isViewOnly },
@@ -40,14 +48,38 @@ const renderControl = (isViewOnly = false) =>
 
 describe('MeasurementValueControl', () => {
   it('renders the value and precision inputs for a numeric measurement', () => {
-    const { getByPlaceholderText } = renderControl();
+    const { getByPlaceholderText } = renderControl(
+      makeFormMethods('CUSTOM', numericValue),
+    );
     expect(getByPlaceholderText('Value')).toBeInTheDocument();
     expect(getByPlaceholderText('Precision')).toBeInTheDocument();
   });
 
   it('disables the inputs in view-only mode', () => {
-    const { getByPlaceholderText } = renderControl(true);
+    const { getByPlaceholderText } = renderControl(
+      makeFormMethods('CUSTOM', numericValue),
+      true,
+    );
     expect(getByPlaceholderText('Value')).toBeDisabled();
     expect(getByPlaceholderText('Precision')).toBeDisabled();
   });
+
+  // #604: with no value set yet, the value-type is preselected from the measurement's own type.
+  it.each([
+    { measurementType: 'SELECTIVITY', expected: ReactionMeasurementValueType.Number },
+    { measurementType: 'YIELD', expected: ReactionMeasurementValueType.Percent },
+    { measurementType: 'PURITY', expected: ReactionMeasurementValueType.Percent },
+    { measurementType: 'AMOUNT', expected: ReactionMeasurementValueType.Mass },
+    { measurementType: 'AREA', expected: ReactionMeasurementValueType.Number },
+  ])(
+    'defaults an unset $measurementType value to the $expected value-type (#604)',
+    ({ measurementType, expected }) => {
+      const { container } = renderControl(makeFormMethods(measurementType, undefined));
+      // happy-dom's :checked selector doesn't match property-set state, so read the property.
+      const checked = Array.from(
+        container.querySelectorAll<HTMLInputElement>('input[type="radio"]'),
+      ).find(radio => radio.checked);
+      expect(checked?.value).toBe(expected);
+    },
+  );
 });
