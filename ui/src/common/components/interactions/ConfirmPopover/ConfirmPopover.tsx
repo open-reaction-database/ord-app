@@ -23,6 +23,8 @@ interface ConfirmPopoverProps extends PopoverProps {
   text: string;
   onConfirm: () => void;
   onCancel: () => void;
+  // Render the confirm (OK) button in red for destructive actions (remove/delete/unshare). (#314)
+  destructive?: boolean;
 }
 
 export function ConfirmPopover({
@@ -31,6 +33,7 @@ export function ConfirmPopover({
   text,
   onConfirm,
   onCancel,
+  destructive,
   ...rest
 }: Readonly<ConfirmPopoverProps>) {
   return (
@@ -79,6 +82,7 @@ export function ConfirmPopover({
             <Button
               className={classes.popoverButton}
               size="xs"
+              color={destructive ? 'red' : undefined}
               onClick={onConfirm}
             >
               OK

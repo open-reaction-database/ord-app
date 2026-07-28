@@ -40,4 +40,32 @@ describe('ConfirmPopover', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
+
+  const renderPopover = (destructive?: boolean) =>
+    renderWithMantine(
+      <ConfirmPopover
+        opened
+        destructive={destructive}
+        target={<button>open</button>}
+        title="Remove?"
+        text="x"
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+
+  it('renders a red OK button for destructive confirmations (#314)', () => {
+    renderPopover(true);
+    // Mantine color="red" inlines the red color custom properties on the button element.
+    expect(
+      screen.getByRole('button', { name: 'OK' }).getAttribute('style') ?? '',
+    ).toContain('red');
+  });
+
+  it('renders a default (non-red) OK button when not destructive', () => {
+    renderPopover(false);
+    expect(
+      screen.getByRole('button', { name: 'OK' }).getAttribute('style') ?? '',
+    ).not.toContain('red');
+  });
 });
