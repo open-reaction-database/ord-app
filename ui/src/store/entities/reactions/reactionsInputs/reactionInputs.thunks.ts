@@ -24,13 +24,13 @@ import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reacti
 
 export const addIdentifierByName = createThunkWithExplicitResult(
   addIdentifierByNameActions,
-  ({ reactionId, pathComponents, name }) =>
+  ({ reactionId, pathComponents, name, identifierType }) =>
     async (dispatch, getState) => {
       try {
         const result = await axiosInstance.post<{ smiles: string }>(
           '/resolve-compound',
           {
-            identifier_type: 'name',
+            identifier_type: identifierType,
             identifier: name,
           },
         );
