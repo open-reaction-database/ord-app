@@ -419,6 +419,28 @@ async def test_update_reaction_rejects_oversized_attachments(
     assert "10 MB" in response.json()["detail"]
 
 
+async def test_update_reaction_rejects_oversized_provenance_metadata_attachments(
+    api_client, mock_authenticated_user, test_db_session
+):
+    # Provenance reaction_metadata uploads count toward the same cumulative attachment cap.
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset
+    )
+
+    pb_reaction = Reaction(reaction_id=faker.uuid4())
+    pb_reaction.provenance.reaction_metadata["project_file"].bytes_value = b"x" * (
+        10 * 1024 * 1024 + 1
+    )
+    payload = {"binpb": b64encode(pb_reaction.SerializeToString()).decode()}
+    response = api_client.patch(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}", json=payload
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "10 MB" in response.json()["detail"]
+
+
 async def test_update_reaction_allows_attachments_under_limit(
     api_client, mock_authenticated_user, test_db_session
 ):

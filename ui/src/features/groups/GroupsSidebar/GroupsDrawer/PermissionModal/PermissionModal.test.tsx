@@ -16,13 +16,31 @@
 import { describe, it, expect } from 'vitest';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { PermissionsModal } from './PermissionModal.tsx';
-
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
-const Component = PermissionsModal as unknown as () => JSX.Element;
+import { screen, within } from '@testing-library/react';
 
 describe('PermissionsModal', () => {
-  it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
-    expect(container).toBeInTheDocument();
+  it('allows editors to delete but reserves trash management for admins', () => {
+    renderWithProviders(
+      <PermissionsModal
+        opened
+        onClose={() => undefined}
+      />,
+    );
+
+    const deleteRow = screen.getByText('Delete').closest('tr');
+    const trashRow = screen.getByText('Trash').closest('tr');
+
+    expect(deleteRow).not.toBeNull();
+    expect(trashRow).not.toBeNull();
+    expect(
+      within(deleteRow as HTMLTableRowElement).getAllByRole('img', {
+        name: 'Allowed',
+      }),
+    ).toHaveLength(2);
+    expect(
+      within(trashRow as HTMLTableRowElement).getAllByRole('img', {
+        name: 'Allowed',
+      }),
+    ).toHaveLength(1);
   });
 });

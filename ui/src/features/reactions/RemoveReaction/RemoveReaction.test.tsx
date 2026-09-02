@@ -16,13 +16,28 @@
 import { describe, it, expect } from 'vitest';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { RemoveReaction } from './RemoveReaction.tsx';
-
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
-const Component = RemoveReaction as unknown as () => JSX.Element;
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 describe('RemoveReaction', () => {
-  it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
-    expect(container).toBeInTheDocument();
+  it('confirms that reactions move to trash', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RemoveReaction reactionId={1} />);
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(screen.getByText('Move reaction to trash')).toBeInTheDocument();
+    expect(
+      screen.getByText('Are you sure you want to move this reaction to trash?'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps permanent removal copy for templates', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RemoveReaction reactionId="template-1" />);
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(screen.getByText('Remove this template')).toBeInTheDocument();
   });
 });

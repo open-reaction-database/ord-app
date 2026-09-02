@@ -18,6 +18,7 @@ import type {
   ReactionDateTime,
   WithId,
 } from '../reactionEntity/reactionEntity.types.ts';
+import type { AppData } from '../reactionData/reactionData.types.ts';
 
 export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'details'>> {
   time: ReactionDateTime;
@@ -26,11 +27,16 @@ export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'deta
 
 export interface ReactionProvenance extends Omit<
   ord.IReactionProvenance,
-  'experimentStart' | 'recordModified' | 'experimenter' | 'recordCreated'
+  | 'experimentStart'
+  | 'recordModified'
+  | 'experimenter'
+  | 'recordCreated'
+  | 'reactionMetadata'
 > {
   id: string;
   experimentStart: ReactionDateTime;
   experimenter: ord.IPerson;
   recordCreated: ReactionRecordEvent;
   recordModified: Array<ReactionRecordEvent>;
+  reactionMetadata: Record<string, AppData>;
 }

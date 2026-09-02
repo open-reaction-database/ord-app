@@ -64,6 +64,12 @@ export const selectAddMemberError = buildSelector(state => state.addMemberError)
 
 export const selectIsGroupUpdating = buildSelector(state => state.isGroupUpdating);
 
+export const selectGroupTrash = buildSelector(state => state.trash);
+
+export const selectIsTrashLoading = buildSelector(state => state.isTrashLoading);
+
+export const selectIsTrashUpdating = buildSelector(state => state.isTrashUpdating);
+
 export const selectMemberRoles = createSelector(
   [selectEditingGroupId, (state: AppState) => state, selectSelf],
   (editingGroupId, state, currentUser) => {

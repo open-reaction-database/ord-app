@@ -64,8 +64,16 @@ interface EntryShape {
     notes?: Record<string, unknown>;
     reactionId?: string;
     outcomes?: Array<unknown>;
+    provenance?: {
+      reactionMetadata?: Record<string, { name?: string }>;
+    };
   };
-  dataBeforeEdit?: { notes?: Record<string, unknown> };
+  dataBeforeEdit?: {
+    notes?: Record<string, unknown>;
+    provenance?: {
+      reactionMetadata?: Record<string, { name?: string }>;
+    };
+  };
   variables: Record<string, unknown>;
 }
 const asEntry = (entry: unknown): EntryShape => entry as EntryShape;
@@ -245,6 +253,38 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({
       text: 'original',
     });
+    expect(asEntry(afterFailure.reactionsById[1]).dataBeforeEdit).toBeUndefined();
+  });
+
+  it('rolls back an optimistic provenance reactionMetadata add on failure', () => {
+    const seeded = {
+      reactionsById: {
+        1: reaction(1, { provenance: { reactionMetadata: {} } }),
+      } as never,
+    };
+    const afterEdit = reduce(
+      seeded,
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['provenance', 'reactionMetadata', 'meta-1'],
+        newValue: {
+          id: 'meta-1',
+          name: 'project_id',
+          data: { type: 'Text', value: 'ORD-123' },
+        },
+      } as never),
+    );
+    expect(
+      asEntry(afterEdit.reactionsById[1]).data.provenance?.reactionMetadata?.['meta-1']
+        ?.name,
+    ).toBe('project_id');
+    const afterFailure = reduce(
+      afterEdit,
+      addUpdateReactionFieldActions.failure('Failed to update reaction.' as never),
+    );
+    expect(
+      asEntry(afterFailure.reactionsById[1]).data.provenance?.reactionMetadata,
+    ).toEqual({});
     expect(asEntry(afterFailure.reactionsById[1]).dataBeforeEdit).toBeUndefined();
   });
 

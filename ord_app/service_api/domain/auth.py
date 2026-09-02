@@ -76,6 +76,7 @@ def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
         membership = (
             DatasetGroupAssociationModel.dataset_id == dataset_id,
             DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
+            DatasetModel.deleted_at.is_(None),
             UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
             UserGroupsMembershipModel.user_id == user.id,
         )

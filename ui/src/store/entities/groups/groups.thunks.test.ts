@@ -20,20 +20,28 @@ import axiosInstance from 'store/axiosInstance.ts';
 import {
   addGroupMember,
   createGroup,
+  emptyGroupTrash,
   getGroupList,
+  getGroupTrash,
   removeGroupMembers,
+  restoreGroupTrashItem,
   updateGroupMembers,
 } from './groups.thunks.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
+  emptyGroupTrashActions,
   getGroupListActions,
+  getGroupTrashActions,
   removeGroupMembersActions,
+  restoreGroupTrashItemActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import { ADD_MEMBER_ERROR } from './groups.types.ts';
 import { USER_ROLES } from 'common/types';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -91,6 +99,69 @@ describe('createGroup', () => {
         createGroupActions.success.type,
       ]),
     );
+  });
+});
+
+describe('group trash', () => {
+  it('loads, restores, and empties trash through group-scoped endpoints', async () => {
+    const trash = { datasets: [], reactions: [] };
+    axiosMock.get.mockResolvedValueOnce({ data: trash });
+    axiosMock.get.mockResolvedValue({
+      data: { items: [], page: 1, size: 10, total: 0, pages: 0 },
+    });
+    const { store, types } = makeStore();
+
+    await store.dispatch(getGroupTrash(3) as unknown as UnknownAction);
+    await store.dispatch(
+      restoreGroupTrashItem({
+        groupId: 3,
+        kind: 'reaction',
+        id: 8,
+      }) as unknown as UnknownAction,
+    );
+    await store.dispatch(emptyGroupTrash(3) as unknown as UnknownAction);
+
+    expect(axiosMock.get).toHaveBeenCalledWith('/groups/3/trash');
+    expect(axiosMock.post).toHaveBeenCalledWith('/groups/3/trash/restore', {
+      kind: 'reaction',
+      id: 8,
+    });
+    expect(axiosMock.get).toHaveBeenCalledWith('/datasets', {
+      params: { page: 1, size: 10 },
+    });
+    expect(axiosMock.post).toHaveBeenCalledWith('/groups/3/trash/empty');
+    expect(types()).toEqual(
+      expect.arrayContaining([
+        getGroupTrashActions.success.type,
+        restoreGroupTrashItemActions.success.type,
+        emptyGroupTrashActions.success.type,
+      ]),
+    );
+  });
+
+  it('surfaces FastAPI detail when restore conflicts', async () => {
+    axiosMock.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        status: 409,
+        data: { detail: 'Reaction id already in use in this dataset.' },
+      },
+    });
+    const { store, types } = makeStore();
+
+    await store.dispatch(
+      restoreGroupTrashItem({
+        groupId: 3,
+        kind: 'reaction',
+        id: 8,
+      }) as unknown as UnknownAction,
+    );
+
+    expect(types()).toContain(restoreGroupTrashItemActions.failure.type);
+    expect(showNotification).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Reaction id already in use in this dataset.',
+    });
   });
 });
 

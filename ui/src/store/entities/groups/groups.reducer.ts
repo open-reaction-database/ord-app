@@ -16,13 +16,16 @@
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
 import { itemsById } from 'common/utils';
-import type { GroupMember, GroupItem } from './groups.types.ts';
+import type { GroupMember, GroupItem, GroupTrash } from './groups.types.ts';
 import {
   addGroupMemberActions,
+  emptyGroupTrashActions,
   getGroupListActions,
   getGroupMembersActions,
+  getGroupTrashActions,
   removeGroupMembersActions,
   resetAddMemberErrorAction,
+  restoreGroupTrashItemActions,
   setAddMemberInputValueAction,
   setEditingGroupIdAction,
   setGroupSearchAction,
@@ -130,6 +133,43 @@ const isGroupUpdating = createReducer<boolean>(false, builder => {
   );
 });
 
+const initialTrash: GroupTrash = { datasets: [], reactions: [] };
+
+const trash = createReducer<GroupTrash>(initialTrash, builder => {
+  builder.addCase(getGroupTrashActions.success, (_, action) => action.payload.trash);
+  builder.addCase(restoreGroupTrashItemActions.success, (state, action) => {
+    const collection =
+      action.payload.kind === 'dataset' ? state.datasets : state.reactions;
+    const itemIndex = collection.findIndex(item => item.id === action.payload.id);
+    if (itemIndex >= 0) collection.splice(itemIndex, 1);
+  });
+  builder.addCase(emptyGroupTrashActions.success, () => initialTrash);
+});
+
+const isTrashLoading = createReducer<boolean>(false, builder => {
+  builder.addCase(getGroupTrashActions.request, () => true);
+  builder.addMatcher(
+    isAnyOf(getGroupTrashActions.success, getGroupTrashActions.failure),
+    () => false,
+  );
+});
+
+const isTrashUpdating = createReducer<boolean>(false, builder => {
+  builder.addMatcher(
+    isAnyOf(restoreGroupTrashItemActions.request, emptyGroupTrashActions.request),
+    () => true,
+  );
+  builder.addMatcher(
+    isAnyOf(
+      restoreGroupTrashItemActions.success,
+      restoreGroupTrashItemActions.failure,
+      emptyGroupTrashActions.success,
+      emptyGroupTrashActions.failure,
+    ),
+    () => false,
+  );
+});
+
 export const groupsReducer = combineReducers({
   groupsById,
   groupNameSearch,
@@ -138,4 +178,7 @@ export const groupsReducer = combineReducers({
   addMemberInputValue,
   addMemberError,
   isGroupUpdating,
+  trash,
+  isTrashLoading,
+  isTrashUpdating,
 });

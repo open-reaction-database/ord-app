@@ -50,7 +50,10 @@ class DatasetsRepository:
     async def update_modified_at(self, dataset_id: int) -> DatasetModel | None:
         stmt = (
             update(DatasetModel)
-            .where(DatasetModel.id == dataset_id)
+            .where(
+                DatasetModel.id == dataset_id,
+                DatasetModel.deleted_at.is_(None),
+            )
             .values(modified_at=func.now())
             .returning(DatasetModel)
         )
@@ -86,13 +89,36 @@ class DatasetsRepository:
         )
         return await self.db.scalar(stmt)
 
+    async def get_live(self, dataset_id: int) -> DatasetModel | None:
+        stmt = (
+            select(DatasetModel)
+            .where(
+                DatasetModel.id == dataset_id,
+                DatasetModel.deleted_at.is_(None),
+            )
+            .options(
+                joinedload(DatasetModel.owner),
+                joinedload(DatasetModel.groups),
+            )
+        )
+        return await self.db.scalar(stmt)
+
     async def get_with_sharable_info(
         self, dataset_id: int, user_id: int
     ) -> DatasetModel:
         stmt = (
             select(*SELECT_STMT)
-            .outerjoin(DatasetModel.reactions)
-            .where(DatasetModel.id == dataset_id)
+            .outerjoin(
+                ReactionModel,
+                and_(
+                    ReactionModel.dataset_id == DatasetModel.id,
+                    ReactionModel.deleted_at.is_(None),
+                ),
+            )
+            .where(
+                DatasetModel.id == dataset_id,
+                DatasetModel.deleted_at.is_(None),
+            )
             .options(
                 # Eager-load related owner, associations, and groups.
                 joinedload(DatasetModel.owner),
@@ -149,8 +175,18 @@ class DatasetsRepository:
     async def get_with_reactions(self, dataset_id: int) -> DatasetModel | None:
         stmt = (
             select(DatasetModel)
-            .where(DatasetModel.id == dataset_id)
-            .options(selectinload(DatasetModel.reactions))
+            .where(
+                DatasetModel.id == dataset_id,
+                DatasetModel.deleted_at.is_(None),
+            )
+            .options(
+                selectinload(DatasetModel.reactions),
+                with_loader_criteria(
+                    ReactionModel,
+                    ReactionModel.deleted_at.is_(None),
+                    include_aliases=True,
+                ),
+            )
         )
         return await self.db.scalar(stmt)
 
@@ -184,7 +220,8 @@ class DatasetsRepository:
         self, user_id: int, group_id: int | None = None
     ) -> Page[DatasetModel]:
         filters = [
-            DatasetModel.groups.any(GroupModel.members.any(UserModel.id == user_id))
+            DatasetModel.groups.any(GroupModel.members.any(UserModel.id == user_id)),
+            DatasetModel.deleted_at.is_(None),
         ]
 
         if group_id is not None:
@@ -192,7 +229,13 @@ class DatasetsRepository:
 
         stmt = (
             select(*SELECT_STMT)
-            .outerjoin(DatasetModel.reactions)
+            .outerjoin(
+                ReactionModel,
+                and_(
+                    ReactionModel.dataset_id == DatasetModel.id,
+                    ReactionModel.deleted_at.is_(None),
+                ),
+            )
             .where(and_(*filters))
             .group_by(DatasetModel.id)
             .order_by(DatasetModel.modified_at.desc())
@@ -207,7 +250,12 @@ class DatasetsRepository:
         self, dataset_id: int, payload: dict, autocommit: bool = True
     ) -> None:
         stmt = (
-            update(DatasetModel).where(DatasetModel.id == dataset_id).values(**payload)
+            update(DatasetModel)
+            .where(
+                DatasetModel.id == dataset_id,
+                DatasetModel.deleted_at.is_(None),
+            )
+            .values(**payload)
         )
 
         if autocommit:

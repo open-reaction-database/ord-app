@@ -94,6 +94,7 @@ const additionalEntityNames = [
   'authenticStandard',
   'molBlockIdentifiers',
   'automationCode',
+  'reactionMetadata',
 ];
 
 export const allowedNodeEntityNames: Array<string> = [

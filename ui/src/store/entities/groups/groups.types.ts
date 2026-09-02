@@ -43,3 +43,34 @@ export interface GroupItem {
   role: USER_ROLES;
   name: string;
 }
+
+export type TrashItemKind = 'dataset' | 'reaction';
+
+export interface TrashDeletedBy extends Pick<User, 'id'> {
+  name: string | null;
+}
+
+interface TrashItem {
+  id: number;
+  deleted_at: string;
+  deleted_by: TrashDeletedBy | null;
+}
+
+export interface TrashedDataset extends TrashItem {
+  name: string | null;
+}
+
+export interface TrashedReaction extends TrashItem {
+  pb_reaction_id: string;
+}
+
+export interface GroupTrash {
+  datasets: Array<TrashedDataset>;
+  reactions: Array<TrashedReaction>;
+}
+
+export interface RestoreTrashItem {
+  groupId: number;
+  kind: TrashItemKind;
+  id: number;
+}

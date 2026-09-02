@@ -75,4 +75,28 @@ describe('replaceNameIdInReactionComponentPath', () => {
       ),
     ).toEqual(['temperature', 'measurements']);
   });
+
+  it('maps reactionMetadata names to ids and back', () => {
+    const reaction = {
+      provenance: {
+        reactionMetadata: {
+          'uuid-m': { id: 'uuid-m', name: 'project_id' },
+        },
+      },
+    } as unknown as AppReaction;
+    expect(
+      replaceNameIdInReactionComponentPath(
+        ['provenance', 'reactionMetadata', 'project_id'],
+        reaction,
+        'id',
+      ),
+    ).toEqual(['provenance', 'reactionMetadata', 'uuid-m']);
+    expect(
+      replaceNameIdInReactionComponentPath(
+        ['provenance', 'reactionMetadata', 'uuid-m'],
+        reaction,
+        'name',
+      ),
+    ).toEqual(['provenance', 'reactionMetadata', 'project_id']);
+  });
 });

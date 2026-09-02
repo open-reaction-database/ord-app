@@ -37,6 +37,7 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
+from ord_app.service_api.repositories.trash import TrashRepository
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
     DatasetDownloadFileFormats,
@@ -64,6 +65,7 @@ class DatasetUseCases:
         self.current_user = current_user
         self.dataset_repository = DatasetsRepository(db)
         self.reaction_repository = ReactionsRepository(db)
+        self.trash_repository = TrashRepository(db)
 
     async def create(self, group_id: int, payload: DatasetCreateSchema) -> DatasetModel:
         dataset = await self.dataset_repository.create(
@@ -99,7 +101,7 @@ class DatasetUseCases:
     async def extend_enumerate(
         self, dataset_id: int, payload: DatasetEnumerateExtendSchema
     ) -> DatasetModel:
-        dataset = await self.dataset_repository.get(dataset_id)
+        dataset = await self.dataset_repository.get_live(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.add_reactions(
@@ -142,7 +144,7 @@ class DatasetUseCases:
                 "An error occurred while reading the file."
             ) from e
 
-        dataset = await self.dataset_repository.get(dataset_id)
+        dataset = await self.dataset_repository.get_live(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.add_reactions(dataset, dataset_pb.reactions)
@@ -244,7 +246,7 @@ class DatasetUseCases:
         await self.dataset_repository.update(
             dataset_id, payload.model_dump(exclude_unset=True)
         )
-        dataset = await self.dataset_repository.get(dataset_id)
+        dataset = await self.dataset_repository.get_live(dataset_id)
         if dataset is None:
             raise EntityNotFoundError(f"Dataset {dataset_id} not found")
         await self.dataset_repository.enrich_datasets_with_user_roles(
@@ -253,7 +255,7 @@ class DatasetUseCases:
         return dataset
 
     async def delete(self, dataset_id: int) -> None:
-        return await self.dataset_repository.delete(dataset_id)
+        await self.trash_repository.trash_dataset(dataset_id, self.current_user.id)
 
     async def download(
         self, dataset_id: int, file_format: DatasetDownloadFileFormats
@@ -299,6 +301,8 @@ class DatasetUseCases:
         primary_dataset_id: int,
         payload: DatasetShareCreateSchema,
     ) -> DatasetGroupAssociationModel:
+        if await self.dataset_repository.get_live(primary_dataset_id) is None:
+            raise EntityNotFoundError(f"Dataset {primary_dataset_id} not found")
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError(
                 "Cannot share datasets with the same secondary group"
@@ -324,6 +328,8 @@ class DatasetUseCases:
         primary_dataset_id: int,
         payload: DatasetShareCreateSchema,
     ) -> None:
+        if await self.dataset_repository.get_live(primary_dataset_id) is None:
+            raise EntityNotFoundError(f"Dataset {primary_dataset_id} not found")
         if primary_group_id == payload.secondary_group_id:
             raise UnprocessableEntityError(
                 "Cannot unshare datasets with the same secondary group"

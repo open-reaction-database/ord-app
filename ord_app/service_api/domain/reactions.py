@@ -36,6 +36,7 @@ from ord_app.service_api.domain.auth import authenticate
 from ord_app.service_api.models import ReactionModel, UserModel
 from ord_app.service_api.repositories.datasets import DatasetsRepository
 from ord_app.service_api.repositories.reactions import ReactionsRepository
+from ord_app.service_api.repositories.trash import TrashRepository
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import (
@@ -62,6 +63,8 @@ from ord_app.service_api.services.postgresql import get_db_session
 async def validate_dataset_reactions(
     db: AsyncSession, dataset_id: int | None = None
 ) -> None:
+    if dataset_id is not None and not await DatasetsRepository(db).get_live(dataset_id):
+        return
     reaction_repo = ReactionsRepository(db)
     async for reactions in reaction_repo.stream_reactions(
         chunk_size=1000, dataset_id=dataset_id
@@ -104,6 +107,7 @@ class ReactionsUseCase:
         self.current_user = current_user
         self.reaction_repo = ReactionsRepository(db)
         self.dataset_repo = DatasetsRepository(db)
+        self.trash_repo = TrashRepository(db)
 
     @staticmethod
     def _enforce_attachment_limit(pb_reaction: Reaction) -> None:
@@ -158,7 +162,7 @@ class ReactionsUseCase:
             raise ProtobufDecodeError("An error occurred while load reaction.") from e
 
         pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
-        if db_reaction := await self.reaction_repo.get(
+        if db_reaction := await self.reaction_repo.get_live(
             pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id
         ):
             pb_reaction.reaction_id = (
@@ -206,7 +210,7 @@ class ReactionsUseCase:
             ) from e
 
         pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
-        if db_reaction := await self.reaction_repo.get(
+        if db_reaction := await self.reaction_repo.get_live(
             pb_reaction_id=pb_reaction.reaction_id, dataset_id=dataset_id
         ):
             pb_reaction.reaction_id = (
@@ -232,7 +236,7 @@ class ReactionsUseCase:
         )
 
     async def get(self, dataset_id: int, reaction_id: int) -> ReactionModel:
-        if reaction := await self.reaction_repo.get(
+        if reaction := await self.reaction_repo.get_live(
             id=reaction_id, dataset_id=dataset_id
         ):
             _, errors, warning = await async_validate_pb_reaction(reaction.pb)
@@ -241,7 +245,7 @@ class ReactionsUseCase:
         raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
 
     async def search(self, **kwargs: Any) -> ReactionModel:
-        if reaction := await self.reaction_repo.get(**kwargs):
+        if reaction := await self.reaction_repo.get_live(**kwargs):
             return reaction
         raise EntityNotFoundError(f"Reaction with {kwargs} not found")
 
@@ -260,7 +264,7 @@ class ReactionsUseCase:
             )
         pb_reaction.reaction_id = pb_reaction_id
 
-        db_reaction = await self.reaction_repo.get(
+        db_reaction = await self.reaction_repo.get_live(
             id=reaction_id, dataset_id=dataset_id
         )
         if db_reaction is None:
@@ -285,8 +289,8 @@ class ReactionsUseCase:
             "is_valid": is_valid,
         }
 
-        reaction = await self.reaction_repo.update(
-            updating_data, id=reaction_id, dataset_id=dataset_id
+        reaction = await self.reaction_repo.update_live(
+            updating_data, reaction_id=reaction_id, dataset_id=dataset_id
         )
         if reaction is None:
             raise EntityNotFoundError(f"Reaction with id={reaction_id} not found")
@@ -295,13 +299,15 @@ class ReactionsUseCase:
         return reaction
 
     async def delete(self, dataset_id: int, reaction_id: int) -> None:
-        await self.reaction_repo.delete(dataset_id=dataset_id, id=reaction_id)
+        await self.trash_repo.trash_reaction(
+            dataset_id, reaction_id, self.current_user.id
+        )
         await self.dataset_repo.update_modified_at(dataset_id)
 
     async def download(
         self, dataset_id: int, reaction_id: int, file_format: DownloadFileFormats
     ) -> tuple[ReactionModel, bytes]:
-        if reaction := await self.reaction_repo.get(
+        if reaction := await self.reaction_repo.get_live(
             id=reaction_id, dataset_id=dataset_id
         ):
             reaction_pb = await run_in_threadpool(

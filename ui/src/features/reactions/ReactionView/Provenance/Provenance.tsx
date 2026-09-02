@@ -25,6 +25,8 @@ import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEnti
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 
 const ENTITY_FIELD = 'provenance';
 
@@ -109,6 +111,24 @@ export function Provenance() {
             ]}
             entity={recordModification}
             entityKey={index}
+          />
+        ))}
+        {Object.values(provenance.reactionMetadata).map(metadata => (
+          <EntityListItem
+            key={metadata.id}
+            historyPathComponents={[[ENTITY_FIELD]]}
+            entityField={[ENTITY_FIELD, 'reactionMetadata']}
+            title={item => `Reaction Metadata ${item.name}`}
+            requiredFields={[
+              { label: 'Type', render: (entity: AppData) => entity.data.type },
+              {
+                label: 'Value',
+                render: (entity: AppData) => <AppDataDisplay appData={entity} />,
+              },
+              { label: 'Description', render: (entity: AppData) => entity.description },
+            ]}
+            entity={metadata}
+            entityKey={metadata.id}
           />
         ))}
       </Flex>

@@ -26,6 +26,9 @@ services:
       PG_DSN: "postgresql+asyncpg://ord@db:5432/ord"
       PG_TEST_DSN: "postgresql+psycopg://ord@db:5432/test"
       APP_ENV: "localhost"
+      ORD_APP_E2E: "true"
+      TRASH_TTL_DAYS: "30"
+      TRASH_MAX_ITEMS: "0"
     volumes:
       - .:/app
       - /app/.venv

@@ -171,15 +171,15 @@ async def update_dataset(
 
 
 @router.delete(
-    "/datasets/{dataset_id}", dependencies=[Depends(dataset_authorization(("admin",)))]
+    "/datasets/{dataset_id}",
+    dependencies=[Depends(dataset_authorization(("admin", "editor")))],
 )
 async def delete_dataset(
     dataset_id: int,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> str:
-    # TODO: soft deletion needs to be implemented
     await use_case.delete(dataset_id)
-    return "Object successfully deleted (or already absent)"
+    return "Object successfully deleted"
 
 
 @router.get(
@@ -212,7 +212,7 @@ async def extend_dataset(
         file, MAP_FILE_EXT_TO_DATASET_KIND
     )
     response = await use_case.extend(dataset_id, file_data, kind)
-    background_tasks.add_task(validate_dataset_reactions, db)
+    background_tasks.add_task(validate_dataset_reactions, db, dataset_id)
     return response
 
 

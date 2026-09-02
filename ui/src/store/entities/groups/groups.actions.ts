@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { Group, GroupMember, GroupItem } from './groups.types.ts';
+import type {
+  Group,
+  GroupMember,
+  GroupItem,
+  GroupTrash,
+  RestoreTrashItem,
+} from './groups.types.ts';
 import type { USER_ROLES } from 'common/types';
 
 const { createAsyncAction, createAction } = createActionFactory('groups');
@@ -64,3 +70,15 @@ export const resetAddMemberErrorAction = createAction('set_add_member_error');
 
 export const setAddMemberInputValueAction =
   createAction<string>('set_add_member_input');
+
+export const getGroupTrashActions = createAsyncAction<
+  number,
+  { groupId: number; trash: GroupTrash }
+>('get_trash');
+
+export const restoreGroupTrashItemActions = createAsyncAction<
+  RestoreTrashItem,
+  Pick<RestoreTrashItem, 'kind' | 'id'>
+>('restore_trash_item');
+
+export const emptyGroupTrashActions = createAsyncAction<number, void>('empty_trash');

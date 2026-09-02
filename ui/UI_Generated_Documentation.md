@@ -94,6 +94,7 @@ ORD (Open Reaction Database) is a web application built with a React frontend an
 
 - Reaction "forms" are reused with disabled fields and variable labels.
 - Shared as immutable data.
+- Templates list supports client-side name search (debounced).
 - Support CSV-based enumeration.
 
 ### Enumeration

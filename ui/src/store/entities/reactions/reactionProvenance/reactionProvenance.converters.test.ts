@@ -69,12 +69,39 @@ describe('record event converters', () => {
 });
 
 describe('provenance converters', () => {
-  it('builds a default provenance with an id and empty recordModified list', () => {
+  it('builds a default provenance with an id, empty recordModified, and empty reactionMetadata', () => {
     const result = ordProvenanceToReaction(null);
     expect(typeof result.id).toBe('string');
     expect(result.recordModified).toEqual([]);
+    expect(result.reactionMetadata).toEqual({});
     expect(typeof result.recordCreated.id).toBe('string');
     expect(result.experimentStart).toBeNull();
+  });
+
+  it('loads absent reactionMetadata as an empty map', () => {
+    const result = ordProvenanceToReaction({ city: 'Boston' });
+    expect(result.reactionMetadata).toEqual({});
+    expect(result.city).toBe('Boston');
+  });
+
+  it('converts a populated reactionMetadata map and preserves isMined', () => {
+    const result = ordProvenanceToReaction({
+      isMined: true,
+      reactionMetadata: {
+        project_id: { stringValue: 'ORD-123', description: 'internal id' },
+        empty_data: {},
+      },
+    });
+    expect(result.isMined).toBe(true);
+    const items = Object.values(result.reactionMetadata);
+    expect(items).toHaveLength(2);
+    const byName = Object.fromEntries(items.map(item => [item.name, item]));
+    expect(byName.project_id.data).toMatchObject({
+      type: 'Text',
+      value: 'ORD-123',
+    });
+    expect(byName.project_id.description).toBe('internal id');
+    expect(byName.empty_data.data).toMatchObject({ type: 'Number', value: null });
   });
 
   it('strips the id and maps nested events when converting back to ord', () => {
@@ -84,5 +111,24 @@ describe('provenance converters', () => {
     expect(result.recordModified).toEqual([]);
     expect(result.recordCreated).toBeDefined();
     expect(result.experimentStart).toBeNull();
+    expect(result.reactionMetadata).toBeNull();
+  });
+
+  it('round-trips reactionMetadata names and values, including empty oneof Data', () => {
+    const provenance = ordProvenanceToReaction({
+      isMined: false,
+      reactionMetadata: {
+        note: { stringValue: 'hello' },
+        blank: {},
+      },
+    });
+    const ordOut = reactionProvenanceToOrd(provenance);
+    expect(ordOut.isMined).toBe(false);
+    expect(ordOut.reactionMetadata).toEqual({
+      note: expect.objectContaining({ stringValue: 'hello' }),
+      blank: expect.objectContaining({}),
+    });
+    expect(ordOut.reactionMetadata?.blank?.floatValue).toBeUndefined();
+    expect(ordOut.reactionMetadata?.blank?.stringValue).toBeUndefined();
   });
 });

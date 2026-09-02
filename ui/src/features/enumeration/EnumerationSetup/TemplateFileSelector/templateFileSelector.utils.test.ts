@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { guessDelimiter } from './templateFileSelector.utils.ts';
+import { guessDelimiter, normalizeCsvText } from './templateFileSelector.utils.ts';
+
+describe('normalizeCsvText', () => {
+  it('strips a leading UTF-8 BOM', () => {
+    expect(normalizeCsvText('\uFEFFa,b')).toBe('a,b');
+  });
+
+  it('returns the content unchanged when there is no BOM', () => {
+    expect(normalizeCsvText('a,b')).toBe('a,b');
+    expect(normalizeCsvText('')).toBe('');
+  });
+});
 
 describe('guessDelimiter', () => {
   it('detects a consistent delimiter from the first line', () => {
@@ -37,11 +48,36 @@ describe('guessDelimiter', () => {
     expect(guessDelimiter('a,b;c\n')).toBe(';');
   });
 
-  it('treats a space like any other non-alphanumeric delimiter character', () => {
-    // `allowedSymbols` is /[A-Za-z0-9]/, so spaces count as delimiters: a
-    // consistently space-separated header yields ' ', while a header mixing
-    // spaces with another separator is "mixed" and falls back to ';'.
-    expect(guessDelimiter('col a col b\n')).toBe(' ');
-    expect(guessDelimiter('first name,last name\n')).toBe(';');
+  it('detects comma for underscore and hyphen header names', () => {
+    expect(guessDelimiter('alcohol_smiles,product_yield\n')).toBe(',');
+    expect(guessDelimiter('col-a,col-b\n')).toBe(',');
+  });
+
+  it('detects semicolon for underscore header names', () => {
+    expect(guessDelimiter('alcohol_smiles;product_yield\n')).toBe(';');
+  });
+
+  it('ignores spaces and quotes when detecting delimiters', () => {
+    expect(guessDelimiter('first name,last name\n')).toBe(',');
+    expect(guessDelimiter('"a","b"\n')).toBe(',');
+  });
+
+  it('ignores supported delimiters inside quoted header fields', () => {
+    expect(guessDelimiter('"temperature; corrected",yield\n')).toBe(',');
+    expect(guessDelimiter('"a,b";c\n')).toBe(';');
+    expect(guessDelimiter('"say ""hi; there""",next\n')).toBe(',');
+  });
+
+  it('continues past newlines inside quoted header fields', () => {
+    expect(guessDelimiter('"multi\nline",yield')).toBe(',');
+    expect(guessDelimiter('"multi\r\nline",yield')).toBe(',');
+  });
+
+  it('falls back to ";" for space-only separated headers', () => {
+    expect(guessDelimiter('col a col b\n')).toBe(';');
+  });
+
+  it('detects comma after BOM is stripped via normalizeCsvText', () => {
+    expect(guessDelimiter(normalizeCsvText('\uFEFFa,b'))).toBe(',');
   });
 });

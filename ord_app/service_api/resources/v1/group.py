@@ -23,6 +23,7 @@ from ord_app.service_api.domain.groups import (
     get_group_members_use_case,
     get_group_use_case,
 )
+from ord_app.service_api.domain.trash import TrashUseCases, get_trash_use_case
 from ord_app.service_api.models import UserGroupsMembershipModel
 from ord_app.service_api.schemas.groups import (
     GroupAddMemberSchema,
@@ -31,8 +32,46 @@ from ord_app.service_api.schemas.groups import (
     GroupUpdateMemberSchema,
     GroupUserResponseSchema,
 )
+from ord_app.service_api.schemas.trash import TrashResponseSchema, TrashRestoreSchema
 
 router = APIRouter(tags=["group"], prefix="/groups")
+
+
+@router.get(
+    "/{group_id}/trash",
+    response_model=TrashResponseSchema,
+    dependencies=[Depends(group_authorization(("admin",)))],
+)
+async def get_group_trash(
+    group_id: int,
+    use_case: Annotated[TrashUseCases, Depends(get_trash_use_case)],
+) -> dict:
+    return await use_case.list(group_id)
+
+
+@router.post(
+    "/{group_id}/trash/restore",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(group_authorization(("admin",)))],
+)
+async def restore_group_trash(
+    group_id: int,
+    payload: TrashRestoreSchema,
+    use_case: Annotated[TrashUseCases, Depends(get_trash_use_case)],
+) -> None:
+    await use_case.restore(group_id, payload)
+
+
+@router.post(
+    "/{group_id}/trash/empty",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(group_authorization(("admin",)))],
+)
+async def empty_group_trash(
+    group_id: int,
+    use_case: Annotated[TrashUseCases, Depends(get_trash_use_case)],
+) -> None:
+    await use_case.empty(group_id)
 
 
 @router.post(

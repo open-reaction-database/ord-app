@@ -17,14 +17,17 @@ import { describe, it, expect } from 'vitest';
 import { groupsReducer } from './groups.reducer.ts';
 import {
   addGroupMemberActions,
+  emptyGroupTrashActions,
   getGroupListActions,
   getGroupMembersActions,
+  getGroupTrashActions,
   removeGroupMembersActions,
   resetAddMemberErrorAction,
   setAddMemberInputValueAction,
   setEditingGroupIdAction,
   setGroupSearchAction,
   renameGroupActions,
+  restoreGroupTrashItemActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 import { USER_ROLES } from 'common/types';
@@ -67,6 +70,9 @@ describe('groupsReducer', () => {
       addMemberInputValue: '',
       addMemberError: null,
       isGroupUpdating: false,
+      trash: { datasets: [], reactions: [] },
+      isTrashLoading: false,
+      isTrashUpdating: false,
     });
   });
 
@@ -216,6 +222,34 @@ describe('groupsReducer', () => {
       expect(state.isGroupUpdating).toBe(true);
       state = groupsReducer(state, addGroupMemberActions.failure('GENERIC'));
       expect(state.isGroupUpdating).toBe(false);
+    });
+  });
+
+  describe('trash', () => {
+    it('stores fetched items and removes restored items', () => {
+      const trash = {
+        datasets: [{ id: 1, name: null, deleted_at: '2026-08-19', deleted_by: null }],
+        reactions: [
+          {
+            id: 2,
+            pb_reaction_id: 'rxn-2',
+            deleted_at: '2026-08-19',
+            deleted_by: null,
+          },
+        ],
+      };
+      let state = groupsReducer(
+        initialState(),
+        getGroupTrashActions.success({ groupId: 7, trash }),
+      );
+      state = groupsReducer(
+        state,
+        restoreGroupTrashItemActions.success({ kind: 'dataset', id: 1 }),
+      );
+      expect(state.trash).toEqual({ datasets: [], reactions: trash.reactions });
+
+      state = groupsReducer(state, emptyGroupTrashActions.success());
+      expect(state.trash).toEqual({ datasets: [], reactions: [] });
     });
   });
 });

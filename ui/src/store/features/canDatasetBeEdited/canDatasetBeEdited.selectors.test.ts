@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  selectCanDatasetBeDeleted,
-  selectCanDatasetBeEdited,
-} from './canDatasetBeEdited.selectors.ts';
+import { selectCanDatasetBeEdited } from './canDatasetBeEdited.selectors.ts';
 import { USER_ROLES } from 'common/types';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
@@ -80,47 +77,5 @@ describe('selectCanDatasetBeEdited', () => {
   it('is false when a dataset group is missing from the groups store (undefined role)', () => {
     const state = buildState(1, { 1: datasetWithGroups([99]) }, {});
     expect(selectCanDatasetBeEdited(state)).toBe(false);
-  });
-});
-
-describe('selectCanDatasetBeDeleted (Admin-only, #610)', () => {
-  it('is true only when the user is an admin in one of the dataset groups', () => {
-    const state = buildState(
-      1,
-      { 1: datasetWithGroups([10]) },
-      { 10: group(10, USER_ROLES.ADMIN) },
-    );
-    expect(selectCanDatasetBeDeleted(state)).toBe(true);
-  });
-
-  it('is false for an editor (editors can edit but not delete)', () => {
-    const state = buildState(
-      1,
-      { 1: datasetWithGroups([10]) },
-      { 10: group(10, USER_ROLES.EDITOR) },
-    );
-    expect(selectCanDatasetBeDeleted(state)).toBe(false);
-  });
-
-  it('is false for a viewer', () => {
-    const state = buildState(
-      1,
-      { 1: datasetWithGroups([10]) },
-      { 10: group(10, USER_ROLES.VIEWER) },
-    );
-    expect(selectCanDatasetBeDeleted(state)).toBe(false);
-  });
-
-  it('is true when the user is admin in at least one of several dataset groups', () => {
-    const state = buildState(
-      1,
-      { 1: datasetWithGroups([10, 20]) },
-      { 10: group(10, USER_ROLES.EDITOR), 20: group(20, USER_ROLES.ADMIN) },
-    );
-    expect(selectCanDatasetBeDeleted(state)).toBe(true);
-  });
-
-  it('is false when the active dataset is not loaded', () => {
-    expect(selectCanDatasetBeDeleted(buildState(1, {}, {}))).toBe(false);
   });
 });

@@ -25,6 +25,10 @@ import type {
   ReactionRecordEvent,
 } from './reactionProvenance.types.ts';
 import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import {
+  ordDataMapToReactionDataMap,
+  reactionDataMapToOrdDataMap,
+} from '../reactionData/reactionData.converters.ts';
 
 export const ordPersonToReactionPerson = (
   person: OrdOptional<ord.IPerson>,
@@ -65,14 +69,21 @@ export const ordProvenanceToReaction = (
 ): ReactionProvenance => {
   const existingProvenance: ord.IReactionProvenance =
     provenance ?? ord.ReactionProvenance.toObject(new ord.ReactionProvenance());
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
-    existingProvenance;
+  const {
+    experimentStart,
+    recordModified,
+    experimenter,
+    recordCreated,
+    reactionMetadata,
+    ...rest
+  } = existingProvenance;
 
   return withId({
     experimentStart: ordDateTimeToReaction(experimentStart),
     recordModified: (recordModified || []).map(ordRecordEventToReaction),
     experimenter: ordPersonToReactionPerson(experimenter),
     recordCreated: ordRecordEventToReaction(recordCreated),
+    reactionMetadata: ordDataMapToReactionDataMap(reactionMetadata || {}),
     ...rest,
   });
 };
@@ -80,14 +91,21 @@ export const ordProvenanceToReaction = (
 export const reactionProvenanceToOrd = (
   provenance: ReactionProvenance,
 ): ord.IReactionProvenance => {
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
-    withoutId(provenance);
+  const {
+    experimentStart,
+    recordModified,
+    experimenter,
+    recordCreated,
+    reactionMetadata,
+    ...rest
+  } = withoutId(provenance);
 
   return {
     experimentStart: reactionDateTimeToOrd(experimentStart),
     recordModified: recordModified.map(reactionRecordEventToOrd),
     experimenter: reactionPersonToOrdPerson(experimenter),
     recordCreated: reactionRecordEventToOrd(recordCreated),
+    reactionMetadata: reactionDataMapToOrdDataMap(reactionMetadata),
     ...rest,
   };
 };

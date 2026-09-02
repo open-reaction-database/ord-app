@@ -17,7 +17,10 @@ import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import {
+  buildUseSelectItems,
+  buildUseSelectItemsListFromMap,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ord } from 'ord-schema-protobufjs';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
@@ -29,6 +32,14 @@ import {
   createReactionPerson,
   createUpdatePersonInfoRow,
 } from './reactionPerson.models.tsx';
+import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
+import {
+  createReactionDataAddItem,
+  reactionDataDisplay,
+} from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
+
+const reactionMetadataEntityPath = 'reactionMetadata';
 
 const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
   return [
@@ -141,5 +152,20 @@ export const reactionProvenance: Array<ReactionFormNode> = [
       label: 'Record Modification',
       useCreate: buildUseCreate('recordModified', createEmptyModification),
     },
+  },
+  {
+    type: ReactionFormNodeType.list,
+    name: reactionMetadataEntityPath,
+    getKey: item => (item as AppData).id,
+    title: {
+      label: 'Reaction Metadata',
+      hint: 'Additional reaction metadata; e.g., an internal project identifier.',
+    },
+    useSelectItems: buildUseSelectItemsListFromMap(
+      reactionMetadataEntityPath,
+      compareNamedEntities,
+    ),
+    ItemDisplay: reactionDataDisplay(reactionMetadataEntityPath),
+    addItem: createReactionDataAddItem(reactionMetadataEntityPath, 'Metadata'),
   },
 ];

@@ -17,12 +17,20 @@ from itertools import batched
 from loguru import logger
 from sqlalchemy import Select, insert, or_, select, true, update
 
-from ord_app.service_api.models import ReactionModel
+from ord_app.service_api.models import DatasetModel, ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
 
 
 class ReactionsRepository(BaseRepository[ReactionModel]):
     model = ReactionModel
+
+    async def get_live(self, **kwargs: object) -> ReactionModel | None:
+        stmt = select(ReactionModel).where(
+            *self._get_filter_stmt(ReactionModel, **kwargs),
+            ReactionModel.deleted_at.is_(None),
+            ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
+        )
+        return await self.db.scalar(stmt)
 
     async def get_by_reaction_ids_gen(
         self,
@@ -31,12 +39,43 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
         max_num_query_args: int = 10_000,
     ) -> AsyncIterator[ReactionModel]:
         for batch in batched(pb_reaction_ids, max_num_query_args):
-            for item in await self.filter(dataset_id=dataset_id, pb_reaction_id=batch):
+            stmt = select(ReactionModel).where(
+                ReactionModel.dataset_id == dataset_id,
+                ReactionModel.pb_reaction_id.in_(batch),
+                ReactionModel.deleted_at.is_(None),
+                ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
+            )
+            for item in (await self.db.scalars(stmt)).all():
                 yield item
 
     async def bulk_update(self, values: list[dict]) -> None:
-        await self.db.execute(update(ReactionModel), values)
+        await self.db.execute(
+            update(ReactionModel).where(
+                ReactionModel.deleted_at.is_(None),
+                ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
+            ),
+            values,
+            execution_options={"synchronize_session": False},
+        )
         await self.db.commit()
+
+    async def update_live(
+        self, payload: dict, reaction_id: int, dataset_id: int
+    ) -> ReactionModel | None:
+        stmt = (
+            update(ReactionModel)
+            .where(
+                ReactionModel.id == reaction_id,
+                ReactionModel.dataset_id == dataset_id,
+                ReactionModel.deleted_at.is_(None),
+                ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
+            )
+            .values(**payload)
+            .returning(ReactionModel)
+        )
+        reaction = await self.db.scalar(stmt)
+        await self.db.commit()
+        return reaction
 
     async def stream_reactions(
         self, chunk_size: int = 1000, dataset_id: int | None = None
@@ -51,6 +90,8 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
                     if dataset_id is not None
                     else true(),
                     ReactionModel.is_valid.is_(None),
+                    ReactionModel.deleted_at.is_(None),
+                    ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
                 )
                 .order_by(ReactionModel.id)
                 .limit(chunk_size)
@@ -81,7 +122,11 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
     ) -> Select:
         stmt = (
             select(ReactionModel)
-            .where(ReactionModel.dataset_id == dataset_id)
+            .where(
+                ReactionModel.dataset_id == dataset_id,
+                ReactionModel.deleted_at.is_(None),
+                ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
+            )
             .order_by(ReactionModel.id)
         )
 
@@ -110,6 +155,8 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
                 ReactionModel.dataset_id == dataset_id,
                 ReactionModel.pb_reaction_id == pb_reaction_id,
                 ReactionModel.pb_reaction_id.not_in(exclude_pb_reaction_ids),
+                ReactionModel.deleted_at.is_(None),
+                ReactionModel.dataset.has(DatasetModel.deleted_at.is_(None)),
             )
             .limit(1)
         )

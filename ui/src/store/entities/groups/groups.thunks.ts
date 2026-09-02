@@ -18,19 +18,26 @@ import { isAxiosError } from 'axios';
 import {
   ADD_MEMBER_ERROR,
   type Group,
+  type GroupTrash,
   type GroupMember,
   type GroupItem,
+  type RestoreTrashItem,
 } from './groups.types.ts';
 import {
   addGroupMemberActions,
   createGroupActions,
+  emptyGroupTrashActions,
   getGroupListActions,
   getGroupMembersActions,
+  getGroupTrashActions,
   removeGroupMembersActions,
   renameGroupActions,
+  restoreGroupTrashItemActions,
   updateGroupMembersActions,
 } from './groups.actions.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
+import { selectDatasetsPagination } from '../datasets/datasets.selectors.ts';
+import { getDatasetsPage } from '../datasets/datasets.thunks.ts';
 import { USER_ROLES } from 'common/types';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
@@ -151,5 +158,32 @@ export const addGroupMember = createThunk(
       });
       return addGroupMemberActions.failure(ADD_MEMBER_ERROR.GENERIC);
     }
+  },
+);
+
+export const getGroupTrash = createThunk(getGroupTrashActions, groupId => async () => {
+  const trash = (await axiosInstance.get<GroupTrash>(`/groups/${groupId}/trash`)).data;
+  return getGroupTrashActions.success({ groupId, trash });
+});
+
+export const restoreGroupTrashItem = createThunkWithExplicitResult(
+  restoreGroupTrashItemActions,
+  ({ groupId, kind, id }: RestoreTrashItem) =>
+    async (dispatch, getState) => {
+      await axiosInstance.post(`/groups/${groupId}/trash/restore`, { kind, id });
+      dispatch(restoreGroupTrashItemActions.success({ kind, id }));
+      // The datasets list is server-paged, so a restored dataset — or a restored reaction that
+      // changes its dataset's size and "Last modified" — only shows up after refetching the
+      // page currently on screen.
+      const { page, size } = selectDatasetsPagination(getState());
+      dispatch(getDatasetsPage({ page, size }));
+    },
+);
+
+export const emptyGroupTrash = createThunkWithExplicitResult(
+  emptyGroupTrashActions,
+  groupId => async dispatch => {
+    await axiosInstance.post(`/groups/${groupId}/trash/empty`);
+    dispatch(emptyGroupTrashActions.success());
   },
 );

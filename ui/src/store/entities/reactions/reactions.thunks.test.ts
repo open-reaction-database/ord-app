@@ -31,6 +31,8 @@ import {
   removeReactionActions,
 } from './reactions.actions.ts';
 import { getDatasetActions } from '../datasets/datasets.actions.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -120,6 +122,24 @@ describe('removeReaction', () => {
     // store optimistically and does NOT refetch the list — no getReactionPage request. (#586 covers
     // the edge case where a refetch IS needed; see the next test.)
     expect(types()).not.toContain(getReactionPageActions.request.type);
+  });
+
+  it('surfaces FastAPI detail when trash is full', async () => {
+    axiosMock.delete.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 409, data: { detail: 'Trash is full.' } },
+    });
+    const { store, types } = makeStore();
+    store.dispatch(getReactionsListActions.request(5));
+
+    await store.dispatch(removeReaction(42) as unknown as UnknownAction);
+
+    expect(types()).toContain(removeReactionActions.failure.type);
+    expect(showNotification).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Trash is full.',
+    });
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it('refetches the clamped page (1) when the last reaction on the last page is removed (#586)', async () => {

@@ -39,6 +39,8 @@ import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts
 import clsx from 'clsx';
 import { typographyClasses } from 'common/styling';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
+import { USER_ROLES } from 'common/types';
+import { GroupTrash } from './GroupTrash/GroupTrash.tsx';
 
 export function GroupsDrawer() {
   const dispatch = useAppDispatch();
@@ -118,6 +120,7 @@ export function GroupsDrawer() {
           <Drawer.Body className={classes.body}>
             <AddMemberInput />
             <GroupMembersList />
+            {group?.role === USER_ROLES.ADMIN && <GroupTrash groupId={groupId} />}
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>

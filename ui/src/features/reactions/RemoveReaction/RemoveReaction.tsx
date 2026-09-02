@@ -33,7 +33,12 @@ export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
     useDisclosure();
   const isTemplate = typeof reactionId === 'string';
-  const entityToRemove = isTemplate ? 'template' : 'reaction';
+  const confirmationTitle = isTemplate
+    ? 'Remove this template'
+    : 'Move reaction to trash';
+  const confirmationText = isTemplate
+    ? 'Are you sure you want to remove this template?'
+    : 'Are you sure you want to move this reaction to trash?';
 
   const onReactionRemove = useCallback(() => {
     if (isTemplate) {
@@ -46,8 +51,8 @@ export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
 
   return (
     <ConfirmPopover
-      title={`Remove this ${entityToRemove}`}
-      text={`Are you sure you want to remove this ${entityToRemove}?`}
+      title={confirmationTitle}
+      text={confirmationText}
       opened={confirmationOpened}
       onConfirm={onReactionRemove}
       onCancel={closeConfirmation}

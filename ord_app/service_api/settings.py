@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     # app_env is non-production (see ``e2e_auth_enabled``), so it can never weaken prod auth.
     e2e: bool = Field(False, validation_alias="ord_app_e2e")
 
+    # trash
+    trash_ttl_days: int = Field(30, ge=1)
+    trash_max_items: int = 0
+
     # databases
     pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"  # NOSONAR
     # Alembic can't work with asynchronous driver

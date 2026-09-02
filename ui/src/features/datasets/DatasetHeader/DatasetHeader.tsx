@@ -37,10 +37,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import classes from './datasetHeader.module.scss';
-import {
-  selectCanDatasetBeDeleted,
-  selectCanDatasetBeEdited,
-} from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
 import { buttonClasses, typographyClasses } from 'common/styling';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
@@ -57,7 +54,6 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
   const [removeConfirmOpened, { open: openRemoveConfirm, close: closeRemoveConfirm }] =
     useDisclosure(false);
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
-  const canDatasetBeDeleted = useSelector(selectCanDatasetBeDeleted);
 
   const openEdit = useCallback(() => {
     dispatch(setDatasetEditOpenedAction(true));
@@ -146,13 +142,13 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         className={classes.buttonContainer}
         gap="sm"
       >
-        {canDatasetBeDeleted && (
+        {canDatasetBeEdited && (
           <ConfirmPopover
             opened={removeConfirmOpened}
             position="right"
             offset={8}
-            title="Remove dataset"
-            text="Are you sure to remove this dataset? It will be removed from all of the groups"
+            title="Move dataset to trash"
+            text="Are you sure you want to move this dataset to trash?"
             onConfirm={handleDatasetRemove}
             onCancel={closeRemoveConfirm}
             target={

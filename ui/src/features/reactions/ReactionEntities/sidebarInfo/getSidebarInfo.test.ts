@@ -38,4 +38,12 @@ describe('getSidebarInfo', () => {
       'Identifiers',
     );
   });
+
+  it('resolves provenance reactionMetadata to the Reaction Metadata Features sidebar', () => {
+    // Sidebar lookup receives the reversed storage path (see ReactionDetailsSidebar).
+    const info = getSidebarInfo(['meta-1', 'reactionMetadata', 'provenance']);
+    expect(info.label).toBe('Reaction Metadata');
+    expect(info.entityName).toBe('features');
+    expect(info.pathComponents).toEqual(['reactionMetadata', 'provenance']);
+  });
 });

@@ -257,7 +257,11 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
         'Additional metadata about how this reaction was performed and originally reported',
     }),
     useInitialValues: buildUseInitialValues(
-      ({ recordModified: _, ...values }: ReactionProvenance) => values,
+      ({
+        recordModified: _recordModified,
+        reactionMetadata: _reactionMetadata,
+        ...values
+      }: ReactionProvenance) => values,
     ),
   },
   {
@@ -269,6 +273,15 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       hasDelete: true,
     }),
     useInitialValues: buildUseInitialValues((value: ord.IRecordEvent) => value),
+  },
+  {
+    pathComponents: ['reactionMetadata', 'provenance'],
+    ...featureSidebarInfo,
+    label: 'Reaction Metadata',
+    sidebarTitle: createReactionEntityTitle({
+      entityName: 'Reaction Metadata',
+      hasDelete: true,
+    }),
   },
   {
     pathComponents: ['outcomes'],

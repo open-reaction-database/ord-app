@@ -36,11 +36,14 @@ import {
   shareDatasetWithGroupActions,
   unshareDatasetWithGroupActions,
 } from './datasets.actions.ts';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
+vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;
 // cast to a plain record of mock fns instead.
@@ -120,6 +123,23 @@ describe('removeDataset', () => {
     expect(axiosMock.delete).toHaveBeenCalledWith('/datasets/1');
     expect(types()).toContain(removeDatasetActions.success.type);
     expect(navigate).toHaveBeenCalledWith('/');
+  });
+
+  it('surfaces FastAPI detail when trash is full', async () => {
+    axiosMock.delete.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 409, data: { detail: 'Trash is full.' } },
+    });
+    const { store, types } = makeStore();
+
+    await store.dispatch(removeDataset(1) as unknown as UnknownAction);
+
+    expect(types()).toContain(removeDatasetActions.failure.type);
+    expect(showNotification).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Trash is full.',
+    });
+    expect(navigate).not.toHaveBeenCalled();
   });
 });
 

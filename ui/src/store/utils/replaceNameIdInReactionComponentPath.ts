@@ -24,6 +24,7 @@ const mapKeys = new Set([
   'features',
   'analysisData',
   'automationCode',
+  'reactionMetadata',
 ]);
 
 const conditionsWithMeasurements = new Set([

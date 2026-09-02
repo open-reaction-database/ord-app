@@ -23,7 +23,7 @@ import { useCallback, useMemo, useState, type MouseEvent } from 'react';
 import { Buffer } from 'buffer';
 import { parse } from 'csv-parse/sync';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { guessDelimiter } from './templateFileSelector.utils.ts';
+import { guessDelimiter, normalizeCsvText } from './templateFileSelector.utils.ts';
 import type { VariableMatch } from 'store/entities/enumeration/enumeration.types.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
@@ -138,15 +138,15 @@ export function TemplateFileSelector({
     if (file) {
       try {
         const buffer = await file.arrayBuffer();
-        const newValue = Buffer.from(buffer).toString();
-        const delimiter = guessDelimiter(newValue);
-        const [headers] = parse(newValue, { delimiter });
+        const text = normalizeCsvText(Buffer.from(buffer).toString());
+        const delimiter = guessDelimiter(text);
+        const [headers] = parse(text, { delimiter });
         if (!validateHeaders(headers)) {
           form.setFieldValue('csvFile', null);
           return;
         }
 
-        const content = parse(newValue, { delimiter, cast: cast, columns: true });
+        const content = parse(text, { delimiter, cast: cast, columns: true });
         form.setFieldValue('templateCSV', {
           headers,
           content,
@@ -159,10 +159,17 @@ export function TemplateFileSelector({
           },
         );
         form.setFieldValue('matching', matching);
-      } catch (_e: unknown) {
+      } catch (e: unknown) {
+        const isInconsistentColumns =
+          typeof e === 'object' &&
+          e !== null &&
+          'code' in e &&
+          e.code === 'CSV_RECORD_INCONSISTENT_COLUMNS';
         showNotification({
           variant: NotificationVariant.ERROR,
-          message: 'Invalid CSV file',
+          message: isInconsistentColumns
+            ? 'CSV column counts do not match. Quote any field that contains the delimiter.'
+            : 'Invalid CSV file',
         });
         form.setFieldValue('csvFile', null);
         form.setFieldValue('templateCSV', null);

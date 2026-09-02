@@ -14,15 +14,36 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { screen } from '@testing-library/react';
+import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
 import { Provenance } from './Provenance.tsx';
+import { AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 
-// Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
 const Component = Provenance as unknown as () => JSX.Element;
 
 describe('Provenance', () => {
   it('mounts within the reaction view without crashing', () => {
     const { container } = renderInReactionView(<Component />);
     expect(container).toBeInTheDocument();
+  });
+
+  it('renders reaction metadata entries from provenance.reactionMetadata', () => {
+    const reaction = emptyReactionData();
+    reaction.provenance.reactionMetadata = {
+      'meta-1': {
+        id: 'meta-1',
+        name: 'project_id',
+        description: 'internal id',
+        data: { type: AppDataType.Text, value: 'ORD-123', format: null },
+      },
+    };
+    renderInReactionView(<Component />, {
+      reaction: reaction as AppReaction,
+    });
+    expect(screen.getByText('Reaction Metadata project_id')).toBeInTheDocument();
+    expect(screen.getByText('Text')).toBeInTheDocument();
+    expect(screen.getByText('ORD-123')).toBeInTheDocument();
+    expect(screen.getByText('internal id')).toBeInTheDocument();
   });
 });

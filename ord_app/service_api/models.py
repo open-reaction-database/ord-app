@@ -16,7 +16,7 @@ import re
 from typing import Literal, get_args
 
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import Enum, ForeignKey, Index, LargeBinary, UniqueConstraint, func
+from sqlalchemy import Enum, ForeignKey, Index, LargeBinary, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -132,7 +132,17 @@ class DatasetModel(BaseModel):
     description: Mapped[str] = mapped_column(nullable=True)
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
-    owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
+    owner: Mapped[UserModel] = relationship(
+        UserModel, backref="datasets", foreign_keys=[owner_id]
+    )
+
+    deleted_at: Mapped[datetime.datetime | None] = mapped_column(nullable=True)
+    deleted_by_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user.id", ondelete="SET NULL"), nullable=True
+    )
+    deleted_by: Mapped[UserModel | None] = relationship(
+        UserModel, foreign_keys=[deleted_by_id]
+    )
 
     reactions: Mapped[list["ReactionModel"]] = relationship(
         "ReactionModel", back_populates="dataset", order_by="ReactionModel.id"
@@ -202,11 +212,25 @@ class ReactionModel(BaseModel):
     )
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
-    owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
+    owner: Mapped[UserModel] = relationship(
+        UserModel, backref="reactions", foreign_keys=[owner_id]
+    )
+
+    deleted_at: Mapped[datetime.datetime | None] = mapped_column(nullable=True)
+    deleted_by_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user.id", ondelete="SET NULL"), nullable=True
+    )
+    deleted_by: Mapped[UserModel | None] = relationship(
+        UserModel, foreign_keys=[deleted_by_id]
+    )
 
     __table_args__ = (
-        UniqueConstraint(
-            "pb_reaction_id", "dataset_id", name="uq_pb_reaction_id_dataset_id"
+        Index(
+            "uq_live_pb_reaction_id_dataset_id",
+            "pb_reaction_id",
+            "dataset_id",
+            unique=True,
+            postgresql_where=text("deleted_at IS NULL"),
         ),
         Index("ix_reaction_pb_reaction_id", "pb_reaction_id", postgresql_using="hash"),
         Index("ix_reaction_dataset_id", "dataset_id", postgresql_using="hash"),

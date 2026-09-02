@@ -69,6 +69,13 @@ const permissionsList: Array<Permission> = [
   {
     feature: 'Delete',
     admin: true,
+    editor: true,
+    viewer: false,
+    category: 'Datasets',
+  },
+  {
+    feature: 'Trash',
+    admin: true,
     editor: false,
     viewer: false,
     category: 'Datasets',
@@ -86,7 +93,11 @@ interface FeatureIconProps {
 
 function FeatureIcon({ hasAccess }: Readonly<FeatureIconProps>) {
   return (
-    <Flex className={classes.icon}>
+    <Flex
+      className={classes.icon}
+      role="img"
+      aria-label={hasAccess ? 'Allowed' : 'Not allowed'}
+    >
       {hasAccess ? <CheckCircleIcon /> : <CrossCircleIcon />}
     </Flex>
   );

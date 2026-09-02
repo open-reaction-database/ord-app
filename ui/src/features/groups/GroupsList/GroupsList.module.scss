@@ -53,11 +53,13 @@
   position: relative;
 }
 
+/* Centered with auto block margins instead of translateY(-50%): Mantine's :active style
+   sets its own transform on the ActionIcon, which would drop a centering transform. */
 .editIcon {
   position: absolute;
-  top: 50%;
+  inset-block: 0;
   right: 6px;
-  transform: translateY(-50%);
+  margin-block: auto;
   opacity: 0;
   transition: opacity 0.15s ease-out;
 }

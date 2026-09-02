@@ -40,22 +40,38 @@ Run them against the whole tree at any time with `uv run pre-commit run --all-fi
 
 ## Run in Docker
 ### docker-compose
-You can run the Back-End and the Database using a single docker-compose file.
+`docker-compose.yml` is intended for local development: it starts the Back-End
+and Database with `APP_ENV=localhost` and `ORD_APP_E2E=true` (Auth0 bypass on
+the API).
+
 ```shell
 docker compose up -d
 ```
-At the same time, you need to run the Front-End separately.
+
+At the same time, run the Front-End separately. Copy the env template, enable
+the local Auth0 bypass, then start Vite:
+
 ```shell
 cd ui
+cp .env.template .env
 ```
+
+In `ui/.env`, uncomment:
+
+```
+VITE_E2E_NO_AUTH=TRUE
+```
+
+(`VITE_API_ENDPOINT` is already set in the template. Leave `VITE_E2E_DEV_TOKEN`
+commented unless you need a custom value; it defaults to `e2e-dev-token`.)
 
 ```shell
 npm ci
-```
-
-```shell
 npm run dev
 ```
+
+Open http://localhost:5173. Both the UI `VITE_E2E_NO_AUTH` flag and the API
+`ORD_APP_E2E` setting are required; otherwise the app stays on “Loading…”.
 
 ### Single docker file
 Or run the Front-End and Back-End in a single Dockerfile.
@@ -86,6 +102,7 @@ Envs for backend:
 | `pg_dsn`                | DSN for connecting to the database                 | false    | `postgresql+psycopg://ord@localhost:5400/ord`           |
 | `cors_origins`          | Allowed origins                                    | false    | `["http://localhost:5173"]`                             |
 | `app_env`               | Manages the application context (debug parameters) | false    | `production` (available: `localhost`, `production`)     |
+| `ord_app_e2e`           | Dev/test Auth0 bypass (only if `app_env=localhost`) | false   | `false` (`true` in `docker-compose.yml`)                |
 | `vite_auth0_domain`     | Auth0 config                                       | true     | -                                                       |
 | `vite_auth0_algorithms` | Auth0 config                                       | true     | -                                                       |
 | `vite_auth0_audience`   | Auth0 config                                       | true     | -                                                       |
