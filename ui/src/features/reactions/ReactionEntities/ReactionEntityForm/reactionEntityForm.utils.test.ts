@@ -32,6 +32,9 @@ import {
 } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { ordReactionToReaction } from 'store/entities/reactions/reactions.converters.ts';
+import { reactionToOrdConvertersByNodeEntity } from 'store/entities/reactions/reactions.models.ts';
+import { fullReaction } from 'test/fullReaction.ts';
 
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 
@@ -184,4 +187,62 @@ describe('pasteReactionPart', () => {
     clipboard.setStored('not valid json');
     expect(await pasteReactionPart(ReactionNodeEntity.Notes)).toEqual([null, '']);
   });
+});
+
+// Copy and paste pick the ord message for an entity type from ordSchemaByNodeEntity. A message
+// that does not match the entity's converters drops fields without an error.
+describe('copy and paste of each entity type', () => {
+  const reaction = ordReactionToReaction(fullReaction);
+  const [input] = Object.values(reaction.inputs);
+  const [component] = input.components;
+  const [outcome] = reaction.outcomes;
+  const { conditions, provenance, setup } = reaction;
+  const [workup] = reaction.workups;
+  const entitiesByType: Record<ReactionNodeEntity, Array<object | null>> = {
+    [ReactionNodeEntity.Inputs]: [input],
+    [ReactionNodeEntity.Input]: [workup.input],
+    [ReactionNodeEntity.Outcomes]: [outcome],
+    [ReactionNodeEntity.Identifiers]: reaction.identifiers,
+    [ReactionNodeEntity.Setup]: [setup],
+    [ReactionNodeEntity.Notes]: [reaction.notes],
+    [ReactionNodeEntity.Components]: [component],
+    [ReactionNodeEntity.CrudeComponents]: input.crudeComponents,
+    [ReactionNodeEntity.ComponentPreparations]: component.preparations,
+    [ReactionNodeEntity.Features]: Object.values(component.features),
+    [ReactionNodeEntity.ComponentIdentifiers]: [
+      ...component.molBlockIdentifiers,
+      ...component.identifiers,
+    ],
+    [ReactionNodeEntity.Analyses]: Object.values(outcome.analyses),
+    [ReactionNodeEntity.Products]: outcome.products,
+    [ReactionNodeEntity.Measurements]: outcome.products[0].measurements,
+    [ReactionNodeEntity.Observations]: reaction.observations,
+    [ReactionNodeEntity.Provenance]: [provenance],
+    [ReactionNodeEntity.RecordModified]: provenance.recordModified,
+    [ReactionNodeEntity.Conditions]: [conditions],
+    [ReactionNodeEntity.Workups]: [workup],
+    [ReactionNodeEntity.TemperatureMeasurements]:
+      conditions.temperature.temperatureMeasurements,
+    [ReactionNodeEntity.ElectrochemistryMeasurements]:
+      conditions.electrochemistry.electrochemistryMeasurements,
+    [ReactionNodeEntity.PressureMeasurements]: conditions.pressure.pressureMeasurements,
+    [ReactionNodeEntity.VesselPreparations]: setup.vessel.vesselPreparations,
+    [ReactionNodeEntity.VesselAttachments]: setup.vessel.vesselAttachments,
+  };
+
+  it.each(Object.entries(entitiesByType))(
+    'keeps every field of %s',
+    async (type, entities) => {
+      const entityType = type as ReactionNodeEntity;
+      const toOrd = reactionToOrdConvertersByNodeEntity[entityType];
+      expect(entities.length).toBeGreaterThan(0);
+      for (const entity of entities) {
+        expect(entity).not.toBeNull();
+        stubClipboard();
+        await copyReactionPart(entityType, entity as object);
+        const [pasted] = await pasteReactionPart(entityType);
+        expect(toOrd(pasted)).toEqual(toOrd(entity));
+      }
+    },
+  );
 });

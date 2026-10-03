@@ -16,9 +16,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // parseReaction orchestrates protobuf decode → app reaction → previews/validation.
-// Stub the binpb decode so the test exercises parseReaction's own assembly
-// (previews via the real getReactionPreviews, validation passthrough) without a
-// real binpb fixture. getReactionPreviews/parseValidation stay real.
+// Stub the binpb decode so the test exercises parseReaction's own assembly without a
+// binpb fixture; getReactionPreviews and parseValidation stay real.
 vi.mock('./reactions.converters.ts', () => ({
   ordBinpbToReaction: vi.fn(() => ({ inputs: {}, outcomes: [], workups: [] })),
 }));
