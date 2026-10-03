@@ -31,6 +31,7 @@ import {
   ordTimeToReaction,
   ordValuePrecisionToReaction,
   reactionBooleanToOrd,
+  reactionIntegerToOrd,
   reactionTimeToOrd,
   reactionValuePrecisionToOrd,
   withId,
@@ -87,7 +88,7 @@ export const reactionAnalysisToOrd = ({
     : undefined,
   isOfIsolatedSpecies: reactionBooleanToOrd(isOfIsolatedSpecies),
   details: details ?? undefined,
-  chmoId: chmoId ?? undefined,
+  chmoId: reactionIntegerToOrd(chmoId),
   instrumentManufacturer: instrumentManufacturer ?? undefined,
 });
 

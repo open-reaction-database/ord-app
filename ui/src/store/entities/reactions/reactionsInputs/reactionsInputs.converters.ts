@@ -39,6 +39,7 @@ import {
   reactionAdditionSpeedToOrd,
   reactionBooleanToOrd,
   reactionFlowRateToOrd,
+  reactionIntegerToOrd,
   reactionTemperatureToOrd,
   reactionTextureToOrd,
   reactionTimeToOrd,
@@ -133,7 +134,7 @@ export function reactionInputWithoutNameToOrd(
   return {
     components: components.map(reactionInputComponentToOrd),
     crudeComponents: crudeComponents.map(reactionCrudeComponentToOrd),
-    additionOrder: additionOrder ?? undefined,
+    additionOrder: reactionIntegerToOrd(additionOrder),
     additionSpeed: reactionAdditionSpeedToOrd(additionSpeed),
     additionDuration: reactionTimeToOrd(additionDuration),
     flowRate: reactionFlowRateToOrd(flowRate),

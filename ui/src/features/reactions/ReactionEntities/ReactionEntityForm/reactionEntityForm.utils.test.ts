@@ -33,7 +33,6 @@ import {
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { ordReactionToReaction } from 'store/entities/reactions/reactions.converters.ts';
-import { reactionToOrdConvertersByNodeEntity } from 'store/entities/reactions/reactions.models.ts';
 import { fullReaction } from 'test/fullReaction.ts';
 
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
@@ -189,8 +188,8 @@ describe('pasteReactionPart', () => {
   });
 });
 
-// Copy and paste pick the ord message for an entity type from ordSchemaByNodeEntity. A message
-// that does not match the entity's converters drops fields without an error.
+// Copy converts an entity to the ord message that ordSchemaByNodeEntity names, and paste
+// converts it back. A converter or message that loses a field does so without an error.
 describe('copy and paste of each entity type', () => {
   const reaction = ordReactionToReaction(fullReaction);
   const [input] = Object.values(reaction.inputs);
@@ -234,15 +233,32 @@ describe('copy and paste of each entity type', () => {
     'keeps every field of %s',
     async (type, entities) => {
       const entityType = type as ReactionNodeEntity;
-      const toOrd = reactionToOrdConvertersByNodeEntity[entityType];
       expect(entities.length).toBeGreaterThan(0);
       for (const entity of entities) {
         expect(entity).not.toBeNull();
         stubClipboard();
         await copyReactionPart(entityType, entity as object);
         const [pasted] = await pasteReactionPart(entityType);
-        expect(toOrd(pasted)).toEqual(toOrd(entity));
+        const { name: _, ...expected } = entity as { name?: string };
+        expect(withoutIds(pasted)).toEqual(withoutIds(expected));
       }
     },
   );
 });
+
+// Pasting assigns new random ids. Drops `id` fields and turns records keyed by id into arrays.
+function withoutIds(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(withoutIds);
+  }
+  if (value === null || typeof value !== 'object' || value instanceof Uint8Array) {
+    return value;
+  }
+  const entries = Object.entries(value).filter(([key]) => key !== 'id');
+  const isKeyedById =
+    entries.length > 0 &&
+    entries.every(([key, item]) => (item as { id?: unknown } | null)?.id === key);
+  return isKeyedById
+    ? entries.map(([, item]) => withoutIds(item))
+    : Object.fromEntries(entries.map(([key, item]) => [key, withoutIds(item)]));
+}

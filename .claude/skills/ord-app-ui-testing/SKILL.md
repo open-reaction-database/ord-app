@@ -55,7 +55,7 @@ vi.mock('features/reactions/ReactionEntities', () => ({
 }));
 ```
 
-**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction`/`parseReactionList` (in `reactions.utils.ts`) and `linkReactionEntities` (in `reactions.converters.ts`) to plain objects, keeping the reducer's merge helpers intact. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`.
+**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction`/`parseReactionList` (in `reactions.utils.ts`) and `linkReactionEntities` (in `reactions.converters.ts`) to plain objects, keeping the reducer's merge helpers intact. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (`src/test/fullReaction.ts`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
 
 ## Thunk test harness (mocked axios + action recorder)
 

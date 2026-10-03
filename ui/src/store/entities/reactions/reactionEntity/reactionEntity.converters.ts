@@ -160,6 +160,12 @@ export function ordScalarToReaction<T extends string | number>(
   return value || undefined;
 }
 
+// Number inputs accept decimals, and encoding an int32 field that holds one throws, so a
+// decimal is truncated toward zero.
+export function reactionIntegerToOrd(value: OrdOptional<number>): number | undefined {
+  return value === null || value === undefined ? undefined : Math.trunc(value);
+}
+
 export function ordValuePrecisionToReaction(
   ordValue: OrdOptional<OrdValuePrecision>,
 ): ReactionValuePrecision {
@@ -468,7 +474,7 @@ export const reactionStirringRateToOrd = ({
     ? {
         type: ordType,
         details: details ?? undefined,
-        rpm: rpm ?? undefined,
+        rpm: reactionIntegerToOrd(rpm),
       }
     : undefined;
 };

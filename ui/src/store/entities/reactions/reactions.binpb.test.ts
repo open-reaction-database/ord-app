@@ -68,4 +68,17 @@ describe('binpb conversion', () => {
     expect(findNonSerializableValue(appReaction)).toBe(false);
     expect(JSON.stringify(appReaction)).not.toContain('$typeName');
   });
+
+  it('truncates a decimal that a number input put in an int32 field', () => {
+    const appReaction = ordBinpbToReaction(toBinpb(fullReaction));
+    const [input] = Object.values(appReaction.inputs);
+    const [analysis] = Object.values(appReaction.outcomes[0].analyses);
+    input.additionOrder = 1.5;
+    appReaction.conditions.stirring.rate.rpm = 800.7;
+    analysis.chmoId = 1234.2;
+    const ordReaction = fromBinpb(reactionToOrdBinpb(appReaction));
+    expect(ordReaction.inputs.ethanol.additionOrder).toBe(1);
+    expect(ordReaction.conditions?.stirring?.rate?.rpm).toBe(800);
+    expect(ordReaction.outcomes[0].analyses.nmr.chmoId).toBe(1234);
+  });
 });
