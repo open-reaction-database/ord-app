@@ -309,7 +309,13 @@ export const fullReaction = create(ReactionSchema, {
     recordModified: [
       { time: { value: '2024-06-03T12:00:00' }, person: { name: 'Grace Hopper' } },
     ],
-    reactionMetadata: { origin: { kind: { case: 'stringValue', value: 'notebook' } } },
+    reactionMetadata: {
+      origin: { kind: { case: 'stringValue', value: 'notebook' } },
+      scan: {
+        kind: { case: 'bytesValue', value: new Uint8Array([4, 5]) },
+        format: 'raw',
+      },
+    },
     isMined: false,
   },
 });

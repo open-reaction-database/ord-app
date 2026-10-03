@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Data } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import type { JsonValue } from '@bufbuild/protobuf';
 import type {
   Optional,
   ReactionDateTime,
@@ -40,8 +40,9 @@ export interface ReactionProvenance extends ReactionEntity {
   patent?: Optional<string>;
   publicationUrl?: Optional<string>;
   isMined?: Optional<boolean>;
-  // Not edited in the app; carried through so that saving a reaction keeps it.
-  reactionMetadata?: Record<string, Data>;
+  // Not edited in the app; carried through so that saving a reaction keeps it. Each value is
+  // the proto3 JSON of an ord Data message, which, unlike its bytes, Redux can serialize.
+  reactionMetadata?: Record<string, JsonValue>;
   experimentStart: ReactionDateTime;
   experimenter: ReactionPerson;
   recordCreated: ReactionRecordEvent;

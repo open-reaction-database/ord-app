@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import { create, fromJson, toJson, type MessageInitShape } from '@bufbuild/protobuf';
 import {
+  DataSchema,
   PersonSchema,
   ReactionProvenanceSchema,
   RecordEventSchema,
@@ -110,7 +111,12 @@ export const ordProvenanceToReaction = (
     patent: ordScalarToReaction(patent),
     publicationUrl: ordScalarToReaction(publicationUrl),
     isMined,
-    reactionMetadata,
+    reactionMetadata: Object.fromEntries(
+      Object.entries(reactionMetadata).map(([key, data]) => [
+        key,
+        toJson(DataSchema, data),
+      ]),
+    ),
   });
 };
 
@@ -140,6 +146,13 @@ export const reactionProvenanceToOrd = (
     patent: patent ?? undefined,
     publicationUrl: publicationUrl ?? undefined,
     isMined: isMined ?? undefined,
-    reactionMetadata,
+    reactionMetadata:
+      reactionMetadata &&
+      Object.fromEntries(
+        Object.entries(reactionMetadata).map(([key, json]) => [
+          key,
+          fromJson(DataSchema, json),
+        ]),
+      ),
   };
 };

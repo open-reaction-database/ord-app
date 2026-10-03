@@ -15,6 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { equals, fromBinary, toBinary } from '@bufbuild/protobuf';
+import { findNonSerializableValue } from '@reduxjs/toolkit';
 import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
 import {
   ReactionSchema,
@@ -62,9 +63,9 @@ describe('binpb conversion', () => {
     expect(appReaction.provenance.recordCreated.person).toEqual({});
   });
 
-  it('keeps no protobuf-es message metadata in the app reaction', () => {
+  it('decodes to a serializable app reaction without protobuf-es messages', () => {
     const appReaction = ordBinpbToReaction(toBinpb(fullReaction));
-    const { reactionMetadata: _, ...provenance } = appReaction.provenance;
-    expect(JSON.stringify({ ...appReaction, provenance })).not.toContain('$typeName');
+    expect(findNonSerializableValue(appReaction)).toBe(false);
+    expect(JSON.stringify(appReaction)).not.toContain('$typeName');
   });
 });
