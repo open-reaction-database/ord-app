@@ -16,13 +16,17 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Bare imports such as `store/…` resolve from src/ */
+    "paths": {
+      "*": ["./src/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "baseUrl": "./src"
+    "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }

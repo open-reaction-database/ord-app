@@ -7,7 +7,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - `ord_app/` — Python backend (Python 3.12).
   - `service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`.
   - `api/`, `visualization/` — supporting modules. `tests/` — pytest suite.
-- `ui/` — React 19 + Vite 6 frontend. Redux Toolkit store, Mantine v7, wouter routing. Imports use `baseUrl: ./src` (write `store/…`, `common/…`, `features/…`, not `../../`).
+- `ui/` — React 19 + Vite 6 frontend. Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths` (write `store/…`, `common/…`, `features/…`, not `../../`).
   - Reaction protobufs come from the protobuf-es SDK that the Buf Schema Registry generates from ord-schema, `@buf/open-reaction-database_ord-schema.bufbuild_es`; `ui/.npmrc` points the `@buf` scope at buf.build. Pin it to the exact version of an ord-schema release (its `label-vX.Y.Z` dist-tag): a caret range floats to newer, unreleased BSR commits. The converters under `store/entities/reactions/` map ord messages to and from the store's shapes.
 - `migrations/` — Alembic. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + backend.
 

@@ -5,7 +5,7 @@ description: Use when writing, debugging, or running tests for the ord-app `ui/`
 
 # ORD-App UI Testing
 
-Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Mantine v7 / Redux Toolkit / wouter. Playwright for E2E. Imports use `baseUrl: ./src` (vite-tsconfig-paths), so write `store/…`, `common/…`, `features/…`, `test/…` — not relative `../../`.
+Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Mantine v7 / Redux Toolkit / wouter. Playwright for E2E. Imports resolve from `src/` through tsconfig `paths` (vite-tsconfig-paths), so write `store/…`, `common/…`, `features/…`, `test/…` — not relative `../../`.
 
 ## Pre-flight: match CI or get a false green
 
