@@ -7,7 +7,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - `ord_app/` — Python backend (Python 3.12).
   - `service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`.
   - `api/`, `visualization/` — supporting modules. `tests/` — pytest suite.
-- `ui/` — React 19 + Vite 6 frontend. Redux Toolkit store, Mantine v7, wouter routing, `ord-schema-protobufjs` for reaction protobufs. Imports use `baseUrl: ./src` (write `store/…`, `common/…`, `features/…`, not `../../`).
+- `ui/` — React 19 + Vite 6 frontend. Redux Toolkit store, Mantine v7, wouter routing, `ord-schema-protobufjs` for reaction protobufs. Imports resolve from `src/` through tsconfig `paths` (write `store/…`, `common/…`, `features/…`, not `../../`).
 - `migrations/` — Alembic. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + backend.
 
 ## Backend (Python, `uv`)
