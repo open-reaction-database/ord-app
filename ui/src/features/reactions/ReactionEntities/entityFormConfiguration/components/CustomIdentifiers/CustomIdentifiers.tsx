@@ -18,7 +18,11 @@ import { PaperButton } from 'common/components/interactions/PaperButton/PaperBut
 import { SearchIcon, StylusNoteIcon } from 'common/icons';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { useCallback, useContext, useState } from 'react';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import {
+  CompoundIdentifier_CompoundIdentifierType,
+  CompoundIdentifierSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
@@ -48,13 +52,13 @@ const useSelectIdentifiers = buildUseSelectItems(ENTITY_FIELD);
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
   (newIndex, _, value?: unknown) => {
+    const { value: identifierValue, details } = (value as IdentifierData) || {};
     const newIdentifier = ordCompoundIdentifierToReaction(
-      ord.CompoundIdentifier.toObject(
-        new ord.CompoundIdentifier({
-          type: ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK,
-          ...((value as IdentifierData) || {}),
-        }),
-      ),
+      create(CompoundIdentifierSchema, {
+        type: CompoundIdentifier_CompoundIdentifierType.MOLBLOCK,
+        value: identifierValue ?? undefined,
+        details: details ?? undefined,
+      }),
     );
     return [newIndex, newIdentifier];
   },

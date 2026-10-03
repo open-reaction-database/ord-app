@@ -27,12 +27,10 @@ import type { TemplateResponse, Variable } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
 import {
-  convertReactionFloatsToDoubles,
-  ordReactionToReaction,
-  reactionToOrdReaction,
+  ordBinpbToReaction,
+  reactionToOrdBinpb,
 } from '../reactions/reactions.converters.ts';
 import { navigate } from 'wouter/use-browser-location';
-import { ord } from 'ord-schema-protobufjs';
 import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
@@ -57,9 +55,7 @@ const parseTemplate = ({
   variables: rawVariables,
   ...rest
 }: TemplateResponse): ReactionTemplate => {
-  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
-  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
-  convertReactionFloatsToDoubles(appReaction);
+  const appReaction = ordBinpbToReaction(binpb);
   const previews = getReactionPreviews(appReaction, molblocks);
   const variablesParsed: Array<Variable> = JSON.parse(rawVariables);
 
@@ -90,10 +86,7 @@ export const createTemplate = createThunkWithExplicitResult(
   createNewTemplateActions,
   templateLoad => async (dispatch, getState) => {
     const baseReaction = selectReactionById(templateLoad.reactionId)(getState());
-    const ordReaction = reactionToOrdReaction(baseReaction.data);
-    const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
-      'base64',
-    );
+    const binpb = reactionToOrdBinpb(baseReaction.data);
     const payload = {
       name: templateLoad.name,
       binpb: binpb,
@@ -191,10 +184,7 @@ export const downloadTemplateInJSON: ThunkCustomWrapper<string> =
       name,
     } = selectReactionById(templateId)(getState());
     const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-    const ordReaction = reactionToOrdReaction(reaction);
-    const binpb = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
-      'base64',
-    );
+    const binpb = reactionToOrdBinpb(reaction);
     downloadAsJson({ variables: variablesList, binpb }, `${name}.json`);
   };
 

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import {
+  CrudeComponentSchema,
+  ReactionInputSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordCrudeComponentToReaction,
   reactionCrudeComponentToOrd,
@@ -26,11 +31,13 @@ import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 describe('crude component converters', () => {
   it('maps booleans to the tri-state enum and assigns an id', () => {
-    const result = ordCrudeComponentToReaction({
-      reactionId: 'r1',
-      includesWorkup: true,
-      hasDerivedAmount: false,
-    });
+    const result = ordCrudeComponentToReaction(
+      create(CrudeComponentSchema, {
+        reactionId: 'r1',
+        includesWorkup: true,
+        hasDerivedAmount: false,
+      }),
+    );
     expect(typeof result.id).toBe('string');
     expect(result.reactionId).toBe('r1');
     expect(result.includesWorkup).toBe(ReactionBoolean.True);
@@ -38,11 +45,13 @@ describe('crude component converters', () => {
   });
 
   it('maps the tri-state enum back to ord booleans', () => {
-    const reaction = ordCrudeComponentToReaction({
-      reactionId: 'r1',
-      includesWorkup: true,
-      hasDerivedAmount: false,
-    });
+    const reaction = ordCrudeComponentToReaction(
+      create(CrudeComponentSchema, {
+        reactionId: 'r1',
+        includesWorkup: true,
+        hasDerivedAmount: false,
+      }),
+    );
     const ord = reactionCrudeComponentToOrd(reaction);
     expect(ord.reactionId).toBe('r1');
     expect(ord.includesWorkup).toBe(true);
@@ -52,20 +61,29 @@ describe('crude component converters', () => {
 
 describe('ordInputWithoutNameToReaction', () => {
   it('assigns an id and defaults component lists to empty arrays', () => {
-    const result = ordInputWithoutNameToReaction({});
+    const result = ordInputWithoutNameToReaction(create(ReactionInputSchema));
     expect(typeof result.id).toBe('string');
     expect(result.components).toEqual([]);
     expect(result.crudeComponents).toEqual([]);
   });
 
   it('preserves additionOrder', () => {
-    expect(ordInputWithoutNameToReaction({ additionOrder: 2 }).additionOrder).toBe(2);
+    expect(
+      ordInputWithoutNameToReaction(create(ReactionInputSchema, { additionOrder: 2 }))
+        .additionOrder,
+    ).toBe(2);
+  });
+
+  it('reads an unset additionOrder as undefined rather than 0', () => {
+    expect(
+      ordInputWithoutNameToReaction(create(ReactionInputSchema)).additionOrder,
+    ).toBeUndefined();
   });
 });
 
 describe('ordInputToReaction', () => {
   it('prepends the input name to the converted input', () => {
-    const result = ordInputToReaction({}, 'Reagent A');
+    const result = ordInputToReaction(create(ReactionInputSchema), 'Reagent A');
     expect(result.name).toBe('Reagent A');
     expect(typeof result.id).toBe('string');
   });
@@ -74,7 +92,10 @@ describe('ordInputToReaction', () => {
 describe('input map converters', () => {
   it('keys converted inputs by their generated id', () => {
     const byString = (a: string, b: string) => a.localeCompare(b);
-    const result = ordInputsToReactionInputs({ reagent: {}, solvent: {} });
+    const result = ordInputsToReactionInputs({
+      reagent: create(ReactionInputSchema),
+      solvent: create(ReactionInputSchema),
+    });
     const entries = Object.values(result);
     expect(entries).toHaveLength(2);
     expect(entries.map(input => input.name).sort(byString)).toEqual([
@@ -87,7 +108,9 @@ describe('input map converters', () => {
   });
 
   it('round-trips a single input back to an ord map keyed by name', () => {
-    const reactionInputs = ordInputsToReactionInputs({ reagent: { additionOrder: 1 } });
+    const reactionInputs = ordInputsToReactionInputs({
+      reagent: create(ReactionInputSchema, { additionOrder: 1 }),
+    });
     const ordInputs = reactionInputsToOrdInputs(reactionInputs);
     expect(Object.keys(ordInputs ?? {})).toEqual(['reagent']);
     expect(ordInputs?.reagent.additionOrder).toBe(1);

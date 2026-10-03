@@ -13,164 +13,288 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import type { DescEnum } from '@bufbuild/protobuf';
+import {
+  Analysis_AnalysisTypeSchema,
+  CompoundIdentifier_CompoundIdentifierTypeSchema,
+  CompoundPreparation_CompoundPreparationTypeSchema,
+  Current_CurrentUnitSchema,
+  ElectrochemistryConditions_ElectrochemistryCell_ElectrochemistryCellTypeSchema,
+  ElectrochemistryConditions_ElectrochemistryTypeSchema,
+  FlowConditions_FlowTypeSchema,
+  FlowConditions_Tubing_TubingTypeSchema,
+  FlowRate_FlowRateUnitSchema,
+  IlluminationConditions_IlluminationTypeSchema,
+  Length_LengthUnitSchema,
+  PressureConditions_Atmosphere_AtmosphereTypeSchema,
+  PressureConditions_PressureControl_PressureControlTypeSchema,
+  PressureConditions_PressureMeasurement_PressureMeasurementTypeSchema,
+  Pressure_PressureUnitSchema,
+  ProductMeasurement_MassSpecMeasurementDetails_MassSpecMeasurementTypeSchema,
+  ProductMeasurement_ProductMeasurementTypeSchema,
+  ProductMeasurement_Selectivity_SelectivityTypeSchema,
+  ReactionIdentifier_ReactionIdentifierTypeSchema,
+  ReactionInput_AdditionDevice_AdditionDeviceTypeSchema,
+  ReactionInput_AdditionSpeed_AdditionSpeedTypeSchema,
+  ReactionRole_ReactionRoleTypeSchema,
+  ReactionSetup_ReactionEnvironment_ReactionEnvironmentTypeSchema,
+  ReactionWorkup_ReactionWorkupTypeSchema,
+  StirringConditions_StirringMethodTypeSchema,
+  StirringConditions_StirringRate_StirringRateTypeSchema,
+  TemperatureConditions_TemperatureControl_TemperatureControlTypeSchema,
+  TemperatureConditions_TemperatureMeasurement_TemperatureMeasurementTypeSchema,
+  Temperature_TemperatureUnitSchema,
+  Texture_TextureTypeSchema,
+  Time_TimeUnitSchema,
+  VesselAttachment_VesselAttachmentTypeSchema,
+  VesselMaterial_VesselMaterialTypeSchema,
+  VesselPreparation_VesselPreparationTypeSchema,
+  Vessel_VesselTypeSchema,
+  Voltage_VoltageUnitSchema,
+  Volume_VolumeUnitSchema,
+  Wavelength_WavelengthUnitSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
+import type {
+  CompoundIdentifierType,
+  CompoundPreparationType,
+  ElectrochemistryCellType,
+  ElectrochemistryType,
+  PressureControlType,
+  PressureMeasurementType,
+  ReactionAdditionDeviceType,
+  ReactionAnalysisType,
+  ReactionAtmosphereType,
+  ReactionCurrentType,
+  ReactionEnvironmentType,
+  ReactionFlowRateType,
+  ReactionFlowType,
+  ReactionIdentifierType,
+  ReactionIlluminationType,
+  ReactionLengthType,
+  ReactionMassSpecType,
+  ReactionMeasurementType,
+  ReactionPressureType,
+  ReactionRole,
+  ReactionSelectivityType,
+  ReactionSpeedType,
+  ReactionStirringMethodType,
+  ReactionTemperatureControlType,
+  ReactionTemperatureType,
+  ReactionTextureType,
+  ReactionTimeType,
+  ReactionVesselAttachmentType,
+  ReactionVesselMaterialType,
+  ReactionVesselPreparationType,
+  ReactionVesselType,
+  ReactionVolumeTypeValues,
+  ReactionWaveLengthType,
+  StirringRateType,
+  TemperatureMeasurementType,
+  TubingType,
+  VoltageUnit,
+  WorkupType,
+} from './reactionEntityTypes.types.ts';
 
-const generateOptionsAndByValue = <T extends string>(entities: Record<T, number>) => ({
-  options: Object.keys(entities),
-  byValue: reversePrimitiveRecord<T, number>(entities),
-});
+// Maps each value name of an enum to its number, read from the enum descriptor: the generated
+// TypeScript enum object also maps each number back to its name. `T` is the union of the
+// generated enum's value names.
+export const enumValueByName = <T extends string>(
+  schema: DescEnum,
+): Record<T, number> =>
+  Object.fromEntries(schema.values.map(({ name, number }) => [name, number])) as Record<
+    T,
+    number
+  >;
+
+const generateOptionsAndByValue = <T extends string>(schema: DescEnum) => {
+  const valueByName = enumValueByName<T>(schema);
+  return {
+    options: Object.keys(valueByName),
+    byValue: reversePrimitiveRecord<T, number>(valueByName),
+  };
+};
 
 export const { options: reactionRoleOptions, byValue: reactionRoleByValue } =
-  generateOptionsAndByValue(ord.ReactionRole.ReactionRoleType);
+  generateOptionsAndByValue<ReactionRole>(ReactionRole_ReactionRoleTypeSchema);
 
 export const { options: preparationTypeOptions, byValue: preparationTypeByValue } =
-  generateOptionsAndByValue(ord.CompoundPreparation.CompoundPreparationType);
+  generateOptionsAndByValue<CompoundPreparationType>(
+    CompoundPreparation_CompoundPreparationTypeSchema,
+  );
 
 export const { options: timeUnitOptions, byValue: timeUnitByValue } =
-  generateOptionsAndByValue(ord.Time.TimeUnit);
+  generateOptionsAndByValue<ReactionTimeType>(Time_TimeUnitSchema);
 
 export const {
   options: additionDeviceTypeOptions,
   byValue: reactionAdditionDeviceByValue,
-} = generateOptionsAndByValue(ord.ReactionInput.AdditionDevice.AdditionDeviceType);
+} = generateOptionsAndByValue<ReactionAdditionDeviceType>(
+  ReactionInput_AdditionDevice_AdditionDeviceTypeSchema,
+);
 
 export const { options: additionSpeedTypeOptions, byValue: additionSpeedTypeByValue } =
-  generateOptionsAndByValue(ord.ReactionInput.AdditionSpeed.AdditionSpeedType);
+  generateOptionsAndByValue<ReactionSpeedType>(
+    ReactionInput_AdditionSpeed_AdditionSpeedTypeSchema,
+  );
 
 export const { options: flowRateOptions, byValue: flowRateTypeByValue } =
-  generateOptionsAndByValue(ord.FlowRate.FlowRateUnit);
+  generateOptionsAndByValue<ReactionFlowRateType>(FlowRate_FlowRateUnitSchema);
 
 export const { options: temperatureOptions, byValue: temperatureTypeByValue } =
-  generateOptionsAndByValue(ord.Temperature.TemperatureUnit);
+  generateOptionsAndByValue<ReactionTemperatureType>(Temperature_TemperatureUnitSchema);
 
 export const { options: stirringRateOptions, byValue: stirringRateTypeByValue } =
-  generateOptionsAndByValue(ord.StirringConditions.StirringRate.StirringRateType);
+  generateOptionsAndByValue<StirringRateType>(
+    StirringConditions_StirringRate_StirringRateTypeSchema,
+  );
 
 export const { options: pressureUnitOptions, byValue: pressureByValue } =
-  generateOptionsAndByValue(ord.Pressure.PressureUnit);
+  generateOptionsAndByValue<ReactionPressureType>(Pressure_PressureUnitSchema);
 
 export const { options: atmosphereTypeOptions, byValue: atmosphereTypeByValue } =
-  generateOptionsAndByValue(ord.PressureConditions.Atmosphere.AtmosphereType);
+  generateOptionsAndByValue<ReactionAtmosphereType>(
+    PressureConditions_Atmosphere_AtmosphereTypeSchema,
+  );
 
 export const {
   options: temperatureControlTypeOptions,
   byValue: temperatureControlTypeByValue,
-} = generateOptionsAndByValue(
-  ord.TemperatureConditions.TemperatureControl.TemperatureControlType,
+} = generateOptionsAndByValue<ReactionTemperatureControlType>(
+  TemperatureConditions_TemperatureControl_TemperatureControlTypeSchema,
 );
 
 export const { options: textureTypeOptions, byValue: textureTypeByValue } =
-  generateOptionsAndByValue(ord.Texture.TextureType);
+  generateOptionsAndByValue<ReactionTextureType>(Texture_TextureTypeSchema);
 
 export const { options: analysisOptions, byValue: analysisTypeByValue } =
-  generateOptionsAndByValue(ord.Analysis.AnalysisType);
+  generateOptionsAndByValue<ReactionAnalysisType>(Analysis_AnalysisTypeSchema);
 
 export const {
   options: reactionIdentifierTypeOptions,
   byValue: reactionIdentifierTypeByValue,
-} = generateOptionsAndByValue(ord.ReactionIdentifier.ReactionIdentifierType);
+} = generateOptionsAndByValue<ReactionIdentifierType>(
+  ReactionIdentifier_ReactionIdentifierTypeSchema,
+);
 
 export const { options: measurementsTypeOptions, byValue: measurementTypeByValue } =
-  generateOptionsAndByValue(ord.ProductMeasurement.ProductMeasurementType);
+  generateOptionsAndByValue<ReactionMeasurementType>(
+    ProductMeasurement_ProductMeasurementTypeSchema,
+  );
 
 export const { options: selectivityTypeOptions, byValue: selectivityTypeByValue } =
-  generateOptionsAndByValue(ord.ProductMeasurement.Selectivity.SelectivityType);
+  generateOptionsAndByValue<ReactionSelectivityType>(
+    ProductMeasurement_Selectivity_SelectivityTypeSchema,
+  );
 
 export const { options: waveLengthTypeOptions, byValue: waveLengthTypeByValue } =
-  generateOptionsAndByValue(ord.Wavelength.WavelengthUnit);
+  generateOptionsAndByValue<ReactionWaveLengthType>(Wavelength_WavelengthUnitSchema);
 
 export const { options: massSpecTypeOptions, byValue: massSpecTypeByValue } =
-  generateOptionsAndByValue(
-    ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType,
+  generateOptionsAndByValue<ReactionMassSpecType>(
+    ProductMeasurement_MassSpecMeasurementDetails_MassSpecMeasurementTypeSchema,
   );
 
 export const {
   options: compoundIdentifierTypeOptions,
   byValue: compoundIdentifierTypeByValue,
-} = generateOptionsAndByValue(ord.CompoundIdentifier.CompoundIdentifierType);
+} = generateOptionsAndByValue<CompoundIdentifierType>(
+  CompoundIdentifier_CompoundIdentifierTypeSchema,
+);
 
 export const {
   options: stirringMethodTypeOptions,
   byValue: stirringMethodTypeByValue,
-} = generateOptionsAndByValue(ord.StirringConditions.StirringMethodType);
+} = generateOptionsAndByValue<ReactionStirringMethodType>(
+  StirringConditions_StirringMethodTypeSchema,
+);
 
 export const { options: illuminationTypeOptions, byValue: illuminationTypeByValue } =
-  generateOptionsAndByValue(ord.IlluminationConditions.IlluminationType);
+  generateOptionsAndByValue<ReactionIlluminationType>(
+    IlluminationConditions_IlluminationTypeSchema,
+  );
 
 export const { options: lengthTypeOptions, byValue: lengthTypeByValue } =
-  generateOptionsAndByValue(ord.Length.LengthUnit);
+  generateOptionsAndByValue<ReactionLengthType>(Length_LengthUnitSchema);
 
 export const {
   options: electrochemistryTypeOptions,
   byValue: electrochemistryTypeByValue,
-} = generateOptionsAndByValue(ord.ElectrochemistryConditions.ElectrochemistryType);
+} = generateOptionsAndByValue<ElectrochemistryType>(
+  ElectrochemistryConditions_ElectrochemistryTypeSchema,
+);
 
 export const { options: currentTypeOptions, byValue: currentTypeByValue } =
-  generateOptionsAndByValue(ord.Current.CurrentUnit);
+  generateOptionsAndByValue<ReactionCurrentType>(Current_CurrentUnitSchema);
 
 export const {
   options: electrochemistryCellTypeOptions,
   byValue: electrochemistryCellTypeByValue,
-} = generateOptionsAndByValue(
-  ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType,
+} = generateOptionsAndByValue<ElectrochemistryCellType>(
+  ElectrochemistryConditions_ElectrochemistryCell_ElectrochemistryCellTypeSchema,
 );
 
 export const { options: flowTypeOptions, byValue: flowTypeByValue } =
-  generateOptionsAndByValue(ord.FlowConditions.FlowType);
+  generateOptionsAndByValue<ReactionFlowType>(FlowConditions_FlowTypeSchema);
 
 export const { options: tubingTypeOptions, byValue: tubingTypeByValue } =
-  generateOptionsAndByValue(ord.FlowConditions.Tubing.TubingType);
+  generateOptionsAndByValue<TubingType>(FlowConditions_Tubing_TubingTypeSchema);
 
 export const { options: workupTypeOptions, byValue: workupTypeByValue } =
-  generateOptionsAndByValue(ord.ReactionWorkup.ReactionWorkupType);
+  generateOptionsAndByValue<WorkupType>(ReactionWorkup_ReactionWorkupTypeSchema);
 
 export const {
   options: temperatureMeasurementTypeOptions,
   byValue: temperatureMeasurementTypeByValue,
-} = generateOptionsAndByValue(
-  ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType,
+} = generateOptionsAndByValue<TemperatureMeasurementType>(
+  TemperatureConditions_TemperatureMeasurement_TemperatureMeasurementTypeSchema,
 );
 
 export const {
   options: pressureControlTypeOptions,
   byValue: pressureControlTypeByValue,
-} = generateOptionsAndByValue(
-  ord.PressureConditions.PressureControl.PressureControlType,
+} = generateOptionsAndByValue<PressureControlType>(
+  PressureConditions_PressureControl_PressureControlTypeSchema,
 );
 
 export const { options: voltageUnitOptions, byValue: voltageUnitByValue } =
-  generateOptionsAndByValue(ord.Voltage.VoltageUnit);
+  generateOptionsAndByValue<VoltageUnit>(Voltage_VoltageUnitSchema);
 
 export const {
   options: pressureMeasurementTypeOptions,
   byValue: pressureMeasurementTypeByValue,
-} = generateOptionsAndByValue(
-  ord.PressureConditions.PressureMeasurement.PressureMeasurementType,
+} = generateOptionsAndByValue<PressureMeasurementType>(
+  PressureConditions_PressureMeasurement_PressureMeasurementTypeSchema,
 );
 
 export const { options: vesselTypeOptions, byValue: vesselTypeByValue } =
-  generateOptionsAndByValue(ord.Vessel.VesselType);
+  generateOptionsAndByValue<ReactionVesselType>(Vessel_VesselTypeSchema);
 
 export const {
   options: vesselMaterialTypeOptions,
   byValue: vesselMaterialTypeByValue,
-} = generateOptionsAndByValue(ord.VesselMaterial.VesselMaterialType);
+} = generateOptionsAndByValue<ReactionVesselMaterialType>(
+  VesselMaterial_VesselMaterialTypeSchema,
+);
 
 export const { options: volumeTypeOptions, byValue: volumeTypeByValue } =
-  generateOptionsAndByValue(ord.Volume.VolumeUnit);
+  generateOptionsAndByValue<ReactionVolumeTypeValues>(Volume_VolumeUnitSchema);
 
 export const { options: environmentTypeOptions, byValue: environmentTypeByValue } =
-  generateOptionsAndByValue(
-    ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType,
+  generateOptionsAndByValue<ReactionEnvironmentType>(
+    ReactionSetup_ReactionEnvironment_ReactionEnvironmentTypeSchema,
   );
 
 export const {
   options: vesselPreparationTypeOptions,
   byValue: vesselPreparationTypeByValue,
-} = generateOptionsAndByValue(ord.VesselPreparation.VesselPreparationType);
+} = generateOptionsAndByValue<ReactionVesselPreparationType>(
+  VesselPreparation_VesselPreparationTypeSchema,
+);
 
 export const {
   options: vesselAttachmentTypeOptions,
   byValue: vesselAttachmentTypeByValue,
-} = generateOptionsAndByValue(ord.VesselAttachment.VesselAttachmentType);
+} = generateOptionsAndByValue<ReactionVesselAttachmentType>(
+  VesselAttachment_VesselAttachmentTypeSchema,
+);

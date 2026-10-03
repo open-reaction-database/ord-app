@@ -16,7 +16,6 @@
 import { Flex, Title } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ord } from 'ord-schema-protobufjs';
 import { Fragment, useMemo, useContext } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from 'common/styling';
@@ -26,7 +25,7 @@ import { reactionContext } from '../../reactions.context.ts';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
-const notesFields: Array<[keyof ord.IReactionNotes, string]> = [
+const notesFields: Array<[keyof ReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
   ['safetyNotes', 'Safety notes'],
   ['isHeterogeneous', 'Is heterogeneous'],

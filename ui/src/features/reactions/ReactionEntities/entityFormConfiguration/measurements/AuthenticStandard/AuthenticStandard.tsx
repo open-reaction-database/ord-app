@@ -21,7 +21,8 @@ import type { Optional } from 'store/entities/reactions/reactionEntity/reactionE
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { Button, Flex, Title } from '@mantine/core';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { CompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
@@ -61,9 +62,7 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
-    const authenticStandard = ordInputComponentToReaction(
-      ord.Compound.toObject(new ord.Compound()),
-    );
+    const authenticStandard = ordInputComponentToReaction(create(CompoundSchema));
     dispatch(
       addUpdateReactionField({
         reactionId,

@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
+    "@buf/open-reaction-database_ord-schema.bufbuild_es": "2.16.0-00000000000000-2a4e5a8d72a2.1",
+    "@bufbuild/protobuf": "^2.16.0",
     "@fastify/deepmerge": "^2.0.2",
     "@mantine/core": "^7.15.3",
     "@mantine/dates": "^7.15.3",
@@ -38,7 +40,6 @@
     "ketcher-standalone": "^3.15.0",
     "mantine-react-table": "^2.0.0-beta.8",
     "mime": "^4.0.6",
-    "ord-schema-protobufjs": "^0.6.31",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-lazy-with-preload": "^2.2.1",

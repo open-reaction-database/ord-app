@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type {
+  Optional,
   ReactionBoolean,
   ReactionTemperature,
   ReactionPressure,
@@ -40,17 +40,15 @@ import type {
   PressureMeasurementType,
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 
-export interface TemperatureMeasurement extends WithId<
-  Pick<ord.TemperatureConditions.ITemperatureMeasurement, 'details'>
-> {
+export interface TemperatureMeasurement extends WithId<object> {
+  details?: Optional<string>;
   type: TemperatureMeasurementType;
   time: ReactionTime;
   temperature: ReactionTemperature;
 }
 
-export interface PressureMeasurement extends WithId<
-  Pick<ord.PressureConditions.IPressureMeasurement, 'details'>
-> {
+export interface PressureMeasurement extends WithId<object> {
+  details?: Optional<string>;
   type: PressureMeasurementType;
   time: ReactionTime;
   pressure: ReactionPressure;
@@ -75,27 +73,24 @@ export interface ReactionPressureCondition {
   pressureMeasurements: Array<PressureMeasurement>;
 }
 
-export interface ReactionStirringCondition extends Pick<
-  ord.IStirringConditions,
-  'details'
-> {
+export interface ReactionStirringCondition {
+  details?: Optional<string>;
   type: ReactionStirringMethodType;
   rate: StirringRate;
 }
 
-export interface ReactionIlluminationCondition extends Pick<
-  ord.IIlluminationConditions,
-  'details' | 'color'
-> {
+export interface ReactionIlluminationCondition {
+  details?: Optional<string>;
+  color?: Optional<string>;
   type: ReactionIlluminationType;
   peakWavelength: ReactionWaveLength;
   distanceToVessel: ReactionLength;
 }
 
-export interface ReactionElectrochemistryCondition extends Pick<
-  ord.IElectrochemistryConditions,
-  'details' | 'anodeMaterial' | 'cathodeMaterial'
-> {
+export interface ReactionElectrochemistryCondition {
+  details?: Optional<string>;
+  anodeMaterial?: Optional<string>;
+  cathodeMaterial?: Optional<string>;
   type: ElectrochemistryType;
   current: ReactionCurrent;
   voltage: Voltage;
@@ -104,17 +99,16 @@ export interface ReactionElectrochemistryCondition extends Pick<
   electrochemistryMeasurements: Array<ElectrochemistryMeasurement>;
 }
 
-export interface ReactionFlowCondition extends Pick<
-  ord.IFlowConditions,
-  'details' | 'pumpType'
-> {
+export interface ReactionFlowCondition {
+  details?: Optional<string>;
+  pumpType?: Optional<string>;
   type: ReactionFlowType;
   tubing: Tubing;
 }
 
-export interface ReactionConditions extends WithId<
-  Pick<ord.IReactionConditions, 'details' | 'ph'>
-> {
+export interface ReactionConditions extends WithId<object> {
+  details?: Optional<string>;
+  ph?: Optional<number>;
   temperature: ReactionTemperatureCondition;
   pressure: ReactionPressureCondition;
   stirring: ReactionStirringCondition;

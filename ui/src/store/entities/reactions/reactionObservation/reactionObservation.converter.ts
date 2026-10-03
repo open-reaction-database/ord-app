@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  ReactionObservation as OrdReactionObservation,
+  ReactionObservationSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordDataToReaction,
   reactionDataToOrd,
@@ -35,7 +39,7 @@ export interface ReactionObservation {
 }
 
 export const ordObservationToReaction = (
-  observation: ord.IReactionObservation,
+  observation: OrdReactionObservation,
 ): ReactionObservation =>
   withId({
     comment: observation.comment ?? '',
@@ -45,7 +49,7 @@ export const ordObservationToReaction = (
 
 export const reactionObservationToOrd = (
   observation: ReactionObservation,
-): ord.IReactionObservation => {
+): MessageInitShape<typeof ReactionObservationSchema> => {
   return {
     comment: observation.comment,
     image: reactionDataToOrd(observation.image),

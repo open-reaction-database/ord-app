@@ -18,7 +18,7 @@ import { describe, it, expect, vi } from 'vitest';
 // ordReactionToReaction/reactionToOrdReaction/linkReactionEntities are thin
 // orchestrators delegating each field to a per-entity sub-converter. Stub every
 // sub-converter with a recognizable sentinel so the tests assert the field
-// wiring and the length-gated null branches without the sub-converters' logic.
+// wiring and the length-gated undefined branches without the sub-converters' logic.
 vi.mock(
   'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts',
   () => ({
@@ -36,6 +36,7 @@ vi.mock(
 );
 vi.mock('store/entities/reactions/reactionEntity/reactionEntity.converters.ts', () => ({
   ordReactionIdentifierToReaction: (identifier: unknown) => ({ id: identifier }),
+  ordScalarToReaction: (value: unknown) => value || undefined,
   reactionIdentifierToOrd: (identifier: unknown) => ({ ordId: identifier }),
 }));
 vi.mock('store/entities/reactions/reactionNotes/reactionNotes.converters.ts', () => ({
@@ -64,7 +65,7 @@ vi.mock('./reactionSetup/reactionSetup.converter.ts', () => ({
 }));
 
 import type { AppReaction } from './reactions.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
+import type { Reaction } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   convertReactionFloatsToDoubles,
   linkReactionEntities,
@@ -113,10 +114,10 @@ describe('convertReactionFloatsToDoubles', () => {
 });
 
 describe('ordReactionToReaction', () => {
-  it('spreads the proto and routes each field through its sub-converter', () => {
+  it('routes each field through its sub-converter', () => {
     const reaction = {
+      $typeName: 'ord.Reaction',
       reactionId: 'r1',
-      extra: 'preserved',
       inputs: { a: 1 },
       outcomes: ['o1'],
       identifiers: ['i1', 'i2'],
@@ -126,11 +127,10 @@ describe('ordReactionToReaction', () => {
       notes: { n: 1 },
       provenance: { p: 1 },
       workups: ['w1'],
-    } as unknown as ord.IReaction;
+    } as unknown as Reaction;
 
-    expect(ordReactionToReaction(reaction)).toEqual({
+    expect(ordReactionToReaction(reaction)).toStrictEqual({
       reactionId: 'r1',
-      extra: 'preserved',
       inputs: 'INPUTS',
       outcomes: 'OUTCOMES',
       identifiers: [{ id: 'i1' }, { id: 'i2' }],
@@ -146,7 +146,7 @@ describe('ordReactionToReaction', () => {
   it('defaults missing list fields to empty arrays', () => {
     const result = ordReactionToReaction({
       reactionId: 'r2',
-    } as unknown as ord.IReaction);
+    } as unknown as Reaction);
     expect(result.identifiers).toEqual([]);
     expect(result.observations).toEqual([]);
     expect(result.workups).toEqual([]);
@@ -164,7 +164,7 @@ describe('reactionToOrdReaction', () => {
     provenance: {},
   };
 
-  it('nulls the list fields that are empty and routes the rest through sub-converters', () => {
+  it('leaves empty list fields unset and routes the rest through sub-converters', () => {
     const result = reactionToOrdReaction({
       ...base,
       identifiers: [],
@@ -176,13 +176,13 @@ describe('reactionToOrdReaction', () => {
       reactionId: 'r1',
       inputs: 'ORD_INPUTS',
       outcomes: 'ORD_OUTCOMES',
-      identifiers: null,
+      identifiers: undefined,
       setup: 'ORD_SETUP',
-      observations: null,
+      observations: undefined,
       conditions: 'ORD_CONDITIONS',
       notes: 'ORD_NOTES',
       provenance: 'ORD_PROVENANCE',
-      workups: null,
+      workups: undefined,
     });
   });
 

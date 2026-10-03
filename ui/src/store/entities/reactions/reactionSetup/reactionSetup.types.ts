@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type {
+  Optional,
   ReactionBoolean,
+  ReactionEntity,
   ReactionEnvironment,
   VesselMaterial,
   Volume,
-  WithId,
 } from '../reactionEntity/reactionEntity.types';
 import type {
   ReactionVesselPreparationType,
@@ -28,14 +28,16 @@ import type {
 } from '../reactionEntityTypes/reactionEntityTypes.types';
 import type { AppData } from '../reactionData/reactionData.types.ts';
 
-export interface ReactionSetup extends Pick<ord.IReactionSetup, 'automationPlatform'> {
+export interface ReactionSetup {
+  automationPlatform?: Optional<string>;
   isAutomated: ReactionBoolean;
   vessel: ReactionVessel;
   environment: ReactionEnvironment;
   automationCode: Record<string, AppData>;
 }
 
-export interface ReactionVessel extends Pick<ord.IVessel, 'details'> {
+export interface ReactionVessel {
+  details?: Optional<string>;
   type: ReactionVesselType;
   material: VesselMaterial;
   volume: Volume;
@@ -43,14 +45,12 @@ export interface ReactionVessel extends Pick<ord.IVessel, 'details'> {
   vesselAttachments: Array<ReactionVesselAttachment>;
 }
 
-export interface ReactionVesselPreparation extends WithId<
-  Pick<ord.IVesselPreparation, 'details'>
-> {
+export interface ReactionVesselPreparation extends ReactionEntity {
+  details?: Optional<string>;
   type: ReactionVesselPreparationType;
 }
 
-export interface ReactionVesselAttachment extends WithId<
-  Pick<ord.IVesselAttachment, 'details'>
-> {
+export interface ReactionVesselAttachment extends ReactionEntity {
+  details?: Optional<string>;
   type: ReactionVesselAttachmentType;
 }

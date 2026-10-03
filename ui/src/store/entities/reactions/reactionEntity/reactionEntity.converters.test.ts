@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import {
+  CompoundIdentifierSchema,
+  ReactionIdentifierSchema,
+  StirringConditions_StirringRateSchema,
+  TextureSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordBooleanToReaction,
+  ordCompoundIdentifierToReaction,
+  ordReactionIdentifierToReaction,
+  ordScalarToReaction,
+  ordStirringRateToReaction,
+  ordTextureToReaction,
   ordValuePrecisionToReaction,
   reactionBooleanToOrd,
   reactionValuePrecisionToOrd,
@@ -66,7 +78,7 @@ describe('ordBooleanToReaction', () => {
 
 describe('reactionBooleanToOrd', () => {
   it('is the inverse of ordBooleanToReaction', () => {
-    expect(reactionBooleanToOrd(ReactionBoolean.Unspecified)).toBeNull();
+    expect(reactionBooleanToOrd(ReactionBoolean.Unspecified)).toBeUndefined();
     expect(reactionBooleanToOrd(ReactionBoolean.True)).toBe(true);
     expect(reactionBooleanToOrd(ReactionBoolean.False)).toBe(false);
   });
@@ -93,14 +105,60 @@ describe('ordValuePrecisionToReaction', () => {
 });
 
 describe('reactionValuePrecisionToOrd', () => {
-  it('returns null when both value and precision are null', () => {
-    expect(reactionValuePrecisionToOrd({ value: null, precision: null })).toBeNull();
+  it('returns undefined when both value and precision are null', () => {
+    expect(
+      reactionValuePrecisionToOrd({ value: null, precision: null }),
+    ).toBeUndefined();
   });
 
-  it('returns the value/precision pair otherwise', () => {
-    expect(reactionValuePrecisionToOrd({ value: 1, precision: null })).toEqual({
+  it('returns the value/precision pair otherwise, leaving a null field unset', () => {
+    expect(reactionValuePrecisionToOrd({ value: 1, precision: null })).toStrictEqual({
       value: 1,
-      precision: null,
+      precision: undefined,
     });
+  });
+});
+
+describe('ordScalarToReaction', () => {
+  it('reads the proto3 zero value as unset', () => {
+    expect(ordScalarToReaction('')).toBeUndefined();
+    expect(ordScalarToReaction(0)).toBeUndefined();
+    expect(ordScalarToReaction(undefined)).toBeUndefined();
+  });
+
+  it('passes other values through', () => {
+    expect(ordScalarToReaction('details')).toBe('details');
+    expect(ordScalarToReaction(250)).toBe(250);
+  });
+});
+
+describe('unset string and number fields', () => {
+  it('reads unset type details as null', () => {
+    expect(ordTextureToReaction(create(TextureSchema))).toEqual({
+      type: 'UNSPECIFIED',
+      details: null,
+    });
+  });
+
+  it('reads unset reaction identifier strings as null', () => {
+    const identifier = ordReactionIdentifierToReaction(
+      create(ReactionIdentifierSchema),
+    );
+    expect(identifier.value).toBeNull();
+    expect(identifier.details).toBeNull();
+  });
+
+  it('reads unset compound identifier strings as undefined', () => {
+    const identifier = ordCompoundIdentifierToReaction(
+      create(CompoundIdentifierSchema, { value: 'CCO' }),
+    );
+    expect(identifier.value).toBe('CCO');
+    expect(identifier.details).toBeUndefined();
+  });
+
+  it('reads an unset stirring rate as undefined rather than 0', () => {
+    expect(
+      ordStirringRateToReaction(create(StirringConditions_StirringRateSchema)).rpm,
+    ).toBeUndefined();
   });
 });

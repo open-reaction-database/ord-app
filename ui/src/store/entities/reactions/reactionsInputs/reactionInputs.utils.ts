@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 import type { ReactionInput } from './reactionInputs.types.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ordInputToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 
 export function createEmptyReactionInput(name: string): ReactionInput {
-  return ordInputToReaction(ord.ReactionInput.toObject(new ord.ReactionInput()), name);
+  return ordInputToReaction(create(ReactionInputSchema), name);
 }

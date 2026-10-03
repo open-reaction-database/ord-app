@@ -33,7 +33,7 @@ import type { ReactionProvenance } from './reactionProvenance/reactionProvenance
 import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
 import type { ReactionConditions } from './reactionConditions/reactionConditions.types.ts';
 import type { ReactionSetup } from './reactionSetup/reactionSetup.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
+import type { DescMessage, MessageInitShape } from '@bufbuild/protobuf';
 
 export enum ReactionNodeEntity {
   Inputs = 'inputs',
@@ -78,8 +78,10 @@ export type OrdToReactionEntityConverter =
   | OrdToReactionNamelessEntityConverter
   | OrdToReactionNamedEntityConverter;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ReactionToOrdEntityConverter = (reactionEntity: any) => Optional<object>;
+export type ReactionToOrdEntityConverter = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  reactionEntity: any,
+) => MessageInitShape<DescMessage> | undefined;
 
 export interface ReactionSummary {
   provenance: Record<string, string | number>;
@@ -123,7 +125,8 @@ export interface ReactionMolBlocks {
   workups: Array<Array<ComponentProductPreview>>;
 }
 
-export interface AppReaction extends Pick<ord.IReaction, 'reactionId'> {
+export interface AppReaction {
+  reactionId?: Optional<string>;
   inputs: Record<string, ReactionInput>;
   outcomes: Array<ReactionOutcome>;
   identifiers: Array<ReactionIdentifier>;

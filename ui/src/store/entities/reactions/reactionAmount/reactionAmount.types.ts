@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Mass_MassUnit,
+  Moles_MolesUnit,
+  Volume_VolumeUnit,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import type {
+  Optional,
+  ReactionBoolean,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export type AppAmountUnspecified = 'UNSPECIFIED';
 
-export type AppMolesUnit = Exclude<
-  keyof typeof ord.Moles.MolesUnit,
-  AppAmountUnspecified
->;
+export type AppMolesUnit = Exclude<keyof typeof Moles_MolesUnit, AppAmountUnspecified>;
 
-export type AppMassUnit = Exclude<keyof typeof ord.Mass.MassUnit, AppAmountUnspecified>;
+export type AppMassUnit = Exclude<keyof typeof Mass_MassUnit, AppAmountUnspecified>;
 
 export type AppVolumeUnit = Exclude<
-  keyof typeof ord.Volume.VolumeUnit,
+  keyof typeof Volume_VolumeUnit,
   AppAmountUnspecified
 >;
 
@@ -36,12 +40,9 @@ export type ReactionAmountType =
   | AppVolumeUnit
   | AppAmountUnspecified;
 
-type ReactionAmountValuePrecision = Pick<
-  NonNullable<Required<ord.IAmount>['mass']>,
-  'value' | 'precision'
->;
-
-export interface ReactionAmount extends ReactionAmountValuePrecision {
+export interface ReactionAmount {
+  value?: Optional<number>;
+  precision?: Optional<number>;
   volumeIncludesSolutes: ReactionBoolean;
   units: ReactionAmountType;
 }

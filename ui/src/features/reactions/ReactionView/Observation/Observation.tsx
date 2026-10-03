@@ -25,7 +25,8 @@ import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunk
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ordObservationToReaction } from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
@@ -44,9 +45,7 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
       ENTITY_FIELD,
       observations.length,
     ];
-    const newObservation = ordObservationToReaction(
-      ord.ReactionObservation.toObject(new ord.ReactionObservation()),
-    );
+    const newObservation = ordObservationToReaction(create(ReactionObservationSchema));
 
     dispatch(
       addUpdateReactionField({

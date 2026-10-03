@@ -18,7 +18,8 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { RecordEventSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { formatDateToDisplay } from 'common/utils';
@@ -31,10 +32,7 @@ import {
 } from './reactionPerson.models.tsx';
 
 const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
-  return [
-    newIndex,
-    ordRecordEventToReaction(ord.RecordEvent.toObject(new ord.RecordEvent())),
-  ];
+  return [newIndex, ordRecordEventToReaction(create(RecordEventSchema))];
 };
 
 export const reactionProvenance: Array<ReactionFormNode> = [

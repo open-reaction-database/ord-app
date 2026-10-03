@@ -87,7 +87,22 @@ import {
   ordEnvironmentTypeToReaction,
   reactionEnvironmentTypeToOrd,
 } from '../reactionEntityTypes/reactionEntityTypes.converters';
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  CompoundIdentifier,
+  CompoundIdentifierSchema,
+  DateTime,
+  DateTimeSchema,
+  ElectrochemistryConditions_ElectrochemistryType,
+  FlowConditions_Tubing,
+  FlowConditions_TubingSchema,
+  ProductMeasurement_MassSpecMeasurementDetails,
+  ProductMeasurement_MassSpecMeasurementDetailsSchema,
+  ReactionIdentifier as OrdReactionIdentifier,
+  ReactionIdentifierSchema,
+  StirringConditions_StirringRate,
+  StirringConditions_StirringRateSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type { ElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
 import { convertUtcDateToUserTZ, convertUserTZDateToUtc } from 'common/utils';
 import { DATE_TIME_FORMAT } from 'common/constants.ts';
@@ -126,15 +141,23 @@ export function ordBooleanToReaction(value?: boolean | null): ReactionBoolean {
   return value ? ReactionBoolean.True : ReactionBoolean.False;
 }
 
-export function reactionBooleanToOrd(value: ReactionBoolean): boolean | null {
+export function reactionBooleanToOrd(value: ReactionBoolean): boolean | undefined {
   switch (value) {
     case ReactionBoolean.Unspecified:
-      return null;
+      return undefined;
     case ReactionBoolean.True:
       return true;
     case ReactionBoolean.False:
       return false;
   }
+}
+
+// Proto3 reads an unset string or number field as '' or 0. The store holds such a field as
+// undefined, so forms show it as empty and lists sort and render it as unset.
+export function ordScalarToReaction<T extends string | number>(
+  value: OrdOptional<T>,
+): T | undefined {
+  return value || undefined;
 }
 
 export function ordValuePrecisionToReaction(
@@ -150,16 +173,16 @@ export function ordValuePrecisionToReaction(
 export function reactionValuePrecisionToOrd({
   value,
   precision,
-}: ReactionValuePrecision): Optional<OrdValuePrecision> {
+}: ReactionValuePrecision): OrdValuePrecision | undefined {
   if (value === null && precision === null) {
-    return null;
+    return undefined;
   }
-  return { value, precision };
+  return { value: value ?? undefined, precision: precision ?? undefined };
 }
 
 const generateValuePrecisionUnitConverter = <T extends string>(
   typeFromOrd: (value: OrdOptional<number>) => T,
-  typeToOrd: (value: T) => OrdOptional<number>,
+  typeToOrd: (value: T) => number,
 ) => ({
   fromOrd: (
     ordValue: OrdOptional<OrdValuePrecisionUnit>,
@@ -173,38 +196,45 @@ const generateValuePrecisionUnitConverter = <T extends string>(
   },
   toOrd: (
     vpu: Optional<ReactionValuePrecisionUnit<T>>,
-  ): Optional<OrdValuePrecisionUnit> => {
+  ): OrdValuePrecisionUnit | undefined => {
     if (!vpu) {
-      return null;
+      return undefined;
     }
-    const { units, ...rest } = vpu;
+    const { units, value, precision } = vpu;
 
     const unitsOrd = typeToOrd(units);
-    const isDefault =
-      unitsOrd === 0 && Object.values(rest).every(value => value === null);
-    return isDefault ? null : { units: unitsOrd, ...rest };
+    const isDefault = unitsOrd === 0 && value === null && precision === null;
+    return isDefault
+      ? undefined
+      : {
+          units: unitsOrd,
+          value: value ?? undefined,
+          precision: precision ?? undefined,
+        };
   },
 });
 
 const generateTypeDetailsConverter = <T extends string>(
   typeFromOrd: (value: OrdOptional<number>) => T,
-  typeToOrd: (value: T) => OrdOptional<number>,
+  typeToOrd: (value: T) => number,
 ) => ({
   fromOrd: (ordValue: OrdOptional<OrdTypeDetails>): ReactionTypeDetails<T> => {
     const { details, type } = ordValue ?? {};
     return {
       type: typeFromOrd(type),
-      details: details ?? null,
+      details: details || null,
     };
   },
-  toOrd: (typeDetails: Optional<ReactionTypeDetails<T>>): Optional<OrdTypeDetails> => {
+  toOrd: (
+    typeDetails: Optional<ReactionTypeDetails<T>>,
+  ): OrdTypeDetails | undefined => {
     if (!typeDetails) {
-      return null;
+      return undefined;
     }
     const { type, details } = typeDetails;
     const typeOrd = typeToOrd(type);
     const isDefault = typeOrd === 0 && (details === null || details === '');
-    return isDefault ? null : { type: typeOrd, details: details };
+    return isDefault ? undefined : { type: typeOrd, details: details ?? undefined };
   },
 });
 
@@ -309,59 +339,72 @@ export const ordReactionIdentifierToReaction = ({
   type,
   details,
   value,
-}: ord.IReactionIdentifier): ReactionIdentifier =>
+}: OrdReactionIdentifier): ReactionIdentifier =>
   withId({
     type: ordReactionIdentifierTypeToReaction(type),
-    value: value ?? null,
-    details: details ?? null,
+    value: value || null,
+    details: details || null,
   });
 
-export const reactionIdentifierToOrd = ({ type, ...rest }: ReactionIdentifier) =>
-  withoutId({
-    type: reactionIdentifierTypeToOrd(type),
-    ...rest,
-  });
+export const reactionIdentifierToOrd = ({
+  type,
+  value,
+  details,
+}: ReactionIdentifier): MessageInitShape<typeof ReactionIdentifierSchema> => ({
+  type: reactionIdentifierTypeToOrd(type),
+  value: value ?? undefined,
+  details: details ?? undefined,
+});
 
 export const ordMassSpecToReaction = (
-  massSpec: OrdOptional<ord.ProductMeasurement.IMassSpecMeasurementDetails>,
-): ReactionMassSpec => {
-  const { type, eicMasses, ...rest } = massSpec ?? {};
-  return {
-    type: ordMassSpecTypeToReaction(type),
-    eicMasses: eicMasses ?? [],
-    ...rest,
-  };
-};
+  massSpec: OrdOptional<ProductMeasurement_MassSpecMeasurementDetails>,
+): ReactionMassSpec => ({
+  type: ordMassSpecTypeToReaction(massSpec?.type),
+  eicMasses: massSpec?.eicMasses ?? [],
+  details: ordScalarToReaction(massSpec?.details),
+  ticMinimumMz: massSpec?.ticMinimumMz,
+  ticMaximumMz: massSpec?.ticMaximumMz,
+});
 
 export const reactionMassSpecToOrd = ({
   type,
   eicMasses,
-  ...rest
-}: ReactionMassSpec): ord.ProductMeasurement.IMassSpecMeasurementDetails => ({
+  details,
+  ticMinimumMz,
+  ticMaximumMz,
+}: ReactionMassSpec): MessageInitShape<
+  typeof ProductMeasurement_MassSpecMeasurementDetailsSchema
+> => ({
   type: reactionMassSpecTypeToOrd(type),
-  eicMasses: eicMasses?.length > 0 ? eicMasses : null,
-  ...rest,
+  eicMasses: eicMasses?.length > 0 ? eicMasses : undefined,
+  details: details ?? undefined,
+  ticMinimumMz: ticMinimumMz ?? undefined,
+  ticMaximumMz: ticMaximumMz ?? undefined,
 });
 
 export const ordCompoundIdentifierToReaction = ({
   type,
-  ...rest
-}: ord.ICompoundIdentifier): ReactionCompoundIdentifier =>
+  details,
+  value,
+}: CompoundIdentifier): ReactionCompoundIdentifier =>
   withId({
     type: ordCompoundIdentifierTypeToReaction(type),
-    ...rest,
+    details: ordScalarToReaction(details),
+    value: ordScalarToReaction(value),
   });
 
 export const reactionCompoundIdentifierToOrd = ({
   type,
-  ...rest
-}: ReactionCompoundIdentifier): ord.ICompoundIdentifier => ({
+  details,
+  value,
+}: ReactionCompoundIdentifier): MessageInitShape<typeof CompoundIdentifierSchema> => ({
   type: reactionCompoundIdentifierTypeToOrd(type),
-  ...rest,
+  details: details ?? undefined,
+  value: value ?? undefined,
 });
 
 export const ordDateTimeToReaction = (
-  dateTime: OrdOptional<ord.IDateTime>,
+  dateTime: OrdOptional<DateTime>,
 ): ReactionDateTime => {
   if (!dateTime?.value) {
     return null;
@@ -372,70 +415,66 @@ export const ordDateTimeToReaction = (
 
 export const reactionDateTimeToOrd = (
   dateTime: ReactionDateTime,
-): Optional<ord.IDateTime> => {
+): MessageInitShape<typeof DateTimeSchema> | undefined => {
   if (!dateTime) {
-    return null;
+    return undefined;
   }
   const date = convertUserTZDateToUtc(dateTime);
   return { value: date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime };
 };
 
 export const ordTubingToReaction = (
-  tubing: OrdOptional<ord.FlowConditions.ITubing>,
-): Tubing => {
-  const { type, details, diameter } = tubing ?? {};
-  return {
-    type: ordTubingTypeToReaction(type),
-    details,
-    diameter: ordLengthToReaction(diameter),
-  };
-};
+  tubing: OrdOptional<FlowConditions_Tubing>,
+): Tubing => ({
+  type: ordTubingTypeToReaction(tubing?.type),
+  details: ordScalarToReaction(tubing?.details),
+  diameter: ordLengthToReaction(tubing?.diameter),
+});
 
 export const reactionTubingToOrd = ({
   type,
   details,
   diameter,
-}: Tubing): Optional<ord.FlowConditions.ITubing> => {
+}: Tubing): MessageInitShape<typeof FlowConditions_TubingSchema> | undefined => {
   const diameterOrd = reactionLengthToOrd(diameter);
   const typeOrd = reactionTubingTypeToOrd(type);
 
   return diameterOrd || typeOrd !== 0 || details
     ? {
         type: typeOrd,
-        details,
+        details: details ?? undefined,
         diameter: diameterOrd,
       }
-    : null;
+    : undefined;
 };
 
 export const ordStirringRateToReaction = (
-  stirringRate: OrdOptional<ord.StirringConditions.IStirringRate>,
-): StirringRate => {
-  const { type, details, rpm } = stirringRate ?? {};
-  return {
-    type: ordStirringRateTypeToReaction(type),
-    details,
-    rpm,
-  };
-};
+  stirringRate: OrdOptional<StirringConditions_StirringRate>,
+): StirringRate => ({
+  type: ordStirringRateTypeToReaction(stirringRate?.type),
+  details: ordScalarToReaction(stirringRate?.details),
+  rpm: ordScalarToReaction(stirringRate?.rpm),
+});
 
 export const reactionStirringRateToOrd = ({
   type,
   details,
   rpm,
-}: StirringRate): Optional<ord.StirringConditions.IStirringRate> => {
+}: StirringRate):
+  | MessageInitShape<typeof StirringConditions_StirringRateSchema>
+  | undefined => {
   const ordType = reactionStirringRateTypeToOrd(type);
   return ordType !== 0 || details || rpm
     ? {
         type: ordType,
-        details,
-        rpm,
+        details: details ?? undefined,
+        rpm: rpm ?? undefined,
       }
-    : null;
+    : undefined;
 };
 
 export const convertElectrochemistryTypeToOrd = (
-  type: ord.ElectrochemistryConditions.ElectrochemistryType | undefined | null,
+  type: OrdOptional<ElectrochemistryConditions_ElectrochemistryType>,
 ): ElectrochemistryType => {
   return type !== undefined && type !== null
     ? ordElectrochemistryTypeToReaction(type)

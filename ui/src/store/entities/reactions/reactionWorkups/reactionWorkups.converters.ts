@@ -16,13 +16,18 @@
 import type { ReactionWorkup } from './reactionWorkups.types.ts';
 import {
   ordBooleanToReaction,
+  ordScalarToReaction,
   ordTimeToReaction,
   reactionBooleanToOrd,
   reactionTimeToOrd,
   withId,
   withoutId,
 } from '../reactionEntity/reactionEntity.converters.ts';
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  ReactionWorkup as OrdReactionWorkup,
+  ReactionWorkupSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordWorkupTypeToReaction,
   reactionWorkupTypeToOrd,
@@ -51,8 +56,10 @@ export const ordWorkupToReaction = ({
   temperature,
   stirring,
   isAutomated,
-  ...workup
-}: ord.IReactionWorkup): ReactionWorkup =>
+  details,
+  keepPhase,
+  targetPh,
+}: OrdReactionWorkup): ReactionWorkup =>
   withId({
     type: ordWorkupTypeToReaction(type),
     duration: ordTimeToReaction(duration),
@@ -61,23 +68,39 @@ export const ordWorkupToReaction = ({
     temperature: ordTemperatureConditionToReaction(temperature),
     stirring: ordStirringConditionToReaction(stirring),
     isAutomated: ordBooleanToReaction(isAutomated),
-    ...workup,
+    details: ordScalarToReaction(details),
+    keepPhase: ordScalarToReaction(keepPhase),
+    targetPh,
   });
 
-export const reactionWorkupToOrd = (workup: ReactionWorkup): ord.IReactionWorkup => {
-  const { type, duration, amount, input, temperature, stirring, isAutomated, ...rest } =
-    withoutId(workupTransform(workup));
+export const reactionWorkupToOrd = (
+  workup: ReactionWorkup,
+): MessageInitShape<typeof ReactionWorkupSchema> => {
+  const {
+    type,
+    duration,
+    amount,
+    input,
+    temperature,
+    stirring,
+    isAutomated,
+    details,
+    keepPhase,
+    targetPh,
+  } = withoutId(workupTransform(workup));
 
   return {
     type: reactionWorkupTypeToOrd(type),
     duration: reactionTimeToOrd(duration),
-    amount: amount ? reactionAmountToOrd(amount) : amount,
-    input: input ? reactionInputWithoutNameToOrd(input) : null,
+    amount: amount ? reactionAmountToOrd(amount) : undefined,
+    input: input ? reactionInputWithoutNameToOrd(input) : undefined,
     temperature: temperature
       ? reactionTemperatureConditionToOrd(temperature)
-      : temperature,
-    stirring: stirring ? reactionStirringConditionToOrd(stirring) : stirring,
+      : undefined,
+    stirring: stirring ? reactionStirringConditionToOrd(stirring) : undefined,
     isAutomated: reactionBooleanToOrd(isAutomated),
-    ...rest,
+    details: details ?? undefined,
+    keepPhase: keepPhase ?? undefined,
+    targetPh: targetPh ?? undefined,
   };
 };

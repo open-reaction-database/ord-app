@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import type {
+  Optional,
   ReactionBoolean,
+  ReactionNamedEntity,
   ReactionTime,
   ReactionValuePrecision,
   WithId,
-  WithIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionAnalysisType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
-export interface ReactionAnalysis extends WithIdName<
-  Pick<ord.IAnalysis, 'details' | 'chmoId' | 'instrumentManufacturer'>
-> {
+export interface ReactionAnalysis extends ReactionNamedEntity {
+  details?: Optional<string>;
+  chmoId?: Optional<number>;
+  instrumentManufacturer?: Optional<string>;
   type: ReactionAnalysisType;
   analysisData: Record<string, AppData>;
   instrumentLastCalibrated: string | null;

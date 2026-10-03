@@ -29,7 +29,8 @@ import { Button, Flex, Title } from '@mantine/core';
 import classes from '../measurements/AuthenticStandard/authenticStandard.module.scss';
 import { AddCircleIcon } from 'common/icons';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
@@ -81,9 +82,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   }, [currentPath, dispatch, reactionId]);
 
   const onCreate = useCallback(() => {
-    const input = ordInputWithoutNameToReaction(
-      ord.ReactionInput.toObject(new ord.ReactionInput()),
-    );
+    const input = ordInputWithoutNameToReaction(create(ReactionInputSchema));
     dispatch(
       addUpdateReactionField({
         reactionId,

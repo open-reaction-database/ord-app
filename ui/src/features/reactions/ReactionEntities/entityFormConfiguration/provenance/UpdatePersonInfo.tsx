@@ -17,7 +17,7 @@ import { Button } from '@mantine/core';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useSelector } from 'react-redux';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';
-import type { ord } from 'ord-schema-protobufjs';
+import type { ReactionPerson } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { useCallback, useContext } from 'react';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
@@ -31,7 +31,7 @@ export interface UpdatePersonInfoProps extends ReactionFormCustomProps {
   text: string;
 }
 
-const keys: Array<[keyof ord.IPerson, keyof User]> = [
+const keys: Array<[keyof ReactionPerson, keyof User]> = [
   ['name', 'name'],
   ['email', 'email'],
   ['orcid', 'orcid_id'],
@@ -47,8 +47,8 @@ export function UpdatePersonInfo({
   const { setValues } = formMethods;
 
   const updateFields = useCallback(() => {
-    const person: Partial<ord.IPerson> = keys.reduce(
-      (acc: Partial<ord.IPerson>, [personKey, userKey]) => {
+    const person: ReactionPerson = keys.reduce(
+      (acc: ReactionPerson, [personKey, userKey]) => {
         const value = user[userKey];
         return value ? { ...acc, [personKey]: value } : acc;
       },

@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  Amount,
+  AmountSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type {
   ReactionAmount,
   ReactionAmountType,
@@ -34,72 +38,73 @@ import {
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-const amountOptions: Array<
-  ['moles' | 'mass' | 'volume', Record<number, ReactionAmountType>]
-> = [
-  ['moles', molesUnitByValue],
-  ['mass', massUnitByValue],
-  ['volume', volumeUnitByValue],
-];
+type MeasuredAmountKind = 'moles' | 'mass' | 'volume';
 
-export function ordAmountToReaction(ordAmount?: ord.IAmount | null): ReactionAmount {
-  const requiredOrdAmount = ordAmount ?? ({} as ord.IAmount);
-  const volumeIncludesSolutes = ordBooleanToReaction(
-    requiredOrdAmount.volumeIncludesSolutes,
-  );
+const unitsByValueByKind: Record<
+  MeasuredAmountKind,
+  Record<number, ReactionAmountType>
+> = {
+  moles: molesUnitByValue,
+  mass: massUnitByValue,
+  volume: volumeUnitByValue,
+};
 
-  const result = amountOptions.reduce(
-    (acc: ReactionAmount | null, [key, unitsByValue]) => {
-      const currentValue = requiredOrdAmount[key];
-      const units = unitsByValue[currentValue?.units ?? 0];
-      if (currentValue?.units && units) {
-        return { ...currentValue, units: units, volumeIncludesSolutes };
-      }
-      return acc;
-    },
-    null,
-  );
-
-  return (
-    result ?? {
-      value: null,
-      precision: null,
-      units: appAmountUnspecified,
-      volumeIncludesSolutes: ReactionBoolean.Unspecified,
-    }
-  );
+function ordMeasuredAmountToReaction(
+  kind: Amount['kind'],
+): Pick<ReactionAmount, 'value' | 'precision' | 'units'> | null {
+  if (kind.case !== 'moles' && kind.case !== 'mass' && kind.case !== 'volume') {
+    return null;
+  }
+  const { value, precision, units } = kind.value;
+  const unitsName = unitsByValueByKind[kind.case][units];
+  return units && unitsName ? { value, precision, units: unitsName } : null;
 }
 
-const x: Array<['moles' | 'mass' | 'volume', Array<string>]> = [
+export function ordAmountToReaction(ordAmount?: Amount | null): ReactionAmount {
+  const measuredAmount = ordAmount ? ordMeasuredAmountToReaction(ordAmount.kind) : null;
+  if (measuredAmount) {
+    return {
+      ...measuredAmount,
+      volumeIncludesSolutes: ordBooleanToReaction(ordAmount?.volumeIncludesSolutes),
+    };
+  }
+
+  return {
+    value: null,
+    precision: null,
+    units: appAmountUnspecified,
+    volumeIncludesSolutes: ReactionBoolean.Unspecified,
+  };
+}
+
+const unitNamesByKind: Array<[MeasuredAmountKind, Array<string>]> = [
   ['moles', molesUnitNames],
   ['mass', massUnitNames],
   ['volume', volumeUnitNames],
 ];
 
-export function reactionAmountToOrd(amount: ReactionAmount): ord.IAmount | null {
+export function reactionAmountToOrd(
+  amount: ReactionAmount,
+): MessageInitShape<typeof AmountSchema> | undefined {
   if (amount.units === appAmountUnspecified) {
-    return null;
+    return undefined;
+  }
+  const kind = unitNamesByKind.find(([, names]) => names.includes(amount.units))?.[0];
+  if (kind === undefined) {
+    return undefined;
   }
   const volumeIncludesSolutes = volumeUnitNames.includes(amount.units)
     ? reactionBooleanToOrd(amount.volumeIncludesSolutes)
-    : null;
-  const ordAmountValue = {
-    value: amount.value,
-    precision: amount.precision,
-    units: unitValueByName[amount.units],
+    : undefined;
+  return {
+    volumeIncludesSolutes,
+    kind: {
+      case: kind,
+      value: {
+        value: amount.value ?? undefined,
+        precision: amount.precision ?? undefined,
+        units: unitValueByName[amount.units],
+      },
+    },
   };
-
-  const result = x.reduce((acc: ord.IAmount | null, [key, names]) => {
-    if (names.includes(amount.units)) {
-      return { [key]: ordAmountValue };
-    }
-    return acc;
-  }, null);
-
-  return result === null
-    ? null
-    : {
-        volumeIncludesSolutes,
-        ...result,
-      };
 }

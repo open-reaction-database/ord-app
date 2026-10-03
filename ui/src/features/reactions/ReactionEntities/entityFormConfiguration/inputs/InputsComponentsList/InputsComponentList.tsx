@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { Button, Flex } from '@mantine/core';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { CompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { AddCircleIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback, useContext } from 'react';
@@ -48,9 +49,7 @@ export function InputsComponentList() {
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {
-    const newComponent = ordInputComponentToReaction(
-      ord.Compound.toObject(new ord.Compound()),
-    );
+    const newComponent = ordInputComponentToReaction(create(CompoundSchema));
     const newPath = [...pathComponents, 'components', length];
     dispatch(
       addUpdateReactionField({

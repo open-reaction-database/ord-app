@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 import type { ReactionAnalysis, ReactionOutcome } from './reactionOutcomes.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  Analysis,
+  AnalysisSchema,
+  ReactionOutcome as OrdReactionOutcome,
+  ReactionOutcomeSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordDataMapToReactionDataMap,
   reactionDataMapToOrdDataMap,
 } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import {
   ordBooleanToReaction,
+  ordScalarToReaction,
   ordTimeToReaction,
   ordValuePrecisionToReaction,
   reactionBooleanToOrd,
@@ -28,7 +35,6 @@ import {
   reactionValuePrecisionToOrd,
   withId,
   withIdName,
-  withoutIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   ordAnalysisTypeToReaction,
@@ -41,16 +47,26 @@ import {
 import { itemsById } from 'common/utils';
 
 export const ordAnalysisToReaction = (
-  { type, data, instrumentLastCalibrated, isOfIsolatedSpecies, ...rest }: ord.IAnalysis,
+  {
+    type,
+    data,
+    instrumentLastCalibrated,
+    isOfIsolatedSpecies,
+    details,
+    chmoId,
+    instrumentManufacturer,
+  }: Analysis,
   name: string,
 ): ReactionAnalysis =>
   withIdName(
     {
       type: ordAnalysisTypeToReaction(type),
       analysisData: ordDataMapToReactionDataMap(data || {}),
-      instrumentLastCalibrated: instrumentLastCalibrated?.value ?? null,
+      instrumentLastCalibrated: instrumentLastCalibrated?.value || null,
       isOfIsolatedSpecies: ordBooleanToReaction(isOfIsolatedSpecies),
-      ...rest,
+      details: ordScalarToReaction(details),
+      chmoId: ordScalarToReaction(chmoId),
+      instrumentManufacturer: ordScalarToReaction(instrumentManufacturer),
     },
     name,
   );
@@ -60,24 +76,27 @@ export const reactionAnalysisToOrd = ({
   analysisData,
   instrumentLastCalibrated,
   isOfIsolatedSpecies,
-  ...rest
-}: ReactionAnalysis): ord.IAnalysis =>
-  withoutIdName({
-    type: reactionAnalysisTypeToOrd(type),
-    data: reactionDataMapToOrdDataMap(analysisData),
-    instrumentLastCalibrated: instrumentLastCalibrated
-      ? { value: instrumentLastCalibrated }
-      : null,
-    isOfIsolatedSpecies: reactionBooleanToOrd(isOfIsolatedSpecies),
-    ...rest,
-  });
+  details,
+  chmoId,
+  instrumentManufacturer,
+}: ReactionAnalysis): MessageInitShape<typeof AnalysisSchema> => ({
+  type: reactionAnalysisTypeToOrd(type),
+  data: reactionDataMapToOrdDataMap(analysisData),
+  instrumentLastCalibrated: instrumentLastCalibrated
+    ? { value: instrumentLastCalibrated }
+    : undefined,
+  isOfIsolatedSpecies: reactionBooleanToOrd(isOfIsolatedSpecies),
+  details: details ?? undefined,
+  chmoId: chmoId ?? undefined,
+  instrumentManufacturer: instrumentManufacturer ?? undefined,
+});
 
 export const ordOutcomeToReactionOutcome = ({
   reactionTime,
   conversion,
   analyses,
   products,
-}: ord.IReactionOutcome): ReactionOutcome =>
+}: OrdReactionOutcome): ReactionOutcome =>
   withId({
     reactionTime: ordTimeToReaction(reactionTime),
     conversion: ordValuePrecisionToReaction(conversion),
@@ -96,7 +115,7 @@ export const reactionOutcomeToOrd = ({
   conversion,
   analyses,
   products,
-}: ReactionOutcome): ord.IReactionOutcome => ({
+}: ReactionOutcome): MessageInitShape<typeof ReactionOutcomeSchema> => ({
   reactionTime: reactionTimeToOrd(reactionTime),
   conversion: reactionValuePrecisionToOrd(conversion),
   analyses: Object.values(analyses || {}).reduce(
@@ -110,14 +129,14 @@ export const reactionOutcomeToOrd = ({
 });
 
 export const ordOutcomesListToReactionOutcomesList = (
-  outcomes: Array<ord.IReactionOutcome>,
+  outcomes: Array<OrdReactionOutcome>,
 ): Array<ReactionOutcome> => {
   return outcomes.map(ordOutcomeToReactionOutcome);
 };
 
 export const reactionOutcomesListToOrdOutcomesList = (
   outcomes: Array<ReactionOutcome>,
-): Array<ord.IReactionOutcome> => {
+): Array<MessageInitShape<typeof ReactionOutcomeSchema>> => {
   return outcomes.map(reactionOutcomeToOrd);
 };
 

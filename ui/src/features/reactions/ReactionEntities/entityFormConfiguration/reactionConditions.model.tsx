@@ -42,7 +42,12 @@ import type {
   TemperatureMeasurement,
 } from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
 import { buildUseCreate } from './buildUseCreate.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import {
+  ElectrochemistryConditions_ElectrochemistryMeasurementSchema,
+  PressureConditions_PressureMeasurementSchema,
+  TemperatureConditions_TemperatureMeasurementSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordElectrochemistryMeasurementToReaction,
   ordPressureMeasurementToReaction,
@@ -130,9 +135,7 @@ export const reactionTemperatureCondition: ReactionFormNode = {
       temperatureMeasurementsPathComponents,
       () =>
         ordTemperatureMeasurementToReaction(
-          ord.TemperatureConditions.TemperatureMeasurement.toObject(
-            new ord.TemperatureConditions.TemperatureMeasurement(),
-          ),
+          create(TemperatureConditions_TemperatureMeasurementSchema),
         ),
       [
         {
@@ -309,9 +312,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         pressureMeasurementsPathComponents,
         () =>
           ordPressureMeasurementToReaction(
-            ord.PressureConditions.PressureMeasurement.toObject(
-              new ord.PressureConditions.PressureMeasurement(),
-            ),
+            create(PressureConditions_PressureMeasurementSchema),
           ),
         [
           {
@@ -478,9 +479,7 @@ export const reactionConditions: Array<ReactionFormNode> = [
         electrochemistryMeasurementsPathComponents,
         () =>
           ordElectrochemistryMeasurementToReaction(
-            ord.ElectrochemistryConditions.ElectrochemistryMeasurement.toObject(
-              new ord.ElectrochemistryConditions.ElectrochemistryMeasurement(),
-            ),
+            create(ElectrochemistryConditions_ElectrochemistryMeasurementSchema),
           ),
         [
           {

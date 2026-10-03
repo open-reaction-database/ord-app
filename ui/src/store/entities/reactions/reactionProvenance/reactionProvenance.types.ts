@@ -13,24 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { Data } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type {
+  Optional,
   ReactionDateTime,
-  WithId,
+  ReactionEntity,
 } from '../reactionEntity/reactionEntity.types.ts';
 
-export interface ReactionRecordEvent extends WithId<Pick<ord.IRecordEvent, 'details'>> {
-  time: ReactionDateTime;
-  person: ord.IPerson;
+export interface ReactionPerson {
+  username?: Optional<string>;
+  name?: Optional<string>;
+  orcid?: Optional<string>;
+  organization?: Optional<string>;
+  email?: Optional<string>;
 }
 
-export interface ReactionProvenance extends Omit<
-  ord.IReactionProvenance,
-  'experimentStart' | 'recordModified' | 'experimenter' | 'recordCreated'
-> {
-  id: string;
+export interface ReactionRecordEvent extends ReactionEntity {
+  details?: Optional<string>;
+  time: ReactionDateTime;
+  person: ReactionPerson;
+}
+
+export interface ReactionProvenance extends ReactionEntity {
+  city?: Optional<string>;
+  doi?: Optional<string>;
+  patent?: Optional<string>;
+  publicationUrl?: Optional<string>;
+  isMined?: Optional<boolean>;
+  // Not edited in the app; carried through so that saving a reaction keeps it.
+  reactionMetadata?: Record<string, Data>;
   experimentStart: ReactionDateTime;
-  experimenter: ord.IPerson;
+  experimenter: ReactionPerson;
   recordCreated: ReactionRecordEvent;
   recordModified: Array<ReactionRecordEvent>;
 }

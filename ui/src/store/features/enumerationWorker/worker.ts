@@ -29,9 +29,7 @@ import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
 } from 'store/entities/reactions/reactions.utils.ts';
-import { Buffer } from 'buffer';
-import { ord } from 'ord-schema-protobufjs';
-import { reactionToOrdReaction } from 'store/entities/reactions/reactions.converters.ts';
+import { reactionToOrdBinpb } from 'store/entities/reactions/reactions.converters.ts';
 import { ordBooleanToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
@@ -167,8 +165,7 @@ function enumerateReaction(
       generateDeepPartialReactionByPath(path, value),
     );
   });
-  const ordReaction = reactionToOrdReaction(updatedTemplate);
-  return Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString('base64');
+  return reactionToOrdBinpb(updatedTemplate);
 }
 
 onmessage = event => {

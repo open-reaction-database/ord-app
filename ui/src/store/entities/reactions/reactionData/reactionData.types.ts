@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  WithIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export enum AppDataType {
   Number = 'Number',
@@ -23,9 +25,10 @@ export enum AppDataType {
   Upload = 'Upload',
 }
 
-export interface AppData extends WithIdName<Pick<ord.IData, 'description'>> {
+export interface AppData extends WithIdName<{ description?: Optional<string> }> {
   data: {
     value: number | string | null;
     type: AppDataType;
-  } & Pick<ord.IData, 'format'>;
+    format?: Optional<string>;
+  };
 }

@@ -17,7 +17,8 @@ import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { AnalysisSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import type { ReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
@@ -36,10 +37,7 @@ const createEmptyAnalysis = (
     'Analysis',
     (analyses as Array<ReactionAnalysis>).map(({ name }) => name),
   );
-  const analysis = ordAnalysisToReaction(
-    ord.Analysis.toObject(new ord.Analysis()),
-    uniqueName,
-  );
+  const analysis = ordAnalysisToReaction(create(AnalysisSchema), uniqueName);
   return [analysis.id, analysis];
 };
 

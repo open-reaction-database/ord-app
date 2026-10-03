@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { ord } from 'ord-schema-protobufjs';
+import {
+  ReactionRole_ReactionRoleType,
+  Time_TimeUnit,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordReactionRoleToReaction,
   reactionReactionRoleToOrd,
@@ -35,7 +38,7 @@ const firstNonZeroValue = (enumObject: Record<string, unknown>): number => {
 
 describe('generated entity-type converters', () => {
   it('round-trips a known ord value through its name (reaction role)', () => {
-    const value = firstNonZeroValue(ord.ReactionRole.ReactionRoleType);
+    const value = firstNonZeroValue(ReactionRole_ReactionRoleType);
     const name = ordReactionRoleToReaction(value);
     expect(typeof name).toBe('string');
     expect(reactionReactionRoleToOrd(name)).toBe(value);
@@ -48,7 +51,7 @@ describe('generated entity-type converters', () => {
   });
 
   it('applies the same factory behavior to another converter (time unit)', () => {
-    const value = firstNonZeroValue(ord.Time.TimeUnit);
+    const value = firstNonZeroValue(Time_TimeUnit);
     const name = ordTimeTypeToReaction(value);
     expect(reactionTimeTypeToOrd(name)).toBe(value);
     expect(ordTimeTypeToReaction(undefined)).toBe(ordTimeTypeToReaction(0));

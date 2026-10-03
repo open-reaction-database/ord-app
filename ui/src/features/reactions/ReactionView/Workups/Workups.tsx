@@ -21,7 +21,8 @@ import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { AddCircleIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
@@ -148,9 +149,7 @@ export function Workups() {
 
   const onWorkupCreate = () => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, workups.length];
-    const newWorkup = ordWorkupToReaction(
-      ord.ReactionWorkup.toObject(new ord.ReactionWorkup()),
-    );
+    const newWorkup = ordWorkupToReaction(create(ReactionWorkupSchema));
 
     dispatch(
       addUpdateReactionField({
