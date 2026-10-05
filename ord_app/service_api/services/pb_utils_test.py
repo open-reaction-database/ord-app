@@ -17,14 +17,17 @@ import pyarrow
 import pytest
 from google.protobuf import text_format
 from ord_schema.proto.dataset_pb2 import Dataset
+from ord_schema.proto.reaction_pb2 import Reaction, ReactionNotes
 
 from ord_app.conftest import read_testdata_text
 from ord_app.service_api.services.pb_utils import (
     MAP_FILE_EXT_TO_DATASET_KIND,
     MAP_FILE_EXT_TO_PB_KIND,
     load_dataset_message,
+    load_message,
     validate_pb_kind_by_file_ext,
     write_dataset_message,
+    write_message,
 )
 
 
@@ -68,6 +71,14 @@ def test_dataset_helpers_delegate_for_non_parquet_kinds(kind):
     loaded = load_dataset_message(write_dataset_message(dataset, kind), kind)
     assert loaded.name == dataset.name
     assert len(loaded.reactions) == len(dataset.reactions)
+
+
+@pytest.mark.parametrize("kind", ("binpb", "json", "txtpb"))
+def test_write_message_round_trips_non_ascii_text(kind):
+    reaction = Reaction(
+        notes=ReactionNotes(procedure_details="Stirred in 5 µL THF at 25 °C – 2 h")
+    )
+    assert load_message(write_message(reaction, kind), Reaction, kind) == reaction
 
 
 def test_load_malformed_parquet_raises():

@@ -201,7 +201,7 @@ def write_message(message: Dataset | Reaction, kind: str) -> bytes:
         case "json":
             data = json_format.MessageToJson(message).encode()
         case "txtpb":
-            data = text_format.MessageToBytes(message)
+            data = text_format.MessageToBytes(message, as_utf8=True)
         case _:
             raise ValueError(kind)
     return data

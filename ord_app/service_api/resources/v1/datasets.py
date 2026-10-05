@@ -26,6 +26,7 @@ from ord_app.service_api.models import (
     DatasetModel,
     GroupModel,
 )
+from ord_app.service_api.resources.v1.responses import attachment_response
 from ord_app.service_api.schemas.datasets import (
     DatasetCreateSchema,
     DatasetDownloadFileFormats,
@@ -142,12 +143,7 @@ async def download_dataset(
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> Response:
     dataset, data = await use_case.download(dataset_id, file_format)
-    return Response(
-        data,
-        headers={
-            "Content-Disposition": f'attachment; filename="{dataset.name}.{file_format}"'
-        },
-    )
+    return attachment_response(data, f"{dataset.name}.{file_format}")
 
 
 @router.get("/datasets", response_model=Page[DatasetWithReactionCountResponseSchema])

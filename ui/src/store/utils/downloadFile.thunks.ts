@@ -32,6 +32,20 @@ export const downloadFile = (blob: Blob, fileName: string) => {
   }
 };
 
+// The backend names a download twice (RFC 6266): `filename*` holds the exact name,
+// percent-encoded as UTF-8, and `filename` an ASCII fallback.
+export const fileNameFromContentDisposition = (header: string): string => {
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (encoded) {
+    return decodeURIComponent(encoded[1]);
+  }
+  const quoted = /filename="([^"]*)"/.exec(header);
+  if (quoted) {
+    return quoted[1];
+  }
+  throw new Error('Missing file name in Content-Disposition header');
+};
+
 export const downloadFileFromUrl =
   (url: string): ThunkAction<Promise<void>, AppState, void, Action> =>
   async () => {
@@ -47,8 +61,7 @@ export const downloadFileFromUrl =
       if (header === undefined) {
         throw new Error('Missing Content-Disposition header');
       }
-      const fileName = header.replace(/^.*filename="(.*)"/, '$1');
-      downloadFile(blob, fileName);
+      downloadFile(blob, fileNameFromContentDisposition(header));
     } catch (error) {
       // A removed dataset/reaction (404) or lost group access (403) rejects the download; tell the
       // user instead of only logging to the console. (#616)
