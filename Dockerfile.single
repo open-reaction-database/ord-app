@@ -31,8 +31,17 @@ RUN npm ci --ignore-scripts
 ARG VITE_API_ENDPOINT=/api/v1
 ENV VITE_API_ENDPOINT=${VITE_API_ENDPOINT}
 
+# The Auth0 settings are compiled into the bundle. They come from these build arguments
+# or, for any not passed, from ui/.env. ORD_APP_REQUIRE_AUTH0 fails the build when one is
+# missing (see vite.config.ts).
+ARG VITE_AUTH0_DOMAIN
+ARG VITE_AUTH0_CLIENT_ID
+ARG VITE_AUTH0_AUDIENCE
+ARG VITE_AUTH0_ISSUER
+ARG VITE_AUTH0_SCOPE
+
 # Build the React app
-RUN npm run build
+RUN ORD_APP_REQUIRE_AUTH0=true npm run build
 
 # Stage 2: Build the FastAPI backend
 FROM python:3.12-slim AS fastapi-build
