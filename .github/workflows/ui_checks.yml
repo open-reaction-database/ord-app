@@ -38,7 +38,21 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run lint:check
+      # Dockerfile.single builds with ORD_APP_REQUIRE_AUTH0, which fails the build when an
+      # Auth0 setting is missing (vite.config.ts). The check runs as the config loads, so
+      # this step is fast; the build below passes it with placeholder values.
+      - name: Image builds fail without the Auth0 settings
+        run: |
+          ORD_APP_REQUIRE_AUTH0=true npx vite build > "$RUNNER_TEMP/auth0.log" 2>&1 || true
+          grep 'Missing VITE_AUTH0_DOMAIN' "$RUNNER_TEMP/auth0.log"
       - run: npm run build
+        env:
+          ORD_APP_REQUIRE_AUTH0: 'true'
+          VITE_AUTH0_DOMAIN: auth0.example.com
+          VITE_AUTH0_CLIENT_ID: placeholder
+          VITE_AUTH0_AUDIENCE: https://auth0.example.com/api/v2/
+          VITE_AUTH0_ISSUER: https://auth0.example.com/
+          VITE_AUTH0_SCOPE: openid
 
   test_ui:
     runs-on: ubuntu-latest
