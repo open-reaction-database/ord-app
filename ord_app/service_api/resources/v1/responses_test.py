@@ -27,9 +27,10 @@ from ord_app.service_api.resources.v1.responses import attachment_response
     ],
 )
 def test_attachment_response_names_the_file(filename, fallback):
-    response = attachment_response(b"data", filename)
+    response = attachment_response(b"data", filename, "application/json")
 
     header = response.headers["content-disposition"]
     assert header.startswith(f'attachment; filename="{fallback}"; ')
     assert unquote(header.split("filename*=UTF-8''")[1]) == filename
     assert response.body == b"data"
+    assert response.headers["content-type"] == "application/json"

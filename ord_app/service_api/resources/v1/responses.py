@@ -18,12 +18,24 @@ from urllib.parse import quote
 
 from fastapi import Response
 
+from ord_app.service_api.schemas.datasets import DatasetDownloadFileFormats
+
 # Characters that can't appear inside a quoted ASCII ``filename`` parameter: anything
 # outside printable ASCII (0x20-0x7e), plus ``"`` (0x22) and ``\`` (0x5c).
 _UNSAFE_FILENAME_CHARACTERS = re.compile(r"[^\x20\x21\x23-\x5b\x5d-\x7e]")
 
+# Content type of each download format. nginx compresses responses by content type
+# (gzip_types in nginx.conf), so a download without one is sent uncompressed. Parquet
+# is already compressed, and nginx.conf leaves it out.
+DOWNLOAD_MEDIA_TYPES: dict[DatasetDownloadFileFormats, str] = {
+    "binpb": "application/x-protobuf",
+    "json": "application/json",
+    "txtpb": "text/plain; charset=utf-8",
+    "parquet": "application/vnd.apache.parquet",
+}
 
-def attachment_response(data: bytes, filename: str) -> Response:
+
+def attachment_response(data: bytes, filename: str, media_type: str) -> Response:
     """Returns ``data`` as a file download that the client saves as ``filename``.
 
     Header values are Latin-1, so the name is sent twice (RFC 6266): an ASCII
@@ -33,6 +45,7 @@ def attachment_response(data: bytes, filename: str) -> Response:
     Args:
         data: The file contents.
         filename: The name to save the file under.
+        media_type: The ``Content-Type``; see ``DOWNLOAD_MEDIA_TYPES``.
 
     Returns:
         A response with an attachment ``Content-Disposition`` header.
@@ -41,6 +54,7 @@ def attachment_response(data: bytes, filename: str) -> Response:
     encoded = quote(filename, safe="")
     return Response(
         data,
+        media_type=media_type,
         headers={
             "Content-Disposition": (
                 f"attachment; filename=\"{fallback}\"; filename*=UTF-8''{encoded}"
