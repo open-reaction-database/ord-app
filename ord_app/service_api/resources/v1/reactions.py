@@ -19,6 +19,7 @@ from fastapi_pagination import Page
 from ord_app.service_api.domain.auth import dataset_authorization
 from ord_app.service_api.domain.reactions import ReactionsUseCase, get_reaction_use_case
 from ord_app.service_api.models import ReactionModel
+from ord_app.service_api.resources.v1.responses import attachment_response
 from ord_app.service_api.schemas.datasets import DownloadFileFormats
 from ord_app.service_api.schemas.reactions import (
     ReactionCreateSchema,
@@ -149,8 +150,4 @@ async def download_reaction(
     use_case: Annotated[ReactionsUseCase, Depends(get_reaction_use_case)],
 ) -> Response:
     reaction, data = await use_case.download(dataset_id, reaction_id, file_format)
-    filename = f"{reaction.pb_reaction_id}.{file_format}"
-    return Response(
-        data,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
+    return attachment_response(data, f"{reaction.pb_reaction_id}.{file_format}")

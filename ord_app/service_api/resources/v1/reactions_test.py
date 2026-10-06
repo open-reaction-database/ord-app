@@ -17,7 +17,7 @@ from base64 import b64decode, b64encode
 from faker import Faker
 from fastapi import status
 from ord_schema.proto.dataset_pb2 import Dataset
-from ord_schema.proto.reaction_pb2 import Reaction
+from ord_schema.proto.reaction_pb2 import Reaction, ReactionNotes
 
 from ord_app.conftest import (
     create_test_dataset,
@@ -359,6 +359,26 @@ async def test_download_reaction(api_client, mock_authenticated_user, test_db_se
 
     decompressed_data = json.loads(response_data.content)
     assert decompressed_data["reactionId"] == reaction.pb_reaction_id
+
+
+async def test_download_reaction_with_non_ascii_text_as_txtpb(
+    api_client, mock_authenticated_user, test_db_session
+):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    pb_reaction = Reaction(
+        reaction_id=fake.uuid4(),
+        notes=ReactionNotes(procedure_details="Stirred in 5 µL THF at 25 °C"),
+    )
+    reaction = await create_test_reaction(
+        test_db_session, mock_authenticated_user, dataset, pb_reaction=pb_reaction
+    )
+
+    response = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/reactions/{reaction.id}/download"
+        "?file_format=txtpb"
+    ).raise_for_status()
+
+    assert load_message(response.content, Reaction, "txtpb") == pb_reaction
 
 
 async def test_update_reaction(api_client, mock_authenticated_user, test_db_session):

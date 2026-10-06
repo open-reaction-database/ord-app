@@ -15,6 +15,7 @@ import json
 from base64 import b64encode
 from datetime import datetime
 from io import BytesIO
+from urllib.parse import unquote
 
 import pytest
 from faker import Faker
@@ -770,13 +771,35 @@ async def test_download_dataset_as_parquet_round_trips(
     response = api_client.get(
         f"/api/v1/datasets/{dataset.id}/download?file_format=parquet"
     ).raise_for_status()
-    assert response.headers["content-disposition"].endswith('.parquet"')
+    assert response.headers["content-disposition"].endswith(".parquet")
 
     # The downloaded bytes round-trip back into a Dataset with the same reaction.
     loaded = load_dataset_message(response.content, "parquet")
     assert loaded.name == dataset.name
     assert loaded.description == dataset.description
     assert [r.reaction_id for r in loaded.reactions] == [reaction_id]
+
+
+@pytest.mark.parametrize("file_format", ("binpb", "json", "txtpb", "parquet"))
+async def test_download_dataset_with_non_ascii_text(
+    file_format, api_client, mock_authenticated_user, test_db_session
+):
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    dataset.name = "C–N coupling at 25 °C"
+    dataset.description = "Volumes in µL"
+    await _add_reaction(test_db_session, user, dataset)
+
+    response = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format={file_format}"
+    ).raise_for_status()
+
+    header = response.headers["content-disposition"]
+    assert (
+        unquote(header.split("filename*=UTF-8''")[1]) == f"{dataset.name}.{file_format}"
+    )
+    loaded = load_dataset_message(response.content, file_format)
+    assert loaded.description == dataset.description
 
 
 @pytest.mark.parametrize("description", (None, "", "   "))

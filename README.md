@@ -62,20 +62,27 @@ Or run the Front-End and Back-End in a single Dockerfile.
 
 _Note: the database must be on the same network as docker or docker must connect to the external database (and have access)_
 
-1. Build the Docker image
+1. Build the Docker image. The UI compiles the Auth0 settings in, so the build needs
+   them, as build arguments or in `ui/.env` (see `ui/.env.template`), and fails if any
+   is missing.
    ```shell
-   docker build -f Dockerfile.single -t ord . 
+   docker build -f Dockerfile.single -t ord \
+   --build-arg VITE_AUTH0_DOMAIN="..." \
+   --build-arg VITE_AUTH0_CLIENT_ID="..." \
+   --build-arg VITE_AUTH0_AUDIENCE="..." \
+   --build-arg VITE_AUTH0_ISSUER="..." \
+   --build-arg VITE_AUTH0_SCOPE="openid profile email offline_access" \
+   .
    ```
-2. Run the Docker image
+2. Run the Docker image. The backend reads its Auth0 settings at run time.
    ```shell
    docker run \
    --network ord_network \
-   -e VITE_API_ENDPOINT="http://localhost:8000/service_api/api/v1" \
    -e VITE_AUTH0_DOMAIN="..." \
    -e VITE_AUTH0_CLIENT_ID="..." \
    -e VITE_AUTH0_AUDIENCE="..." \
    -e VITE_AUTH0_ISSUER="..." \
-   -e PG_DSN="postgresql+asyncpg://ord@db:5432/ord"
+   -e PG_DSN="postgresql+asyncpg://ord@db:5432/ord" \
    --rm -p 5173:5173 -p 8000:8000 ord
    ```
 
