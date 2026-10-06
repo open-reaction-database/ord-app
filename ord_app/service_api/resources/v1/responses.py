@@ -18,8 +18,9 @@ from urllib.parse import quote
 
 from fastapi import Response
 
-# Characters that can't appear inside a quoted ASCII ``filename`` parameter.
-_UNSAFE_FILENAME_CHARACTERS = re.compile(r'[^\x20-\x7e]|["\\]')
+# Characters that can't appear inside a quoted ASCII ``filename`` parameter: anything
+# outside printable ASCII (0x20-0x7e), plus ``"`` (0x22) and ``\`` (0x5c).
+_UNSAFE_FILENAME_CHARACTERS = re.compile(r"[^\x20\x21\x23-\x5b\x5d-\x7e]")
 
 
 def attachment_response(data: bytes, filename: str) -> Response:
