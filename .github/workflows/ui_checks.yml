@@ -43,7 +43,7 @@ jobs:
       # this step is fast; the build below passes it with placeholder values.
       - name: Image builds fail without the Auth0 settings
         run: |
-          ORD_APP_REQUIRE_AUTH0=true npx vite build > "$RUNNER_TEMP/auth0.log" 2>&1 || true
+          ORD_APP_REQUIRE_AUTH0=true ./node_modules/.bin/vite build > "$RUNNER_TEMP/auth0.log" 2>&1 || true
           grep 'Missing VITE_AUTH0_DOMAIN' "$RUNNER_TEMP/auth0.log"
       - run: npm run build
         env:
