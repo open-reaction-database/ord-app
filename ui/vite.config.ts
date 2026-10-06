@@ -13,13 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
+import { loadEnv } from 'vite';
+import { defineConfig, type ViteUserConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+const AUTH0_VARIABLES = [
+  'VITE_AUTH0_DOMAIN',
+  'VITE_AUTH0_CLIENT_ID',
+  'VITE_AUTH0_AUDIENCE',
+  'VITE_AUTH0_ISSUER',
+  'VITE_AUTH0_SCOPE',
+];
+
+// The Auth0 settings are compiled into the bundle, and a bundle built without them sends
+// every visitor to https://undefined/authorize. Image builds (Dockerfile.single) set
+// ORD_APP_REQUIRE_AUTH0 so they fail instead.
+function assertAuth0Configured(mode: string): void {
+  if (process.env.ORD_APP_REQUIRE_AUTH0 !== 'true') {
+    return;
+  }
+  const env = loadEnv(mode, process.cwd(), 'VITE_AUTH0_');
+  const missing = AUTH0_VARIABLES.filter(name => !env[name]);
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing ${missing.join(', ')}: pass them as build arguments or set them in ui/.env ` +
+        '(see ui/.env.template).',
+    );
+  }
+}
+
 // https://vite.dev/config/
-export default defineConfig({
+const config: ViteUserConfig = {
   plugins: [react(), svgr(), tsconfigPaths()],
   worker: {
     plugins: () => [tsconfigPaths()],
@@ -65,4 +91,9 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
   },
+};
+
+export default defineConfig(({ mode }) => {
+  assertAuth0Configured(mode);
+  return config;
 });
