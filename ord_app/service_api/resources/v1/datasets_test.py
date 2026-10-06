@@ -38,6 +38,7 @@ from ord_app.service_api.models import (
     UserGroupsMembershipModel,
     UserModel,
 )
+from ord_app.service_api.resources.v1.responses import DOWNLOAD_MEDIA_TYPES
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH
 from ord_app.service_api.services.pb_utils import (
     load_dataset_message,
@@ -798,6 +799,8 @@ async def test_download_dataset_with_non_ascii_text(
     assert (
         unquote(header.split("filename*=UTF-8''")[1]) == f"{dataset.name}.{file_format}"
     )
+    # nginx compresses downloads by content type, so each format needs one.
+    assert response.headers["content-type"] == DOWNLOAD_MEDIA_TYPES[file_format]
     loaded = load_dataset_message(response.content, file_format)
     assert loaded.description == dataset.description
 
