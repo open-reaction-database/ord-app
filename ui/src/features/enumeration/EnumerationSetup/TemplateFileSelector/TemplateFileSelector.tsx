@@ -24,7 +24,10 @@ import { Buffer } from 'buffer';
 import { parse } from 'csv-parse/sync';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { guessDelimiter } from './templateFileSelector.utils.ts';
-import type { VariableMatch } from 'store/entities/enumeration/enumeration.types.ts';
+import type {
+  TemplateCSVRow,
+  VariableMatch,
+} from 'store/entities/enumeration/enumeration.types.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
 import { DownloadIcon } from 'common/icons';
@@ -146,7 +149,11 @@ export function TemplateFileSelector({
           return;
         }
 
-        const content = parse(newValue, { delimiter, cast: cast, columns: true });
+        const content = parse<TemplateCSVRow>(newValue, {
+          delimiter,
+          cast: cast,
+          columns: true,
+        });
         form.setFieldValue('templateCSV', {
           headers,
           content,

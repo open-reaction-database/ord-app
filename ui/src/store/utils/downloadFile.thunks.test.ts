@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import axiosInstance from '../axiosInstance.ts';
 import {
   downloadFile,
@@ -27,7 +27,7 @@ vi.mock('../axiosInstance.ts', () => ({ default: { get: vi.fn() } }));
 vi.mock('./notifyApiError.ts', () => ({ notifyApiError: vi.fn() }));
 const axiosMock = axiosInstance as unknown as Record<'get', ReturnType<typeof vi.fn>>;
 
-let clickSpy: ReturnType<typeof vi.fn>;
+let clickSpy: Mock<() => void>;
 let lastAnchor: HTMLAnchorElement | undefined;
 let createObjectURL: ReturnType<typeof vi.fn>;
 let revokeObjectURL: ReturnType<typeof vi.fn>;
