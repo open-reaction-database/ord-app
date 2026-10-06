@@ -19,6 +19,7 @@ import {
   downloadFile,
   downloadFileFromUrl,
   downloadAsJson,
+  fileNameFromContentDisposition,
 } from './downloadFile.thunks.ts';
 import { notifyApiError } from './notifyApiError.ts';
 
@@ -65,6 +66,26 @@ describe('downloadFile', () => {
     expect(lastAnchor?.download).toBe('note.txt');
     expect(clickSpy).toHaveBeenCalledTimes(1);
     expect(revokeObjectURL).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('fileNameFromContentDisposition', () => {
+  it('prefers the UTF-8 filename* over the ASCII fallback', () => {
+    expect(
+      fileNameFromContentDisposition(
+        `attachment; filename="C_N coupling.json"; filename*=UTF-8''C%E2%80%93N%20coupling.json`,
+      ),
+    ).toBe('C–N coupling.json');
+  });
+
+  it('uses the quoted filename when there is no filename*', () => {
+    expect(fileNameFromContentDisposition('attachment; filename="report.json"')).toBe(
+      'report.json',
+    );
+  });
+
+  it('throws when the header names no file', () => {
+    expect(() => fileNameFromContentDisposition('attachment')).toThrow();
   });
 });
 
