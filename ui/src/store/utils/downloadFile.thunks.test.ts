@@ -174,13 +174,17 @@ describe('downloadFileFromUrl with a file name', () => {
       headers: {},
     });
 
-    await downloadFileFromUrl('/datasets/5/download', 'data.json')(
+    const download = downloadFileFromUrl('/datasets/5/download', 'data.json')(
       vi.fn(),
       vi.fn(),
       undefined,
     );
-
+    // Synchronously, inside the click that dispatched the download: browsers open the
+    // dialog only during a user gesture.
     expect(showSaveFilePicker).toHaveBeenCalledWith({ suggestedName: 'data.json' });
+    expect(axiosMock.get).not.toHaveBeenCalled();
+    await download;
+
     expect(axiosMock.get).toHaveBeenCalledWith('/datasets/5/download', {
       adapter: 'fetch',
       responseType: 'stream',
