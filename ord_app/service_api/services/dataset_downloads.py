@@ -1,0 +1,171 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Serializes a dataset for download a batch of reactions at a time.
+
+A download holds one batch of reactions in memory, not the whole dataset, and its first
+bytes go out before the last reactions are read.
+"""
+
+import json
+import textwrap
+from collections.abc import AsyncIterator, Sequence
+from functools import partial
+from pathlib import Path
+
+from google.protobuf import json_format, text_format
+from ord_schema import parquet as parquet_dataset
+from ord_schema.proto.dataset_pb2 import Dataset
+from ord_schema.proto.reaction_pb2 import Reaction
+from starlette.concurrency import iterate_in_threadpool, run_in_threadpool
+
+from ord_app.service_api.services.pb_utils import staged_parquet_path
+
+# Size of the chunks a Parquet download is read back in.
+_PARQUET_CHUNK_SIZE = 1 << 20
+
+
+def _varint(value: int) -> bytes:
+    """Returns ``value`` encoded as a protobuf base-128 varint."""
+    encoded = bytearray()
+    while value > 0x7F:
+        encoded.append((value & 0x7F) | 0x80)
+        value >>= 7
+    encoded.append(value)
+    return bytes(encoded)
+
+
+# The key of a Dataset's `reactions` field: its number, and wire type 2 (length-delimited).
+_REACTIONS_KEY = _varint(Dataset.REACTIONS_FIELD_NUMBER << 3 | 2)
+
+
+def binpb_header(dataset: Dataset) -> bytes:
+    """Returns the binpb encoding of the dataset's own fields."""
+    return dataset.SerializeToString()
+
+
+def binpb_reactions(binpbs: Sequence[bytes]) -> bytes:
+    """Returns stored reactions as binpb ``reactions`` fields, without parsing them."""
+    return b"".join(_REACTIONS_KEY + _varint(len(data)) + data for data in binpbs)
+
+
+def text_header(dataset: Dataset) -> bytes:
+    """Returns the text format of the dataset's own fields."""
+    return text_format.MessageToBytes(dataset, as_utf8=True)
+
+
+def text_reactions(binpbs: Sequence[bytes]) -> bytes:
+    """Returns stored reactions as text-format ``reactions { ... }`` blocks."""
+    blocks = (
+        "reactions {\n"
+        + text_format.MessageToString(Reaction.FromString(data), as_utf8=True, indent=2)
+        + "}\n"
+        for data in binpbs
+    )
+    return "".join(blocks).encode()
+
+
+def json_header(dataset: Dataset) -> bytes:
+    """Returns the JSON object's opening, the dataset's own fields, and an open array."""
+    fields = json_format.MessageToDict(dataset)
+    lines = "".join(
+        f"  {json.dumps(key)}: {json.dumps(value)},\n" for key, value in fields.items()
+    )
+    return ("{\n" + lines + '  "reactions": [').encode()
+
+
+def json_reactions(binpbs: Sequence[bytes]) -> bytes:
+    """Returns stored reactions as comma-separated elements of the ``reactions`` array."""
+    elements = (
+        "\n"
+        + textwrap.indent(
+            json_format.MessageToJson(Reaction.FromString(data), indent=2), "    "
+        )
+        for data in binpbs
+    )
+    return ",".join(elements).encode()
+
+
+# Per format: the header, the serializer for a batch of reactions, the separator between
+# batches, and the footer.
+_WRITERS = {
+    "binpb": (binpb_header, binpb_reactions, b"", b""),
+    "txtpb": (text_header, text_reactions, b"", b""),
+    "json": (json_header, json_reactions, b",", b"\n  ]\n}\n"),
+}
+
+
+async def stream_dataset(
+    dataset: Dataset, kind: str, batches: AsyncIterator[Sequence[bytes]]
+) -> AsyncIterator[bytes]:
+    """Yields a dataset serialized as ``kind``, one batch of reactions at a time.
+
+    Each batch is serialized in a worker thread, so the event loop stays free.
+
+    Args:
+        dataset: The dataset's own fields; its reactions come from ``batches``.
+        kind: ``binpb``, ``json``, ``txtpb``, or ``parquet``.
+        batches: Serialized Reaction messages, in download order.
+
+    Yields:
+        Chunks of the serialized dataset.
+
+    Raises:
+        ValueError: If ``kind`` is not one of the above.
+    """
+    if kind == "parquet":
+        async for chunk in _stream_parquet(dataset, batches):
+            yield chunk
+        return
+    if kind not in _WRITERS:
+        raise ValueError(kind)
+    header, reactions, separator, footer = _WRITERS[kind]
+    yield header(dataset)
+    first = True
+    async for batch in batches:
+        if not batch:
+            continue
+        if not first and separator:
+            yield separator
+        yield await run_in_threadpool(reactions, batch)
+        first = False
+    if footer:
+        yield footer
+
+
+def _write_parquet_batch(
+    writer: parquet_dataset.DatasetWriter, batch: Sequence[bytes]
+) -> None:
+    """Writes stored reactions to a Parquet writer, which flushes every 1,000 rows."""
+    for data in batch:
+        writer.write(Reaction.FromString(data))
+
+
+async def _stream_parquet(
+    dataset: Dataset, batches: AsyncIterator[Sequence[bytes]]
+) -> AsyncIterator[bytes]:
+    """Writes the dataset to a staged Parquet file a batch at a time, then yields the file.
+
+    Parquet's footer is written last, so the file is complete before its first byte goes
+    out; memory still holds only one batch of reactions.
+    """
+    with staged_parquet_path() as path:
+        with parquet_dataset.DatasetWriter(
+            path, name=dataset.name, description=dataset.description
+        ) as writer:
+            async for batch in batches:
+                await run_in_threadpool(_write_parquet_batch, writer, batch)
+        with Path(path).open("rb") as handle:
+            chunks = iter(partial(handle.read, _PARQUET_CHUNK_SIZE), b"")
+            async for chunk in iterate_in_threadpool(chunks):
+                yield chunk

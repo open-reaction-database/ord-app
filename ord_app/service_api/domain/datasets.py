@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections.abc import AsyncIterator
 from typing import Any
 from uuid import uuid4
 
@@ -44,6 +45,7 @@ from ord_app.service_api.schemas.datasets import (
     DatasetEnumerateExtendSchema,
     DatasetShareCreateSchema,
 )
+from ord_app.service_api.services.dataset_downloads import stream_dataset
 from ord_app.service_api.services.exceptions import (
     EntityNotFoundError,
     ForbiddenError,
@@ -53,9 +55,11 @@ from ord_app.service_api.services.exceptions import (
 from ord_app.service_api.services.pb_utils import (
     load_dataset_message,
     load_message,
-    write_dataset_message,
 )
 from ord_app.service_api.services.postgresql import get_db_session
+
+# Reactions per batch of a streamed download: the most a download holds in memory.
+DOWNLOAD_BATCH_SIZE = 1000
 
 
 class DatasetUseCases:
@@ -257,8 +261,25 @@ class DatasetUseCases:
 
     async def download(
         self, dataset_id: int, file_format: DatasetDownloadFileFormats
-    ) -> tuple[DatasetModel, bytes]:
-        dataset = await self.dataset_repository.get_with_reactions(dataset_id)
+    ) -> tuple[DatasetModel, AsyncIterator[bytes]]:
+        """Returns a dataset and its serialization, streamed a batch of reactions at a time.
+
+        Every check runs here, before the response starts: a failure once the first bytes
+        have gone out would truncate a download that already reported 200.
+
+        Args:
+            dataset_id: The dataset to download.
+            file_format: The serialization.
+
+        Returns:
+            The dataset, and the chunks of its serialization.
+
+        Raises:
+            EntityDoesNotExist: If there is no such dataset.
+            UnprocessableEntityError: If ``file_format`` is ``parquet`` and the dataset has
+                no reactions or no description, which ord-schema's Parquet writer requires.
+        """
+        dataset = await self.dataset_repository.get(dataset_id)
 
         if not dataset:
             raise EntityDoesNotExist("Dataset not found")
@@ -269,14 +290,8 @@ class DatasetUseCases:
             "json",
         )
 
-        dataset_pb.reactions.extend(
-            [Reaction.FromString(reaction.binpb) for reaction in dataset.reactions]
-        )
-
         if file_format == "parquet":
-            # ord-schema's Parquet writer requires a non-empty description and at least one
-            # reaction; surface a clear 422 rather than letting it raise a bare ValueError.
-            if not dataset_pb.reactions:
+            if not await self.reaction_repository.any_in_dataset(dataset_id):
                 raise UnprocessableEntityError(
                     "Parquet export requires at least one reaction in the dataset."
                 )
@@ -288,10 +303,10 @@ class DatasetUseCases:
                     "Add a description and try again."
                 )
 
-        data = await run_in_threadpool(
-            write_dataset_message, dataset_pb, kind=file_format
+        batches = self.reaction_repository.stream_binpbs(
+            dataset_id, chunk_size=DOWNLOAD_BATCH_SIZE
         )
-        return dataset, data
+        return dataset, stream_dataset(dataset_pb, file_format, batches)
 
     async def share(
         self,

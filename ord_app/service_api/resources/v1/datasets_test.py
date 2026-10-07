@@ -30,6 +30,7 @@ from ord_app.conftest import (
     read_testdata_bytes,
     read_testdata_text,
 )
+from ord_app.service_api.domain import datasets as datasets_domain
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
@@ -803,6 +804,29 @@ async def test_download_dataset_with_non_ascii_text(
     assert response.headers["content-type"] == DOWNLOAD_MEDIA_TYPES[file_format]
     loaded = load_dataset_message(response.content, file_format)
     assert loaded.description == dataset.description
+
+
+@pytest.mark.parametrize("file_format", ("binpb", "json", "txtpb", "parquet"))
+async def test_download_dataset_streams_reactions_in_order(
+    file_format, api_client, mock_authenticated_user, test_db_session, monkeypatch
+):
+    # Two reactions per batch, so five reactions take three batches.
+    monkeypatch.setattr(datasets_domain, "DOWNLOAD_BATCH_SIZE", 2)
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    dataset.description = "Streamed in batches"
+    reaction_ids = [
+        await _add_reaction(test_db_session, user, dataset) for _ in range(5)
+    ]
+
+    response = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format={file_format}"
+    ).raise_for_status()
+
+    # A streamed response goes out in chunks, so it has no Content-Length.
+    assert "content-length" not in response.headers
+    loaded = load_dataset_message(response.content, file_format)
+    assert [reaction.reaction_id for reaction in loaded.reactions] == reaction_ids
 
 
 @pytest.mark.parametrize("description", (None, "", "   "))

@@ -15,7 +15,7 @@ from collections.abc import AsyncIterator, Sequence
 from itertools import batched
 
 from loguru import logger
-from sqlalchemy import Select, insert, or_, select, true, update
+from sqlalchemy import Select, exists, insert, or_, select, true, update
 
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
@@ -60,6 +60,42 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
                 break
             yield reactions
             last_id = reactions[-1].id
+
+    async def stream_binpbs(
+        self, dataset_id: int, chunk_size: int = 1000
+    ) -> AsyncIterator[Sequence[bytes]]:
+        """Yields a dataset's serialized reactions in ``id`` order, a chunk at a time.
+
+        Each chunk is its own query, keyed on the last ``id`` seen, so no cursor stays
+        open between chunks.
+
+        Args:
+            dataset_id: The dataset whose reactions to read.
+            chunk_size: The number of reactions per chunk.
+
+        Yields:
+            The ``binpb`` of up to ``chunk_size`` reactions.
+        """
+        last_id = 0
+        while True:
+            stmt = (
+                select(ReactionModel.id, ReactionModel.binpb)
+                .where(
+                    ReactionModel.dataset_id == dataset_id, ReactionModel.id > last_id
+                )
+                .order_by(ReactionModel.id)
+                .limit(chunk_size)
+            )
+            rows = (await self.db.execute(stmt)).all()
+            if not rows:
+                break
+            yield [row.binpb for row in rows]
+            last_id = rows[-1].id
+
+    async def any_in_dataset(self, dataset_id: int) -> bool:
+        """Returns whether the dataset has any reactions."""
+        stmt = select(exists().where(ReactionModel.dataset_id == dataset_id))
+        return bool(await self.db.scalar(stmt))
 
     # Reaction creation needs ownership and dataset context, so this override deliberately
     # takes a wider signature than the base create(payload).
