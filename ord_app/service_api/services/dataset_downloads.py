@@ -19,7 +19,7 @@ bytes go out before the last reactions are read.
 
 import json
 import textwrap
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncIterator, Iterator, Sequence
 from functools import partial
 from pathlib import Path
 
@@ -151,6 +151,12 @@ def _write_parquet_batch(
         writer.write(Reaction.FromString(data))
 
 
+def _read_chunks(path: str) -> Iterator[bytes]:
+    """Yields a file's bytes a chunk at a time; driven from a worker thread."""
+    with Path(path).open("rb") as handle:
+        yield from iter(partial(handle.read, _PARQUET_CHUNK_SIZE), b"")
+
+
 async def _stream_parquet(
     dataset: Dataset, batches: AsyncIterator[Sequence[bytes]]
 ) -> AsyncIterator[bytes]:
@@ -165,7 +171,5 @@ async def _stream_parquet(
         ) as writer:
             async for batch in batches:
                 await run_in_threadpool(_write_parquet_batch, writer, batch)
-        with Path(path).open("rb") as handle:
-            chunks = iter(partial(handle.read, _PARQUET_CHUNK_SIZE), b"")
-            async for chunk in iterate_in_threadpool(chunks):
-                yield chunk
+        async for chunk in iterate_in_threadpool(_read_chunks(path)):
+            yield chunk

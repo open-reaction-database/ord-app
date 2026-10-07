@@ -93,8 +93,10 @@ async def test_stream_dataset_without_reactions(kind):
 
 
 async def test_stream_dataset_rejects_an_unknown_kind():
+    dataset = Dataset(name="n", description="d")
+
     with pytest.raises(ValueError, match="csv"):
-        await _stream(Dataset(name="n", description="d"), "csv", 2)
+        await _stream(dataset, "csv", 2)
 
 
 def test_binpb_reactions_match_protobuf_encoding():
