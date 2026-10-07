@@ -37,10 +37,10 @@ async def test_update_user(api_client, mock_authenticated_user):
 
 
 async def test_update_foreign_user(api_client, mock_authenticated_user):
-    _ = mock_authenticated_user
+    user, *_ = mock_authenticated_user
 
     payload = {"email": fake.email(), "orcid_id": fake.uuid4()}
-    response = api_client.patch("/api/v1/users/100", json=payload)
+    response = api_client.patch(f"/api/v1/users/{user.id + 1}", json=payload)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
