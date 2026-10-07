@@ -66,8 +66,9 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
     ) -> AsyncIterator[Sequence[bytes]]:
         """Yields a dataset's serialized reactions in ``id`` order, a chunk at a time.
 
-        Each chunk is its own query, keyed on the last ``id`` seen, so no cursor stays
-        open between chunks.
+        One query reads every chunk through a server-side cursor, so all of them come
+        from the same snapshot even when reactions change during the read. The cursor
+        stays open until the last chunk is read or the generator is closed.
 
         Args:
             dataset_id: The dataset whose reactions to read.
@@ -76,21 +77,18 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
         Yields:
             The ``binpb`` of up to ``chunk_size`` reactions.
         """
-        last_id = 0
-        while True:
-            stmt = (
-                select(ReactionModel.id, ReactionModel.binpb)
-                .where(
-                    ReactionModel.dataset_id == dataset_id, ReactionModel.id > last_id
-                )
-                .order_by(ReactionModel.id)
-                .limit(chunk_size)
-            )
-            rows = (await self.db.execute(stmt)).all()
-            if not rows:
-                break
-            yield [row.binpb for row in rows]
-            last_id = rows[-1].id
+        stmt = (
+            select(ReactionModel.binpb)
+            .where(ReactionModel.dataset_id == dataset_id)
+            .order_by(ReactionModel.id)
+            .execution_options(yield_per=chunk_size)
+        )
+        result = await self.db.stream_scalars(stmt)
+        try:
+            async for chunk in result.partitions():
+                yield chunk
+        finally:
+            await result.close()
 
     async def any_in_dataset(self, dataset_id: int) -> bool:
         """Returns whether the dataset has any reactions."""

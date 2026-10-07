@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import AsyncIterator, Sequence
+import tempfile
+from collections.abc import AsyncGenerator, AsyncIterator, Sequence
 
 import pytest
 from google.protobuf import text_format
@@ -19,6 +20,7 @@ from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import ReactionNotes
 
 from ord_app.conftest import read_testdata_text
+from ord_app.service_api.services import dataset_downloads
 from ord_app.service_api.services.dataset_downloads import (
     binpb_reactions,
     stream_dataset,
@@ -56,12 +58,16 @@ async def _batches(
         yield binpbs[start : start + batch_size]
 
 
-async def _stream(dataset: Dataset, kind: str, batch_size: int) -> bytes:
-    """Streams ``dataset`` the way a download does: its own fields, then its reactions."""
+def _chunks(dataset: Dataset, kind: str, batch_size: int) -> AsyncGenerator[bytes]:
+    """Streams ``dataset`` as a download does: its own fields, then its reactions."""
     fields = Dataset(name=dataset.name, description=dataset.description)
     binpbs = [reaction.SerializeToString() for reaction in dataset.reactions]
-    chunks = stream_dataset(fields, kind, _batches(binpbs, batch_size))
-    return b"".join([chunk async for chunk in chunks])
+    return stream_dataset(fields, kind, _batches(binpbs, batch_size))
+
+
+async def _stream(dataset: Dataset, kind: str, batch_size: int) -> bytes:
+    """Returns the whole of a streamed download of ``dataset``."""
+    return b"".join([chunk async for chunk in _chunks(dataset, kind, batch_size)])
 
 
 @pytest.mark.parametrize("batch_size", [1, 2, 1000])
@@ -80,9 +86,7 @@ async def test_stream_dataset_round_trips(kind, batch_size):
 async def test_stream_dataset_matches_the_whole_dataset_serializer(kind):
     dataset = _example_dataset()
 
-    streamed = load_dataset_message(await _stream(dataset, kind, 2), kind)
-
-    assert streamed == load_dataset_message(write_dataset_message(dataset, kind), kind)
+    assert await _stream(dataset, kind, 2) == write_dataset_message(dataset, kind)
 
 
 @pytest.mark.parametrize("kind", ["binpb", "json", "txtpb"])
@@ -99,9 +103,22 @@ async def test_stream_dataset_rejects_an_unknown_kind():
         await _stream(dataset, "csv", 2)
 
 
+async def test_closing_a_parquet_stream_removes_its_staged_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    # Small chunks, so the stream is still open after its first one.
+    monkeypatch.setattr(dataset_downloads, "_PARQUET_CHUNK_SIZE", 1024)
+    chunks = _chunks(_example_dataset(), "parquet", 2)
+
+    await anext(chunks)
+    assert list(tmp_path.iterdir())
+    await chunks.aclose()
+
+    assert not list(tmp_path.iterdir())
+
+
 def test_binpb_reactions_match_protobuf_encoding():
-    # Stored reactions are copied in as `reactions` fields without parsing; the bytes must
-    # be exactly what protobuf writes for a dataset holding only those reactions.
+    # Stored reactions are copied in as `reactions` fields without parsing; the bytes
+    # must be exactly what protobuf writes for a dataset holding only those reactions.
     reactions = list(_example_dataset().reactions)
 
     encoded = binpb_reactions([reaction.SerializeToString() for reaction in reactions])

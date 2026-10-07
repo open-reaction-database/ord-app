@@ -58,7 +58,7 @@ from ord_app.service_api.services.pb_utils import (
 )
 from ord_app.service_api.services.postgresql import get_db_session
 
-# Reactions per batch of a streamed download: the most a download holds in memory.
+# Reactions read per query while streaming a download, which bounds its memory.
 DOWNLOAD_BATCH_SIZE = 1000
 
 
@@ -262,22 +262,23 @@ class DatasetUseCases:
     async def download(
         self, dataset_id: int, file_format: DatasetDownloadFileFormats
     ) -> tuple[DatasetModel, AsyncIterator[bytes]]:
-        """Returns a dataset and its serialization, streamed a batch of reactions at a time.
+        """Returns a dataset and its serialization, streamed in batches of reactions.
 
-        Every check runs here, before the response starts: a failure once the first bytes
-        have gone out would truncate a download that already reported 200.
+        Every check runs here, before the response starts: a failure once the first
+        bytes have gone out would truncate a download that already reported 200.
 
         Args:
             dataset_id: The dataset to download.
-            file_format: The serialization.
+            file_format: ``binpb``, ``json``, ``txtpb``, or ``parquet``.
 
         Returns:
             The dataset, and the chunks of its serialization.
 
         Raises:
             EntityDoesNotExist: If there is no such dataset.
-            UnprocessableEntityError: If ``file_format`` is ``parquet`` and the dataset has
-                no reactions or no description, which ord-schema's Parquet writer requires.
+            UnprocessableEntityError: If ``file_format`` is ``parquet`` and the dataset
+                has no reactions or no description, which ord-schema's Parquet writer
+                requires.
         """
         dataset = await self.dataset_repository.get(dataset_id)
 

@@ -13,13 +13,14 @@
 # limitations under the License.
 """Serializes a dataset for download a batch of reactions at a time.
 
-A download holds one batch of reactions in memory, not the whole dataset, and its first
-bytes go out before the last reactions are read.
+A download holds a bounded number of reactions in memory. Except for Parquet, which
+writes its footer last, its first bytes go out before the last reactions are read.
 """
 
 import json
 import textwrap
-from collections.abc import AsyncIterator, Iterator, Sequence
+from collections.abc import AsyncGenerator, AsyncIterator, Iterator, Sequence
+from contextlib import aclosing
 from functools import partial
 from pathlib import Path
 
@@ -31,7 +32,7 @@ from starlette.concurrency import iterate_in_threadpool, run_in_threadpool
 
 from ord_app.service_api.services.pb_utils import staged_parquet_path
 
-# Size of the chunks a Parquet download is read back in.
+# Bytes per chunk when a staged Parquet file is read back for the response.
 _PARQUET_CHUNK_SIZE = 1 << 20
 
 
@@ -45,7 +46,7 @@ def _varint(value: int) -> bytes:
     return bytes(encoded)
 
 
-# The key of a Dataset's `reactions` field: its number, and wire type 2 (length-delimited).
+# Key of Dataset.reactions: the field number, and wire type 2 (length-delimited).
 _REACTIONS_KEY = _varint(Dataset.REACTIONS_FIELD_NUMBER << 3 | 2)
 
 
@@ -76,7 +77,7 @@ def text_reactions(binpbs: Sequence[bytes]) -> bytes:
 
 
 def json_header(dataset: Dataset) -> bytes:
-    """Returns the JSON object's opening, the dataset's own fields, and an open array."""
+    """Returns the dataset's own fields as JSON, through the opening of ``reactions``."""
     fields = json_format.MessageToDict(dataset)
     lines = "".join(
         f"  {json.dumps(key)}: {json.dumps(value)},\n" for key, value in fields.items()
@@ -85,7 +86,7 @@ def json_header(dataset: Dataset) -> bytes:
 
 
 def json_reactions(binpbs: Sequence[bytes]) -> bytes:
-    """Returns stored reactions as comma-separated elements of the ``reactions`` array."""
+    """Returns stored reactions as comma-separated elements of ``reactions``."""
     elements = (
         "\n"
         + textwrap.indent(
@@ -101,13 +102,13 @@ def json_reactions(binpbs: Sequence[bytes]) -> bytes:
 _WRITERS = {
     "binpb": (binpb_header, binpb_reactions, b"", b""),
     "txtpb": (text_header, text_reactions, b"", b""),
-    "json": (json_header, json_reactions, b",", b"\n  ]\n}\n"),
+    "json": (json_header, json_reactions, b",", b"\n  ]\n}"),
 }
 
 
 async def stream_dataset(
     dataset: Dataset, kind: str, batches: AsyncIterator[Sequence[bytes]]
-) -> AsyncIterator[bytes]:
+) -> AsyncGenerator[bytes]:
     """Yields a dataset serialized as ``kind``, one batch of reactions at a time.
 
     Each batch is serialized in a worker thread, so the event loop stays free.
@@ -115,7 +116,7 @@ async def stream_dataset(
     Args:
         dataset: The dataset's own fields; its reactions come from ``batches``.
         kind: ``binpb``, ``json``, ``txtpb``, or ``parquet``.
-        batches: Serialized Reaction messages, in download order.
+        batches: Batches of serialized Reaction messages, in download order.
 
     Yields:
         Chunks of the serialized dataset.
@@ -124,8 +125,10 @@ async def stream_dataset(
         ValueError: If ``kind`` is not one of the above.
     """
     if kind == "parquet":
-        async for chunk in _stream_parquet(dataset, batches):
-            yield chunk
+        # Closing this stream closes the Parquet one, which removes its staged file.
+        async with aclosing(_stream_parquet(dataset, batches)) as chunks:
+            async for chunk in chunks:
+                yield chunk
         return
     if kind not in _WRITERS:
         raise ValueError(kind)
@@ -159,17 +162,32 @@ def _read_chunks(path: str) -> Iterator[bytes]:
 
 async def _stream_parquet(
     dataset: Dataset, batches: AsyncIterator[Sequence[bytes]]
-) -> AsyncIterator[bytes]:
-    """Writes the dataset to a staged Parquet file a batch at a time, then yields the file.
+) -> AsyncGenerator[bytes]:
+    """Writes the dataset to a staged Parquet file, then yields the file's bytes.
 
-    Parquet's footer is written last, so the file is complete before its first byte goes
-    out; memory still holds only one batch of reactions.
+    Parquet writes its footer last, so the file is complete before its first byte goes
+    out. Opening, writing, and closing the writer all run in worker threads. The staged
+    file is removed when the stream finishes or is closed.
+
+    Args:
+        dataset: The dataset's name and description.
+        batches: Batches of serialized Reaction messages, written a batch at a time.
+
+    Yields:
+        Chunks of the Parquet file.
     """
     with staged_parquet_path() as path:
-        with parquet_dataset.DatasetWriter(
-            path, name=dataset.name, description=dataset.description
-        ) as writer:
+        writer = await run_in_threadpool(
+            parquet_dataset.DatasetWriter,
+            path,
+            name=dataset.name,
+            description=dataset.description,
+        )
+        # On an error, leaving the block aborts the write. Otherwise close() flushes the
+        # last row group and the footer, and the block's own close is then a no-op.
+        with writer:
             async for batch in batches:
                 await run_in_threadpool(_write_parquet_batch, writer, batch)
+            await run_in_threadpool(writer.close)
         async for chunk in iterate_in_threadpool(_read_chunks(path)):
             yield chunk
