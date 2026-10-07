@@ -173,6 +173,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         <DownloadMenu
           options={datasetFileDownloadOptions}
           url={`/datasets/${dataset.id}/download`}
+          fileName={dataset.name}
           target={
             <Button
               className={classes.target}

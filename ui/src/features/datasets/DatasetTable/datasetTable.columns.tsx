@@ -134,6 +134,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
         <DownloadMenu
           options={datasetFileDownloadOptions}
           url={`/datasets/${row.original.id}/download`}
+          fileName={row.original.name}
           target={
             <ActionIcon
               onClick={handleMenu}

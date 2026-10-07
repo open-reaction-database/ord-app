@@ -25,9 +25,17 @@ interface DownloadMenuProps {
   options: Array<DownloadMenuOptions>;
   url: string;
   target: JSX.Element;
+  // Name of the downloaded file without its extension. When set, the download reports progress
+  // and, where the browser supports it, asks where to save and streams to disk.
+  fileName?: string;
 }
 
-export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProps>) {
+export function DownloadMenu({
+  options,
+  url,
+  target,
+  fileName,
+}: Readonly<DownloadMenuProps>) {
   const dispatch = useAppDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +43,12 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
   const handleDatasetDownload = useCallback(
     (format: string) => {
       setIsLoading(true);
-      dispatch(downloadFileFromUrl(`${url}?file_format=${format}`))
+      dispatch(
+        downloadFileFromUrl(
+          `${url}?file_format=${format}`,
+          fileName === undefined ? undefined : `${fileName}.${format}`,
+        ),
+      )
         .catch(error => {
           console.info('Error downloading file:', error);
         })
@@ -43,7 +56,7 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
           setIsLoading(false);
         });
     },
-    [dispatch, url],
+    [dispatch, url, fileName],
   );
 
   return (
