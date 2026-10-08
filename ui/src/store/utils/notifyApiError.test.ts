@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import { notifyApiError } from './notifyApiError.ts';
@@ -24,10 +24,6 @@ const showMock = vi.mocked(showNotification);
 function axiosError(status: number, data?: unknown) {
   return { isAxiosError: true, response: { status, data } } as unknown;
 }
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('notifyApiError', () => {
   it('shows an error toast with the mapped message for a 403 (#614/#616)', () => {

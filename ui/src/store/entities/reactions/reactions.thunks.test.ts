@@ -66,7 +66,6 @@ const emptyPage = { items: [], page: 1, size: 10, total: 0, pages: 0 };
 const makeStore = makeRecordingStore;
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.get.mockResolvedValue({ data: emptyPage });
   axiosMock.post.mockResolvedValue({ data: {} });
   axiosMock.delete.mockResolvedValue({ data: {} });

@@ -32,7 +32,6 @@ const tokens = { access_token: 'a-token', id_token: 'i-token' };
 const user = { id: 7, orcid_id: '0000', name: 'E2E User', email: 'e2e@example.com' };
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.post.mockResolvedValue({ data: user });
 });
 

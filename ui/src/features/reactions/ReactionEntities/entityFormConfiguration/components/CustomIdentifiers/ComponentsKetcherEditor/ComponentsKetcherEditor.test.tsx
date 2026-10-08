@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type * as ReactNS from 'react';
@@ -51,10 +51,6 @@ vi.mock('ketcher-react/dist/index.css', () => ({}));
 const identifier = { value: 'CCO', details: 'ethanol' };
 
 describe('ComponentsKetcherEditor', () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('loads the identifier structure into Ketcher once the editor initializes', async () => {
     renderWithMantine(
       <ComponentsKetcherEditor

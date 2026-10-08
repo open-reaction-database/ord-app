@@ -78,6 +78,7 @@ function makeStore() {
 - **Seed selector state by dispatching, not by hand-building preloadedState**: `store.dispatch(getReactionsListActions.request(5))` sets `activeDatasetId`; `store.dispatch(setEditingGroupIdAction(3))` sets the editing group. `arrayContaining`/`toContain` tolerate the extra setup action.
 - Watch payload field names/enums: e.g. `updateGroupMembers` takes `{ user_id, role: USER_ROLES }` (snake_case, enum is `USER_ROLES.VIEWER` = `'viewer'`). `getDatasetsPage` requires its `Partial<CurrentPage>` arg.
 - Teardown belongs in `afterEach`, not `beforeEach` (else the last test's global stub — e.g. `vi.unstubAllGlobals()` / clipboard stub — is never torn down).
+- Every mock is reset before each test (`mockReset: true` in `vite.config.ts`): calls, overrides, and unused `mock*Once` values are gone, and a `vi.fn(impl)` is back to `impl`. Don't add `vi.clearAllMocks()` or `mockClear()` to hooks. Give a module-level mock its default as `vi.fn(impl)`: `vi.fn().mockResolvedValue(x)` loses `x` at the first reset. A call made at module load is gone by the first test; record it right after the import (see `previewsWorker/worker.test.ts`).
 
 ## Playwright E2E against the live no-auth stack
 

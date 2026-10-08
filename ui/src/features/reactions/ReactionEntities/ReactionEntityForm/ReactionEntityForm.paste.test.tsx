@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionEntityForm } from './ReactionEntityForm.tsx';
@@ -44,10 +44,6 @@ vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
 const provenanceSidebarInfo = reactionSidebarInfo.find(
   info => info.entityName === ReactionNodeEntity.Provenance,
 )!;
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('ReactionEntityForm — Paste Chunk filtering', () => {
   it('submits the filtered chunk, dropping fields the sidebar excludes (e.g. recordModified)', async () => {

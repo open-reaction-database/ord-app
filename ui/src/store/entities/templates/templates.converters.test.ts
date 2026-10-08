@@ -40,7 +40,6 @@ const variable = (name: string, path: Array<string>): Variable => ({
 });
 
 beforeEach(() => {
-  vi.clearAllMocks();
   vi.spyOn(console, 'info').mockImplementation(() => {});
 });
 

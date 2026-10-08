@@ -73,7 +73,6 @@ const latestValues = () => forms[forms.length - 1].getValues();
 
 beforeEach(() => {
   forms.length = 0;
-  vi.clearAllMocks();
 });
 
 describe('TemplateFileSelector CSV upload', () => {

@@ -19,7 +19,6 @@ import { copyToClipboard } from './copyToClipboard.ts';
 const writeText = vi.fn();
 
 beforeEach(() => {
-  vi.clearAllMocks();
   Object.defineProperty(globalThis, 'navigator', {
     value: { clipboard: { writeText } },
     configurable: true,
