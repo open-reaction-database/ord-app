@@ -16,6 +16,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import axiosInstance from '../axiosInstance.ts';
 import {
+  downloadDatasetThroughLink,
   downloadFile,
   downloadFileFromUrl,
   downloadAsJson,
@@ -23,9 +24,14 @@ import {
 } from './downloadFile.thunks.ts';
 import { notifyApiError } from './notifyApiError.ts';
 
-vi.mock('../axiosInstance.ts', () => ({ default: { get: vi.fn() } }));
+vi.mock('../axiosInstance.ts', () => ({
+  default: { get: vi.fn(), post: vi.fn(), getUri: vi.fn() },
+}));
 vi.mock('./notifyApiError.ts', () => ({ notifyApiError: vi.fn() }));
-const axiosMock = axiosInstance as unknown as Record<'get', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'getUri',
+  ReturnType<typeof vi.fn>
+>;
 
 let clickSpy: Mock<() => void>;
 let lastAnchor: HTMLAnchorElement | undefined;
@@ -113,6 +119,46 @@ describe('downloadFileFromUrl', () => {
     await expect(
       downloadFileFromUrl('/bad')(vi.fn(), vi.fn(), undefined),
     ).resolves.toBeUndefined();
+    expect(clickSpy).not.toHaveBeenCalled();
+    expect(notifyApiError).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('downloadDatasetThroughLink', () => {
+  it('has the browser fetch a link made for the dataset and format', async () => {
+    axiosMock.post.mockResolvedValueOnce({ data: { token: '5.json.7.123.sig' } });
+    axiosMock.getUri.mockImplementationOnce(
+      ({ url }: { url: string }) => `https://example.org/api/v1${url}`,
+    );
+    let connectedWhenClicked: boolean | undefined;
+    clickSpy.mockImplementationOnce(() => {
+      connectedWhenClicked = lastAnchor?.isConnected;
+    });
+
+    await downloadDatasetThroughLink(5, 'json')(vi.fn(), vi.fn(), undefined);
+
+    expect(axiosMock.post).toHaveBeenCalledWith('/datasets/5/download-link', null, {
+      params: { file_format: 'json' },
+    });
+    expect(lastAnchor?.href).toBe(
+      'https://example.org/api/v1/downloads/5.json.7.123.sig',
+    );
+    expect(lastAnchor?.hasAttribute('download')).toBe(true);
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(connectedWhenClicked).toBe(true);
+    expect(lastAnchor?.isConnected).toBe(false);
+  });
+
+  it('notifies the user, and opens nothing, when the link cannot be made', async () => {
+    axiosMock.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 422 },
+    });
+
+    await expect(
+      downloadDatasetThroughLink(5, 'parquet')(vi.fn(), vi.fn(), undefined),
+    ).resolves.toBeUndefined();
+
     expect(clickSpy).not.toHaveBeenCalled();
     expect(notifyApiError).toHaveBeenCalledTimes(1);
   });

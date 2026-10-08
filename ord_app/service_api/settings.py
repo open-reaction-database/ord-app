@@ -13,7 +13,7 @@
 # limitations under the License.
 from pathlib import PosixPath
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ord_app.service_api.constants import AppEnvs
@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     auth0_audience: str = Field("", validation_alias="vite_auth0_audience")
     auth0_issuer: str = Field("", validation_alias="vite_auth0_issuer")
     auth0_client_id: str = Field("", validation_alias="vite_auth0_client_id")
+
+    # Key for the HMAC that signs download links. Required unless app_env is localhost,
+    # where an unset key falls back to a fixed development key.
+    download_link_secret: SecretStr = SecretStr("")
 
 
 RuntimeSettings = Settings()

@@ -26,6 +26,7 @@ import {
 } from 'common/icons';
 import classes from './reactionCard.module.scss';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
+import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
@@ -82,7 +83,11 @@ export function ReactionHeaderActions({
 
       <DownloadMenu
         options={fileDownloadOptions}
-        url={`/datasets/${datasetId}/reactions/${reaction.id}/download`}
+        download={format =>
+          downloadFileFromUrl(
+            `/datasets/${datasetId}/reactions/${reaction.id}/download?file_format=${format}`,
+          )
+        }
         target={
           <Button
             className={classes.target}

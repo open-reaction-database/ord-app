@@ -67,32 +67,53 @@ def group_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
     return _authorize
 
 
+async def authorize_dataset(
+    db_session: AsyncSession,
+    dataset_id: int | None,
+    user_id: int,
+    allowed_roles: tuple[UserRolesList, ...],
+) -> None:
+    """Checks that a user has one of the roles in a group that holds the dataset.
+
+    Args:
+        db_session: The session to query.
+        dataset_id: The dataset to check access to.
+        user_id: The user whose group memberships are checked.
+        allowed_roles: Roles that grant access; any one of them is enough.
+
+    Raises:
+        EntityNotFoundError: If none of the user's groups holds the dataset.
+        ForbiddenError: If they do, but with none of ``allowed_roles``.
+    """
+    membership = (
+        DatasetGroupAssociationModel.dataset_id == dataset_id,
+        DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
+        UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
+        UserGroupsMembershipModel.user_id == user_id,
+    )
+    # Single query (no TOCTOU window): bool_or over the user's memberships for this dataset is
+    # None when there's no membership at all -> 404 (don't reveal whether the dataset exists),
+    # False when the user is a member but has no allowed role -> 403 (lets the UI re-gate to
+    # read-only on the next write), and True when an allowed role is present. (#446)
+    authorized = await db_session.scalar(
+        select(func.bool_or(UserGroupsMembershipModel.role.in_(allowed_roles))).where(
+            *membership
+        )
+    )
+    if authorized is None:
+        raise EntityNotFoundError(detail="Dataset not found")
+    if not authorized:
+        raise ForbiddenError(
+            detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"}
+        )
+
+
 def dataset_authorization(allowed_roles: tuple[UserRolesList, ...]) -> Callable:
     async def _authorize(
         dataset_id: int | None,
         user: UserModel = Depends(authenticate),
         db_session: AsyncSession = Depends(get_db_session),
     ) -> None:
-        membership = (
-            DatasetGroupAssociationModel.dataset_id == dataset_id,
-            DatasetGroupAssociationModel.dataset_id == DatasetModel.id,
-            UserGroupsMembershipModel.group_id == DatasetGroupAssociationModel.group_id,
-            UserGroupsMembershipModel.user_id == user.id,
-        )
-        # Single query (no TOCTOU window): bool_or over the user's memberships for this dataset is
-        # None when there's no membership at all -> 404 (don't reveal whether the dataset exists),
-        # False when the user is a member but has no allowed role -> 403 (lets the UI re-gate to
-        # read-only on the next write), and True when an allowed role is present. (#446)
-        authorized = await db_session.scalar(
-            select(
-                func.bool_or(UserGroupsMembershipModel.role.in_(allowed_roles))
-            ).where(*membership)
-        )
-        if authorized is None:
-            raise EntityNotFoundError(detail="Dataset not found")
-        if not authorized:
-            raise ForbiddenError(
-                detail="Access forbidden", headers={"WWW-Authenticate": "Bearer"}
-            )
+        await authorize_dataset(db_session, dataset_id, user.id, allowed_roles)
 
     return _authorize

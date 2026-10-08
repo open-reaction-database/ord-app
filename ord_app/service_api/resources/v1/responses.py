@@ -14,9 +14,11 @@
 """Response helpers shared by the v1 routers."""
 
 import re
+from collections.abc import AsyncIterable
 from urllib.parse import quote
 
 from fastapi import Response
+from fastapi.responses import StreamingResponse
 
 from ord_app.service_api.schemas.datasets import DatasetDownloadFileFormats
 
@@ -35,29 +37,31 @@ DOWNLOAD_MEDIA_TYPES: dict[DatasetDownloadFileFormats, str] = {
 }
 
 
-def attachment_response(data: bytes, filename: str, media_type: str) -> Response:
-    """Returns ``data`` as a file download that the client saves as ``filename``.
+def attachment_response(
+    content: bytes | AsyncIterable[bytes], filename: str, media_type: str
+) -> Response:
+    """Returns ``content`` as a file download that the client saves as ``filename``.
 
     Header values are Latin-1, so the name is sent twice (RFC 6266): an ASCII
     ``filename`` with other characters replaced by ``_``, and the exact name in
     ``filename*``, percent-encoded as UTF-8.
 
     Args:
-        data: The file contents.
+        content: The file contents, or chunks of them to stream.
         filename: The name to save the file under.
         media_type: The ``Content-Type``; see ``DOWNLOAD_MEDIA_TYPES``.
 
     Returns:
-        A response with an attachment ``Content-Disposition`` header.
+        A response with an attachment ``Content-Disposition`` header; a
+        ``StreamingResponse`` when ``content`` is chunks.
     """
     fallback = _UNSAFE_FILENAME_CHARACTERS.sub("_", filename)
     encoded = quote(filename, safe="")
-    return Response(
-        data,
-        media_type=media_type,
-        headers={
-            "Content-Disposition": (
-                f"attachment; filename=\"{fallback}\"; filename*=UTF-8''{encoded}"
-            )
-        },
-    )
+    headers = {
+        "Content-Disposition": (
+            f"attachment; filename=\"{fallback}\"; filename*=UTF-8''{encoded}"
+        )
+    }
+    if isinstance(content, bytes):
+        return Response(content, media_type=media_type, headers=headers)
+    return StreamingResponse(content, media_type=media_type, headers=headers)

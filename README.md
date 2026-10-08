@@ -74,10 +74,12 @@ _Note: the database must be on the same network as docker or docker must connect
    --build-arg VITE_AUTH0_SCOPE="openid profile email offline_access" \
    .
    ```
-2. Run the Docker image. The backend reads its Auth0 settings at run time.
+2. Run the Docker image. The backend reads its Auth0 settings and the key that signs
+   download links at run time.
    ```shell
    docker run \
    --network ord_network \
+   -e DOWNLOAD_LINK_SECRET="$(openssl rand -base64 32)" \
    -e VITE_AUTH0_DOMAIN="..." \
    -e VITE_AUTH0_CLIENT_ID="..." \
    -e VITE_AUTH0_AUDIENCE="..." \
@@ -98,6 +100,7 @@ Envs for backend:
 | `vite_auth0_audience`   | Auth0 config                                       | true     | -                                                       |
 | `vite_auth0_issuer`     | Auth0 config                                       | true     | -                                                       |
 | `vite_auth0_client_id`  | Auth0 config                                       | true     | -                                                       |
+| `download_link_secret`  | Key that signs download links; the same for every worker | unless `app_env` is `localhost` | -                                  |
 
 
 ## Testing
