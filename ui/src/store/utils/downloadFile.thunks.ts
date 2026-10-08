@@ -46,8 +46,10 @@ export const fileNameFromContentDisposition = (header: string): string => {
   throw new Error('Missing file name in Content-Disposition header');
 };
 
+export type DownloadThunk = ThunkAction<Promise<void>, AppState, void, Action>;
+
 export const downloadFileFromUrl =
-  (url: string): ThunkAction<Promise<void>, AppState, void, Action> =>
+  (url: string): DownloadThunk =>
   async () => {
     try {
       const response = await axiosInstance.get(url, {
@@ -65,6 +67,36 @@ export const downloadFileFromUrl =
     } catch (error) {
       // A removed dataset/reaction (404) or lost group access (403) rejects the download; tell the
       // user instead of only logging to the console. (#616)
+      notifyApiError(error);
+    }
+  };
+
+interface DownloadLinkResponse {
+  token: string;
+}
+
+/**
+ * Downloads a dataset through a short-lived link that the browser fetches itself, so the file
+ * streams to disk and shows in the browser's downloads list with its progress.
+ */
+export const downloadDatasetThroughLink =
+  (datasetId: number, format: string): DownloadThunk =>
+  async () => {
+    try {
+      const { data } = await axiosInstance.post<DownloadLinkResponse>(
+        `/datasets/${datasetId}/download-link`,
+        null,
+        { params: { file_format: format } },
+      );
+      const link = document.createElement('a');
+      link.href = axiosInstance.getUri({ url: `/downloads/${data.token}` });
+      // On the app's own origin, this keeps a failed response from replacing the app. The
+      // Content-Disposition header names the file.
+      link.download = '';
+      document.body.append(link);
+      link.click();
+      link.remove();
+    } catch (error) {
       notifyApiError(error);
     }
   };

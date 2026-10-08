@@ -25,6 +25,7 @@ import clsx from 'clsx';
 import classes from './datasetTable.module.scss';
 import { DotsIcon, AlertCircleIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
+import { downloadDatasetThroughLink } from 'store/utils/downloadFile.thunks.ts';
 import { datasetFileDownloadOptions } from 'common/constants.ts';
 
 export const handleMenu = (event: MouseEvent) => {
@@ -133,7 +134,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
       return (
         <DownloadMenu
           options={datasetFileDownloadOptions}
-          url={`/datasets/${row.original.id}/download`}
+          download={format => downloadDatasetThroughLink(row.original.id, format)}
           target={
             <ActionIcon
               onClick={handleMenu}
