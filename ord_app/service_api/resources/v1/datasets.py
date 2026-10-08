@@ -18,14 +18,20 @@ from fastapi.params import Depends
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ord_app.service_api.domain.auth import dataset_authorization, group_authorization
+from ord_app.service_api.domain.auth import (
+    authorize_dataset,
+    dataset_authorization,
+    group_authorization,
+)
 from ord_app.service_api.domain.datasets import DatasetUseCases, get_dataset_use_case
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
     DatasetModel,
     GroupModel,
+    UserRolesList,
 )
+from ord_app.service_api.repositories.users import UserRepository
 from ord_app.service_api.resources.v1.responses import (
     DOWNLOAD_MEDIA_TYPES,
     attachment_response,
@@ -40,9 +46,15 @@ from ord_app.service_api.schemas.datasets import (
     DatasetShareCreateSchema,
     DatasetShareSchema,
     DatasetWithReactionCountResponseSchema,
+    DownloadLinkResponseSchema,
 )
 from ord_app.service_api.schemas.groups import GroupShareSchema
-from ord_app.service_api.services.exceptions import EntityNotFoundError
+from ord_app.service_api.services.download_links import (
+    InvalidDownloadLinkError,
+    sign_download_link,
+    verify_download_link,
+)
+from ord_app.service_api.services.exceptions import EntityNotFoundError, ForbiddenError
 from ord_app.service_api.services.pb_utils import (
     MAP_FILE_EXT_TO_DATASET_KIND,
     validate_uploaded_pb_file,
@@ -50,6 +62,9 @@ from ord_app.service_api.services.pb_utils import (
 from ord_app.service_api.services.postgresql import get_db_session
 
 router = APIRouter(tags=["datasets"])
+
+# Roles that may download a dataset.
+DOWNLOAD_ROLES: tuple[UserRolesList, ...] = ("admin", "editor", "viewer")
 
 
 @router.post(
@@ -135,19 +150,63 @@ async def extend_enumerate_dataset(
     background_tasks.add_task(validate_dataset_reactions, db, dataset.id)
 
 
+async def _dataset_attachment(
+    use_case: DatasetUseCases, dataset_id: int, file_format: DatasetDownloadFileFormats
+) -> Response:
+    """Returns a dataset as a file download named after it."""
+    dataset, data = await use_case.download(dataset_id, file_format)
+    return attachment_response(
+        data, f"{dataset.name}.{file_format}", DOWNLOAD_MEDIA_TYPES[file_format]
+    )
+
+
 @router.get(
     "/datasets/{dataset_id}/download",
     response_model=None,
-    dependencies=[Depends(dataset_authorization(("admin", "editor", "viewer")))],
+    dependencies=[Depends(dataset_authorization(DOWNLOAD_ROLES))],
 )
 async def download_dataset(
     dataset_id: int,
     file_format: DatasetDownloadFileFormats,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> Response:
-    dataset, data = await use_case.download(dataset_id, file_format)
-    return attachment_response(
-        data, f"{dataset.name}.{file_format}", DOWNLOAD_MEDIA_TYPES[file_format]
+    return await _dataset_attachment(use_case, dataset_id, file_format)
+
+
+@router.post(
+    "/datasets/{dataset_id}/download-link",
+    dependencies=[Depends(dataset_authorization(DOWNLOAD_ROLES))],
+)
+async def create_download_link(
+    dataset_id: int,
+    file_format: DatasetDownloadFileFormats,
+    use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
+) -> DownloadLinkResponseSchema:
+    # The download's checks run here as well, so a dataset that cannot be downloaded
+    # fails with an error the UI shows, not as a failed browser download.
+    await use_case.prepare_download(dataset_id, file_format)
+    token = sign_download_link(dataset_id, file_format, use_case.current_user.id)
+    return DownloadLinkResponseSchema(token=token)
+
+
+@router.get("/downloads/{token}", response_model=None)
+async def download_dataset_with_link(
+    token: str, db: Annotated[AsyncSession, Depends(get_db_session)]
+) -> Response:
+    # Authorized by the token rather than a bearer header, so a browser can fetch it
+    # directly and save the response as it arrives.
+    try:
+        link = verify_download_link(token)
+    except InvalidDownloadLinkError as error:
+        raise ForbiddenError(
+            detail="Download link is invalid or has expired"
+        ) from error
+    user = await UserRepository(db).get(id=link.user_id)
+    if user is None:
+        raise ForbiddenError(detail="Download link is invalid or has expired")
+    await authorize_dataset(db, link.dataset_id, user.id, DOWNLOAD_ROLES)
+    return await _dataset_attachment(
+        DatasetUseCases(db, user), link.dataset_id, link.file_format
     )
 
 

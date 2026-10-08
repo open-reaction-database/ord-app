@@ -38,6 +38,7 @@ from ord_app.service_api.resources.v1 import (
     users,
     utilities,
 )
+from ord_app.service_api.services.download_links import download_link_key
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -60,6 +61,8 @@ async def run_background_task() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # Raises, so the app does not start, when download links have no key.
+    download_link_key()
     # Keep a reference so the task isn't garbage-collected before it completes.
     app.state.background_task = asyncio.create_task(run_background_task())
     yield
