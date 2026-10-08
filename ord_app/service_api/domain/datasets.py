@@ -259,20 +259,17 @@ class DatasetUseCases:
     async def delete(self, dataset_id: int) -> None:
         return await self.dataset_repository.delete(dataset_id)
 
-    async def download(
+    async def prepare_download(
         self, dataset_id: int, file_format: DatasetDownloadFileFormats
-    ) -> tuple[DatasetModel, AsyncIterator[bytes]]:
-        """Returns a dataset and its serialization, streamed in batches of reactions.
-
-        Every check runs here, before the response starts: a failure once the first
-        bytes have gone out would truncate a download that already reported 200.
+    ) -> tuple[DatasetModel, Dataset]:
+        """Returns a dataset and its own fields, after the checks a download needs.
 
         Args:
             dataset_id: The dataset to download.
             file_format: ``binpb``, ``json``, ``txtpb``, or ``parquet``.
 
         Returns:
-            The dataset, and the chunks of its serialization.
+            The dataset, and a Dataset message holding its name and description.
 
         Raises:
             EntityDoesNotExist: If there is no such dataset.
@@ -303,7 +300,30 @@ class DatasetUseCases:
                     "Parquet export requires a dataset description. "
                     "Add a description and try again."
                 )
+        return dataset, dataset_pb
 
+    async def download(
+        self, dataset_id: int, file_format: DatasetDownloadFileFormats
+    ) -> tuple[DatasetModel, AsyncIterator[bytes]]:
+        """Returns a dataset and its serialization, streamed in batches of reactions.
+
+        Every check runs here, before the response starts: a failure once the first
+        bytes have gone out would truncate a download that already reported 200.
+
+        Args:
+            dataset_id: The dataset to download.
+            file_format: ``binpb``, ``json``, ``txtpb``, or ``parquet``.
+
+        Returns:
+            The dataset, and the chunks of its serialization.
+
+        Raises:
+            EntityDoesNotExist: If there is no such dataset.
+            UnprocessableEntityError: If ``file_format`` is ``parquet`` and the dataset
+                has no reactions or no description, which ord-schema's Parquet writer
+                requires.
+        """
+        dataset, dataset_pb = await self.prepare_download(dataset_id, file_format)
         batches = self.reaction_repository.stream_binpbs(
             dataset_id, chunk_size=DOWNLOAD_BATCH_SIZE
         )

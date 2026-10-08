@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { type JSX, type MouseEvent, useCallback, useState, cloneElement } from 'react';
-import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
+import type { DownloadThunk } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
 import { DownloadIcon } from 'common/icons';
@@ -23,11 +23,16 @@ import type { DownloadMenuOptions } from 'common/types/downloadMenuOptions';
 
 interface DownloadMenuProps {
   options: Array<DownloadMenuOptions>;
-  url: string;
+  // Makes the thunk that downloads the chosen format.
+  download: (format: string) => DownloadThunk;
   target: JSX.Element;
 }
 
-export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProps>) {
+export function DownloadMenu({
+  options,
+  download,
+  target,
+}: Readonly<DownloadMenuProps>) {
   const dispatch = useAppDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +40,7 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
   const handleDatasetDownload = useCallback(
     (format: string) => {
       setIsLoading(true);
-      dispatch(downloadFileFromUrl(`${url}?file_format=${format}`))
+      dispatch(download(format))
         .catch(error => {
           console.info('Error downloading file:', error);
         })
@@ -43,7 +48,7 @@ export function DownloadMenu({ options, url, target }: Readonly<DownloadMenuProp
           setIsLoading(false);
         });
     },
-    [dispatch, url],
+    [dispatch, download],
   );
 
   return (

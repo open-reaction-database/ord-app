@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import time
 from base64 import b64encode
 from datetime import datetime
 from io import BytesIO
@@ -22,7 +23,7 @@ from faker import Faker
 from fastapi import status
 from ord_schema.proto.dataset_pb2 import Dataset
 from ord_schema.proto.reaction_pb2 import Reaction
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from ord_app.conftest import (
     create_test_dataset,
@@ -32,6 +33,7 @@ from ord_app.conftest import (
 )
 from ord_app.service_api.domain import datasets as datasets_domain
 from ord_app.service_api.domain.reactions import validate_dataset_reactions
+from ord_app.service_api.main import app
 from ord_app.service_api.models import (
     DatasetGroupAssociationModel,
     DatasetModel,
@@ -41,6 +43,11 @@ from ord_app.service_api.models import (
 )
 from ord_app.service_api.resources.v1.responses import DOWNLOAD_MEDIA_TYPES
 from ord_app.service_api.schemas.base import MAX_CRITICAL_FIELD_LENGTH, MAX_FIELD_LENGTH
+from ord_app.service_api.services.auth0 import verify_access_token
+from ord_app.service_api.services.download_links import (
+    DOWNLOAD_LINK_LIFETIME,
+    sign_download_link,
+)
 from ord_app.service_api.services.pb_utils import (
     load_dataset_message,
     write_dataset_message,
@@ -827,6 +834,123 @@ async def test_download_dataset_streams_reactions_in_order(
     assert "content-length" not in response.headers
     loaded = load_dataset_message(response.content, file_format)
     assert [reaction.reaction_id for reaction in loaded.reactions] == reaction_ids
+
+
+def _create_download_link(api_client, dataset_id, file_format="binpb"):
+    return api_client.post(
+        f"/api/v1/datasets/{dataset_id}/download-link?file_format={file_format}"
+    )
+
+
+async def test_download_link_downloads_without_a_bearer_token(
+    api_client, mock_authenticated_user, test_db_session
+):
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    await _add_reaction(test_db_session, user, dataset)
+    token = (
+        _create_download_link(api_client, dataset.id).raise_for_status().json()["token"]
+    )
+    expected = api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format=binpb"
+    ).raise_for_status()
+
+    # From here on, requests carry no credentials the bearer routes accept.
+    app.dependency_overrides.pop(verify_access_token)
+    assert not api_client.get(
+        f"/api/v1/datasets/{dataset.id}/download?file_format=binpb"
+    ).is_success
+    response = api_client.get(f"/api/v1/downloads/{token}").raise_for_status()
+
+    assert response.content == expected.content
+    assert (
+        response.headers["content-disposition"]
+        == expected.headers["content-disposition"]
+    )
+
+
+async def test_download_link_requires_access_to_the_dataset(
+    api_client, mock_authenticated_user, test_db_session
+):
+    other_user, other_group = await create_test_user_with_group(test_db_session)
+    dataset = DatasetModel(owner=other_user, groups=[other_group], name="private")
+    test_db_session.add(dataset)
+    await test_db_session.commit()
+
+    response = _create_download_link(api_client, dataset.id)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+async def test_download_link_runs_the_download_checks(
+    api_client, mock_authenticated_user, test_db_session
+):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+
+    response = _create_download_link(api_client, dataset.id, "parquet")
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+async def test_download_link_rejects_an_altered_token(
+    api_client, mock_authenticated_user, test_db_session
+):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    token = (
+        _create_download_link(api_client, dataset.id).raise_for_status().json()["token"]
+    )
+    payload, _, signature = token.rpartition(".")
+    altered = payload.replace(".binpb.", ".json.") + "." + signature
+
+    response = api_client.get(f"/api/v1/downloads/{altered}")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+async def test_download_link_rejects_an_expired_token(
+    api_client, mock_authenticated_user, test_db_session
+):
+    user, *_ = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    token = sign_download_link(
+        dataset.id, "binpb", user.id, now=time.time() - DOWNLOAD_LINK_LIFETIME
+    )
+
+    response = api_client.get(f"/api/v1/downloads/{token}")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+async def test_download_link_rejects_a_token_for_a_missing_user(
+    api_client, mock_authenticated_user, test_db_session
+):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    token = sign_download_link(dataset.id, "binpb", 2_000_000_000)
+
+    response = api_client.get(f"/api/v1/downloads/{token}")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+async def test_download_link_rechecks_access_when_used(
+    api_client, mock_authenticated_user, test_db_session
+):
+    user, _, group = mock_authenticated_user
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    token = (
+        _create_download_link(api_client, dataset.id).raise_for_status().json()["token"]
+    )
+    await test_db_session.execute(
+        delete(UserGroupsMembershipModel).where(
+            UserGroupsMembershipModel.user_id == user.id,
+            UserGroupsMembershipModel.group_id == group.id,
+        )
+    )
+    await test_db_session.commit()
+
+    response = api_client.get(f"/api/v1/downloads/{token}")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.parametrize("description", (None, "", "   "))

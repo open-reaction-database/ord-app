@@ -22,6 +22,7 @@ import {
 } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 import { formatUtcDateToDisplay } from 'common/utils';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
+import { downloadDatasetThroughLink } from 'store/utils/downloadFile.thunks.ts';
 import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { useCallback, useMemo } from 'react';
@@ -172,7 +173,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
         <ShareDataset dataset={dataset} />
         <DownloadMenu
           options={datasetFileDownloadOptions}
-          url={`/datasets/${dataset.id}/download`}
+          download={format => downloadDatasetThroughLink(dataset.id, format)}
           target={
             <Button
               className={classes.target}
