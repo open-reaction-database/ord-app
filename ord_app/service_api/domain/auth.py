@@ -77,9 +77,9 @@ async def authorize_dataset(
 
     Args:
         db_session: The session to query.
-        dataset_id: The dataset.
-        user_id: The user.
-        allowed_roles: Roles that grant access.
+        dataset_id: The dataset to check access to.
+        user_id: The user whose group memberships are checked.
+        allowed_roles: Roles that grant access; any one of them is enough.
 
     Raises:
         EntityNotFoundError: If none of the user's groups holds the dataset.

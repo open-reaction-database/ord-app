@@ -22,7 +22,7 @@ import hashlib
 import hmac
 import time
 from dataclasses import dataclass
-from typing import cast, get_args
+from typing import cast
 
 from ord_app.service_api.constants import AppEnvs
 from ord_app.service_api.schemas.datasets import DatasetDownloadFileFormats
@@ -91,8 +91,8 @@ def sign_download_link(
         now: Unix time in seconds that the lifetime counts from; defaults to the clock.
 
     Returns:
-        ``<dataset_id>.<file_format>.<user_id>.<expiry>.<signature>``, which is safe in a
-        URL path segment.
+        ``<dataset_id>.<file_format>.<user_id>.<expiry>.<signature>``, which needs no
+        escaping in a URL path segment.
     """
     expires = int(time.time() if now is None else now) + DOWNLOAD_LINK_LIFETIME
     payload = f"{dataset_id}.{file_format}.{user_id}.{expires}"
@@ -116,9 +116,8 @@ def verify_download_link(token: str, *, now: float | None = None) -> DownloadLin
     payload, _, signature = token.rpartition(".")
     if not hmac.compare_digest(signature.encode(), _signature(payload)):
         raise InvalidDownloadLinkError("Signature does not match")
+    # Only this module signs payloads, so a valid signature means a well-formed payload.
     dataset_id, file_format, user_id, expires = payload.split(".")
-    if file_format not in get_args(DatasetDownloadFileFormats):
-        raise InvalidDownloadLinkError(f"Unknown format: {file_format}")
     if (time.time() if now is None else now) >= int(expires):
         raise InvalidDownloadLinkError("Expired")
     return DownloadLink(

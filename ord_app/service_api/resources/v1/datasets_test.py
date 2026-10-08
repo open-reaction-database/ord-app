@@ -921,6 +921,17 @@ async def test_download_link_rejects_an_expired_token(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+async def test_download_link_rejects_a_token_for_a_missing_user(
+    api_client, mock_authenticated_user, test_db_session
+):
+    dataset = await create_test_dataset(test_db_session, mock_authenticated_user)
+    token = sign_download_link(dataset.id, "binpb", 2_000_000_000)
+
+    response = api_client.get(f"/api/v1/downloads/{token}")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
 async def test_download_link_rechecks_access_when_used(
     api_client, mock_authenticated_user, test_db_session
 ):
