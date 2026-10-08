@@ -15,13 +15,21 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
+  ordInputComponentToReaction,
   ordPreparationToReaction,
+  reactionInputComponentToOrd,
   reactionPreparationToOrd,
 } from './reactionComponent.converters.ts';
 import type { ReactionComponentPreparation } from './reactionComponent.types.ts';
 
 // CompoundPreparationType: CUSTOM = 1, SYNTHESIZED = 6.
 const SYNTHESIZED = 6;
+
+// CompoundIdentifierType: SMILES = 2, MOLBLOCK = 4, NAME = 6, CXSMILES = 10.
+const SMILES = 2;
+const MOLBLOCK = 4;
+const NAME = 6;
+const CXSMILES = 10;
 
 describe('ordPreparationToReaction', () => {
   it('assigns an id and maps the type to its name', () => {
@@ -56,5 +64,35 @@ describe('reactionPreparationToOrd', () => {
     } as ReactionComponentPreparation);
     expect(custom.reactionId).toBeNull();
     expect(custom.details).toBe('d');
+  });
+});
+
+describe('structure identifier routing', () => {
+  it('routes drawable structures to molBlockIdentifiers and the rest to identifiers', () => {
+    const component = ordInputComponentToReaction({
+      identifiers: [
+        { type: MOLBLOCK, value: 'MOLFILE' },
+        { type: CXSMILES, value: 'C[C@H](N)C(=O)O |&1:1|' },
+        { type: SMILES, value: 'CCO' },
+        { type: NAME, value: 'ethanol' },
+      ],
+    });
+
+    expect(component.molBlockIdentifiers.map(item => item.type)).toEqual([
+      'MOLBLOCK',
+      'CXSMILES',
+    ]);
+    expect(component.identifiers.map(item => item.type)).toEqual(['SMILES', 'NAME']);
+  });
+
+  it('round-trips a CXSMILES identifier back into the ORD identifier list', () => {
+    const value = 'C[C@H](N)C(=O)O |&1:1|';
+    const component = ordInputComponentToReaction({
+      identifiers: [{ type: CXSMILES, value }],
+    });
+
+    expect(reactionInputComponentToOrd(component).identifiers).toEqual([
+      expect.objectContaining({ type: CXSMILES, value }),
+    ]);
   });
 });

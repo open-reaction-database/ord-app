@@ -23,15 +23,24 @@ import classes from './componentsKetcherEditor.module.scss';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import { useField } from '@mantine/form';
+import { showNotification } from 'common/utils/showNotification.tsx';
+import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+  isStructureIdentifierType,
+  type StructureIdentifierType,
+} from 'store/entities/reactions/reactionEntity/structureIdentifiers.ts';
 import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
+type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'> & {
+  type: StructureIdentifierType;
+};
 
 interface ComponentsKetcherEditorProps {
   opened: boolean;
   onClose: () => void;
   onSave: (identifier: IdentifierData) => void;
-  identifier: IdentifierData | null;
+  identifier: ReactionCompoundIdentifier | null;
 }
 
 const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
@@ -68,13 +77,39 @@ export function ComponentsKetcherEditor({
   }, [ketcherInstance, opened]);
 
   const handleSave = () => {
-    if (ketcherInstance) {
-      ketcherInstance.getMolfile().then(molfile => {
-        const details = getValue();
-        onSave({ value: molfile, details });
-        onClose();
-      });
+    if (!ketcherInstance) {
+      return;
     }
+    // Round-trip the drawing back into whichever structure format the identifier
+    // already used; a drawing started from scratch becomes a molblock.
+    const type =
+      identifier && isStructureIdentifierType(identifier.type)
+        ? identifier.type
+        : DEFAULT_STRUCTURE_IDENTIFIER_TYPE;
+    // `getSmiles` throws synchronously rather than rejecting, so serialize inside an
+    // async function to funnel both failure modes into the same catch.
+    const serialize = async () =>
+      type === 'CXSMILES'
+        ? ketcherInstance.getSmiles(true)
+        : ketcherInstance.getMolfile();
+    serialize()
+      .then(value => {
+        const details = getValue();
+        onSave({ type, value, details });
+        onClose();
+      })
+      .catch((error: unknown) => {
+        // Ketcher rejects structures it cannot express in the target format --
+        // most commonly a canvas holding a reaction arrow.
+        showNotification({
+          variant: NotificationVariant.ERROR,
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Failed to save the drawn structure.',
+        });
+        console.error(error);
+      });
   };
 
   return (

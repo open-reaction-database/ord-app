@@ -14,12 +14,12 @@
 from base64 import b64decode, b64encode
 from typing import Any
 
-from ord_schema.message_helpers import molblock_from_compound
 from ord_schema.proto.reaction_pb2 import Reaction
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ord_app.service_api.schemas.base import BaseSchema
 from ord_app.service_api.services.pb_utils import load_message
+from ord_app.service_api.services.structures import molblock_from_compound
 
 
 class _ReactionValidation(BaseSchema):

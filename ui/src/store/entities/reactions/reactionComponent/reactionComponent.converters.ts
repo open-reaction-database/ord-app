@@ -31,6 +31,7 @@ import {
   reactionWaveLengthToOrd,
   withId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import { isStructureIdentifierType } from 'store/entities/reactions/reactionEntity/structureIdentifiers.ts';
 import {
   ordMeasurementTypeToReaction,
   ordPreparationTypeToReaction,
@@ -241,13 +242,13 @@ function ordComponentBaseToReaction({
 
   const { nonMolBlockIdentifiers, molBlockIdentifiers } = reactionIdentifiers.reduce(
     ({ nonMolBlockIdentifiers, molBlockIdentifiers }, item) => {
-      const isMolblock = item.type === 'MOLBLOCK';
+      const isStructure = isStructureIdentifierType(item.type);
 
       return {
-        nonMolBlockIdentifiers: isMolblock
+        nonMolBlockIdentifiers: isStructure
           ? nonMolBlockIdentifiers
           : nonMolBlockIdentifiers.concat(item),
-        molBlockIdentifiers: isMolblock
+        molBlockIdentifiers: isStructure
           ? molBlockIdentifiers.concat(item)
           : molBlockIdentifiers,
       };

@@ -18,8 +18,8 @@ from urllib.parse import quote
 
 from httpx import AsyncClient
 from loguru import logger
-from ord_schema import resolvers
 
+from ord_app.service_api.services.structures import canonicalize_smiles
 from ord_app.service_api.services.utils import alru_cache
 
 
@@ -72,4 +72,4 @@ async def name_resolve_cached(value_type: str, value: str) -> tuple[str, str] | 
 
 @lru_cache(maxsize=128)
 def canonicalize_smiles_cached(smiles: str) -> str:
-    return resolvers.canonicalize_smiles(smiles)
+    return canonicalize_smiles(smiles)

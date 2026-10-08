@@ -19,16 +19,23 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { compoundIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import type { SelectOptions } from 'common/types/selectOptions.ts';
+import { STRUCTURE_IDENTIFIER_TYPES } from 'store/entities/reactions/reactionEntity/structureIdentifiers.ts';
 
-const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(
-  item => item !== 'MOLBLOCK',
+// Structure identifiers are created and edited through the Ketcher editor, so they
+// are listed here only to label existing values, never as a choice.
+const structureTypes: ReadonlyArray<string> = STRUCTURE_IDENTIFIER_TYPES;
+
+const textEntryTypeOptions: SelectOptions = compoundIdentifierTypeOptions.filter(
+  item => !structureTypes.includes(item),
 );
 
-const typeOptions = typeOptionsWithoutMolBlock.concat({
-  label: 'MOLBLOCK',
-  value: 'MOLBLOCK',
-  disabled: true,
-});
+const typeOptions = textEntryTypeOptions.concat(
+  STRUCTURE_IDENTIFIER_TYPES.map(type => ({
+    label: type,
+    value: type,
+    disabled: true,
+  })),
+);
 
 export const reactionComponentIdentifiers: Array<ReactionFormNode> = [
   {

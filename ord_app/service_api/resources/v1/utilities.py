@@ -16,7 +16,7 @@
 
 from fastapi import APIRouter, Request, Response
 from ord_schema import resolvers
-from ord_schema.message_helpers import create_message, molblock_from_compound
+from ord_schema.message_helpers import create_message
 from ord_schema.proto.reaction_pb2 import Compound
 from ord_schema.validations import ValidationOptions, validate_message
 
@@ -29,6 +29,7 @@ from ord_app.service_api.services.resolvers import (
     canonicalize_smiles_cached,
     name_resolve_cached,
 )
+from ord_app.service_api.services.structures import molblock_from_compound
 
 router = APIRouter(tags=["utilities"])
 
@@ -82,7 +83,7 @@ async def resolve_compound(inputs: ResolveCompoundInputs) -> dict | Response:
 async def canonicalize_smiles(smiles: str) -> str | Response:
     """Canonicalizes a SMILES string."""
     try:
-        return resolvers.canonicalize_smiles(smiles)
+        return canonicalize_smiles_cached(smiles)
     except ValueError as error:
         return Response(str(error), status_code=400)
 

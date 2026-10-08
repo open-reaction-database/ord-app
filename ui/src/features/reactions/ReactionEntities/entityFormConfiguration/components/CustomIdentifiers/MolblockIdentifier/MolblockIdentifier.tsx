@@ -55,7 +55,7 @@ export function MolblockIdentifier({
         >
           <KeyValueDisplay
             label="Type"
-            value="Molblock"
+            value={identifier.type}
             multiline
           />
           <KeyValueDisplay
