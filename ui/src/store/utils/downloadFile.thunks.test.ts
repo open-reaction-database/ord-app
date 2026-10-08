@@ -33,7 +33,6 @@ let createObjectURL: ReturnType<typeof vi.fn>;
 let revokeObjectURL: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
-  vi.clearAllMocks();
   lastAnchor = undefined;
   clickSpy = vi.fn();
   createObjectURL = vi.fn(() => 'blob:mock-url');

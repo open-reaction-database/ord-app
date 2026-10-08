@@ -52,7 +52,6 @@ vi.mock('features/templates/EntitiesMenu/EntitiesMenu.tsx', () => ({
 import { DatasetsListPage } from './DatasetsList.page.tsx';
 
 beforeEach(() => {
-  vi.clearAllMocks();
   mocks.activeGroupId = 7;
 });
 

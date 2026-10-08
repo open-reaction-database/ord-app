@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { MouseEvent } from 'react';
 
 const dispatch = vi.hoisted(() => vi.fn());
@@ -34,10 +34,6 @@ import {
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,
 } from './reactionViewDeleteButtons.utils.ts';
-
-afterEach(() => {
-  dispatch.mockClear();
-});
 
 describe('onViewDeleteButtonsWrapperClick', () => {
   it('stops event propagation', () => {

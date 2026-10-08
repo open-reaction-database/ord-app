@@ -58,6 +58,9 @@ const config: ViteUserConfig = {
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./src/test/setup.ts'],
+    // Before each test, reset every mock: its calls, and any implementation or queued
+    // mock*Once value a test set. A vi.fn(impl) goes back to impl.
+    mockReset: true,
     // Unit tests live under src/; e2e/ is Playwright (run via `npm run test:e2e`), not vitest.
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {

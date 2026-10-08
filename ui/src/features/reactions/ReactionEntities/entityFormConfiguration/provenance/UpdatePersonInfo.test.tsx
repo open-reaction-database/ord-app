@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { UpdatePersonInfo } from './UpdatePersonInfo.tsx';
@@ -36,10 +36,6 @@ const renderButton = (isViewOnly = false) =>
     />,
     { isViewOnly },
   );
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('UpdatePersonInfo', () => {
   it('renders the action button and merges the user info on click when editable', () => {

@@ -43,7 +43,6 @@ const makeStore = makeRecordingStore;
 const pathComponents = ['inputs', 0, 'components', 0, 'identifiers'];
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.post.mockResolvedValue({ data: { smiles: 'O' } });
 });
 

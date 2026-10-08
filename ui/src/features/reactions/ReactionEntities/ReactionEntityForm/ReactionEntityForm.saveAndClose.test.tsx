@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionEntityForm } from './ReactionEntityForm.tsx';
@@ -52,10 +52,6 @@ function renderForm() {
     />,
   );
 }
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('ReactionEntityForm — Save and Close (#550)', () => {
   it('saves the form and closes the sidebar when clicked', async () => {
