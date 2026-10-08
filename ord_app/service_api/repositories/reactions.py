@@ -15,7 +15,7 @@ from collections.abc import AsyncIterator, Sequence
 from itertools import batched
 
 from loguru import logger
-from sqlalchemy import Select, insert, or_, select, true, update
+from sqlalchemy import Select, exists, insert, or_, select, true, update
 
 from ord_app.service_api.models import ReactionModel
 from ord_app.service_api.repositories.base import BaseRepository
@@ -60,6 +60,40 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
                 break
             yield reactions
             last_id = reactions[-1].id
+
+    async def stream_binpbs(
+        self, dataset_id: int, chunk_size: int = 1000
+    ) -> AsyncIterator[Sequence[bytes]]:
+        """Yields a dataset's serialized reactions in ``id`` order, a chunk at a time.
+
+        One query reads every chunk through a server-side cursor, so all of them come
+        from the same snapshot even when reactions change during the read. The cursor
+        stays open until the last chunk is read or the generator is closed.
+
+        Args:
+            dataset_id: The dataset whose reactions to read.
+            chunk_size: The number of reactions per chunk.
+
+        Yields:
+            The ``binpb`` of up to ``chunk_size`` reactions.
+        """
+        stmt = (
+            select(ReactionModel.binpb)
+            .where(ReactionModel.dataset_id == dataset_id)
+            .order_by(ReactionModel.id)
+            .execution_options(yield_per=chunk_size)
+        )
+        result = await self.db.stream_scalars(stmt)
+        try:
+            async for chunk in result.partitions():
+                yield chunk
+        finally:
+            await result.close()
+
+    async def any_in_dataset(self, dataset_id: int) -> bool:
+        """Returns whether the dataset has any reactions."""
+        stmt = select(exists().where(ReactionModel.dataset_id == dataset_id))
+        return bool(await self.db.scalar(stmt))
 
     # Reaction creation needs ownership and dataset context, so this override deliberately
     # takes a wider signature than the base create(payload).

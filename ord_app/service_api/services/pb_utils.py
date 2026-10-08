@@ -231,7 +231,7 @@ def load_message(data: bytes, message_type: type[MessageT], kind: str) -> Messag
 
 
 @contextmanager
-def _staged_parquet_path() -> Iterator[str]:
+def staged_parquet_path() -> Iterator[str]:
     """Yield a private, tempfile-generated path for staging a Parquet dataset on disk.
 
     ord-schema reads and writes Parquet from a filesystem path (via pyarrow), so dataset bytes
@@ -268,7 +268,7 @@ def load_dataset_message(file_data: bytes, kind: str) -> Dataset:
         ValueError: If ``kind`` is unknown, or if a Parquet file is not a valid ORD dataset.
     """
     if kind == "parquet":
-        with _staged_parquet_path() as tmp_path:
+        with staged_parquet_path() as tmp_path:
             Path(tmp_path).write_bytes(file_data)
             return parquet_dataset.load_dataset(tmp_path)
     return load_message(file_data, Dataset, kind)
@@ -289,7 +289,7 @@ def write_dataset_message(dataset: Dataset, kind: str) -> bytes:
             missing the name/description/reactions that ord-schema requires for Parquet.
     """
     if kind == "parquet":
-        with _staged_parquet_path() as tmp_path:
+        with staged_parquet_path() as tmp_path:
             parquet_dataset.save_dataset(dataset, tmp_path)
             return Path(tmp_path).read_bytes()
     return write_message(dataset, kind)
