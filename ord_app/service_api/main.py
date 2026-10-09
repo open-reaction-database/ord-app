@@ -103,7 +103,7 @@ async def catch_errors(
         if isinstance(context_err, psycopg.errors.UniqueViolation):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
-                content={"detail": "Unique constraint violation caught."},
+                content={"detail": "Object already exists."},
             )
         elif isinstance(context_err, psycopg.errors.NumericValueOutOfRange):
             return JSONResponse(
