@@ -31,10 +31,10 @@ describe('handleApiError', () => {
     });
   });
 
-  it('prefers a backend-provided message over the default', () => {
-    expect(handleApiError(axiosErrorWith(403, { message: 'Custom denied' }))).toEqual({
-      errorCode: 403,
-      errorMessage: 'Custom denied',
+  it('shows a backend-provided message for a conflict', () => {
+    expect(handleApiError(axiosErrorWith(409, { message: 'Already shared' }))).toEqual({
+      errorCode: 409,
+      errorMessage: 'Already shared',
     });
   });
 
@@ -49,11 +49,19 @@ describe('handleApiError', () => {
 
   it('prefers detail over message', () => {
     expect(
-      handleApiError(
-        axiosErrorWith(404, { detail: 'Dataset not found', message: 'Other' }),
-      ),
-    ).toEqual({ errorCode: 404, errorMessage: 'Dataset not found' });
+      handleApiError(axiosErrorWith(400, { detail: 'Data error.', message: 'Other' })),
+    ).toEqual({ errorCode: 400, errorMessage: 'Data error.' });
   });
+
+  it.each([403, 404, 500])(
+    'keeps the generic message for %i, whose detail can be for developers',
+    status => {
+      const detail = "Reaction with {'dataset_id': 3, 'id': 5} not found";
+      expect(handleApiError(axiosErrorWith(status, { detail })).errorMessage).toBe(
+        { 403: 'Access denied', 404: 'Entity not found', 500: 'Unknown error' }[status],
+      );
+    },
+  );
 
   it('falls back to the default for a list of validation errors', () => {
     const detail = [{ loc: ['query', 'file_format'], msg: 'Input should be json' }];
@@ -64,16 +72,16 @@ describe('handleApiError', () => {
   });
 
   it('falls back past a blank detail', () => {
-    expect(handleApiError(axiosErrorWith(404, { detail: '  ' }))).toEqual({
-      errorCode: 404,
-      errorMessage: 'Entity not found',
+    expect(handleApiError(axiosErrorWith(422, { detail: '  ' }))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
     });
   });
 
   it('falls back to the default for a body that is not JSON', () => {
-    expect(handleApiError(axiosErrorWith(404, new Blob(['{"detail": "x"}'])))).toEqual({
-      errorCode: 404,
-      errorMessage: 'Entity not found',
+    expect(handleApiError(axiosErrorWith(422, new Blob(['{"detail": "x"}'])))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
     });
   });
 
