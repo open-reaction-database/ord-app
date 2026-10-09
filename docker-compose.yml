@@ -33,7 +33,7 @@ services:
       - ord_network
 
   db:
-    image: bitnamilegacy/postgresql:17
+    image: soldevelo/postgresql:17
     environment:
       ALLOW_EMPTY_PASSWORD: "yes"
       POSTGRESQL_DATABASE: ord
