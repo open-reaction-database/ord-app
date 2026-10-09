@@ -69,7 +69,7 @@ describe('binpb conversion', () => {
     expect(JSON.stringify(appReaction)).not.toContain('$typeName');
   });
 
-  it('truncates a decimal that a number input put in an int32 field', () => {
+  it('truncates a decimal that a template variable put in an int32 field', () => {
     const appReaction = ordBinpbToReaction(toBinpb(fullReaction));
     const [input] = Object.values(appReaction.inputs);
     const [analysis] = Object.values(appReaction.outcomes[0].analyses);

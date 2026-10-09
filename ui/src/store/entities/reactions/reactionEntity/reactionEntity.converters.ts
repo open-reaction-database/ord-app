@@ -160,8 +160,9 @@ export function ordScalarToReaction<T extends string | number>(
   return value || undefined;
 }
 
-// Number inputs accept decimals, and encoding an int32 field that holds one throws, so a
-// decimal is truncated toward zero.
+// Encoding an int32 field that holds a decimal throws. The form inputs for these fields
+// reject decimals, but a template variable can still supply one, so it is truncated toward
+// zero.
 export function reactionIntegerToOrd(value: OrdOptional<number>): number | undefined {
   return value === null || value === undefined ? undefined : Math.trunc(value);
 }

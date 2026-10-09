@@ -83,7 +83,7 @@ export const reactionInputWithoutName: Array<ReactionFormNode> = [
           {
             type: ReactionFormNodeType.value,
             name: 'additionOrder',
-            inputType: 'number',
+            inputType: 'integer',
             wrapperConfig: {
               label: 'Order',
               hint: 'Order should be an integer value, starting at 1',

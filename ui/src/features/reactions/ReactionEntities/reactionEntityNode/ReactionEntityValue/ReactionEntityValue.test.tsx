@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionEntityValue } from './ReactionEntityValue.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
@@ -48,6 +49,25 @@ describe('ReactionEntityValue', () => {
   it('renders a numeric input for number fields', () => {
     const { container } = renderValue('number');
     expect(container.querySelector('input')).not.toBeNull();
+  });
+
+  it.each([
+    ['number', 2.5],
+    ['integer', 25],
+  ])('%s field reads a typed 2.5 as %s', async (inputType, expected) => {
+    const onChange = vi.fn();
+    const { container } = renderInReactionView(
+      <ReactionEntityValue
+        node={{ name: 'field', inputType } as unknown as ReactionFormValue}
+        formMethods={
+          {
+            getInputProps: () => ({ value: '', onChange }),
+          } as unknown as ReactionEntityNodeProps<ReactionFormValue>['formMethods']
+        }
+      />,
+    );
+    await userEvent.type(container.querySelector('input') as HTMLInputElement, '2.5');
+    expect(onChange).toHaveBeenLastCalledWith(expected);
   });
 
   it('disables the input in view-only mode', () => {

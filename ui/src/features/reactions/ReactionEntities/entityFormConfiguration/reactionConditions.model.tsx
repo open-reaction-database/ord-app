@@ -199,7 +199,7 @@ export const reactionStirringCondition: ReactionFormNode = {
         {
           type: ReactionFormNodeType.value,
           name: 'stirring.rate.rpm',
-          inputType: 'number',
+          inputType: 'integer',
           wrapperConfig: {
             label: 'RPM',
           },

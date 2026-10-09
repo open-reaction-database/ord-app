@@ -61,7 +61,7 @@ export const reactionAnalyses: Array<ReactionFormNode> = [
     {
       type: ReactionFormNodeType.value,
       name: 'chmoId',
-      inputType: 'number',
+      inputType: 'integer',
       wrapperConfig: {
         label: 'Chmo ID',
         hint: 'RSC Chemical Methods Ontology ID to define the analytical method with greater specificity. Defined at https://github.com/rsc-ontologies/rsc-cmo.',

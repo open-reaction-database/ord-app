@@ -26,6 +26,7 @@ import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumbe
 const getVariableType = (inputType: ReactionFormValue['inputType']): VariableType => {
   switch (inputType) {
     case 'number':
+    case 'integer':
       return VariableType.Number;
     case 'string':
     case 'textarea':
@@ -76,9 +77,11 @@ export function ReactionEntityValue({
         />
       );
     case 'number':
+    case 'integer':
       return (
         <AppNumberInput
           {...props}
+          allowDecimal={node.inputType === 'number'}
           disabled={isViewOnly}
         />
       );
