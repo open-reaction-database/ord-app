@@ -40,7 +40,7 @@ describe('handleApiError', () => {
 
   it("shows FastAPI's detail when it is a sentence", () => {
     const detail =
-      'Parquet export requires a dataset description. Add a description and try again.';
+      'Parquet export requires a dataset description. Please add a description and try again.';
     expect(handleApiError(axiosErrorWith(422, { detail }))).toEqual({
       errorCode: 422,
       errorMessage: detail,

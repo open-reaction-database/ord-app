@@ -298,7 +298,7 @@ class DatasetUseCases:
                 # exported as a meaningless value.
                 raise UnprocessableEntityError(
                     "Parquet export requires a dataset description. "
-                    "Add a description and try again."
+                    "Please add a description and try again."
                 )
         return dataset, dataset_pb
 
