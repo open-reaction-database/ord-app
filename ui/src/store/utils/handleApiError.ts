@@ -26,11 +26,33 @@ const ERROR_MESSAGES: Record<number, string> = {
   500: 'Unknown error',
 };
 
+// Statuses whose backend message is written for the user to act on: a bad request, a
+// conflict, or a request the backend will not process, such as a Parquet export of a
+// dataset without a description. Other statuses keep their generic message, since their
+// backend message can be written for developers.
+const STATUSES_WITH_USER_MESSAGES = new Set([400, 409, 422]);
+
+// FastAPI puts an error's explanation in `detail`: a sentence for an error the backend
+// raises, and a list of field errors when a request fails validation, which has no
+// short form to show.
+const messageFromBody = (data: unknown): string | undefined => {
+  if (typeof data !== 'object' || data === null) {
+    return undefined;
+  }
+  const { detail, message } = data as { detail?: unknown; message?: unknown };
+  // A blank string would show an empty notification, so it falls through too.
+  return [detail, message].find(
+    (text): text is string => typeof text === 'string' && text.trim() !== '',
+  );
+};
+
 export function getErrorDetails(error: unknown): RejectValue {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 500;
-    const message =
-      error.response?.data?.message ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
+    const backendMessage = STATUSES_WITH_USER_MESSAGES.has(status)
+      ? messageFromBody(error.response?.data)
+      : undefined;
+    const message = backendMessage ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
     return { errorCode: status, errorMessage: message };
   }
   return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };

@@ -216,6 +216,10 @@ async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):
         files={"file": ("wrong.pdf", BytesIO(b"pdf"))},
     )
     assert response_data.status_code == status.HTTP_400_BAD_REQUEST
+    assert response_data.json()["detail"] == (
+        "Invalid file extension. Please use one of: "
+        ".json, .binpb, .pb, .txtpb, .pbtxt, .parquet."
+    )
 
 
 async def test_upload_wrong_file(api_client, mock_authenticated_user):

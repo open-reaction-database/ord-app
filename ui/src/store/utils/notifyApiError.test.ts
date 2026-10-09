@@ -42,11 +42,13 @@ describe('notifyApiError', () => {
     });
   });
 
-  it('prefers the backend-provided message when present', () => {
-    notifyApiError(axiosError(403, { message: 'You cannot edit this dataset' }));
+  it("shows the backend's message for a request it will not process", () => {
+    const detail =
+      'Parquet export requires a dataset description. Please add a description and try again.';
+    notifyApiError(axiosError(422, { detail }));
     expect(showMock).toHaveBeenCalledWith({
       variant: NotificationVariant.ERROR,
-      message: 'You cannot edit this dataset',
+      message: detail,
     });
   });
 

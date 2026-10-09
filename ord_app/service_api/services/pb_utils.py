@@ -111,7 +111,7 @@ async def validate_uploaded_pb_file(
     if not kind:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
-            f"Invalid file extension. Please use: {ext_to_kind.keys()}",
+            f"Invalid file extension. Please use one of: {', '.join(ext_to_kind)}.",
         )
 
     file_data = await file.read()
