@@ -32,6 +32,11 @@ import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reacti
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from 'common/styling/colors.ts';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import { reactionCompoundIdentifierTypeToOrd } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.converters.ts';
+import {
+  DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+  type StructureIdentifierType,
+} from 'store/entities/reactions/reactionEntity/structureIdentifiers.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import {
   ReactionEntityBlock,
@@ -39,7 +44,9 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
+type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'> & {
+  type: StructureIdentifierType;
+};
 
 const ENTITY_FIELD = 'molBlockIdentifiers';
 
@@ -48,11 +55,14 @@ const useSelectIdentifiers = buildUseSelectItems(ENTITY_FIELD);
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
   (newIndex, _, value?: unknown) => {
+    const { type, ...rest } = (value as IdentifierData | undefined) ?? {};
     const newIdentifier = ordCompoundIdentifierToReaction(
       ord.CompoundIdentifier.toObject(
         new ord.CompoundIdentifier({
-          type: ord.CompoundIdentifier.CompoundIdentifierType.MOLBLOCK,
-          ...((value as IdentifierData) || {}),
+          type: reactionCompoundIdentifierTypeToOrd(
+            type ?? DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+          ),
+          ...rest,
         }),
       ),
     );
@@ -146,7 +156,7 @@ export function CustomIdentifiers() {
       <ReactionEntityBlock
         renderedTitle={
           <ReactionEntityBlockTitle
-            leftSection={<Title order={3}>Molblock Identifiers</Title>}
+            leftSection={<Title order={3}>Structure Identifiers</Title>}
           />
         }
       >
