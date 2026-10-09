@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Form, useForm } from '@mantine/form';
-import { Anchor, Button, Flex, Modal, Text, TextInput } from '@mantine/core';
+import { Anchor, Button, Flex, Modal, Select, Text, TextInput } from '@mantine/core';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addIdentifierByName } from 'store/entities/reactions/reactionsInputs/reactionInputs.thunks.ts';
 import { useContext, useEffect, type FormEvent } from 'react';
@@ -32,6 +32,13 @@ interface ComponentsLookupProps {
   onClose: () => void;
 }
 
+// Resolver identifier types. Values match what the backend / PubChem expect (#465).
+const IDENTIFIER_TYPE_OPTIONS = [
+  { value: 'name', label: 'Name' },
+  { value: 'smiles', label: 'SMILES' },
+  { value: 'inchi', label: 'InChI' },
+];
+
 export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
   const dispatch = useAppDispatch();
   const { reactionId, pathComponents } = useContext(reactionEntityContext);
@@ -43,6 +50,7 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
     clearInputErrorOnChange: true,
     initialValues: {
       search: '',
+      identifierType: 'name',
     },
   });
 
@@ -60,7 +68,10 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
     }
   }, [dispatch, hasError, values.search]);
 
-  const onSubmit = (values: { search: string }, event?: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (
+    values: { search: string; identifierType: string },
+    event?: FormEvent<HTMLFormElement>,
+  ) => {
     event?.stopPropagation();
     const path = pathComponents.concat('identifiers');
     dispatch(
@@ -68,6 +79,7 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
         reactionId: reactionId,
         pathComponents: path,
         name: values.search,
+        identifierType: values.identifierType,
       }),
     );
   };
@@ -108,8 +120,15 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
           </Anchor>
           databases
         </Text>
+        <Select
+          label="Identifier type"
+          data={IDENTIFIER_TYPE_OPTIONS}
+          allowDeselect={false}
+          {...form.getInputProps('identifierType')}
+        />
         <TextInput
-          label="Compound name"
+          label="Compound identifier"
+          placeholder="Name, SMILES, or InChI"
           {...inputProps}
           error={hasError ? 'Compound not found' : inputProps.error}
           data-autofocus
