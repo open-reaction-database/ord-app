@@ -38,6 +38,7 @@ import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumbe
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionMeasurementType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 
@@ -177,12 +178,30 @@ function handleMeasurementTypeChange(
   return { type: newType, value: newValue } as ReactionMeasurementValue;
 }
 
-const defaultValueType = ReactionMeasurementValueType.Percent;
-
-const defaultMeasurementValue: ReactionMeasurementValueNumber = {
-  type: defaultValueType,
-  value: typeToDefaultValue[defaultValueType],
+// Default value-type per measurement type (#604). A single global "%" default was wrong for
+// non-percentage measurements (e.g. Selectivity ratios). Percentages stay %, amounts default to a
+// mass, and everything else (Selectivity, Area, Counts, Intensity, Custom, …) defaults to Number.
+const measurementTypeToDefaultValueType: Partial<
+  Record<ReactionMeasurementType, ReactionMeasurementValueType>
+> = {
+  YIELD: ReactionMeasurementValueType.Percent,
+  PURITY: ReactionMeasurementValueType.Percent,
+  AMOUNT: ReactionMeasurementValueType.Mass,
 };
+
+const fallbackValueType = ReactionMeasurementValueType.Number;
+
+function buildDefaultMeasurementValue(
+  measurementType: Optional<ReactionMeasurementType>,
+): ReactionMeasurementValue {
+  const valueType =
+    (measurementType && measurementTypeToDefaultValueType[measurementType]) ??
+    fallbackValueType;
+  return {
+    type: valueType,
+    value: typeToDefaultValue[valueType],
+  } as ReactionMeasurementValue;
+}
 
 export function MeasurementValueControl({
   name,
@@ -192,7 +211,12 @@ export function MeasurementValueControl({
   const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
   });
-  const activeMeasurementValue = measurementValue ?? defaultMeasurementValue;
+  // When no value has been entered yet, preselect the value-type based on the measurement's own
+  // type (sibling `type` field) rather than always defaulting to "%". (#604)
+  const measurementType = (formMethods.getValues()?.type ??
+    null) as Optional<ReactionMeasurementType>;
+  const activeMeasurementValue =
+    measurementValue ?? buildDefaultMeasurementValue(measurementType);
   const { value, type } = activeMeasurementValue;
   const Component = typeToComponent[type];
 
