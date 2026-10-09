@@ -16,7 +16,6 @@ import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 
-import asyncpg
 import psycopg.errors
 from fastapi import APIRouter, FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,17 +88,6 @@ async def catch_errors(
         context_err = (
             (err.orig.__context__ or err.orig) if err.orig is not None else err
         )
-        if isinstance(context_err, asyncpg.UniqueViolationError):
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={"detail": "Object already exists."},
-            )
-        elif isinstance(context_err, asyncpg.DataError):
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"detail": "Data error."},
-            )
-
         if isinstance(context_err, psycopg.errors.UniqueViolation):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,

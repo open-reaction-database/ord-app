@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     e2e: bool = Field(False, validation_alias="ord_app_e2e")
 
     # databases
-    pg_dsn: str = "postgresql+asyncpg://ord@localhost:5400/ord"  # NOSONAR
+    pg_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"  # NOSONAR
     # Alembic can't work with asynchronous driver
     pg_alembic_dsn: str = "postgresql+psycopg://ord@localhost:5400/ord"  # NOSONAR
     pg_test_dsn: str = "postgresql+psycopg://ord@localhost:5400/test"  # NOSONAR
