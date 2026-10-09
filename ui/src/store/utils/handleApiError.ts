@@ -34,10 +34,10 @@ const messageFromBody = (data: unknown): string | undefined => {
     return undefined;
   }
   const { detail, message } = data as { detail?: unknown; message?: unknown };
-  if (typeof detail === 'string') {
-    return detail;
-  }
-  return typeof message === 'string' ? message : undefined;
+  // A blank string would show an empty notification, so it falls through too.
+  return [detail, message].find(
+    (text): text is string => typeof text === 'string' && text.trim() !== '',
+  );
 };
 
 export function getErrorDetails(error: unknown): RejectValue {

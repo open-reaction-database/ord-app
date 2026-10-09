@@ -57,7 +57,14 @@ describe('handleApiError', () => {
 
   it('falls back to the default for a list of validation errors', () => {
     const detail = [{ loc: ['query', 'file_format'], msg: 'Input should be json' }];
-    expect(handleApiError(axiosErrorWith(404, { detail }))).toEqual({
+    expect(handleApiError(axiosErrorWith(422, { detail }))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
+    });
+  });
+
+  it('falls back past a blank detail', () => {
+    expect(handleApiError(axiosErrorWith(404, { detail: '  ' }))).toEqual({
       errorCode: 404,
       errorMessage: 'Entity not found',
     });
