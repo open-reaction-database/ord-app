@@ -16,7 +16,6 @@ import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 
-import asyncpg
 import psycopg.errors
 from fastapi import APIRouter, FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,6 +37,7 @@ from ord_app.service_api.resources.v1 import (
     users,
     utilities,
 )
+from ord_app.service_api.services.download_links import download_link_key
 from ord_app.service_api.services.postgresql import db_session_maker
 from ord_app.service_api.settings import RuntimeSettings
 
@@ -60,6 +60,8 @@ async def run_background_task() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # Raises, so the app does not start, when download links have no key.
+    download_link_key()
     # Keep a reference so the task isn't garbage-collected before it completes.
     app.state.background_task = asyncio.create_task(run_background_task())
     yield
@@ -86,21 +88,10 @@ async def catch_errors(
         context_err = (
             (err.orig.__context__ or err.orig) if err.orig is not None else err
         )
-        if isinstance(context_err, asyncpg.UniqueViolationError):
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={"detail": "Object already exists."},
-            )
-        elif isinstance(context_err, asyncpg.DataError):
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"detail": "Data error."},
-            )
-
         if isinstance(context_err, psycopg.errors.UniqueViolation):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
-                content={"detail": "Unique constraint violation caught."},
+                content={"detail": "Object already exists."},
             )
         elif isinstance(context_err, psycopg.errors.NumericValueOutOfRange):
             return JSONResponse(

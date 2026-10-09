@@ -26,6 +26,7 @@ import {
 } from 'common/icons';
 import { useCallback, useContext, useMemo, useRef } from 'react';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
+import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { useLocation, useRouter } from 'wouter';
 import { fileDownloadOptions } from 'common/constants.ts';
 import { useDisclosure } from '@mantine/hooks';
@@ -113,7 +114,11 @@ export function ReactionHeader({
           </Button>
           <DownloadMenu
             options={fileDownloadOptions}
-            url={`/datasets/${datasetId}/reactions/${reactionId}/download`}
+            download={format =>
+              downloadFileFromUrl(
+                `/datasets/${datasetId}/reactions/${reactionId}/download?file_format=${format}`,
+              )
+            }
             target={
               <Button
                 leftSection={<DownloadIcon />}

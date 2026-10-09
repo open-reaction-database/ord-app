@@ -57,7 +57,6 @@ function seedNewDatasetProgress(store: ReturnType<typeof makeRecordingStore>['st
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.get.mockResolvedValue({ data: emptyPage });
   axiosMock.post.mockResolvedValue({ data: { id: 7 } });
 });

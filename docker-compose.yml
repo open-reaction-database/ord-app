@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      PG_DSN: "postgresql+asyncpg://ord@db:5432/ord"
+      PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
       PG_TEST_DSN: "postgresql+psycopg://ord@db:5432/test"
       APP_ENV: "localhost"
     volumes:

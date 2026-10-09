@@ -46,7 +46,6 @@ function contextWrapper(reactionId: number, pathComponents: Array<string | numbe
 }
 
 afterEach(() => {
-  vi.clearAllMocks();
   selectorReturn = undefined;
 });
 

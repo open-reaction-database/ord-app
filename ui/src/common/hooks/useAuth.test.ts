@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // noAuth is a module-level constant the hook branches on; expose it through a
 // getter backed by hoisted state so each test can flip the dev/prod path via a
@@ -84,13 +84,6 @@ beforeEach(() => {
   getAccessTokenSilently = vi.fn().mockResolvedValue('access-tok');
   getIdTokenClaims = vi.fn().mockResolvedValue({ __raw: 'id-raw' });
   setAuth0();
-});
-
-// vi.clearAllMocks() resets the persistent hoisted mocks' call history between
-// tests (their vi.fn implementations are preserved); the per-test Auth0 spies
-// are rebuilt fresh in beforeEach.
-afterEach(() => {
-  vi.clearAllMocks();
 });
 
 describe('useAuth — no-auth dev/E2E bypass', () => {

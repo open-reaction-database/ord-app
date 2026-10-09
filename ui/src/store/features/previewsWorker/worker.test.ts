@@ -32,6 +32,9 @@ vi.mock('common/utils/indigo.ts', () => ({
 // Importing the module calls initIndigo() and assigns the global onmessage handler.
 import './worker.ts';
 
+// Counted at load, since every mock is reset before each test.
+const initIndigoCallsAtLoad = initIndigoMock.mock.calls.length;
+
 const handler = globalThis.onmessage as unknown as (event: { data: unknown }) => void;
 
 let postMessageMock: ReturnType<typeof vi.fn>;
@@ -39,8 +42,6 @@ let postMessageMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   postMessageMock = vi.fn();
   vi.stubGlobal('postMessage', postMessageMock);
-  renderSvgMock.mockClear();
-  waitForIndigoMock.mockClear();
 });
 
 afterEach(() => {
@@ -49,7 +50,7 @@ afterEach(() => {
 
 describe('previews worker', () => {
   it('calls initIndigo once at module load', () => {
-    expect(initIndigoMock).toHaveBeenCalledTimes(1);
+    expect(initIndigoCallsAtLoad).toBe(1);
   });
 
   it('ignores a message whose data is not an object', () => {

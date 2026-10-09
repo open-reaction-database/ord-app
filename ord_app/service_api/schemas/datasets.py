@@ -119,3 +119,8 @@ class DatasetShareSchema(BaseSchema):
 
 class DatasetShareCreateSchema(BaseSchema):
     secondary_group_id: int
+
+
+class DownloadLinkResponseSchema(BaseSchema):
+    # Fetch it from /downloads/{token}.
+    token: str

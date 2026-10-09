@@ -20,6 +20,7 @@ from alembic.config import Config
 from faker import Faker
 from fastapi.testclient import TestClient
 from ord_schema.proto.reaction_pb2 import Reaction
+from pydantic import SecretStr
 from sqlalchemy import create_engine, make_url, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -140,6 +141,13 @@ async def test_db_session():
 
 async def mock_validate_reactions_task(*args, **kwargs):
     pass
+
+
+@pytest.fixture(autouse=True)
+def download_link_secret(monkeypatch):
+    monkeypatch.setattr(
+        RuntimeSettings, "download_link_secret", SecretStr("test download link secret")
+    )
 
 
 @pytest.fixture(autouse=True)

@@ -36,7 +36,6 @@ const axiosMock = axiosInstance as unknown as Record<
 >;
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.delete.mockResolvedValue({ data: {} });
 });
 

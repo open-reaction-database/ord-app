@@ -84,7 +84,6 @@ let postMessageMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   postMessageMock = vi.fn();
   vi.stubGlobal('postMessage', postMessageMock);
-  reactionToOrdBinpbMock.mockClear();
 });
 
 afterEach(() => {

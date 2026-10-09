@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { AppThunk, AppVoidThunk } from 'common/types/store/thunk.ts';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { type UnknownAction } from '@reduxjs/toolkit';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
@@ -35,10 +35,6 @@ const testActions = createAsyncAction<number, { value: string }>('test/thunk');
 function axiosErrorWithDetail(detail: unknown): unknown {
   return { isAxiosError: true, response: { data: { detail } } };
 }
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('createThunk', () => {
   it('dispatches request, runs the inner thunk, dispatches and returns its result action', async () => {

@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import axiosInstance from '../axiosInstance.ts';
 import {
+  downloadDatasetThroughLink,
   downloadFile,
   downloadFileFromUrl,
   downloadAsJson,
+  fileNameFromContentDisposition,
 } from './downloadFile.thunks.ts';
 import { notifyApiError } from './notifyApiError.ts';
 
-vi.mock('../axiosInstance.ts', () => ({ default: { get: vi.fn() } }));
+vi.mock('../axiosInstance.ts', () => ({
+  default: { get: vi.fn(), post: vi.fn(), getUri: vi.fn() },
+}));
 vi.mock('./notifyApiError.ts', () => ({ notifyApiError: vi.fn() }));
-const axiosMock = axiosInstance as unknown as Record<'get', ReturnType<typeof vi.fn>>;
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'getUri',
+  ReturnType<typeof vi.fn>
+>;
 
-let clickSpy: ReturnType<typeof vi.fn>;
+let clickSpy: Mock<() => void>;
 let lastAnchor: HTMLAnchorElement | undefined;
 let createObjectURL: ReturnType<typeof vi.fn>;
 let revokeObjectURL: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
-  vi.clearAllMocks();
   lastAnchor = undefined;
   clickSpy = vi.fn();
   createObjectURL = vi.fn(() => 'blob:mock-url');
@@ -68,6 +74,26 @@ describe('downloadFile', () => {
   });
 });
 
+describe('fileNameFromContentDisposition', () => {
+  it('prefers the UTF-8 filename* over the ASCII fallback', () => {
+    expect(
+      fileNameFromContentDisposition(
+        `attachment; filename="C_N coupling.json"; filename*=UTF-8''C%E2%80%93N%20coupling.json`,
+      ),
+    ).toBe('C–N coupling.json');
+  });
+
+  it('uses the quoted filename when there is no filename*', () => {
+    expect(fileNameFromContentDisposition('attachment; filename="report.json"')).toBe(
+      'report.json',
+    );
+  });
+
+  it('throws when the header names no file', () => {
+    expect(() => fileNameFromContentDisposition('attachment')).toThrow();
+  });
+});
+
 describe('downloadFileFromUrl', () => {
   it('fetches the blob and downloads it using the content-disposition filename', async () => {
     axiosMock.get.mockResolvedValueOnce({
@@ -93,6 +119,46 @@ describe('downloadFileFromUrl', () => {
     await expect(
       downloadFileFromUrl('/bad')(vi.fn(), vi.fn(), undefined),
     ).resolves.toBeUndefined();
+    expect(clickSpy).not.toHaveBeenCalled();
+    expect(notifyApiError).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('downloadDatasetThroughLink', () => {
+  it('has the browser fetch a link made for the dataset and format', async () => {
+    axiosMock.post.mockResolvedValueOnce({ data: { token: '5.json.7.123.sig' } });
+    axiosMock.getUri.mockImplementationOnce(
+      ({ url }: { url: string }) => `https://example.org/api/v1${url}`,
+    );
+    let connectedWhenClicked: boolean | undefined;
+    clickSpy.mockImplementationOnce(() => {
+      connectedWhenClicked = lastAnchor?.isConnected;
+    });
+
+    await downloadDatasetThroughLink(5, 'json')(vi.fn(), vi.fn(), undefined);
+
+    expect(axiosMock.post).toHaveBeenCalledWith('/datasets/5/download-link', null, {
+      params: { file_format: 'json' },
+    });
+    expect(lastAnchor?.href).toBe(
+      'https://example.org/api/v1/downloads/5.json.7.123.sig',
+    );
+    expect(lastAnchor?.hasAttribute('download')).toBe(true);
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(connectedWhenClicked).toBe(true);
+    expect(lastAnchor?.isConnected).toBe(false);
+  });
+
+  it('notifies the user, and opens nothing, when the link cannot be made', async () => {
+    axiosMock.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 422 },
+    });
+
+    await expect(
+      downloadDatasetThroughLink(5, 'parquet')(vi.fn(), vi.fn(), undefined),
+    ).resolves.toBeUndefined();
+
     expect(clickSpy).not.toHaveBeenCalled();
     expect(notifyApiError).toHaveBeenCalledTimes(1);
   });

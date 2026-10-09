@@ -39,5 +39,6 @@ Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` 
 ## Conventions
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
+- Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `ui/.env`, and fail without them; the backend reads them from the environment or `ord_app/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
 - Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `ui/vite.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.

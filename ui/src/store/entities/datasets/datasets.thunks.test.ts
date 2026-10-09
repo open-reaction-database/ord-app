@@ -54,7 +54,6 @@ const makeStore = makeRecordingStore;
 const dataset = { id: 1, name: 'd1', description: '', groups: [] };
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.get.mockResolvedValue({ data: dataset });
   axiosMock.post.mockResolvedValue({ data: dataset });
   axiosMock.patch.mockResolvedValue({ data: dataset });

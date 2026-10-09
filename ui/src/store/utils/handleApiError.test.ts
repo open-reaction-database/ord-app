@@ -31,10 +31,57 @@ describe('handleApiError', () => {
     });
   });
 
-  it('prefers a backend-provided message over the default', () => {
-    expect(handleApiError(axiosErrorWith(403, { message: 'Custom denied' }))).toEqual({
-      errorCode: 403,
-      errorMessage: 'Custom denied',
+  it('shows a backend-provided message for a conflict', () => {
+    expect(handleApiError(axiosErrorWith(409, { message: 'Already shared' }))).toEqual({
+      errorCode: 409,
+      errorMessage: 'Already shared',
+    });
+  });
+
+  it("shows FastAPI's detail when it is a sentence", () => {
+    const detail =
+      'Parquet export requires a dataset description. Please add a description and try again.';
+    expect(handleApiError(axiosErrorWith(422, { detail }))).toEqual({
+      errorCode: 422,
+      errorMessage: detail,
+    });
+  });
+
+  it('prefers detail over message', () => {
+    expect(
+      handleApiError(axiosErrorWith(400, { detail: 'Data error.', message: 'Other' })),
+    ).toEqual({ errorCode: 400, errorMessage: 'Data error.' });
+  });
+
+  it.each([403, 404, 500])(
+    'keeps the generic message for %i, whose detail can be for developers',
+    status => {
+      const detail = "Reaction with {'dataset_id': 3, 'id': 5} not found";
+      expect(handleApiError(axiosErrorWith(status, { detail })).errorMessage).toBe(
+        { 403: 'Access denied', 404: 'Entity not found', 500: 'Unknown error' }[status],
+      );
+    },
+  );
+
+  it('falls back to the default for a list of validation errors', () => {
+    const detail = [{ loc: ['query', 'file_format'], msg: 'Input should be json' }];
+    expect(handleApiError(axiosErrorWith(422, { detail }))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
+    });
+  });
+
+  it('falls back past a blank detail', () => {
+    expect(handleApiError(axiosErrorWith(422, { detail: '  ' }))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
+    });
+  });
+
+  it('falls back to the default for a body that is not JSON', () => {
+    expect(handleApiError(axiosErrorWith(422, new Blob(['{"detail": "x"}'])))).toEqual({
+      errorCode: 422,
+      errorMessage: 'Unknown error',
     });
   });
 

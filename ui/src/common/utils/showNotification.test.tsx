@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { notifications } from '@mantine/notifications';
 import { showNotification } from './showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
@@ -21,10 +21,6 @@ import { NotificationVariant } from 'common/types/notification.ts';
 vi.mock('@mantine/notifications', () => ({ notifications: { show: vi.fn() } }));
 
 const showMock = vi.mocked(notifications.show);
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
 
 describe('showNotification', () => {
   it('forwards the message and the shared default options to notifications.show', () => {

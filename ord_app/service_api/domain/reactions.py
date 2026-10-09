@@ -155,7 +155,9 @@ class ReactionsUseCase:
             logger.error(
                 f"Failed to load reaction dataset_id={dataset_id}, kind=binpb: {e}"
             )
-            raise ProtobufDecodeError("An error occurred while load reaction.") from e
+            raise ProtobufDecodeError(
+                "An error occurred while loading the reaction."
+            ) from e
 
         pb_reaction.reaction_id = (pb_reaction.reaction_id or "").strip()
         if db_reaction := await self.reaction_repo.get(

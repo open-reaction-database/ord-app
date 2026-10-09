@@ -64,7 +64,6 @@ function makeStore() {
 const axiosError = (status: number) => ({ isAxiosError: true, response: { status } });
 
 beforeEach(() => {
-  vi.clearAllMocks();
   axiosMock.get.mockResolvedValue({ data: [] });
   axiosMock.post.mockResolvedValue({ data: { user: { name: 'Ann' } } });
   axiosMock.patch.mockResolvedValue({ data: { user: { name: 'Ann' } } });

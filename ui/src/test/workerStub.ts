@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { expect, it, vi } from 'vitest';
+import { expect, it, vi, type Mock } from 'vitest';
 import type { MiddlewareAPI } from '@reduxjs/toolkit';
 
 /** A recorded Worker instance: posted messages plus the handlers the middleware assigns. */
@@ -25,8 +25,8 @@ export interface CapturedWorker {
 
 /** Handles a worker-middleware test drives: the recorded worker plus the dispatch/next spies. */
 export interface WorkerMiddlewareHandles {
-  dispatch: ReturnType<typeof vi.fn>;
-  next: ReturnType<typeof vi.fn>;
+  dispatch: Mock<(action: unknown) => unknown>;
+  next: Mock<(action: unknown) => unknown>;
   invoke: (action: unknown) => unknown;
   worker: CapturedWorker;
 }
@@ -68,8 +68,8 @@ export function stubWorker(): Array<CapturedWorker> {
  */
 export function createWorkerHarness(): {
   workers: Array<CapturedWorker>;
-  dispatch: ReturnType<typeof vi.fn>;
-  next: ReturnType<typeof vi.fn>;
+  dispatch: Mock<(action: unknown) => unknown>;
+  next: Mock<(action: unknown) => unknown>;
   api: MiddlewareAPI;
 } {
   const workers = stubWorker();

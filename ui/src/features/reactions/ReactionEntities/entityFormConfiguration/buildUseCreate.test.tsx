@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
@@ -82,11 +82,6 @@ function renderCreate(
   );
   return result.current;
 }
-
-afterEach(() => {
-  dispatch.mockClear();
-  createKey.mockClear();
-});
 
 describe('buildUseCreate', () => {
   it('calls the key factory and dispatches the field update + sidebar open at the composed path', () => {

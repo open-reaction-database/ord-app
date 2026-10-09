@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { handleResponseError, setPermissionDeniedHandler } from './axiosInstance.ts';
 
 function axiosError(status: number) {
@@ -22,7 +22,7 @@ function axiosError(status: number) {
 }
 
 describe('handleResponseError', () => {
-  let handler: ReturnType<typeof vi.fn>;
+  let handler: Mock<() => void>;
 
   beforeEach(() => {
     handler = vi.fn();

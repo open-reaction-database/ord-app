@@ -25,18 +25,23 @@ vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() 
 
 const toBlobMock = vi.mocked(htmlToImage.toBlob);
 const notifyMock = vi.mocked(showNotification);
-const clipboardWrite = vi.fn().mockResolvedValue(undefined);
+const clipboardWrite = vi.fn(async () => {});
 const node = { scrollWidth: 120, scrollHeight: 90 } as HTMLDivElement;
+
+class FakeClipboardItem {
+  items: unknown;
+
+  constructor(items: unknown) {
+    this.items = items;
+  }
+}
 
 const expectNotified = (variant: NotificationVariant) =>
   expect(notifyMock).toHaveBeenCalledWith(expect.objectContaining({ variant }));
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.stubGlobal(
-    'ClipboardItem',
-    vi.fn((items: unknown) => ({ items })),
-  );
+  // The code under test constructs it with `new`, so the stub must be constructible.
+  vi.stubGlobal('ClipboardItem', vi.fn(FakeClipboardItem));
   Object.defineProperty(globalThis, 'navigator', {
     value: { clipboard: { write: clipboardWrite } },
     configurable: true,
