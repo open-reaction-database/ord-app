@@ -26,6 +26,9 @@ import {
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
+const INT32_MIN = -(2 ** 31);
+const INT32_MAX = 2 ** 31 - 1;
+
 const emptyNumberValue: Pick<AppData['data'], 'type' | 'value'> = {
   type: AppDataType.Number,
   value: null,
@@ -92,10 +95,12 @@ function reactionDataValueToOrd({
       value: Uint8Array.from(Buffer.from(String(value), 'base64')),
     };
   }
-  if (Number.isInteger(value)) {
-    return { case: 'integerValue', value: Number(value) };
+  const number = Number(value);
+  // integer_value is an int32, and encoding one out of range throws.
+  if (Number.isInteger(value) && number >= INT32_MIN && number <= INT32_MAX) {
+    return { case: 'integerValue', value: number };
   }
-  return { case: 'floatValue', value: Number(value) };
+  return { case: 'floatValue', value: number };
 }
 
 export function reactionDataToOrd({

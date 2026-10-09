@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { create, fromJson, type MessageInitShape } from '@bufbuild/protobuf';
+import { create, fromJson, toBinary, type MessageInitShape } from '@bufbuild/protobuf';
 import { DataSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordDataMapToReactionDataMap,
@@ -138,6 +138,25 @@ describe('reactionDataToOrd', () => {
       reactionDataToOrd({ ...base, data: { type: AppDataType.Number, value: 1.5 } })
         .kind,
     ).toEqual({ case: 'floatValue', value: 1.5 });
+  });
+
+  it('writes an integer outside the int32 range as a float', () => {
+    const toOrd = (value: number) =>
+      create(
+        DataSchema,
+        reactionDataToOrd({ ...base, data: { type: AppDataType.Number, value } }),
+      );
+    expect(toOrd(2 ** 31 - 1).kind).toEqual({
+      case: 'integerValue',
+      value: 2 ** 31 - 1,
+    });
+    expect(toOrd(-(2 ** 31)).kind).toEqual({ case: 'integerValue', value: -(2 ** 31) });
+    expect(toOrd(2 ** 31).kind).toEqual({ case: 'floatValue', value: 2 ** 31 });
+    expect(toOrd(-(2 ** 31) - 1).kind).toEqual({
+      case: 'floatValue',
+      value: -(2 ** 31) - 1,
+    });
+    expect(() => toBinary(DataSchema, toOrd(3e9))).not.toThrow();
   });
 
   it('decodes an Upload base64 string to bytes', () => {
