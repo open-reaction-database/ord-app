@@ -149,6 +149,7 @@ export function DatasetHeader({ dataset }: Readonly<DatasetHeaderProps>) {
       >
         {canDatasetBeDeleted && (
           <ConfirmPopover
+            destructive
             opened={removeConfirmOpened}
             position="right"
             offset={8}

@@ -46,6 +46,7 @@ export function RemoveReaction({ reactionId }: Readonly<RemoveReactionProps>) {
 
   return (
     <ConfirmPopover
+      destructive
       title={`Remove this ${entityToRemove}`}
       text={`Are you sure you want to remove this ${entityToRemove}?`}
       opened={confirmationOpened}

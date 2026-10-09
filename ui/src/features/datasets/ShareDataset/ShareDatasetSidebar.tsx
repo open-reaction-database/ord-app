@@ -78,6 +78,7 @@ function GroupListItem({ group, onUnshareWithGroup }: Readonly<GroupsListItemPro
         />
       </Flex>
       <ConfirmPopover
+        destructive
         opened={popoverOpened}
         onCancel={close}
         onConfirm={() => onUnshareWithGroup(group.id)}

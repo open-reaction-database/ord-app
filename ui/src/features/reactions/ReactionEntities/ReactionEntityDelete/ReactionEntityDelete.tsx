@@ -68,6 +68,7 @@ export function ReactionEntityDelete({
 
   return (
     <ConfirmPopover
+      destructive
       title={`Remove ${entityName}`}
       text={`Are you sure to remove this ${entityName}?`}
       opened={confirmationOpened}
