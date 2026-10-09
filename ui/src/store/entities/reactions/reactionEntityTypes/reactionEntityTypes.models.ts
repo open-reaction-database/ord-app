@@ -96,7 +96,7 @@ import type {
   WorkupType,
 } from './reactionEntityTypes.types.ts';
 
-// Maps each value name of an enum to its number, read from the enum descriptor: the generated
+// Maps each value name of an enum to its number. Reads the enum descriptor, since the generated
 // TypeScript enum object also maps each number back to its name. `T` is the union of the
 // generated enum's value names.
 export const enumValueByName = <T extends string>(

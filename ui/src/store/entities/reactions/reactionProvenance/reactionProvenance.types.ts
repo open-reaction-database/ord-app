@@ -41,7 +41,7 @@ export interface ReactionProvenance extends ReactionEntity {
   publicationUrl?: Optional<string>;
   isMined?: Optional<boolean>;
   // Not edited in the app; carried through so that saving a reaction keeps it. Each value is
-  // the proto3 JSON of an ord Data message, which, unlike its bytes, Redux can serialize.
+  // the proto3 JSON of an ord Data message, since Redux cannot serialize a bytes value.
   reactionMetadata?: Record<string, JsonValue>;
   experimentStart: ReactionDateTime;
   experimenter: ReactionPerson;
