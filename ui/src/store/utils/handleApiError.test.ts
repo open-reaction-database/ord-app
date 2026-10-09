@@ -38,6 +38,38 @@ describe('handleApiError', () => {
     });
   });
 
+  it("shows FastAPI's detail when it is a sentence", () => {
+    const detail =
+      'Parquet export requires a dataset description. Add a description and try again.';
+    expect(handleApiError(axiosErrorWith(422, { detail }))).toEqual({
+      errorCode: 422,
+      errorMessage: detail,
+    });
+  });
+
+  it('prefers detail over message', () => {
+    expect(
+      handleApiError(
+        axiosErrorWith(404, { detail: 'Dataset not found', message: 'Other' }),
+      ),
+    ).toEqual({ errorCode: 404, errorMessage: 'Dataset not found' });
+  });
+
+  it('falls back to the default for a list of validation errors', () => {
+    const detail = [{ loc: ['query', 'file_format'], msg: 'Input should be json' }];
+    expect(handleApiError(axiosErrorWith(404, { detail }))).toEqual({
+      errorCode: 404,
+      errorMessage: 'Entity not found',
+    });
+  });
+
+  it('falls back to the default for a body that is not JSON', () => {
+    expect(handleApiError(axiosErrorWith(404, new Blob(['{"detail": "x"}'])))).toEqual({
+      errorCode: 404,
+      errorMessage: 'Entity not found',
+    });
+  });
+
   it('falls back to the 500 message for an unmapped status', () => {
     expect(handleApiError(axiosErrorWith(418))).toEqual({
       errorCode: 418,

@@ -26,11 +26,27 @@ const ERROR_MESSAGES: Record<number, string> = {
   500: 'Unknown error',
 };
 
+// FastAPI puts an error's explanation in `detail`: a sentence for an error the backend
+// raises, and a list of field errors when a request fails validation, which has no
+// short form to show.
+const messageFromBody = (data: unknown): string | undefined => {
+  if (typeof data !== 'object' || data === null) {
+    return undefined;
+  }
+  const { detail, message } = data as { detail?: unknown; message?: unknown };
+  if (typeof detail === 'string') {
+    return detail;
+  }
+  return typeof message === 'string' ? message : undefined;
+};
+
 export function getErrorDetails(error: unknown): RejectValue {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 500;
     const message =
-      error.response?.data?.message ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
+      messageFromBody(error.response?.data) ??
+      ERROR_MESSAGES[status] ??
+      ERROR_MESSAGES[500];
     return { errorCode: status, errorMessage: message };
   }
   return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };
