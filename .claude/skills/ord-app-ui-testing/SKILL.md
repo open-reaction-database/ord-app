@@ -89,7 +89,7 @@ Boot the full stack with the dev/test Auth0 bypass, then drive Chromium. The **c
 docker compose up -d db   # wait for healthy
 
 # 2) migrations + backend (host), under /service_api
-export PG_DSN="postgresql+asyncpg://ord@localhost:5400/ord"
+export PG_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_ALEMBIC_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_TEST_DSN="postgresql+psycopg://ord@localhost:5400/test"
 export APP_ENV=localhost ORD_APP_E2E=true CORS_ORIGINS='["http://127.0.0.1:5173"]'

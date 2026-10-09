@@ -22,7 +22,6 @@ dependencies = [
     "orjson>=3.10.12,<4",
     "loguru>=0.7.3,<0.8",
     "freezegun>=1.5.1,<2",
-    "asyncpg>=0.30.0,<0.31",
     "fastapi>=0.138.0,<0.200",
     "gunicorn>=23.0.0,<24",
     "ord-schema>=0.6.31,<0.7",
