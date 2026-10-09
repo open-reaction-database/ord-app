@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Actions in .github/workflows are pinned to commit SHAs. Dependabot rewrites
-# both the SHA and its trailing version comment, which is what keeps a pinned
-# workflow from freezing on whatever was current the day it was written.
+# Actions in .github/workflows are pinned to commit SHAs, and the Dockerfiles'
+# images to digests. Dependabot rewrites each pin along with the version beside
+# it, which is what keeps a pinned workflow or image from freezing on whatever
+# was current the day it was written.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -24,5 +25,14 @@ updates:
     groups:
       # One pull request per month for all actions rather than one per action.
       actions:
+        patterns:
+          - "*"
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      # One pull request per month for the base images and uv.
+      docker:
         patterns:
           - "*"
