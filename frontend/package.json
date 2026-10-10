@@ -1,0 +1,56 @@
+{
+  "name": "ord-app-frontend",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "lint:css": "stylelint '**/*.[s]css'",
+    "lint:css:fix": "stylelint --fix '**/*.[s]css'",
+    "lint:check": "prettier --check . && npm run lint && npm run lint:css",
+    "prettier": "prettier --write .",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "typecheck": "tsc -b"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-no-relative-import-paths": "^1.6.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-sonarjs": "^4.1.0",
+    "globals": "^15.11.0",
+    "jscpd": "^5.0.11",
+    "prettier": "^3.4.0",
+    "stylelint": "^16.11.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-scss": "^6.10.0",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.11.0"
+  },
+  "overrides": {
+    "ketcher-react": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    },
+    "ketcher-core": "^3.15.0",
+    "draft-js": {
+      "immutable": "3.8.3"
+    },
+    "immutable@<3.8.3": "3.8.3",
+    "minimatch@<3.1.4": "3.1.4",
+    "minimatch@>=9.0.0 <9.0.7": "9.0.7",
+    "picomatch@<2.3.2": "2.3.2",
+    "brace-expansion@<1.1.21": "1.1.21",
+    "brace-expansion@>=2.0.0 <2.0.3": "2.0.3",
+    "brace-expansion@>=3.0.0 <5.0.12": "5.0.12"
+  }
+}
