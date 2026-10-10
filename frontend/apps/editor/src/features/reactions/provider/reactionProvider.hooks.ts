@@ -97,6 +97,11 @@ export function useIsViewOnly(): boolean {
   return useProviderValue().actions === undefined;
 }
 
+/** Whether the reaction is a template, which is always read-only. */
+export function useIsTemplate(): boolean {
+  return useProviderValue().isTemplate;
+}
+
 export function useReactionSlots(): ReactionSlots {
   return useProviderValue().slots;
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Test-only render helper (exports a fixture factory + a Dummy context component), not an HMR boundary.
+// Test-only render helper (exports a fixture factory too), not an HMR boundary.
 /* eslint-disable react-refresh/only-export-components */
 import { render, type RenderOptions } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
@@ -21,18 +21,34 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from 'store/rootReducer.ts';
 import type { AppState } from 'store/configureAppStore.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import type {
+  ReactionActions,
+  ReactionSlots,
+} from 'features/reactions/provider/reactionProvider.types.ts';
 import { ordSetupToReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.converter.ts';
 import { ordConditionsToReaction } from 'store/entities/reactions/reactionConditions/reactionConditions.converter.ts';
 import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
 import { ordProvenanceToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import {
+  reduxReactionActions,
+  reduxReactionSource,
+} from 'store/entities/reactions/reduxReactionSource.ts';
+import type {
+  AppReaction,
+  DatasetReaction,
+} from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactElement, ReactNode } from 'react';
 
 const Dummy = () => null;
+
+const DUMMY_SLOTS: ReactionSlots = {
+  ViewDeleteButtons: Dummy,
+  ValueLabel: Dummy,
+  ViewOnlyLabel: Dummy,
+};
 
 /** A structurally-valid empty reaction, built from the same default converters the app uses. */
 export function emptyReactionData(): AppReaction {
@@ -50,19 +66,23 @@ export function emptyReactionData(): AppReaction {
   } as unknown as AppReaction;
 }
 
-// Only the dataset-reaction shape is modelled here (isTemplate: false). The template variant of
-// ReactionsContext additionally requires a string reactionId + isViewOnly: true; if a template
-// smoke test is ever needed, add a dedicated helper rather than loosening these options.
-interface ReactionViewOptions extends Omit<RenderOptions, 'wrapper'> {
-  reactionId?: number;
-  pathComponents?: ReactionPathComponents;
-  reaction?: AppReaction;
-  isViewOnly?: boolean;
-}
+/** A dataset reaction, editable unless `isViewOnly`, or a template (a string ID, read-only). */
+type ReactionViewTarget =
+  | { reactionId?: number; isViewOnly?: boolean; actions?: ReactionActions }
+  | { reactionId: string; isViewOnly?: never; actions?: never };
+
+type ReactionViewOptions = Omit<RenderOptions, 'wrapper'> &
+  ReactionViewTarget & {
+    pathComponents?: ReactionPathComponents;
+    reaction?: AppReaction;
+    /** Stored fields beside `data`, such as `pb_reaction_id`, `is_valid`, or `validation`. */
+    record?: Partial<Omit<DatasetReaction, 'id' | 'data'>>;
+    slots?: Partial<ReactionSlots>;
+  };
 
 /**
- * Renders a ReactionView-tree component with the reaction/entity contexts and a seeded reaction in
- * the store, so components that read `reactionContext`/`reactionEntityContext` mount correctly.
+ * Renders a component of the reaction view under ReactionProvider, over a store that holds the
+ * reaction, with `reactionEntityContext` set to `pathComponents`.
  */
 export function renderInReactionView(
   ui: ReactElement,
@@ -72,7 +92,10 @@ export function renderInReactionView(
     reactionId = 1,
     pathComponents = [],
     reaction,
+    record,
     isViewOnly = false,
+    actions,
+    slots,
     ...renderOptions
   } = options;
   const store = configureStore({
@@ -81,29 +104,43 @@ export function renderInReactionView(
       entities: {
         reactions: {
           reactionsById: {
-            [reactionId]: { id: reactionId, data: reaction ?? emptyReactionData() },
+            [reactionId]: {
+              id: reactionId,
+              data: reaction ?? emptyReactionData(),
+              previews: {},
+              summary: { provenance: {}, summary: {}, conditions: '' },
+              ...record,
+            },
           },
         },
       },
     } as unknown as AppState,
   });
-  const reactionCtxValue = {
-    reactionId,
-    isTemplate: false,
-    isViewOnly,
-    ViewDeleteButtonsComponent: Dummy,
-    ValueLabelComponent: Dummy,
-    ViewOnlyLabelComponent: Dummy,
-  } as unknown as ReactionsContext;
+  // Built once, outside Wrapper, so a rerender keeps the same source and actions.
+  const source = reduxReactionSource(store, reactionId);
+  const target =
+    typeof reactionId === 'string'
+      ? { reactionId, isTemplate: true as const }
+      : {
+          reactionId,
+          actions: isViewOnly
+            ? undefined
+            : (actions ?? reduxReactionActions(store.dispatch, reactionId)),
+        };
+  const allSlots = { ...DUMMY_SLOTS, ...slots };
   function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <Provider store={store}>
         <MantineProvider>
-          <reactionContext.Provider value={reactionCtxValue}>
+          <ReactionProvider
+            {...target}
+            source={source}
+            slots={allSlots}
+          >
             <reactionEntityContext.Provider value={{ reactionId, pathComponents }}>
               {children}
             </reactionEntityContext.Provider>
-          </reactionContext.Provider>
+          </ReactionProvider>
         </MantineProvider>
       </Provider>
     );

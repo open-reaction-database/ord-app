@@ -20,6 +20,7 @@ import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/rea
 import { emptyReactionData } from 'test/renderInReactionView.tsx';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import {
+  useIsTemplate,
   useIsViewOnly,
   useOrderedInputs,
   usePreviews,
@@ -118,6 +119,25 @@ describe('reaction hooks over a static source', () => {
       isViewOnly: true,
     });
     expect(legacy.ViewDeleteButtonsComponent).toBe(Empty);
+  });
+
+  it('report whether the reaction is a template', () => {
+    expect(renderHook(useIsTemplate, { wrapper }).result.current).toBe(false);
+    function TemplateWrapper({ children }: Readonly<{ children: ReactNode }>) {
+      return (
+        <ReactionProvider
+          reactionId="template_1"
+          isTemplate
+          source={source}
+          slots={slots}
+        >
+          {children}
+        </ReactionProvider>
+      );
+    }
+    expect(renderHook(useIsTemplate, { wrapper: TemplateWrapper }).result.current).toBe(
+      true,
+    );
   });
 
   it('are editable with actions', () => {
