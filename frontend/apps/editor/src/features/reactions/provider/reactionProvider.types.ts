@@ -30,16 +30,29 @@ import type { PreviewStatesById } from 'store/entities/reactions/reactionsPrevie
 export type ReactionSnapshot = BaseReaction &
   Partial<Pick<DatasetReaction, 'pb_reaction_id' | 'is_valid' | 'validation'>>;
 
-/** One reaction's data and molecule previews, read through `useSyncExternalStore`. */
+/**
+ * One reaction's data and molecule previews, read through `useSyncExternalStore`.
+ *
+ * A host keeps one source object per reaction across renders (for example with useMemo);
+ * a new source resubscribes every hook beneath the provider.
+ */
 export interface ReactionSource {
-  /** Returns the same object until the reaction changes, or undefined before it loads. */
+  /**
+   * Returns the same object until the reaction changes, or undefined while there is no such
+   * reaction: before it loads, after it is removed, or for an unknown ID.
+   */
   getSnapshot(): ReactionSnapshot | undefined;
   /** Returns the same object until a preview changes. */
   getPreviews(): PreviewStatesById;
   subscribe(listener: () => void): () => void;
 }
 
-/** Edits to one reaction. A provider given no actions is read-only. */
+/**
+ * Edits to one reaction. A provider given no actions is read-only.
+ *
+ * Each promise settles once the edit is saved or the save has failed, and resolves either
+ * way: the host app reports a failed save itself rather than through a rejection.
+ */
 export interface ReactionActions {
   update(pathComponents: ReactionPathComponents, newValue: unknown): Promise<void>;
   remove(pathComponents: ReactionPathComponents): Promise<void>;

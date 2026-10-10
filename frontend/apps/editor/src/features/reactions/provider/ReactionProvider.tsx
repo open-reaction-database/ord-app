@@ -16,7 +16,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { reactionProviderContext } from './reactionProvider.context.ts';
 import type {
   ReactionActions,
@@ -25,46 +24,60 @@ import type {
   ReactionSource,
 } from './reactionProvider.types.ts';
 
-interface ReactionProviderProps {
-  /** The ID that components still reading `reactionContext` select by. */
-  reactionId: ReactionId;
+interface ReactionProviderBaseProps {
+  /** Keep the same source across renders (for example with useMemo); a new one resubscribes every hook. */
   source: ReactionSource;
-  actions?: ReactionActions;
-  isTemplate?: boolean;
   slots: ReactionSlots;
   children: ReactNode;
 }
 
+/** A dataset reaction: a numeric ID, editable when actions are given. */
+interface DatasetReactionProviderProps extends ReactionProviderBaseProps {
+  /** The ID that components reading `reactionContext` select by. */
+  reactionId: number;
+  isTemplate?: false;
+  actions?: ReactionActions;
+}
+
+/** A template: a string ID, and always read-only. */
+interface TemplateReactionProviderProps extends ReactionProviderBaseProps {
+  /** The ID that components reading `reactionContext` select by. */
+  reactionId: string;
+  isTemplate: true;
+  actions?: never;
+}
+
+type ReactionProviderProps =
+  | DatasetReactionProviderProps
+  | TemplateReactionProviderProps;
+
 /**
  * Supplies one reaction, its edit actions if it can be edited, and the host app's slot
- * components to the view beneath. It also supplies `reactionContext` for the components
- * that have not moved to the hooks.
+ * components to the view beneath. It also supplies `reactionContext`, built from the same
+ * props, for components that read it.
  */
-export function ReactionProvider({
-  reactionId,
-  source,
-  actions,
-  isTemplate = false,
-  slots,
-  children,
-}: Readonly<ReactionProviderProps>) {
+export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
+  const { reactionId, source, actions, slots, children } = props;
+  const isTemplate = props.isTemplate === true;
   const value = useMemo(
     (): ReactionProviderValue => ({ source, actions, isTemplate, slots }),
     [source, actions, isTemplate, slots],
   );
-  // ReactionsContext pairs string IDs with templates; the pages keep that pairing.
-  const legacyValue = useMemo(
-    () =>
-      ({
-        reactionId,
-        isTemplate,
-        isViewOnly: actions === undefined,
-        ViewDeleteButtonsComponent: slots.ViewDeleteButtons,
-        ValueLabelComponent: slots.ValueLabel,
-        ViewOnlyLabelComponent: slots.ViewOnlyLabel,
-      }) as ReactionsContext,
-    [reactionId, isTemplate, actions, slots],
-  );
+  const legacyValue = useMemo((): ReactionsContext => {
+    const components = {
+      ViewDeleteButtonsComponent: slots.ViewDeleteButtons,
+      ValueLabelComponent: slots.ValueLabel,
+      ViewOnlyLabelComponent: slots.ViewOnlyLabel,
+    };
+    return typeof reactionId === 'string'
+      ? { ...components, reactionId, isTemplate: true, isViewOnly: true }
+      : {
+          ...components,
+          reactionId,
+          isTemplate: false,
+          isViewOnly: actions === undefined,
+        };
+  }, [reactionId, actions, slots]);
   return (
     <reactionProviderContext.Provider value={value}>
       <reactionContext.Provider value={legacyValue}>

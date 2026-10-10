@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { configureStore, type Action, type ThunkDispatch } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  type Action,
+  type Middleware,
+  type ThunkDispatch,
+  type UnknownAction,
+} from '@reduxjs/toolkit';
 import { act, render, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
@@ -25,10 +31,25 @@ import {
 import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
+import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from 'test/renderInReactionView.tsx';
-import { addUpdateReactionFieldActions } from './reactions.actions.ts';
+import {
+  addUpdateReactionFieldActions,
+  deleteReactionFieldActions,
+} from './reactions.actions.ts';
 import { setPreviewsByIds } from './reactionsPreviews/reactionsPreviews.actions.ts';
 import { reduxReactionActions, reduxReactionSource } from './reduxReactionSource.ts';
+
+vi.mock('store/axiosInstance.ts', () => ({
+  default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+
+// axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc.
+const axiosMock = axiosInstance as unknown as Record<
+  'get' | 'post' | 'patch' | 'delete',
+  ReturnType<typeof vi.fn>
+>;
 
 const Empty = () => null;
 const slots: ReactionSlots = {
@@ -37,15 +58,21 @@ const slots: ReactionSlots = {
   ViewOnlyLabel: Empty,
 };
 
-function makeStore() {
+/** A store holding reactions 1, 2, and template_3; `recorded`, if given, collects every action. */
+function makeStore(recorded?: Array<UnknownAction>) {
   const reaction = (id: number | string) => ({
     id,
     data: emptyReactionData(),
     previews: {},
     summary: { provenance: {}, summary: {}, conditions: '' },
   });
+  const recorder: Middleware = () => next => action => {
+    recorded?.push(action as UnknownAction);
+    return next(action);
+  };
   return configureStore({
     reducer: rootReducer,
+    middleware: getDefault => getDefault().concat(recorder),
     preloadedState: {
       entities: {
         reactions: {
@@ -105,10 +132,14 @@ describe('hooks over the Redux source', () => {
   function setup(reactionId: number | string = 1) {
     const store = makeStore();
     const source = reduxReactionSource(store, reactionId);
+    const target =
+      typeof reactionId === 'string'
+        ? { reactionId, isTemplate: true as const }
+        : { reactionId };
     function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
       return (
         <ReactionProvider
-          reactionId={reactionId}
+          {...target}
           source={source}
           slots={slots}
         >
@@ -169,17 +200,40 @@ describe('hooks over the Redux source', () => {
 });
 
 describe('reduxReactionActions', () => {
-  it('dispatch the field update and delete thunks for the reaction', async () => {
-    const dispatch = vi.fn((_thunk: unknown) => Promise.resolve());
-    const actions = reduxReactionActions(
-      dispatch as unknown as ThunkDispatch<AppState, never, Action>,
-      1,
-    );
+  it('request the field update and the delete for their own reaction', async () => {
+    const recorded: Array<UnknownAction> = [];
+    const store = makeStore(recorded);
+    const actions = reduxReactionActions(store.dispatch, 1);
     await actions.update(['notes'], { safetyNotes: 'gloves' });
-    await actions.remove(['identifiers', 0]);
-    expect(dispatch).toHaveBeenCalledTimes(2);
-    expect(dispatch.mock.calls.every(([thunk]) => typeof thunk === 'function')).toBe(
-      true,
+    await actions.remove(['notes', 'safetyNotes']);
+    const requestTypes = new Set([
+      addUpdateReactionFieldActions.request.type,
+      deleteReactionFieldActions.request.type,
+    ]);
+    expect(recorded.filter(action => requestTypes.has(action.type))).toEqual([
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes'],
+        newValue: { safetyNotes: 'gloves' },
+      }),
+      deleteReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'safetyNotes'],
+      }),
+    ]);
+  });
+
+  it('resolve when the save fails, after dispatching the failure', async () => {
+    axiosMock.patch.mockRejectedValue(new Error('offline'));
+    const recorded: Array<UnknownAction> = [];
+    const store = makeStore(recorded);
+    await expect(
+      reduxReactionActions(store.dispatch, 1).update(['notes'], {
+        safetyNotes: 'gloves',
+      }),
+    ).resolves.toBeUndefined();
+    expect(recorded.map(action => action.type)).toContain(
+      addUpdateReactionFieldActions.failure.type,
     );
   });
 

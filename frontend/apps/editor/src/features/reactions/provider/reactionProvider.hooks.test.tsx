@@ -145,6 +145,48 @@ describe('reaction hooks before the reaction loads', () => {
   });
 });
 
+describe('ReactionProvider props', () => {
+  it('pair a template with a string ID and no actions, and a dataset reaction with a number', () => {
+    const source = createStaticReactionSource(snapshot);
+    const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
+    // Each element below must fail to type-check; `tsc -b` reports an unused directive if one
+    // compiles.
+    const invalid = [
+      // @ts-expect-error A template is read-only, so it takes no actions.
+      <ReactionProvider
+        key="template-with-actions"
+        reactionId="template_1"
+        isTemplate
+        actions={actions}
+        source={source}
+        slots={slots}
+      >
+        {null}
+      </ReactionProvider>,
+      // @ts-expect-error A template's ID is a string.
+      <ReactionProvider
+        key="template-with-number"
+        reactionId={1}
+        isTemplate
+        source={source}
+        slots={slots}
+      >
+        {null}
+      </ReactionProvider>,
+      // @ts-expect-error A dataset reaction's ID is a number.
+      <ReactionProvider
+        key="dataset-with-string"
+        reactionId="template_1"
+        source={source}
+        slots={slots}
+      >
+        {null}
+      </ReactionProvider>,
+    ];
+    expect(invalid).toHaveLength(3);
+  });
+});
+
 describe('reaction hooks outside a provider', () => {
   it('throw a message naming the provider', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);

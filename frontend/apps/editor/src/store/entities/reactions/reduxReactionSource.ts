@@ -40,7 +40,9 @@ export function reduxReactionSource(
  * Edits one reaction through the thunks that apply a change optimistically and save it.
  *
  * The thunks are async, so dispatching one returns a promise, though `ThunkWrapper` types
- * the result as void; awaiting it makes each action settle when the save does.
+ * the result as void; awaiting it makes each action settle when the save does. The thunk
+ * wrapper catches a failed save and dispatches the failure action, so the action resolves
+ * then too.
  */
 export function reduxReactionActions(
   dispatch: ThunkDispatch<AppState, never, Action>,

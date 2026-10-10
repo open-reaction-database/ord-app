@@ -18,7 +18,6 @@
 import { MantineProvider } from '@mantine/core';
 import { render, type RenderOptions } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import type {
   ReactionActions,
@@ -36,37 +35,42 @@ const EMPTY_SLOTS: ReactionSlots = {
   ViewOnlyLabel: Empty,
 };
 
-interface RenderWithReactionOptions extends Omit<RenderOptions, 'wrapper'> {
-  reactionId?: ReactionId;
-  snapshot?: ReactionSnapshot;
-  source?: ReactionSource;
-  actions?: ReactionActions;
-  isTemplate?: boolean;
-  slots?: Partial<ReactionSlots>;
-}
+/** A dataset reaction, editable when given actions, or a read-only template. */
+type ReactionTarget =
+  | { reactionId?: number; isTemplate?: false; actions?: ReactionActions }
+  | { reactionId: string; isTemplate: true; actions?: never };
+
+type RenderWithReactionOptions = Omit<RenderOptions, 'wrapper'> &
+  ReactionTarget & {
+    snapshot?: ReactionSnapshot;
+    source?: ReactionSource;
+    slots?: Partial<ReactionSlots>;
+  };
 
 /** Renders under a ReactionProvider: a static source over `snapshot` unless a source is given. */
 export function renderWithReaction(
   ui: ReactElement,
-  {
-    reactionId = 1,
+  options: RenderWithReactionOptions = {},
+) {
+  const {
+    reactionId,
+    isTemplate,
+    actions,
     snapshot,
     source = createStaticReactionSource(snapshot),
-    actions,
-    isTemplate = false,
     slots,
-    ...options
-  }: RenderWithReactionOptions = {},
-) {
+    ...renderOptions
+  } = options;
+  const target = options.isTemplate
+    ? { reactionId: options.reactionId, isTemplate: true as const }
+    : { reactionId: options.reactionId ?? 1, actions: options.actions };
   const allSlots = { ...EMPTY_SLOTS, ...slots };
   function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <MantineProvider>
         <ReactionProvider
-          reactionId={reactionId}
+          {...target}
           source={source}
-          actions={actions}
-          isTemplate={isTemplate}
           slots={allSlots}
         >
           {children}
@@ -74,5 +78,5 @@ export function renderWithReaction(
       </MantineProvider>
     );
   }
-  return render(ui, { wrapper: Wrapper, ...options });
+  return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
