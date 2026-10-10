@@ -38,7 +38,8 @@ export function ReactionHeader({
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const onPreviewSave = useCallback(() => {
-    copyPreviewAsImage(previewRef.current);
+    // It reports its own success or failure in a notification.
+    void copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
 
   return (

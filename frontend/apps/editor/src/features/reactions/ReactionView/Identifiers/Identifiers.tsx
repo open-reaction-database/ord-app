@@ -98,7 +98,7 @@ export function Identifiers() {
         key={identifiers.length}
       >
         {identifiers.map((identifier, index) => (
-          <div key={index}>
+          <div key={identifier.id}>
             <Flex
               align="center"
               className={classes.identifier}
