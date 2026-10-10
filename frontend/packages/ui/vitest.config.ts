@@ -30,6 +30,13 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.d.ts', 'src/testing/**'],
+      // Floors at the measured coverage, rounded down; raise them as code moves in.
+      thresholds: {
+        lines: 92,
+        statements: 92,
+        branches: 100,
+        functions: 85,
+      },
     },
   },
 });
