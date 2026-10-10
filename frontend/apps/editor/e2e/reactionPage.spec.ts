@@ -16,9 +16,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { seedReaction } from './seed.ts';
 
-/** What differs between runs: the reaction ID the upload assigns, and the footer's year. */
+/**
+ * What differs between runs: the footer's year. The fixture sets its own reaction ID, since
+ * one the upload assigned would change the heading's width, and with it the layout beside it.
+ */
 function changingContent(page: Page) {
-  return [page.getByText(/^[0-9a-f]{32}$/), page.getByText(/Copyright \d{4}/)];
+  return [page.getByText(/Copyright \d{4}/)];
 }
 
 const PREVIEW = 'img[src^="data:image/svg+xml"]';

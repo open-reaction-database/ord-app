@@ -1,3 +1,4 @@
+reaction_id: "e2e-reaction-page"
 identifiers { type: REACTION_SMILES value: "CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1" }
 inputs {
   key: "acid"

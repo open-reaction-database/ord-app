@@ -122,7 +122,7 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 
 ### Screenshot tests (`toHaveScreenshot`)
 
-`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`). The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. It masks what changes between runs (the reaction ID the upload assigns, the footer's year) and does not retry, so a missing baseline fails the run instead of being written and then matched by a retry.
+`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`). The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. It masks what changes between runs (the footer's year) and does not retry, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
 
 When a change alters the page's look on purpose, refresh the baselines from CI:
 1. Delete the outdated PNGs and push; `test_e2e` fails with "A snapshot doesn't exist … writing actual".
