@@ -94,7 +94,7 @@ const datasetsById = createReducer<ItemsById<Dataset>>({}, builder => {
         (acc: Record<string, Dataset>, item) => ({
           ...acc,
           [getDatasetId(item)]: {
-            ...(state[item.id] || {}),
+            ...state[item.id],
             ...item,
           },
         }),

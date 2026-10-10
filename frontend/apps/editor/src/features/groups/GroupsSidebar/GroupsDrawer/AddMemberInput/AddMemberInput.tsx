@@ -53,7 +53,7 @@ export function AddMemberInput() {
     [isAdmin, inputError, isGroupUpdating, inputValue],
   );
 
-  const handleAddMember = async () => {
+  const handleAddMember = () => {
     dispatch(addGroupMember(inputValue));
   };
 

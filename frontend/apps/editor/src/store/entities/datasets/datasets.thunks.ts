@@ -45,7 +45,7 @@ export const getDataset = createThunk(getDatasetActions, datasetId => async () =
 
 export const getInitialDatasetsList = createThunk(
   getGroupsInitialDatasetListActions,
-  groupId => async () => {
+  (groupId: number | null) => async () => {
     const url = groupId ? `/groups/${groupId}/datasets` : 'datasets';
     const params = { page: 1, size: 10 };
 

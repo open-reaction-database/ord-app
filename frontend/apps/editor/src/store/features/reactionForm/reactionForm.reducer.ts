@@ -33,9 +33,7 @@ const reactionPathComponentsList = createReducer(
     builder.addCase(addReactionPathComponentToList, (state, action) =>
       state.concat([action.payload]),
     );
-    builder.addCase(popReactionPathComponents, state =>
-      state.slice(0, state.length - 1),
-    );
+    builder.addCase(popReactionPathComponents, state => state.slice(0, -1));
     builder.addCase(sliceReactionPathComponentsList, (state, action) =>
       state.slice(0, action.payload + 1),
     );

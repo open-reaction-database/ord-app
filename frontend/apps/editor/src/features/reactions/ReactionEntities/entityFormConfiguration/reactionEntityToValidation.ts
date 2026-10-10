@@ -54,7 +54,7 @@ const createNamedEntityValidation = (entityName: string) =>
     reactionId: ReactionId,
     pathComponents: ReactionPathComponents,
   ) {
-    const objectsPath = pathComponents.slice(0, pathComponents.length - 1);
+    const objectsPath = pathComponents.slice(0, -1);
     const itemId = pathComponents.at(-1) as string;
 
     const objects: Record<string, WithIdName<unknown>> = useSelector(

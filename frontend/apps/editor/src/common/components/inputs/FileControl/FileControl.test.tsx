@@ -18,6 +18,16 @@ import { screen, fireEvent } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { FileControl } from './FileControl.tsx';
 
+const { showNotificationMock } = vi.hoisted(() => ({ showNotificationMock: vi.fn() }));
+vi.mock('common/utils/showNotification.tsx', () => ({
+  showNotification: showNotificationMock,
+}));
+
+function pickFile(file: File) {
+  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  fireEvent.change(input, { target: { files: [file] } });
+}
+
 describe('FileControl', () => {
   it('renders the labelled file input when there is no value', () => {
     renderWithMantine(
@@ -29,6 +39,45 @@ describe('FileControl', () => {
       />,
     );
     expect(screen.getByText('Data file')).toBeInTheDocument();
+  });
+
+  it('reports a picked file as base64 with its extension', async () => {
+    const onChange = vi.fn();
+    renderWithMantine(
+      <FileControl
+        name="data"
+        label="Data file"
+        value={null}
+        onChange={onChange}
+      />,
+    );
+    pickFile(new File(['abc'], 'molecule.pb'));
+    await vi.waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith({ value: 'YWJj', format: 'pb' }),
+    );
+  });
+
+  it('says so when a picked file cannot be read', async () => {
+    const onChange = vi.fn();
+    renderWithMantine(
+      <FileControl
+        name="data"
+        label="Data file"
+        value={null}
+        onChange={onChange}
+      />,
+    );
+    const file = new File(['abc'], 'broken.pb');
+    Object.defineProperty(file, 'arrayBuffer', {
+      value: () => Promise.reject(new Error('unreadable')),
+    });
+    pickFile(file);
+    await vi.waitFor(() =>
+      expect(showNotificationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'File broken.pb could not be read.' }),
+      ),
+    );
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('shows a download link for the stored file and clears it on remove', () => {

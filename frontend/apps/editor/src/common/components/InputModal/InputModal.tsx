@@ -22,7 +22,8 @@ import * as yup from 'yup';
 
 interface InputModalProps {
   onClose: () => void;
-  onSubmit: (value: string) => Promise<void>;
+  /** Called with the entered value; the modal waits for a returned promise before closing. */
+  onSubmit: (value: string) => void | Promise<void>;
   title: string;
   initialValue?: string;
   inputLabel: string;

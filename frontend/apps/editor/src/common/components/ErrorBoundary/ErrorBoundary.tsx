@@ -52,7 +52,7 @@ export class ErrorBoundary extends Component<
           <Button
             mt="lg"
             className={classes.button}
-            onClick={() => navigate('/datasets')}
+            onClick={this.handleGoHome}
           >
             <HomeIcon
               className={classes.homeIcon}

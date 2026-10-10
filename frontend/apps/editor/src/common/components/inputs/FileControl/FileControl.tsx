@@ -16,7 +16,7 @@
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
 import { type ReactNode, useCallback, useState } from 'react';
 import mime from 'mime/lite';
-import { Buffer } from 'buffer';
+import { base64Encode } from '@bufbuild/protobuf/wire';
 import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
 import { inputWrapperClasses } from '../../display/InputWrapper';
 import { RemoveIcon } from 'common/icons';
@@ -57,12 +57,20 @@ export function FileControl({
         setFile(file);
         const fileParts = file.name.split('.');
         const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
-        file.arrayBuffer().then(buffer => {
-          const formatFromBlob = mime.getExtension(file.type);
-          const format = extensionFromFile ?? formatFromBlob ?? 'txt';
-          const newValue = Buffer.from(buffer).toString('base64');
-          onChange({ value: newValue, format });
-        });
+        file.arrayBuffer().then(
+          buffer => {
+            const formatFromBlob = mime.getExtension(file.type);
+            const format = extensionFromFile ?? formatFromBlob ?? 'txt';
+            const newValue = base64Encode(new Uint8Array(buffer));
+            onChange({ value: newValue, format });
+          },
+          () => {
+            showNotification({
+              variant: NotificationVariant.ERROR,
+              message: `File ${file.name} could not be read.`,
+            });
+          },
+        );
       }
     },
     [onChange],

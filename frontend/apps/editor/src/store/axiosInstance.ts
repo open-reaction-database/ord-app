@@ -47,7 +47,7 @@ export async function handleResponseError(error: unknown): Promise<never> {
   if (axios.isAxiosError(error) && error.response?.status === 403) {
     onPermissionDenied?.();
   }
-  return Promise.reject(error);
+  throw error;
 }
 
 axiosInstance.interceptors.response.use(response => response, handleResponseError);

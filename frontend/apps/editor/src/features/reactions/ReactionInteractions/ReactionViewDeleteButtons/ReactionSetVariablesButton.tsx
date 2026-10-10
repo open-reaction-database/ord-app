@@ -30,6 +30,8 @@ export function ReactionSetVariablesButton({
   return (
     <div
       className={classes.buttonsWrapper}
+      // Catches clicks bubbling from the buttons inside, so they don't toggle the row around them.
+      role="presentation"
       onClick={onViewDeleteButtonsWrapperClick}
     >
       <Button

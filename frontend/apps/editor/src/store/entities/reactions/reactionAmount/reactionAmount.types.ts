@@ -34,6 +34,8 @@ export type AppVolumeUnit = Exclude<
   AppAmountUnspecified
 >;
 
+// NOSONAR: each unit type is a union of the ORD enum's names; an analysis that cannot resolve
+// the ORD SDK reads them as string and reports 'UNSPECIFIED' as overridden.
 export type ReactionAmountType =
   | AppMolesUnit
   | AppMassUnit

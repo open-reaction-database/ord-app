@@ -31,7 +31,6 @@ import {
   reactionToOrdBinpb,
 } from '../reactions/reactions.converters.ts';
 import { navigate } from 'wouter/use-browser-location';
-import { Buffer } from 'buffer';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
@@ -193,10 +192,10 @@ export const importFromFile = createThunkWithExplicitResult(
   ({ name, file }) =>
     async dispatch => {
       try {
-        const fileContentString = Buffer.from(await file.arrayBuffer()).toString();
+        const fileContentString = await file.text();
         const { binpb, variables } = JSON.parse(fileContentString);
         if (!Array.isArray(variables)) {
-          throw new Error('Incorrect variables schema');
+          throw new TypeError('Incorrect variables schema');
         }
         const payload = {
           name: name,
