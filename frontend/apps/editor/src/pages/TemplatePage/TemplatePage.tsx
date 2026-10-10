@@ -16,7 +16,7 @@
 import { useParams } from 'wouter';
 import { useMemo } from 'react';
 import { Badge, Flex, Paper } from '@mantine/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import classes from './templatePage.module.scss';
 import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
@@ -26,12 +26,20 @@ import { selectAreTemplatesLoaded } from 'store/entities/templates/templates.sel
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
 import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
-import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
 import { TemplateReactionValueLabelWrapper } from 'features/reactions/ReactionInteractions/ReactionValueLabel/TemplateReactionValueLabel.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 import { VariablesSidebar } from '../../features/templates/VariablesSidebar/VariablesSidebar.tsx';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
+import type { AppState } from 'store/configureAppStore.ts';
+import { reduxReactionSource } from 'store/entities/reactions/reduxReactionSource.ts';
+
+const TEMPLATE_SLOTS: ReactionSlots = {
+  ViewDeleteButtons: ReactionSetVariablesButton,
+  ValueLabel: TemplateReactionValueLabelWrapper,
+  ViewOnlyLabel: DatasetReactionValueLabel,
+};
 
 export function TemplatePage() {
   const { templateId: rawTemplateId } = useParams<{ templateId: string }>();
@@ -49,16 +57,10 @@ export function TemplatePage() {
     ];
   }, [templateId, template?.name]);
 
-  const reactionContextValue = useMemo(
-    (): ReactionsContext => ({
-      reactionId: templateId,
-      isTemplate: true,
-      isViewOnly: true,
-      ViewDeleteButtonsComponent: ReactionSetVariablesButton,
-      ValueLabelComponent: TemplateReactionValueLabelWrapper,
-      ViewOnlyLabelComponent: DatasetReactionValueLabel,
-    }),
-    [templateId],
+  const store = useStore<AppState>();
+  const source = useMemo(
+    () => reduxReactionSource(store, templateId),
+    [store, templateId],
   );
 
   // Once the template list has loaded, an unknown id is genuinely missing — show a 404 instead of
@@ -83,7 +85,12 @@ export function TemplatePage() {
         </Badge>
       }
     >
-      <reactionContext.Provider value={reactionContextValue}>
+      <ReactionProvider
+        reactionId={templateId}
+        isTemplate
+        source={source}
+        slots={TEMPLATE_SLOTS}
+      >
         {template && (
           <Flex
             direction="column"
@@ -101,7 +108,7 @@ export function TemplatePage() {
             <VariablesSidebar templateId={templateId} />
           </Flex>
         )}
-      </reactionContext.Provider>
+      </ReactionProvider>
     </PageContainer>
   );
 }

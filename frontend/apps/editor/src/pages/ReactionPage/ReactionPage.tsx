@@ -34,14 +34,11 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
-import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
-import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
-import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
-import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
+import { useDatasetReactionProviderProps } from './useDatasetReactionProviderProps.ts';
 
 const VIEW_MODE_OPTIONS: Array<SegmentedControlItem> = [
   { label: 'Tabs', value: 'tabs' },
@@ -59,7 +56,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   const reaction = useSelector(selectReactionById(reactionId));
   const dataset = useSelector(selectDatasetById(datasetId));
   const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
-  const isViewOnly = !canDatasetBeEdited;
+  const providerProps = useDatasetReactionProviderProps(reactionId, canDatasetBeEdited);
   const [viewMode, setViewMode] = useState<'tabs' | 'list'>('tabs');
   const breadcrumbs = useMemo((): Breadcrumbs => {
     return [
@@ -76,20 +73,6 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
     dispatch(getReaction({ datasetId, reactionId }));
   }, [dispatch, datasetId, reactionId]);
 
-  const reactionContextValue = useMemo(
-    (): ReactionsContext => ({
-      reactionId,
-      isTemplate: false,
-      isViewOnly,
-      ViewDeleteButtonsComponent: isViewOnly
-        ? ReactionViewButton
-        : ReactionEditDeleteButtons,
-      ValueLabelComponent: DatasetReactionValueLabel,
-      ViewOnlyLabelComponent: DatasetReactionValueLabel,
-    }),
-    [reactionId, isViewOnly],
-  );
-
   useEffect(
     () => () => {
       dispatch(resetErrorPageAction());
@@ -103,7 +86,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <reactionContext.Provider value={reactionContextValue}>
+      <ReactionProvider {...providerProps}>
         {!reaction ? (
           <Flex
             justify="center"
@@ -141,7 +124,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>
         )}
-      </reactionContext.Provider>
+      </ReactionProvider>
     </PageContainer>
   );
 }

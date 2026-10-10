@@ -23,6 +23,7 @@ const control = vi.hoisted(() => ({ template: undefined as unknown, loaded: fals
 vi.mock('wouter', () => ({ useParams: () => ({ templateId: '999' }) }));
 vi.mock('react-redux', () => ({
   useSelector: (selector: (state: unknown) => unknown) => selector(undefined),
+  useStore: () => ({ getState: () => undefined, subscribe: () => () => undefined }),
 }));
 vi.mock('store/entities/reactions/reactions.selectors.ts', () => ({
   selectReactionById: () => () => control.template,
