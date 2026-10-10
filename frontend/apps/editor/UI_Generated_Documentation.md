@@ -46,8 +46,8 @@ ORD (Open Reaction Database) is a web application built with a React frontend an
 
 ## 📁 Project Structure
 
-- `ui/`: React frontend root
-- `ui/src/`:
+- `frontend/apps/editor/`: React frontend root
+- `frontend/apps/editor/src/`:
   - `store/`: Redux logic (actions, thunks, reducers)
   - `features/`: Core feature modules (e.g., reactions, datasets, templates)
   - `common/`: Shared resources (icons, constants, formats)
@@ -126,9 +126,9 @@ ORD (Open Reaction Database) is a web application built with a React frontend an
 cp .env.example .env
 docker-compose up -d
 
-# In ui/
+# In frontend/
 npm ci
-npm run dev
+npm run dev -w apps/editor
 ```
 
 ---

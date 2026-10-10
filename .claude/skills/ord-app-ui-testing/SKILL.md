@@ -1,6 +1,6 @@
 ---
 name: ord-app-ui-testing
-description: Use when writing, debugging, or running tests for the ord-app `ui/` package — Vitest unit/integration tests (components, thunks, reducers, converters), mocking patterns (axios, Ketcher, protobuf), or Playwright E2E against the live no-auth stack. Covers the CI gotchas that cause "passes locally, fails in CI".
+description: Use when writing, debugging, or running tests for the ord-app frontend (`frontend/`, the editor in `frontend/apps/editor/`) — Vitest unit/integration tests (components, thunks, reducers, converters), mocking patterns (axios, Ketcher, protobuf), or Playwright E2E against the live no-auth stack. Covers the CI gotchas that cause "passes locally, fails in CI".
 ---
 
 # ORD-App UI Testing
@@ -9,15 +9,15 @@ Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Manti
 
 ## Pre-flight: match CI or get a false green
 
-- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd ui && npx tsc -b --force`.
-- **Lint/format** exactly as CI: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint src *.ts *.cjs *.mjs` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
+- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
+- **Lint/format** exactly as CI, from `frontend/`: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint .` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
 - **zsh word-splitting**: a `$VAR` holding a space-separated file list does NOT split. Use `${=FILES}` (e.g. `npx eslint ${=FILES}`).
 - ESLint rules that bite tests: `no-duplicate-imports`; use `Array<string>` not `string[]`; `react-refresh/only-export-components` fires on files that export both a component and helpers (add a file-level `/* eslint-disable react-refresh/only-export-components */` to test-only render helpers); forbids inline `import()` type annotations (`@typescript-eslint/consistent-type-imports`) — see the partial-mock note below.
 
 ## Running tests
 
 ```
-cd ui
+cd frontend/apps/editor
 npx vitest run                         # whole suite (~20s)
 npx vitest run <path-or-substring>     # subset
 ```
@@ -97,7 +97,7 @@ uv run alembic upgrade head
 uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
 
 # 3) UI — BOTH env vars are required
-cd ui && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
+cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
   npm run dev -- --host 127.0.0.1 --port 5173 &
 
 # 4) Playwright (config baseURL is http://127.0.0.1:5173)
@@ -119,7 +119,7 @@ For confirming a fix in the real app (e.g. "does this label/badge/unit render?")
 
 - **Standalone script import**: `@playwright/test` is CJS, so `import { chromium }` fails. Use:
   ```js
-  import pkg from '/abs/path/ui/node_modules/@playwright/test/index.js';
+  import pkg from '/abs/path/frontend/node_modules/@playwright/test/index.js';
   const { chromium } = pkg;
   ```
   Run with `node /tmp/shot.mjs`. Screenshot to `/tmp/*.png` and Read the image back.
