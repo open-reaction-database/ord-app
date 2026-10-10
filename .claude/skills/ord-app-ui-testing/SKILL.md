@@ -117,6 +117,19 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 - Scope selectors to the dialog (`page.getByRole('dialog').getByLabel(…)`) — table headers collide with form labels. Prefer `getByRole('button', { name })` over `getByText` (the latter matches hidden icon `aria-label`s and hangs on click).
 - Create-reaction lives on the **dataset** page (`/datasets/:id` → "Reaction" button → "From Scratch"), not the reaction editor.
 - **Before/after on a one-line change**: edit the source file while the dev server runs — Vite HMR reloads it live — capture the buggy screenshot, revert, capture the fixed one. Verify the working tree is clean afterward.
+- **Seed through the API, not the UI.** `seedReaction(request)` in `e2e/seed.ts` provisions the dev user and creates a group, a dataset, and the fixture reaction (`e2e/fixtures/reaction.pbtxt`); in e2e mode the backend accepts any bearer token as that user. Each worker's `beforeAll` seeds its own copy, so specs stay independent under `fullyParallel`.
+- **Wait for what loads after the reaction before asserting on the page as a whole**: the dataset (which decides whether edit controls show), the user menu, and the molecule previews from the Indigo worker. `waitForPageToSettle` in `e2e/reactionPage.spec.ts` waits for each.
+
+### Screenshot tests (`toHaveScreenshot`)
+
+`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`). The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. It masks what changes between runs (the reaction ID the upload assigns, the footer's year) and does not retry, so a missing baseline fails the run instead of being written and then matched by a retry.
+
+When a change alters the page's look on purpose, refresh the baselines from CI:
+1. Delete the outdated PNGs and push; `test_e2e` fails with "A snapshot doesn't exist … writing actual".
+2. Download the failed run's artifact (`gh run download <run-id> -n playwright-report`); it holds the new PNGs under `e2e/reactionPage.spec.ts-snapshots/`.
+3. Look at each one for anything half-loaded or run-specific, copy them into `frontend/apps/editor/e2e/reactionPage.spec.ts-snapshots/`, commit, and push; the next run should pass.
+
+To preview a capture locally, run with `CI=1`: Playwright writes `*-chromium-darwin.png` baselines next to the Linux ones. Delete them; they are not compared in CI.
 
 ## Exploratory screenshot verification (manual, not a spec)
 
