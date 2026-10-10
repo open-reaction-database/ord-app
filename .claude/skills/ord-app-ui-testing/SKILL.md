@@ -20,12 +20,17 @@ Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Manti
 cd frontend/apps/editor
 npx vitest run                         # whole suite (~20s)
 npx vitest run <path-or-substring>     # subset
+
+cd frontend/packages/ui                # the shared package: theme, display primitives
+npx vitest run                         # its own suite and coverage floors
 ```
-Vitest is scoped to `src/**`; Playwright specs live in `e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
+Each workspace's Vitest is scoped to its own `src/**`, so a component that lives in `packages/ui` (`KeyValueDisplay`, `RequiredOptionalFields`, `DataField`, `Counter`, the theme) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
 
-## Render helpers (in `src/test/`)
+## Render helpers
 
-- `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it).
+In the editor (`apps/editor/src/test/`):
+
+- `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it). `packages/ui` has its own copy, imported as `#testing/renderWithMantine.tsx`; package files import each other through `#…` or from the same folder, never `../` or `test/…`.
 - `renderWithProviders(ui, { preloadedState })` — fresh `configureStore({ reducer: rootReducer, preloadedState })` + Mantine. Returns `{ store, ...renderResult }`. Seed only the slices the component reads.
 - `renderInReactionView(ui, { reactionId, reaction, isViewOnly, pathComponents })` — also seeds `reactionContext` + `reactionEntityContext` and a reaction in the store (`emptyReactionData()` by default). Use for components under `ReactionView/` / `reactionEntityNode/`.
 

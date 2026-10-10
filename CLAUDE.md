@@ -7,8 +7,9 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - `ord_app/` — Python backend (Python 3.12).
   - `service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`.
   - `api/`, `visualization/` — supporting modules. `tests/` — pytest suite.
-- `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
-  - `apps/editor/` — the editor: React 19 + Vite 6, Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths` (write `store/…`, `common/…`, `features/…`, not `../../`).
+- `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, a `tsconfig.base.json` every project extends, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
+  - `apps/editor/` — the editor: React 19 + Vite 6, Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths`, one entry per top-level directory (write `store/…`, `common/…`, `features/…`, not `../../`).
+  - `packages/ui/` — `@open-reaction-database/ui`, private and unpublished: the Mantine theme and color/typography/button classes (`src/theme/`, with the global stylesheet `global.scss`) and display primitives such as `KeyValueDisplay` and `Counter` (`src/display/`). Apps consume it as TypeScript source and import it only through its `exports` (`@open-reaction-database/ui/theme`, `…/theme/global.scss`, `…/display`). Inside the package, files import each other through `#…` subpath imports (`#theme/index.ts`) or from the same folder, never `../`, and every import must be declared in its own `package.json`; ESLint enforces both, and bans Redux, axios, Auth0, and wouter there.
   - Reaction protobufs come from the protobuf-es SDK that the Buf Schema Registry generates from ord-schema, `@buf/open-reaction-database_ord-schema.bufbuild_es`; `frontend/.npmrc` points the `@buf` scope at buf.build. Pin it to the exact version of an ord-schema release (its `label-vX.Y.Z` dist-tag): a caret range floats to newer, unreleased BSR commits. The converters under `store/entities/reactions/` map ord messages to and from the store's shapes.
 - `migrations/` — Alembic. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + backend.
 
@@ -24,6 +25,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 - Run from `frontend/`: setup `npm ci`; lint/format `npm run lint:check` (= `prettier --check . && npm run lint && npm run lint:css`, i.e. `eslint .` + `stylelint '**/*.[s]css'`); type-check `npm run typecheck` (= `tsc -b`); coverage `npm run test:coverage` (each workspace's own Vitest config and floors).
 - Editor: `npm run dev -w apps/editor`, `npm run build -w apps/editor` (= `tsc -b && vite build`), `npm run test:e2e -w apps/editor` (Playwright, specs in `apps/editor/e2e/`). Unit tests: `cd apps/editor && npx vitest run` (Vitest + happy-dom + Testing Library).
+- Shared package: unit tests `npm test -w packages/ui -- --run` (its own Vitest config; render with `#testing/renderWithMantine.tsx`). A component's tests move with it into the package and no longer run in the editor's suite.
 - **Type-check with `tsc -b`, not bare `tsc --noEmit`** (the latter skips test files → false green; CI runs `tsc -b`). See `.claude/rules/ui-testing.md` and the **`ord-app-ui-testing` skill** for the full testing playbook (mocking patterns, render helpers, thunk harness, E2E stack boot).
 
 ## Formatting & pre-commit
@@ -40,5 +42,5 @@ Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` 
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
 - Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `frontend/apps/editor/.env`, and fail without them; the backend reads them from the environment or `ord_app/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
-- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts`); it is no longer uploaded to Codecov.
+- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts` and `frontend/packages/ui/vitest.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.
