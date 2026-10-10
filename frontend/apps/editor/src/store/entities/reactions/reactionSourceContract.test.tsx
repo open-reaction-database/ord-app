@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
+import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
 import { renderOverBothSources } from 'test/renderOverBothSources.tsx';
 
@@ -27,6 +29,15 @@ describe('the reaction view over either source', () => {
       />,
     ],
     ['the preview', <ReactionPreview key="preview" />],
+    ['the header', <ReactionHeader key="header" />],
+    [
+      'a card',
+      <ReactionCard
+        key="card"
+        title="Card"
+        actions={null}
+      />,
+    ],
   ])('renders %s the same', (_name, ui) => {
     const [overStatic, overRedux] = renderOverBothSources(ui);
     expect(overStatic).toBe(overRedux);

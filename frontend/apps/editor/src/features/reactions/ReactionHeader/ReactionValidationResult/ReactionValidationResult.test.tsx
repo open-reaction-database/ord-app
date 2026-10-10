@@ -32,6 +32,13 @@ describe('ReactionValidationResult', () => {
     expect(getByText('1 warning')).toBeInTheDocument();
   });
 
+  it('shows no badge for a reaction that carries no validity, such as a template', () => {
+    const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
+      reactionId: 'template_1',
+    });
+    expect(queryByText(/Reaction is/)).not.toBeInTheDocument();
+  });
+
   it('shows neither an error nor a warning count when the reaction is valid', () => {
     const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
       record: { is_valid: true, validation: null },

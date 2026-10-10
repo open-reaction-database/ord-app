@@ -13,12 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { fireEvent } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { DatasetReactionHeader } from './DatasetReactionHeader.tsx';
 
 const record = { pb_reaction_id: 'ord-123', is_valid: true, validation: null };
 
 describe('DatasetReactionHeader', () => {
+  it('opens the rename dialog from its control, offered only when editable', () => {
+    const editable = renderInReactionView(
+      <DatasetReactionHeader
+        datasetId={2}
+        reactionId={1}
+      />,
+      { record },
+    );
+    fireEvent.click(editable.getByRole('button', { name: 'Rename reaction' }));
+    expect(editable.getByText('Edit Reaction ID')).toBeInTheDocument();
+    editable.unmount();
+
+    const readOnly = renderInReactionView(
+      <DatasetReactionHeader
+        datasetId={2}
+        reactionId={1}
+      />,
+      { record, isViewOnly: true },
+    );
+    expect(
+      readOnly.queryByRole('button', { name: 'Rename reaction' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('offers Remove only when the reaction is editable', () => {
     const editable = renderInReactionView(
       <DatasetReactionHeader

@@ -23,7 +23,7 @@ import { useReactionSnapshot } from 'features/reactions/provider/reactionProvide
 export function ReactionValidationResult() {
   const [opened, { toggle, close }] = useDisclosure();
   const snapshot = useReactionSnapshot();
-  const isValid = snapshot?.is_valid ?? false;
+  const isValid = snapshot?.is_valid;
   const validation = snapshot?.validation ?? null;
   const hasErrorsWarnings =
     validation !== null &&
@@ -34,6 +34,11 @@ export function ReactionValidationResult() {
       close();
     }
   }, [isValid, close]);
+
+  // Only a validated dataset reaction carries validity; a template has none to show.
+  if (isValid === undefined) {
+    return null;
+  }
 
   return (
     <Flex>

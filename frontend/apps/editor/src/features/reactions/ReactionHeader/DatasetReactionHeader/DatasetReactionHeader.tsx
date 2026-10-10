@@ -118,8 +118,12 @@ export function DatasetReactionHeader({
           <>
             <CopyButton options={copyOptions} />
             {!isViewOnly && (
-              <ActionIcon variant="transparent">
-                <EditIcon onClick={onRenameOpen} />
+              <ActionIcon
+                variant="transparent"
+                aria-label="Rename reaction"
+                onClick={onRenameOpen}
+              >
+                <EditIcon />
               </ActionIcon>
             )}
           </>

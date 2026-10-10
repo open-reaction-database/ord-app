@@ -50,11 +50,11 @@ export function Outcomes() {
     onCreateNew(outcomes.length, outcomes);
   };
 
-  const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
+  const ids = useMemo(() => outcomes.map(outcome => outcome.id), [outcomes]);
   // Display outcomes ordered by reaction time when available, else stored order. The original
   // stored index is preserved for each so the edit path stays correct. (#599)
   const orderedOutcomes = useMemo(
-    () => sortOutcomesByReactionTime(outcomes ?? []),
+    () => sortOutcomesByReactionTime(outcomes),
     [outcomes],
   );
 
@@ -66,7 +66,7 @@ export function Outcomes() {
           gap="sm"
         >
           <Title order={2}>Outcomes</Title>
-          <Counter amount={outcomes?.length} />
+          <Counter amount={outcomes.length} />
           <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
@@ -81,7 +81,7 @@ export function Outcomes() {
       <span>
         Outcomes record timestamped analyses and, optionally, product characterization
       </span>
-      {outcomes?.length > 0 ? (
+      {outcomes.length > 0 ? (
         <Accordion
           variant="separated"
           chevronPosition="left"

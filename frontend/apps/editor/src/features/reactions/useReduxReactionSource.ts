@@ -20,7 +20,7 @@ import type { AppState } from 'store/configureAppStore.ts';
 import { reduxReactionSource } from 'store/entities/reactions/reduxReactionSource.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
-/** One source per reaction for the life of the component, read from the editor's store. */
+/** A source over one reaction in the editor's store, rebuilt only when the reaction ID changes. */
 export function useReduxReactionSource(reactionId: ReactionId): ReactionSource {
   const store = useStore<AppState>();
   return useMemo(() => reduxReactionSource(store, reactionId), [store, reactionId]);
