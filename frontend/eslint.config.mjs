@@ -168,4 +168,35 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['apps/editor/src/features/reactions/provider/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                'react-redux',
+                '@reduxjs/toolkit',
+                'axios',
+                '@auth0/*',
+                'wouter',
+                'store/configureAppStore*',
+                'store/useAppDispatch*',
+                'store/axiosInstance*',
+                'store/**/*.selectors*',
+                'store/**/*.thunks*',
+                'store/**/*.actions*',
+                'store/**/*.reducer*',
+              ],
+              allowTypeImports: true,
+              message:
+                'The provider moves into the shared package in step G; keep it free of the store.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );
