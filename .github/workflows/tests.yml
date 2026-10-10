@@ -166,4 +166,5 @@ jobs:
           path: |
             frontend/apps/editor/playwright-report/
             frontend/apps/editor/test-results/
+            frontend/apps/editor/e2e/*-snapshots/
           retention-days: 7

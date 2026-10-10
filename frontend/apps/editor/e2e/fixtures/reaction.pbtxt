@@ -1,0 +1,31 @@
+identifiers { type: REACTION_SMILES value: "CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1" }
+inputs {
+  key: "acid"
+  value {
+    components {
+      identifiers { type: SMILES value: "CC(=O)O" }
+      amount { moles { value: 1 units: MILLIMOLE } }
+      reaction_role: REACTANT
+    }
+  }
+}
+inputs {
+  key: "amine"
+  value {
+    components {
+      identifiers { type: SMILES value: "NCc1ccccc1" }
+      amount { moles { value: 1.2 units: MILLIMOLE } }
+      reaction_role: REACTANT
+    }
+  }
+}
+conditions { temperature { setpoint { value: 25 units: CELSIUS } } }
+outcomes {
+  reaction_time { value: 2 units: HOUR }
+  products {
+    identifiers { type: SMILES value: "CC(=O)NCc1ccccc1" }
+    is_desired_product: true
+    measurements { type: YIELD percentage { value: 85 } }
+    reaction_role: PRODUCT
+  }
+}
