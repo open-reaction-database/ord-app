@@ -237,7 +237,7 @@ async def delete_dataset(
     dataset_id: int,
     use_case: Annotated[DatasetUseCases, Depends(get_dataset_use_case)],
 ) -> str:
-    # TODO: soft deletion needs to be implemented
+    # Deletes the dataset and its reactions outright; nothing is kept to restore.
     await use_case.delete(dataset_id)
     return "Object successfully deleted (or already absent)"
 

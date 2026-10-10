@@ -200,8 +200,6 @@ def clear_database():
     with sync_engine.begin() as conn:
         conn.execute(_truncate_all_tables)
 
-    yield
-
 
 @pytest.fixture
 async def test_user(test_db_session):

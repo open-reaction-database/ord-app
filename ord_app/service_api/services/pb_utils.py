@@ -18,7 +18,7 @@ from base64 import b64encode
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from fastapi import HTTPException, UploadFile, status
 from google.protobuf import json_format, text_format
@@ -51,26 +51,34 @@ def total_attachment_size(message: Message) -> int:
     Returns:
         The total number of bytes across all populated ``bytes_value`` fields.
     """
-    total = 0
-    for field, value in message.ListFields():
-        if field.name == "bytes_value" and field.type == FieldDescriptor.TYPE_BYTES:
-            total += len(value)
-        elif field.type == FieldDescriptor.TYPE_MESSAGE:
-            if field.label != FieldDescriptor.LABEL_REPEATED:
-                total += total_attachment_size(value)
-            elif field.message_type.GetOptions().map_entry:
-                value_type = field.message_type.fields_by_name["value"].type
-                if value_type == FieldDescriptor.TYPE_MESSAGE:
-                    for item in value.values():
-                        total += total_attachment_size(item)
-                elif value_type == FieldDescriptor.TYPE_BYTES:
-                    # Defensive: no map<string, bytes> exists in the Reaction schema today, but count
-                    # it toward the cap if one is ever added so attachments there can't slip past.
-                    total += sum(len(item) for item in value.values())
-            else:
-                for item in value:
-                    total += total_attachment_size(item)
-    return total
+    return sum(
+        _field_attachment_size(field, value) for field, value in message.ListFields()
+    )
+
+
+def _field_attachment_size(field: FieldDescriptor, value: Any) -> int:
+    """Returns the attachment bytes held by one set field of a message."""
+    if field.name == "bytes_value" and field.type == FieldDescriptor.TYPE_BYTES:
+        return len(value)
+    if field.type != FieldDescriptor.TYPE_MESSAGE:
+        return 0
+    if field.label != FieldDescriptor.LABEL_REPEATED:
+        return total_attachment_size(value)
+    if field.message_type.GetOptions().map_entry:
+        return _map_attachment_size(field, value)
+    return sum(total_attachment_size(item) for item in value)
+
+
+def _map_attachment_size(field: FieldDescriptor, value: Any) -> int:
+    """Returns the attachment bytes held by the values of a map field."""
+    value_type = field.message_type.fields_by_name["value"].type
+    if value_type == FieldDescriptor.TYPE_MESSAGE:
+        return sum(total_attachment_size(item) for item in value.values())
+    if value_type == FieldDescriptor.TYPE_BYTES:
+        # Defensive: no map<string, bytes> exists in the Reaction schema today, but count
+        # it toward the cap if one is ever added so attachments there can't slip past.
+        return sum(len(item) for item in value.values())
+    return 0
 
 
 # Per-message protobuf serializations; valid for single-Reaction uploads and dataset uploads alike.
@@ -131,11 +139,23 @@ def _adjust_error(error: str) -> str:
     return message.strip()
 
 
-async def validate_pb_reaction(
+def validate_pb_reaction(
     reaction: Reaction | None,
     raise_on_error: bool = False,
     options: ValidationOptions = ValidationOptions(require_provenance=True),
 ) -> tuple[bool | None, list[str], list[str]]:
+    """Validates a Reaction against the ORD schema.
+
+    Args:
+        reaction: The reaction to validate, or None.
+        raise_on_error: If True, ord-schema raises on the first error; the exception is
+            reported as the only error.
+        options: The ord-schema validation options.
+
+    Returns:
+        Whether the reaction is valid (None when there is no reaction), its errors, and its
+        warnings, each with the message name stripped.
+    """
     if reaction is None:
         return None, [], []
 
@@ -166,23 +186,9 @@ async def async_validate_pb_reaction(
     in a thread pool. Although the validation is CPU-bound, it may take a significant
     amount of time, so running it in a thread pool prevents blocking the main thread.
     """
-    if reaction is None:
-        return None, [], []
-
-    try:
-        output = await run_in_threadpool(
-            validate_message, reaction, raise_on_error=raise_on_error, options=options
-        )
-    except Exception as err:
-        return False, [str(err)], []
-
-    errors, warnings = (
-        list(map(_adjust_error, output.errors)),
-        list(map(_adjust_error, output.warnings)),
+    return await run_in_threadpool(
+        validate_pb_reaction, reaction, raise_on_error=raise_on_error, options=options
     )
-    if errors:
-        return False, errors, warnings
-    return True, errors, warnings
 
 
 def write_message(message: Dataset | Reaction, kind: str) -> bytes:

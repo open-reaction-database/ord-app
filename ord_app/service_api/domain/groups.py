@@ -39,10 +39,10 @@ class GroupUseCases:
         self.group_repository = GroupRepository(db)
 
     async def create(self, payload: GroupCreateSchema) -> dict:
-        group = await self.group_repository.create(
+        group = await self.group_repository.create_owned(
             self.current_user.id, payload.model_dump(exclude_unset=True)
         )
-        # The creator is added as the group's admin (see GroupRepository.create). (#569)
+        # The creator is added as the group's admin (see GroupRepository.create_owned). (#569)
         return {"id": group.id, "name": group.name, "role": "admin"}
 
     async def get(self, group_id: int) -> dict:

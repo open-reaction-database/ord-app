@@ -203,9 +203,7 @@ async def test_upload_dataset_with_reaction_validation(
         ReactionModel.dataset_id == response_data["id"]
     )
     await validate_dataset_reactions(test_db_session)
-    assert {
-        True,
-    } == set((await test_db_session.scalars(stmt)).all())
+    assert set((await test_db_session.scalars(stmt)).all()) == {True}
 
 
 async def test_upload_wrong_file_extension(api_client, mock_authenticated_user):

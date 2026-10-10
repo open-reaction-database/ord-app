@@ -22,7 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from loguru import logger
 from rdkit import RDLogger
-from sqlalchemy.exc import DataError, DBAPIError
+from sqlalchemy.exc import DBAPIError
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
@@ -84,7 +84,7 @@ async def catch_errors(
 ) -> Response:
     try:
         return await call_next(request)
-    except (DataError, DBAPIError) as err:
+    except DBAPIError as err:
         context_err = (
             (err.orig.__context__ or err.orig) if err.orig is not None else err
         )

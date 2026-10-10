@@ -88,6 +88,7 @@ class TemplateUpdateModel(BaseSchema):
     def load_binpb(cls, raw: Any) -> Reaction | None:
         if raw is not None:
             return load_message(b64decode(raw), Reaction, "binpb")
+        return None
 
     def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         data = super().model_dump(*args, **kwargs)

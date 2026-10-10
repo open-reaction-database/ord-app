@@ -95,11 +95,10 @@ class ReactionsRepository(BaseRepository[ReactionModel]):
         stmt = select(exists().where(ReactionModel.dataset_id == dataset_id))
         return bool(await self.db.scalar(stmt))
 
-    # Reaction creation needs ownership and dataset context, so this override deliberately
-    # takes a wider signature than the base create(payload).
-    async def create(  # ty: ignore[invalid-method-override]
+    async def create_in_dataset(
         self, dataset_id: int, user_id: int, payload: dict, autocommit: bool = True
     ) -> ReactionModel:
+        """Creates a reaction in dataset `dataset_id`, owned by `user_id`."""
         reaction = ReactionModel(owner_id=user_id, dataset_id=dataset_id, **payload)
 
         if autocommit:
