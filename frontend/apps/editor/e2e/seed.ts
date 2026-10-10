@@ -39,7 +39,7 @@ async function post<T>(
 /** Creates a group, a dataset in it, and the fixture reaction, as the e2e dev user. */
 export async function seedReaction(
   request: APIRequestContext,
-): Promise<{ datasetId: number; reactionId: number }> {
+): Promise<{ groupId: number; datasetId: number; reactionId: number }> {
   await post(request, '/auth/jit-provisioning', {
     data: { access_token: TOKEN, id_token: TOKEN },
   });
@@ -64,5 +64,5 @@ export async function seedReaction(
       },
     },
   );
-  return { datasetId: dataset.id, reactionId: reaction.id };
+  return { groupId: group.id, datasetId: dataset.id, reactionId: reaction.id };
 }
