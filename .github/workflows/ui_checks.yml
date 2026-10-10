@@ -16,6 +16,9 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
+      # PRs branched before the frontend/ move change ui/**; their checks run on the merge
+      # ref, which has frontend/.
+      - 'ui/**'
     branches:
       - '*'
   push:
