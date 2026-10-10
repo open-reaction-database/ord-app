@@ -18,7 +18,7 @@ import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-s
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
-import { getDeepReactionPart } from 'store/entities/reactions/reactions.utils.ts';
+import { getDeepReactionPart } from './getDeepReactionPart.ts';
 import { shallowEqualArrays, shallowEqualRecords } from './equality.ts';
 import { orderInputs } from './orderInputs.ts';
 import { reactionProviderContext } from './reactionProvider.context.ts';

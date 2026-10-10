@@ -176,23 +176,16 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: [
-                'react-redux',
-                '@reduxjs/toolkit',
-                'axios',
-                '@auth0/*',
-                'wouter',
-                'store/configureAppStore*',
-                'store/useAppDispatch*',
-                'store/axiosInstance*',
-                'store/**/*.selectors*',
-                'store/**/*.thunks*',
-                'store/**/*.actions*',
-                'store/**/*.reducer*',
-              ],
+              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
               allowTypeImports: true,
               message:
-                'The provider moves into the shared package in step G; keep it free of the store.',
+                'The provider is bound for @open-reaction-database/ui; keep it free of app state, transport, and routing.',
+            },
+            {
+              regex: '^store/',
+              allowTypeImports: true,
+              message:
+                'The provider is bound for @open-reaction-database/ui; import only types from the editor store.',
             },
           ],
         },
