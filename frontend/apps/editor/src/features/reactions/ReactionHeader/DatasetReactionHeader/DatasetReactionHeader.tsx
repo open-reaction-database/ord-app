@@ -68,8 +68,10 @@ export function DatasetReactionHeader({
   ] = useDisclosure();
 
   const onReactionNameChange = useCallback(
-    async (name: string) => {
+    (name: string) => {
       dispatch(renameReaction({ reactionId, name }));
+      // InputModal awaits its submit handler; the rename reports its own outcome.
+      return Promise.resolve();
     },
     [dispatch, reactionId],
   );
