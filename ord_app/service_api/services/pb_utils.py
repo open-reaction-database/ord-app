@@ -197,12 +197,17 @@ async def async_validate_pb_reaction(
     raise_on_error: bool = False,
     options: ValidationOptions = ValidationOptions(require_provenance=True),
 ) -> tuple[bool | None, list[str], list[str]]:
-    """
-    Asynchronously validate a protocol buffer reaction.
+    """Runs ``validate_pb_reaction`` in the thread pool, off the event loop.
 
-    This function validates a Reaction object by executing the validation process
-    in a thread pool. Although the validation is CPU-bound, it may take a significant
-    amount of time, so running it in a thread pool prevents blocking the main thread.
+    Validation is CPU-bound and can take long enough to stall other requests.
+
+    Args:
+        reaction: The reaction to validate, or None.
+        raise_on_error: As for ``validate_pb_reaction``.
+        options: The ord-schema validation options.
+
+    Returns:
+        What ``validate_pb_reaction`` returns.
     """
     return await run_in_threadpool(
         validate_pb_reaction, reaction, raise_on_error=raise_on_error, options=options
