@@ -43,8 +43,6 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
   const onTemplateNameChange = useCallback(
     (_name: string) => {
       dispatch(renameTemplate({ templateId: templateId, name: _name }));
-      // InputModal awaits its submit handler; the rename reports its own outcome.
-      return Promise.resolve();
     },
     [dispatch, templateId],
   );
