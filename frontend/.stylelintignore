@@ -1,2 +1,3 @@
 **/dist/**
+packages/ui/src/theme/_palette.scss
 packages/ui/src/theme/colors.module.scss

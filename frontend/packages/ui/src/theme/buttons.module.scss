@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* The global transparent-button rule in index.scss forces an orange hover (--color-text-hover),
+/* The global transparent-button rule in global.scss forces an orange hover (--color-text-hover),
    which overrides the red of a destructive button (e.g. "Remove") and makes it turn orange on
    hover. Apply this to such buttons to keep them red on hover. The class is intentionally doubled
    so it outranks the `button[data-variant='transparent']` element+attribute selector. (#314) */
