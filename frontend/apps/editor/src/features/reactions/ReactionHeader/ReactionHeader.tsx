@@ -99,7 +99,7 @@ export function ReactionHeader({
         justify="space-between"
         align="flex-end"
       >
-        <ReactionValidationResult reactionId={reactionId} />
+        <ReactionValidationResult />
         <Flex
           align="center"
           gap="sm"
@@ -177,10 +177,7 @@ export function ReactionHeader({
               Copy reaction image
             </Button>
           </Flex>
-          <ReactionPreview
-            reaction={reaction}
-            ref={previewRef}
-          />
+          <ReactionPreview ref={previewRef} />
         </Flex>
       </Paper>
       {isRenameOpened && (

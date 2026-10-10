@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect } from 'react';
 import { ReactionValidationBadge } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationBadge.tsx';
 import { ReactionValidationList } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationList.tsx';
+import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
-interface ReactionValidationResultProps {
-  reactionId: number;
-}
-
-export function ReactionValidationResult({
-  reactionId,
-}: Readonly<ReactionValidationResultProps>) {
+export function ReactionValidationResult() {
   const [opened, { toggle, close }] = useDisclosure();
-  const { is_valid, validation } = useSelector(selectReactionById(reactionId));
+  const snapshot = useReactionSnapshot();
+  const isValid = snapshot?.is_valid ?? false;
+  const validation = snapshot?.validation ?? null;
   const hasErrorsWarnings =
     validation !== null &&
     (validation.errors.length > 0 || validation.warnings.length > 0);
 
   useEffect(() => {
-    if (is_valid) {
+    if (isValid) {
       close();
     }
-  }, [is_valid, close]);
+  }, [isValid, close]);
 
   return (
     <Flex>
       <ReactionValidationBadge
-        isValid={is_valid}
+        isValid={isValid}
         validation={validation}
         onClick={toggle}
       />

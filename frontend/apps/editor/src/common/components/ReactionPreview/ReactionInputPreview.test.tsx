@@ -29,10 +29,7 @@ describe('ReactionInputPreview', () => {
       inputs: { in1: { id: 'in1', name: 'My Input', components: [] } },
     } as unknown as AppReaction;
     const { getByText, getByTestId } = renderInReactionView(
-      <ReactionInputPreview
-        reactionId={1}
-        inputId="in1"
-      />,
+      <ReactionInputPreview inputId="in1" />,
       {
         reactionId: 1,
         reaction,

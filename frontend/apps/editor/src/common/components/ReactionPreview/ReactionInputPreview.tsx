@@ -13,31 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import { useMemo } from 'react';
 import classes from 'common/components/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import {
+  usePreviews,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface ReactionInputPreviewProps {
-  reactionId: ReactionId;
   inputId: string;
 }
 
-export function ReactionInputPreview({
-  reactionId,
-  inputId,
-}: Readonly<ReactionInputPreviewProps>) {
-  const input: ReactionInput = useSelector(
-    selectReactionPartByPath(reactionId, ['inputs', inputId]),
-  );
+export function ReactionInputPreview({ inputId }: Readonly<ReactionInputPreviewProps>) {
+  // The preview lists only inputs the reaction has.
+  const input = useReactionPart<ReactionInput>(['inputs', inputId])!;
   const componentsIds = useMemo(() => input.components.map(({ id }) => id), [input]);
-  const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
+  const componentsPreviews = usePreviews(componentsIds);
 
   return (
     <div className={classes.inputCard}>

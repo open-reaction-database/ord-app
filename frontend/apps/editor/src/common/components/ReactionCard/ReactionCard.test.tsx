@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionCard } from './ReactionCard.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
-const Component = ReactionCard as unknown as () => JSX.Element;
-
 describe('ReactionCard', () => {
-  it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
-    expect(container).toBeInTheDocument();
+  it('renders the title, the actions, and the reaction preview', () => {
+    const { getByText } = renderInReactionView(
+      <ReactionCard
+        title={<span>Card title</span>}
+        actions={<button type="button">Act</button>}
+      />,
+    );
+    expect(getByText('Card title')).toBeInTheDocument();
+    expect(getByText('Act')).toBeInTheDocument();
+    expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
   });
 });

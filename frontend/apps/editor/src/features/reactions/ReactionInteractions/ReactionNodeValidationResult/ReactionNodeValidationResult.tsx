@@ -21,10 +21,8 @@ import type {
 } from 'store/entities/reactions/reactions.types.ts';
 import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionNodeValidationResult.module.scss';
-import { useContext, useMemo } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
+import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface ReactionNodeValidationResultProps {
   pathComponents: ReactionPathComponents;
@@ -130,17 +128,16 @@ export function ReactionNodeValidationResultDisplay({
 export function ReactionNodeValidationResult({
   pathComponents,
 }: Readonly<ReactionNodeValidationResultProps>) {
-  const { reactionId } = useContext(reactionContext);
-  const reaction = useSelector(selectReactionById(reactionId));
-
-  if (!('validation' in reaction) || reaction.validation === null) {
+  // Templates carry no validation; a reaction not yet loaded has none either.
+  const validation = useReactionSnapshot()?.validation;
+  if (!validation) {
     return null;
   }
 
   return (
     <ReactionNodeValidationResultDisplay
       pathComponents={pathComponents}
-      validation={reaction.validation}
+      validation={validation}
     />
   );
 }

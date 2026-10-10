@@ -27,6 +27,7 @@ import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { TemplatesTopActions } from './TemplatesTopActions/TemplatesTopActions.tsx';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 
 interface TemplateTitleProps {
   index: number;
@@ -88,17 +89,20 @@ export function TemplatesListPage() {
             </Paper>
             <>
               {templatesOrder.map((templateId, index) => (
-                <ReactionCard
+                <TemplateReactionProvider
                   key={templateId}
-                  id={templateId}
-                  actions={<TemplateHeaderActions templateId={templateId} />}
-                  title={
-                    <TemplateTitle
-                      index={index + 1}
-                      templateId={templateId}
-                    />
-                  }
-                />
+                  templateId={templateId}
+                >
+                  <ReactionCard
+                    actions={<TemplateHeaderActions templateId={templateId} />}
+                    title={
+                      <TemplateTitle
+                        index={index + 1}
+                        templateId={templateId}
+                      />
+                    }
+                  />
+                </TemplateReactionProvider>
               ))}
             </>
           </Flex>
