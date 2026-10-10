@@ -51,37 +51,38 @@ repos:
         files: ^ord_app/.*\.py$
         pass_filenames: false
 
-  # UI lint + format. Delegated to the tools already installed under ui/ via
-  # their npm scripts (run `npm ci` in ui/ first).
+  # UI lint + format. Delegated to the tools installed under frontend/ via
+  # their npm scripts (run `npm ci` in frontend/ first).
   - repo: local
     hooks:
       - id: prettier
         name: prettier (ui)
-        entry: npm --prefix ui run prettier
+        entry: npm --prefix frontend run prettier
         language: system
-        files: ^ui/
+        files: ^frontend/
         pass_filenames: false
       - id: eslint
         name: eslint (ui)
-        entry: npm --prefix ui run lint:fix
+        entry: npm --prefix frontend run lint:fix
         language: system
-        files: ^ui/.*\.(ts|tsx|cjs|mjs)$
+        files: ^frontend/.*\.(ts|tsx|cjs|mjs)$
         pass_filenames: false
       - id: stylelint
         name: stylelint (ui)
-        entry: npm --prefix ui run lint:css:fix
+        entry: npm --prefix frontend run lint:css:fix
         language: system
-        files: ^ui/.*\.s?css$
+        files: ^frontend/.*\.s?css$
         pass_filenames: false
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
-  # Uses the jscpd binary installed under ui/ (run `npm ci` in ui/ first) with the
-  # root .jscpd.json; scans the configured trees rather than just the staged files.
+  # Uses the jscpd binary installed under frontend/ (run `npm ci` in frontend/ first)
+  # with the root .jscpd.json; scans the configured trees rather than just the staged
+  # files.
   - repo: local
     hooks:
       - id: jscpd
         name: jscpd (duplication)
-        entry: ui/node_modules/.bin/jscpd --config .jscpd.json
+        entry: frontend/node_modules/.bin/jscpd --config .jscpd.json
         language: system
-        files: ^(ord_app|ui/src)/.*\.(py|ts|tsx)$
+        files: ^(ord_app|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
         pass_filenames: false

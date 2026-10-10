@@ -1,6 +1,6 @@
 {
   "//": "Cross-language copy-paste detection (replaces SonarCloud's duplication metric). Scoped to code (Python + TS/TSX); stylesheets are excluded because scoped CSS modules legitimately repeat layout declarations (~80% 'duplication') and markup/json carry no logic.",
-  "path": ["ord_app", "ui/src"],
+  "path": ["ord_app", "frontend/apps/editor/src"],
   "format": ["python", "typescript", "tsx"],
   "ignore": [
     "**/tests/**",
