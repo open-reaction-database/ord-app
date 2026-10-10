@@ -171,6 +171,15 @@ describe('reactionDataToOrd', () => {
     });
   });
 
+  it('rejects an Upload value that is not base64 rather than storing other bytes', () => {
+    expect(() =>
+      reactionDataToOrd({
+        ...base,
+        data: { type: AppDataType.Upload, value: 'not base64!' },
+      }),
+    ).toThrow('invalid base64 string');
+  });
+
   it('leaves the kind oneof unset when value is null', () => {
     const ordData = reactionDataToOrd({
       ...base,

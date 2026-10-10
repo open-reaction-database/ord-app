@@ -30,8 +30,6 @@ describe.each<[string, FC<ReactionViewDeleteButtonsProps>, string]>([
     const { getByRole, store } = renderWithProviders(
       // Stands in for a row that toggles when clicked, like an accordion control.
       <div onClick={onRowClick}>
-        {' '}
-        {/* NOSONAR: a test double, not UI */}
         <Button
           entityName="Notes"
           pathComponents={['notes']}

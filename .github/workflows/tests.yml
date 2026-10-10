@@ -133,7 +133,7 @@ jobs:
       - name: Start servers and run E2E
         run: |
           set -e
-          nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          nohup uv run --frozen --no-build uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
           nohup npm --prefix frontend -w apps/editor run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2

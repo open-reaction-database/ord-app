@@ -65,6 +65,7 @@ export function FileControl({
             onChange({ value: newValue, format });
           },
           () => {
+            setFile(null);
             showNotification({
               variant: NotificationVariant.ERROR,
               message: `File ${file.name} could not be read.`,

@@ -78,6 +78,8 @@ describe('FileControl', () => {
       ),
     );
     expect(onChange).not.toHaveBeenCalled();
+    // The picker clears, rather than naming a file the form does not hold.
+    expect(screen.queryByText('broken.pb')).not.toBeInTheDocument();
   });
 
   it('shows a download link for the stored file and clears it on remove', () => {

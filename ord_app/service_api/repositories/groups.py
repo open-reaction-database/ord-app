@@ -33,7 +33,17 @@ class GroupRepository(BaseRepository[GroupModel]):
     async def create_owned(
         self, owner_id: int, payload: dict, autocommit: bool = True
     ) -> GroupModel:
-        """Creates a group owned by `owner_id`, who becomes its first admin member."""
+        """Creates a group whose owner becomes its first admin member.
+
+        Args:
+            owner_id: ID of the user who owns the group.
+            payload: The group's other columns, such as ``name``.
+            autocommit: If True, add the group to the session, commit, and refresh it; if
+                False, return it unsaved and outside the session.
+
+        Returns:
+            The new group.
+        """
         group = GroupModel(
             owner_id=owner_id,
             groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")],

@@ -57,7 +57,16 @@ def total_attachment_size(message: Message) -> int:
 
 
 def _field_attachment_size(field: FieldDescriptor, value: Any) -> int:
-    """Returns the attachment bytes held by one set field of a message."""
+    """Returns the attachment bytes held by one set field of a message.
+
+    Args:
+        field: The field's descriptor.
+        value: The field's value, as ``ListFields`` returns it.
+
+    Returns:
+        The byte length of ``value`` if it is a ``bytes_value``, the attachment bytes nested
+        in it if it holds messages, and 0 otherwise.
+    """
     if field.name == "bytes_value" and field.type == FieldDescriptor.TYPE_BYTES:
         return len(value)
     if field.type != FieldDescriptor.TYPE_MESSAGE:
@@ -70,13 +79,22 @@ def _field_attachment_size(field: FieldDescriptor, value: Any) -> int:
 
 
 def _map_attachment_size(field: FieldDescriptor, value: Any) -> int:
-    """Returns the attachment bytes held by the values of a map field."""
+    """Returns the attachment bytes held by the values of a map field.
+
+    Args:
+        field: The map field's descriptor.
+        value: The map, as ``ListFields`` returns it.
+
+    Returns:
+        The attachment bytes nested in message values, the byte length of bytes values, and
+        0 for any other value type.
+    """
     value_type = field.message_type.fields_by_name["value"].type
     if value_type == FieldDescriptor.TYPE_MESSAGE:
         return sum(total_attachment_size(item) for item in value.values())
     if value_type == FieldDescriptor.TYPE_BYTES:
-        # Defensive: no map<string, bytes> exists in the Reaction schema today, but count
-        # it toward the cap if one is ever added so attachments there can't slip past.
+        # The Reaction schema has no map<string, bytes>; counting one keeps attachments in a
+        # future field from slipping past the cap.
         return sum(len(item) for item in value.values())
     return 0
 
