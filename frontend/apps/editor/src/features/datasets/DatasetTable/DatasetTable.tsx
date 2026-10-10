@@ -28,7 +28,7 @@ import { useCallback } from 'react';
 import { getDatasetsPage } from 'store/entities/datasets/datasets.thunks.ts';
 import { useLocation } from 'wouter';
 import { Flex, Loader, Paper, Title } from '@mantine/core';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
 
 export function DatasetTable() {
   const dispatch = useAppDispatch();

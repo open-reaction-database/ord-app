@@ -26,7 +26,7 @@ import { Flex, Tooltip } from '@mantine/core';
 import { AlertCircleIcon } from 'common/icons/index.ts';
 import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
 
 interface ReactionTitleProps {

@@ -15,7 +15,7 @@
  */
 import { Tooltip } from '@mantine/core';
 import classes from './UserDataField.module.scss';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
 
 interface UserDataFieldProps {

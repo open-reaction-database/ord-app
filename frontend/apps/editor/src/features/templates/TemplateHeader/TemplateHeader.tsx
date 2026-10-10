@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ActionIcon, Flex, Paper, Title } from '@mantine/core';
-import { DataField } from 'common/components/display/DataField/DataField.tsx';
+import { DataField } from '@open-reaction-database/ui/display';
 import { formatUtcDateToDisplay } from 'common/utils';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';

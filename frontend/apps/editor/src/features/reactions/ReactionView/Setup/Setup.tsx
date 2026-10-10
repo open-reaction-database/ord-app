@@ -17,7 +17,7 @@ import { Flex, Title } from '@mantine/core';
 import classes from './setup.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
-import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
+import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import type { ReactionViewSectionProps } from '../reactionView.types';
 import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';

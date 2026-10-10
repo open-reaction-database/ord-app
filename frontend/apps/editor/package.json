@@ -22,6 +22,7 @@
     "@mantine/form": "^7.15.3",
     "@mantine/hooks": "^7.15.3",
     "@mantine/notifications": "^7.15.3",
+    "@open-reaction-database/ui": "0.0.0",
     "@reduxjs/toolkit": "^2.5.0",
     "@tabler/icons-react": "^3.22.0",
     "axios": "^1.20.0",

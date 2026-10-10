@@ -18,7 +18,7 @@ import { AddCircleIcon } from 'common/icons';
 import type { ReactionViewSectionProps } from '../reactionView.types';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors';
-import { Counter } from 'common/components/display/Counter/Counter';
+import { Counter } from '@open-reaction-database/ui/display';
 import { useCallback, useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks';

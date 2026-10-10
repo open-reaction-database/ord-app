@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { RequiredOptionalFieldsProps } from './requiredOptionalFields.types.ts';
-import { KeyValueDisplay } from '../KeyValueDisplay/KeyValueDisplay.tsx';
+import { KeyValueDisplay } from '#display/KeyValueDisplay/KeyValueDisplay.tsx';
 
 export function RequiredOptionalFields<T>({
   entity,

@@ -15,6 +15,7 @@
  */
 import { createRoot } from 'react-dom/client';
 import './index.scss';
+import '@open-reaction-database/ui/theme/global.scss';
 import { AppRoot } from './core/AppRoot.tsx';
 import { Buffer } from 'buffer';
 

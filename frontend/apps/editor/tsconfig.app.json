@@ -1,32 +1,24 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2022",
     "useDefineForClassFields": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
     "types": ["vitest/globals"],
-
-    /* Bundler mode */
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Bare imports such as `store/…` resolve from src/ */
+    /* Bare imports such as `store/…` resolve from src/. The directories are listed one by
+       one so the mapping cannot capture a package's `#…` subpath imports. */
     "paths": {
-      "*": ["./src/*"]
-    },
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+      "common/*": ["./src/common/*"],
+      "core/*": ["./src/core/*"],
+      "features/*": ["./src/features/*"],
+      "pages/*": ["./src/pages/*"],
+      "routes": ["./src/routes"],
+      "routes/*": ["./src/routes/*"],
+      "store/*": ["./src/store/*"],
+      "test/*": ["./src/test/*"]
+    }
   },
   "include": ["src"]
 }

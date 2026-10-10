@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import path from 'node:path';
 import js from '@eslint/js';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import importX from 'eslint-plugin-import-x';
 import prettier from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -86,9 +89,82 @@ export default tseslint.config(
     files: ['apps/editor/**/*.{ts,tsx}'],
     plugins: { 'no-relative-import-paths': noRelativeImportPaths },
     rules: {
+      // The plugin resolves rootDir against the working directory, so it is computed from
+      // wherever ESLint runs.
       'no-relative-import-paths/no-relative-import-paths': [
         'error',
-        { allowSameFolder: true, rootDir: 'apps/editor/src', allowedDepth: 2 },
+        {
+          allowSameFolder: true,
+          rootDir: path.relative(
+            process.cwd(),
+            path.join(import.meta.dirname, 'apps/editor/src'),
+          ),
+          allowedDepth: 2,
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/ui/**/*.{ts,tsx}'],
+    plugins: { 'import-x': importX },
+    settings: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
+          project: path.join(import.meta.dirname, 'packages/ui/tsconfig.json'),
+        }),
+      ],
+    },
+    rules: {
+      // Every import, type-only ones included, must be declared in the package's own
+      // package.json; hoisting would otherwise let an undeclared dependency resolve from
+      // the workspace root.
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          packageDir: [path.join(import.meta.dirname, 'packages/ui')],
+          includeTypes: true,
+          devDependencies: [
+            '**/*.test.{ts,tsx}',
+            '**/testing/**',
+            '**/vitest.config.ts',
+          ],
+        },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                '../*',
+                '@open-reaction-database/ui',
+                '@open-reaction-database/ui/*',
+              ],
+              message: 'Import package files through #… instead.',
+            },
+            {
+              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
+              message:
+                'The shared package stays free of app state, transport, and routing.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@open-reaction-database/ui/src/*', '**/packages/ui/*'],
+              message: 'Import the shared package only through its exports.',
+            },
+          ],
+        },
       ],
     },
   },

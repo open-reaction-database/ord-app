@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DataField } from 'common/components/display/DataField/DataField.tsx';
+import { DataField } from '@open-reaction-database/ui/display';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { ActionIcon, Button, Flex, Paper, Title, Tooltip } from '@mantine/core';
 import {
@@ -43,7 +43,7 @@ import {
   selectCanDatasetBeEdited,
 } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
-import { buttonClasses, typographyClasses } from 'common/styling';
+import { buttonClasses, typographyClasses } from '@open-reaction-database/ui/theme';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
 
 interface DatasetHeaderProps {

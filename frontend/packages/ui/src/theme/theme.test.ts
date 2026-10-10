@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Open Reaction Database Project Authors
+ * Copyright 2026 Open Reaction Database Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@use 'sass:string';
+import { theme } from '#theme/index.ts';
 
-$themeColors: (
-  'white': #ffffff,
-  'baseWhite': #fcfcfc,
-  'blue': #3c78d8,
-  'green': #15b097,
-  'orange': #eda145,
-  'hover': #ff8d00,
-  'black': #000000,
-  'primaryBackgroundActive': #2869d2,
-  'purple': #311b92,
-  'purple2': #3949ab,
-  'red': #e4626f,
-);
-
-:export {
-  @each $color, $value in $themeColors {
-    #{string.unquote($color)}: $value;
-  }
-}
-
-:global {
-  body {
-    @each $color, $value in $themeColors {
-      --color-#{string.unquote($color)}: #{$value};
-    }
-  }
-}
+describe('theme', () => {
+  it('uses the ORD blue as its primary color', () => {
+    expect(theme.primaryColor).toBe('primary');
+    expect(theme.colors?.primary?.[0]).toBe('#3C78D8');
+  });
+});

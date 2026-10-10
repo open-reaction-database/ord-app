@@ -16,7 +16,7 @@
 import { Auth0Provider } from '@auth0/auth0-react';
 import { Provider } from 'react-redux';
 import { MantineProvider } from '@mantine/core';
-import { theme } from 'common/styling/theme.ts';
+import { theme } from '@open-reaction-database/ui/theme';
 import { configureAppStore } from '../store/configureAppStore.ts';
 import { AppContent } from './AppContent.tsx';
 import { initIndigo } from 'common/utils/indigo';

@@ -19,7 +19,7 @@ import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import { formatUtcDateToDisplay } from 'common/utils';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import classes from './datasetTable.module.scss';

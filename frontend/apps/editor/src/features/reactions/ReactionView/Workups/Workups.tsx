@@ -16,7 +16,11 @@
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';
 import { Accordion, Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import {
+  Counter,
+  RequiredOptionalFields,
+  type FieldConfiguration,
+} from '@open-reaction-database/ui/display';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { AddCircleIcon } from 'common/icons';
@@ -28,8 +32,6 @@ import { setReactionPathComponentsList } from 'store/features/reactionForm/react
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
-import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
-import type { FieldConfiguration } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit.ts';
 import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';

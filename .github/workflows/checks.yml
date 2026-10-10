@@ -70,8 +70,8 @@ jobs:
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
   # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
-  # both ord_app/ (Python) and frontend/apps/editor/src/ (TS/TSX) per .jscpd.json. Runs
-  # on every PR (not path-filtered) so Python-only changes are covered too.
+  # ord_app/ (Python) and the frontend workspaces' src/ trees (TS/TSX) per .jscpd.json.
+  # Runs on every PR (not path-filtered) so Python-only changes are covered too.
   check_duplication:
     runs-on: ubuntu-latest
     steps:

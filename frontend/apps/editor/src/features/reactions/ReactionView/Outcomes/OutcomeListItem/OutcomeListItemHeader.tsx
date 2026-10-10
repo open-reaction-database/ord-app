@@ -18,7 +18,7 @@ import { Accordion, Flex, Text } from '@mantine/core';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { FlaskIcon, TimeIcon } from 'common/icons';
 import clsx from 'clsx';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { useContext } from 'react';

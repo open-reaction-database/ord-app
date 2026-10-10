@@ -15,7 +15,7 @@
  */
 import { Grid } from '@mantine/core';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { UploadProgressIcon } from 'common/icons';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 import { useDisclosure } from '@mantine/hooks';

@@ -34,7 +34,7 @@ import { setReactionLookupOpenedAction } from 'store/features/reactionLookup/rea
 import { useSelector } from 'react-redux';
 import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reactionLookup.selectors.ts';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import {

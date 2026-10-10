@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { Fragment, useMemo, useContext } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { reactionContext } from '../../reactions.context.ts';

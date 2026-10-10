@@ -20,7 +20,7 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import { formatDateToDisplay } from 'common/utils';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
-import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
+import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { useContext } from 'react';
 import { reactionContext } from '../../reactions.context.ts';

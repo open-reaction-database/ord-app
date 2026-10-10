@@ -1,2 +1,5 @@
+**/coverage/**
 **/dist/**
-apps/editor/src/common/styling/colors.module.scss
+**/playwright-report/**
+packages/ui/src/theme/_palette.scss
+packages/ui/src/theme/colors.module.scss

@@ -19,7 +19,7 @@ import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDa
 import { useDisclosure } from '@mantine/hooks';
 import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 

@@ -16,7 +16,7 @@
 import { Flex } from '@mantine/core';
 import classes from './molblockIdentifier.module.scss';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
+import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 import { useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';

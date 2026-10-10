@@ -26,7 +26,7 @@ import {
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';

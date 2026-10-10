@@ -19,7 +19,7 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import type { ReactionViewSectionProps } from '../reactionView.types';
 import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
-import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields';
+import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import classes from './conditions.module.scss';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';

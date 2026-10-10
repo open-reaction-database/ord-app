@@ -16,7 +16,7 @@
 import type { ReactNode } from 'react';
 import { EmptyIcon } from 'common/icons';
 import { Flex, Text } from '@mantine/core';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 
 interface ComponentsListOrEmptyProps {
   children: ReactNode;

@@ -15,7 +15,7 @@
  */
 import { Button, Flex, Title } from '@mantine/core';
 import classes from './identifiers.module.scss';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter, KeyValueDisplay } from '@open-reaction-database/ui/display';
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
@@ -28,7 +28,6 @@ import { useCallback, useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay';
 import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 

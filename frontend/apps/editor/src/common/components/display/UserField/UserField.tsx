@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Avatar, Group } from '@mantine/core';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 
 interface UserFieldProps {
   username: string;
