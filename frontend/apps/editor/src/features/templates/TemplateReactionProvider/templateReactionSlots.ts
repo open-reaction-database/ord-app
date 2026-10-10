@@ -16,6 +16,7 @@
 import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { TemplateReactionValueLabelWrapper } from 'features/reactions/ReactionInteractions/ReactionValueLabel/TemplateReactionValueLabel.tsx';
+import { SearchReactionLink } from 'features/reactions/ReactionInteractions/SearchReactionLink/SearchReactionLink.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 
 /** The slots of a template, where a field's label can make it a variable. */
@@ -23,4 +24,5 @@ export const TEMPLATE_SLOTS: ReactionSlots = {
   ViewDeleteButtons: ReactionSetVariablesButton,
   ValueLabel: TemplateReactionValueLabelWrapper,
   ViewOnlyLabel: DatasetReactionValueLabel,
+  ReactionLink: SearchReactionLink,
 };

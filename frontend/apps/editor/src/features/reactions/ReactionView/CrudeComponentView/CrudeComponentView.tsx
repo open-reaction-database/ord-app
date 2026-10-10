@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import { Anchor } from '@mantine/core';
-import { useAppDispatch } from 'store/useAppDispatch';
-import { searchReaction } from 'store/entities/reactions/reactions.thunks.ts';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface CrudeComponentViewProps {
   crudeComponent: ReactionCrudeComponent;
@@ -25,11 +23,11 @@ interface CrudeComponentViewProps {
 export function CrudeComponentView({
   crudeComponent,
 }: Readonly<CrudeComponentViewProps>) {
-  const dispatch = useAppDispatch();
-
-  const onClick = () => {
-    dispatch(searchReaction(crudeComponent.reactionId ?? ''));
-  };
-
-  return <Anchor onClick={onClick}>{crudeComponent.reactionId}</Anchor>;
+  const { ReactionLink } = useReactionSlots();
+  const pbReactionId = crudeComponent.reactionId ?? '';
+  return ReactionLink ? (
+    <ReactionLink pbReactionId={pbReactionId} />
+  ) : (
+    <span>{pbReactionId}</span>
+  );
 }

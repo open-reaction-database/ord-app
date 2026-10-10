@@ -58,11 +58,18 @@ export interface ReactionActions {
   remove(pathComponents: ReactionPathComponents): Promise<void>;
 }
 
+export interface ReactionLinkProps {
+  /** The linked reaction's ORD ID. */
+  pbReactionId: string;
+}
+
 /** Components the host app supplies for the parts of the view it owns. */
 export interface ReactionSlots {
   ViewDeleteButtons: FC<ReactionViewDeleteButtonsProps>;
   ValueLabel: FC<ReactionValueLabelProps>;
   ViewOnlyLabel: FC<ReactionValueLabelProps>;
+  /** Links another reaction by its ORD ID; without it the ID shows as text. */
+  ReactionLink?: FC<ReactionLinkProps>;
 }
 
 export interface ReactionProviderValue {
