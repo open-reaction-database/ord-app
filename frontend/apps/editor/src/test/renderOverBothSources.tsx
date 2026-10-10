@@ -91,8 +91,8 @@ function renderOver(
 
 /**
  * Renders `ui` over a static source with an empty store, and over the Redux source with the
- * reaction in the store, and returns both HTML strings. A component that still reads the
- * reaction from the store renders differently over the two.
+ * reaction in the store, and returns both HTML strings. A component that reads the reaction
+ * from the store renders differently over the two.
  */
 export function renderOverBothSources(ui: ReactElement): [string, string] {
   // One conversion, so both sides see the same generated entity IDs.
