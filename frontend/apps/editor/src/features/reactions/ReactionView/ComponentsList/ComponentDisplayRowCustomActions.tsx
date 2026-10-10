@@ -22,7 +22,7 @@ import clsx from 'clsx';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { useSelector } from 'react-redux';
 import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
+import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 
 export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase>({
   component,

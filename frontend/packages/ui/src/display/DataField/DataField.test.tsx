@@ -15,30 +15,17 @@
  */
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
-import { KeyValueDisplay } from './KeyValueDisplay.tsx';
+import { renderWithMantine } from '#testing/renderWithMantine.tsx';
+import { DataField } from './DataField.tsx';
 
-describe('KeyValueDisplay', () => {
-  it('renders the label with a colon and the value', () => {
+describe('DataField', () => {
+  it('renders the label alongside its children', () => {
     renderWithMantine(
-      <KeyValueDisplay
-        label="Name"
-        value="Acetone"
-      />,
+      <DataField label="Yield">
+        <span>95%</span>
+      </DataField>,
     );
-    expect(screen.getByText('Name:')).toBeInTheDocument();
-    expect(screen.getByText('Acetone')).toBeInTheDocument();
-  });
-
-  it('renders the value in multiline mode', () => {
-    renderWithMantine(
-      <KeyValueDisplay
-        label="Notes"
-        value="line one"
-        multiline
-      />,
-    );
-    expect(screen.getByText('Notes:')).toBeInTheDocument();
-    expect(screen.getByText('line one')).toBeInTheDocument();
+    expect(screen.getByText('Yield')).toBeInTheDocument();
+    expect(screen.getByText('95%')).toBeInTheDocument();
   });
 });

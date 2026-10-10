@@ -19,7 +19,7 @@ import { selectReactionPartByPath } from 'store/entities/reactions/reactions.sel
 import { create } from '@bufbuild/protobuf';
 import { ReactionOutcomeSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { Accordion, Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
 import { AddCircleIcon, NoData } from 'common/icons';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import classes from './outcomes.module.scss';

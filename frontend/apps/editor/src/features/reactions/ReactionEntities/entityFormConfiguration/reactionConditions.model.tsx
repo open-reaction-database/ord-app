@@ -54,7 +54,7 @@ import {
   ordTemperatureMeasurementToReaction,
 } from 'store/entities/reactions/reactionConditions/reactionConditions.converter.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { FieldConfiguration } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
+import type { FieldConfiguration } from '@open-reaction-database/ui/display';
 import { renderValuePrecisionUnit } from '../../ReactionView/renderValuePrecisionUnit.ts';
 
 const temperatureMeasurementsPathComponents = [

@@ -21,7 +21,7 @@ import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
 import { selectTemplatesOrder } from 'store/entities/templates/templates.selectors.ts';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
 import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';

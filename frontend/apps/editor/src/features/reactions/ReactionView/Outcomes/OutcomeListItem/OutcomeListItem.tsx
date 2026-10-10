@@ -23,7 +23,7 @@ import {
 import clsx from 'clsx';
 import classes from './outcomeListItem.module.scss';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
+import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';

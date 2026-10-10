@@ -30,7 +30,7 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
 import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { setShowInvalidOnly } from 'store/entities/reactions/reactions.actions.ts';

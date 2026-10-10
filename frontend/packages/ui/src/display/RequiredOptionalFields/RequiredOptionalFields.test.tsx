@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { RequiredOptionalFields } from './RequiredOptionalFields.tsx';
 
 interface Entity {

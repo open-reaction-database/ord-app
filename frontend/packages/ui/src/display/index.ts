@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
-import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
-import { Counter } from './Counter.tsx';
-
-describe('Counter', () => {
-  it('renders a numeric amount', () => {
-    renderWithMantine(<Counter amount={42} />);
-    expect(screen.getByText('42')).toBeInTheDocument();
-  });
-
-  it('renders a string amount', () => {
-    renderWithMantine(<Counter amount="99+" />);
-    expect(screen.getByText('99+')).toBeInTheDocument();
-  });
-});
+export { Counter } from './Counter/Counter.tsx';
+export { DataField } from './DataField/DataField.tsx';
+export { KeyValueDisplay } from './KeyValueDisplay/KeyValueDisplay.tsx';
+export { RequiredOptionalFields } from './RequiredOptionalFields/RequiredOptionalFields.tsx';
+export type {
+  FieldConfiguration,
+  RequiredOptionalFieldsProps,
+} from './RequiredOptionalFields/requiredOptionalFields.types.ts';

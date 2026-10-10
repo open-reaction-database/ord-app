@@ -18,7 +18,7 @@ import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { EntityListItemProps } from './entityListItem.types.ts';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
-import { RequiredOptionalFields } from 'common/components/display/RequiredOptionalFields/RequiredOptionalFields.tsx';
+import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 
 export function EntityListItem<T>({
   entityKey,

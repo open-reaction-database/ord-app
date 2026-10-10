@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Button, Flex, Title } from '@mantine/core';
-import { Counter } from 'common/components/display/Counter/Counter.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
 import { AddCircleIcon, NoData } from 'common/icons';
 import classes from './inputs.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';

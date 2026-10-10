@@ -15,7 +15,7 @@
  */
 import type { ReactNode } from 'react';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { RequiredOptionalFieldsProps } from 'common/components/display/RequiredOptionalFields/requiredOptionalFields.types.ts';
+import type { RequiredOptionalFieldsProps } from '@open-reaction-database/ui/display';
 
 interface FieldConfiguration<T> {
   label: string;
