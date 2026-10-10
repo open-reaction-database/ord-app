@@ -72,6 +72,10 @@ test.describe('appearance', () => {
   // A missing baseline is written by the attempt that finds it missing; a retry would then
   // match it and pass, so this test does not retry.
   test.describe.configure({ retries: 0 });
+  // Tall enough for the whole reaction page (about 1040 px), so the footer, which is fixed
+  // to the bottom of the viewport, sits below the content. A full-page capture of a shorter
+  // viewport would draw the footer at the viewport's bottom edge, over the content.
+  test.use({ viewport: { width: 1280, height: 1080 } });
 
   test('looks the same', async ({ page }) => {
     // The baselines are rendered on CI's Linux runner; fonts and antialiasing differ
@@ -82,7 +86,6 @@ test.describe('appearance', () => {
     );
     await waitForPageToSettle(page);
     await expect(page).toHaveScreenshot('reaction-page.png', {
-      fullPage: true,
       mask: changingContent(page),
     });
     await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
