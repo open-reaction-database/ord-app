@@ -15,9 +15,6 @@
  */
 import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
-import type { ReactionViewSectionProps } from '../reactionView.types';
-import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors';
 import { Counter } from '@open-reaction-database/ui/display';
 import { useCallback, useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context';
@@ -27,18 +24,28 @@ import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { create } from '@bufbuild/protobuf';
 import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordObservationToReaction } from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
+import {
+  ordObservationToReaction,
+  type ReactionObservation,
+} from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import {
+  useIsViewOnly,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'observations';
 
-export function Observation({ reactionId }: ReactionViewSectionProps) {
+export function Observation() {
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
-  const observations = reaction.data.observations || [];
+  // The ID addresses only the dispatch below.
+  const { reactionId } = useContext(reactionContext);
+  const observations =
+    useReactionPart<Array<ReactionObservation>>([ENTITY_FIELD]) ?? [];
+  const isViewOnly = useIsViewOnly();
 
   const onObservationsCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [
@@ -56,8 +63,6 @@ export function Observation({ reactionId }: ReactionViewSectionProps) {
     );
     dispatch(setReactionPathComponentsList([newIdentifierPath]));
   }, [reactionId, observations.length, dispatch]);
-
-  const { isViewOnly } = useContext(reactionContext);
 
   return (
     <Flex direction="column">

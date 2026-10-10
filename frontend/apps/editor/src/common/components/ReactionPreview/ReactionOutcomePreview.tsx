@@ -16,30 +16,27 @@
 import classes from 'common/components/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo } from 'react';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import {
+  usePreviews,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
-interface ReactionInputPreviewProps {
-  reactionId: ReactionId;
+interface ReactionOutcomePreviewProps {
   outcomeIndex: number;
 }
 
 export function ReactionOutcomePreview({
-  reactionId,
   outcomeIndex,
-}: Readonly<ReactionInputPreviewProps>) {
-  const outcome: ReactionOutcome = useSelector(
-    selectReactionPartByPath(reactionId, ['outcomes', outcomeIndex]),
-  );
+}: Readonly<ReactionOutcomePreviewProps>) {
+  // The preview lists only outcomes the reaction has.
+  const outcome = useReactionPart<ReactionOutcome>(['outcomes', outcomeIndex])!;
   const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
-  const componentsPreviews = useSelector(selectPreviewsByIdsWrapper(componentsIds));
+  const componentsPreviews = usePreviews(componentsIds);
   const outcomeTime = useMemo(() => {
     return outcome.reactionTime?.value
       ? renderValuePrecisionUnit(outcome.reactionTime)

@@ -15,7 +15,6 @@
  */
 import { type FC, Fragment } from 'react';
 import { Tabs, Tooltip } from '@mantine/core';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { Inputs } from 'features/reactions/ReactionView/Inputs/Inputs.tsx';
 import { Identifiers } from 'features/reactions/ReactionView/Identifiers/Identifiers.tsx';
 import { Notes } from 'features/reactions/ReactionView/Notes/Notes.tsx';
@@ -25,14 +24,13 @@ import { Conditions } from 'features/reactions/ReactionView/Conditions/Condition
 import { Provenance } from 'features/reactions/ReactionView/Provenance/Provenance.tsx';
 import { RequiredAsterisk } from 'common/components/display/RequiredAsterisk/RequiredAsterisk.tsx';
 import classes from './reactionTabs.module.scss';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { Workups } from 'features/reactions/ReactionView/Workups/Workups.tsx';
 import { Setup } from 'features/reactions/ReactionView/Setup/Setup';
 
 interface ReactionTab {
   name: string;
   required?: true;
-  Component: FC<ReactionViewSectionProps>;
+  Component: FC;
 }
 
 const tabs: Array<ReactionTab> = [
@@ -47,11 +45,7 @@ const tabs: Array<ReactionTab> = [
   { name: 'provenance', required: true, Component: Provenance },
 ];
 
-interface TemplateTabsProps {
-  reactionId: ReactionId;
-}
-
-export function ReactionTabs({ reactionId }: Readonly<TemplateTabsProps>) {
+export function ReactionTabs() {
   return (
     <Tabs
       defaultValue={tabs[0].name}
@@ -78,7 +72,7 @@ export function ReactionTabs({ reactionId }: Readonly<TemplateTabsProps>) {
           key={name}
           value={name}
         >
-          <Component reactionId={reactionId} />
+          <Component />
         </Tabs.Panel>
       ))}
     </Tabs>

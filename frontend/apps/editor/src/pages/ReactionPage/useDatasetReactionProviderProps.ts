@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
-import { useStore } from 'react-redux';
 import type {
   ReactionActions,
   ReactionSlots,
@@ -22,18 +21,17 @@ import type {
 } from 'features/reactions/provider/reactionProvider.types.ts';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
+import { SearchReactionLink } from 'features/reactions/ReactionInteractions/SearchReactionLink/SearchReactionLink.tsx';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
-import type { AppState } from 'store/configureAppStore.ts';
-import {
-  reduxReactionActions,
-  reduxReactionSource,
-} from 'store/entities/reactions/reduxReactionSource.ts';
+import { reduxReactionActions } from 'store/entities/reactions/reduxReactionSource.ts';
+import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 const EDITABLE_SLOTS: ReactionSlots = {
   ViewDeleteButtons: ReactionEditDeleteButtons,
   ValueLabel: DatasetReactionValueLabel,
   ViewOnlyLabel: DatasetReactionValueLabel,
+  ReactionLink: SearchReactionLink,
 };
 
 const VIEW_ONLY_SLOTS: ReactionSlots = {
@@ -51,12 +49,8 @@ export function useDatasetReactionProviderProps(
   actions?: ReactionActions;
   slots: ReactionSlots;
 } {
-  const store = useStore<AppState>();
   const dispatch = useAppDispatch();
-  const source = useMemo(
-    () => reduxReactionSource(store, reactionId),
-    [store, reactionId],
-  );
+  const source = useReduxReactionSource(reactionId);
   const actions = useMemo(
     () => (canEdit ? reduxReactionActions(dispatch, reactionId) : undefined),
     [canEdit, dispatch, reactionId],

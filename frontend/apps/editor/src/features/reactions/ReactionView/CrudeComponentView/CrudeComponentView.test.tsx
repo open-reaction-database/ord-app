@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi } from 'vitest';
-import { fireEvent } from '@testing-library/react';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
-import { CrudeComponentView } from './CrudeComponentView.tsx';
+import { describe, it, expect } from 'vitest';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import type { ReactionLinkProps } from 'features/reactions/provider/reactionProvider.types.ts';
 import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import { CrudeComponentView } from './CrudeComponentView.tsx';
 
-const searchReaction = vi.fn((id: string) => ({
-  type: 'reactions/searchReaction/mock',
-  payload: id,
-}));
-vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
-  ...((await importActual()) as Record<string, unknown>),
-  searchReaction: (id: string) => searchReaction(id),
-}));
+const crude = { reactionId: 'rxn-123' } as ReactionCrudeComponent;
+
+function TestLink({ pbReactionId }: Readonly<ReactionLinkProps>) {
+  return <a href={`/reactions/${pbReactionId}`}>{pbReactionId}</a>;
+}
 
 describe('CrudeComponentView', () => {
-  it('renders a link with the source reaction id and searches it on click', () => {
-    const { getByText } = renderWithProviders(
-      <CrudeComponentView
-        crudeComponent={{ reactionId: 'rxn-123' } as ReactionCrudeComponent}
-      />,
+  it('links the reaction through the host app’s link slot', () => {
+    const { getByRole } = renderInReactionView(
+      <CrudeComponentView crudeComponent={crude} />,
+      { slots: { ReactionLink: TestLink } },
     );
-    const link = getByText('rxn-123');
-    expect(link).toBeInTheDocument();
-    fireEvent.click(link);
-    expect(searchReaction).toHaveBeenCalledWith('rxn-123');
+    expect(getByRole('link', { name: 'rxn-123' })).toHaveAttribute(
+      'href',
+      '/reactions/rxn-123',
+    );
+  });
+
+  it('shows the reaction ID as text when the host supplies no link', () => {
+    const { getByText, queryByRole } = renderInReactionView(
+      <CrudeComponentView crudeComponent={crude} />,
+    );
+    expect(getByText('rxn-123')).toBeInTheDocument();
+    expect(queryByRole('link')).not.toBeInTheDocument();
   });
 });

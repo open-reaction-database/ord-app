@@ -18,8 +18,8 @@ import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListO
 import { ComponentDisplayRow } from 'features/reactions/ReactionView/ComponentsList';
 import clsx from 'clsx';
 import classes from '../inputsComponentsList.module.scss';
-import { useContext, useMemo } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useMemo } from 'react';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
@@ -41,7 +41,7 @@ export function InputComponentsListItem({
   pathComponents,
   historyPathComponents,
 }: Readonly<InputComponentsListItemProps>) {
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtons } = useReactionSlots();
 
   const inputPathComponents = useMemo(() => {
     return [...historyPathComponents, pathComponents];
@@ -56,7 +56,7 @@ export function InputComponentsListItem({
           slot: Accordion.Control renders a <button>, and a nested <button> triggers a
           hydration error. */}
       <div className={classes.controlRow}>
-        <ViewDeleteButtonsComponent
+        <ViewDeleteButtons
           pathComponents={pathComponents}
           historyPathComponents={historyPathComponents}
           entityName="Input"

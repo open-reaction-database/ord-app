@@ -26,13 +26,11 @@ import { compareNamedEntities } from 'features/reactions/ReactionEntities/entity
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { MeasurementsPreview } from '../MeasurementsPreview/MeasurementsPreview.tsx';
 
 const ENTITY_NAME = 'outcomes';
 
 interface OutcomeListItemProps {
-  reactionId: ReactionId;
   outcome: ReactionOutcome;
   outcomeIndex: number;
 }
@@ -49,7 +47,6 @@ const renderDetails = (product: ReactionProduct) => (
 );
 
 export function OutcomeListItem({
-  reactionId,
   outcome,
   outcomeIndex,
 }: Readonly<OutcomeListItemProps>) {
@@ -65,7 +62,6 @@ export function OutcomeListItem({
   return (
     <Accordion.Item value={outcome.id}>
       <OutcomeListItemHeader
-        reactionId={reactionId}
         outcome={outcome}
         pathComponents={outcomePathComponents}
       />

@@ -19,16 +19,14 @@ import { Identifiers } from './Identifiers.tsx';
 
 describe('Identifiers', () => {
   it('renders the identifiers section with the add button when editable', () => {
-    const { getByText, getByRole } = renderInReactionView(
-      <Identifiers reactionId={1} />,
-    );
+    const { getByText, getByRole } = renderInReactionView(<Identifiers />);
     expect(getByText('Identifiers')).toBeInTheDocument();
     expect(getByText(/Reaction identifiers define/)).toBeInTheDocument();
     expect(getByRole('button', { name: /Identifier/ })).toBeInTheDocument();
   });
 
   it('hides the add button in view-only mode', () => {
-    const { queryByRole } = renderInReactionView(<Identifiers reactionId={1} />, {
+    const { queryByRole } = renderInReactionView(<Identifiers />, {
       isViewOnly: true,
     });
     expect(queryByRole('button', { name: /Identifier/ })).not.toBeInTheDocument();

@@ -47,7 +47,8 @@ export function ReactionHeaderActions({
   const datasetId = Number.parseInt(rawDatasetId);
   const reaction = useSelector(selectReactionById(reactionId));
   const onPreviewSave = useCallback(() => {
-    copyPreviewAsImage(previewRef.current);
+    // It reports its own success or failure in a notification.
+    void copyPreviewAsImage(previewRef.current);
   }, [previewRef]);
   const [
     saveAsTemplateOpened,

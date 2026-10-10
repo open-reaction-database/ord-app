@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 import { Flex, Title } from '@mantine/core';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
-import type { ReactionViewSectionProps } from '../reactionView.types';
 import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import classes from './conditions.module.scss';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'conditions';
 
-export function Conditions({ reactionId }: ReactionViewSectionProps) {
-  const conditions: ReactionConditions = useSelector(
-    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
-  );
+export function Conditions() {
+  const conditions = useReactionPart<ReactionConditions>([ENTITY_FIELD])!;
 
   return (
     <Flex direction="column">

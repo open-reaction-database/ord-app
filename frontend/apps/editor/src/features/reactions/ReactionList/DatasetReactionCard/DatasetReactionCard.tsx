@@ -16,8 +16,12 @@
 import { ReactionHeaderActions } from '../../ReactionHeader/ReactionHeaderActions/ReactionHeaderActions.tsx';
 import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { Link, useParams } from 'wouter';
-import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
+import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
+import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
+import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import {
   CopyButton,
   type CopyButtonOptions,
@@ -37,13 +41,14 @@ interface ReactionTitleProps {
 function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
   const datasetId = Number.parseInt(rawDatasetId);
-  const reaction = useSelector(selectReactionById(id));
+  const snapshot = useReactionSnapshot();
+  const pbReactionId = snapshot?.pb_reaction_id ?? '';
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     {
       label: 'Copy Reaction Link',
       value: `${globalThis.location.href}/reactions/${id}`,
     },
-    { label: 'Copy Reaction ID', value: reaction.pb_reaction_id },
+    { label: 'Copy Reaction ID', value: pbReactionId },
   ];
   const linkToPage = `~/datasets/${datasetId}/reactions/${id}`;
 
@@ -54,16 +59,16 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
       className={clsx(classes.titleWrapper, typographyClasses.oneLineTextWrapper)}
     >
       <span className={classes.index}>{index}.</span>
-      <Tooltip label={reaction.pb_reaction_id}>
+      <Tooltip label={pbReactionId}>
         <Link
           className={clsx(classes.link, typographyClasses.oneLineText)}
           to={linkToPage}
         >
-          {reaction.pb_reaction_id}
+          {pbReactionId}
         </Link>
       </Tooltip>
       <CopyButton options={copyToClipboardOptions} />
-      {!reaction.is_valid && (
+      {!snapshot?.is_valid && (
         <Flex
           align="center"
           gap="4px"
@@ -82,18 +87,43 @@ interface DatasetReactionCardProps {
   index: number;
 }
 
+// The card never renders slots; ReactionSlots requires them, so it gets the view-only set.
+const CARD_SLOTS: ReactionSlots = {
+  ViewDeleteButtons: ReactionViewButton,
+  ValueLabel: DatasetReactionValueLabel,
+  ViewOnlyLabel: DatasetReactionValueLabel,
+};
+
 export function DatasetReactionCard({
   reactionId,
   index,
 }: Readonly<DatasetReactionCardProps>) {
+  const source = useReduxReactionSource(reactionId);
+  // The card only displays the reaction; its edit actions live in ReactionHeaderActions.
+  return (
+    <ReactionProvider
+      reactionId={reactionId}
+      source={source}
+      slots={CARD_SLOTS}
+    >
+      <DatasetReactionCardBody
+        reactionId={reactionId}
+        index={index}
+      />
+    </ReactionProvider>
+  );
+}
+
+function DatasetReactionCardBody({
+  reactionId,
+  index,
+}: Readonly<DatasetReactionCardProps>) {
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const reaction = useSelector(selectReactionById(reactionId));
+  const isValid = useReactionSnapshot()?.is_valid ?? false;
   return (
     <ReactionCard
-      key={reactionId}
-      id={reactionId}
       previewRef={previewRef}
-      isInvalid={!reaction.is_valid}
+      isInvalid={!isValid}
       actions={
         <ReactionHeaderActions
           reactionId={reactionId}

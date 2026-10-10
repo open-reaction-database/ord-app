@@ -27,24 +27,23 @@ import React from 'react';
 import { ReactionTabs } from './ReactionTabs';
 
 interface ReactionContentProps {
-  reactionId: number;
   viewMode: 'tabs' | 'list';
 }
 
 export const ReactionContent = React.memo(
-  ({ reactionId, viewMode }: Readonly<ReactionContentProps>) => {
+  ({ viewMode }: Readonly<ReactionContentProps>) => {
     if (viewMode === 'tabs') {
-      return <ReactionTabs reactionId={reactionId} />;
+      return <ReactionTabs />;
     }
     return (
       <Stack gap="xl">
         <Inputs />
-        <Outcomes reactionId={reactionId} />
-        <Conditions reactionId={reactionId} />
-        <Identifiers reactionId={reactionId} />
-        <Setup reactionId={reactionId} />
+        <Outcomes />
+        <Conditions />
+        <Identifiers />
+        <Setup />
         <Notes />
-        <Observation reactionId={reactionId} />
+        <Observation />
         <Workups />
         <Provenance />
       </Stack>

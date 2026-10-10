@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactionContext } from '../../reactions.context.ts';
-import { useCallback, useContext, type ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import { Button } from '@mantine/core';
 import { EditIcon, ViewIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import classes from './openSingleEntityButton.module.scss';
+import {
+  useIsTemplate,
+  useIsViewOnly,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface OpenSingleEntityButtonProps {
   pathComponents: ReactionPathComponents;
@@ -30,7 +33,8 @@ export function OpenSingleEntityButton({
   pathComponents,
 }: Readonly<OpenSingleEntityButtonProps>) {
   const dispatch = useAppDispatch();
-  const { isViewOnly, isTemplate } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
+  const isTemplate = useIsTemplate();
 
   const onOpen = useCallback(() => {
     dispatch(addReactionPathComponentToList(pathComponents));
