@@ -32,7 +32,8 @@ In the editor (`apps/editor/src/test/`):
 
 - `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it). `packages/ui` has its own copy, imported as `#testing/renderWithMantine.tsx`; package files import each other through `#…` or from the same folder, never `../` or `test/…`.
 - `renderWithProviders(ui, { preloadedState })` — fresh `configureStore({ reducer: rootReducer, preloadedState })` + Mantine. Returns `{ store, ...renderResult }`. Seed only the slices the component reads.
-- `renderInReactionView(ui, { reactionId, reaction, isViewOnly, pathComponents })` — also seeds `reactionContext` + `reactionEntityContext` and a reaction in the store (`emptyReactionData()` by default). Use for components under `ReactionView/` / `reactionEntityNode/`.
+- `renderInReactionView(ui, { reactionId, reaction, record, isViewOnly, actions, slots, pathComponents })` — seeds a reaction in the store (`emptyReactionData()` by default) and mounts `ReactionProvider` over a Redux source of it, plus `reactionEntityContext`. The reaction is editable (real `reduxReactionActions`) unless `isViewOnly` is set; a string `reactionId` renders a template; `record` sets stored fields beside `data` (`pb_reaction_id`, `is_valid`, `validation`); `slots` replaces the null slot components. Use for components under `ReactionView/` / `reactionEntityNode/` and anything that calls the provider's hooks, which throw outside a provider.
+- `renderOverBothSources(ui)` (`test/renderOverBothSources.tsx`) — the contract check: renders `ui` over a static source with an empty store and over the Redux source, and returns both HTML strings with generated IDs normalized; they must be equal.
 
 ## Mocking patterns (the ones that cost time)
 
@@ -122,7 +123,7 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 
 ### Screenshot tests (`toHaveScreenshot`)
 
-`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`). The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. It masks what changes between runs (the footer's year) and does not retry, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
+`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. It masks what changes between runs (the footer's year) and does not retry, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
 
 When a change alters the page's look on purpose, refresh the baselines from CI:
 1. Delete the outdated PNGs and push; `test_e2e` fails with "A snapshot doesn't exist … writing actual".
