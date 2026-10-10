@@ -38,7 +38,7 @@ const ENTITY_FIELD = 'identifiers';
 
 export function Identifiers() {
   const dispatch = useAppDispatch();
-  // The ID only addresses the dispatch below, which steps C and E replace.
+  // The ID addresses only the dispatch below.
   const { reactionId } = useContext(reactionContext);
   const identifiers = useReactionPart<Array<ReactionIdentifier>>([ENTITY_FIELD]) ?? [];
   const isViewOnly = useIsViewOnly();

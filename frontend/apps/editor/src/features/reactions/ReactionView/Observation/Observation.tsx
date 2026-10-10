@@ -41,7 +41,7 @@ const ENTITY_FIELD = 'observations';
 
 export function Observation() {
   const dispatch = useAppDispatch();
-  // The ID only addresses the dispatch below, which steps C and E replace.
+  // The ID addresses only the dispatch below.
   const { reactionId } = useContext(reactionContext);
   const observations =
     useReactionPart<Array<ReactionObservation>>([ENTITY_FIELD]) ?? [];

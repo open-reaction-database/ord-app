@@ -35,7 +35,7 @@ import { setReactionRenameOpenedAction } from 'store/features/reactionRename/rea
 import { selectIsReactionRenameOpened } from 'store/features/reactionRename/reactionRename.selector.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
-import { ReactionHeader } from '../ReactionHeader.tsx';
+import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 
 interface DatasetReactionHeaderProps {
   datasetId: number;

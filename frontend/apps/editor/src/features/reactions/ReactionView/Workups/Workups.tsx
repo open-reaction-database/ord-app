@@ -146,7 +146,7 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
 
 export function Workups() {
   const dispatch = useAppDispatch();
-  // The ID only addresses the dispatch below, which steps C and E replace.
+  // The ID addresses only the dispatch below.
   const { reactionId } = useContext(reactionContext);
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
