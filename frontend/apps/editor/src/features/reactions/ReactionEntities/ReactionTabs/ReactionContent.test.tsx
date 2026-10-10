@@ -26,10 +26,7 @@ vi.mock('./ReactionTabs', () => ({
 describe('ReactionContent', () => {
   it('renders the tabbed editor in "tabs" mode', () => {
     const { getByTestId, queryByText } = renderInReactionView(
-      <ReactionContent
-        reactionId={1}
-        viewMode="tabs"
-      />,
+      <ReactionContent viewMode="tabs" />,
       {
         reactionId: 1,
       },
@@ -41,10 +38,7 @@ describe('ReactionContent', () => {
 
   it('renders the flat section list in "list" mode', () => {
     const { getByText, queryByTestId } = renderInReactionView(
-      <ReactionContent
-        reactionId={1}
-        viewMode="list"
-      />,
+      <ReactionContent viewMode="list" />,
       {
         reactionId: 1,
       },

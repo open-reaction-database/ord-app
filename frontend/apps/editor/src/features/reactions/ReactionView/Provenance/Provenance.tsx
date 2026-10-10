@@ -15,24 +15,18 @@
  */
 import { Flex, Title } from '@mantine/core';
 import classes from './provenance.module.scss';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { formatDateToDisplay } from 'common/utils';
 import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
-import { useContext } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'provenance';
 
 export function Provenance() {
-  const { reactionId } = useContext(reactionContext);
-  const provenance: ReactionProvenance = useSelector(
-    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
-  );
+  const provenance = useReactionPart<ReactionProvenance>([ENTITY_FIELD])!;
 
   return (
     <Flex

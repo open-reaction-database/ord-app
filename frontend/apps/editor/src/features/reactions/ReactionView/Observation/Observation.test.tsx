@@ -19,16 +19,14 @@ import { Observation } from './Observation.tsx';
 
 describe('Observation', () => {
   it('renders the observations section with the add button when editable', () => {
-    const { getByText, getByRole } = renderInReactionView(
-      <Observation reactionId={1} />,
-    );
+    const { getByText, getByRole } = renderInReactionView(<Observation />);
     expect(getByText('Observations')).toBeInTheDocument();
     expect(getByText(/Observations are time-stamped comments/)).toBeInTheDocument();
     expect(getByRole('button', { name: /Observation/ })).toBeInTheDocument();
   });
 
   it('hides the add button in view-only mode', () => {
-    const { queryByRole } = renderInReactionView(<Observation reactionId={1} />, {
+    const { queryByRole } = renderInReactionView(<Observation />, {
       isViewOnly: true,
     });
     expect(queryByRole('button', { name: /Observation/ })).not.toBeInTheDocument();

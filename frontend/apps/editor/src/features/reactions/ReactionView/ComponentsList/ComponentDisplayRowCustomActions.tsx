@@ -20,8 +20,7 @@ import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactio
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
-import { useSelector } from 'react-redux';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
+import { usePreviews } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 
 export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase>({
@@ -30,7 +29,7 @@ export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase
   renderDetails,
   gridClassName = clsx(classes.grid, classes.row),
 }: Readonly<ComponentsDisplayRowCustomActions<T>>) {
-  const previewState = useSelector(selectPreviewsByIdsWrapper([component.id]));
+  const previewState = usePreviews([component.id])[component.id];
   return (
     <div
       key={component.id}
@@ -53,7 +52,7 @@ export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase
         justify="flex-start"
         className={clsx(classes.preview, classes.imagePreview)}
       >
-        <ReactionComponentPreview previewState={previewState[component.id]} />
+        <ReactionComponentPreview previewState={previewState} />
       </Flex>
       <Flex
         align="center"

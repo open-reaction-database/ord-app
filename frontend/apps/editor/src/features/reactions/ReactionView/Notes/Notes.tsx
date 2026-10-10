@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 import { Flex, Title } from '@mantine/core';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import { Fragment, useMemo, useContext } from 'react';
+import { Fragment, useMemo } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { reactionContext } from '../../reactions.context.ts';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const notesFields: Array<[keyof ReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],
@@ -43,10 +41,9 @@ type NotEmptyValueType = Exclude<ValueType, null | undefined>;
 const ENTITY_FIELD = 'notes';
 
 export function Notes() {
-  const { reactionId } = useContext(reactionContext);
-  const notesOrNull = useSelector(selectReactionPartByPath(reactionId, [ENTITY_FIELD]));
+  const notesOrNull = useReactionPart<ReactionNotes>([ENTITY_FIELD]);
   const fields = useMemo((): Array<[string, string]> => {
-    const notes: ReactionNotes = notesOrNull || {};
+    const notes: Partial<ReactionNotes> = notesOrNull || {};
     return notesFields
       .map(([key, label]): [string, ValueType] => [label, notes[key]])
       .filter(([, value]) => value && value !== ReactionBoolean.Unspecified) as Array<

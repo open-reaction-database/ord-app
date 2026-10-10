@@ -19,7 +19,7 @@ import { Conditions } from './Conditions.tsx';
 
 describe('Conditions', () => {
   it('renders the conditions section with each condition-group heading', () => {
-    const { getByText } = renderInReactionView(<Conditions reactionId={1} />);
+    const { getByText } = renderInReactionView(<Conditions />);
     expect(getByText('Conditions')).toBeInTheDocument();
     for (const heading of [
       'Temperature',

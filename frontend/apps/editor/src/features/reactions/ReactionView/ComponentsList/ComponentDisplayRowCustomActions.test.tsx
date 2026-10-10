@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
@@ -31,7 +31,7 @@ const component = {
 
 describe('ComponentDisplayRowCustomActions', () => {
   it('renders the identifiers, reaction role, rendered details, and actions', () => {
-    const { getByText } = renderWithProviders(
+    const { getByText } = renderInReactionView(
       <ComponentDisplayRowCustomActions
         component={component}
         renderDetails={() => '10 mL'}

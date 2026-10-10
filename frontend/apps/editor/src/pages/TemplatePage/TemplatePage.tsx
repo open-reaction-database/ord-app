@@ -102,7 +102,7 @@ export function TemplatePage() {
               radius="md"
               p="lg"
             >
-              <ReactionTabs reactionId={templateId} />
+              <ReactionTabs />
             </Paper>
             <ReactionDetailsSidebar reactionId={templateId} />
             <VariablesSidebar templateId={templateId} />

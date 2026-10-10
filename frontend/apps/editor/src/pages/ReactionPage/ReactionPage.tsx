@@ -116,10 +116,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
               radius="md"
               p="lg"
             >
-              <ReactionContent
-                reactionId={reactionId}
-                viewMode={viewMode}
-              />
+              <ReactionContent viewMode={viewMode} />
             </Paper>
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>

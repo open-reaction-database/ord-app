@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { OpenSingleEntityButton } from './OpenSingleEntityButton.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
-const Component = OpenSingleEntityButton as unknown as () => JSX.Element;
-
 describe('OpenSingleEntityButton', () => {
-  it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
-    expect(container).toBeInTheDocument();
+  it.each([
+    [{}, 'Edit'],
+    [{ isViewOnly: true }, 'View'],
+    [{ reactionId: 'template_1' }, 'Set variables'],
+  ] as const)('with %o reads %s', (options, label) => {
+    const { getByRole } = renderInReactionView(
+      <OpenSingleEntityButton pathComponents={['notes']} />,
+      options,
+    );
+    expect(getByRole('button', { name: label })).toBeInTheDocument();
   });
 });

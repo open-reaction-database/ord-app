@@ -15,23 +15,19 @@
  */
 import { Flex, Title } from '@mantine/core';
 import classes from './setup.module.scss';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
-import type { ReactionViewSectionProps } from '../reactionView.types';
 import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { OpenSingleEntityButton } from 'features/reactions/ReactionView/OpenSingleEntityButton/OpenSingleEntityButton';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types';
 import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'setup';
 
-export function Setup({ reactionId }: ReactionViewSectionProps) {
-  const setup: ReactionSetup = useSelector(
-    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
-  );
+export function Setup() {
+  const setup = useReactionPart<ReactionSetup>([ENTITY_FIELD])!;
 
   return (
     <Flex direction="column">

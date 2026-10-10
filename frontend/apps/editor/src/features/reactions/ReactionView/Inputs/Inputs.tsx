@@ -18,16 +18,16 @@ import { Counter } from '@open-reaction-database/ui/display';
 import { AddCircleIcon, NoData } from 'common/icons';
 import classes from './inputs.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
-import { useContext } from 'react';
-import { selectOrderedInputsWrapper } from 'store/entities/reactions/reactions.selectors.ts';
-import { useSelector } from 'react-redux';
 import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
-import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import {
+  useIsViewOnly,
+  useOrderedInputs,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'inputs';
 
@@ -44,8 +44,8 @@ const useCreate = buildUseCreate<ReactionInput>(
 );
 
 export function Inputs() {
-  const { isViewOnly, reactionId } = useContext(reactionContext);
-  const inputs = useSelector(selectOrderedInputsWrapper(reactionId)) || [];
+  const isViewOnly = useIsViewOnly();
+  const inputs = useOrderedInputs();
 
   const onCreateNew = useCreate();
   const handleCreate = () => {
