@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import {
+  PressureConditions_PressureMeasurementSchema,
+  StirringConditionsSchema,
+  TemperatureConditions_TemperatureMeasurementSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordTemperatureMeasurementToReaction,
   reactionTemperatureMeasurementToOrd,
@@ -26,10 +32,11 @@ import {
 
 describe('temperature measurement converters', () => {
   it('assigns an id, maps the type to a name, and carries details', () => {
-    const result = ordTemperatureMeasurementToReaction({
-      type: undefined,
-      details: 'thermocouple',
-    });
+    const result = ordTemperatureMeasurementToReaction(
+      create(TemperatureConditions_TemperatureMeasurementSchema, {
+        details: 'thermocouple',
+      }),
+    );
     expect(typeof result.id).toBe('string');
     expect(typeof result.type).toBe('string');
     expect(result.details).toBe('thermocouple');
@@ -38,7 +45,9 @@ describe('temperature measurement converters', () => {
   });
 
   it('maps a measurement back to ord with a numeric type', () => {
-    const reaction = ordTemperatureMeasurementToReaction({ details: 'probe' });
+    const reaction = ordTemperatureMeasurementToReaction(
+      create(TemperatureConditions_TemperatureMeasurementSchema, { details: 'probe' }),
+    );
     const ord = reactionTemperatureMeasurementToOrd(reaction);
     expect(typeof ord.type).toBe('number');
     expect(ord.details).toBe('probe');
@@ -47,10 +56,9 @@ describe('temperature measurement converters', () => {
 
 describe('pressure measurement converters', () => {
   it('round-trips type/details through ord', () => {
-    const reaction = ordPressureMeasurementToReaction({
-      type: undefined,
-      details: 'gauge',
-    });
+    const reaction = ordPressureMeasurementToReaction(
+      create(PressureConditions_PressureMeasurementSchema, { details: 'gauge' }),
+    );
     expect(typeof reaction.id).toBe('string');
     const ord = reactionPressureMeasurementToOrd(reaction);
     expect(typeof ord.type).toBe('number');
@@ -69,14 +77,24 @@ describe('ordTemperatureConditionToReaction', () => {
 
 describe('stirring condition converters', () => {
   it('maps type/details/rate from ord', () => {
-    const result = ordStirringConditionToReaction({ details: 'magnetic bar' });
+    const result = ordStirringConditionToReaction(
+      create(StirringConditionsSchema, { details: 'magnetic bar' }),
+    );
     expect(typeof result.type).toBe('string');
     expect(result.details).toBe('magnetic bar');
     expect(result.rate).toBeTypeOf('object');
   });
 
-  it('collapses an empty, unspecified-type stirring condition to null', () => {
+  it('collapses an empty, unspecified-type stirring condition to undefined', () => {
     const empty = ordStirringConditionToReaction(null);
-    expect(reactionStirringConditionToOrd(empty)).toBeNull();
+    expect(reactionStirringConditionToOrd(empty)).toBeUndefined();
+  });
+
+  it('reads an unset stirring rate as undefined rather than 0', () => {
+    const result = ordStirringConditionToReaction(
+      create(StirringConditionsSchema, { rate: { details: 'fast' } }),
+    );
+    expect(result.rate.rpm).toBeUndefined();
+    expect(result.rate.details).toBe('fast');
   });
 });

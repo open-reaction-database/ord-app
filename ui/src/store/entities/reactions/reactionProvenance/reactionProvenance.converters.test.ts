@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import {
+  PersonSchema,
+  ReactionProvenanceSchema,
+  RecordEventSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordPersonToReactionPerson,
   reactionPersonToOrdPerson,
@@ -24,15 +30,21 @@ import {
 } from './reactionProvenance.converters.ts';
 
 describe('person converters', () => {
-  it('substitutes an empty Person object for nullish input', () => {
-    expect(ordPersonToReactionPerson(null)).toBeTypeOf('object');
-    expect(ordPersonToReactionPerson(undefined)).not.toBeNull();
+  it('substitutes an empty person for nullish input', () => {
+    expect(ordPersonToReactionPerson(null)).toEqual({});
+    expect(ordPersonToReactionPerson(undefined)).toEqual({});
   });
 
-  it('passes an existing person through in both directions', () => {
-    const person = { name: 'Ada Lovelace', orcid: '0000' };
-    expect(ordPersonToReactionPerson(person)).toBe(person);
-    expect(reactionPersonToOrdPerson(person)).toBe(person);
+  it('carries a person through in both directions, leaving unset fields undefined', () => {
+    const person = ordPersonToReactionPerson(
+      create(PersonSchema, { name: 'Ada Lovelace', orcid: '0000' }),
+    );
+    expect(person).toEqual({ name: 'Ada Lovelace', orcid: '0000' });
+    expect(person.email).toBeUndefined();
+    expect(reactionPersonToOrdPerson(person)).toEqual({
+      name: 'Ada Lovelace',
+      orcid: '0000',
+    });
   });
 });
 
@@ -45,11 +57,13 @@ describe('record event converters', () => {
   });
 
   it('carries details and a person, and formats a present time', () => {
-    const result = ordRecordEventToReaction({
-      details: 'created',
-      time: { value: '2024-06-01T12:00:00' },
-      person: { name: 'Grace Hopper' },
-    });
+    const result = ordRecordEventToReaction(
+      create(RecordEventSchema, {
+        details: 'created',
+        time: { value: '2024-06-01T12:00:00' },
+        person: { name: 'Grace Hopper' },
+      }),
+    );
     expect(result.details).toBe('created');
     expect(result.person.name).toBe('Grace Hopper');
     expect(result.time).toBeTruthy();
@@ -62,7 +76,7 @@ describe('record event converters', () => {
       details: 'edited',
       person: { name: 'Ada' },
     });
-    expect(result.time).toBeNull();
+    expect(result.time).toBeUndefined();
     expect(result.details).toBe('edited');
     expect(result.person).toEqual({ name: 'Ada' });
   });
@@ -83,6 +97,24 @@ describe('provenance converters', () => {
     expect(result).not.toHaveProperty('id');
     expect(result.recordModified).toEqual([]);
     expect(result.recordCreated).toBeDefined();
-    expect(result.experimentStart).toBeNull();
+    expect(result.experimentStart).toBeUndefined();
+  });
+
+  it('carries the fields the app does not edit through a round trip', () => {
+    const ordProvenance = create(ReactionProvenanceSchema, {
+      doi: '10.1000/xyz',
+      isMined: true,
+      reactionMetadata: { source: { kind: { case: 'stringValue', value: 'scraped' } } },
+    });
+    const result = create(
+      ReactionProvenanceSchema,
+      reactionProvenanceToOrd(ordProvenanceToReaction(ordProvenance)),
+    );
+    expect(result.doi).toBe('10.1000/xyz');
+    expect(result.isMined).toBe(true);
+    expect(result.reactionMetadata.source.kind).toEqual({
+      case: 'stringValue',
+      value: 'scraped',
+    });
   });
 });

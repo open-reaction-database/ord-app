@@ -23,7 +23,8 @@ import {
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { CompoundIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { CustomIdentifiers } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/CustomIdentifiers.tsx';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
@@ -81,7 +82,7 @@ export const identifiersList: ReactionFormNode = {
     label: 'Identifier',
     useCreate: buildUseCreate('identifiers', index => {
       const emptyItem = ordCompoundIdentifierToReaction(
-        ord.CompoundIdentifier.toObject(new ord.CompoundIdentifier()),
+        create(CompoundIdentifierSchema),
       );
       return [index, emptyItem];
     }),

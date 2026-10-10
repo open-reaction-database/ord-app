@@ -17,7 +17,8 @@ import {
   type ReactionFormNode,
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { CompoundPreparationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
@@ -37,12 +38,7 @@ import { ordPreparationToReaction } from 'store/entities/reactions/reactionCompo
 import type { ReactionComponentPreparation } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 const emptyPreparation = (newIndex: number): [number, ReactionComponentPreparation] => {
-  return [
-    newIndex,
-    ordPreparationToReaction(
-      ord.CompoundPreparation.toObject(new ord.CompoundPreparation()),
-    ),
-  ];
+  return [newIndex, ordPreparationToReaction(create(CompoundPreparationSchema))];
 };
 
 export const reactionComponents: Array<ReactionFormNode> = [

@@ -13,6 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { DescMessage } from '@bufbuild/protobuf';
+import {
+  AnalysisSchema,
+  CompoundIdentifierSchema,
+  CompoundPreparationSchema,
+  CompoundSchema,
+  CrudeComponentSchema,
+  DataSchema,
+  ElectrochemistryConditions_ElectrochemistryMeasurementSchema,
+  PressureConditions_PressureMeasurementSchema,
+  ProductCompoundSchema,
+  ProductMeasurementSchema,
+  ReactionConditionsSchema,
+  ReactionIdentifierSchema,
+  ReactionInputSchema,
+  ReactionNotesSchema,
+  ReactionObservationSchema,
+  ReactionOutcomeSchema,
+  ReactionProvenanceSchema,
+  ReactionSetupSchema,
+  ReactionWorkupSchema,
+  RecordEventSchema,
+  TemperatureConditions_TemperatureMeasurementSchema,
+  VesselAttachmentSchema,
+  VesselPreparationSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ReactionNodeEntity,
   type OrdToReactionEntityConverter,
@@ -201,6 +227,37 @@ export const ordToReactionConvertersByNodeEntity: Record<
     hasName: false,
     convert: ordVesselAttachmentToReaction,
   },
+};
+
+// The ord message that each node entity converts to and from.
+export const ordSchemaByNodeEntity: Record<ReactionNodeEntity, DescMessage> = {
+  [ReactionNodeEntity.Inputs]: ReactionInputSchema,
+  [ReactionNodeEntity.Input]: ReactionInputSchema,
+  [ReactionNodeEntity.Outcomes]: ReactionOutcomeSchema,
+  [ReactionNodeEntity.Identifiers]: ReactionIdentifierSchema,
+  [ReactionNodeEntity.Setup]: ReactionSetupSchema,
+  [ReactionNodeEntity.Notes]: ReactionNotesSchema,
+  [ReactionNodeEntity.Components]: CompoundSchema,
+  [ReactionNodeEntity.CrudeComponents]: CrudeComponentSchema,
+  [ReactionNodeEntity.ComponentPreparations]: CompoundPreparationSchema,
+  [ReactionNodeEntity.Features]: DataSchema,
+  [ReactionNodeEntity.ComponentIdentifiers]: CompoundIdentifierSchema,
+  [ReactionNodeEntity.Analyses]: AnalysisSchema,
+  [ReactionNodeEntity.Products]: ProductCompoundSchema,
+  [ReactionNodeEntity.Measurements]: ProductMeasurementSchema,
+  [ReactionNodeEntity.Observations]: ReactionObservationSchema,
+  [ReactionNodeEntity.Provenance]: ReactionProvenanceSchema,
+  [ReactionNodeEntity.RecordModified]: RecordEventSchema,
+  [ReactionNodeEntity.Conditions]: ReactionConditionsSchema,
+  [ReactionNodeEntity.Workups]: ReactionWorkupSchema,
+  [ReactionNodeEntity.TemperatureMeasurements]:
+    TemperatureConditions_TemperatureMeasurementSchema,
+  [ReactionNodeEntity.ElectrochemistryMeasurements]:
+    ElectrochemistryConditions_ElectrochemistryMeasurementSchema,
+  [ReactionNodeEntity.PressureMeasurements]:
+    PressureConditions_PressureMeasurementSchema,
+  [ReactionNodeEntity.VesselPreparations]: VesselPreparationSchema,
+  [ReactionNodeEntity.VesselAttachments]: VesselAttachmentSchema,
 };
 
 export const reactionToOrdConvertersByNodeEntity: Record<

@@ -16,31 +16,14 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // parseReaction orchestrates protobuf decode → app reaction → previews/validation.
-// Stub the decode + ord→app converter so the test exercises parseReaction's own
-// assembly (previews via the real getReactionPreviews, validation passthrough)
-// without a real binpb fixture. getReactionPreviews/parseValidation stay real.
-// Keep the real ord namespace (other modules read ord.ReactionRole etc. at load)
-// and override only the two decode helpers parseReaction calls.
-vi.mock('ord-schema-protobufjs', async importActual => {
-  const actual = (await importActual()) as { ord: Record<string, unknown> } & Record<
-    string,
-    unknown
-  >;
-  return {
-    ...actual,
-    ord: {
-      ...actual.ord,
-      Reaction: { decode: vi.fn(() => ({})), toObject: vi.fn(() => ({})) },
-    },
-  };
-});
+// Stub the binpb decode so the test exercises parseReaction's own assembly without a
+// binpb fixture; getReactionPreviews and parseValidation stay real.
 vi.mock('./reactions.converters.ts', () => ({
-  ordReactionToReaction: vi.fn(() => ({ inputs: {}, outcomes: [], workups: [] })),
-  convertReactionFloatsToDoubles: vi.fn(),
+  ordBinpbToReaction: vi.fn(() => ({ inputs: {}, outcomes: [], workups: [] })),
 }));
 
 import {
-  convertObjectToNullIfEmpty,
+  convertObjectToUndefinedIfEmpty,
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
   getDeepReactionPart,
@@ -114,23 +97,25 @@ describe('removeDeepReactionPart', () => {
   });
 });
 
-describe('convertObjectToNullIfEmpty', () => {
-  it('returns null when every value is empty (undefined/null/"")', () => {
-    expect(convertObjectToNullIfEmpty({ a: '', b: null, c: undefined })).toBeNull();
+describe('convertObjectToUndefinedIfEmpty', () => {
+  it('returns undefined when every value is empty (undefined/null/"")', () => {
+    expect(
+      convertObjectToUndefinedIfEmpty({ a: '', b: null, c: undefined }),
+    ).toBeUndefined();
   });
 
   it('returns the object when any value is non-empty', () => {
     const object = { a: 'x', b: '' };
-    expect(convertObjectToNullIfEmpty(object)).toBe(object);
+    expect(convertObjectToUndefinedIfEmpty(object)).toBe(object);
   });
 
   it('treats an enum key set to the unspecified value (0) as empty', () => {
-    expect(convertObjectToNullIfEmpty({ type: 0 }, ['type'])).toBeNull();
+    expect(convertObjectToUndefinedIfEmpty({ type: 0 }, ['type'])).toBeUndefined();
   });
 
   it('keeps a 0-valued key that is not declared as an enum key', () => {
     const object = { type: 0 };
-    expect(convertObjectToNullIfEmpty(object)).toBe(object);
+    expect(convertObjectToUndefinedIfEmpty(object)).toBe(object);
   });
 });
 

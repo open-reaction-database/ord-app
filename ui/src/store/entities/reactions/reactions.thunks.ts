@@ -42,9 +42,7 @@ import {
 } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
-import { ord } from 'ord-schema-protobufjs';
-import { Buffer } from 'buffer';
-import { reactionToOrdReaction } from './reactions.converters.ts';
+import { reactionToOrdBinpb } from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 import { getDataset } from '../datasets/datasets.thunks.ts';
@@ -165,10 +163,7 @@ async function updateReaction(
 ): Promise<UpdateReactionSuccessPayload> {
   const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
-  const ordReaction = reactionToOrdReaction(reaction.data);
-  const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
-    'base64',
-  );
+  const payload = reactionToOrdBinpb(reaction.data);
   const {
     binpb: _,
     molblocks,
@@ -199,10 +194,7 @@ export const renameReaction = createThunk(
       const datasetId = selectActiveDatasetId(getState());
       const reaction = selectReactionById(reactionId)(getState());
       const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
-      const ordReaction = reactionToOrdReaction(updatedReaction);
-      const payload = Buffer.from(ord.Reaction.encode(ordReaction).finish()).toString(
-        'base64',
-      );
+      const payload = reactionToOrdBinpb(updatedReaction);
       await axiosInstance.patch<ReactionResponse>(
         `datasets/${datasetId}/reactions/${reactionId}`,
         {

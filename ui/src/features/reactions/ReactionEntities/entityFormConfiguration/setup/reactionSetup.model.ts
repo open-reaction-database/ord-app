@@ -31,7 +31,11 @@ import {
 } from '../buildUseSelectItems';
 import { createEntityListItemComponent } from '../EntityListItem/entityListItem.utils';
 import { buildUseCreate } from '../buildUseCreate';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import {
+  VesselAttachmentSchema,
+  VesselPreparationSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type {
   ReactionVesselAttachment,
   ReactionVesselPreparation,
@@ -190,12 +194,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Preparation',
       useCreate: buildUseCreate(vesselPreparationEntityPath, index => {
-        return [
-          index,
-          ordVesselPreparationToReaction(
-            ord.VesselPreparation.toObject(new ord.VesselPreparation()),
-          ),
-        ];
+        return [index, ordVesselPreparationToReaction(create(VesselPreparationSchema))];
       }),
     },
   },
@@ -224,12 +223,7 @@ export const reactionSetup: Array<ReactionFormNode> = [
     addItem: {
       label: 'Vessel Attachment',
       useCreate: buildUseCreate(vesselAttachmentEntityPath, index => {
-        return [
-          index,
-          ordVesselAttachmentToReaction(
-            ord.VesselAttachment.toObject(new ord.VesselAttachment()),
-          ),
-        ];
+        return [index, ordVesselAttachmentToReaction(create(VesselAttachmentSchema))];
       }),
     },
   },

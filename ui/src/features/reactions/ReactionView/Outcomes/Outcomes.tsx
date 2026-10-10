@@ -16,7 +16,8 @@
 import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
 import { useSelector } from 'react-redux';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionOutcomeSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { Accordion, Button, Flex, Title } from '@mantine/core';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { AddCircleIcon, NoData } from 'common/icons';
@@ -33,7 +34,7 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
-  ordOutcomeToReactionOutcome(ord.ReactionOutcome.toObject(new ord.ReactionOutcome())),
+  ordOutcomeToReactionOutcome(create(ReactionOutcomeSchema)),
 ]);
 
 const ENTITY_FIELD = 'outcomes';

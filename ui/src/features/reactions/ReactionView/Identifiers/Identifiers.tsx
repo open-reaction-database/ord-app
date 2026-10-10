@@ -20,8 +20,10 @@ import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/r
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { AddCircleIcon } from 'common/icons';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ReactionIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { ordReactionIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { useCallback, useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
@@ -41,7 +43,9 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
       ENTITY_FIELD,
       identifiers.length,
     ];
-    const newIdentifier = ord.ReactionIdentifier.toObject(new ord.ReactionIdentifier());
+    const newIdentifier = ordReactionIdentifierToReaction(
+      create(ReactionIdentifierSchema),
+    );
 
     dispatch(
       addUpdateReactionField({

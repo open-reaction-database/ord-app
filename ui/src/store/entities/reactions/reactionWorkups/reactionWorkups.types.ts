@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type {
   Optional,
   ReactionBoolean,
@@ -28,9 +27,10 @@ import type {
   ReactionTemperatureCondition,
 } from '../reactionConditions/reactionConditions.types.ts';
 
-export interface ReactionWorkup extends WithId<
-  Pick<ord.IReactionWorkup, 'details' | 'keepPhase' | 'targetPh'>
-> {
+export interface ReactionWorkup extends WithId<object> {
+  details?: Optional<string>;
+  keepPhase?: Optional<string>;
+  targetPh?: Optional<number>;
   type: WorkupType;
   duration: Optional<ReactionTime>;
   input: Optional<ReactionInputWithoutName>;

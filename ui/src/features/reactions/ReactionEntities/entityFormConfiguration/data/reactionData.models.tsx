@@ -23,7 +23,8 @@ import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormCo
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { ordDataToReaction } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { DataSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 
 export const reactionData: Array<ReactionFormNode> = [
   {
@@ -78,7 +79,7 @@ const buildCreateEmptyData =
       entityName,
       (dataList as Array<AppData>).map(f => f.name),
     );
-    const data = ordDataToReaction(ord.Data.toObject(new ord.Data()), uniqueName);
+    const data = ordDataToReaction(create(DataSchema), uniqueName);
     return [data.id, data];
   };
 

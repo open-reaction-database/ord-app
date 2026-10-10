@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
-import type { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type {
+  Optional,
+  ReactionBoolean,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
-export interface ReactionNotes extends Pick<
-  ord.IReactionNotes,
-  'procedureDetails' | 'safetyNotes'
-> {
+export interface ReactionNotes {
+  procedureDetails?: Optional<string>;
+  safetyNotes?: Optional<string>;
   isHeterogeneous: ReactionBoolean;
   formsPrecipitate: ReactionBoolean;
   isExothermic: ReactionBoolean;

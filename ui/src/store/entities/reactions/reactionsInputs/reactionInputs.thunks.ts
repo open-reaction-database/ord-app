@@ -16,11 +16,15 @@
 import { createThunkWithExplicitResult } from 'store/utils';
 import { addIdentifierByNameActions } from 'store/entities/reactions/reactionsInputs/reactionInputs.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
-import { ord } from 'ord-schema-protobufjs';
-import CompoundIdentifierType = ord.CompoundIdentifier.CompoundIdentifierType;
+import { create } from '@bufbuild/protobuf';
+import {
+  CompoundIdentifier_CompoundIdentifierType,
+  CompoundIdentifierSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export const addIdentifierByName = createThunkWithExplicitResult(
   addIdentifierByNameActions,
@@ -36,16 +40,14 @@ export const addIdentifierByName = createThunkWithExplicitResult(
         );
         const identifierValue = result.data.smiles;
         const newIdentifier = ordCompoundIdentifierToReaction(
-          ord.CompoundIdentifier.toObject(
-            new ord.CompoundIdentifier({
-              type: CompoundIdentifierType.SMILES,
-              value: identifierValue,
-              details: name,
-            }),
-          ),
+          create(CompoundIdentifierSchema, {
+            type: CompoundIdentifier_CompoundIdentifierType.SMILES,
+            value: identifierValue,
+            details: name,
+          }),
         );
         dispatch(addIdentifierByNameActions.success());
-        const identifiers: Array<ord.CompoundIdentifier> =
+        const identifiers: Array<ReactionCompoundIdentifier> =
           selectReactionPartByPath(reactionId, pathComponents)(getState()) || [];
         const newIndex = identifiers.length;
         dispatch(

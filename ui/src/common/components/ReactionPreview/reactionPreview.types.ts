@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 export type RenderedSvg = string | null;
@@ -26,9 +25,4 @@ export interface ReactionComponentPreview {
 export interface ReactionInputPreview {
   name: string;
   components: Array<ReactionComponentPreview>;
-}
-
-export interface ReactionProductPreview {
-  product: ord.IReactionOutcome;
-  svg: RenderedSvg;
 }

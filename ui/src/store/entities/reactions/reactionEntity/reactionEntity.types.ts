@@ -39,7 +39,6 @@ import type {
   ReactionVesselMaterialType,
   ReactionEnvironmentType,
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
 
 export interface ReactionEntity {
   id: string;
@@ -67,8 +66,8 @@ export type OrdOptional<T> = T | null | undefined;
 export type Optional<T> = T | null;
 
 export interface OrdTypeDetails {
-  type?: Optional<number>;
-  details?: Optional<string>;
+  type?: number;
+  details?: string;
 }
 
 export interface ReactionTypeDetails<T extends string> {
@@ -77,14 +76,12 @@ export interface ReactionTypeDetails<T extends string> {
 }
 
 export interface OrdValuePrecision {
-  value?: Optional<number>;
-  precision?: Optional<number>;
+  value?: number;
+  precision?: number;
 }
 
 export interface OrdValuePrecisionUnit extends OrdValuePrecision {
-  value?: Optional<number>;
-  precision?: Optional<number>;
-  units?: Optional<number>;
+  units?: number;
 }
 
 export interface ReactionValuePrecision {
@@ -126,18 +123,18 @@ export type ReactionLength = ReactionValuePrecisionUnit<ReactionLengthType>;
 
 export type ReactionCurrent = ReactionValuePrecisionUnit<ReactionCurrentType>;
 
-export type ReactionMassSpec = Omit<
-  ord.ProductMeasurement.IMassSpecMeasurementDetails,
-  'type' | 'eicMasses'
-> & {
+export interface ReactionMassSpec {
   type: ReactionMassSpecType;
+  details?: Optional<string>;
+  ticMinimumMz?: Optional<number>;
+  ticMaximumMz?: Optional<number>;
   eicMasses: Array<number>;
-};
+}
 
-export interface ReactionCompoundIdentifier extends WithId<
-  Omit<ord.ICompoundIdentifier, 'type'>
-> {
+export interface ReactionCompoundIdentifier extends ReactionEntity {
   type: CompoundIdentifierType;
+  details?: Optional<string>;
+  value?: Optional<string>;
 }
 
 export type ReactionDateTime = string | null;
@@ -148,19 +145,19 @@ export type PressureControl = ReactionTypeDetails<PressureControlType>;
 
 export type ReactionAtmosphere = ReactionTypeDetails<ReactionAtmosphereType>;
 
-export interface StirringRate extends Pick<
-  ord.StirringConditions.IStirringRate,
-  'details' | 'rpm'
-> {
+export interface StirringRate {
   type: StirringRateType;
+  details?: Optional<string>;
+  rpm?: Optional<number>;
 }
 
 export type Voltage = ReactionValuePrecisionUnit<VoltageUnit>;
 
 export type ElectrochemistryCell = ReactionTypeDetails<ElectrochemistryCellType>;
 
-export interface Tubing extends Pick<ord.FlowConditions.ITubing, 'details'> {
+export interface Tubing {
   type: TubingType;
+  details?: Optional<string>;
   diameter: ReactionLength;
 }
 

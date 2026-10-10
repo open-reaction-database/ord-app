@@ -13,102 +13,102 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type * as ord from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 
-export type ReactionRole = keyof typeof ord.ReactionRole.ReactionRoleType;
+export type ReactionRole = keyof typeof ord.ReactionRole_ReactionRoleType;
 
 export type CompoundPreparationType =
-  keyof typeof ord.CompoundPreparation.CompoundPreparationType;
+  keyof typeof ord.CompoundPreparation_CompoundPreparationType;
 
-export type ReactionTimeType = keyof typeof ord.Time.TimeUnit;
+export type ReactionTimeType = keyof typeof ord.Time_TimeUnit;
 
 export type ReactionAdditionDeviceType =
-  keyof typeof ord.ReactionInput.AdditionDevice.AdditionDeviceType;
+  keyof typeof ord.ReactionInput_AdditionDevice_AdditionDeviceType;
 
 export type ReactionSpeedType =
-  keyof typeof ord.ReactionInput.AdditionSpeed.AdditionSpeedType;
+  keyof typeof ord.ReactionInput_AdditionSpeed_AdditionSpeedType;
 
-export type ReactionFlowRateType = keyof typeof ord.FlowRate.FlowRateUnit;
+export type ReactionFlowRateType = keyof typeof ord.FlowRate_FlowRateUnit;
 
-export type ReactionTemperatureType = keyof typeof ord.Temperature.TemperatureUnit;
+export type ReactionTemperatureType = keyof typeof ord.Temperature_TemperatureUnit;
 
 export type ReactionTemperatureControlType =
-  keyof typeof ord.TemperatureConditions.TemperatureControl.TemperatureControlType;
+  keyof typeof ord.TemperatureConditions_TemperatureControl_TemperatureControlType;
 
-export type ReactionPressureType = keyof typeof ord.Pressure.PressureUnit;
+export type ReactionPressureType = keyof typeof ord.Pressure_PressureUnit;
 
-export type ReactionTextureType = keyof typeof ord.Texture.TextureType;
+export type ReactionTextureType = keyof typeof ord.Texture_TextureType;
 
-export type ReactionAnalysisType = keyof typeof ord.Analysis.AnalysisType;
+export type ReactionAnalysisType = keyof typeof ord.Analysis_AnalysisType;
 
 export type ReactionIdentifierType =
-  keyof typeof ord.ReactionIdentifier.ReactionIdentifierType;
+  keyof typeof ord.ReactionIdentifier_ReactionIdentifierType;
 
 export type ReactionMeasurementType =
-  keyof typeof ord.ProductMeasurement.ProductMeasurementType;
+  keyof typeof ord.ProductMeasurement_ProductMeasurementType;
 
 export type ReactionSelectivityType =
-  keyof typeof ord.ProductMeasurement.Selectivity.SelectivityType;
+  keyof typeof ord.ProductMeasurement_Selectivity_SelectivityType;
 
-export type ReactionWaveLengthType = keyof typeof ord.Wavelength.WavelengthUnit;
+export type ReactionWaveLengthType = keyof typeof ord.Wavelength_WavelengthUnit;
 
-export type ReactionLengthType = keyof typeof ord.Length.LengthUnit;
+export type ReactionLengthType = keyof typeof ord.Length_LengthUnit;
 
-export type ReactionCurrentType = keyof typeof ord.Current.CurrentUnit;
+export type ReactionCurrentType = keyof typeof ord.Current_CurrentUnit;
 
 export type ReactionMassSpecType =
-  keyof typeof ord.ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType;
+  keyof typeof ord.ProductMeasurement_MassSpecMeasurementDetails_MassSpecMeasurementType;
 
 export type CompoundIdentifierType =
-  keyof typeof ord.CompoundIdentifier.CompoundIdentifierType;
+  keyof typeof ord.CompoundIdentifier_CompoundIdentifierType;
 
 export type ReactionAtmosphereType =
-  keyof typeof ord.PressureConditions.Atmosphere.AtmosphereType;
+  keyof typeof ord.PressureConditions_Atmosphere_AtmosphereType;
 
 export type ReactionStirringMethodType =
-  keyof typeof ord.StirringConditions.StirringMethodType;
+  keyof typeof ord.StirringConditions_StirringMethodType;
 
 export type ReactionIlluminationType =
-  keyof typeof ord.IlluminationConditions.IlluminationType;
+  keyof typeof ord.IlluminationConditions_IlluminationType;
 
 export type StirringRateType =
-  keyof typeof ord.StirringConditions.StirringRate.StirringRateType;
+  keyof typeof ord.StirringConditions_StirringRate_StirringRateType;
 
 export type ElectrochemistryType =
-  keyof typeof ord.ElectrochemistryConditions.ElectrochemistryType;
+  keyof typeof ord.ElectrochemistryConditions_ElectrochemistryType;
 
 export type ElectrochemistryCellType =
-  keyof typeof ord.ElectrochemistryConditions.ElectrochemistryCell.ElectrochemistryCellType;
+  keyof typeof ord.ElectrochemistryConditions_ElectrochemistryCell_ElectrochemistryCellType;
 
-export type ReactionFlowType = keyof typeof ord.FlowConditions.FlowType;
+export type ReactionFlowType = keyof typeof ord.FlowConditions_FlowType;
 
-export type TubingType = keyof typeof ord.FlowConditions.Tubing.TubingType;
+export type TubingType = keyof typeof ord.FlowConditions_Tubing_TubingType;
 
-export type WorkupType = keyof typeof ord.ReactionWorkup.ReactionWorkupType;
+export type WorkupType = keyof typeof ord.ReactionWorkup_ReactionWorkupType;
 
 export type PressureControlType =
-  keyof typeof ord.PressureConditions.PressureControl.PressureControlType;
+  keyof typeof ord.PressureConditions_PressureControl_PressureControlType;
 
-export type VoltageUnit = keyof typeof ord.Voltage.VoltageUnit;
+export type VoltageUnit = keyof typeof ord.Voltage_VoltageUnit;
 
 export type TemperatureMeasurementType =
-  keyof typeof ord.TemperatureConditions.TemperatureMeasurement.TemperatureMeasurementType;
+  keyof typeof ord.TemperatureConditions_TemperatureMeasurement_TemperatureMeasurementType;
 
 export type PressureMeasurementType =
-  keyof typeof ord.PressureConditions.PressureMeasurement.PressureMeasurementType;
+  keyof typeof ord.PressureConditions_PressureMeasurement_PressureMeasurementType;
 
-export type ReactionVesselType = keyof typeof ord.Vessel.VesselType;
+export type ReactionVesselType = keyof typeof ord.Vessel_VesselType;
 
 export type ReactionVesselMaterialType =
-  keyof typeof ord.VesselMaterial.VesselMaterialType;
+  keyof typeof ord.VesselMaterial_VesselMaterialType;
 
 export type ReactionVesselPreparationType =
-  keyof typeof ord.VesselPreparation.VesselPreparationType;
+  keyof typeof ord.VesselPreparation_VesselPreparationType;
 
 export type ReactionVesselAttachmentType =
-  keyof typeof ord.VesselAttachment.VesselAttachmentType;
+  keyof typeof ord.VesselAttachment_VesselAttachmentType;
 
 export type ReactionEnvironmentType =
-  keyof typeof ord.ReactionSetup.ReactionEnvironment.ReactionEnvironmentType;
+  keyof typeof ord.ReactionSetup_ReactionEnvironment_ReactionEnvironmentType;
 
-export type ReactionVolumeTypeValues = keyof typeof ord.Volume.VolumeUnit;
+export type ReactionVolumeTypeValues = keyof typeof ord.Volume_VolumeUnit;

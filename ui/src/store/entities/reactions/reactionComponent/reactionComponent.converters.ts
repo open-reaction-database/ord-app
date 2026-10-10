@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  Compound,
+  Compound_Source,
+  Compound_SourceSchema,
+  CompoundPreparation,
+  CompoundPreparationSchema,
+  CompoundSchema,
+  ProductCompound,
+  ProductCompoundSchema,
+  ProductMeasurement,
+  ProductMeasurementSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordBooleanToReaction,
   ordCompoundIdentifierToReaction,
   ordMassSpecToReaction,
+  ordScalarToReaction,
   ordSelectivityToReaction,
   ordTextureToReaction,
   ordTimeToReaction,
@@ -48,9 +61,9 @@ import {
   reactionAmountToOrd,
 } from 'store/entities/reactions/reactionAmount/reactionAmount.converters.ts';
 import {
-  type OrdComponentBase,
   type ReactionComponentBase,
   type ReactionComponentPreparation,
+  type ReactionCompoundSource,
   type ReactionInputComponent,
   type ReactionMeasurement,
   type ReactionMeasurementValue,
@@ -64,34 +77,47 @@ import type {
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { measurementTransform } from '../reactionsMeasurement/reactionMeasurements.transform.ts';
 
+type OrdComponentBaseField = 'identifiers' | 'reactionRole' | 'texture' | 'features';
+
+type OrdComponentBase = Pick<Compound, OrdComponentBaseField> &
+  Pick<ProductCompound, OrdComponentBaseField>;
+
 const emptyIdentifiersArray: Array<ReactionCompoundIdentifier> = [];
 
 const ordCompoundSourceToReaction = (
-  compoundSource: OrdOptional<ord.Compound.ISource>,
-): ord.Compound.ISource => {
-  const { vendor, lot, catalogId } = compoundSource ?? {};
-  return {
-    vendor: vendor ?? null,
-    catalogId: catalogId ?? null,
-    lot: lot ?? null,
-  };
-};
+  compoundSource: OrdOptional<Compound_Source>,
+): ReactionCompoundSource => ({
+  vendor: compoundSource?.vendor || null,
+  catalogId: compoundSource?.catalogId || null,
+  lot: compoundSource?.lot || null,
+});
 
-const reactionCompoundSourceToOrd = (
-  compoundSource: ord.Compound.ISource,
-): Optional<ord.Compound.ISource> => {
-  const { vendor, lot, catalogId } = compoundSource;
+const reactionCompoundSourceToOrd = ({
+  vendor,
+  lot,
+  catalogId,
+}: ReactionCompoundSource):
+  | MessageInitShape<typeof Compound_SourceSchema>
+  | undefined => {
   const hasAnyValues = !!vendor || !!lot || !!catalogId;
-  return hasAnyValues ? compoundSource : null;
+  return hasAnyValues
+    ? {
+        vendor: vendor ?? undefined,
+        catalogId: catalogId ?? undefined,
+        lot: lot ?? undefined,
+      }
+    : undefined;
 };
 
 export const ordPreparationToReaction = ({
   type,
-  ...rest
-}: ord.ICompoundPreparation): ReactionComponentPreparation => {
+  details,
+  reactionId,
+}: CompoundPreparation): ReactionComponentPreparation => {
   return withId({
     type: ordPreparationTypeToReaction(type),
-    ...rest,
+    details: ordScalarToReaction(details),
+    reactionId: ordScalarToReaction(reactionId),
   });
 };
 
@@ -99,70 +125,78 @@ export const reactionPreparationToOrd = ({
   type,
   details,
   reactionId,
-}: ReactionComponentPreparation): ord.ICompoundPreparation => {
+}: ReactionComponentPreparation): MessageInitShape<
+  typeof CompoundPreparationSchema
+> => {
   return {
     type: reactionPreparationTypeToOrd(type),
-    details,
-    reactionId: type === 'SYNTHESIZED' ? reactionId : null,
+    details: details ?? undefined,
+    reactionId: type === 'SYNTHESIZED' ? (reactionId ?? undefined) : undefined,
   };
 };
 
-const ordMeasurementValueToReaction = (
-  measurement: ord.IProductMeasurement,
-): Optional<ReactionMeasurementValue> => {
-  if (measurement.amount) {
-    return {
-      type: ReactionMeasurementValueType.Mass,
-      value: ordAmountToReaction(measurement.amount),
-    };
+const ordMeasurementValueToReaction = ({
+  value,
+}: ProductMeasurement): Optional<ReactionMeasurementValue> => {
+  switch (value.case) {
+    case 'amount':
+      return {
+        type: ReactionMeasurementValueType.Mass,
+        value: ordAmountToReaction(value.value),
+      };
+    case 'stringValue':
+      return value.value
+        ? { type: ReactionMeasurementValueType.String, value: value.value }
+        : null;
+    case 'floatValue':
+      return {
+        type: ReactionMeasurementValueType.Number,
+        value: { value: value.value.value, precision: value.value.precision },
+      };
+    case 'percentage':
+      return {
+        type: ReactionMeasurementValueType.Percent,
+        value: { value: value.value.value, precision: value.value.precision },
+      };
+    default:
+      return null;
   }
-  if (measurement.stringValue) {
-    return {
-      type: ReactionMeasurementValueType.String,
-      value: measurement.stringValue,
-    };
-  }
-  if (measurement.floatValue) {
-    return {
-      type: ReactionMeasurementValueType.Number,
-      value: measurement.floatValue,
-    };
-  }
-  if (measurement.percentage) {
-    return {
-      type: ReactionMeasurementValueType.Percent,
-      value: measurement.percentage,
-    };
-  }
-  return null;
 };
 
 const reactionMeasurementValueToOrd = ({
   type,
   value,
-}: ReactionMeasurementValue): Partial<ord.IProductMeasurement> => {
+}: ReactionMeasurementValue): MessageInitShape<
+  typeof ProductMeasurementSchema
+>['value'] => {
   switch (type) {
-    case ReactionMeasurementValueType.Mass:
-      return {
-        amount: reactionAmountToOrd(value),
-      };
+    case ReactionMeasurementValueType.Mass: {
+      const amount = reactionAmountToOrd(value);
+      return amount ? { case: 'amount', value: amount } : undefined;
+    }
     case ReactionMeasurementValueType.String:
-      return {
-        stringValue: value,
-      };
+      return { case: 'stringValue', value };
     case ReactionMeasurementValueType.Number:
       return {
-        floatValue: value,
+        case: 'floatValue',
+        value: {
+          value: value.value ?? undefined,
+          precision: value.precision ?? undefined,
+        },
       };
     default:
       return {
-        percentage: value,
+        case: 'percentage',
+        value: {
+          value: value.value ?? undefined,
+          precision: value.precision ?? undefined,
+        },
       };
   }
 };
 
 export const ordMeasurementToReaction = (
-  measurement: ord.IProductMeasurement,
+  measurement: ProductMeasurement,
 ): ReactionMeasurement => {
   const {
     type,
@@ -179,7 +213,7 @@ export const ordMeasurementToReaction = (
   } = measurement;
   return withId({
     type: ordMeasurementTypeToReaction(type),
-    details,
+    details: ordScalarToReaction(details),
     value: ordMeasurementValueToReaction(measurement),
     analysis: analysisKey ? { name: analysisKey, id: null } : null,
     isNormalized: ordBooleanToReaction(isNormalized),
@@ -197,7 +231,7 @@ export const ordMeasurementToReaction = (
 
 export const reactionMeasurementToOrd = (
   measurement: ReactionMeasurement,
-): ord.IProductMeasurement => {
+): MessageInitShape<typeof ProductMeasurementSchema> => {
   const {
     type,
     details,
@@ -215,19 +249,21 @@ export const reactionMeasurementToOrd = (
 
   return {
     type: reactionMeasurementTypeToOrd(type),
-    details,
+    details: details ?? undefined,
     analysisKey: analysis?.name,
     isNormalized: reactionBooleanToOrd(isNormalized),
     usesInternalStandard: reactionBooleanToOrd(usesInternalStandard),
     usesAuthenticStandard: reactionBooleanToOrd(usesAuthenticStandard),
-    retentionTime: retentionTime ? reactionTimeToOrd(retentionTime) : null,
-    selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : null,
-    wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : null,
-    massSpecDetails: massSpecDetails ? reactionMassSpecToOrd(massSpecDetails) : null,
+    retentionTime: retentionTime ? reactionTimeToOrd(retentionTime) : undefined,
+    selectivity: selectivity ? reactionSelectivityToOrd(selectivity) : undefined,
+    wavelength: waveLength ? reactionWaveLengthToOrd(waveLength) : undefined,
+    massSpecDetails: massSpecDetails
+      ? reactionMassSpecToOrd(massSpecDetails)
+      : undefined,
     authenticStandard: authenticStandard
       ? reactionInputComponentToOrd(authenticStandard)
-      : null,
-    ...(value ? reactionMeasurementValueToOrd(value) : {}),
+      : undefined,
+    value: value ? reactionMeasurementValueToOrd(value) : undefined,
   };
 };
 
@@ -272,7 +308,7 @@ function reactionComponentBaseToOrd({
   reactionRole,
   texture,
   features,
-}: ReactionComponentBase): OrdComponentBase {
+}: ReactionComponentBase) {
   const ordIdentifiers = [...molBlockIdentifiers, ...identifiers].map(
     reactionCompoundIdentifierToOrd,
   );
@@ -285,7 +321,7 @@ function reactionComponentBaseToOrd({
 }
 
 export function ordInputComponentToReaction(
-  inputComponent: ord.ICompound,
+  inputComponent: Compound,
 ): ReactionInputComponent {
   const { amount, preparations, isLimiting, source } = inputComponent;
 
@@ -300,12 +336,12 @@ export function ordInputComponentToReaction(
 
 export function reactionInputComponentToOrd(
   inputComponent: ReactionInputComponent,
-): ord.ICompound {
+): MessageInitShape<typeof CompoundSchema> {
   const { amount, preparations, source } = inputComponent;
   const isLimiting =
     inputComponent.reactionRole === 'REACTANT'
       ? reactionBooleanToOrd(inputComponent.isLimiting)
-      : null;
+      : undefined;
   return {
     ...reactionComponentBaseToOrd(inputComponent),
     isLimiting,
@@ -315,22 +351,24 @@ export function reactionInputComponentToOrd(
   };
 }
 
-export function ordProductToReaction(product: ord.IProductCompound): ReactionProduct {
+export function ordProductToReaction(product: ProductCompound): ReactionProduct {
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...ordComponentBaseToReaction(product),
     isDesiredProduct: ordBooleanToReaction(isDesiredProduct),
-    isolatedColor,
+    isolatedColor: ordScalarToReaction(isolatedColor),
     measurements: (measurements ?? []).map(ordMeasurementToReaction),
   };
 }
 
-export function reactionProductToOrd(product: ReactionProduct): ord.IProductCompound {
+export function reactionProductToOrd(
+  product: ReactionProduct,
+): MessageInitShape<typeof ProductCompoundSchema> {
   const { measurements, isDesiredProduct, isolatedColor } = product;
   return {
     ...reactionComponentBaseToOrd(product),
     isDesiredProduct: reactionBooleanToOrd(isDesiredProduct),
-    isolatedColor,
+    isolatedColor: isolatedColor ?? undefined,
     measurements: measurements.map(reactionMeasurementToOrd),
   };
 }

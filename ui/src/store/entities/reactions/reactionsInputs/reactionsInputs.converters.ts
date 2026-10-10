@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  CrudeComponent,
+  CrudeComponentSchema,
+  ReactionInput as OrdReactionInput,
+  ReactionInputSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type {
   ReactionInput,
   ReactionCrudeComponent,
@@ -25,6 +31,7 @@ import {
   ordAdditionSpeedToReaction,
   ordBooleanToReaction,
   ordFlowRateToReaction,
+  ordScalarToReaction,
   ordTemperatureToReaction,
   ordTextureToReaction,
   ordTimeToReaction,
@@ -32,6 +39,7 @@ import {
   reactionAdditionSpeedToOrd,
   reactionBooleanToOrd,
   reactionFlowRateToOrd,
+  reactionIntegerToOrd,
   reactionTemperatureToOrd,
   reactionTextureToOrd,
   reactionTimeToOrd,
@@ -53,9 +61,9 @@ export function ordCrudeComponentToReaction({
   hasDerivedAmount,
   texture,
   amount,
-}: ord.ICrudeComponent): ReactionCrudeComponent {
+}: CrudeComponent): ReactionCrudeComponent {
   return withId({
-    reactionId,
+    reactionId: ordScalarToReaction(reactionId),
     includesWorkup: ordBooleanToReaction(includesWorkup),
     hasDerivedAmount: ordBooleanToReaction(hasDerivedAmount),
     texture: ordTextureToReaction(texture),
@@ -69,9 +77,9 @@ export function reactionCrudeComponentToOrd({
   hasDerivedAmount,
   amount,
   texture,
-}: ReactionCrudeComponent): ord.ICrudeComponent {
+}: ReactionCrudeComponent): MessageInitShape<typeof CrudeComponentSchema> {
   return {
-    reactionId,
+    reactionId: reactionId ?? undefined,
     includesWorkup: reactionBooleanToOrd(includesWorkup),
     hasDerivedAmount: reactionBooleanToOrd(hasDerivedAmount),
     amount: reactionAmountToOrd(amount),
@@ -80,7 +88,7 @@ export function reactionCrudeComponentToOrd({
 }
 
 export function ordInputWithoutNameToReaction(
-  ordInput: ord.IReactionInput,
+  ordInput: OrdReactionInput,
 ): ReactionInputWithoutName {
   const {
     components,
@@ -97,7 +105,7 @@ export function ordInputWithoutNameToReaction(
   return withId({
     components: (components || []).map(ordInputComponentToReaction),
     crudeComponents: (crudeComponents || []).map(ordCrudeComponentToReaction),
-    additionOrder,
+    additionOrder: ordScalarToReaction(additionOrder),
     additionSpeed: ordAdditionSpeedToReaction(additionSpeed),
     additionDuration: ordTimeToReaction(additionDuration),
     flowRate: ordFlowRateToReaction(flowRate),
@@ -110,7 +118,7 @@ export function ordInputWithoutNameToReaction(
 
 export function reactionInputWithoutNameToOrd(
   input: ReactionInputWithoutName,
-): ord.IReactionInput {
+): MessageInitShape<typeof ReactionInputSchema> {
   const {
     components,
     crudeComponents,
@@ -126,7 +134,7 @@ export function reactionInputWithoutNameToOrd(
   return {
     components: components.map(reactionInputComponentToOrd),
     crudeComponents: crudeComponents.map(reactionCrudeComponentToOrd),
-    additionOrder,
+    additionOrder: reactionIntegerToOrd(additionOrder),
     additionSpeed: reactionAdditionSpeedToOrd(additionSpeed),
     additionDuration: reactionTimeToOrd(additionDuration),
     flowRate: reactionFlowRateToOrd(flowRate),
@@ -138,7 +146,7 @@ export function reactionInputWithoutNameToOrd(
 }
 
 export function ordInputToReaction(
-  ordInput: ord.IReactionInput,
+  ordInput: OrdReactionInput,
   name: string,
 ): ReactionInput {
   return {
@@ -150,12 +158,12 @@ export function ordInputToReaction(
 export function reactionInputToOrd({
   name: _,
   ...input
-}: ReactionInput): ord.IReactionInput {
+}: ReactionInput): MessageInitShape<typeof ReactionInputSchema> {
   return reactionInputWithoutNameToOrd(input);
 }
 
 export function ordInputsToReactionInputs(
-  ordInputs: ord.IReaction['inputs'],
+  ordInputs: Record<string, OrdReactionInput>,
 ): AppReaction['inputs'] {
   return Object.entries(ordInputs || {}).reduce((acc, [name, ordInput]) => {
     const reactionInput = ordInputToReaction(ordInput, name);
@@ -168,7 +176,7 @@ export function ordInputsToReactionInputs(
 
 export function reactionInputsToOrdInputs(
   reactionInputs: AppReaction['inputs'],
-): ord.IReaction['inputs'] {
+): Record<string, MessageInitShape<typeof ReactionInputSchema>> {
   return Object.values(reactionInputs).reduce(
     (acc, item) => ({
       ...acc,

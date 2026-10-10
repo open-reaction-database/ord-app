@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordObservationToReaction,
   reactionObservationToOrd,
@@ -22,10 +24,12 @@ import { AppDataType } from '../reactionData/reactionData.types.ts';
 
 describe('ordObservationToReaction', () => {
   it('assigns an id, the comment, a time, and the named image data', () => {
-    const result = ordObservationToReaction({
-      comment: 'gas evolved',
-      image: { url: 'https://img' },
-    });
+    const result = ordObservationToReaction(
+      create(ReactionObservationSchema, {
+        comment: 'gas evolved',
+        image: { kind: { case: 'url', value: 'https://img' } },
+      }),
+    );
     expect(typeof result.id).toBe('string');
     expect(result.comment).toBe('gas evolved');
     expect(result.image.name).toBe('Observation');
@@ -37,18 +41,22 @@ describe('ordObservationToReaction', () => {
   });
 
   it('defaults a missing comment to an empty string', () => {
-    expect(ordObservationToReaction({}).comment).toBe('');
+    expect(ordObservationToReaction(create(ReactionObservationSchema)).comment).toBe(
+      '',
+    );
   });
 });
 
 describe('reactionObservationToOrd', () => {
   it('round-trips the comment and image back to ord shape', () => {
-    const observation = ordObservationToReaction({
-      comment: 'precipitate',
-      image: { stringValue: 'note' },
-    });
+    const observation = ordObservationToReaction(
+      create(ReactionObservationSchema, {
+        comment: 'precipitate',
+        image: { kind: { case: 'stringValue', value: 'note' } },
+      }),
+    );
     const result = reactionObservationToOrd(observation);
     expect(result.comment).toBe('precipitate');
-    expect(result.image?.stringValue).toBe('note');
+    expect(result.image?.kind).toEqual({ case: 'stringValue', value: 'note' });
   });
 });

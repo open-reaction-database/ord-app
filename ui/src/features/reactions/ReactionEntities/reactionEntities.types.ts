@@ -78,7 +78,8 @@ export interface ReactionFormWrapper extends ReactionFormNodeBase, ReactionFormF
 export interface ReactionFormValue extends ReactionFormField, ReactionFormNodeBase {
   type: ReactionFormNodeType.value;
   name: string;
-  inputType: 'string' | 'number' | 'textarea';
+  // 'integer' is a number input that rejects decimals, for int32 fields.
+  inputType: 'string' | 'number' | 'integer' | 'textarea';
   inputConfig?: Pick<InputProps, 'leftSection' | 'rightSection'> & {
     placeholder?: string;
   };

@@ -29,12 +29,7 @@ import type {
 import type { PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
 import type { ReactionInput } from './reactionsInputs/reactionInputs.types.ts';
 import type { Pages } from 'common/types';
-import { ord } from 'ord-schema-protobufjs';
-import { Buffer } from 'buffer';
-import {
-  convertReactionFloatsToDoubles,
-  ordReactionToReaction,
-} from './reactions.converters.ts';
+import { ordBinpbToReaction } from './reactions.converters.ts';
 import type { OrdOptional } from './reactionEntity/reactionEntity.types.ts';
 import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 
@@ -282,9 +277,7 @@ export const parseReaction = ({
   validation,
   ...rest
 }: ReactionResponse): DatasetReaction => {
-  const parsedProtobuf = ord.Reaction.decode(Buffer.from(binpb, 'base64'));
-  const appReaction = ordReactionToReaction(ord.Reaction.toObject(parsedProtobuf));
-  convertReactionFloatsToDoubles(appReaction);
+  const appReaction = ordBinpbToReaction(binpb);
   const previews = getReactionPreviews(appReaction, molblocks);
   const updatedValidation = validation
     ? parseValidation(validation, appReaction)
@@ -310,10 +303,10 @@ const ENUM_UNSPECIFIED_VALUE = 0;
 
 type ObjectValue = OrdOptional<number | string | Array<unknown> | boolean | object>;
 
-export function convertObjectToNullIfEmpty<T extends Record<string, ObjectValue>>(
+export function convertObjectToUndefinedIfEmpty<T extends Record<string, ObjectValue>>(
   object: T,
   enumKeys: Array<keyof T> = [],
-): T | null {
+): T | undefined {
   const isEmpty = Object.keys(object).every(key => {
     const value = object[key];
     if (enumKeys.includes(key) && value === ENUM_UNSPECIFIED_VALUE) {
@@ -321,5 +314,5 @@ export function convertObjectToNullIfEmpty<T extends Record<string, ObjectValue>
     }
     return value === undefined || value === null || value === '';
   });
-  return isEmpty ? null : object;
+  return isEmpty ? undefined : object;
 }

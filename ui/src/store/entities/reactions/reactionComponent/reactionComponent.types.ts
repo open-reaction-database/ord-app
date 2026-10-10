@@ -23,6 +23,7 @@ import type {
   OrdOptional,
   ReactionBoolean,
   ReactionCompoundIdentifier,
+  ReactionEntity,
   ReactionMassSpec,
   ReactionSelectivity,
   ReactionTexture,
@@ -30,15 +31,8 @@ import type {
   ReactionWaveLength,
   WithId,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
-
-export type OrdComponentBase = Pick<
-  ord.ICompound,
-  'identifiers' | 'reactionRole' | 'texture' | 'features'
-> &
-  Pick<ord.IProductCompound, 'identifiers' | 'reactionRole' | 'texture' | 'features'>;
 
 export type ReactionComponentBase = WithId<{
   identifiers: Array<ReactionCompoundIdentifier>;
@@ -48,17 +42,23 @@ export type ReactionComponentBase = WithId<{
   features: Record<string, AppData>;
 }>;
 
-export interface ReactionComponentPreparation extends WithId<
-  Omit<ord.ICompoundPreparation, 'type'>
-> {
+export interface ReactionComponentPreparation extends ReactionEntity {
   type: CompoundPreparationType;
+  details?: Optional<string>;
+  reactionId?: Optional<string>;
+}
+
+export interface ReactionCompoundSource {
+  vendor?: Optional<string>;
+  catalogId?: Optional<string>;
+  lot?: Optional<string>;
 }
 
 export interface ReactionInputComponent extends ReactionComponentBase {
   isLimiting: ReactionBoolean;
   amount: ReactionAmount;
   preparations: Array<ReactionComponentPreparation>;
-  source: ord.Compound.ISource;
+  source: ReactionCompoundSource;
 }
 
 export interface ReactionMeasurementAnalysis {
@@ -96,9 +96,8 @@ export type ReactionMeasurementValue =
   | ReactionMeasurementValueString
   | ReactionMeasurementValueMass;
 
-export interface ReactionMeasurement extends WithId<
-  Pick<ord.IProductMeasurement, 'details'>
-> {
+export interface ReactionMeasurement extends ReactionEntity {
+  details?: Optional<string>;
   analysis: Optional<ReactionMeasurementAnalysis>;
   type: ReactionMeasurementType;
   usesAuthenticStandard: ReactionBoolean;
@@ -112,8 +111,8 @@ export interface ReactionMeasurement extends WithId<
   authenticStandard: Optional<ReactionInputComponent>;
 }
 
-export interface ReactionProduct
-  extends ReactionComponentBase, Pick<ord.IProductCompound, 'isolatedColor'> {
+export interface ReactionProduct extends ReactionComponentBase {
+  isolatedColor?: Optional<string>;
   isDesiredProduct: ReactionBoolean;
   measurements: Array<ReactionMeasurement>;
 }

@@ -13,43 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import type {
+  ReactionNotes as OrdReactionNotes,
+  ReactionNotesSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import {
   ordBooleanToReaction,
+  ordScalarToReaction,
   reactionBooleanToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type {
-  Optional,
-  OrdOptional,
-} from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
+import type { OrdOptional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { convertObjectToUndefinedIfEmpty } from '../reactions.utils.ts';
 
 export const ordNotesToReaction = (
-  notes: OrdOptional<ord.IReactionNotes>,
-): ReactionNotes => {
-  const {
-    isHeterogeneous,
-    formsPrecipitate,
-    isExothermic,
-    isSensitiveToLight,
-    isSensitiveToOxygen,
-    isSensitiveToMoisture,
-    offgasses,
-    ...rest
-  } = notes ?? {};
-
-  return {
-    isHeterogeneous: ordBooleanToReaction(isHeterogeneous),
-    formsPrecipitate: ordBooleanToReaction(formsPrecipitate),
-    isExothermic: ordBooleanToReaction(isExothermic),
-    isSensitiveToLight: ordBooleanToReaction(isSensitiveToLight),
-    isSensitiveToMoisture: ordBooleanToReaction(isSensitiveToMoisture),
-    isSensitiveToOxygen: ordBooleanToReaction(isSensitiveToOxygen),
-    offgasses: ordBooleanToReaction(offgasses),
-    ...rest,
-  };
-};
+  notes: OrdOptional<OrdReactionNotes>,
+): ReactionNotes => ({
+  isHeterogeneous: ordBooleanToReaction(notes?.isHeterogeneous),
+  formsPrecipitate: ordBooleanToReaction(notes?.formsPrecipitate),
+  isExothermic: ordBooleanToReaction(notes?.isExothermic),
+  isSensitiveToLight: ordBooleanToReaction(notes?.isSensitiveToLight),
+  isSensitiveToMoisture: ordBooleanToReaction(notes?.isSensitiveToMoisture),
+  isSensitiveToOxygen: ordBooleanToReaction(notes?.isSensitiveToOxygen),
+  offgasses: ordBooleanToReaction(notes?.offgasses),
+  procedureDetails: ordScalarToReaction(notes?.procedureDetails),
+  safetyNotes: ordScalarToReaction(notes?.safetyNotes),
+});
 
 export const reactionNotesToOrd = ({
   isHeterogeneous,
@@ -59,9 +49,10 @@ export const reactionNotesToOrd = ({
   isSensitiveToOxygen,
   isSensitiveToMoisture,
   offgasses,
-  ...rest
-}: ReactionNotes): Optional<ord.IReactionNotes> =>
-  convertObjectToNullIfEmpty({
+  procedureDetails,
+  safetyNotes,
+}: ReactionNotes): MessageInitShape<typeof ReactionNotesSchema> | undefined =>
+  convertObjectToUndefinedIfEmpty({
     isHeterogeneous: reactionBooleanToOrd(isHeterogeneous),
     formsPrecipitate: reactionBooleanToOrd(formsPrecipitate),
     isExothermic: reactionBooleanToOrd(isExothermic),
@@ -69,5 +60,6 @@ export const reactionNotesToOrd = ({
     isSensitiveToMoisture: reactionBooleanToOrd(isSensitiveToMoisture),
     isSensitiveToOxygen: reactionBooleanToOrd(isSensitiveToOxygen),
     offgasses: reactionBooleanToOrd(offgasses),
-    ...rest,
+    procedureDetails: procedureDetails ?? undefined,
+    safetyNotes: safetyNotes ?? undefined,
   });

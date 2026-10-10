@@ -13,39 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import { create, fromJson, toJson, type MessageInitShape } from '@bufbuild/protobuf';
+import {
+  DataSchema,
+  PersonSchema,
+  ReactionProvenanceSchema,
+  RecordEventSchema,
+  type Person,
+  type ReactionProvenance as OrdReactionProvenance,
+  type RecordEvent,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   withoutId,
   withId,
   ordDateTimeToReaction,
+  ordScalarToReaction,
   reactionDateTimeToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import type {
+  ReactionPerson,
   ReactionProvenance,
   ReactionRecordEvent,
 } from './reactionProvenance.types.ts';
-import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
 
 export const ordPersonToReactionPerson = (
-  person: OrdOptional<ord.IPerson>,
-): ord.IPerson => {
-  return person ?? ord.Person.toObject(new ord.Person());
+  person: OrdOptional<Person>,
+): ReactionPerson => {
+  const { username, name, orcid, organization, email } = person ?? create(PersonSchema);
+  return {
+    username: ordScalarToReaction(username),
+    name: ordScalarToReaction(name),
+    orcid: ordScalarToReaction(orcid),
+    organization: ordScalarToReaction(organization),
+    email: ordScalarToReaction(email),
+  };
 };
 
-export const reactionPersonToOrdPerson = (
-  person: ord.IPerson,
-): Optional<ord.IPerson> => {
-  return person;
-};
+export const reactionPersonToOrdPerson = ({
+  username,
+  name,
+  orcid,
+  organization,
+  email,
+}: ReactionPerson): MessageInitShape<typeof PersonSchema> => ({
+  username: username ?? undefined,
+  name: name ?? undefined,
+  orcid: orcid ?? undefined,
+  organization: organization ?? undefined,
+  email: email ?? undefined,
+});
 
 export const ordRecordEventToReaction = (
-  recordEvent: OrdOptional<ord.IRecordEvent>,
+  recordEvent: OrdOptional<RecordEvent>,
 ): ReactionRecordEvent => {
-  const { person, time, details }: ord.IRecordEvent =
-    recordEvent ?? ord.RecordEvent.toObject(new ord.RecordEvent());
+  const { time, details, person } = recordEvent ?? create(RecordEventSchema);
   return withId({
     time: ordDateTimeToReaction(time),
-    details: details,
+    details: ordScalarToReaction(details),
     person: ordPersonToReactionPerson(person),
   });
 };
@@ -54,40 +79,80 @@ export const reactionRecordEventToOrd = ({
   person,
   time,
   details,
-}: ReactionRecordEvent): ord.IRecordEvent => ({
+}: ReactionRecordEvent): MessageInitShape<typeof RecordEventSchema> => ({
   time: reactionDateTimeToOrd(time),
-  details: details,
+  details: details ?? undefined,
   person: reactionPersonToOrdPerson(person),
 });
 
 export const ordProvenanceToReaction = (
-  provenance: OrdOptional<ord.IReactionProvenance>,
+  provenance: OrdOptional<OrdReactionProvenance>,
 ): ReactionProvenance => {
-  const existingProvenance: ord.IReactionProvenance =
-    provenance ?? ord.ReactionProvenance.toObject(new ord.ReactionProvenance());
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
-    existingProvenance;
+  const {
+    experimentStart,
+    recordModified,
+    experimenter,
+    recordCreated,
+    city,
+    doi,
+    patent,
+    publicationUrl,
+    isMined,
+    reactionMetadata,
+  } = provenance ?? create(ReactionProvenanceSchema);
 
   return withId({
     experimentStart: ordDateTimeToReaction(experimentStart),
-    recordModified: (recordModified || []).map(ordRecordEventToReaction),
+    recordModified: recordModified.map(ordRecordEventToReaction),
     experimenter: ordPersonToReactionPerson(experimenter),
     recordCreated: ordRecordEventToReaction(recordCreated),
-    ...rest,
+    city: ordScalarToReaction(city),
+    doi: ordScalarToReaction(doi),
+    patent: ordScalarToReaction(patent),
+    publicationUrl: ordScalarToReaction(publicationUrl),
+    isMined,
+    reactionMetadata: Object.fromEntries(
+      Object.entries(reactionMetadata).map(([key, data]) => [
+        key,
+        toJson(DataSchema, data),
+      ]),
+    ),
   });
 };
 
 export const reactionProvenanceToOrd = (
   provenance: ReactionProvenance,
-): ord.IReactionProvenance => {
-  const { experimentStart, recordModified, experimenter, recordCreated, ...rest } =
-    withoutId(provenance);
+): MessageInitShape<typeof ReactionProvenanceSchema> => {
+  const {
+    experimentStart,
+    recordModified,
+    experimenter,
+    recordCreated,
+    city,
+    doi,
+    patent,
+    publicationUrl,
+    isMined,
+    reactionMetadata,
+  } = withoutId(provenance);
 
   return {
     experimentStart: reactionDateTimeToOrd(experimentStart),
     recordModified: recordModified.map(reactionRecordEventToOrd),
     experimenter: reactionPersonToOrdPerson(experimenter),
     recordCreated: reactionRecordEventToOrd(recordCreated),
-    ...rest,
+    city: city ?? undefined,
+    doi: doi ?? undefined,
+    patent: patent ?? undefined,
+    publicationUrl: publicationUrl ?? undefined,
+    isMined: isMined ?? undefined,
+    reactionMetadata:
+      reactionMetadata &&
+      Object.fromEntries(
+        Object.entries(reactionMetadata).map(([key, json]) => [
+          key,
+          fromJson(DataSchema, json),
+        ]),
+      ),
   };
 };

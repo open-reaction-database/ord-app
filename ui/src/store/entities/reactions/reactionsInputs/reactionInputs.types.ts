@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
 import type {
+  Optional,
   ReactionAdditionDevice,
   ReactionBoolean,
   ReactionFlowRate,
@@ -22,24 +22,22 @@ import type {
   ReactionTemperature,
   ReactionTexture,
   ReactionTime,
-  WithId,
-  WithIdName,
+  ReactionEntity,
+  ReactionNamedEntity,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 
-export interface ReactionCrudeComponent extends WithId<
-  Pick<ord.ICrudeComponent, 'reactionId'>
-> {
+export interface ReactionCrudeComponent extends ReactionEntity {
+  reactionId?: Optional<string>;
   includesWorkup: ReactionBoolean;
   hasDerivedAmount: ReactionBoolean;
   amount: ReactionAmount;
   texture: ReactionTexture;
 }
 
-export interface ReactionInput extends WithIdName<
-  Pick<ord.IReactionInput, 'additionOrder'>
-> {
+export interface ReactionInput extends ReactionNamedEntity {
+  additionOrder?: Optional<number>;
   crudeComponents: Array<ReactionCrudeComponent>;
   components: Array<ReactionInputComponent>;
   additionDuration: ReactionTime;

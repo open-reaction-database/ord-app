@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import { AmountSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordAmountToReaction,
   reactionAmountToOrd,
@@ -38,7 +40,7 @@ const molesUnit = molesUnitNames[0] as AppMolesUnit;
 const volumeUnit = volumeUnitNames[0] as AppVolumeUnit;
 
 describe('reactionAmountToOrd', () => {
-  it('returns null when the unit is unspecified', () => {
+  it('returns undefined when the unit is unspecified', () => {
     expect(
       reactionAmountToOrd({
         value: 1,
@@ -46,40 +48,35 @@ describe('reactionAmountToOrd', () => {
         units: appAmountUnspecified,
         volumeIncludesSolutes: ReactionBoolean.Unspecified,
       }),
-    ).toBeNull();
+    ).toBeUndefined();
   });
 
-  it('nests value/precision under the matching dimension key and resolves the unit value', () => {
+  it('sets the kind oneof to the matching dimension and resolves the unit value', () => {
     const result = reactionAmountToOrd({
       value: 5,
       precision: 0.1,
       units: massUnit,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     });
-    expect(result?.mass).toEqual({
-      value: 5,
-      precision: 0.1,
-      units: unitValueByName[massUnit],
+    expect(result?.kind).toEqual({
+      case: 'mass',
+      value: { value: 5, precision: 0.1, units: unitValueByName[massUnit] },
     });
-    // A mass amount is not a volume, so volumeIncludesSolutes is set to null (present, not omitted).
-    expect(result?.volumeIncludesSolutes).toBeNull();
-    expect(result?.moles).toBeUndefined();
+    // A mass amount is not a volume, so volumeIncludesSolutes stays unset.
+    expect(result?.volumeIncludesSolutes).toBeUndefined();
   });
 
-  it('nests a moles amount under the moles key', () => {
+  it('sets the kind oneof to moles for a moles amount', () => {
     const result = reactionAmountToOrd({
       value: 3,
       precision: null,
       units: molesUnit,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     });
-    expect(result?.moles).toEqual({
-      value: 3,
-      precision: null,
-      units: unitValueByName[molesUnit],
+    expect(result?.kind).toEqual({
+      case: 'moles',
+      value: { value: 3, precision: undefined, units: unitValueByName[molesUnit] },
     });
-    expect(result?.mass).toBeUndefined();
-    expect(result?.volume).toBeUndefined();
   });
 
   it('keeps volumeIncludesSolutes only for volume units', () => {
@@ -89,10 +86,9 @@ describe('reactionAmountToOrd', () => {
       units: volumeUnit,
       volumeIncludesSolutes: ReactionBoolean.True,
     });
-    expect(result?.volume).toEqual({
-      value: 2,
-      precision: null,
-      units: unitValueByName[volumeUnit],
+    expect(result?.kind).toEqual({
+      case: 'volume',
+      value: { value: 2, precision: undefined, units: unitValueByName[volumeUnit] },
     });
     expect(result?.volumeIncludesSolutes).toBe(true);
   });
@@ -107,13 +103,27 @@ describe('ordAmountToReaction', () => {
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     };
     expect(ordAmountToReaction(null)).toEqual(expected);
-    expect(ordAmountToReaction({})).toEqual(expected);
+    expect(ordAmountToReaction(create(AmountSchema))).toEqual(expected);
+  });
+
+  it('returns the unspecified default for an unmeasured amount', () => {
+    const result = ordAmountToReaction(
+      create(AmountSchema, {
+        kind: { case: 'unmeasured', value: { details: 'a pinch' } },
+      }),
+    );
+    expect(result.units).toBe(appAmountUnspecified);
   });
 
   it('maps the dimension value back to its unit name', () => {
-    const result = ordAmountToReaction({
-      mass: { value: 5, precision: 0.1, units: unitValueByName[massUnit] },
-    });
+    const result = ordAmountToReaction(
+      create(AmountSchema, {
+        kind: {
+          case: 'mass',
+          value: { value: 5, precision: 0.1, units: unitValueByName[massUnit] },
+        },
+      }),
+    );
     expect(result).toMatchObject({
       value: 5,
       precision: 0.1,
@@ -123,10 +133,15 @@ describe('ordAmountToReaction', () => {
   });
 
   it('reads volumeIncludesSolutes for volume amounts', () => {
-    const result = ordAmountToReaction({
-      volume: { value: 2, precision: null, units: unitValueByName[volumeUnit] },
-      volumeIncludesSolutes: true,
-    });
+    const result = ordAmountToReaction(
+      create(AmountSchema, {
+        kind: {
+          case: 'volume',
+          value: { value: 2, units: unitValueByName[volumeUnit] },
+        },
+        volumeIncludesSolutes: true,
+      }),
+    );
     expect(result).toMatchObject({
       value: 2,
       units: volumeUnit,
@@ -147,6 +162,8 @@ describe('round trip', () => {
       units,
       volumeIncludesSolutes: ReactionBoolean.Unspecified,
     };
-    expect(ordAmountToReaction(reactionAmountToOrd(amount))).toMatchObject(amount);
+    expect(
+      ordAmountToReaction(create(AmountSchema, reactionAmountToOrd(amount))),
+    ).toMatchObject(amount);
   });
 });

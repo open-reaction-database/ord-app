@@ -13,7 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ord } from 'ord-schema-protobufjs';
+import {
+  create,
+  fromBinary,
+  toBinary,
+  type MessageInitShape,
+} from '@bufbuild/protobuf';
+import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
+import {
+  ReactionSchema,
+  type Reaction,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordInputsToReactionInputs,
   reactionInputsToOrdInputs,
@@ -25,6 +35,7 @@ import {
 } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import {
   ordReactionIdentifierToReaction,
+  ordScalarToReaction,
   reactionIdentifierToOrd,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
@@ -53,9 +64,9 @@ import {
   reactionSetupToOrd,
 } from './reactionSetup/reactionSetup.converter.ts';
 
-export function ordReactionToReaction(reaction: ord.IReaction): AppReaction {
+export function ordReactionToReaction(reaction: Reaction): AppReaction {
   return {
-    ...reaction,
+    reactionId: ordScalarToReaction(reaction.reactionId),
     inputs: ordInputsToReactionInputs(reaction.inputs),
     outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
     identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
@@ -79,21 +90,35 @@ export function reactionToOrdReaction({
   notes,
   provenance,
   workups,
-}: AppReaction): ord.IReaction {
+}: AppReaction): MessageInitShape<typeof ReactionSchema> {
   return {
-    reactionId,
+    reactionId: reactionId ?? undefined,
     inputs: reactionInputsToOrdInputs(inputs),
     outcomes: reactionOutcomesListToOrdOutcomesList(outcomes),
     identifiers:
-      identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : null,
+      identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : undefined,
     setup: reactionSetupToOrd(setup),
     observations:
-      observations.length > 0 ? observations.map(reactionObservationToOrd) : null,
+      observations.length > 0 ? observations.map(reactionObservationToOrd) : undefined,
     conditions: reactionConditionsToOrd(conditions),
     notes: reactionNotesToOrd(notes),
     provenance: reactionProvenanceToOrd(provenance),
-    workups: workups.length > 0 ? workups.map(reactionWorkupToOrd) : null,
+    workups: workups.length > 0 ? workups.map(reactionWorkupToOrd) : undefined,
   };
+}
+
+// The API carries reactions as base64-encoded binary ord.Reaction messages (`binpb`).
+export function ordBinpbToReaction(binpb: string): AppReaction {
+  const reaction = ordReactionToReaction(
+    fromBinary(ReactionSchema, base64Decode(binpb)),
+  );
+  convertReactionFloatsToDoubles(reaction);
+  return reaction;
+}
+
+export function reactionToOrdBinpb(reaction: AppReaction): string {
+  const ordReaction = create(ReactionSchema, reactionToOrdReaction(reaction));
+  return base64Encode(toBinary(ReactionSchema, ordReaction));
 }
 
 export function linkReactionEntities(reaction: AppReaction): AppReaction {

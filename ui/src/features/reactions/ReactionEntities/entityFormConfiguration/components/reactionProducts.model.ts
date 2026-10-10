@@ -34,7 +34,8 @@ import type { ReactionMeasurement } from 'store/entities/reactions/reactionCompo
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { ord } from 'ord-schema-protobufjs';
+import { create } from '@bufbuild/protobuf';
+import { ProductMeasurementSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ordMeasurementToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export const reactionProducts: Array<ReactionFormNode> = [
@@ -96,7 +97,7 @@ export const reactionProducts: Array<ReactionFormNode> = [
       label: 'Measurement',
       useCreate: buildUseCreate('measurements', index => {
         const newMeasurement = ordMeasurementToReaction(
-          ord.ProductMeasurement.toObject(new ord.ProductMeasurement()),
+          create(ProductMeasurementSchema),
         );
         return [index, newMeasurement];
       }),

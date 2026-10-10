@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import {
+  Mass_MassUnitSchema,
+  Moles_MolesUnitSchema,
+  Volume_VolumeUnitSchema,
+  type Mass_MassUnit,
+  type Moles_MolesUnit,
+  type Volume_VolumeUnit,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { reversePrimitiveRecord } from 'common/utils/reversePrimitiveRecord.ts';
+import { enumValueByName } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import type { AppAmountUnitUnspecified } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type {
-  AppAmountUnspecified,
-  AppMassUnit,
-  AppMolesUnit,
-  AppVolumeUnit,
-} from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+import type { AppAmountUnspecified } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import type { SelectOptions } from 'common/types/selectOptions.ts';
 
 export const appAmountUnspecified: AppAmountUnspecified = 'UNSPECIFIED';
@@ -33,19 +36,15 @@ const withoutUnspecified = <T extends AppAmountUnitUnspecified>(
   return rest;
 };
 
-// Sadly typescript do not want to properly infer type of enum
-const molesUnitByName = withoutUnspecified(ord.Moles.MolesUnit) as Record<
-  AppMolesUnit,
-  number
->;
-const massUnitByName = withoutUnspecified(ord.Mass.MassUnit) as Record<
-  AppMassUnit,
-  number
->;
-const volumeUnitByName = withoutUnspecified(ord.Volume.VolumeUnit) as Record<
-  AppVolumeUnit,
-  number
->;
+const molesUnitByName = withoutUnspecified(
+  enumValueByName<keyof typeof Moles_MolesUnit>(Moles_MolesUnitSchema),
+);
+const massUnitByName = withoutUnspecified(
+  enumValueByName<keyof typeof Mass_MassUnit>(Mass_MassUnitSchema),
+);
+const volumeUnitByName = withoutUnspecified(
+  enumValueByName<keyof typeof Volume_VolumeUnit>(Volume_VolumeUnitSchema),
+);
 
 export const unitValueByName = {
   ...molesUnitByName,

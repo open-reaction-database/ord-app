@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordWorkupToReaction,
   reactionWorkupToOrd,
@@ -23,7 +25,9 @@ import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 
 describe('ordWorkupToReaction', () => {
   it('assigns an id and maps the scalar fields, defaulting an absent input to null', () => {
-    const result = ordWorkupToReaction({ isAutomated: true, details: 'quench' });
+    const result = ordWorkupToReaction(
+      create(ReactionWorkupSchema, { isAutomated: true, details: 'quench' }),
+    );
     expect(typeof result.id).toBe('string');
     expect(result.isAutomated).toBe(ReactionBoolean.True);
     expect(result.input).toBeNull();
@@ -33,7 +37,7 @@ describe('ordWorkupToReaction', () => {
 });
 
 describe('reactionWorkupToOrd', () => {
-  it('maps a CUSTOM workup back to ord, preserving null sub-entities', () => {
+  it('maps a CUSTOM workup back to ord, leaving null sub-entities unset', () => {
     const workup = {
       id: 'w1',
       type: 'CUSTOM',
@@ -50,10 +54,10 @@ describe('reactionWorkupToOrd', () => {
 
     const result = reactionWorkupToOrd(workup);
     expect(typeof result.type).toBe('number');
-    expect(result.isAutomated).toBeNull();
-    expect(result.duration).toBeNull();
-    expect(result.amount).toBeNull();
-    expect(result.input).toBeNull();
+    expect(result.isAutomated).toBeUndefined();
+    expect(result.duration).toBeUndefined();
+    expect(result.amount).toBeUndefined();
+    expect(result.input).toBeUndefined();
     expect(result.details).toBe('note');
     // withoutId strips the app-only id.
     expect(result).not.toHaveProperty('id');

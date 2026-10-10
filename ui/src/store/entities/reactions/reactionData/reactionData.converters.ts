@@ -13,74 +13,109 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import {
+  DataSchema,
+  type Data,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { AppDataType, type AppData } from './reactionData.types.ts';
 import { Buffer } from 'buffer';
-import { withIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import {
+  ordScalarToReaction,
+  withIdName,
+} from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+
+const INT32_MIN = -(2 ** 31);
+const INT32_MAX = 2 ** 31 - 1;
+
+const emptyNumberValue: Pick<AppData['data'], 'type' | 'value'> = {
+  type: AppDataType.Number,
+  value: null,
+};
+
+function ordDataValueToReaction(
+  kind: Data['kind'],
+): Pick<AppData['data'], 'type' | 'value'> {
+  switch (kind.case) {
+    case 'url':
+      return kind.value
+        ? { type: AppDataType.Url, value: kind.value }
+        : emptyNumberValue;
+    case 'stringValue':
+      return kind.value
+        ? { type: AppDataType.Text, value: kind.value }
+        : emptyNumberValue;
+    case 'bytesValue':
+      return {
+        type: AppDataType.Upload,
+        value: Buffer.from(kind.value).toString('base64'),
+      };
+    case 'floatValue':
+    case 'integerValue':
+      return { type: AppDataType.Number, value: kind.value };
+    default:
+      return emptyNumberValue;
+  }
+}
 
 export function ordDataToReaction(
-  dataWrapper: OrdOptional<ord.IData>,
+  dataWrapper: OrdOptional<Data>,
   name: string,
 ): AppData {
-  const { description, format, ...data } = dataWrapper || {};
-  let type: AppData['data']['type'];
-  let value: AppData['data']['value'];
-
-  if (data.url) {
-    type = AppDataType.Url;
-    value = data.url;
-  } else if (data.stringValue) {
-    type = AppDataType.Text;
-    value = data.stringValue;
-  } else if (data.bytesValue) {
-    type = AppDataType.Upload;
-    const bytesValue: string | Uint8Array = data.bytesValue;
-    // During copy\paste chunk we pass data via json and since utf8 array cannot be parsed correctly we need this workaround
-    if (typeof bytesValue === 'string') {
-      value = bytesValue;
-    } else {
-      value = Buffer.from(bytesValue).toString('base64');
-    }
-  } else {
-    type = AppDataType.Number;
-    value = data.floatValue ?? data.integerValue ?? null;
-  }
-
+  const { kind, format, description } = dataWrapper ?? create(DataSchema);
   return withIdName(
     {
       data: {
-        value,
-        type,
-        format,
+        ...ordDataValueToReaction(kind),
+        format: ordScalarToReaction(format),
       },
-      description,
+      description: ordScalarToReaction(description),
     },
     name,
   );
 }
 
-export function reactionDataToOrd({ description, data }: AppData): ord.IData {
-  const ordData = ord.Data.toObject(new ord.Data({ description, format: data.format }));
-  if (data.value === null) {
-    // Nothing to add here
-  } else if (data.type === AppDataType.Url) {
-    ordData.url = data.value;
-  } else if (data.type === AppDataType.Text) {
-    ordData.stringValue = data.value;
-  } else if (data.type === AppDataType.Upload) {
-    ordData.bytesValue = Uint8Array.from(Buffer.from(data.value as string, 'base64'));
-  } else if (Number.isInteger(data.value)) {
-    ordData.integerValue = data.value;
-  } else {
-    ordData.floatValue = data.value;
+function reactionDataValueToOrd({
+  type,
+  value,
+}: AppData['data']): MessageInitShape<typeof DataSchema>['kind'] {
+  if (value === null) {
+    return undefined;
   }
+  if (type === AppDataType.Url) {
+    return { case: 'url', value: String(value) };
+  }
+  if (type === AppDataType.Text) {
+    return { case: 'stringValue', value: String(value) };
+  }
+  if (type === AppDataType.Upload) {
+    return {
+      case: 'bytesValue',
+      value: Uint8Array.from(Buffer.from(String(value), 'base64')),
+    };
+  }
+  const number = Number(value);
+  // integer_value is an int32, and encoding one out of range throws.
+  if (Number.isInteger(value) && number >= INT32_MIN && number <= INT32_MAX) {
+    return { case: 'integerValue', value: number };
+  }
+  return { case: 'floatValue', value: number };
+}
 
-  return ordData;
+export function reactionDataToOrd({
+  description,
+  data,
+}: AppData): MessageInitShape<typeof DataSchema> {
+  return {
+    description: description ?? undefined,
+    format: data.format ?? undefined,
+    kind: reactionDataValueToOrd(data),
+  };
 }
 
 export function ordDataMapToReactionDataMap(
-  ordDataMap: Record<string, ord.IData>,
+  ordDataMap: Record<string, Data>,
 ): Record<string, AppData> {
   return Object.entries(ordDataMap).reduce((acc, [name, ordData]) => {
     const reactionData = ordDataToReaction(ordData, name);
@@ -93,7 +128,7 @@ export function ordDataMapToReactionDataMap(
 
 export function reactionDataMapToOrdDataMap(
   reactionDataMap: Record<string, AppData>,
-): Optional<Record<string, ord.IData>> {
+): Record<string, MessageInitShape<typeof DataSchema>> | undefined {
   const values = Object.values(reactionDataMap);
   return values.length > 0
     ? values.reduce(
@@ -103,5 +138,5 @@ export function reactionDataMapToOrdDataMap(
         }),
         {},
       )
-    : null;
+    : undefined;
 }

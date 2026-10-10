@@ -15,7 +15,6 @@
  */
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
-import type { ord } from 'ord-schema-protobufjs';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type {
   ReactionAnalysis,
@@ -27,7 +26,11 @@ import type {
   ReactionProduct,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
-import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import type {
+  ReactionProvenance,
+  ReactionRecordEvent,
+} from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
 import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
 import type {
@@ -223,7 +226,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
     entityName: ReactionNodeEntity.Notes,
     label: 'Notes',
     sidebarTitle: createReactionEntityTitle({ entityName: 'Notes', hasDelete: false }),
-    useInitialValues: buildUseInitialValues((values: ord.IReactionNotes) => values),
+    useInitialValues: buildUseInitialValues((values: ReactionNotes) => values),
   },
   {
     pathComponents: ['inputs'],
@@ -268,7 +271,7 @@ export const reactionSidebarInfo: Array<ReactionSidebarInfo> = [
       entityName: 'Record Modified',
       hasDelete: true,
     }),
-    useInitialValues: buildUseInitialValues((value: ord.IRecordEvent) => value),
+    useInitialValues: buildUseInitialValues((value: ReactionRecordEvent) => value),
   },
   {
     pathComponents: ['outcomes'],

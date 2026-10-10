@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import { AnalysisSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   ordAnalysisToReaction,
   reactionAnalysisToOrd,
@@ -23,12 +25,12 @@ import { ReactionBoolean } from '../reactionEntity/reactionEntity.types.ts';
 describe('ordAnalysisToReaction', () => {
   it('assigns an id/name and unwraps instrumentLastCalibrated + isOfIsolatedSpecies', () => {
     const result = ordAnalysisToReaction(
-      {
+      create(AnalysisSchema, {
         isOfIsolatedSpecies: true,
         instrumentLastCalibrated: { value: '2024-01-01' },
         data: {},
         details: 'NMR run',
-      },
+      }),
       'NMR',
     );
     expect(typeof result.id).toBe('string');
@@ -40,18 +42,20 @@ describe('ordAnalysisToReaction', () => {
   });
 
   it('defaults a missing instrumentLastCalibrated to null', () => {
-    expect(ordAnalysisToReaction({}, 'IR').instrumentLastCalibrated).toBeNull();
+    expect(
+      ordAnalysisToReaction(create(AnalysisSchema), 'IR').instrumentLastCalibrated,
+    ).toBeNull();
   });
 });
 
 describe('reactionAnalysisToOrd', () => {
   it('strips id/name and re-wraps instrumentLastCalibrated as a DateTime', () => {
     const analysis = ordAnalysisToReaction(
-      {
+      create(AnalysisSchema, {
         isOfIsolatedSpecies: true,
         instrumentLastCalibrated: { value: '2024-01-01' },
         details: 'd',
-      },
+      }),
       'NMR',
     );
     const result = reactionAnalysisToOrd(analysis);
@@ -62,8 +66,8 @@ describe('reactionAnalysisToOrd', () => {
     expect(result.details).toBe('d');
   });
 
-  it('emits a null instrumentLastCalibrated when unset', () => {
-    const analysis = ordAnalysisToReaction({}, 'IR');
-    expect(reactionAnalysisToOrd(analysis).instrumentLastCalibrated).toBeNull();
+  it('leaves instrumentLastCalibrated unset when it is empty', () => {
+    const analysis = ordAnalysisToReaction(create(AnalysisSchema), 'IR');
+    expect(reactionAnalysisToOrd(analysis).instrumentLastCalibrated).toBeUndefined();
   });
 });

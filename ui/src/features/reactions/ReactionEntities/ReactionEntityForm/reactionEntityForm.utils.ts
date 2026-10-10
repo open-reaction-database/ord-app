@@ -17,35 +17,34 @@ import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import {
+  ordSchemaByNodeEntity,
   ordToReactionConvertersByNodeEntity,
   reactionToOrdConvertersByNodeEntity,
 } from 'store/entities/reactions/reactions.models.ts';
-import { Buffer } from 'buffer';
+import { create, fromJson, toJson, type JsonValue } from '@bufbuild/protobuf';
 
+// The clipboard holds the entity as the proto3 JSON of its ord message.
 interface ClipboardMessage {
   type: ReactionNodeEntity;
-  value: object;
-}
-
-// TODO parse\stringify via ord-schema
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function replacer(_: unknown, value: any): any {
-  if (value instanceof Uint8Array) {
-    return Buffer.from(value).toString('base64');
-  } else return value;
+  value: JsonValue;
 }
 
 export async function copyReactionPart(
   entityName: ReactionNodeEntity,
   reactionPart: object,
 ) {
-  const value = reactionToOrdConvertersByNodeEntity[entityName](reactionPart);
+  const schema = ordSchemaByNodeEntity[entityName];
+  const message = create(
+    schema,
+    reactionToOrdConvertersByNodeEntity[entityName](reactionPart),
+  );
   const clipboardMessage = JSON.stringify(
     {
       type: entityName,
-      value,
+      // Enums are written as numbers, which every version of the app can read.
+      value: toJson(schema, message, { enumAsInteger: true }),
     },
-    replacer,
+    null,
     2,
   );
   try {
@@ -90,11 +89,17 @@ export async function pasteReactionPart(
     }
     const { value, type } = message;
     const converter = ordToReactionConvertersByNodeEntity[type];
+    // A null value is an empty entity.
+    const ordValue = fromJson(ordSchemaByNodeEntity[type], value ?? {}, {
+      ignoreUnknownFields: true,
+    });
     const {
       id: _i,
       name: _n,
       ...reactionValue
-    } = converter.hasName ? converter.convert(value, '') : converter.convert(value);
+    } = converter.hasName
+      ? converter.convert(ordValue, '')
+      : converter.convert(ordValue);
     return [reactionValue, text];
   } catch (e: unknown) {
     let message = `Failed to paste clipboard content.`;

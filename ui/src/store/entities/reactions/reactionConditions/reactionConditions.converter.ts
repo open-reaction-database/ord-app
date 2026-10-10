@@ -13,7 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ord } from 'ord-schema-protobufjs';
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import {
+  ElectrochemistryConditionsSchema,
+  ReactionConditionsSchema,
+  type ElectrochemistryConditions,
+  type ElectrochemistryConditions_ElectrochemistryMeasurement,
+  type ElectrochemistryConditions_ElectrochemistryMeasurementSchema,
+  type FlowConditions,
+  type FlowConditionsSchema,
+  type IlluminationConditions,
+  type IlluminationConditionsSchema,
+  type PressureConditions,
+  type PressureConditions_PressureMeasurement,
+  type PressureConditions_PressureMeasurementSchema,
+  type PressureConditionsSchema,
+  type ReactionConditions as OrdReactionConditions,
+  type StirringConditions,
+  type StirringConditionsSchema,
+  type TemperatureConditions,
+  type TemperatureConditions_TemperatureMeasurement,
+  type TemperatureConditions_TemperatureMeasurementSchema,
+  type TemperatureConditionsSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   convertElectrochemistryTypeToOrd,
   ordAtmosphereToReaction,
@@ -23,6 +45,7 @@ import {
   ordLengthToReaction,
   ordPressureControlToReaction,
   ordPressureToReaction,
+  ordScalarToReaction,
   ordStirringRateToReaction,
   ordTemperatureControlToReaction,
   ordTemperatureToReaction,
@@ -45,7 +68,6 @@ import {
   reactionVoltageToOrd,
   reactionWaveLengthToOrd,
   withId,
-  withoutId,
 } from '../reactionEntity/reactionEntity.converters';
 import {
   ordFlowTypeToReaction,
@@ -72,20 +94,20 @@ import type {
   ReactionTemperatureCondition,
   TemperatureMeasurement,
 } from './reactionConditions.types';
-import type { Optional, OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
-import { convertObjectToNullIfEmpty } from '../reactions.utils.ts';
+import type { OrdOptional } from '../reactionEntity/reactionEntity.types.ts';
+import { convertObjectToUndefinedIfEmpty } from '../reactions.utils.ts';
 
 export const ordTemperatureMeasurementToReaction = ({
   type,
   details,
   temperature,
   time,
-}: ord.TemperatureConditions.ITemperatureMeasurement): TemperatureMeasurement =>
+}: TemperatureConditions_TemperatureMeasurement): TemperatureMeasurement =>
   withId({
     type: ordTemperatureMeasurementTypeToReaction(type),
     temperature: ordTemperatureToReaction(temperature),
     time: ordTimeToReaction(time),
-    details,
+    details: ordScalarToReaction(details),
   });
 
 export const reactionTemperatureMeasurementToOrd = ({
@@ -93,18 +115,20 @@ export const reactionTemperatureMeasurementToOrd = ({
   details,
   temperature,
   time,
-}: TemperatureMeasurement): ord.TemperatureConditions.ITemperatureMeasurement => ({
+}: TemperatureMeasurement): MessageInitShape<
+  typeof TemperatureConditions_TemperatureMeasurementSchema
+> => ({
   type: reactionTemperatureMeasurementTypeToOrd(type),
   temperature: reactionTemperatureToOrd(temperature),
   time: reactionTimeToOrd(time),
-  details,
+  details: details ?? undefined,
 });
 
 export const ordElectrochemistryMeasurementToReaction = ({
   time,
   current,
   voltage,
-}: ord.ElectrochemistryConditions.IElectrochemistryMeasurement): ElectrochemistryMeasurement =>
+}: ElectrochemistryConditions_ElectrochemistryMeasurement): ElectrochemistryMeasurement =>
   withId({
     time: ordTimeToReaction(time),
     current: ordCurrentToReaction(current),
@@ -115,7 +139,9 @@ export const reactionElectrochemistryMeasurementToOrd = ({
   time,
   current,
   voltage,
-}: ElectrochemistryMeasurement): ord.ElectrochemistryConditions.IElectrochemistryMeasurement => ({
+}: ElectrochemistryMeasurement): MessageInitShape<
+  typeof ElectrochemistryConditions_ElectrochemistryMeasurementSchema
+> => ({
   time: reactionTimeToOrd(time),
   current: reactionCurrentToOrd(current),
   voltage: reactionVoltageToOrd(voltage),
@@ -126,12 +152,12 @@ export const ordPressureMeasurementToReaction = ({
   time,
   pressure,
   details,
-}: ord.PressureConditions.IPressureMeasurement): PressureMeasurement =>
+}: PressureConditions_PressureMeasurement): PressureMeasurement =>
   withId({
     type: ordPressureMeasurementTypeToReaction(type),
     time: ordTimeToReaction(time),
     pressure: ordPressureToReaction(pressure),
-    details,
+    details: ordScalarToReaction(details),
   });
 
 export const reactionPressureMeasurementToOrd = ({
@@ -139,130 +165,140 @@ export const reactionPressureMeasurementToOrd = ({
   pressure,
   time,
   details,
-}: PressureMeasurement): ord.PressureConditions.IPressureMeasurement => ({
+}: PressureMeasurement): MessageInitShape<
+  typeof PressureConditions_PressureMeasurementSchema
+> => ({
   type: reactionPressureMeasurementTypeToOrd(type),
   pressure: reactionPressureToOrd(pressure),
   time: reactionTimeToOrd(time),
-  details,
+  details: details ?? undefined,
 });
 
 export const ordTemperatureConditionToReaction = (
-  condition: OrdOptional<ord.ITemperatureConditions>,
-): ReactionTemperatureCondition => {
-  const { control, setpoint, measurements } = condition ?? {};
-  return {
-    control: ordTemperatureControlToReaction(control),
-    setpoint: ordTemperatureToReaction(setpoint),
-    temperatureMeasurements: (measurements || []).map(
-      ordTemperatureMeasurementToReaction,
-    ),
-  };
-};
+  condition: OrdOptional<TemperatureConditions>,
+): ReactionTemperatureCondition => ({
+  control: ordTemperatureControlToReaction(condition?.control),
+  setpoint: ordTemperatureToReaction(condition?.setpoint),
+  temperatureMeasurements: (condition?.measurements || []).map(
+    ordTemperatureMeasurementToReaction,
+  ),
+});
 
 export const reactionTemperatureConditionToOrd = ({
   control,
   setpoint,
   temperatureMeasurements,
-}: ReactionTemperatureCondition): Optional<ord.ITemperatureConditions> =>
-  convertObjectToNullIfEmpty({
+}: ReactionTemperatureCondition):
+  | MessageInitShape<typeof TemperatureConditionsSchema>
+  | undefined =>
+  convertObjectToUndefinedIfEmpty({
     control: reactionTemperatureControlToOrd(control),
     setpoint: reactionTemperatureToOrd(setpoint),
     measurements:
       temperatureMeasurements.length > 0
         ? temperatureMeasurements.map(reactionTemperatureMeasurementToOrd)
-        : null,
+        : undefined,
   });
 
 const ordPressureConditionToReaction = (
-  pressure: OrdOptional<ord.IPressureConditions>,
-): ReactionPressureCondition => {
-  const { setpoint, atmosphere, control, measurements } = pressure ?? {};
-  return {
-    control: ordPressureControlToReaction(control),
-    setpoint: ordPressureToReaction(setpoint),
-    atmosphere: ordAtmosphereToReaction(atmosphere),
-    pressureMeasurements: (measurements || []).map(ordPressureMeasurementToReaction),
-  };
-};
+  pressure: OrdOptional<PressureConditions>,
+): ReactionPressureCondition => ({
+  control: ordPressureControlToReaction(pressure?.control),
+  setpoint: ordPressureToReaction(pressure?.setpoint),
+  atmosphere: ordAtmosphereToReaction(pressure?.atmosphere),
+  pressureMeasurements: (pressure?.measurements || []).map(
+    ordPressureMeasurementToReaction,
+  ),
+});
 
 const reactionPressureConditionToOrd = ({
   control,
   setpoint,
   atmosphere,
   pressureMeasurements,
-}: ReactionPressureCondition): Optional<ord.IPressureConditions> => {
-  return convertObjectToNullIfEmpty({
+}: ReactionPressureCondition):
+  | MessageInitShape<typeof PressureConditionsSchema>
+  | undefined => {
+  return convertObjectToUndefinedIfEmpty({
     control: reactionPressureControlToOrd(control),
     setpoint: reactionPressureToOrd(setpoint),
     atmosphere: reactionAtmosphereToOrd(atmosphere),
     measurements:
       pressureMeasurements.length > 0
         ? pressureMeasurements.map(reactionPressureMeasurementToOrd)
-        : null,
+        : undefined,
   });
 };
 
 export const ordStirringConditionToReaction = (
-  stirring: OrdOptional<ord.IStirringConditions>,
-): ReactionStirringCondition => {
-  const { type, details, rate } = stirring ?? {};
-
-  return {
-    type: ordStirringMethodTypeToReaction(type),
-    details,
-    rate: ordStirringRateToReaction(rate),
-  };
-};
+  stirring: OrdOptional<StirringConditions>,
+): ReactionStirringCondition => ({
+  type: ordStirringMethodTypeToReaction(stirring?.type),
+  details: ordScalarToReaction(stirring?.details),
+  rate: ordStirringRateToReaction(stirring?.rate),
+});
 
 export const reactionStirringConditionToOrd = ({
   type,
   details,
   rate,
-}: ReactionStirringCondition): Optional<ord.IStirringConditions> =>
-  convertObjectToNullIfEmpty(
+}: ReactionStirringCondition):
+  | MessageInitShape<typeof StirringConditionsSchema>
+  | undefined =>
+  convertObjectToUndefinedIfEmpty(
     {
       type: reactionStirringMethodTypeToOrd(type),
-      details,
+      details: details ?? undefined,
       rate: reactionStirringRateToOrd(rate),
     },
     ['type'],
   );
 
 const ordIlluminationConditionToReaction = (
-  illumination: OrdOptional<ord.IIlluminationConditions>,
-): ReactionIlluminationCondition => {
-  const { type, peakWavelength, distanceToVessel, ...rest } = illumination ?? {};
-
-  return {
-    type: ordIlluminationTypeToReaction(type),
-    peakWavelength: ordWaveLengthToReaction(peakWavelength),
-    distanceToVessel: ordLengthToReaction(distanceToVessel),
-    ...rest,
-  };
-};
+  illumination: OrdOptional<IlluminationConditions>,
+): ReactionIlluminationCondition => ({
+  type: ordIlluminationTypeToReaction(illumination?.type),
+  peakWavelength: ordWaveLengthToReaction(illumination?.peakWavelength),
+  distanceToVessel: ordLengthToReaction(illumination?.distanceToVessel),
+  details: ordScalarToReaction(illumination?.details),
+  color: ordScalarToReaction(illumination?.color),
+});
 
 export const reactionIlluminationConditionToOrd = ({
   type,
   peakWavelength,
   distanceToVessel,
-  ...rest
-}: ReactionIlluminationCondition): Optional<ord.IIlluminationConditions> => {
-  return convertObjectToNullIfEmpty(
+  details,
+  color,
+}: ReactionIlluminationCondition):
+  | MessageInitShape<typeof IlluminationConditionsSchema>
+  | undefined => {
+  return convertObjectToUndefinedIfEmpty(
     {
       type: reactionIlluminationTypeToOrd(type),
       peakWavelength: reactionWaveLengthToOrd(peakWavelength),
       distanceToVessel: reactionLengthToOrd(distanceToVessel),
-      ...rest,
+      details: details ?? undefined,
+      color: color ?? undefined,
     },
     ['type'],
   );
 };
 
 const ordElectrochemistryConditionToReaction = (
-  electrochemistry: OrdOptional<ord.IElectrochemistryConditions>,
+  electrochemistry: OrdOptional<ElectrochemistryConditions>,
 ): ReactionElectrochemistryCondition => {
-  const { type, current, voltage, electrodeSeparation, cell, measurements, ...rest } =
-    electrochemistry ?? {};
+  const {
+    type,
+    current,
+    voltage,
+    electrodeSeparation,
+    cell,
+    measurements,
+    details,
+    anodeMaterial,
+    cathodeMaterial,
+  } = electrochemistry ?? create(ElectrochemistryConditionsSchema);
 
   return {
     type: convertElectrochemistryTypeToOrd(type),
@@ -270,10 +306,12 @@ const ordElectrochemistryConditionToReaction = (
     voltage: ordVoltageToReaction(voltage),
     electrodeSeparation: ordLengthToReaction(electrodeSeparation),
     cell: ordElectrochemistryCellToReaction(cell),
-    electrochemistryMeasurements: (measurements || []).map(
+    electrochemistryMeasurements: measurements.map(
       ordElectrochemistryMeasurementToReaction,
     ),
-    ...rest,
+    details: ordScalarToReaction(details),
+    anodeMaterial: ordScalarToReaction(anodeMaterial),
+    cathodeMaterial: ordScalarToReaction(cathodeMaterial),
   };
 };
 
@@ -284,9 +322,13 @@ export const reactionElectrochemistryConditionToOrd = ({
   electrodeSeparation,
   cell,
   electrochemistryMeasurements,
-  ...rest
-}: ReactionElectrochemistryCondition): Optional<ord.IElectrochemistryConditions> => {
-  return convertObjectToNullIfEmpty(
+  details,
+  anodeMaterial,
+  cathodeMaterial,
+}: ReactionElectrochemistryCondition):
+  | MessageInitShape<typeof ElectrochemistryConditionsSchema>
+  | undefined => {
+  return convertObjectToUndefinedIfEmpty(
     {
       type: reactionElectrochemistryTypeToOrd(type),
       current: reactionCurrentToOrd(current),
@@ -296,58 +338,58 @@ export const reactionElectrochemistryConditionToOrd = ({
       measurements:
         electrochemistryMeasurements.length > 0
           ? electrochemistryMeasurements.map(reactionElectrochemistryMeasurementToOrd)
-          : null,
-      ...rest,
+          : undefined,
+      details: details ?? undefined,
+      anodeMaterial: anodeMaterial ?? undefined,
+      cathodeMaterial: cathodeMaterial ?? undefined,
     },
     ['type'],
   );
 };
 
 const ordFlowConditionToReaction = (
-  flow: OrdOptional<ord.IFlowConditions>,
-): ReactionFlowCondition => {
-  const { type, tubing, ...rest } = flow ?? {};
-
-  return {
-    type: ordFlowTypeToReaction(type),
-    tubing: ordTubingToReaction(tubing),
-    ...rest,
-  };
-};
+  flow: OrdOptional<FlowConditions>,
+): ReactionFlowCondition => ({
+  type: ordFlowTypeToReaction(flow?.type),
+  tubing: ordTubingToReaction(flow?.tubing),
+  details: ordScalarToReaction(flow?.details),
+  pumpType: ordScalarToReaction(flow?.pumpType),
+});
 
 export const reactionFlowConditionToOrd = ({
   type,
   tubing,
-  ...rest
-}: ReactionFlowCondition): Optional<ord.IFlowConditions> => {
-  return convertObjectToNullIfEmpty(
+  details,
+  pumpType,
+}: ReactionFlowCondition):
+  | MessageInitShape<typeof FlowConditionsSchema>
+  | undefined => {
+  return convertObjectToUndefinedIfEmpty(
     {
       type: reactionFlowTypeToOrd(type),
       tubing: reactionTubingToOrd(tubing),
-      ...rest,
+      details: details ?? undefined,
+      pumpType: pumpType ?? undefined,
     },
     ['type'],
   );
 };
 
 export const ordConditionsToReaction = (
-  conditions: OrdOptional<ord.IReactionConditions>,
+  conditions: OrdOptional<OrdReactionConditions>,
 ): ReactionConditions => {
   const {
     temperature,
-    reflux,
-    conditionsAreDynamic,
     pressure,
     stirring,
     illumination,
     electrochemistry,
     flow,
-    ...rest
-  } =
-    conditions ??
-    (ord.ReactionConditions.toObject(
-      new ord.ReactionConditions(),
-    ) as ord.IReactionConditions);
+    reflux,
+    conditionsAreDynamic,
+    details,
+    ph,
+  } = conditions ?? create(ReactionConditionsSchema);
 
   return withId({
     temperature: ordTemperatureConditionToReaction(temperature),
@@ -358,7 +400,8 @@ export const ordConditionsToReaction = (
     flow: ordFlowConditionToReaction(flow),
     reflux: ordBooleanToReaction(reflux),
     conditionsAreDynamic: ordBooleanToReaction(conditionsAreDynamic),
-    ...rest,
+    details: ordScalarToReaction(details),
+    ph,
   });
 };
 
@@ -371,19 +414,21 @@ export const reactionConditionsToOrd = ({
   flow,
   reflux,
   conditionsAreDynamic,
-  ...rest
-}: ReactionConditions): Optional<ord.IReactionConditions> => {
-  return convertObjectToNullIfEmpty(
-    withoutId({
-      temperature: reactionTemperatureConditionToOrd(temperature),
-      pressure: reactionPressureConditionToOrd(pressure),
-      stirring: reactionStirringConditionToOrd(stirring),
-      illumination: reactionIlluminationConditionToOrd(illumination),
-      electrochemistry: reactionElectrochemistryConditionToOrd(electrochemistry),
-      flow: reactionFlowConditionToOrd(flow),
-      reflux: reactionBooleanToOrd(reflux),
-      conditionsAreDynamic: reactionBooleanToOrd(conditionsAreDynamic),
-      ...rest,
-    }),
-  );
+  details,
+  ph,
+}: ReactionConditions):
+  | MessageInitShape<typeof ReactionConditionsSchema>
+  | undefined => {
+  return convertObjectToUndefinedIfEmpty({
+    temperature: reactionTemperatureConditionToOrd(temperature),
+    pressure: reactionPressureConditionToOrd(pressure),
+    stirring: reactionStirringConditionToOrd(stirring),
+    illumination: reactionIlluminationConditionToOrd(illumination),
+    electrochemistry: reactionElectrochemistryConditionToOrd(electrochemistry),
+    flow: reactionFlowConditionToOrd(flow),
+    reflux: reactionBooleanToOrd(reflux),
+    conditionsAreDynamic: reactionBooleanToOrd(conditionsAreDynamic),
+    details: details ?? undefined,
+    ph: ph ?? undefined,
+  });
 };

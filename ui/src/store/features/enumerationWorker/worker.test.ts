@@ -26,15 +26,15 @@ import {
   VariableType,
 } from 'store/entities/templates/templates.types.ts';
 
-// reactionToOrdReaction (and the protobuf encode it feeds) is the heavy tail of
-// enumerateReaction; mocking it lets us capture the *coerced & merged* template
+// reactionToOrdBinpb (the conversion to ord and the protobuf encode) is the heavy tail
+// of enumerateReaction; mocking it lets us capture the *coerced & merged* template
 // without standing up a full, encodable reaction. ordBooleanToReaction and the
 // reactions.utils merge helpers are left real so the coercion logic is exercised.
-const { reactionToOrdReactionMock } = vi.hoisted(() => ({
-  reactionToOrdReactionMock: vi.fn((_template: unknown) => ({})),
+const { reactionToOrdBinpbMock } = vi.hoisted(() => ({
+  reactionToOrdBinpbMock: vi.fn((_template: unknown) => ''),
 }));
 vi.mock('store/entities/reactions/reactions.converters.ts', () => ({
-  reactionToOrdReaction: reactionToOrdReactionMock,
+  reactionToOrdBinpb: reactionToOrdBinpbMock,
 }));
 
 // Importing the module assigns the global onmessage handler as a side effect.
@@ -71,9 +71,9 @@ function run({
   return postMessageMock.mock.calls.at(-1)?.[0] as EnumerationBatchResult;
 }
 
-/** The merged template handed to reactionToOrdReaction for the most recent reaction. */
+/** The merged template handed to reactionToOrdBinpb for the most recent reaction. */
 function lastMergedTemplate(): Record<string, unknown> {
-  return reactionToOrdReactionMock.mock.calls.at(-1)?.[0] as unknown as Record<
+  return reactionToOrdBinpbMock.mock.calls.at(-1)?.[0] as unknown as Record<
     string,
     unknown
   >;
