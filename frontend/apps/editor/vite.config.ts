@@ -50,6 +50,12 @@ const config: ViteUserConfig = {
   worker: {
     plugins: () => [tsconfigPaths()],
   },
+  // The dev server pre-bundles the dependencies it finds by crawling these entries. The Web
+  // Workers are listed because the crawl from index.html does not follow `new Worker(...)`;
+  // a dependency found only when a worker first loads makes the server reload every page.
+  optimizeDeps: {
+    entries: ['index.html', 'src/**/worker.ts'],
+  },
   // Because ketcher needs asserts which requires super outdated package util
   define: {
     'process.env': {},

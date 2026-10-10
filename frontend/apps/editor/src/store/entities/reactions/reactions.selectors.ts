@@ -22,6 +22,7 @@ import type {
   ReactionTemplate,
   ReactionId,
 } from 'store/entities/reactions/reactions.types.ts';
+import { orderInputs } from 'features/reactions/provider/orderInputs.ts';
 import { getDeepReactionPart } from './reactions.utils.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
@@ -68,14 +69,7 @@ const selectReactionId = (_state: unknown, id: ReactionId) => id;
 
 export const selectOrderedInputs = createSelector(
   [selectReactions, selectReactionId],
-  (reactions, id) => {
-    const inputsMap = reactions[id]?.data?.inputs || {};
-    return Object.values(inputsMap).sort((a, b) => {
-      const aOrder = a.additionOrder ?? Infinity;
-      const bOrder = b.additionOrder ?? Infinity;
-      return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
-    });
-  },
+  (reactions, id) => orderInputs(reactions[id]?.data?.inputs || {}),
 );
 
 export const selectOrderedInputsWrapper = (id: ReactionId) => (state: AppState) =>

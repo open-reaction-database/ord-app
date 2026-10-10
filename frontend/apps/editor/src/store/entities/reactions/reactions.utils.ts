@@ -107,19 +107,7 @@ export function removeDeepReactionPart(
   }
 }
 
-export function getDeepReactionPart(
-  reaction: any,
-  pathComponents: ReactionPathComponents,
-): any {
-  try {
-    // If the path is incorrect we will get an error
-    return pathComponents.reduce((reactionPart: any, key) => {
-      return reactionPart[key];
-    }, reaction);
-  } catch (_e) {
-    return null;
-  }
-}
+export { getDeepReactionPart } from 'features/reactions/provider/getDeepReactionPart.ts';
 
 const nodeEntitiesNamesWithoutCollection = new Set([
   'authenticStandard',

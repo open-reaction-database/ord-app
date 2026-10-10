@@ -168,4 +168,28 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['apps/editor/src/features/reactions/provider/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
+              allowTypeImports: true,
+              message:
+                'The provider is bound for @open-reaction-database/ui; keep it free of app state, transport, and routing.',
+            },
+            {
+              regex: '^store/',
+              allowTypeImports: true,
+              message:
+                'The provider is bound for @open-reaction-database/ui; import only types from the editor store.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );
