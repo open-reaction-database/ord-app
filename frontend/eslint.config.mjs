@@ -104,12 +104,14 @@ export default tseslint.config(
       ],
     },
     rules: {
-      // Every import must be declared in the package's own package.json; hoisting would
-      // otherwise let an undeclared dependency resolve from the workspace root.
+      // Every import, type-only ones included, must be declared in the package's own
+      // package.json; hoisting would otherwise let an undeclared dependency resolve from
+      // the workspace root.
       'import-x/no-extraneous-dependencies': [
         'error',
         {
           packageDir: [path.join(import.meta.dirname, 'packages/ui')],
+          includeTypes: true,
           devDependencies: [
             '**/*.test.{ts,tsx}',
             '**/testing/**',
