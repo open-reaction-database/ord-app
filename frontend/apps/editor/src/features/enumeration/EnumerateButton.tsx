@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ArticleIcon } from 'common/icons';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
 import { useCallback } from 'react';
 import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';

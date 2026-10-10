@@ -37,7 +37,7 @@ import {
   selectEditingGroupId,
   selectIsAddingMember,
 } from 'store/features/groups/groups.selectors.ts';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 
 const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
 

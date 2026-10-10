@@ -1,2 +1,2 @@
 **/dist/**
-apps/editor/src/common/styling/colors.module.scss
+packages/ui/src/theme/colors.module.scss

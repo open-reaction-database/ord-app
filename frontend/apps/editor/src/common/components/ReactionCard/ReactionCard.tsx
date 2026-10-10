@@ -19,7 +19,7 @@ import classes from './reactionCard.module.scss';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo, type ReactNode, type MutableRefObject } from 'react';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { showReactionPreviewDetails } from '../../configuration.constants.ts';

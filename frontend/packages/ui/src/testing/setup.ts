@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Open Reaction Database Project Authors
+ * Copyright 2026 Open Reaction Database Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import '@open-reaction-database/ui/theme/global.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { Buffer } from 'buffer';
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-globalThis.global ||= globalThis;
-globalThis.Buffer = Buffer;
-
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+// Registers jest-dom matchers (toBeInTheDocument, etc.).
+import '@testing-library/jest-dom/vitest';

@@ -13,15 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createRoot } from 'react-dom/client';
-import './index.scss';
-import '@open-reaction-database/ui/theme/global.scss';
-import { AppRoot } from './core/AppRoot.tsx';
-import { Buffer } from 'buffer';
-
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-globalThis.global ||= globalThis;
-globalThis.Buffer = Buffer;
-
-createRoot(document.getElementById('root')!).render(<AppRoot />);
+export * from './theme.ts';
+export { colorToCssVariable } from './colors.ts';
+export { default as typographyClasses } from './typography.module.scss';
+export { default as buttonClasses } from './buttons.module.scss';

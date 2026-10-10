@@ -40,7 +40,7 @@ import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
-import { colorToCssVariable } from 'common/styling/colors.ts';
+import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
 
 const VIEW_MODE_OPTIONS: Array<SegmentedControlItem> = [

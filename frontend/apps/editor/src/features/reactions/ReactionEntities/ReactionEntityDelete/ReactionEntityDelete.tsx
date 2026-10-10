@@ -17,7 +17,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import { ActionIcon } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
 import classes from './reactionEntityDelete.module.scss';
-import { buttonClasses } from 'common/styling';
+import { buttonClasses } from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';

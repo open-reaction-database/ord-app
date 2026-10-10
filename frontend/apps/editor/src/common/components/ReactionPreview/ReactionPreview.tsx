@@ -22,7 +22,7 @@ import { ReactionInputPreview } from 'common/components/ReactionPreview/Reaction
 import { ReactionOutcomePreview } from 'common/components/ReactionPreview/ReactionOutcomePreview.tsx';
 import { ArrowIcon, EmptyPreview } from '../../icons';
 import { Flex, Text, Tooltip } from '@mantine/core';
-import { typographyClasses } from '../../styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface ReactionPreviewProps {

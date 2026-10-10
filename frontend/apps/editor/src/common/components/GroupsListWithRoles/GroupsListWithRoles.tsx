@@ -22,7 +22,7 @@ import { useDisclosure } from '@mantine/hooks';
 import type { GroupItem } from 'store/entities/groups/groups.types.ts';
 import { USER_ROLES } from 'common/types';
 import { selectGroupsByIdsList } from 'store/entities/groups/groups.selectors.ts';
-import { typographyClasses } from '../../styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
 
 interface GroupsListWithRolesProps {

@@ -40,7 +40,7 @@ import classes from './shareDataset.module.scss';
 import { RemoveIcon } from 'common/icons';
 import { Counter } from 'common/components/display/Counter/Counter.tsx';
 import { KeyValueDisplay } from 'common/components/display/KeyValueDisplay/KeyValueDisplay.tsx';
-import { buttonClasses, typographyClasses } from 'common/styling';
+import { buttonClasses, typographyClasses } from '@open-reaction-database/ui/theme';
 import { clearDatasetGroupsListAction } from 'store/entities/datasets/datasets.actions.ts';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';

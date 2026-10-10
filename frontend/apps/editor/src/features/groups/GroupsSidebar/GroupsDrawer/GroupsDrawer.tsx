@@ -37,7 +37,7 @@ import classes from './GroupsDrawer.module.scss';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import clsx from 'clsx';
-import { typographyClasses } from 'common/styling';
+import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 
 export function GroupsDrawer() {

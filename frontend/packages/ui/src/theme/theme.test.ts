@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Open Reaction Database Project Authors
+ * Copyright 2026 Open Reaction Database Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './theme';
-export { default as typographyClasses } from './typography.module.scss';
-export { default as buttonClasses } from './buttons.module.scss';
+import { theme } from '#theme/index.ts';
+
+describe('theme', () => {
+  it('uses the ORD blue as its primary color', () => {
+    expect(theme.primaryColor).toBe('primary');
+    expect(theme.colors?.primary?.[0]).toBe('#3C78D8');
+  });
+});

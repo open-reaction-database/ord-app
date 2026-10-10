@@ -43,7 +43,7 @@ import {
   selectCanDatasetBeEdited,
 } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
-import { buttonClasses, typographyClasses } from 'common/styling';
+import { buttonClasses, typographyClasses } from '@open-reaction-database/ui/theme';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
 
 interface DatasetHeaderProps {
