@@ -7,9 +7,17 @@
     "types": ["vitest/globals"],
     "jsx": "react-jsx",
 
-    /* Bare imports such as `store/…` resolve from src/ */
+    /* Bare imports such as `store/…` resolve from src/. The directories are listed one by
+       one so the mapping cannot capture a package's `#…` subpath imports. */
     "paths": {
-      "*": ["./src/*"]
+      "common/*": ["./src/common/*"],
+      "core/*": ["./src/core/*"],
+      "features/*": ["./src/features/*"],
+      "pages/*": ["./src/pages/*"],
+      "routes": ["./src/routes"],
+      "routes/*": ["./src/routes/*"],
+      "store/*": ["./src/store/*"],
+      "test/*": ["./src/test/*"]
     }
   },
   "include": ["src"]

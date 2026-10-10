@@ -89,9 +89,18 @@ export default tseslint.config(
     files: ['apps/editor/**/*.{ts,tsx}'],
     plugins: { 'no-relative-import-paths': noRelativeImportPaths },
     rules: {
+      // The plugin resolves rootDir against the working directory, so it is computed from
+      // wherever ESLint runs.
       'no-relative-import-paths/no-relative-import-paths': [
         'error',
-        { allowSameFolder: true, rootDir: 'apps/editor/src', allowedDepth: 2 },
+        {
+          allowSameFolder: true,
+          rootDir: path.relative(
+            process.cwd(),
+            path.join(import.meta.dirname, 'apps/editor/src'),
+          ),
+          allowedDepth: 2,
+        },
       ],
     },
   },
@@ -100,7 +109,9 @@ export default tseslint.config(
     plugins: { 'import-x': importX },
     settings: {
       'import-x/resolver-next': [
-        createTypeScriptImportResolver({ project: 'packages/ui/tsconfig.json' }),
+        createTypeScriptImportResolver({
+          project: path.join(import.meta.dirname, 'packages/ui/tsconfig.json'),
+        }),
       ],
     },
     rules: {
@@ -123,7 +134,14 @@ export default tseslint.config(
         'error',
         {
           patterns: [
-            { group: ['../*'], message: 'Import package files through #… instead.' },
+            {
+              group: [
+                '../*',
+                '@open-reaction-database/ui',
+                '@open-reaction-database/ui/*',
+              ],
+              message: 'Import package files through #… instead.',
+            },
             {
               group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
               message:
