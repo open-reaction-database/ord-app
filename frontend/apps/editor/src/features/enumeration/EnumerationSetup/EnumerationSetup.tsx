@@ -20,6 +20,7 @@ import { useForm, yupResolver } from '@mantine/form';
 import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
 import type {
@@ -156,7 +157,11 @@ export function EnumerationSetup({
           />
 
           <ReactionEntityBlockTitle leftSection={<Title order={3}>Reaction</Title>} />
-          {template && <ReactionPreview reaction={template} />}
+          {template && (
+            <TemplateReactionProvider templateId={form.values.templateId}>
+              <ReactionPreview />
+            </TemplateReactionProvider>
+          )}
 
           <VariablesMatching form={form} />
         </Flex>

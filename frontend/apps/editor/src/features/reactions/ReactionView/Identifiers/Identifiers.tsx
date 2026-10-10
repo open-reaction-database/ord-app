@@ -16,9 +16,6 @@
 import { Button, Flex, Title } from '@mantine/core';
 import classes from './identifiers.module.scss';
 import { Counter, KeyValueDisplay } from '@open-reaction-database/ui/display';
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { useSelector } from 'react-redux';
 import { AddCircleIcon } from 'common/icons';
 import { create } from '@bufbuild/protobuf';
 import { ReactionIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
@@ -28,15 +25,24 @@ import { useCallback, useContext } from 'react';
 import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import {
+  useIsViewOnly,
+  useReactionPart,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'identifiers';
 
-export function Identifiers({ reactionId }: ReactionViewSectionProps) {
+export function Identifiers() {
   const dispatch = useAppDispatch();
-  const reaction = useSelector(selectReactionById(reactionId));
-  const identifiers = reaction.data.identifiers || [];
+  // The ID addresses only the dispatch below.
+  const { reactionId } = useContext(reactionContext);
+  const identifiers = useReactionPart<Array<ReactionIdentifier>>([ENTITY_FIELD]) ?? [];
+  const isViewOnly = useIsViewOnly();
+  const { ViewDeleteButtons } = useReactionSlots();
   const onIdentifierCreate = useCallback(() => {
     const newIdentifierPath: ReactionPathComponents = [
       ENTITY_FIELD,
@@ -55,8 +61,6 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
     );
     dispatch(setReactionPathComponentsList([newIdentifierPath]));
   }, [reactionId, identifiers.length, dispatch]);
-
-  const { ViewDeleteButtonsComponent, isViewOnly } = useContext(reactionContext);
 
   return (
     <Flex
@@ -94,13 +98,13 @@ export function Identifiers({ reactionId }: ReactionViewSectionProps) {
         key={identifiers.length}
       >
         {identifiers.map((identifier, index) => (
-          <div key={index}>
+          <div key={identifier.id}>
             <Flex
               align="center"
               className={classes.identifier}
             >
               <span className={classes.identifierLabel}>Identifier {index + 1}</span>
-              <ViewDeleteButtonsComponent
+              <ViewDeleteButtons
                 entityName="Identifier"
                 pathComponents={[ENTITY_FIELD, index]}
               />

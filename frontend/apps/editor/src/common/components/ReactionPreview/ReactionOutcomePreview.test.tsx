@@ -35,10 +35,7 @@ describe('ReactionOutcomePreview', () => {
       conversion: { value: 90 },
     });
     const { getByText } = renderInReactionView(
-      <ReactionOutcomePreview
-        reactionId={1}
-        outcomeIndex={0}
-      />,
+      <ReactionOutcomePreview outcomeIndex={0} />,
       {
         reactionId: 1,
         reaction,
@@ -50,10 +47,7 @@ describe('ReactionOutcomePreview', () => {
   it('shows a bare "Outcome" label when there is no time or conversion', () => {
     const reaction = reactionWith({});
     const { getByText } = renderInReactionView(
-      <ReactionOutcomePreview
-        reactionId={1}
-        outcomeIndex={0}
-      />,
+      <ReactionOutcomePreview outcomeIndex={0} />,
       {
         reactionId: 1,
         reaction,

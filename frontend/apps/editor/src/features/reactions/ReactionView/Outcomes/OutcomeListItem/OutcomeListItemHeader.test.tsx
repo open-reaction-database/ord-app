@@ -24,7 +24,6 @@ const renderHeader = (outcome: Partial<ReactionOutcome>) =>
     <Accordion>
       <Accordion.Item value="outcome">
         <OutcomeListItemHeader
-          reactionId={1}
           outcome={outcome as ReactionOutcome}
           pathComponents={['outcomes', 0]}
         />

@@ -41,8 +41,10 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
   const isReadyForEnumeration = variablesSize > 0;
   const [opened, { open, close }] = useDisclosure();
   const onTemplateNameChange = useCallback(
-    async (_name: string) => {
+    (_name: string) => {
       dispatch(renameTemplate({ templateId: templateId, name: _name }));
+      // InputModal awaits its submit handler; the rename reports its own outcome.
+      return Promise.resolve();
     },
     [dispatch, templateId],
   );
@@ -98,7 +100,7 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           <DataField label="Last Modified">
             {formatUtcDateToDisplay(template.modified_at)}
           </DataField>
-          <ReactionPreview reaction={template} />
+          <ReactionPreview />
         </Flex>
         {opened && (
           <InputModal

@@ -18,7 +18,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo, useState } from 'react';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
+import { DatasetReactionHeader } from 'features/reactions/ReactionHeader/DatasetReactionHeader/DatasetReactionHeader.tsx';
 import {
   type SegmentedControlItem,
   Flex,
@@ -99,7 +99,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
             direction="column"
             gap="sm"
           >
-            <ReactionHeader
+            <DatasetReactionHeader
               datasetId={datasetId}
               reactionId={reactionId}
             />
@@ -116,10 +116,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
               radius="md"
               p="lg"
             >
-              <ReactionContent
-                reactionId={reactionId}
-                viewMode={viewMode}
-              />
+              <ReactionContent viewMode={viewMode} />
             </Paper>
             <ReactionDetailsSidebar reactionId={reactionId} />
           </Flex>

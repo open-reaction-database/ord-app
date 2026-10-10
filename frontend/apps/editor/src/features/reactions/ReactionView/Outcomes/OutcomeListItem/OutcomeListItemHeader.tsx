@@ -21,13 +21,10 @@ import clsx from 'clsx';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { useContext } from 'react';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface OutcomeListItemHeaderProps {
-  reactionId: ReactionId;
   outcome: ReactionOutcome;
   pathComponents: ReactionPathComponents;
 }
@@ -36,12 +33,12 @@ export function OutcomeListItemHeader({
   outcome,
   pathComponents,
 }: Readonly<OutcomeListItemHeaderProps>) {
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtons } = useReactionSlots();
   return (
     // The view/delete buttons sit beside Accordion.Control rather than in its `icon` slot:
     // Accordion.Control renders a <button>, and a nested <button> triggers a hydration error.
     <div className={classes.controlRow}>
-      <ViewDeleteButtonsComponent
+      <ViewDeleteButtons
         entityName="Outcome"
         pathComponents={pathComponents}
       />

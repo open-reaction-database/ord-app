@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionViewSectionProps } from 'features/reactions/ReactionView/reactionView.types.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { create } from '@bufbuild/protobuf';
 import { ReactionOutcomeSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { Accordion, Button, Flex, Title } from '@mantine/core';
@@ -28,9 +25,12 @@ import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes
 import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { sortOutcomesByReactionTime } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.utils.ts';
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
-import { useMemo, useContext } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
+import { useMemo } from 'react';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import {
+  useIsViewOnly,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,
@@ -39,21 +39,22 @@ const useCreate = buildUseCreate('outcomes', newIndex => [
 
 const ENTITY_FIELD = 'outcomes';
 
-export function Outcomes({ reactionId }: ReactionViewSectionProps) {
-  const outcomes: Array<ReactionOutcome> = useSelector(
-    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
-  );
+const NO_OUTCOMES: Array<ReactionOutcome> = [];
+
+export function Outcomes() {
+  const outcomes =
+    useReactionPart<Array<ReactionOutcome>>([ENTITY_FIELD]) ?? NO_OUTCOMES;
   const onCreateNew = useCreate();
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const handleCreate = () => {
     onCreateNew(outcomes.length, outcomes);
   };
 
-  const ids = useMemo(() => outcomes?.map(outcome => outcome.id), [outcomes]);
+  const ids = useMemo(() => outcomes.map(outcome => outcome.id), [outcomes]);
   // Display outcomes ordered by reaction time when available, else stored order. The original
   // stored index is preserved for each so the edit path stays correct. (#599)
   const orderedOutcomes = useMemo(
-    () => sortOutcomesByReactionTime(outcomes ?? []),
+    () => sortOutcomesByReactionTime(outcomes),
     [outcomes],
   );
 
@@ -65,7 +66,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           gap="sm"
         >
           <Title order={2}>Outcomes</Title>
-          <Counter amount={outcomes?.length} />
+          <Counter amount={outcomes.length} />
           <ReactionNodeValidationResult pathComponents={[ENTITY_FIELD]} />
         </Flex>
         {!isViewOnly && (
@@ -80,7 +81,7 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
       <span>
         Outcomes record timestamped analyses and, optionally, product characterization
       </span>
-      {outcomes?.length > 0 ? (
+      {outcomes.length > 0 ? (
         <Accordion
           variant="separated"
           chevronPosition="left"
@@ -91,7 +92,6 @@ export function Outcomes({ reactionId }: ReactionViewSectionProps) {
           {orderedOutcomes.map(({ outcome, index }) => (
             <OutcomeListItem
               key={outcome.id}
-              reactionId={reactionId}
               outcome={outcome}
               outcomeIndex={index}
             />

@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionValidationResult } from './ReactionValidationResult.tsx';
-import type { AppState } from 'store/configureAppStore.ts';
-
-const stateWith = (record: object): { preloadedState: AppState } => ({
-  preloadedState: {
-    entities: { reactions: { reactionsById: { 1: { id: 1, data: {}, ...record } } } },
-  } as unknown as AppState,
-});
 
 describe('ReactionValidationResult', () => {
   it('shows pluralized error and warning counts when the reaction is invalid', () => {
-    const { getByText } = renderWithProviders(
-      <ReactionValidationResult reactionId={1} />,
-      stateWith({
+    const { getByText } = renderInReactionView(<ReactionValidationResult />, {
+      record: {
         is_valid: false,
         validation: {
           errors: [{ text: 'a' }, { text: 'b' }],
           warnings: [{ text: 'c' }],
         },
-      }),
-    );
+      },
+    });
     expect(getByText('2 errors')).toBeInTheDocument();
     expect(getByText('1 warning')).toBeInTheDocument();
   });
 
+  it('shows no badge for a reaction that carries no validity, such as a template', () => {
+    const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
+      reactionId: 'template_1',
+    });
+    expect(queryByText(/Reaction is/)).not.toBeInTheDocument();
+  });
+
   it('shows neither an error nor a warning count when the reaction is valid', () => {
-    const { queryByText } = renderWithProviders(
-      <ReactionValidationResult reactionId={1} />,
-      stateWith({ is_valid: true, validation: null }),
-    );
+    const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
+      record: { is_valid: true, validation: null },
+    });
     expect(queryByText(/error/)).not.toBeInTheDocument();
     expect(queryByText(/warning/)).not.toBeInTheDocument();
   });

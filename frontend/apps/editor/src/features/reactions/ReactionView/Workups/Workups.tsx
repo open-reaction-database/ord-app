@@ -21,8 +21,6 @@ import {
   RequiredOptionalFields,
   type FieldConfiguration,
 } from '@open-reaction-database/ui/display';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { AddCircleIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { create } from '@bufbuild/protobuf';
@@ -37,6 +35,11 @@ import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit.ts';
 import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
 import { InputComponentsListItem } from '../Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import {
+  useIsViewOnly,
+  useReactionPart,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'workups';
 
@@ -143,11 +146,11 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
 
 export function Workups() {
   const dispatch = useAppDispatch();
-  const { isViewOnly, reactionId, ViewDeleteButtonsComponent } =
-    useContext(reactionContext);
-  const workups: Array<ReactionWorkup> = useSelector(
-    selectReactionPartByPath(reactionId, [ENTITY_FIELD]),
-  );
+  // The ID addresses only the dispatch below.
+  const { reactionId } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
+  const { ViewDeleteButtons } = useReactionSlots();
+  const workups = useReactionPart<Array<ReactionWorkup>>([ENTITY_FIELD])!;
 
   const onWorkupCreate = () => {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, workups.length];
@@ -201,7 +204,7 @@ export function Workups() {
           >
             <Flex align="center">
               <Title order={3}>Workup {index + 1}</Title>
-              <ViewDeleteButtonsComponent
+              <ViewDeleteButtons
                 entityName="Workup"
                 pathComponents={[ENTITY_FIELD, index]}
               />

@@ -29,7 +29,6 @@ describe('OutcomeListItem', () => {
     const { getByText } = renderInReactionView(
       <Accordion defaultValue="o1">
         <OutcomeListItem
-          reactionId={1}
           outcome={outcome}
           outcomeIndex={0}
         />

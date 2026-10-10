@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useContext } from 'react';
 import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ComponentDisplayRowProps } from './componentsList.types.ts';
-import { reactionContext } from '../../reactions.context.ts';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
   component,
@@ -26,7 +25,7 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
   gridClassName,
   historyPathComponents,
 }: Readonly<ComponentDisplayRowProps<T>>) {
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtons } = useReactionSlots();
 
   return (
     <ComponentDisplayRowCustomActions
@@ -34,7 +33,7 @@ export function ComponentDisplayRow<T extends ReactionComponentBase>({
       renderDetails={renderDetails}
       gridClassName={gridClassName}
       actions={
-        <ViewDeleteButtonsComponent
+        <ViewDeleteButtons
           entityName="Component"
           pathComponents={componentPath}
           historyPathComponents={historyPathComponents}

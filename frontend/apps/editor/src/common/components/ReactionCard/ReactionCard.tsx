@@ -16,12 +16,10 @@
 import { Flex, Paper, Title } from '@mantine/core';
 import clsx from 'clsx';
 import classes from './reactionCard.module.scss';
-import { useSelector } from 'react-redux';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface DescriptorsListProps {
@@ -57,7 +55,6 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 }
 
 interface ReactionCardProps {
-  id: ReactionId;
   title: ReactNode;
   actions: ReactNode;
   previewRef?: MutableRefObject<HTMLDivElement | null>;
@@ -65,14 +62,13 @@ interface ReactionCardProps {
 }
 
 export function ReactionCard({
-  id,
   title,
   actions,
   previewRef,
   isInvalid,
 }: Readonly<ReactionCardProps>) {
-  const reaction = useSelector(selectReactionById(id));
-  if (!reaction) {
+  const summary = useReactionSnapshot()?.summary;
+  if (!summary) {
     return null;
   }
 
@@ -96,7 +92,7 @@ export function ReactionCard({
           {showReactionPreviewDetails && (
             <DescriptorsList
               title="Provenance"
-              items={reaction.summary.provenance}
+              items={summary.provenance}
             />
           )}
         </div>
@@ -113,14 +109,11 @@ export function ReactionCard({
           </Flex>
         </Flex>
       </div>
-      <ReactionPreview
-        reaction={reaction}
-        ref={previewRef}
-      />
+      <ReactionPreview ref={previewRef} />
       {showReactionPreviewDetails && (
         <DescriptorsList
           title="Summary"
-          items={reaction.summary.summary}
+          items={summary.summary}
         />
       )}
     </Paper>

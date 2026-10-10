@@ -19,7 +19,7 @@ import { Setup } from './Setup.tsx';
 
 describe('Setup', () => {
   it('renders the setup section with the vessel and material fields', () => {
-    const { getByText } = renderInReactionView(<Setup reactionId={1} />);
+    const { getByText } = renderInReactionView(<Setup />);
     expect(getByText('Setup')).toBeInTheDocument();
     // KeyValueDisplay renders each label with a trailing colon.
     expect(getByText('Vessel:')).toBeInTheDocument();
