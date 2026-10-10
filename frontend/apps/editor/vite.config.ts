@@ -38,8 +38,8 @@ function assertAuth0Configured(mode: string): void {
   const missing = AUTH0_VARIABLES.filter(name => !env[name]);
   if (missing.length > 0) {
     throw new Error(
-      `Missing ${missing.join(', ')}: pass them as build arguments or set them in ui/.env ` +
-        '(see ui/.env.template).',
+      `Missing ${missing.join(', ')}: pass them as build arguments or set them in ` +
+        'frontend/apps/editor/.env (see frontend/apps/editor/.env.template).',
     );
   }
 }

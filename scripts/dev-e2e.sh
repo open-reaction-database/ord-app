@@ -21,7 +21,7 @@
 #
 # Usage:
 #   PG_DSN=... PG_ALEMBIC_DSN=... PG_TEST_DSN=... ./scripts/dev-e2e.sh
-#   # then, in another shell: cd ui && npm run test:e2e
+#   # then, in another shell: cd frontend/apps/editor && npm run test:e2e
 set -euo pipefail
 
 export APP_ENV="${APP_ENV:-localhost}"
@@ -38,4 +38,4 @@ backend_pid=$!
 trap 'kill "${backend_pid}" 2>/dev/null || true' EXIT
 
 echo "Starting UI (no-auth) on http://127.0.0.1:5173 ..."
-( cd ui && VITE_E2E_NO_AUTH=TRUE npm run dev -- --host 127.0.0.1 --port 5173 )
+( cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE npm run dev -- --host 127.0.0.1 --port 5173 )

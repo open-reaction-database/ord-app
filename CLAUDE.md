@@ -7,8 +7,9 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - `ord_app/` — Python backend (Python 3.12).
   - `service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`.
   - `api/`, `visualization/` — supporting modules. `tests/` — pytest suite.
-- `ui/` — React 19 + Vite 6 frontend. Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths` (write `store/…`, `common/…`, `features/…`, not `../../`).
-  - Reaction protobufs come from the protobuf-es SDK that the Buf Schema Registry generates from ord-schema, `@buf/open-reaction-database_ord-schema.bufbuild_es`; `ui/.npmrc` points the `@buf` scope at buf.build. Pin it to the exact version of an ord-schema release (its `label-vX.Y.Z` dist-tag): a caret range floats to newer, unreleased BSR commits. The converters under `store/entities/reactions/` map ord messages to and from the store's shapes.
+- `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
+  - `apps/editor/` — the editor: React 19 + Vite 6, Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths` (write `store/…`, `common/…`, `features/…`, not `../../`).
+  - Reaction protobufs come from the protobuf-es SDK that the Buf Schema Registry generates from ord-schema, `@buf/open-reaction-database_ord-schema.bufbuild_es`; `frontend/.npmrc` points the `@buf` scope at buf.build. Pin it to the exact version of an ord-schema release (its `label-vX.Y.Z` dist-tag): a caret range floats to newer, unreleased BSR commits. The converters under `store/entities/reactions/` map ord messages to and from the store's shapes.
 - `migrations/` — Alembic. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + backend.
 
 ## Backend (Python, `uv`)
@@ -19,26 +20,25 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - Tests: `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
 - Lint/type: `ruff` + `ruff format`, `ty` (Astral's type checker; `uv run ty check ord_app`).
 
-## Frontend (`ui/`)
+## Frontend (`frontend/`)
 
-- Setup: `cd ui && npm ci`. Dev: `npm run dev`. Build: `npm run build` (= `tsc -b && vite build`).
-- Unit tests: `npx vitest run` (Vitest + happy-dom + Testing Library). E2E: `npm run test:e2e` (Playwright, specs in `e2e/`).
-- Lint/format: `npm run lint:check` (= `prettier --check . && npm run lint && npm run lint:css`, i.e. `eslint src *.ts *.cjs *.mjs` + `stylelint '**/*.[s]css'`).
+- Run from `frontend/`: setup `npm ci`; lint/format `npm run lint:check` (= `prettier --check . && npm run lint && npm run lint:css`, i.e. `eslint .` + `stylelint '**/*.[s]css'`); type-check `npm run typecheck` (= `tsc -b`); coverage `npm run test:coverage` (each workspace's own Vitest config and floors).
+- Editor: `npm run dev -w apps/editor`, `npm run build -w apps/editor` (= `tsc -b && vite build`), `npm run test:e2e -w apps/editor` (Playwright, specs in `apps/editor/e2e/`). Unit tests: `cd apps/editor && npx vitest run` (Vitest + happy-dom + Testing Library).
 - **Type-check with `tsc -b`, not bare `tsc --noEmit`** (the latter skips test files → false green; CI runs `tsc -b`). See `.claude/rules/ui-testing.md` and the **`ord-app-ui-testing` skill** for the full testing playbook (mocking patterns, render helpers, thunk harness, E2E stack boot).
 
 ## Formatting & pre-commit
 
-Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` once (and `npm ci` in `ui/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` (scoped to `ord_app/`), and UI `prettier`/`eslint`/`stylelint`. Run all: `uv run pre-commit run --all-files`.
+Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` once (and `npm ci` in `frontend/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` (scoped to `ord_app/`), and UI `prettier`/`eslint`/`stylelint`. Run all: `uv run pre-commit run --all-files`.
 
 ## CI gates (a PR is not mergeable until these are green)
 
 - **Tests**: `test_python` (ubuntu + macos), `test_ui`, `test_e2e` (boots the full no-auth stack).
-- **Checks**: `check_python` (ruff / ruff-format / ty), `check_javascript` (clang-format), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `make duplication`), `lint_and_build_ui` (`lint:check` + `npm run build`), `check_license_headers`.
+- **Checks**: `check_python` (ruff / ruff-format / ty), `check_javascript` (clang-format), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `make duplication`), `lint_and_build_ui` (`lint:check` + `typecheck` + `npm run build`), `check_license_headers`.
 - **SonarCloud quality gate** and **Greptile review** also gate merges — never merge over a red Sonar check; address Greptile findings (and read its PR-body summary for sub-threshold notes) before merging.
 
 ## Conventions
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
-- Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `ui/.env`, and fail without them; the backend reads them from the environment or `ord_app/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
-- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `ui/vite.config.ts`); it is no longer uploaded to Codecov.
+- Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `frontend/apps/editor/.env`, and fail without them; the backend reads them from the environment or `ord_app/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
+- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.

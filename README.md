@@ -29,8 +29,8 @@
 
 Formatting and linting run through [pre-commit](https://pre-commit.com): license headers via
 [`addlicense`](https://github.com/google/addlicense), Python via [Ruff](https://docs.astral.sh/ruff/), and the UI via
-Prettier/ESLint/Stylelint. Install the hooks once after cloning (and run `npm ci` in `ui/` so the UI hooks can find
-their tools):
+Prettier/ESLint/Stylelint. Install the hooks once after cloning (and run `npm ci` in `frontend/` so the UI hooks can
+find their tools):
 
 ```shell
 uv run pre-commit install
@@ -46,7 +46,7 @@ docker compose up -d
 ```
 At the same time, you need to run the Front-End separately.
 ```shell
-cd ui
+cd frontend
 ```
 
 ```shell
@@ -54,8 +54,12 @@ npm ci
 ```
 
 ```shell
-npm run dev
+npm run dev -w apps/editor
 ```
+
+The frontend lives in `frontend/`, an npm workspace with the editor in `frontend/apps/editor/`. A checkout from before
+the move may still hold an untracked `ui/` directory (`ui/node_modules`, `ui/.env`): move `ui/.env` to
+`frontend/apps/editor/.env`, then delete `ui/`.
 
 ### Single docker file
 Or run the Front-End and Back-End in a single Dockerfile.
@@ -63,8 +67,8 @@ Or run the Front-End and Back-End in a single Dockerfile.
 _Note: the database must be on the same network as docker or docker must connect to the external database (and have access)_
 
 1. Build the Docker image. The UI compiles the Auth0 settings in, so the build needs
-   them, as build arguments or in `ui/.env` (see `ui/.env.template`), and fails if any
-   is missing.
+   them, as build arguments or in `frontend/apps/editor/.env` (see
+   `frontend/apps/editor/.env.template`), and fails if any is missing.
    ```shell
    docker build -f Dockerfile.single -t ord \
    --build-arg VITE_AUTH0_DOMAIN="..." \

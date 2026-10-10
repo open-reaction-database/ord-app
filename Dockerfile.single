@@ -17,8 +17,8 @@ FROM node:22-alpine AS react-build
 
 WORKDIR /app
 
-# Copy the rest of the React app
-COPY ui/ ./
+# Copy the frontend workspace
+COPY frontend/ ./
 
 # Install dependencies
 RUN npm ci --ignore-scripts
@@ -26,14 +26,15 @@ RUN npm ci --ignore-scripts
 # The backend is served from the same origin (nginx proxies /api to uvicorn), so
 # default the API base to a relative path. This keeps every deployed environment
 # (prod, staging, ...) calling its own origin instead of a hardcoded host, which
-# would otherwise be baked in from a local ui/.env at build time. A build-time env
-# var takes precedence over .env files in Vite. Override with --build-arg if needed.
+# would otherwise be baked in from a local frontend/apps/editor/.env at build time. A
+# build-time env var takes precedence over .env files in Vite. Override with --build-arg
+# if needed.
 ARG VITE_API_ENDPOINT=/api/v1
 ENV VITE_API_ENDPOINT=${VITE_API_ENDPOINT}
 
 # The Auth0 settings are compiled into the bundle. They come from these build arguments
-# or, for any not passed, from ui/.env. ORD_APP_REQUIRE_AUTH0 fails the build when one is
-# missing (see vite.config.ts).
+# or, for any not passed, from frontend/apps/editor/.env. ORD_APP_REQUIRE_AUTH0 fails the
+# build when one is missing (see frontend/apps/editor/vite.config.ts).
 ARG VITE_AUTH0_DOMAIN
 ARG VITE_AUTH0_CLIENT_ID
 ARG VITE_AUTH0_AUDIENCE
@@ -41,7 +42,7 @@ ARG VITE_AUTH0_ISSUER
 ARG VITE_AUTH0_SCOPE
 
 # Build the React app
-RUN ORD_APP_REQUIRE_AUTH0=true npm run build
+RUN ORD_APP_REQUIRE_AUTH0=true npm run build -w apps/editor
 
 # Stage 2: Build the FastAPI backend
 FROM python:3.12-slim AS fastapi-build
@@ -93,7 +94,7 @@ RUN uv sync --frozen --no-dev
 COPY ord_app/ ./ord_app
 
 # Copy the built React app from the previous stage
-COPY --from=react-build /app/dist /var/www/html
+COPY --from=react-build /app/apps/editor/dist /var/www/html
 
 # Copy Nginx config file
 COPY nginx.conf /etc/nginx/nginx.conf

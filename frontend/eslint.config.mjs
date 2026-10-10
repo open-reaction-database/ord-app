@@ -24,7 +24,7 @@ import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import sonarjs from 'eslint-plugin-sonarjs';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['**/dist', '**/coverage', '**/playwright-report', '**/test-results'] },
   {
     extends: [
       js.configs.recommended,
@@ -43,7 +43,6 @@ export default tseslint.config(
       react: react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'no-relative-import-paths': noRelativeImportPaths,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -57,10 +56,6 @@ export default tseslint.config(
       '@typescript-eslint/no-namespace': ['off'],
       complexity: ['error', 10],
       'no-duplicate-imports': 'error',
-      'no-relative-import-paths/no-relative-import-paths': [
-        'error',
-        { allowSameFolder: true, rootDir: 'src', allowedDepth: 2 },
-      ],
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -82,14 +77,19 @@ export default tseslint.config(
       'sonarjs/no-nested-conditional': 'off', // nested ternaries are the idiomatic JSX conditional-render pattern; the rule can't scope itself to non-JSX
     },
     settings: {
-      'import/resolver': {
-        node: {
-          moduleDirectory: ['node_modules', 'src/'],
-        },
-      },
       react: {
         version: 'detect',
       },
+    },
+  },
+  {
+    files: ['apps/editor/**/*.{ts,tsx}'],
+    plugins: { 'no-relative-import-paths': noRelativeImportPaths },
+    rules: {
+      'no-relative-import-paths/no-relative-import-paths': [
+        'error',
+        { allowSameFolder: true, rootDir: 'apps/editor/src', allowedDepth: 2 },
+      ],
     },
   },
 );

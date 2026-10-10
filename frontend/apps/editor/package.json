@@ -1,5 +1,5 @@
 {
-  "name": "ord-app-ui",
+  "name": "@open-reaction-database/editor",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -7,12 +7,6 @@
     "analyze": "vite-bundle-visualizer --open",
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "prettier": "prettier --write .",
-    "lint": "eslint src *.ts *.cjs *.mjs",
-    "lint:fix": "eslint --fix src *.ts *.cjs *.mjs",
-    "lint:css": "stylelint '**/*.[s]css'",
-    "lint:css:fix": "stylelint --fix '**/*.[s]css'",
-    "lint:check": "prettier --check . && npm run lint && npm run lint:css",
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -49,7 +43,6 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.13.0",
     "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -58,48 +51,15 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "@vitest/coverage-v8": "^4.1.11",
-    "eslint": "^9.13.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-no-relative-import-paths": "^1.6.1",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
-    "eslint-plugin-sonarjs": "^4.1.0",
-    "globals": "^15.11.0",
     "happy-dom": "^20.9.0",
-    "jscpd": "^5.0.11",
     "postcss": "^8.5.29",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
-    "prettier": "^3.4.0",
     "sass": "^1.81.0",
-    "stylelint": "^16.11.0",
-    "stylelint-config-standard": "^36.0.1",
-    "stylelint-scss": "^6.10.0",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "^8.11.0",
     "vite": "^6.4.3",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-svgr": "^4.3.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.1.11"
-  },
-  "overrides": {
-    "ketcher-react": {
-      "react": "^19.0.0",
-      "react-dom": "^19.0.0"
-    },
-    "ketcher-core": "^3.15.0",
-    "draft-js": {
-      "immutable": "3.8.3"
-    },
-    "immutable@<3.8.3": "3.8.3",
-    "minimatch@<3.1.4": "3.1.4",
-    "minimatch@>=9.0.0 <9.0.7": "9.0.7",
-    "picomatch@<2.3.2": "2.3.2",
-    "brace-expansion@<1.1.21": "1.1.21",
-    "brace-expansion@>=2.0.0 <2.0.3": "2.0.3",
-    "brace-expansion@>=3.0.0 <5.0.12": "5.0.12"
   }
 }

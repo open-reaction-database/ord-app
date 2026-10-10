@@ -69,9 +69,9 @@ jobs:
           find . -name '*.js' -exec clang-format -n -Werror {} +
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
-  # jscpd is pinned as a ui/ devDependency; run from the repo root so it scans both
-  # ord_app/ (Python) and ui/src/ (TS/TSX) per .jscpd.json. Runs on every PR (not
-  # path-filtered) so Python-only changes are covered too.
+  # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
+  # both ord_app/ (Python) and frontend/apps/editor/src/ (TS/TSX) per .jscpd.json. Runs
+  # on every PR (not path-filtered) so Python-only changes are covered too.
   check_duplication:
     runs-on: ubuntu-latest
     steps:
@@ -80,8 +80,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: ui/package-lock.json
-      - name: Install jscpd (via ui devDependencies)
-        run: npm --prefix ui ci
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install jscpd (via frontend devDependencies)
+        run: npm --prefix frontend ci
       - name: jscpd
-        run: ui/node_modules/.bin/jscpd --config .jscpd.json
+        run: frontend/node_modules/.bin/jscpd --config .jscpd.json
