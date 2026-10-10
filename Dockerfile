@@ -34,8 +34,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ntpsec-ntpdate \
     python3-dev \
     zlib1g-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir --only-binary :all: uv==0.13.0
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# uv from its release image, pinned by version.
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /bin/
 
 ENV UV_PROJECT_ENVIRONMENT=/usr/local \
     UV_COMPILE_BYTECODE=1 \

@@ -40,3 +40,20 @@ export const useOnViewEdit = ({
     }
   }, [dispatch, pathComponents, historyPathComponents]);
 };
+
+/**
+ * Opens the entity from a button that sits inside a row that toggles when clicked, without
+ * letting the click toggle the row.
+ */
+export const useOnViewEditButton = (
+  props: Omit<ReactionViewDeleteButtonsProps, 'entityName'>,
+) => {
+  const onViewEdit = useOnViewEdit(props);
+  return useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onViewEdit();
+    },
+    [onViewEdit],
+  );
+};

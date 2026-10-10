@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import {
-  onViewDeleteButtonsWrapperClick,
-  useOnViewEdit,
-} from './reactionViewDeleteButtons.utils.ts';
+import { useOnViewEditButton } from './reactionViewDeleteButtons.utils.ts';
 import { ViewIcon } from 'common/icons';
 import classes from './reactionViewDeleteButtons.module.scss';
 import { Button } from '@mantine/core';
@@ -26,18 +23,13 @@ export function ReactionViewButton({
   pathComponents,
   historyPathComponents,
 }: Readonly<ReactionViewDeleteButtonsProps>) {
-  const onEdit = useOnViewEdit({ pathComponents, historyPathComponents });
+  const onOpen = useOnViewEditButton({ pathComponents, historyPathComponents });
   return (
-    <div
-      className={classes.buttonsWrapper}
-      // Catches clicks bubbling from the buttons inside, so they don't toggle the row around them.
-      role="presentation"
-      onClick={onViewDeleteButtonsWrapperClick}
-    >
+    <div className={classes.buttonsWrapper}>
       <Button
         variant="transparent"
         classNames={{ root: classes.button, section: classes.buttonSection }}
-        onClick={onEdit}
+        onClick={onOpen}
         leftSection={<ViewIcon />}
       >
         View

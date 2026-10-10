@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent } from '@testing-library/react';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
 
@@ -21,6 +22,26 @@ import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
 const Component = ReactionSetVariablesButton as unknown as () => JSX.Element;
 
 describe('ReactionSetVariablesButton', () => {
+  it('opens the entity without the click reaching the row around it', () => {
+    const onRowClick = vi.fn();
+    const { getByRole, store } = renderWithProviders(
+      // Stands in for a row that toggles when clicked, like an accordion control.
+      <div onClick={onRowClick}>
+        {' '}
+        {/* NOSONAR: a test double, not UI */}
+        <ReactionSetVariablesButton
+          entityName="Notes"
+          pathComponents={['notes']}
+        />
+      </div>,
+    );
+    fireEvent.click(getByRole('button', { name: 'Set Variables' }));
+    expect(onRowClick).not.toHaveBeenCalled();
+    expect(store.getState().features.reactionForm.reactionPathComponentsList).toEqual([
+      ['notes'],
+    ]);
+  });
+
   it('mounts without crashing', () => {
     const { container } = renderWithProviders(<Component />);
     expect(container).toBeInTheDocument();
