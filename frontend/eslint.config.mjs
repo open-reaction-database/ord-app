@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import path from 'node:path';
 import js from '@eslint/js';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import importX from 'eslint-plugin-import-x';
 import prettier from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -89,6 +92,59 @@ export default tseslint.config(
       'no-relative-import-paths/no-relative-import-paths': [
         'error',
         { allowSameFolder: true, rootDir: 'apps/editor/src', allowedDepth: 2 },
+      ],
+    },
+  },
+  {
+    files: ['packages/ui/**/*.{ts,tsx}'],
+    plugins: { 'import-x': importX },
+    settings: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({ project: 'packages/ui/tsconfig.json' }),
+      ],
+    },
+    rules: {
+      // Every import must be declared in the package's own package.json; hoisting would
+      // otherwise let an undeclared dependency resolve from the workspace root.
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          packageDir: [path.join(import.meta.dirname, 'packages/ui')],
+          devDependencies: [
+            '**/*.test.{ts,tsx}',
+            '**/testing/**',
+            '**/vitest.config.ts',
+          ],
+        },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { group: ['../*'], message: 'Import package files through #… instead.' },
+            {
+              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
+              message:
+                'The shared package stays free of app state, transport, and routing.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@open-reaction-database/ui/src/*', '**/packages/ui/*'],
+              message: 'Import the shared package only through its exports.',
+            },
+          ],
+        },
       ],
     },
   },
