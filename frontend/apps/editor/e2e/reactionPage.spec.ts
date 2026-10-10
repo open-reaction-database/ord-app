@@ -21,6 +21,21 @@ function changingContent(page: Page) {
   return [page.getByText(/^[0-9a-f]{32}$/), page.getByText(/Copyright \d{4}/)];
 }
 
+const PREVIEW = 'img[src^="data:image/svg+xml"]';
+const LOADER = '.mantine-Loader-root';
+
+/** Waits for what the page loads after the reaction itself, so a screenshot shows it all. */
+async function waitForPageToSettle(page: Page) {
+  // Edit controls appear once the dataset loads and grants the dev user edit rights.
+  await expect(page.getByRole('button', { name: 'Remove', exact: true })).toBeVisible();
+  // The user menu appears once the signed-in user loads.
+  await expect(page.getByText('E2E User', { exact: true })).toBeVisible();
+  // The Indigo worker renders the molecule previews: three in the header and two in the
+  // inputs list.
+  await expect(page.locator(LOADER)).toHaveCount(0);
+  await expect(page.locator(PREVIEW).filter({ visible: true })).toHaveCount(5);
+}
+
 let reactionUrl: string;
 
 test.beforeAll(async ({ request }) => {
@@ -43,7 +58,7 @@ test('switches between the tabs and list views', async ({ page }) => {
 });
 
 test('opens an entity in the drawer and closes it', async ({ page }) => {
-  await page.getByRole('button', { name: 'Edit' }).first().click();
+  await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
   const drawer = page.getByRole('dialog');
   await expect(drawer).toBeVisible();
   await page.keyboard.press('Escape');
@@ -62,12 +77,17 @@ test.describe('appearance', () => {
       !process.env.CI,
       'Screenshots are compared only in CI, where the baselines are made.',
     );
+    await waitForPageToSettle(page);
     await expect(page).toHaveScreenshot('reaction-page.png', {
       fullPage: true,
       mask: changingContent(page),
     });
-    await page.getByRole('button', { name: 'Edit' }).first().click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+    const drawer = page.getByRole('dialog');
+    await expect(drawer).toBeVisible();
+    // The drawer shows the first input's single component preview.
+    await expect(drawer.locator(LOADER)).toHaveCount(0);
+    await expect(drawer.locator(PREVIEW)).toHaveCount(1);
     await expect(page).toHaveScreenshot('reaction-drawer.png', {
       mask: changingContent(page),
     });
