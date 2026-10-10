@@ -31,7 +31,7 @@ jobs:
         with:
           go-version: '>=1.16'
       - name: Install dependencies
-        run: go install github.com/google/addlicense@latest
+        run: go install github.com/google/addlicense@v1.2.0
       - name: addlicense
         run: addlicense -check -c "Open Reaction Database Project Authors" -l apache .
 
@@ -47,16 +47,16 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: ruff
-        run: uv run ruff check ord_app/
+        run: uv run --frozen --no-build ruff check ord_app/
 
       - name: ruff format
-        run: uv run ruff format --check ord_app/
+        run: uv run --frozen --no-build ruff format --check ord_app/
 
       - name: ty
-        run: uv run ty check ord_app
+        run: uv run --frozen --no-build ty check ord_app
 
   check_javascript:
     runs-on: ubuntu-latest
@@ -82,6 +82,6 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - name: Install jscpd (via frontend devDependencies)
-        run: npm --prefix frontend ci
+        run: npm --prefix frontend ci --ignore-scripts
       - name: jscpd
         run: frontend/node_modules/.bin/jscpd --config .jscpd.json

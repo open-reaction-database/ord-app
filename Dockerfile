@@ -16,27 +16,26 @@ FROM python:3.12-slim
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
-    make \
     cmake \
+    g++ \
+    gcc \
+    git \
     libboost-dev \
     libboost-python-dev \
-    python3-dev \
     libffi-dev \
-    libxml2-dev \
-    libxslt-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    libpng-dev \
     libgl1 \
-    libxrender1 \
+    libjpeg-dev \
+    libpng-dev \
     libxext6 \
-    git \
-    ntpsec-ntpdate && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --no-cache-dir uv
+    libxml2-dev \
+    libxrender1 \
+    libxslt-dev \
+    make \
+    ntpsec-ntpdate \
+    python3-dev \
+    zlib1g-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir --only-binary :all: uv
 
 ENV UV_PROJECT_ENVIRONMENT=/usr/local \
     UV_COMPILE_BYTECODE=1 \
@@ -48,7 +47,7 @@ COPY uv.lock .
 COPY pyproject.toml .
 COPY ord_app/ ./ord_app
 
-RUN uv sync --frozen
+RUN uv sync --frozen --no-build
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

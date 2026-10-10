@@ -50,17 +50,17 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: Run alembic migrations
-        run: uv run alembic upgrade head
+        run: uv run --frozen --no-build alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
-        run: uv run pytest -vv --cov=ord_app --cov-report=term-missing --cov-report=html --durations=10
+        run: uv run --frozen --no-build pytest -vv --cov=ord_app --cov-report=term-missing --cov-report=html --durations=10
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
@@ -72,7 +72,7 @@ jobs:
           {
             echo "### Python test coverage"
             echo ""
-            uv run coverage report --format=markdown || echo "_coverage data unavailable_"
+            uv run --frozen --no-build coverage report --format=markdown || echo "_coverage data unavailable_"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Python coverage report
@@ -104,10 +104,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: Run alembic migrations
-        run: uv run alembic upgrade head
+        run: uv run --frozen --no-build alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
@@ -120,11 +120,11 @@ jobs:
 
       - name: Install UI dependencies
         working-directory: frontend
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Install Playwright browsers
         working-directory: frontend
-        run: npx playwright install --with-deps chromium
+        run: node_modules/.bin/playwright install --with-deps chromium
 
       # The UI is served via the dev server (vite dev), not a production build: the no-auth
       # bypass is hard-gated off in production builds (import.meta.env.PROD), so e2e must use
