@@ -54,11 +54,12 @@ export function makeContractStore(snapshot?: ReactionSnapshot) {
 
 /**
  * Generated IDs differ between two mounts: React's useId output (and Mantine's style classes
- * built from it) and Mantine's random element IDs. Nothing else may.
+ * built from it) and Mantine's random element IDs, which take up to nine base-36 digits of
+ * Math.random() and so are sometimes shorter. Nothing else may.
  */
-function normalizeIds(html: string): string {
+export function normalizeIds(html: string): string {
   return html.replaceAll(
-    /«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_|mantine-[0-9a-z]{9}\b/g,
+    /«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_|mantine-[0-9a-z]{1,9}\b/g,
     'ID',
   );
 }
