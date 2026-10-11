@@ -14,9 +14,10 @@
 
 # Run `uv run pre-commit install` once to enable these hooks locally.
 repos:
-  # License headers. addlicense stamps the Apache header on any file missing it
-  # and accepts an existing header whatever its year, so new files use the
-  # current year without tripping the check. CI runs this hook.
+  # License headers. addlicense stamps the Apache header on any file whose first
+  # lines name no copyright or SPDX license, and leaves the rest alone whatever
+  # their year, so new files use the current year without tripping the check.
+  # CI runs this hook.
   - repo: https://github.com/google/addlicense
     rev: v1.2.0
     hooks:

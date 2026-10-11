@@ -167,6 +167,7 @@ export function TemplateFileSelector({
         );
         form.setFieldValue('matching', matching);
       } catch {
+        // The file could not be read or parsed as CSV; the form drops it and says so.
         showNotification({
           variant: NotificationVariant.ERROR,
           message: 'Invalid CSV file',
