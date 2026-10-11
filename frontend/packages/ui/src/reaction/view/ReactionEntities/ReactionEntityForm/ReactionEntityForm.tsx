@@ -121,7 +121,8 @@ export function ReactionEntityForm({
         form.setValues(formValues);
         onSubmit(formValues);
         setFormKey(crypto.randomUUID());
-      } catch (_e: unknown) {
+      } catch {
+        // A chunk that does not fit this form fails to filter or apply; the notification says so.
         showNotification({
           variant: NotificationVariant.ERROR,
           message: 'Failed to paste chunk',

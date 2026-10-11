@@ -76,7 +76,7 @@ export async function copyPreviewAsImage(node?: HTMLDivElement | null) {
     } else {
       showNotification(errorMessage);
     }
-  } catch (_) {
+  } catch {
     // Rendering the image or writing the clipboard (which needs the page's permission) failed;
     // the notification is the whole report.
     showNotification(errorMessage);

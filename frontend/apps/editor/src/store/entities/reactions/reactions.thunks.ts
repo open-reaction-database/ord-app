@@ -283,7 +283,7 @@ export const searchReaction = createThunkWithExplicitResult(
       const parsedReaction = parseReaction(result);
       dispatch(searchReactionActions.success(parsedReaction));
       navigate(`/datasets/${datasetId}/reactions/${parsedReaction.id}`);
-    } catch (_e: unknown) {
+    } catch {
       // The dataset has no reaction with that ID, or the search failed; either way, say so.
       dispatch(searchReactionActions.failure(null));
       showNotification({

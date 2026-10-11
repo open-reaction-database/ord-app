@@ -13,7 +13,6 @@ ord_app/tests/
 docker-compose.yml
 Dockerfile
 Dockerfile.single
-format.sh
 Makefile
 MANIFEST.in
 
