@@ -16,7 +16,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { createReactionEntityTitle } from './reactionEntityTitle.utils.tsx';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 // Capture the props the factory forwards to the underlying title component.
@@ -24,26 +23,20 @@ vi.mock('./ReactionEntityTitle.tsx', () => ({
   ReactionEntityTitle: (
     props: Readonly<{
       entityName?: string;
-      reactionId?: ReactionId;
       hasDelete?: boolean;
       pathComponents?: ReactionPathComponents;
     }>,
   ) => (
-    <div data-testid="title">{`${props.entityName}:${props.reactionId}:${props.hasDelete}:${props.pathComponents?.join('.')}`}</div>
+    <div data-testid="title">{`${props.entityName}:${props.hasDelete}:${props.pathComponents?.join('.')}`}</div>
   ),
 }));
 
 describe('createReactionEntityTitle', () => {
   it('merges the fixed constructor props with the per-render props', () => {
     const Title = createReactionEntityTitle({ hasDelete: true, entityName: 'Input' });
-    const { getByTestId } = renderWithMantine(
-      <Title
-        reactionId={5}
-        pathComponents={['inputs', 0]}
-      />,
-    );
-    // entityName + hasDelete come from the constructor; reactionId + pathComponents from the
-    // render-time props — all forwarded to the underlying title.
-    expect(getByTestId('title')).toHaveTextContent('Input:5:true:inputs.0');
+    const { getByTestId } = renderWithMantine(<Title pathComponents={['inputs', 0]} />);
+    // entityName + hasDelete come from the constructor; pathComponents from the render-time
+    // props — all forwarded to the underlying title.
+    expect(getByTestId('title')).toHaveTextContent('Input:true:inputs.0');
   });
 });

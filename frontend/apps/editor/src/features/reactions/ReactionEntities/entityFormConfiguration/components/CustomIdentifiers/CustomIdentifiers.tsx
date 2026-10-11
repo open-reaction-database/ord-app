@@ -26,19 +26,14 @@ import {
 import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { MolblockIdentifier } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/MolblockIdentifier/MolblockIdentifier.tsx';
-import { setReactionLookupOpenedAction } from 'store/features/reactionLookup/reactionLookup.actions.ts';
-import { useSelector } from 'react-redux';
-import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reactionLookup.selectors.ts';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
@@ -70,8 +65,7 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 );
 
 export function CustomIdentifiers() {
-  const dispatch = useAppDispatch();
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const [
@@ -80,15 +74,7 @@ export function CustomIdentifiers() {
   ] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
   const createNewMolblockIdentifier = useCreateNewMolblockIdentifier();
-  const isReactionLookupOpened = useSelector(selectIsReactionLookupOpen);
-
-  const openAddCustomIdentifier = useCallback(() => {
-    dispatch(setReactionLookupOpenedAction(true));
-  }, [dispatch]);
-
-  const closeAddCustomIdentifier = useCallback(() => {
-    dispatch(setReactionLookupOpenedAction(false));
-  }, [dispatch]);
+  const [isLookupOpened, { open: openLookup, close: closeLookup }] = useDisclosure();
 
   const identifiers = useSelectIdentifiers();
 
@@ -109,13 +95,7 @@ export function CustomIdentifiers() {
         ...value,
       };
       const newPathComponents = [...pathComponents, ENTITY_FIELD, editedMolblock];
-      dispatch(
-        addUpdateReactionField({
-          reactionId,
-          pathComponents: newPathComponents,
-          newValue: identifier,
-        }),
-      );
+      void actions?.update(newPathComponents, identifier);
     } else {
       createNewMolblockIdentifier(identifiers.length, identifiers, value);
     }
@@ -138,7 +118,7 @@ export function CustomIdentifiers() {
               description="Via Look up Name"
               icon={<SearchIcon />}
               color={colorToCssVariable['orange']}
-              onClick={openAddCustomIdentifier}
+              onClick={openLookup}
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -177,9 +157,7 @@ export function CustomIdentifiers() {
         identifier={selectedMolblockIdentifier}
       />
 
-      {isReactionLookupOpened && (
-        <ComponentsLookup onClose={closeAddCustomIdentifier} />
-      )}
+      {isLookupOpened && <ComponentsLookup onClose={closeLookup} />}
     </>
   );
 }

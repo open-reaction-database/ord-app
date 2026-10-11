@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
+import { useStore } from 'react-redux';
+import type { AppState } from 'store/configureAppStore.ts';
 import type {
   ReactionActions,
   ReactionSlots,
@@ -49,11 +51,15 @@ export function useDatasetReactionProviderProps(
   actions?: ReactionActions;
   slots: ReactionSlots;
 } {
+  const store = useStore<AppState>();
   const dispatch = useAppDispatch();
   const source = useReduxReactionSource(reactionId);
   const actions = useMemo(
-    () => (canEdit ? reduxReactionActions(dispatch, reactionId) : undefined),
-    [canEdit, dispatch, reactionId],
+    () =>
+      canEdit
+        ? reduxReactionActions({ dispatch, getState: store.getState }, reactionId)
+        : undefined,
+    [canEdit, dispatch, store, reactionId],
   );
   return {
     reactionId,

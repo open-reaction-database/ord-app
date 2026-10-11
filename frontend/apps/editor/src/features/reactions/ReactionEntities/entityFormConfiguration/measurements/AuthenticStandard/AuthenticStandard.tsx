@@ -21,8 +21,6 @@ import { Button, Flex, Title } from '@mantine/core';
 import { create } from '@bufbuild/protobuf';
 import { CompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { AddCircleIcon } from 'common/icons';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 import classes from './authenticStandard.module.scss';
@@ -33,7 +31,7 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import {
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
   useReactionPart,
   useReactionSlots,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -42,33 +40,20 @@ const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
-  const dispatch = useAppDispatch();
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
   const currentPath = useEntityFieldPath(name);
   const authenticStandard = useReactionPart<ReactionInputComponent>(currentPath);
 
   const onRemove = useCallback(() => {
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: currentPath,
-        newValue: null,
-      }),
-    );
-  }, [currentPath, dispatch, reactionId]);
+    void actions?.update(currentPath, null);
+  }, [currentPath, actions]);
 
   const onCreate = useCallback(() => {
     const authenticStandard = ordInputComponentToReaction(create(CompoundSchema));
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: currentPath,
-        newValue: authenticStandard,
-      }),
-    );
-  }, [currentPath, dispatch, reactionId]);
+    void actions?.update(currentPath, authenticStandard);
+  }, [currentPath, actions]);
 
   return !!authenticStandard || !isViewOnly ? (
     <ReactionEntityBlock

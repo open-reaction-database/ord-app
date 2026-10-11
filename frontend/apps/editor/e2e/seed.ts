@@ -22,15 +22,16 @@ const API = process.env.VITE_API_ENDPOINT ?? 'http://127.0.0.1:8000/service_api/
 const TOKEN = 'e2e-dev-token';
 const headers = { Authorization: `Bearer ${TOKEN}` };
 
-async function post<T>(
+async function call<T>(
   request: APIRequestContext,
+  method: 'get' | 'patch' | 'post',
   url: string,
-  options: object,
+  options: object = {},
 ): Promise<T> {
-  const response = await request.post(`${API}${url}`, { headers, ...options });
+  const response = await request[method](`${API}${url}`, { headers, ...options });
   if (!response.ok()) {
     throw new Error(
-      `POST ${url} returned ${response.status()}: ${await response.text()}`,
+      `${method.toUpperCase()} ${url} returned ${response.status()}: ${await response.text()}`,
     );
   }
   return (await response.json()) as T;
@@ -40,17 +41,23 @@ async function post<T>(
 export async function seedReaction(
   request: APIRequestContext,
 ): Promise<{ groupId: number; datasetId: number; reactionId: number }> {
-  await post(request, '/auth/jit-provisioning', {
+  await call(request, 'post', '/auth/jit-provisioning', {
     data: { access_token: TOKEN, id_token: TOKEN },
   });
-  const group = await post<{ id: number }>(request, '/groups', {
+  const group = await call<{ id: number }>(request, 'post', '/groups', {
     data: { name: `e2e reaction page ${Date.now()}` },
   });
-  const dataset = await post<{ id: number }>(request, `/groups/${group.id}/datasets`, {
-    data: { name: 'Reaction page' },
-  });
-  const reaction = await post<{ id: number }>(
+  const dataset = await call<{ id: number }>(
     request,
+    'post',
+    `/groups/${group.id}/datasets`,
+    {
+      data: { name: 'Reaction page' },
+    },
+  );
+  const reaction = await call<{ id: number }>(
+    request,
+    'post',
     `/datasets/${dataset.id}/reactions/upload`,
     {
       multipart: {
@@ -65,4 +72,17 @@ export async function seedReaction(
     },
   );
   return { groupId: group.id, datasetId: dataset.id, reactionId: reaction.id };
+}
+
+/** Seeds the fixture reaction in a dataset the e2e user may only view. */
+export async function seedReadOnlyReaction(
+  request: APIRequestContext,
+): Promise<{ datasetId: number; reactionId: number }> {
+  const { groupId, datasetId, reactionId } = await seedReaction(request);
+  const me = await call<{ id: number }>(request, 'get', '/users/me');
+  // The user created the group, so it is the group's admin and may change its own role.
+  await call(request, 'patch', `/groups/${groupId}/members`, {
+    data: { user_id: me.id, role: 'viewer' },
+  });
+  return { datasetId, reactionId };
 }

@@ -25,4 +25,27 @@ describe('ReactionEntityTitle', () => {
     const { container } = renderInReactionView(<Component />);
     expect(container).toBeInTheDocument();
   });
+
+  const title = (options: Parameters<typeof renderInReactionView>[1]) =>
+    renderInReactionView(
+      <ReactionEntityTitle
+        pathComponents={['notes']}
+        entityName="Notes"
+        hasDelete
+      />,
+      options,
+    );
+
+  it('offers Delete when the reaction can be edited', () => {
+    expect(title({}).getByRole('button', { name: 'Remove Notes' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['a read-only dataset', { isViewOnly: true }],
+    ['a template', { reactionId: 'template_1' }],
+  ] as const)('offers no Delete on %s', (_name, options) => {
+    expect(
+      title(options).queryByRole('button', { name: 'Remove Notes' }),
+    ).not.toBeInTheDocument();
+  });
 });

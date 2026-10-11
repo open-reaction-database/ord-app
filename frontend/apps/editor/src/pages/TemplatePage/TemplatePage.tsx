@@ -81,7 +81,7 @@ export function TemplatePage() {
             >
               <ReactionTabs />
             </Paper>
-            <ReactionDetailsSidebar reactionId={templateId} />
+            <ReactionDetailsSidebar />
             <VariablesSidebar templateId={templateId} />
           </Flex>
         )}

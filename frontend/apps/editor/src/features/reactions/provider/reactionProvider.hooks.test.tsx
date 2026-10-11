@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 import { act, renderHook } from '@testing-library/react';
-import { useContext, type ReactNode } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import type { ReactNode } from 'react';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { emptyReactionData } from 'test/renderInReactionView.tsx';
 import { ReactionProvider } from './ReactionProvider.tsx';
@@ -115,17 +114,9 @@ describe('reaction hooks over a static source', () => {
     });
   });
 
-  it('are read-only without actions, and supply the old context as view-only', () => {
+  it('are read-only without actions', () => {
     expect(renderHook(useIsViewOnly, { wrapper }).result.current).toBe(true);
     expect(renderHook(useReactionActions, { wrapper }).result.current).toBeUndefined();
-    const legacy = renderHook(() => useContext(reactionContext), { wrapper }).result
-      .current;
-    expect(legacy).toMatchObject({
-      reactionId: 7,
-      isTemplate: false,
-      isViewOnly: true,
-    });
-    expect(legacy.ViewDeleteButtonsComponent).toBe(Empty);
   });
 
   it('report whether the reaction is a template', () => {
@@ -148,14 +139,16 @@ describe('reaction hooks over a static source', () => {
   });
 
   it('are editable with actions', () => {
-    const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
+    const actions: ReactionActions = {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn(),
+    };
     const editable = wrapperFor(source, actions);
     expect(renderHook(useIsViewOnly, { wrapper: editable }).result.current).toBe(false);
     expect(renderHook(useReactionActions, { wrapper: editable }).result.current).toBe(
       actions,
     );
-    const legacy = renderHook(() => useContext(reactionContext), { wrapper: editable });
-    expect(legacy.result.current.isViewOnly).toBe(false);
   });
 });
 
@@ -175,7 +168,11 @@ describe('reaction hooks before the reaction loads', () => {
 describe('ReactionProvider props', () => {
   it('pair a template with a string ID and no actions, and a dataset reaction with a number', () => {
     const source = createStaticReactionSource(snapshot);
-    const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
+    const actions: ReactionActions = {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn(),
+    };
     // Each element below must fail to type-check; `tsc -b` reports an unused directive if one
     // compiles.
     const invalid = [

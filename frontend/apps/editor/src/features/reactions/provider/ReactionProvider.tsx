@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 import { useMemo, useReducer, useState, type ReactNode } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
-import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { createDrawerActions, drawerReducer, EMPTY_DRAWER_STACK } from './drawer.ts';
 import {
   drawerActionsContext,
@@ -38,7 +36,7 @@ interface ReactionProviderBaseProps {
 
 /** A dataset reaction: a numeric ID, editable when actions are given. */
 interface DatasetReactionProviderProps extends ReactionProviderBaseProps {
-  /** The ID `useReactionId()` returns, which components reading `reactionContext` select by. */
+  /** The ID `useReactionId()` returns. */
   reactionId: number;
   isTemplate?: false;
   actions?: ReactionActions;
@@ -46,7 +44,7 @@ interface DatasetReactionProviderProps extends ReactionProviderBaseProps {
 
 /** A template: a string ID, and always read-only. */
 interface TemplateReactionProviderProps extends ReactionProviderBaseProps {
-  /** The ID `useReactionId()` returns, which components reading `reactionContext` select by. */
+  /** The ID `useReactionId()` returns. */
   reactionId: string;
   isTemplate: true;
   actions?: never;
@@ -58,9 +56,8 @@ type ReactionProviderProps =
 
 /**
  * Supplies one reaction, its edit actions if it can be edited, and the host app's slot
- * components to the view beneath. It also supplies `reactionContext`, built from the same
- * props, for components that read it. Its drawer stack lives as long as it does; give it a
- * `key` per reaction so the stack starts empty for each one.
+ * components to the view beneath. Its drawer stack lives as long as it does; give it a `key`
+ * per reaction so the stack starts empty for each one.
  */
 export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
   const { reactionId, source, actions, slots, children } = props;
@@ -69,34 +66,17 @@ export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
     (): ReactionProviderValue => ({ reactionId, source, actions, isTemplate, slots }),
     [reactionId, source, actions, isTemplate, slots],
   );
-  const legacyValue = useMemo((): ReactionsContext => {
-    const components = {
-      ViewDeleteButtonsComponent: slots.ViewDeleteButtons,
-      ValueLabelComponent: slots.ValueLabel,
-      ViewOnlyLabelComponent: slots.ViewOnlyLabel,
-    };
-    return typeof reactionId === 'string'
-      ? { ...components, reactionId, isTemplate: true, isViewOnly: true }
-      : {
-          ...components,
-          reactionId,
-          isTemplate: false,
-          isViewOnly: actions === undefined,
-        };
-  }, [reactionId, actions, slots]);
   const [drawerStack, dispatchDrawer] = useReducer(drawerReducer, EMPTY_DRAWER_STACK);
   // Held in state so the actions keep their identity for the provider's life; a memo may be
   // recomputed.
   const [drawer] = useState(() => createDrawerActions(dispatchDrawer));
   return (
     <reactionProviderContext.Provider value={value}>
-      <reactionContext.Provider value={legacyValue}>
-        <drawerActionsContext.Provider value={drawer}>
-          <drawerStackContext.Provider value={drawerStack}>
-            {children}
-          </drawerStackContext.Provider>
-        </drawerActionsContext.Provider>
-      </reactionContext.Provider>
+      <drawerActionsContext.Provider value={drawer}>
+        <drawerStackContext.Provider value={drawerStack}>
+          {children}
+        </drawerStackContext.Provider>
+      </drawerActionsContext.Provider>
     </reactionProviderContext.Provider>
   );
 }

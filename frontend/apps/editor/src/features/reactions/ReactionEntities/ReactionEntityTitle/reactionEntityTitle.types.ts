@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
 export interface ReactionEntityTitleProps {
   pathComponents: ReactionPathComponents;
-  reactionId: ReactionId;
 }
 
 export interface ReactionEntityTitleConstructorProps {

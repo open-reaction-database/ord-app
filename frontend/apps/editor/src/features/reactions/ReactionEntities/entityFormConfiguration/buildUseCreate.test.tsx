@@ -19,6 +19,8 @@ import type { ReactNode } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
+import type { AppState } from 'store/configureAppStore.ts';
+import { reduxReactionActions } from 'store/entities/reactions/reduxReactionSource.ts';
 
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
@@ -35,9 +37,10 @@ interface NewEntity {
   entity: string;
 }
 
+// The real actions over the dispatch spy, so the test sees each edit as the thunk it dispatches.
 const ReactionWrapper = reactionWrapper({
   reactionId: 7,
-  actions: { update: vi.fn(), remove: vi.fn() },
+  actions: reduxReactionActions({ dispatch, getState: () => ({}) as AppState }, 7),
 });
 
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {
