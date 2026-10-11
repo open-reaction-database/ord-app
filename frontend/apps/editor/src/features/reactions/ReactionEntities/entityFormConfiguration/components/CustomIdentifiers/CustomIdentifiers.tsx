@@ -47,7 +47,8 @@ type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 
 const ENTITY_FIELD = 'molBlockIdentifiers';
 
-const useSelectIdentifiers = buildUseSelectItems(ENTITY_FIELD);
+const useSelectIdentifiers =
+  buildUseSelectItems<ReactionCompoundIdentifier>(ENTITY_FIELD);
 
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
@@ -85,7 +86,7 @@ export function CustomIdentifiers() {
     dispatch(setReactionLookupOpenedAction(false));
   }, [dispatch]);
 
-  const identifiers: Array<ReactionCompoundIdentifier> = useSelectIdentifiers();
+  const identifiers = useSelectIdentifiers();
 
   const handleCloseKetcher = useCallback(() => {
     setEditedMolblock(null);

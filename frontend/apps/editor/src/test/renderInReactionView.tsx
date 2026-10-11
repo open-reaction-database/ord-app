@@ -128,7 +128,7 @@ export function renderInReactionView(
             : (actions ?? reduxReactionActions(store.dispatch, reactionId)),
         };
   const allSlots = { ...DUMMY_SLOTS, ...slots };
-  const entityContextValue = { reactionId, pathComponents };
+  const entityContextValue = { pathComponents };
   function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <Provider store={store}>

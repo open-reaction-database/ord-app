@@ -66,8 +66,8 @@ export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
   const { reactionId, source, actions, slots, children } = props;
   const isTemplate = props.isTemplate === true;
   const value = useMemo(
-    (): ReactionProviderValue => ({ source, actions, isTemplate, slots }),
-    [source, actions, isTemplate, slots],
+    (): ReactionProviderValue => ({ reactionId, source, actions, isTemplate, slots }),
+    [reactionId, source, actions, isTemplate, slots],
   );
   const legacyValue = useMemo((): ReactionsContext => {
     const components = {

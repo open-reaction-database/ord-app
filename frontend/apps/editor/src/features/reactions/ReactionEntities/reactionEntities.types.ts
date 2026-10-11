@@ -19,7 +19,6 @@ import type { FC, ReactNode } from 'react';
 import type { useForm } from '@mantine/form';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { EntityListItemRuntimeProps } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.types.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import type { WithId } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export enum ReactionFormNodeType {
@@ -176,5 +175,4 @@ export type ReactionFormNode =
 
 export interface ReactionEntityContext {
   pathComponents: ReactionPathComponents;
-  reactionId: ReactionId;
 }

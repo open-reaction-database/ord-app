@@ -38,7 +38,7 @@ import { ReactionNodeValidationResult } from 'features/reactions/ReactionInterac
 
 const ENTITY_FIELD = 'products';
 
-const useSelectData = buildUseSelectItems(ENTITY_FIELD);
+const useSelectData = buildUseSelectItems<ReactionProduct>(ENTITY_FIELD);
 
 const renderDetails = (product: ReactionProduct) => (
   <MeasurementsPreview product={product} />
@@ -49,7 +49,7 @@ export function ProductsComponentsList() {
   const drawer = useDrawer();
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const components = useSelectData() as Array<ReactionProduct>;
+  const components = useSelectData();
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {

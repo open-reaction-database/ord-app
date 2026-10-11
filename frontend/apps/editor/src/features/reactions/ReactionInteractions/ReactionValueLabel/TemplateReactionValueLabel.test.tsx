@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { TemplateReactionValueLabelWrapper } from './TemplateReactionValueLabel.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
+// Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = TemplateReactionValueLabelWrapper as unknown as () => JSX.Element;
 
 describe('TemplateReactionValueLabelWrapper', () => {
   it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
+    const { container } = renderInReactionView(<Component />, {
+      reactionId: 'template_1',
+    });
     expect(container).toBeInTheDocument();
   });
 });

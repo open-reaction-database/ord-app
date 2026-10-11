@@ -36,7 +36,7 @@ import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListO
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
-const useSelectData = buildUseSelectItems('components');
+const useSelectData = buildUseSelectItems<ReactionInputComponent>('components');
 
 const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';
@@ -46,7 +46,7 @@ export function InputsComponentList() {
   const drawer = useDrawer();
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const components = useSelectData() as Array<ReactionInputComponent>;
+  const components = useSelectData();
   const length = components.length;
 
   const onCreateComponent = useCallback(() => {

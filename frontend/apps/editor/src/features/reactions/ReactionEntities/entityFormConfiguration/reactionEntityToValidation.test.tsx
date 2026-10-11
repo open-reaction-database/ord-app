@@ -15,41 +15,28 @@
  */
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import type { ReactNode } from 'react';
-import { rootReducer } from 'store/rootReducer.ts';
-import type { AppState } from 'store/configureAppStore.ts';
+import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
+import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
+import { emptyReactionData } from 'test/renderInReactionView.tsx';
 import { useReactionEntityValidation } from './reactionEntityToValidation.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
-const store = configureStore({
-  reducer: rootReducer,
-  preloadedState: {
-    entities: {
-      reactions: {
-        reactionsById: {
-          1: {
-            id: 1,
-            data: {
-              inputs: {
-                in1: { id: 'in1', name: 'Existing' },
-                in2: { id: 'in2', name: 'Other' },
-              },
-            },
-          },
-        },
+const wrapper = reactionWrapper({
+  snapshot: {
+    data: {
+      ...emptyReactionData(),
+      inputs: {
+        in1: { id: 'in1', name: 'Existing' },
+        in2: { id: 'in2', name: 'Other' },
       },
     },
-  } as unknown as AppState,
+    previews: {},
+    summary: { provenance: {}, summary: {}, conditions: '' },
+  } as unknown as ReactionSnapshot,
 });
 
-const wrapper = ({ children }: Readonly<{ children: ReactNode }>) => (
-  <Provider store={store}>{children}</Provider>
-);
-
 const renderValidate = (entity: ReactionNodeEntity, pathComponents: Array<string>) =>
-  renderHook(() => useReactionEntityValidation(1, pathComponents, entity), { wrapper })
+  renderHook(() => useReactionEntityValidation(pathComponents, entity), { wrapper })
     .result.current;
 
 describe('useReactionEntityValidation', () => {
@@ -67,6 +54,16 @@ describe('useReactionEntityValidation', () => {
     const validate = renderValidate(ReactionNodeEntity.Inputs, ['inputs', 'in2']);
     // 'Other' is in2's own current name, so re-using it is allowed.
     expect(validate({ name: 'Other' }).name).toBeFalsy();
+  });
+
+  it('accepts any name for an entity whose list does not exist yet', () => {
+    const validate = renderValidate(ReactionNodeEntity.Analyses, [
+      'outcomes',
+      '0',
+      'analyses',
+      'a1',
+    ]);
+    expect(validate({ name: 'First' }).name).toBeFalsy();
   });
 
   it('falls back to an empty (always-valid) schema for entities without a rule', () => {

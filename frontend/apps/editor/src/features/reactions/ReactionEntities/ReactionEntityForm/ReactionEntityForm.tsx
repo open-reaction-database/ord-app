@@ -66,22 +66,15 @@ export function ReactionEntityForm({
   const [formKey, setFormKey] = useState(crypto.randomUUID());
 
   const contextValue = useMemo(
-    (): ReactionEntityContext => ({
-      reactionId,
-      pathComponents: reactionPathComponents,
-    }),
-    [reactionId, reactionPathComponents],
+    (): ReactionEntityContext => ({ pathComponents: reactionPathComponents }),
+    [reactionPathComponents],
   );
 
   const formEntity = sidebarInfo.entityName;
-  const validate = useReactionEntityValidation(
-    reactionId,
-    reactionPathComponents,
-    formEntity,
-  );
+  const validate = useReactionEntityValidation(reactionPathComponents, formEntity);
 
   const [initialValues, reactionPartWithNestedEntities, filterValues] =
-    sidebarInfo.useInitialValues(reactionId, reactionPathComponents);
+    sidebarInfo.useInitialValues(reactionPathComponents);
 
   const form = useForm({
     mode: 'uncontrolled',
