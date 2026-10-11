@@ -74,6 +74,7 @@ export function ReactionEntityDelete({
       onCancel={closeConfirmation}
       target={
         <ActionIcon
+          aria-label={`Remove ${entityName}`}
           onClick={openConfirmation}
           className={clsx(classes.icon, buttonClasses.redHover)}
           variant="transparent"

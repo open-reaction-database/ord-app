@@ -20,6 +20,7 @@ import type {
 import { Flex, Text, Title } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export function ReactionEntityTitle({
   pathComponents,
@@ -27,6 +28,7 @@ export function ReactionEntityTitle({
   hasDelete,
   description,
 }: Readonly<ReactionEntityTitleProps & ReactionEntityTitleConstructorProps>) {
+  const isViewOnly = useIsViewOnly();
   return (
     <Flex
       direction="column"
@@ -37,7 +39,7 @@ export function ReactionEntityTitle({
         gap="xs"
       >
         <Title order={2}>{entityName}</Title>
-        {hasDelete && (
+        {hasDelete && !isViewOnly && (
           <ReactionEntityDelete
             entityName={entityName}
             pathComponents={pathComponents}
