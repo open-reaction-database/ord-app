@@ -17,14 +17,10 @@ import classes from './editSidebar.module.scss';
 import { Anchor, Breadcrumbs, Drawer, Flex } from '@mantine/core';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { ReactionEntityForm } from '../ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
-import { useSelector } from 'react-redux';
-import { selectReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.selectors.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import {
-  clearReactionPathComponentsList,
-  popReactionPathComponents,
-  sliceReactionPathComponentsList,
-} from 'store/features/reactionForm/reactionForm.actions.ts';
+  useDrawer,
+  useDrawerStack,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
@@ -38,8 +34,8 @@ interface EditSidebarProps {
 }
 
 function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarProps>) {
-  const dispatch = useAppDispatch();
-  const reactionPathComponentsList = useSelector(selectReactionPathComponentsList);
+  const reactionPathComponentsList = useDrawerStack();
+  const drawer = useDrawer();
   const [
     isOpenedCloseAll,
     { open: openCloseAllConfirmation, close: closeCloseAllConfirmation },
@@ -75,14 +71,14 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
   const isOpened = reactionPathComponentsList.length > 0;
 
   const onFormClose = useCallback(() => {
-    dispatch(popReactionPathComponents());
+    drawer.pop();
     closeCloseConfirmation();
-  }, [dispatch, closeCloseConfirmation]);
+  }, [drawer, closeCloseConfirmation]);
 
   const onSidebarClose = useCallback(() => {
-    dispatch(clearReactionPathComponentsList());
+    drawer.clear();
     closeCloseAllConfirmation();
-  }, [dispatch, closeCloseAllConfirmation]);
+  }, [drawer, closeCloseAllConfirmation]);
 
   useEffect(() => {
     return () => {
@@ -103,11 +99,11 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
       return {
         name: sidebarInfos[index].label,
         onClick: () => {
-          dispatch(sliceReactionPathComponentsList(index));
+          drawer.truncate(index);
         },
       };
     });
-  }, [dispatch, reactionPathComponentsList, sidebarInfos]);
+  }, [drawer, reactionPathComponentsList, sidebarInfos]);
 
   const currentPath = reactionPathComponentsList[currentIndex];
   const currentSidebarInfo = sidebarInfos[currentIndex];

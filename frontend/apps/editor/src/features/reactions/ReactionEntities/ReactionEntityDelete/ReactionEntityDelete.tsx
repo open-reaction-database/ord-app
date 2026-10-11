@@ -23,7 +23,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { popReactionPathComponents } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { deleteReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
@@ -43,13 +43,14 @@ export function ReactionEntityDelete({
   onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
     useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleRemove = useCallback(() => {
     if (shouldCloseSidebar) {
-      dispatch(popReactionPathComponents());
+      drawer.pop();
     }
     if (onRemove) {
       onRemove();
@@ -60,6 +61,7 @@ export function ReactionEntityDelete({
   }, [
     closeConfirmation,
     dispatch,
+    drawer,
     onRemove,
     pathComponents,
     reactionId,

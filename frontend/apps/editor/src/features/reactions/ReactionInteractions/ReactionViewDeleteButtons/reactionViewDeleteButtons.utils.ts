@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 import { useCallback, type MouseEvent } from 'react';
-import {
-  addReactionPathComponentToList,
-  setReactionPathComponentsList,
-} from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 export const onViewDeleteButtonsWrapperClick = (event: MouseEvent) => {
   event.stopPropagation();
@@ -29,16 +25,14 @@ export const useOnViewEdit = ({
   pathComponents,
   historyPathComponents,
 }: Omit<ReactionViewDeleteButtonsProps, 'entityName'>) => {
-  const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   return useCallback(() => {
     if (historyPathComponents) {
-      dispatch(
-        setReactionPathComponentsList(historyPathComponents.concat([pathComponents])),
-      );
+      drawer.set(historyPathComponents.concat([pathComponents]));
     } else {
-      dispatch(addReactionPathComponentToList(pathComponents));
+      drawer.push(pathComponents);
     }
-  }, [dispatch, pathComponents, historyPathComponents]);
+  }, [drawer, pathComponents, historyPathComponents]);
 };
 
 /**

@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
+import { combineReducers, createReducer } from '@reduxjs/toolkit';
 import { setVariablesSidebarOpenedAction } from './variablesSidebar.actions.ts';
-import {
-  addReactionPathComponentToList,
-  setReactionPathComponentsList,
-} from '../reactionForm/reactionForm.actions.ts';
 
 const isVariablesSidebarOpened = createReducer(false, builder => {
   builder.addCase(setVariablesSidebarOpenedAction, (_, action) => action.payload);
-  builder.addMatcher(
-    isAnyOf(setReactionPathComponentsList, addReactionPathComponentToList),
-    () => false,
-  );
 });
 
 export const variablesSidebarReducer = combineReducers({

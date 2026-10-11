@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
+import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
+import { emptyReactionData } from 'test/renderInReactionView.tsx';
 
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
 vi.mock('store/entities/reactions/reactions.thunks.ts', () => ({
   addUpdateReactionField: (payload: unknown) => ({
     type: 'addUpdateReactionField',
-    payload,
-  }),
-}));
-vi.mock('store/features/reactionForm/reactionForm.actions.ts', () => ({
-  addReactionPathComponentToList: (payload: unknown) => ({
-    type: 'addReactionPathComponentToList',
     payload,
   }),
 }));
@@ -41,24 +38,29 @@ interface NewEntity {
   entity: string;
 }
 
-const reactionCtxValue: ReactionsContext = {
-  reactionId: 7,
-  isTemplate: false,
-  isViewOnly: false,
-  ViewDeleteButtonsComponent: () => null,
-  ValueLabelComponent: () => null,
-  ViewOnlyLabelComponent: () => null,
-};
+const Empty = () => null;
+const slots = { ViewDeleteButtons: Empty, ValueLabel: Empty, ViewOnlyLabel: Empty };
+const source = createStaticReactionSource({
+  data: emptyReactionData(),
+  previews: {},
+  summary: { provenance: {}, summary: {}, conditions: '' },
+});
+const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
 
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <reactionContext.Provider value={reactionCtxValue}>
+    <ReactionProvider
+      reactionId={7}
+      source={source}
+      actions={actions}
+      slots={slots}
+    >
       <reactionEntityContext.Provider
         value={{ reactionId: 7, pathComponents: ['inputs', 0] }}
       >
         {children}
       </reactionEntityContext.Provider>
-    </reactionContext.Provider>
+    </ReactionProvider>
   );
 }
 
@@ -74,19 +76,20 @@ function renderCreate(
   entityName: string | Array<string | number>,
   shouldOpenSidebar?: boolean,
 ) {
+  const useCreate = buildUseCreate<NewEntity>(entityName, createKey, shouldOpenSidebar);
   const { result } = renderHook(
-    () => buildUseCreate<NewEntity>(entityName, createKey, shouldOpenSidebar)(),
+    () => ({ create: useCreate(), stack: useDrawerStack() }),
     {
       wrapper: ContextWrapper,
     },
   );
-  return result.current;
+  return result;
 }
 
 describe('buildUseCreate', () => {
-  it('calls the key factory and dispatches the field update + sidebar open at the composed path', () => {
-    const create = renderCreate('components');
-    create(0, [], { entity: 'seed' });
+  it('calls the key factory, dispatches the field update, and opens the drawer at the composed path', () => {
+    const result = renderCreate('components');
+    act(() => result.current.create(0, [], { entity: 'seed' }));
 
     expect(createKey).toHaveBeenCalledWith(0, [], { entity: 'seed' });
     expect(dispatch).toHaveBeenCalledWith({
@@ -97,14 +100,12 @@ describe('buildUseCreate', () => {
         newValue: { entity: 'new' },
       },
     });
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'addReactionPathComponentToList',
-      payload: ['inputs', 0, 'components', 'key1'],
-    });
+    expect(result.current.stack).toEqual([['inputs', 0, 'components', 'key1']]);
   });
 
   it('appends an array entityName verbatim to the context path (and opens the sidebar there)', () => {
-    renderCreate(['conditions', 'temperature'])(0, []);
+    const result = renderCreate(['conditions', 'temperature']);
+    act(() => result.current.create(0, []));
     expect(dispatch).toHaveBeenCalledWith({
       type: 'addUpdateReactionField',
       payload: {
@@ -113,15 +114,16 @@ describe('buildUseCreate', () => {
         newValue: { entity: 'new' },
       },
     });
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'addReactionPathComponentToList',
-      payload: ['inputs', 0, 'conditions', 'temperature', 'key1'],
-    });
+    expect(result.current.stack).toEqual([
+      ['inputs', 0, 'conditions', 'temperature', 'key1'],
+    ]);
   });
 
   it('does not open the sidebar when shouldOpenSidebar is false', () => {
-    renderCreate('components', false)(0, []);
+    const result = renderCreate('components', false);
+    act(() => result.current.create(0, []));
     expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(result.current.stack).toEqual([]);
     expect(dispatch).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'addUpdateReactionField' }),
     );

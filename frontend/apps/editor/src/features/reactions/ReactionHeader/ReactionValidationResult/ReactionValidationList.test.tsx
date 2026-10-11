@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionValidationList } from './ReactionValidationList.tsx';
 import type { ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
 
@@ -25,7 +25,7 @@ const validation: ReactionValidation = {
 
 describe('ReactionValidationList', () => {
   it('renders the drawer with the error and warning messages when opened', () => {
-    const { getByText } = renderWithProviders(
+    const { getByText } = renderInReactionView(
       <ReactionValidationList
         opened
         onClose={() => {}}
@@ -38,7 +38,7 @@ describe('ReactionValidationList', () => {
   });
 
   it('does not render the drawer contents when closed', () => {
-    const { queryByText } = renderWithProviders(
+    const { queryByText } = renderInReactionView(
       <ReactionValidationList
         opened={false}
         onClose={() => {}}

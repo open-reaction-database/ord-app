@@ -20,7 +20,7 @@ import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
@@ -46,6 +46,7 @@ const renderDetails = (product: ReactionProduct) => (
 
 export function ProductsComponentsList() {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   const { reactionId, isViewOnly } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData() as Array<ReactionProduct>;
@@ -61,8 +62,8 @@ export function ProductsComponentsList() {
         newValue: newComponent,
       }),
     );
-    dispatch(addReactionPathComponentToList(newPath));
-  }, [dispatch, reactionId, pathComponents, length]);
+    drawer.push(newPath);
+  }, [dispatch, drawer, reactionId, pathComponents, length]);
 
   return (
     <ReactionEntityBlock

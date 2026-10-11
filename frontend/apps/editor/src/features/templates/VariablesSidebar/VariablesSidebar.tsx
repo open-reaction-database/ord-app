@@ -23,7 +23,7 @@ import classes from './variablesSidebar.module.scss';
 import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface VariablesSidebarProps {
   templateId: string;
@@ -31,6 +31,7 @@ interface VariablesSidebarProps {
 
 export function VariablesSidebar({ templateId }: Readonly<VariablesSidebarProps>) {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   const isOpened = useSelector(selectIsVariablesSidebarOpened);
 
   const onClose = useCallback(() => {
@@ -48,7 +49,9 @@ export function VariablesSidebar({ templateId }: Readonly<VariablesSidebarProps>
   }, [variables]);
 
   const onVariableClick = (pathComponentsList: Array<ReactionPathComponents>) => {
-    dispatch(setReactionPathComponentsList(pathComponentsList));
+    // Opening the variable's entity replaces this drawer with the reaction drawer.
+    onClose();
+    drawer.set(pathComponentsList);
   };
 
   return (
