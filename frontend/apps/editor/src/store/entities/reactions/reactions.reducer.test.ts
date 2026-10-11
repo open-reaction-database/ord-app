@@ -26,6 +26,7 @@ import {
   importReactionFromFileActions,
   removeReactionActions,
   renameReactionActions,
+  restoreSavedReaction,
   setShowInvalidOnly,
 } from './reactions.actions.ts';
 import {
@@ -34,6 +35,7 @@ import {
   removeTemplateActions,
   removeVariableActions,
   renameTemplateActions,
+  restoreSavedVariables,
 } from 'store/entities/templates/templates.actions.ts';
 
 type ReactionsState = ReturnType<typeof reactionsReducer>;
@@ -230,7 +232,7 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     });
   });
 
-  it('restores the snapshot and clears it when the backend rejects the edit', () => {
+  it('restores the saved data and clears it when a save fails', () => {
     const afterEdit = reduce(
       seedNotes('original'),
       deleteReactionFieldActions.request({
@@ -238,10 +240,7 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
         pathComponents: ['notes', 'text'],
       } as never),
     );
-    const afterFailure = reduce(
-      afterEdit,
-      deleteReactionFieldActions.failure('Access denied' as never),
-    );
+    const afterFailure = reduce(afterEdit, restoreSavedReaction(1));
     expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({
       text: 'original',
     });
@@ -262,7 +261,11 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     // reactionsPreviews slice also handles this action and indexes them.
     const afterSuccess = reduce(
       afterEdit,
-      addUpdateReactionFieldActions.success({ id: 1, previews: {} } as never),
+      addUpdateReactionFieldActions.success({
+        id: 1,
+        previews: {},
+        savedData: asEntry(afterEdit.reactionsById[1]).data,
+      } as never),
     );
     expect(asEntry(afterSuccess.reactionsById[1]).dataBeforeEdit).toBeUndefined();
     expect(asEntry(afterSuccess.reactionsById[1]).data.notes).toEqual({
@@ -293,11 +296,54 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     });
   });
 
-  it('is a no-op on failure when no edit is pending', () => {
+  it('is a no-op on restore when no edit is pending', () => {
     const seeded = seedNotes('x');
-    const state = reduce(seeded, deleteReactionFieldActions.failure('err' as never));
+    const state = reduce(seeded, restoreSavedReaction(1));
     expect(asEntry(state.reactionsById[1]).data.notes).toEqual({ text: 'x' });
     expect(asEntry(state.reactionsById[1]).dataBeforeEdit).toBeUndefined();
+  });
+
+  it('rolls back to what a save sent when edits made during it are rejected', () => {
+    const edit = (state: Partial<ReactionsState>, text: string) =>
+      reduce(
+        state,
+        addUpdateReactionFieldActions.request({
+          reactionId: 1,
+          pathComponents: ['notes', 'text'],
+          newValue: text,
+        } as never),
+      );
+    const first = edit(seedNotes('original'), 'first');
+    const sent = asEntry(first.reactionsById[1]).data;
+    const second = edit(first, 'second');
+    const saved = reduce(
+      second,
+      addUpdateReactionFieldActions.success({
+        id: 1,
+        previews: {},
+        savedData: sent,
+      } as never),
+    );
+    expect(asEntry(saved.reactionsById[1]).data.notes).toEqual({ text: 'second' });
+    const restored = reduce(saved, restoreSavedReaction(1));
+    expect(asEntry(restored.reactionsById[1]).data.notes).toEqual({ text: 'first' });
+  });
+
+  it('renames the saved data too, so a failed save keeps the new name', () => {
+    const afterEdit = reduce(
+      seedNotes('original'),
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: 'edited',
+      } as never),
+    );
+    const renamed = reduce(
+      afterEdit,
+      renameReactionActions.success({ reactionId: 1, name: 'renamed' } as never),
+    );
+    const restored = reduce(renamed, restoreSavedReaction(1));
+    expect(asEntry(restored.reactionsById[1]).data.reactionId).toBe('renamed');
   });
 });
 
@@ -373,20 +419,26 @@ describe('reactions.reducer — templates', () => {
         seededVariables(),
         actions.request({ templateId: 't1', variable } as never),
       );
-      const failed = reduce(pending, actions.failure(null as never));
+      const failed = reduce(pending, restoreSavedVariables('t1'));
       expect(asEntry(failed.reactionsById.t1).variables).toEqual({
         'notes.safetyNotes': kept,
       });
     },
   );
 
-  it('keeps saved variables when a later save fails with none pending', () => {
+  it('keeps saved variables when a restore finds none pending', () => {
     const pending = reduce(
       seededVariables(),
       addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
     );
-    const saved = reduce(pending, addUpdateVariableActions.success());
-    const failed = reduce(saved, removeVariableActions.failure(null as never));
+    const saved = reduce(
+      pending,
+      addUpdateVariableActions.success({
+        templateId: 't1',
+        savedVariables: asEntry(pending.reactionsById.t1).variables as never,
+      }),
+    );
+    const failed = reduce(saved, restoreSavedVariables('t1'));
     expect(asEntry(failed.reactionsById.t1).variables).toEqual({
       'notes.safetyNotes': kept,
       'conditions.temperature': added,

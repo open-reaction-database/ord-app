@@ -22,10 +22,17 @@ import {
   addUpdateVariableActions,
   removeVariableActions,
   importTemplateFromFileActions,
+  restoreSavedVariables,
 } from './templates.actions.ts';
-import type { TemplateResponse, Variable } from './templates.types.ts';
+import type {
+  SavedVariablesPayload,
+  TemplateResponse,
+  Variable,
+} from './templates.types.ts';
+import type { Action } from '@reduxjs/toolkit';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
+import { createSaveQueue } from 'store/utils/saveQueue.ts';
 import {
   ordBinpbToReaction,
   reactionToOrdBinpb,
@@ -134,36 +141,70 @@ export const renameTemplate = createThunk(
   { failureMessage: 'Failed to rename template.' },
 );
 
-const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> =
-  templateId => async (_d, getState) => {
-    const { variables, data: reaction } = selectReactionById(templateId)(getState());
-    const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
-    const entityId = getTemplateIdNumber(templateId);
-    await axiosInstance.patch<TemplateResponse>(`templates/${entityId}`, {
-      variables: JSON.stringify(variablesList),
-    });
-    showNotification({
-      variant: NotificationVariant.SUCCESS,
-      message: 'Template updated.',
-    });
-  };
+// Each save sends every variable, so saves of one template run one at a time, in order.
+const enqueueVariablesSave = createSaveQueue<string>();
 
-export const addUpdateVariable = createThunk(
+/**
+ * Saves the template's unsaved variable edits once earlier saves settle, and records the outcome
+ * before the next save starts. Saves nothing when none are left: an earlier save sent them, or a
+ * failed one rolled them back.
+ */
+const saveEditedVariables: ThunkCustomWrapper<
+  {
+    templateId: string;
+    succeeded: (payload: SavedVariablesPayload) => Action;
+  },
+  Promise<void>
+> =
+  ({ templateId, succeeded }) =>
+  (dispatch, getState) =>
+    enqueueVariablesSave(templateId, async () => {
+      const {
+        variables,
+        variablesBeforeEdit,
+        data: reaction,
+      } = selectReactionById(templateId)(getState()) as ReactionTemplate;
+      if (variablesBeforeEdit === undefined) {
+        return;
+      }
+      try {
+        const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
+        await axiosInstance.patch<TemplateResponse>(
+          `templates/${getTemplateIdNumber(templateId)}`,
+          { variables: JSON.stringify(variablesList) },
+        );
+      } catch (e) {
+        dispatch(restoreSavedVariables(templateId));
+        throw e;
+      }
+      dispatch(succeeded({ templateId, savedVariables: variables }));
+      showNotification({
+        variant: NotificationVariant.SUCCESS,
+        message: 'Template updated.',
+      });
+    });
+
+export const addUpdateVariable = createThunkWithExplicitResult(
   addUpdateVariableActions,
   ({ templateId }) =>
-    async (dispatch, _g) => {
-      await dispatch(syncVariablesWithBackend(templateId));
-      return addUpdateVariableActions.success();
+    async dispatch => {
+      await dispatch(
+        saveEditedVariables({
+          templateId,
+          succeeded: addUpdateVariableActions.success,
+        }),
+      );
     },
   { failureMessage: 'Failed to update template variables.' },
 );
 
-export const removeVariable = createThunk(
+export const removeVariable = createThunkWithExplicitResult(
   removeVariableActions,
   ({ templateId }) =>
-    async (dispatch, _g) => {
-      await dispatch(syncVariablesWithBackend(templateId));
-      return removeVariableActions.success();
+    async dispatch => {
+      await dispatch(
+        saveEditedVariables({ templateId, succeeded: removeVariableActions.success }),
+      );
     },
   { failureMessage: 'Failed to update template variables.' },
 );

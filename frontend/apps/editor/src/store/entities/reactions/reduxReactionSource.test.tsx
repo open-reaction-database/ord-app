@@ -34,6 +34,7 @@ import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import { deferred } from 'test/deferred.ts';
 import { ordInputToReaction } from '@open-reaction-database/ui/reaction/model';
 import { create } from '@bufbuild/protobuf';
 import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
@@ -48,6 +49,7 @@ import {
 } from './reactions.actions.ts';
 import { setPreviewsByIds } from './reactionsPreviews/reactionsPreviews.actions.ts';
 import { reduxReactionActions, reduxReactionSource } from './reduxReactionSource.ts';
+import { renameReaction } from './reactions.thunks.ts';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -367,10 +369,15 @@ describe('reduxReactionActions.addIdentifierByName', () => {
       );
       return { data: { smiles: 'O' } };
     });
-    axiosMock.patch.mockReturnValue(new Promise(() => undefined));
-    await reduxReactionActions(store, 1).addIdentifierByName(path, 'water');
+    // The save fails once the test is done with it, so it does not hold later saves.
+    const save = deferred();
+    axiosMock.patch.mockReturnValue(save.promise);
+    const adding = reduxReactionActions(store, 1).addIdentifierByName(path, 'water');
+    await new Promise(resolve => setTimeout(resolve, 0));
     const requests = recorded.filter(addUpdateReactionFieldActions.request.match);
     expect(requests.at(-1)?.payload.pathComponents).toEqual([...path, 1]);
+    save.reject(new Error('done'));
+    await adding;
   });
 
   it('resolves false and changes nothing when the name does not resolve', async () => {
@@ -399,5 +406,106 @@ describe('reduxReactionActions.currentPerson', () => {
 
   it('returns undefined before the user loads', () => {
     expect(reduxReactionActions(makeStore(), 1).currentPerson?.()).toBeUndefined();
+  });
+});
+
+describe('overlapping edits to one reaction', () => {
+  /** A save the backend accepts. */
+  const accepted = () => ({
+    data: {
+      id: 1,
+      molblocks: { inputs: {}, outcomes: [], workups: [] },
+      validation: null,
+      summary: { provenance: {}, summary: {}, conditions: '' },
+    },
+  });
+  const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+  const dataOf = (store: ReturnType<typeof makeStore>) =>
+    store.getState().entities.reactions.reactionsById[1].data;
+
+  it('save one after another, never at once', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockResolvedValue(accepted());
+    const store = makeStore();
+    const actions = reduxReactionActions(store, 1);
+    const first = actions.update(['notes'], { safetyNotes: 'gloves' });
+    await flush();
+    const second = actions.remove(['inputs', 'in1']);
+    await flush();
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
+    firstSave.resolve(accepted());
+    await Promise.all([first, second]);
+    expect(axiosMock.patch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keep an earlier saved edit when a later one fails', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockRejectedValueOnce(new Error('offline'));
+    const store = makeStore();
+    const actions = reduxReactionActions(store, 1);
+    const first = actions.update(['notes'], { safetyNotes: 'gloves' });
+    await flush();
+    const second = actions.remove(['inputs', 'in1']);
+    await flush();
+    firstSave.resolve(accepted());
+    await Promise.all([first, second]);
+    expect(dataOf(store).notes.safetyNotes).toBe('gloves');
+    expect(dataOf(store).inputs).toHaveProperty('in1');
+  });
+
+  it('drop later edits when an earlier save fails, without saving them', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockResolvedValue(accepted());
+    const store = makeStore();
+    const before = dataOf(store);
+    const actions = reduxReactionActions(store, 1);
+    const first = actions.update(['notes'], { safetyNotes: 'gloves' });
+    await flush();
+    const second = actions.remove(['inputs', 'in1']);
+    await flush();
+    firstSave.reject(new Error('offline'));
+    await Promise.all([first, second]);
+    expect(dataOf(store)).toEqual(before);
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
+    expect(showNotification).toHaveBeenCalledTimes(1);
+  });
+
+  it('save once for edits made before the first save starts', async () => {
+    axiosMock.patch.mockResolvedValue(accepted());
+    const store = makeStore();
+    const actions = reduxReactionActions(store, 1);
+    await Promise.all([
+      actions.update(['notes'], { safetyNotes: 'gloves' }),
+      actions.remove(['inputs', 'in1']),
+    ]);
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
+    expect(dataOf(store).notes.safetyNotes).toBe('gloves');
+    expect(dataOf(store).inputs).not.toHaveProperty('in1');
+  });
+
+  it('rename only after a pending save settles', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockResolvedValue(accepted());
+    const store = makeStore();
+    const edit = reduxReactionActions(store, 1).update(['notes'], {
+      safetyNotes: 'gloves',
+    });
+    await flush();
+    const rename = store.dispatch(
+      renameReaction({ reactionId: 1, name: 'renamed' }) as unknown as UnknownAction,
+    );
+    await flush();
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
+    firstSave.resolve(accepted());
+    await Promise.all([edit, rename]);
+    expect(axiosMock.patch).toHaveBeenCalledTimes(2);
   });
 });

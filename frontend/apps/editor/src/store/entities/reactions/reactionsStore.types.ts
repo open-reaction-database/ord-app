@@ -25,7 +25,7 @@ export interface ReactionTemplate extends BaseReaction {
   id: string;
   name: string;
   variables: Record<string, Variable>;
-  /** The variables before an unsaved edit, restored if the save fails; client-only. */
+  /** The variables the backend holds while edits are unsaved; restored if a save fails. */
   variablesBeforeEdit?: Record<string, Variable>;
   modified_at: string;
 }
@@ -37,6 +37,11 @@ export type UpdateReactionSuccessPayload = Omit<
   DatasetReaction,
   'data' | 'dataBeforeEdit'
 >;
+
+/** A saved edit: the server's fields, and the reaction data the save sent, which it now holds. */
+export interface SavedReactionPayload extends UpdateReactionSuccessPayload {
+  savedData: DatasetReaction['data'];
+}
 
 export interface ImportReactionFromFilePayload {
   file: File;

@@ -151,9 +151,9 @@ export interface BaseReaction {
   data: AppReaction;
   previews: PreviewsById;
   summary: ReactionSummary;
-  // Snapshot of `data` taken before an optimistic field edit, used to roll the edit back if the
-  // backend rejects it (e.g. the user's role was changed to viewer, or the backend is down).
-  // Transient: present only while an edit is in flight, cleared on success or rollback. (#615)
+  // The `data` the backend holds while optimistic field edits are unsaved, restored if a save of
+  // them fails (e.g. the user's role was changed to viewer, or the backend is down). Transient:
+  // present only while edits are unsaved, cleared when they are saved or rolled back. (#615)
   dataBeforeEdit?: AppReaction;
 }
 

@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
+import { deferred } from 'test/deferred.ts';
 import { navigate } from 'wouter/use-browser-location';
 import {
   addUpdateVariable,
@@ -152,5 +153,57 @@ describe('a failed save', () => {
       variables: unknown;
     };
     expect(template.variables).toEqual({ 'notes.safetyNotes': kept });
+  });
+
+  it('of a later variable keeps an earlier saved one', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockRejectedValueOnce(new Error('offline'));
+    const { store } = storeWithTemplate();
+    const temperature = { path: ['conditions', 'temperature'], name: 'temp' };
+    const pressure = { path: ['conditions', 'pressure'], name: 'pressure' };
+    const first = store.dispatch(
+      addUpdateVariable({
+        templateId: 'template_5',
+        variable: temperature,
+      } as never) as unknown as UnknownAction,
+    );
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const second = store.dispatch(
+      addUpdateVariable({
+        templateId: 'template_5',
+        variable: pressure,
+      } as never) as unknown as UnknownAction,
+    );
+    await new Promise(resolve => setTimeout(resolve, 0));
+    firstSave.resolve({ data: {} });
+    await Promise.all([first, second]);
+    const template = store.getState().entities.reactions.reactionsById.template_5 as {
+      variables: unknown;
+    };
+    expect(template.variables).toEqual({
+      'notes.safetyNotes': kept,
+      'conditions.temperature': temperature,
+    });
+  });
+
+  it('of variables edited together is sent once', async () => {
+    axiosMock.patch.mockResolvedValue({ data: {} });
+    const { store } = storeWithTemplate();
+    await Promise.all(
+      [
+        { path: ['conditions', 'temperature'], name: 'temp' },
+        { path: ['conditions', 'pressure'], name: 'pressure' },
+      ].map(variable =>
+        store.dispatch(
+          addUpdateVariable({
+            templateId: 'template_5',
+            variable,
+          } as never) as unknown as UnknownAction,
+        ),
+      ),
+    );
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
   });
 });

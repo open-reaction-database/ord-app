@@ -23,7 +23,7 @@ import {
 } from 'store/entities/reactions/reactions.actions.ts';
 import type { PreviewsById } from './reactionsPreviews.types.ts';
 import type { DatasetReaction } from '@open-reaction-database/ui/reaction/model';
-import type { UpdateReactionSuccessPayload } from 'store/entities/reactions/reactionsStore.types.ts';
+import type { SavedReactionPayload } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { Pages } from 'common/types';
 
 const reactionWithPreviews = (previews: PreviewsById) =>
@@ -68,7 +68,7 @@ describe('reactionsPreviewsReducer', () => {
     it('handles the add-update-field success payload the same way', () => {
       const payload = {
         previews: { c: 'ref' },
-      } as unknown as UpdateReactionSuccessPayload;
+      } as unknown as SavedReactionPayload;
       const state = reactionsPreviewsReducer(
         initialState(),
         addUpdateReactionFieldActions.success(payload),
