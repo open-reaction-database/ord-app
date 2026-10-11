@@ -36,7 +36,10 @@ import { selectIsReactionLookupOpen } from 'store/features/reactionLookup/reacti
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  useIsViewOnly,
+  useReactionId,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
@@ -68,7 +71,8 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 
 export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
-  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const reactionId = useReactionId();
+  const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const [
     componentsEditorOpened,

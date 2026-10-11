@@ -15,9 +15,6 @@
  */
 import { useCallback, useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { Button, Flex, Title } from '@mantine/core';
@@ -34,22 +31,26 @@ import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  useIsViewOnly,
+  useReactionId,
+  useReactionPart,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';
 
 export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } =
-    useContext(reactionContext);
+  const reactionId = useReactionId();
+  const isViewOnly = useIsViewOnly();
+  const { ViewDeleteButtons } = useReactionSlots();
   const { pathComponents } = useContext(reactionEntityContext);
   const currentPath = useMemo(() => {
     return pathComponents.concat(name);
   }, [pathComponents, name]);
-  const authenticStandard: Optional<ReactionInputComponent> = useSelector(
-    selectReactionPartByPath(reactionId, currentPath),
-  );
+  const authenticStandard = useReactionPart<ReactionInputComponent>(currentPath);
 
   const onRemove = useCallback(() => {
     dispatch(
@@ -79,7 +80,7 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
           leftSection={<Title order={4}>Authentic Standard</Title>}
           rightSection={
             authenticStandard ? (
-              <ViewDeleteButtonsComponent
+              <ViewDeleteButtons
                 entityName="Authentic standard"
                 pathComponents={currentPath}
                 onRemove={onRemove}

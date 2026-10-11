@@ -19,7 +19,7 @@ import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 import { useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 interface MolblockIdentifierProps {
@@ -35,7 +35,7 @@ export function MolblockIdentifier({
   index,
   onEdit,
 }: Readonly<MolblockIdentifierProps>) {
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtons } = useReactionSlots();
   const { pathComponents } = useContext(reactionEntityContext);
   return (
     <Flex
@@ -65,7 +65,7 @@ export function MolblockIdentifier({
           />
         </Flex>
         <Flex>
-          <ViewDeleteButtonsComponent
+          <ViewDeleteButtons
             entityName="Identifier"
             pathComponents={[...pathComponents, 'molBlockIdentifiers', itemKey]}
             onEdit={() => onEdit(index)}

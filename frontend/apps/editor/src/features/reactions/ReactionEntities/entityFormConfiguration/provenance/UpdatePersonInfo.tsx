@@ -18,14 +18,14 @@ import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntitie
 import { useSelector } from 'react-redux';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';
 import type { ReactionPerson } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
 } from 'store/entities/reactions/reactions.utils.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export interface UpdatePersonInfoProps extends ReactionFormCustomProps {
   text: string;
@@ -42,7 +42,7 @@ export function UpdatePersonInfo({
   formMethods,
   text,
 }: Readonly<UpdatePersonInfoProps>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const user = useSelector(selectSelf)!;
   const { setValues } = formMethods;
 

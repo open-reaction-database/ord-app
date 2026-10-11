@@ -17,7 +17,7 @@ import { Flex, Title } from '@mantine/core';
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { EntityListItemProps } from './entityListItem.types.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 
 export function EntityListItem<T>({
@@ -29,7 +29,7 @@ export function EntityListItem<T>({
   optionalFields,
   historyPathComponents,
 }: Readonly<EntityListItemProps<T>>) {
-  const { ViewDeleteButtonsComponent } = useContext(reactionContext);
+  const { ViewDeleteButtons } = useReactionSlots();
   const { pathComponents } = useContext(reactionEntityContext);
   const itemPathComponents = useMemo(() => {
     const basePathComponents = Array.isArray(entityField)
@@ -54,7 +54,7 @@ export function EntityListItem<T>({
         gap="xs"
       >
         <Title order={3}>{titleText}</Title>
-        <ViewDeleteButtonsComponent
+        <ViewDeleteButtons
           entityName={titleText}
           pathComponents={itemPathComponents}
           historyPathComponents={historyPathComponents}

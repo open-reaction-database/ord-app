@@ -16,8 +16,7 @@
 import { Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useContext } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
@@ -38,7 +37,7 @@ export function ReactionEntityValue({
   node,
   formMethods: { getInputProps },
 }: Readonly<ReactionEntityNodeProps<ReactionFormValue>>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const type = getVariableType(node.inputType);
 
   const label = (

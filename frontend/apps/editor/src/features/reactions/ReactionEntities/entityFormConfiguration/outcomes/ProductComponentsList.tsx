@@ -20,7 +20,11 @@ import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import {
+  useDrawer,
+  useIsViewOnly,
+  useReactionId,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
@@ -32,7 +36,6 @@ import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityF
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
 import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
 import { MeasurementsPreview } from 'features/reactions/ReactionView/Outcomes/MeasurementsPreview/MeasurementsPreview.tsx';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
@@ -47,7 +50,8 @@ const renderDetails = (product: ReactionProduct) => (
 export function ProductsComponentsList() {
   const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const reactionId = useReactionId();
+  const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData();
   const length = components.length;

@@ -15,21 +15,19 @@
  */
 import classes from './componentPreview.module.scss';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
-import { selectPreviewsByIdsWrapper } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.selectors.ts';
-import { useSelector } from 'react-redux';
 import { useContext } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  usePreviews,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 
 export function ComponentPreview() {
-  const { reactionId } = useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
-  const component: ReactionInputComponent = useSelector(
-    selectReactionPartByPath(reactionId, pathComponents),
-  );
-  const previewStates = useSelector(selectPreviewsByIdsWrapper([component.id]));
+  // The preview renders inside an existing component's form.
+  const component = useReactionPart<ReactionInputComponent>(pathComponents)!;
+  const previewStates = usePreviews([component.id]);
   return (
     <div className={classes.previewWrapper}>
       <ReactionComponentPreview previewState={previewStates[component.id]} />

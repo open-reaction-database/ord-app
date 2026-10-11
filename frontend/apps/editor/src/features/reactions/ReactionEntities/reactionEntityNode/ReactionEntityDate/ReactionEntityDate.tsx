@@ -19,9 +19,9 @@ import { useUncontrolled } from '@mantine/hooks';
 import { DateInput, type DateValue } from '@mantine/dates';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Input, TextInput } from '@mantine/core';
-import { type FocusEvent, useCallback, useContext, useState } from 'react';
+import { type FocusEvent, useCallback, useState } from 'react';
 import dayjs from 'dayjs';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { DATE_FORMAT } from 'common/constants.ts';
@@ -30,7 +30,7 @@ export function ReactionEntityDate({
   node,
   formMethods,
 }: Readonly<ReactionEntityNodeProps<ReactionFormDate>>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const label = (
     <ReactionValueLabelWrapper
       name={node.name}
