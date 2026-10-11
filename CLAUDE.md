@@ -30,7 +30,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 ## Formatting & pre-commit
 
-Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` once (and `npm ci` in `frontend/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` (scoped to `ord_app/`), and UI `prettier`/`eslint`/`stylelint`. Run all: `uv run pre-commit run --all-files`.
+Run hooks via [pre-commit](https://pre-commit.com): `uv run pre-commit install` once (and `npm ci` in `frontend/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` + `ty` (scoped to `ord_app/`), UI `prettier`/`eslint`/`stylelint` and the `tsc -b` type check, and `jscpd`. Run all: `uv run pre-commit run --all-files`.
 
 ## CI gates (a PR is not mergeable until these are green)
 
