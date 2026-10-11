@@ -35,8 +35,8 @@ vi.mock('store/entities/datasets/datasets.thunks.ts', () => ({
   getInitialDatasetsList: mocks.getInitialDatasetsList,
 }));
 // Stub the heavy children — the test only covers the page's fetch-on-mount behaviour.
-vi.mock('common/components/PageContainer/PageContainer.tsx', () => ({
-  PageContainer: ({ children }: Readonly<{ children: React.ReactNode }>) => (
+vi.mock('common/components/PageContainer/EditorPageContainer.tsx', () => ({
+  EditorPageContainer: ({ children }: Readonly<{ children: React.ReactNode }>) => (
     <div>{children}</div>
   ),
 }));

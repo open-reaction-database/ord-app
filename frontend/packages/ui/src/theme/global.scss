@@ -67,6 +67,9 @@ button[data-variant='transparent'] {
 }
 
 a {
+  color: var(--mantine-color-primary-light-color);
+  text-decoration: none;
+
   &:hover {
     color: var(--color-text-hover);
   }

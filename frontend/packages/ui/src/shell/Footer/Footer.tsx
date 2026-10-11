@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Flex } from '@mantine/core';
-import { Github, Linkedin } from '@open-reaction-database/ui/theme';
+import { Github, Linkedin } from '#theme/icons/index.ts';
 import classes from './footer.module.scss';
 
 export function Footer() {
@@ -24,8 +24,8 @@ export function Footer() {
     <Flex className={classes.root}>
       <div className={classes.copyright}>© Copyright {year} Open Reaction Database</div>
       <div>
-        <a href="mailto:help@open‑reaction-database.org">
-          help@open‑reaction-database.org
+        <a href="mailto:help@open-reaction-database.org">
+          help@open-reaction-database.org
         </a>
       </div>
       <div className={classes.footerLinks}>
