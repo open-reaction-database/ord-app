@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCallback, useContext, useMemo } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import { useCallback } from 'react';
+import { useEntityFieldPath } from 'features/reactions/ReactionEntities/useEntityFieldPath.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { Button, Flex, Title } from '@mantine/core';
@@ -46,10 +46,7 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
   const reactionId = useReactionId();
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
-  const { pathComponents } = useContext(reactionEntityContext);
-  const currentPath = useMemo(() => {
-    return pathComponents.concat(name);
-  }, [pathComponents, name]);
+  const currentPath = useEntityFieldPath(name);
   const authenticStandard = useReactionPart<ReactionInputComponent>(currentPath);
 
   const onRemove = useCallback(() => {

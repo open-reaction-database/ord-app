@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import type { ReactionFormCustomProps } from '../../reactionEntities.types.ts';
-import { useCallback, useContext, useMemo } from 'react';
-import { reactionEntityContext } from '../../reactionEntity.context.ts';
+import { useCallback } from 'react';
+import { useEntityFieldPath } from '../../useEntityFieldPath.ts';
 import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import {
   ReactionEntityBlock,
@@ -55,11 +55,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const reactionId = useReactionId();
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
-  const { pathComponents } = useContext(reactionEntityContext);
-
-  const currentPath = useMemo(() => {
-    return pathComponents.concat(name);
-  }, [pathComponents, name]);
+  const currentPath = useEntityFieldPath(name);
 
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
