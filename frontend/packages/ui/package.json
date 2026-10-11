@@ -12,7 +12,8 @@
   "exports": {
     "./theme": "./src/theme/index.ts",
     "./theme/global.scss": "./src/theme/global.scss",
-    "./display": "./src/display/index.ts"
+    "./display": "./src/display/index.ts",
+    "./reaction/previews": "./src/reaction/previews/index.ts"
   },
   "imports": {
     "#*": "./src/*"
@@ -28,7 +29,9 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "clsx": "^2.1.1"
+    "@bufbuild/protobuf": "^2.16.0",
+    "clsx": "^2.1.1",
+    "indigo-ketcher": "1.43.0"
   },
   "devDependencies": {
     "@mantine/core": "^7.15.3",
