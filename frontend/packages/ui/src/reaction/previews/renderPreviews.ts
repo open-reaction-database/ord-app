@@ -90,7 +90,8 @@ export function createPreviewRenderer(createWorker: () => PreviewWorker) {
     if (Object.values(molblocksById).every(molblock => molblock === null)) {
       return Promise.resolve(nullsFor(molblocksById));
     }
-    const id = nextId++;
+    const id = nextId;
+    nextId += 1;
     return new Promise((resolve, reject) => {
       // A worker that cannot be created throws here, which rejects this request.
       const target = getWorker();

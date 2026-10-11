@@ -63,13 +63,11 @@ describe('DisplayMolblockPreview', () => {
 
   it('keeps the newest molblock when an earlier render finishes last', async () => {
     let finishFirst: ((svgsById: PreviewsById) => void) | undefined;
+    const first = new Promise<PreviewsById>(resolve => {
+      finishFirst = resolve;
+    });
     renderPreviewsMock
-      .mockImplementationOnce(
-        () =>
-          new Promise<PreviewsById>(resolve => {
-            finishFirst = resolve;
-          }),
-      )
+      .mockReturnValueOnce(first)
       .mockResolvedValueOnce({ molblock: 'U0VDT05E' });
     const { findByRole, getByRole, rerender } = renderWithMantine(
       <DisplayMolblockPreview identifier={identifier('MOL 1')} />,
@@ -79,7 +77,11 @@ describe('DisplayMolblockPreview', () => {
       'src',
       'data:image/svg+xml;base64,U0VDT05E',
     );
-    await act(async () => finishFirst?.({ molblock: 'RklSU1Q=' }));
+    // The component's handler for the first render runs before act's await on it returns.
+    await act(() => {
+      finishFirst?.({ molblock: 'RklSU1Q=' });
+      return first;
+    });
     expect(getByRole('img')).toHaveAttribute(
       'src',
       'data:image/svg+xml;base64,U0VDT05E',

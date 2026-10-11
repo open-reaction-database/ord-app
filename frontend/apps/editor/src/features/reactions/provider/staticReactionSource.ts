@@ -78,7 +78,9 @@ export function createStaticReactionSource(
         { isLoading: false, svg: svgFor(key) },
       ]),
     );
-    listeners.forEach(listener => listener());
+    for (const listener of listeners) {
+      listener();
+    }
   };
   return {
     getSnapshot: () => snapshot,
