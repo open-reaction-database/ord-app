@@ -15,30 +15,21 @@
  */
 import { Form, useForm } from '@mantine/form';
 import { Anchor, Button, Flex, Modal, Text, TextInput } from '@mantine/core';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addIdentifierByName } from 'store/entities/reactions/reactionsInputs/reactionInputs.thunks.ts';
-import { useContext, useEffect, type FormEvent } from 'react';
+import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useSelector } from 'react-redux';
-import {
-  selectHasReactionLookupError,
-  selectReactionLookupIsLoading,
-} from 'store/features/reactionLookup/reactionLookup.selectors.ts';
-import { resetReactionLookupErrorAction } from 'store/features/reactionLookup/reactionLookup.actions.ts';
 import classes from './componentsLookup.module.scss';
 import { NavigateOutsideIcon } from 'common/icons';
-import { useReactionId } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionActions } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface ComponentsLookupProps {
   onClose: () => void;
 }
 
 export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
-  const dispatch = useAppDispatch();
-  const reactionId = useReactionId();
   const { pathComponents } = useContext(reactionEntityContext);
-  const isLoading = useSelector(selectReactionLookupIsLoading);
-  const hasError = useSelector(selectHasReactionLookupError);
+  const actions = useReactionActions();
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const form = useForm({
     mode: 'controlled',
@@ -58,20 +49,31 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
 
   useEffect(() => {
     if (hasError && values.search.length > 0) {
-      dispatch(resetReactionLookupErrorAction());
+      setHasError(false);
     }
-  }, [dispatch, hasError, values.search]);
+  }, [hasError, values.search]);
+
+  const lookUp = async (name: string) => {
+    if (!actions) {
+      return;
+    }
+    setIsLoading(true);
+    const found = await actions.addIdentifierByName(
+      pathComponents.concat('identifiers'),
+      name,
+    );
+    setIsLoading(false);
+    if (found) {
+      onClose();
+    } else {
+      setHasError(true);
+    }
+  };
 
   const onSubmit = (values: { search: string }, event?: FormEvent<HTMLFormElement>) => {
+    // The lookup sits inside the drawer's form; keep its submit from reaching that form.
     event?.stopPropagation();
-    const path = pathComponents.concat('identifiers');
-    dispatch(
-      addIdentifierByName({
-        reactionId: reactionId,
-        pathComponents: path,
-        name: values.search,
-      }),
-    );
+    void lookUp(values.search);
   };
 
   const inputProps = form.getInputProps('search');
