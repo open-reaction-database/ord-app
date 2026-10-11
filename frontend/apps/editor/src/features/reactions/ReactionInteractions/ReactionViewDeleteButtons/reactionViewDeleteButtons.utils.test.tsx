@@ -15,40 +15,19 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import type { MouseEvent, ReactNode } from 'react';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import type { MouseEvent } from 'react';
 import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
 import {
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,
 } from './reactionViewDeleteButtons.utils.ts';
 
-const Empty = () => null;
-const source = createStaticReactionSource({
-  data: emptyReactionData(),
-  previews: {},
-  summary: { provenance: {}, summary: {}, conditions: '' },
-});
-
-function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
-  return (
-    <ReactionProvider
-      reactionId={1}
-      source={source}
-      slots={{ ViewDeleteButtons: Empty, ValueLabel: Empty, ViewOnlyLabel: Empty }}
-    >
-      {children}
-    </ReactionProvider>
-  );
-}
-
 function openWith(props: Omit<ReactionViewDeleteButtonsProps, 'entityName'>) {
   const { result } = renderHook(
     () => ({ open: useOnViewEdit(props), stack: useDrawerStack() }),
-    { wrapper: Wrapper },
+    { wrapper: reactionWrapper() },
   );
   act(() => result.current.open());
   return result.current.stack;

@@ -269,8 +269,12 @@ describe('the drawer', () => {
 });
 
 describe('reaction hooks outside a provider', () => {
-  it('throw a message naming the provider', () => {
+  it.each<[string, () => unknown]>([
+    ['useReactionSnapshot', useReactionSnapshot],
+    ['useDrawerStack', useDrawerStack],
+    ['useDrawer', useDrawer],
+  ])('%s throws a message naming the provider', (_name, hook) => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() => renderHook(useReactionSnapshot)).toThrow(/ReactionProvider/);
+    expect(() => renderHook(hook)).toThrow(/ReactionProvider/);
   });
 });

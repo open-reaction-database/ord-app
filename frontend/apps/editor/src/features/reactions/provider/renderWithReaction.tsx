@@ -40,32 +40,26 @@ type ReactionTarget =
   | { reactionId?: number; isTemplate?: false; actions?: ReactionActions }
   | { reactionId: string; isTemplate: true; actions?: never };
 
-type RenderWithReactionOptions = Omit<RenderOptions, 'wrapper'> &
-  ReactionTarget & {
-    snapshot?: ReactionSnapshot;
-    source?: ReactionSource;
-    slots?: Partial<ReactionSlots>;
-  };
+type ReactionWrapperOptions = ReactionTarget & {
+  snapshot?: ReactionSnapshot;
+  source?: ReactionSource;
+  slots?: Partial<ReactionSlots>;
+};
 
-/** Renders under a ReactionProvider: a static source over `snapshot` unless a source is given. */
-export function renderWithReaction(
-  ui: ReactElement,
-  options: RenderWithReactionOptions = {},
-) {
-  const {
-    reactionId,
-    isTemplate,
-    actions,
-    snapshot,
-    source = createStaticReactionSource(snapshot),
-    slots,
-    ...renderOptions
-  } = options;
+type RenderWithReactionOptions = Omit<RenderOptions, 'wrapper'> &
+  ReactionWrapperOptions;
+
+/**
+ * A wrapper component, for `render` or `renderHook`, that puts its children under a
+ * ReactionProvider: a static source over `snapshot` unless a source is given.
+ */
+export function reactionWrapper(options: ReactionWrapperOptions = {}) {
+  const { snapshot, source = createStaticReactionSource(snapshot), slots } = options;
   const target = options.isTemplate
     ? { reactionId: options.reactionId, isTemplate: true as const }
     : { reactionId: options.reactionId ?? 1, actions: options.actions };
   const allSlots = { ...EMPTY_SLOTS, ...slots };
-  function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
+  return function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <MantineProvider>
         <ReactionProvider
@@ -77,6 +71,15 @@ export function renderWithReaction(
         </ReactionProvider>
       </MantineProvider>
     );
-  }
-  return render(ui, { wrapper: Wrapper, ...renderOptions });
+  };
+}
+
+/** Renders under a ReactionProvider: a static source over `snapshot` unless a source is given. */
+export function renderWithReaction(
+  ui: ReactElement,
+  options: RenderWithReactionOptions = {},
+) {
+  const { reactionId, isTemplate, actions, snapshot, source, slots, ...renderOptions } =
+    options;
+  return render(ui, { wrapper: reactionWrapper(options), ...renderOptions });
 }

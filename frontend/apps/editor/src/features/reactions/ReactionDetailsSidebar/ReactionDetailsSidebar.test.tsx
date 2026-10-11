@@ -16,7 +16,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData, renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import type { AppState } from 'store/configureAppStore.ts';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
+import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { DrawerActions } from 'features/reactions/provider/drawer.ts';
 import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -71,5 +75,30 @@ describe('ReactionDetailsSidebar', () => {
 
     act(() => drawer.set([['provenance']]));
     expect(await screen.findByText('Form for provenance')).toBeInTheDocument();
+  });
+
+  it('opens a template’s entity from its Set Variables button', async () => {
+    renderWithProviders(
+      <TemplateReactionProvider templateId="template_1">
+        <ReactionSetVariablesButton
+          entityName="Notes"
+          pathComponents={['notes']}
+        />
+        <ReactionDetailsSidebar reactionId="template_1" />
+      </TemplateReactionProvider>,
+      {
+        preloadedState: {
+          entities: {
+            reactions: {
+              reactionsById: {
+                template_1: { id: 1, data: emptyReactionData(), variables: {} },
+              },
+            },
+          },
+        } as unknown as AppState,
+      },
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Set Variables' }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Form for notes');
   });
 });

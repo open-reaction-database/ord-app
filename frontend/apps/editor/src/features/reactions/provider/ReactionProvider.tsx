@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useMemo, useReducer, type ReactNode } from 'react';
+import { useMemo, useReducer, useState, type ReactNode } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionsContext } from 'features/reactions/reactions.types.ts';
 import { createDrawerActions, drawerReducer, EMPTY_DRAWER_STACK } from './drawer.ts';
@@ -85,7 +85,9 @@ export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
         };
   }, [reactionId, actions, slots]);
   const [drawerStack, dispatchDrawer] = useReducer(drawerReducer, EMPTY_DRAWER_STACK);
-  const drawer = useMemo(() => createDrawerActions(dispatchDrawer), []);
+  // Held in state so the actions keep their identity for the provider's life; a memo may be
+  // recomputed.
+  const [drawer] = useState(() => createDrawerActions(dispatchDrawer));
   return (
     <reactionProviderContext.Provider value={value}>
       <reactionContext.Provider value={legacyValue}>

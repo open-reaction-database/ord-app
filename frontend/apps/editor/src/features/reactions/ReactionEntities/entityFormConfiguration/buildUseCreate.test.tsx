@@ -17,11 +17,8 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
 import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
-import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
 
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
@@ -38,29 +35,20 @@ interface NewEntity {
   entity: string;
 }
 
-const Empty = () => null;
-const slots = { ViewDeleteButtons: Empty, ValueLabel: Empty, ViewOnlyLabel: Empty };
-const source = createStaticReactionSource({
-  data: emptyReactionData(),
-  previews: {},
-  summary: { provenance: {}, summary: {}, conditions: '' },
+const ReactionWrapper = reactionWrapper({
+  reactionId: 7,
+  actions: { update: vi.fn(), remove: vi.fn() },
 });
-const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
 
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <ReactionProvider
-      reactionId={7}
-      source={source}
-      actions={actions}
-      slots={slots}
-    >
+    <ReactionWrapper>
       <reactionEntityContext.Provider
         value={{ reactionId: 7, pathComponents: ['inputs', 0] }}
       >
         {children}
       </reactionEntityContext.Provider>
-    </ReactionProvider>
+    </ReactionWrapper>
   );
 }
 
