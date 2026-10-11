@@ -34,6 +34,9 @@ import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import { ordInputToReaction } from '@open-reaction-database/ui/reaction/model';
+import { create } from '@bufbuild/protobuf';
+import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
   NotificationVariant,
   showNotification,
@@ -67,6 +70,15 @@ const slots: ReactionSlots = {
   ViewOnlyLabel: Empty,
 };
 
+/** An input `in1` with one empty component `c1`, complete enough to save. */
+function savableInput() {
+  const input = ordInputToReaction(
+    create(ReactionInputSchema, { components: [{}] }),
+    'in1',
+  );
+  return { ...input, id: 'in1', components: [{ ...input.components[0], id: 'c1' }] };
+}
+
 /**
  * A store holding reactions 1, 2, and template_3, and `self` as the signed-in user;
  * `recorded`, if given, collects every action. Reaction 1 has an input `in1` with one
@@ -79,13 +91,7 @@ function makeStore(recorded?: Array<UnknownAction>, self?: Partial<User>) {
       id === 1
         ? {
             ...emptyReactionData(),
-            inputs: {
-              in1: {
-                id: 'in1',
-                name: 'in1',
-                components: [{ id: 'c1', identifiers: [] }],
-              },
-            },
+            inputs: { in1: savableInput() },
           }
         : emptyReactionData(),
     previews: {},
@@ -277,6 +283,8 @@ describe('reduxReactionActions', () => {
       const store = makeStore();
       const before = store.getState().entities.reactions.reactionsById[1].data;
       await edit(reduxReactionActions(store, 1));
+      // The save reached the backend, so the failure is the request's.
+      expect(axiosMock.patch).toHaveBeenCalled();
       expect(showNotification).toHaveBeenCalledTimes(1);
       expect(showNotification).toHaveBeenCalledWith({
         message: 'Failed to update reaction.',
