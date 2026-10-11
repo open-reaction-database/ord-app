@@ -47,4 +47,21 @@ describe('PageContainer', () => {
     expect(getByText('BADGE')).toBeInTheDocument();
     expect(getByText('page content')).toBeInTheDocument();
   });
+
+  it('keeps several header controls together, apart from the logo', () => {
+    const { getByText, getByRole } = renderWithMantine(
+      <PageContainer
+        breadcrumbs={[]}
+        headerActions={
+          <>
+            <span>help</span>
+            <span>menu</span>
+          </>
+        }
+      />,
+    );
+    const controls = getByText('menu').parentElement;
+    expect(getByText('help').parentElement).toBe(controls);
+    expect(controls).not.toBe(getByRole('banner'));
+  });
 });

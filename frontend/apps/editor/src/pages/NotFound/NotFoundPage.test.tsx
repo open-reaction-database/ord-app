@@ -18,8 +18,8 @@ import type { ReactNode } from 'react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { NotFoundPage } from './NotFoundPage.tsx';
 
-// EditorPageContainer pulls in the auth-aware UserMenu; stub it to a passthrough so this test stays
-// focused on the not-found content.
+// EditorPageContainer pulls in the auth-aware UserMenu; stub it to a passthrough so
+// this test stays focused on the not-found content.
 vi.mock('common/components/PageContainer/EditorPageContainer.tsx', () => ({
   EditorPageContainer: ({ children }: Readonly<{ children: ReactNode }>) => (
     <div>{children}</div>

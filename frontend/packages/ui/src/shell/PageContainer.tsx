@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import type { PropsWithChildren, ReactNode } from 'react';
-import { AppShell, Flex } from '@mantine/core';
+import { AppShell, Flex, Group } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from './ORDLogo.png';
 import { Breadcrumbs } from '#shell/Breadcrumbs/Breadcrumbs.tsx';
-import type { Breadcrumb } from './breadcrumbs.ts';
+import type { Breadcrumbs as BreadcrumbItems } from './breadcrumbs.ts';
 import { Footer } from '#shell/Footer/Footer.tsx';
 
 export interface PageContainerProps extends PropsWithChildren {
-  breadcrumbs: Array<Breadcrumb>;
+  breadcrumbs: BreadcrumbItems;
   badge?: ReactNode;
   /** Controls at the right of the header, such as the signed-in user's menu. */
   headerActions?: ReactNode;
@@ -49,7 +49,12 @@ export function PageContainer({
           alt="Open Reaction Database logo"
         />
 
-        {headerActions}
+        <Group
+          gap="xs"
+          wrap="nowrap"
+        >
+          {headerActions}
+        </Group>
       </AppShell.Header>
 
       <AppShell.Main>

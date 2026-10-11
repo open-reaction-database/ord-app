@@ -16,8 +16,8 @@
     "./reaction": "./src/reaction/index.ts",
     "./reaction/previews": "./src/reaction/previews/index.ts",
     "./reaction/model": "./src/reaction/model/index.ts",
-    "./testing": "./src/testing/index.ts",
-    "./shell": "./src/shell/index.ts"
+    "./shell": "./src/shell/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "imports": {
     "#*": "./src/*"
