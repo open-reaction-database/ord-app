@@ -27,12 +27,15 @@ interface ReactionHeaderProps {
   actions?: ReactNode;
   /** Controls after the reaction's ID, such as copy and rename. */
   titleActions?: ReactNode;
+  /** Shows the reaction's conditions over the preview's arrow. */
+  showDetails?: boolean;
 }
 
 /** The reaction's validation, ID, and preview, with the host app's controls beside them. */
 export function ReactionHeader({
   actions,
   titleActions,
+  showDetails = false,
 }: Readonly<ReactionHeaderProps>) {
   const pbReactionId = useReactionSnapshot()?.pb_reaction_id;
   const previewRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +93,10 @@ export function ReactionHeader({
               Copy reaction image
             </Button>
           </Flex>
-          <ReactionPreview ref={previewRef} />
+          <ReactionPreview
+            ref={previewRef}
+            showDetails={showDetails}
+          />
         </Flex>
       </Paper>
     </>

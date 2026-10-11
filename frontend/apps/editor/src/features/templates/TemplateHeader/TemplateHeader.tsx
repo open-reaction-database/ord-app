@@ -29,6 +29,7 @@ import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/
 import { renameTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { ValidityButton } from 'common/components/interactions/ValidityButton/ValidityButton.tsx';
 import { setVariablesSidebarOpenedAction } from 'store/features/variablesSidebar/variablesSidebar.actions.ts';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
 
 interface TemplateHeaderProps {
   templateId: string;
@@ -98,7 +99,7 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           <DataField label="Last Modified">
             {formatUtcDateToDisplay(template.modified_at)}
           </DataField>
-          <ReactionPreview />
+          <ReactionPreview showDetails={showReactionPreviewDetails} />
         </Flex>
         {opened && (
           <InputModal

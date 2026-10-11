@@ -28,6 +28,7 @@ import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { TemplatesTopActions } from './TemplatesTopActions/TemplatesTopActions.tsx';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
 
 interface TemplateTitleProps {
   index: number;
@@ -94,6 +95,7 @@ export function TemplatesListPage() {
                   templateId={templateId}
                 >
                   <ReactionCard
+                    showDetails={showReactionPreviewDetails}
                     actions={<TemplateHeaderActions templateId={templateId} />}
                     title={
                       <TemplateTitle

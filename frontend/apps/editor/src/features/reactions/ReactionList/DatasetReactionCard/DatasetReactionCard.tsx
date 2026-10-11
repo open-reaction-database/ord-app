@@ -34,6 +34,7 @@ import classes from '../reactionsList.module.scss';
 import { useRef } from 'react';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
 
 interface ReactionTitleProps {
   index: number;
@@ -124,6 +125,7 @@ function DatasetReactionCardBody({
   const isValid = useReactionSnapshot()?.is_valid ?? false;
   return (
     <ReactionCard
+      showDetails={showReactionPreviewDetails}
       previewRef={previewRef}
       isInvalid={!isValid}
       actions={

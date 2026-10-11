@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionHeader } from './ReactionHeader.tsx';
 
@@ -30,5 +32,19 @@ describe('ReactionHeader', () => {
     expect(getByText('Title action')).toBeInTheDocument();
     expect(getByText('Copy reaction image')).toBeInTheDocument();
     expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
+  });
+
+  it('passes the request for details to its preview', () => {
+    const { getByText } = renderInReactionView(<ReactionHeader showDetails />, {
+      reaction: {
+        ...emptyReactionData(),
+        inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
+      } as unknown as AppReaction,
+      record: {
+        pb_reaction_id: 'ord-123',
+        summary: { provenance: {}, summary: {}, conditions: 'Stirred at 25 C' },
+      },
+    });
+    expect(getByText('Stirred at 25 C')).toBeInTheDocument();
   });
 });

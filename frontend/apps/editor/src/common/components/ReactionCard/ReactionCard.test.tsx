@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionCard } from './ReactionCard.tsx';
 
@@ -27,5 +29,39 @@ describe('ReactionCard', () => {
     expect(getByText('Card title')).toBeInTheDocument();
     expect(getByText('Act')).toBeInTheDocument();
     expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
+  });
+
+  it('lists the provenance, the summary, and the conditions only when asked for details', () => {
+    const options = {
+      reaction: {
+        ...emptyReactionData(),
+        inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
+      } as unknown as AppReaction,
+      record: {
+        summary: {
+          provenance: { Creator: 'Ada' },
+          summary: { Yield: '90%' },
+          conditions: 'Stirred at 25 C',
+        },
+      },
+    };
+    const card = (showDetails?: boolean) => (
+      <ReactionCard
+        title="Card title"
+        actions={null}
+        showDetails={showDetails}
+      />
+    );
+    const plain = renderInReactionView(card(), options);
+    expect(plain.queryByText('Provenance:')).not.toBeInTheDocument();
+    expect(plain.queryByText('Summary:')).not.toBeInTheDocument();
+    expect(plain.queryByText('Stirred at 25 C')).not.toBeInTheDocument();
+    plain.unmount();
+    const detailed = renderInReactionView(card(true), options);
+    expect(detailed.getByText('Provenance:')).toBeInTheDocument();
+    expect(detailed.getByText('Ada')).toBeInTheDocument();
+    expect(detailed.getByText('Summary:')).toBeInTheDocument();
+    expect(detailed.getByText('90%')).toBeInTheDocument();
+    expect(detailed.getByText('Stirred at 25 C')).toBeInTheDocument();
   });
 });

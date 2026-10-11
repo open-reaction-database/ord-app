@@ -23,7 +23,7 @@ import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon } from 'common/i
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { fileDownloadOptions } from 'common/constants.ts';
-import { domain } from 'common/configuration.constants.ts';
+import { domain, showReactionPreviewDetails } from 'common/configuration.constants.ts';
 import {
   useIsViewOnly,
   useReactionSnapshot,
@@ -85,6 +85,7 @@ export function DatasetReactionHeader({
   return (
     <>
       <ReactionHeader
+        showDetails={showReactionPreviewDetails}
         actions={
           <>
             {!isViewOnly && <RemoveReaction reactionId={reactionId} />}

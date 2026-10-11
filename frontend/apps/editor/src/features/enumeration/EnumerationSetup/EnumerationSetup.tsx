@@ -44,6 +44,7 @@ import {
   MAX_CRITICAL_FIELD_LENGTH,
   MAX_FIELD_LENGTH,
 } from 'common/constants/fieldLimits.ts';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
 
 export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
@@ -159,7 +160,7 @@ export function EnumerationSetup({
           <ReactionEntityBlockTitle leftSection={<Title order={3}>Reaction</Title>} />
           {template && (
             <TemplateReactionProvider templateId={form.values.templateId}>
-              <ReactionPreview />
+              <ReactionPreview showDetails={showReactionPreviewDetails} />
             </TemplateReactionProvider>
           )}
 

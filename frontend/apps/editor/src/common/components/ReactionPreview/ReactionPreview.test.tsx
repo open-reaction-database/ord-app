@@ -41,4 +41,21 @@ describe('ReactionPreview', () => {
     });
     expect(getByText('Input A')).toBeInTheDocument();
   });
+
+  it('shows the conditions over the arrow only when asked for details', () => {
+    const options = {
+      reaction: {
+        ...emptyReactionData(),
+        inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
+      } as unknown as AppReaction,
+      record: {
+        summary: { provenance: {}, summary: {}, conditions: 'Stirred at 25 C' },
+      },
+    };
+    const plain = renderInReactionView(<ReactionPreview />, options);
+    expect(plain.queryByText('Stirred at 25 C')).not.toBeInTheDocument();
+    plain.unmount();
+    const detailed = renderInReactionView(<ReactionPreview showDetails />, options);
+    expect(detailed.getByText('Stirred at 25 C')).toBeInTheDocument();
+  });
 });

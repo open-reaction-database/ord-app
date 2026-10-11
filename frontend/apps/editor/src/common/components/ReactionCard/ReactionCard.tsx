@@ -20,7 +20,6 @@ import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
 import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
-import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface DescriptorsListProps {
   title: string;
@@ -59,6 +58,8 @@ interface ReactionCardProps {
   actions: ReactNode;
   previewRef?: MutableRefObject<HTMLDivElement | null>;
   isInvalid?: boolean;
+  /** Shows the provenance, the summary, and the conditions over the preview's arrow. */
+  showDetails?: boolean;
 }
 
 export function ReactionCard({
@@ -66,6 +67,7 @@ export function ReactionCard({
   actions,
   previewRef,
   isInvalid,
+  showDetails = false,
 }: Readonly<ReactionCardProps>) {
   const summary = useReactionSnapshot()?.summary;
   if (!summary) {
@@ -89,7 +91,7 @@ export function ReactionCard({
             {title}
           </Flex>
 
-          {showReactionPreviewDetails && (
+          {showDetails && (
             <DescriptorsList
               title="Provenance"
               items={summary.provenance}
@@ -109,8 +111,11 @@ export function ReactionCard({
           </Flex>
         </Flex>
       </div>
-      <ReactionPreview ref={previewRef} />
-      {showReactionPreviewDetails && (
+      <ReactionPreview
+        ref={previewRef}
+        showDetails={showDetails}
+      />
+      {showDetails && (
         <DescriptorsList
           title="Summary"
           items={summary.summary}
