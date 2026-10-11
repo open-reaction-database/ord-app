@@ -52,8 +52,14 @@ describe('ReactionDrawerForm', () => {
     const reaction = ordReactionToReaction(
       create(ReactionSchema, {
         identifiers: [
-          { type: ReactionIdentifier_ReactionIdentifierType.NAME, value: 'first' },
-          { type: ReactionIdentifier_ReactionIdentifierType.NAME, value: 'second' },
+          {
+            type: ReactionIdentifier_ReactionIdentifierType.REACTION_SMILES,
+            value: 'A>>B',
+          },
+          {
+            type: ReactionIdentifier_ReactionIdentifierType.REACTION_SMILES,
+            value: 'C>>D',
+          },
         ],
       }),
     );
@@ -67,6 +73,6 @@ describe('ReactionDrawerForm', () => {
     await waitFor(() => expect(actions.update).toHaveBeenCalled());
     const [pathComponents, newValue] = actions.update.mock.calls[0];
     expect(pathComponents).toEqual(['identifiers', 1]);
-    expect(newValue).toMatchObject({ value: 'second' });
+    expect(newValue).toMatchObject({ value: 'C>>D' });
   });
 });
