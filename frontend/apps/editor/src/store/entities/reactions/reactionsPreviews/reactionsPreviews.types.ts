@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export type ComponentProductPreview = string | null;
-
-export type PreviewsById = Record<string, ComponentProductPreview>;
-
-export interface PreviewState {
-  isLoading: boolean;
-  svg: ComponentProductPreview;
-}
-
-export type PreviewStatesById = Record<string, PreviewState>;
+export type {
+  ComponentProductPreview,
+  PreviewsById,
+  PreviewState,
+  PreviewStatesById,
+} from '@open-reaction-database/ui/reaction/previews';

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 import { isAnyOf, type Middleware } from '@reduxjs/toolkit';
+import {
+  renderPreviews,
+  type PreviewsById,
+} from '@open-reaction-database/ui/reaction/previews';
 import type { AppState } from 'store/configureAppStore.ts';
 import {
   addUpdateReactionFieldActions,
@@ -29,7 +33,6 @@ import {
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
-import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
 const singleReactionActionsMatcher = isAnyOf(
   getReactionActions.success,
@@ -46,41 +49,43 @@ const multipleReactionsActionsMatcher = isAnyOf(
   getAllTemplatesActions.success,
 );
 
-export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
-  const worker = new Worker(new URL('./worker.ts', import.meta.url), {
-    type: 'module',
-  });
+/** The molblocks an action brings in, keyed by component ID, or undefined if it brings none. */
+function molblocksIn(action: unknown): PreviewsById | undefined {
+  if (singleReactionActionsMatcher(action)) {
+    return action.payload.previews;
+  }
+  if (multipleReactionsActionsMatcher(action)) {
+    if (getAllTemplatesActions.success.match(action)) {
+      return action.payload.reduce(
+        (acc, template) => ({ ...acc, ...template.previews }),
+        {},
+      );
+    }
+    return action.payload.items.reduce(
+      (acc, reaction) => ({ ...acc, ...reaction.previews }),
+      {},
+    );
+  }
+  return undefined;
+}
 
-  worker.onmessage = event => {
-    const previews: PreviewsById = event.data;
-    api.dispatch(setPreviewsByIds(previews));
-  };
+function withoutPreviews(molblocksById: PreviewsById): PreviewsById {
+  return Object.fromEntries(Object.keys(molblocksById).map(key => [key, null]));
+}
 
-  return next => action => {
+/** Renders the previews of reactions and templates as they arrive, and stores the SVGs. */
+export const previewsWorkerMiddleware: Middleware<object, AppState> =
+  api => next => action => {
     if (typeof action === 'function') {
       return next(action);
     }
-
-    if (singleReactionActionsMatcher(action)) {
-      worker.postMessage(action.payload.previews);
+    const molblocksById = molblocksIn(action);
+    if (molblocksById) {
+      void renderPreviews(molblocksById).then(
+        svgsById => api.dispatch(setPreviewsByIds(svgsById)),
+        // A failed render still ends the loading state; the previews show as missing.
+        () => api.dispatch(setPreviewsByIds(withoutPreviews(molblocksById))),
+      );
     }
-
-    if (multipleReactionsActionsMatcher(action)) {
-      let previews: PreviewsById = {};
-      if (getAllTemplatesActions.success.match(action)) {
-        previews = action.payload.reduce(
-          (acc, template) => ({ ...acc, ...template.previews }),
-          {},
-        );
-      } else {
-        previews = action.payload.items.reduce(
-          (acc, reaction) => ({ ...acc, ...reaction.previews }),
-          {},
-        );
-      }
-      worker.postMessage(previews);
-    }
-
     return next(action);
   };
-};
