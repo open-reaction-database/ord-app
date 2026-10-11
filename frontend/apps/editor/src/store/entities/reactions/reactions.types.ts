@@ -18,7 +18,7 @@ import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/rea
 import type {
   ComponentProductPreview,
   PreviewsById,
-} from './reactionsPreviews/reactionsPreviews.types.ts';
+} from '@open-reaction-database/ui/reaction/previews';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import type {
   Optional,
@@ -27,7 +27,6 @@ import type {
   WithIdName,
 } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
-import type { Variable } from '../templates/templates.types.ts';
 import type { ReactionObservation } from './reactionObservation/reactionObservation.converter.ts';
 import type { ReactionProvenance } from './reactionProvenance/reactionProvenance.types.ts';
 import type { ReactionWorkup } from './reactionWorkups/reactionWorkups.types.ts';
@@ -165,38 +164,4 @@ export interface DatasetReaction extends BaseReaction {
   validation: Optional<ReactionValidation>;
 }
 
-export interface ReactionTemplate extends BaseReaction {
-  id: string;
-  name: string;
-  variables: Record<string, Variable>;
-  modified_at: string;
-}
-
-export type ReactionOrTemplate = DatasetReaction | ReactionTemplate;
-
 export type ReactionId = number | string;
-
-// The server response never includes the client-only `dataBeforeEdit` snapshot. (#615)
-export type UpdateReactionSuccessPayload = Omit<
-  DatasetReaction,
-  'data' | 'dataBeforeEdit'
->;
-
-export interface ImportReactionFromFilePayload {
-  file: File;
-}
-
-export interface RenameReactionPayload {
-  reactionId: ReactionId;
-  name: string;
-}
-
-export interface UpdateReactionPayload {
-  reactionId: ReactionId;
-  pathComponents: ReactionPathComponents;
-}
-
-export interface AddEditReactionFieldPayload extends UpdateReactionPayload {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  newValue: any;
-}

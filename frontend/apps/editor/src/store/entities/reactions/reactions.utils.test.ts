@@ -29,7 +29,6 @@ import {
   getDeepReactionPart,
   getReactionPreviews,
   parseReaction,
-  parseReactionList,
   parseValidation,
   reactionFlatPathToSidebars,
   removeDeepReactionPart,
@@ -40,7 +39,6 @@ import type {
   OrdValidation,
   ReactionResponse,
 } from './reactions.types.ts';
-import type { Pages } from 'common/types';
 
 describe('generateDeepPartialReactionByPath', () => {
   it('returns the value directly for an empty path', () => {
@@ -314,23 +312,5 @@ describe('parseReaction', () => {
       errors: [{ text: 'plain error' }],
       warnings: [],
     });
-  });
-});
-
-describe('parseReactionList', () => {
-  it('maps every item through parseReaction in order while preserving pagination', () => {
-    const pages = {
-      page: 1,
-      size: 10,
-      total: 2,
-      items: [reactionResponse(1), reactionResponse(2)],
-    } as unknown as Pages<ReactionResponse>;
-
-    const result = parseReactionList(pages);
-    expect(result.page).toBe(1);
-    expect(result.total).toBe(2);
-    expect(result.items.map(item => item.id)).toEqual([1, 2]);
-    expect(result.items.map(item => item.pb_reaction_id)).toEqual(['rx1', 'rx2']);
-    expect(result.items[0].previews).toEqual({});
   });
 });

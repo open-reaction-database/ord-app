@@ -18,7 +18,7 @@ import { TagsInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 import { useMemo } from 'react';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function MeasurementMasses({

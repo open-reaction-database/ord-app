@@ -21,7 +21,8 @@ import {
 import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import { VariableType, type Variable } from './templates.types.ts';
+import type { Variable } from './templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import type { AppReaction } from '../reactions/reactions.types.ts';
 
 vi.mock('../../utils/replaceNameIdInReactionComponentPath.ts', () => ({

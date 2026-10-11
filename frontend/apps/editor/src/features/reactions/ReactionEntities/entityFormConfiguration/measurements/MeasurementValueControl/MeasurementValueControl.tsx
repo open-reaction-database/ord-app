@@ -39,7 +39,7 @@ import {
   useIsViewOnly,
   useReactionSlots,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);

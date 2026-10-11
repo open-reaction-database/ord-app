@@ -48,6 +48,8 @@ vi.mock('./reactions.utils.ts', async importActual => ({
     previews: {},
     validation: null,
   }),
+}));
+vi.mock('./parseReactionList.ts', () => ({
   parseReactionList: (pages: unknown) => pages,
 }));
 vi.mock('./reactions.converters.ts', async importActual => ({

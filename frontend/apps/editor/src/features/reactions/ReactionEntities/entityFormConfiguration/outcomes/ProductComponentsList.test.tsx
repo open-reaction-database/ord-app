@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { ProductsComponentsList } from './ProductComponentsList.tsx';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 

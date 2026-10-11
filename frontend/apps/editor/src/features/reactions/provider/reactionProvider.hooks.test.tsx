@@ -16,7 +16,7 @@
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import {
   useDrawer,

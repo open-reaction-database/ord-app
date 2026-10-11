@@ -18,7 +18,7 @@ import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedContro
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntitySelect({

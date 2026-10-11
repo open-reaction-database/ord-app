@@ -28,12 +28,8 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type {
-  AppReaction,
-  ReactionId,
-  ReactionResponse,
-  UpdateReactionSuccessPayload,
-} from './reactions.types.ts';
+import type { AppReaction, ReactionId, ReactionResponse } from './reactions.types.ts';
+import type { UpdateReactionSuccessPayload } from 'store/entities/reactions/reactionsStore.types.ts';
 import {
   selectActiveDatasetId,
   selectReactionById,
@@ -51,9 +47,9 @@ import { NotificationVariant } from 'common/types/notification.ts';
 import {
   getReactionPreviews,
   parseReaction,
-  parseReactionList,
   parseValidation,
 } from './reactions.utils.ts';
+import { parseReactionList } from './parseReactionList.ts';
 
 export const getReactionsList = createThunk(
   getReactionsListActions,

@@ -19,7 +19,7 @@ import {
   selectTemplates,
   selectTemplatesOrder,
 } from './templates.selectors.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { AppState } from '../../configureAppStore.ts';
 
 const makeTemplate = (id: string): ReactionTemplate =>

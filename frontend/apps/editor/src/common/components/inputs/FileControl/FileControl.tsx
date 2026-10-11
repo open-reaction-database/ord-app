@@ -24,7 +24,7 @@ import { buttonClasses } from '@open-reaction-database/ui/theme';
 import type { FileControlValue } from './fileControl.types.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import { MAX_DATA_FILE_SIZE } from 'common/constants.ts';
+import { MAX_DATA_FILE_SIZE } from 'common/reactionFormats.ts';
 
 interface FileControlProps {
   name: string;

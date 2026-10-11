@@ -26,9 +26,8 @@ import type {
   ReactionResponse,
   ReactionValidation,
 } from './reactions.types.ts';
-import type { PreviewsById } from './reactionsPreviews/reactionsPreviews.types.ts';
+import type { PreviewsById } from '@open-reaction-database/ui/reaction/previews';
 import type { ReactionInput } from './reactionsInputs/reactionInputs.types.ts';
-import type { Pages } from 'common/types';
 import { ordBinpbToReaction } from './reactions.converters.ts';
 import type { OrdOptional } from './reactionEntity/reactionEntity.types.ts';
 import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
@@ -278,14 +277,6 @@ export const parseReaction = ({
     data: appReaction,
     validation: updatedValidation,
   };
-};
-
-export const parseReactionList = (
-  pages: Pages<ReactionResponse>,
-): Pages<DatasetReaction> => {
-  const { items, ...pagination } = pages;
-  const wrappedItems = items.map(parseReaction);
-  return { ...pagination, items: wrappedItems };
 };
 
 const ENUM_UNSPECIFIED_VALUE = 0;

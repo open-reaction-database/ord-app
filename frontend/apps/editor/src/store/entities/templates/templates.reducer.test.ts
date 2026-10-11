@@ -22,7 +22,7 @@ import {
   importTemplateFromFileActions,
   removeTemplateActions,
 } from './templates.actions.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 
 // The reducer only reads `template.id`, so a minimal stub keeps the test focused.
 const makeTemplate = (id: string): ReactionTemplate =>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Title, type TitleProps } from '@mantine/core';
-import { DOT_DELIMITER } from 'common/constants.ts';
+import { DOT_DELIMITER } from 'common/reactionFormats.ts';
 import type { ReactNode } from 'react';
 
 type TitleOrder = TitleProps['order'];

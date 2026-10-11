@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { VariablesMatching } from './VariablesMatching.tsx';
 import type { EnumerationForm } from '../enumerationSetup.types.ts';
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Open Reaction Database Project Authors
+ * Copyright 2026 Open Reaction Database Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,5 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './date.ts';
-export * from './itemsById.ts';
+import type { Pages } from 'common/types/pages.ts';
+import type {
+  DatasetReaction,
+  ReactionResponse,
+} from 'store/entities/reactions/reactions.types.ts';
+import { parseReaction } from 'store/entities/reactions/reactions.utils.ts';
+
+export const parseReactionList = (
+  pages: Pages<ReactionResponse>,
+): Pages<DatasetReaction> => {
+  const { items, ...pagination } = pages;
+  const wrappedItems = items.map(parseReaction);
+  return { ...pagination, items: wrappedItems };
+};

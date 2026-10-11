@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import type { ReactionSnapshot } from './reactionProvider.types.ts';
 import { createStaticReactionSource } from './staticReactionSource.ts';
 

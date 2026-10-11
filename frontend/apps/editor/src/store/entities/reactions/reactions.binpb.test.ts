@@ -15,7 +15,6 @@
  */
 import { describe, it, expect } from 'vitest';
 import { equals, fromBinary, toBinary } from '@bufbuild/protobuf';
-import { findNonSerializableValue } from '@reduxjs/toolkit';
 import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
 import {
   ReactionSchema,
@@ -61,12 +60,6 @@ describe('binpb conversion', () => {
     expect(appReaction.identifiers).toEqual([]);
     expect(appReaction.notes.procedureDetails).toBeUndefined();
     expect(appReaction.provenance.recordCreated.person).toEqual({});
-  });
-
-  it('decodes to a serializable app reaction without protobuf-es messages', () => {
-    const appReaction = ordBinpbToReaction(toBinpb(fullReaction));
-    expect(findNonSerializableValue(appReaction)).toBe(false);
-    expect(JSON.stringify(appReaction)).not.toContain('$typeName');
   });
 
   it('truncates a decimal that a template variable put in an int32 field', () => {

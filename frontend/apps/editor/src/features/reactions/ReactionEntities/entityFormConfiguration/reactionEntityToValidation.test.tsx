@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
 import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { useReactionEntityValidation } from './reactionEntityToValidation.ts';
 import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 

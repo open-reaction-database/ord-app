@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { MeasurementsBasedOn } from './MeasurementsBasedOn.tsx';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';

@@ -104,8 +104,8 @@ import type {
   StirringConditions_StirringRateSchema,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type { ElectrochemistryType } from '../reactionEntityTypes/reactionEntityTypes.types';
-import { convertUtcDateToUserTZ, convertUserTZDateToUtc } from 'common/utils';
-import { DATE_TIME_FORMAT } from 'common/constants.ts';
+import { convertUtcDateToUserTZ, convertUserTZDateToUtc } from 'common/utils/date.ts';
+import { DATE_TIME_FORMAT } from 'common/reactionFormats.ts';
 
 export function withId<T>(entity: T): WithId<T> {
   return {

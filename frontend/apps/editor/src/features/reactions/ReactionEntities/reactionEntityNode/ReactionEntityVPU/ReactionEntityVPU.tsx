@@ -18,7 +18,7 @@ import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntitie
 import type { ReactionFormValuePrecisionUnit } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useMemo } from 'react';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntityVPU({

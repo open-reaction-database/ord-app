@@ -20,7 +20,7 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
 import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import {
   buildUseSelectItems,
   buildUseSelectItemsListFromMap,

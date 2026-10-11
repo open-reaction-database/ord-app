@@ -16,7 +16,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import { emptyReactionData, renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { CustomIdentifiers } from './CustomIdentifiers.tsx';
 
 // Ketcher needs a canvas to load; its editor stays closed here.

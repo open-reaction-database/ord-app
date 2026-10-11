@@ -29,9 +29,9 @@ import {
 import dayjs from 'dayjs';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 import classes from './reactionEntityDateTime.module.scss';
-import { DATE_TIME_FORMAT } from 'common/constants.ts';
+import { DATE_TIME_FORMAT } from 'common/reactionFormats.ts';
 
 function formatDate(inputDate: string | Date): string {
   return dayjs(inputDate).format(DATE_TIME_FORMAT);

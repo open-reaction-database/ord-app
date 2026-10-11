@@ -19,9 +19,9 @@ import type { AppState } from 'store/configureAppStore.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type {
   DatasetReaction,
-  ReactionTemplate,
   ReactionId,
 } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import { orderInputs } from 'features/reactions/provider/orderInputs.ts';
 import { getDeepReactionPart } from './reactions.utils.ts';
 

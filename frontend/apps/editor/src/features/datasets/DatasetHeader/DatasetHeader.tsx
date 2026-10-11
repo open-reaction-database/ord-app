@@ -20,7 +20,7 @@ import {
   CopyButton,
   type CopyButtonOptions,
 } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { formatUtcDateToDisplay } from 'common/utils';
+import { formatUtcDateToDisplay } from 'common/utils/date.ts';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { downloadDatasetThroughLink } from 'store/utils/downloadFile.thunks.ts';
 import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';

@@ -35,13 +35,12 @@ import {
   createNewTemplateActions,
   importTemplateFromFileActions,
 } from 'store/entities/templates/templates.actions.ts';
-import { itemsById } from 'common/utils';
+import { itemsById } from 'common/utils/itemsById.ts';
+import type { AppReaction, DatasetReaction } from './reactions.types.ts';
 import type {
   ReactionOrTemplate,
-  AppReaction,
-  DatasetReaction,
   ReactionTemplate,
-} from './reactions.types.ts';
+} from 'store/entities/reactions/reactionsStore.types.ts';
 import type { ItemsById, Pagination } from 'common/types';
 import { emptyPagination } from 'common/constants.ts';
 import {

@@ -16,7 +16,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { DATE_TIME_HUMAN_FORMAT } from '../constants.ts';
+import { DATE_TIME_HUMAN_FORMAT } from 'common/reactionFormats.ts';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

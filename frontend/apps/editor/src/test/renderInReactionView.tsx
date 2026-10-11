@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Test-only render helper (exports a fixture factory too), not an HMR boundary.
+// Test-only render helper, not an HMR boundary.
 /* eslint-disable react-refresh/only-export-components */
 import { render, type RenderOptions } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
@@ -27,10 +27,6 @@ import type {
   ReactionActions,
   ReactionSlots,
 } from 'features/reactions/provider/reactionProvider.types.ts';
-import { ordSetupToReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.converter.ts';
-import { ordConditionsToReaction } from 'store/entities/reactions/reactionConditions/reactionConditions.converter.ts';
-import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
-import { ordProvenanceToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
 import {
   reduxReactionActions,
   reduxReactionSource,
@@ -41,6 +37,7 @@ import type {
 } from 'store/entities/reactions/reactions.types.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactElement, ReactNode } from 'react';
+import { emptyReactionData } from './emptyReactionData.ts';
 
 const Dummy = () => null;
 
@@ -49,22 +46,6 @@ const DUMMY_SLOTS: ReactionSlots = {
   ValueLabel: Dummy,
   ViewOnlyLabel: Dummy,
 };
-
-/** A structurally-valid empty reaction, built from the same default converters the app uses. */
-export function emptyReactionData(): AppReaction {
-  return {
-    reactionId: '',
-    inputs: {},
-    outcomes: [],
-    identifiers: [],
-    setup: ordSetupToReactionSetup(null),
-    observations: [],
-    conditions: ordConditionsToReaction(null),
-    notes: ordNotesToReaction(null),
-    provenance: ordProvenanceToReaction(null),
-    workups: [],
-  } as unknown as AppReaction;
-}
 
 /** A dataset reaction, editable unless `isViewOnly`, or a template (a string ID, read-only). */
 type ReactionViewTarget =

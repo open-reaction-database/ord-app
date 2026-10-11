@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ItemsById } from 'common/types';
-
 export function itemsById<T>(
   items: Array<T>,
   getId: (item: T) => string | number,
-): ItemsById<T> {
+): Record<string | number, T> {
   return items.reduce(
     (acc, item) => ({
       ...acc,
       [getId(item)]: item,
     }),
-    {} as ItemsById<T>,
+    {} as Record<string | number, T>,
   );
 }

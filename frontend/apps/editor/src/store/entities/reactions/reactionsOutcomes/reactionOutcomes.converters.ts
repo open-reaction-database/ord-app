@@ -45,7 +45,7 @@ import {
   ordProductToReaction,
   reactionProductToOrd,
 } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
-import { itemsById } from 'common/utils';
+import { itemsById } from 'common/utils/itemsById.ts';
 
 export const ordAnalysisToReaction = (
   {

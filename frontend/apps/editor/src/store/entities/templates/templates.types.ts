@@ -15,15 +15,7 @@
  */
 import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-
-export enum VariableType {
-  String = 'string',
-  Number = 'number',
-  Select = 'select',
-  Date = 'date',
-  DateTime = 'dateTime',
-  NumberArray = 'numberArray',
-}
+import type { VariableType } from 'store/entities/reactions/variableType.ts';
 
 export interface Variable {
   name: string;

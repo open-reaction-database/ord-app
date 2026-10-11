@@ -16,7 +16,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { emptyReactionData, renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import type { AppState } from 'store/configureAppStore.ts';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';

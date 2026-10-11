@@ -32,7 +32,7 @@ import type { ReactionSlots } from 'features/reactions/provider/reactionProvider
 import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   addUpdateReactionFieldActions,

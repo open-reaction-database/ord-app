@@ -34,7 +34,7 @@ import { navigate } from 'wouter/use-browser-location';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import {
   ordTemplateVariablesToReaction,
   reactionTemplateVariablesToOrd,

@@ -18,7 +18,7 @@ import {
   useReactionSnapshot,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { AppState } from 'store/configureAppStore.ts';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { TemplateReactionProvider } from './TemplateReactionProvider.tsx';
 

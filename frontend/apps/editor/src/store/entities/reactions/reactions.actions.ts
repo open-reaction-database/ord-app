@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
+import type { DatasetReaction } from './reactions.types.ts';
 import type {
   AddEditReactionFieldPayload,
   ImportReactionFromFilePayload,
-  DatasetReaction,
   UpdateReactionPayload,
   UpdateReactionSuccessPayload,
   RenameReactionPayload,
-} from './reactions.types.ts';
+} from 'store/entities/reactions/reactionsStore.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
 

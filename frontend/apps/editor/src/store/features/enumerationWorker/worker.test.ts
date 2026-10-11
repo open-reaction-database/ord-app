@@ -21,10 +21,8 @@ import type {
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
 import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
-import {
-  type Variable,
-  VariableType,
-} from 'store/entities/templates/templates.types.ts';
+import type { Variable } from 'store/entities/templates/templates.types.ts';
+import { VariableType } from 'store/entities/reactions/variableType.ts';
 
 // reactionToOrdBinpb (the conversion to ord and the protobuf encode) is the heavy tail
 // of enumerateReaction; mocking it lets us capture the *coerced & merged* template

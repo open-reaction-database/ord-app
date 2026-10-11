@@ -15,7 +15,7 @@
  */
 import { ActionIcon, Flex, Paper, Title } from '@mantine/core';
 import { DataField } from '@open-reaction-database/ui/display';
-import { formatUtcDateToDisplay } from 'common/utils';
+import { formatUtcDateToDisplay } from 'common/utils/date.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { useSelector } from 'react-redux';
 import { EditIcon } from 'common/icons';
