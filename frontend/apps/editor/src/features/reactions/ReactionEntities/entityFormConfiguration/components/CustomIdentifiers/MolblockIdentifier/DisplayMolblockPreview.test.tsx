@@ -44,12 +44,24 @@ describe('DisplayMolblockPreview', () => {
     expect(renderPreviewsMock).toHaveBeenCalledWith({ molblock: 'MOL' }, { size: 80 });
   });
 
-  it('shows nothing when the molblock cannot be rendered', async () => {
-    renderPreviewsMock.mockRejectedValue(new Error('no wasm'));
-    const { queryByRole } = renderWithMantine(
-      <DisplayMolblockPreview identifier={identifier('MOL')} />,
+  it('shows nothing, not the previous structure, when a molblock cannot be rendered', async () => {
+    let failRender: ((error: Error) => void) | undefined;
+    const failure = new Promise<PreviewsById>((_resolve, reject) => {
+      failRender = reject;
+    });
+    renderPreviewsMock
+      .mockResolvedValueOnce({ molblock: 'PHN2Zz4=' })
+      .mockReturnValueOnce(failure);
+    const { findByRole, queryByRole, rerender } = renderWithMantine(
+      <DisplayMolblockPreview identifier={identifier('MOL 1')} />,
     );
-    await vi.waitFor(() => expect(renderPreviewsMock).toHaveBeenCalled());
+    expect(await findByRole('img', { name: 'drawn' })).toBeInTheDocument();
+    rerender(<DisplayMolblockPreview identifier={identifier('MOL 2')} />);
+    // Fail the render, and let the failure settle before looking.
+    await act(async () => {
+      failRender?.(new Error('no wasm'));
+      await failure.catch(() => undefined);
+    });
     expect(queryByRole('img')).not.toBeInTheDocument();
   });
 

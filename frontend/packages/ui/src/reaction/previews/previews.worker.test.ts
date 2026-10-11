@@ -83,6 +83,15 @@ describe('previews worker', () => {
     });
   });
 
+  it('replies with the error when rendering throws', async () => {
+    renderSvgMock.mockImplementationOnce(() => {
+      throw new Error('aborted');
+    });
+    handler({ data: { id: 4, molblocksById: { a: 'X' }, size: 80 } });
+    await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
+    expect(postMessageMock).toHaveBeenCalledWith({ id: 4, error: 'Error: aborted' });
+  });
+
   it('replies with the error when Indigo fails to load', async () => {
     waitForIndigoMock.mockImplementationOnce(() =>
       Promise.reject(new Error('no wasm')),

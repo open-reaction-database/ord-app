@@ -17,6 +17,7 @@ import type { MiddlewareAPI } from '@reduxjs/toolkit';
 import { describe, expect, it, vi } from 'vitest';
 import { previewsWorkerMiddleware } from './previewsWorkerMiddleware.ts';
 import {
+  addUpdateReactionFieldActions,
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
@@ -112,6 +113,40 @@ describe('previewsWorkerMiddleware', () => {
     );
     await vi.waitFor(() =>
       expect(dispatch).toHaveBeenCalledWith(setPreviewsByIds({ a: null, b: null })),
+    );
+  });
+
+  it('drops the keys of a render that a newer one has replaced', async () => {
+    let finishFirst: ((svgsById: Record<string, string | null>) => void) | undefined;
+    renderPreviewsMock
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            finishFirst = resolve;
+          }),
+      )
+      .mockImplementationOnce(() => Promise.resolve({ a: null }));
+    const dispatch = vi.fn();
+    const api = { dispatch, getState: vi.fn() } as unknown as MiddlewareAPI;
+    const handle = previewsWorkerMiddleware(api)(vi.fn()) as (
+      action: unknown,
+    ) => unknown;
+    handle(
+      action(getReactionActions.success.type, { previews: { a: 'MOL A', b: 'MOL B' } }),
+    );
+    // The user clears a's structure while the first render is still running.
+    handle(
+      action(addUpdateReactionFieldActions.success.type, { previews: { a: null } }),
+    );
+    await vi.waitFor(() =>
+      expect(dispatch).toHaveBeenCalledWith(setPreviewsByIds({ a: null })),
+    );
+    finishFirst?.({ a: 'OLD SVG', b: 'SVG B' });
+    await vi.waitFor(() =>
+      expect(dispatch).toHaveBeenCalledWith(setPreviewsByIds({ b: 'SVG B' })),
+    );
+    expect(dispatch).not.toHaveBeenCalledWith(
+      setPreviewsByIds({ a: 'OLD SVG', b: 'SVG B' }),
     );
   });
 });

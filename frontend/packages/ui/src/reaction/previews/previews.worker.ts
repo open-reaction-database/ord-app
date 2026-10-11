@@ -42,8 +42,8 @@ onmessage = (event: MessageEvent<unknown>) => {
     return;
   }
   const { id, molblocksById, size } = event.data;
-  waitForIndigo().then(
-    () => {
+  waitForIndigo()
+    .then(() => {
       const svgsById = Object.fromEntries(
         Object.entries(molblocksById).map(([key, molblock]) => [
           key,
@@ -51,9 +51,9 @@ onmessage = (event: MessageEvent<unknown>) => {
         ]),
       );
       postMessage({ id, svgsById } satisfies PreviewsReply);
-    },
-    (error: unknown) => {
+    })
+    // Indigo failed to load, or rendering threw; either way the request gets an answer.
+    .catch((error: unknown) => {
       postMessage({ id, error: String(error) } satisfies PreviewsReply);
-    },
-  );
+    });
 };

@@ -105,7 +105,8 @@ export function createPreviewRenderer(createWorker: () => PreviewWorker) {
  * Renders molblocks to base64 SVGs, keyed as given, in one worker shared by every caller.
  *
  * A null molblock, or one Indigo cannot render, maps to null. The returned promise rejects
- * when the worker cannot start or fails.
+ * when the worker cannot start or fails. Requests can settle out of order (one with nothing
+ * to render resolves at once), so a caller that renders a key again keeps the latest result.
  */
 export const renderPreviews = createPreviewRenderer(
   () =>

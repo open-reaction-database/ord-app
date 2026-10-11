@@ -73,19 +73,52 @@ function withoutPreviews(molblocksById: PreviewsById): PreviewsById {
   return Object.fromEntries(Object.keys(molblocksById).map(key => [key, null]));
 }
 
-/** Renders the previews of reactions and templates as they arrive, and stores the SVGs. */
-export const previewsWorkerMiddleware: Middleware<object, AppState> =
-  api => next => action => {
+/**
+ * Renders the previews of reactions and templates as they arrive, and stores the SVGs.
+ *
+ * Renders can finish out of order (one with nothing to draw resolves at once), so each key
+ * keeps only the result of the latest render that asked for it.
+ */
+export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
+  let renders = 0;
+  const latestRenderByKey = new Map<string, number>();
+
+  /** The previews of `render` that no later render has asked for; their keys are settled. */
+  const settle = (render: number, previewsById: PreviewsById): PreviewsById =>
+    Object.fromEntries(
+      Object.entries(previewsById).filter(([key]) => {
+        if (latestRenderByKey.get(key) !== render) {
+          return false;
+        }
+        latestRenderByKey.delete(key);
+        return true;
+      }),
+    );
+
+  const store = (render: number, previewsById: PreviewsById) => {
+    const current = settle(render, previewsById);
+    if (Object.keys(current).length > 0) {
+      api.dispatch(setPreviewsByIds(current));
+    }
+  };
+
+  return next => action => {
     if (typeof action === 'function') {
       return next(action);
     }
     const molblocksById = molblocksIn(action);
     if (molblocksById) {
+      renders += 1;
+      const render = renders;
+      for (const key of Object.keys(molblocksById)) {
+        latestRenderByKey.set(key, render);
+      }
       void renderPreviews(molblocksById).then(
-        svgsById => api.dispatch(setPreviewsByIds(svgsById)),
+        svgsById => store(render, svgsById),
         // A failed render still ends the loading state; the previews show as missing.
-        () => api.dispatch(setPreviewsByIds(withoutPreviews(molblocksById))),
+        () => store(render, withoutPreviews(molblocksById)),
       );
     }
     return next(action);
   };
+};
