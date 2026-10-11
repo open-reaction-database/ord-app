@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 import { isAnyOf, type Middleware } from '@reduxjs/toolkit';
+import {
+  renderPreviews,
+  type PreviewsById,
+} from '@open-reaction-database/ui/reaction/previews';
 import type { AppState } from 'store/configureAppStore.ts';
 import {
   addUpdateReactionFieldActions,
@@ -29,7 +33,6 @@ import {
   renameTemplateActions,
 } from 'store/entities/templates/templates.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
-import type { PreviewsById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
 const singleReactionActionsMatcher = isAnyOf(
   getReactionActions.success,
@@ -46,41 +49,76 @@ const multipleReactionsActionsMatcher = isAnyOf(
   getAllTemplatesActions.success,
 );
 
-export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
-  const worker = new Worker(new URL('./worker.ts', import.meta.url), {
-    type: 'module',
-  });
+/** The molblocks an action brings in, keyed by component ID, or undefined if it brings none. */
+function molblocksIn(action: unknown): PreviewsById | undefined {
+  if (singleReactionActionsMatcher(action)) {
+    return action.payload.previews;
+  }
+  if (multipleReactionsActionsMatcher(action)) {
+    if (getAllTemplatesActions.success.match(action)) {
+      return action.payload.reduce(
+        (acc, template) => ({ ...acc, ...template.previews }),
+        {},
+      );
+    }
+    return action.payload.items.reduce(
+      (acc, reaction) => ({ ...acc, ...reaction.previews }),
+      {},
+    );
+  }
+  return undefined;
+}
 
-  worker.onmessage = event => {
-    const previews: PreviewsById = event.data;
-    api.dispatch(setPreviewsByIds(previews));
+function withoutPreviews(molblocksById: PreviewsById): PreviewsById {
+  return Object.fromEntries(Object.keys(molblocksById).map(key => [key, null]));
+}
+
+/**
+ * Renders the previews of reactions and templates as they arrive, and stores the SVGs.
+ *
+ * Renders can finish out of order (one with nothing to draw resolves at once), so each key
+ * keeps only the result of the latest render that asked for it.
+ */
+export const previewsWorkerMiddleware: Middleware<object, AppState> = api => {
+  let renders = 0;
+  const latestRenderByKey = new Map<string, number>();
+
+  /** The previews of `render` that no later render has asked for; their keys are settled. */
+  const settle = (render: number, previewsById: PreviewsById): PreviewsById =>
+    Object.fromEntries(
+      Object.entries(previewsById).filter(([key]) => {
+        if (latestRenderByKey.get(key) !== render) {
+          return false;
+        }
+        latestRenderByKey.delete(key);
+        return true;
+      }),
+    );
+
+  const store = (render: number, previewsById: PreviewsById) => {
+    const current = settle(render, previewsById);
+    if (Object.keys(current).length > 0) {
+      api.dispatch(setPreviewsByIds(current));
+    }
   };
 
   return next => action => {
     if (typeof action === 'function') {
       return next(action);
     }
-
-    if (singleReactionActionsMatcher(action)) {
-      worker.postMessage(action.payload.previews);
-    }
-
-    if (multipleReactionsActionsMatcher(action)) {
-      let previews: PreviewsById = {};
-      if (getAllTemplatesActions.success.match(action)) {
-        previews = action.payload.reduce(
-          (acc, template) => ({ ...acc, ...template.previews }),
-          {},
-        );
-      } else {
-        previews = action.payload.items.reduce(
-          (acc, reaction) => ({ ...acc, ...reaction.previews }),
-          {},
-        );
+    const molblocksById = molblocksIn(action);
+    if (molblocksById) {
+      renders += 1;
+      const render = renders;
+      for (const key of Object.keys(molblocksById)) {
+        latestRenderByKey.set(key, render);
       }
-      worker.postMessage(previews);
+      void renderPreviews(molblocksById).then(
+        svgsById => store(render, svgsById),
+        // A failed render still ends the loading state; the previews show as missing.
+        () => store(render, withoutPreviews(molblocksById)),
+      );
     }
-
     return next(action);
   };
 };

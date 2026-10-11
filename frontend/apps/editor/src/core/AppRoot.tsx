@@ -19,7 +19,6 @@ import { MantineProvider } from '@mantine/core';
 import { theme } from '@open-reaction-database/ui/theme';
 import { configureAppStore } from '../store/configureAppStore.ts';
 import { AppContent } from './AppContent.tsx';
-import { initIndigo } from 'common/utils/indigo';
 import {
   auth0Audience,
   auth0ClientId,
@@ -30,7 +29,6 @@ import {
 } from '../common/configuration.constants.ts';
 
 const store = configureAppStore();
-initIndigo();
 
 export function AppRoot() {
   return (

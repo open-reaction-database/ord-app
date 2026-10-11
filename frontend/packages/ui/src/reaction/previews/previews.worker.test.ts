@@ -16,21 +16,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // indigo wraps a WASM structure renderer that can't load under vitest; stub it
-// so the worker's reduce-and-render path runs against predictable output. The
+// so the worker's render path runs against predictable output. The
 // real initIndigo() is also a no-op-at-import side effect we don't want here.
 const { initIndigoMock, waitForIndigoMock, renderSvgMock } = vi.hoisted(() => ({
   initIndigoMock: vi.fn(),
   waitForIndigoMock: vi.fn(() => Promise.resolve()),
   renderSvgMock: vi.fn((component: unknown) => `<svg>${String(component)}</svg>`),
 }));
-vi.mock('common/utils/indigo.ts', () => ({
+vi.mock('./indigo.ts', () => ({
   initIndigo: initIndigoMock,
   waitForIndigo: waitForIndigoMock,
   renderSvg: renderSvgMock,
 }));
 
 // Importing the module calls initIndigo() and assigns the global onmessage handler.
-import './worker.ts';
+import './previews.worker.ts';
 
 // Counted at load, since every mock is reset before each test.
 const initIndigoCallsAtLoad = initIndigoMock.mock.calls.length;
@@ -65,31 +65,47 @@ describe('previews worker', () => {
     expect(postMessageMock).not.toHaveBeenCalled();
   });
 
-  it('renders every preview to SVG and posts the keyed result', async () => {
-    handler({ data: { a: 'molA', b: 'molB' } });
+  it('ignores an object that is not a request', () => {
+    handler({ data: { a: 'molA' } });
+    handler({ data: { id: 3 } });
+    expect(waitForIndigoMock).not.toHaveBeenCalled();
+    expect(postMessageMock).not.toHaveBeenCalled();
+  });
+
+  it('renders every molblock at the requested size and replies with the request ID', async () => {
+    handler({ data: { id: 3, molblocksById: { a: 'X', b: null }, size: 80 } });
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
-    expect(renderSvgMock).toHaveBeenCalledWith('molA');
-    expect(renderSvgMock).toHaveBeenCalledWith('molB');
+    expect(renderSvgMock).toHaveBeenCalledWith('X', 80);
+    expect(renderSvgMock).toHaveBeenCalledWith(null, 80);
     expect(postMessageMock).toHaveBeenCalledWith({
-      a: '<svg>molA</svg>',
-      b: '<svg>molB</svg>',
+      id: 3,
+      svgsById: { a: '<svg>X</svg>', b: '<svg>null</svg>' },
     });
   });
 
-  it('posts no preview for every key when Indigo fails to load', async () => {
+  it('replies with the error when rendering throws', async () => {
+    renderSvgMock.mockImplementationOnce(() => {
+      throw new Error('aborted');
+    });
+    handler({ data: { id: 4, molblocksById: { a: 'X' }, size: 80 } });
+    await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
+    expect(postMessageMock).toHaveBeenCalledWith({ id: 4, error: 'Error: aborted' });
+  });
+
+  it('replies with the error when Indigo fails to load', async () => {
     waitForIndigoMock.mockImplementationOnce(() =>
       Promise.reject(new Error('no wasm')),
     );
-    handler({ data: { a: 'molA', b: null } });
+    handler({ data: { id: 3, molblocksById: { a: 'X', b: null }, size: 80 } });
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
     expect(renderSvgMock).not.toHaveBeenCalled();
-    expect(postMessageMock).toHaveBeenCalledWith({ a: null, b: null });
+    expect(postMessageMock).toHaveBeenCalledWith({ id: 3, error: 'Error: no wasm' });
   });
 
-  it('posts an empty object for an empty preview map', async () => {
-    handler({ data: {} });
+  it('replies with an empty map for an empty request', async () => {
+    handler({ data: { id: 4, molblocksById: {}, size: 120 } });
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
     expect(renderSvgMock).not.toHaveBeenCalled();
-    expect(postMessageMock).toHaveBeenCalledWith({});
+    expect(postMessageMock).toHaveBeenCalledWith({ id: 4, svgsById: {} });
   });
 });

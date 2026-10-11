@@ -80,11 +80,11 @@ export function createWorkerHarness(): {
 }
 
 /**
- * Register the passthrough behavior every worker middleware shares.
+ * Register the passthrough behavior a worker middleware owes every other action.
  *
- * Both worker middlewares forward thunk (function) actions and unrelated actions
- * to ``next`` without posting to the worker; this declares those two ``it`` cases
- * once. Call it inside the middleware's ``describe`` block.
+ * A worker middleware forwards thunk (function) actions and unrelated actions to
+ * ``next`` without posting to the worker; this declares those two ``it`` cases.
+ * Call it inside the middleware's ``describe`` block.
  *
  * Args:
  *     setup: Builds fresh handles (stubbed worker + applied middleware) per test.
