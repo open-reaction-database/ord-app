@@ -18,3 +18,5 @@ no build step of its own and is not published.
   into components.
 - A `ReactionProvider` around the reaction view, with a source, the slots, and actions for an editable
   reaction.
+- A `<ReactionDetailsSidebar />` inside that provider, which shows the drawer forms the view's buttons
+  open; without it, those buttons open nothing.

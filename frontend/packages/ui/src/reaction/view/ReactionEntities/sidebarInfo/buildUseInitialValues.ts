@@ -23,7 +23,7 @@ export function buildUseInitialValues<Result extends object, Input extends Resul
   return function useInitialValues(
     pathComponents: ReactionPathComponents,
   ): [object, object, (values: object) => object] {
-    // A drawer form opens only for an entity that exists.
+    // A drawer form renders only while its entity exists.
     const { id: _, ...reactionPart } =
       useReactionPart<Record<string, unknown>>(pathComponents)!;
 

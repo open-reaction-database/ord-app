@@ -23,7 +23,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from '#display/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
 import {
-  useDrawer,
   useIsViewOnly,
   useReactionActions,
 } from '#reaction/provider/reactionProvider.hooks.ts';
@@ -31,7 +30,8 @@ import {
 interface ReactionEntityDeleteProps {
   entityName: string;
   pathComponents: ReactionPathComponents;
-  shouldCloseSidebar?: true;
+  /** Closes the form that shows the entity, when the removal is confirmed. */
+  onFormClose?: () => void;
   onRemove?: () => void;
 }
 
@@ -39,34 +39,24 @@ interface ReactionEntityDeleteProps {
 export function ReactionEntityDelete({
   entityName,
   pathComponents,
-  shouldCloseSidebar,
+  onFormClose,
   onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
-  const drawer = useDrawer();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
     useDisclosure();
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleRemove = useCallback(() => {
-    if (shouldCloseSidebar) {
-      drawer.pop();
-    }
+    onFormClose?.();
     if (onRemove) {
       onRemove();
     } else {
       void actions?.remove(pathComponents);
     }
     closeConfirmation();
-  }, [
-    actions,
-    closeConfirmation,
-    drawer,
-    onRemove,
-    pathComponents,
-    shouldCloseSidebar,
-  ]);
+  }, [actions, closeConfirmation, onFormClose, onRemove, pathComponents]);
 
   if (isViewOnly) {
     return null;

@@ -18,28 +18,44 @@ import { reactionNodeToComponent } from '#reaction/view/ReactionEntities/index.t
 import { nodeToComponentContext } from '#reaction/view/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { getSidebarInfo } from '#reaction/view/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
 import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
+import { useReactionPart } from '#reaction/provider/reactionProvider.hooks.ts';
 
 interface ReactionDrawerFormProps {
   pathComponents: ReactionPathComponents;
   /** Shows the entity's title, with its Delete icon, above the form. */
   showTitle?: boolean;
-  /** Closes the form; without it, the form offers no Close or Save and Close. */
+  /**
+   * Closes the form, including when its title removes the entity; without it, the form
+   * offers no Close or Save and Close.
+   */
   onClose?: () => void;
 }
 
 const ignore = () => undefined;
 
-/** One entity's drawer form, rendered in place rather than in the drawer. */
+/**
+ * One entity's drawer form, rendered in place rather than in the drawer. It renders nothing
+ * once the entity is gone, so a host can leave it mounted across a removal.
+ */
 export function ReactionDrawerForm({
   pathComponents,
   showTitle = false,
   onClose,
 }: Readonly<ReactionDrawerFormProps>) {
+  const entity = useReactionPart(pathComponents);
+  if (entity === null) {
+    return null;
+  }
   const sidebarInfo = getSidebarInfo([...pathComponents].reverse());
   const Title = sidebarInfo.sidebarTitle;
   return (
     <nodeToComponentContext.Provider value={reactionNodeToComponent}>
-      {showTitle && Title && <Title pathComponents={pathComponents} />}
+      {showTitle && Title && (
+        <Title
+          pathComponents={pathComponents}
+          onFormClose={onClose}
+        />
+      )}
       <ReactionEntityForm
         key={pathComponents.join('.')}
         reactionPathComponents={pathComponents}

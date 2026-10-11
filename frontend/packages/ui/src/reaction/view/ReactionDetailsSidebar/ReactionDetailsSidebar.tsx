@@ -158,6 +158,7 @@ function ReactionDetailsSidebarComponent() {
               {SidebarTitle && (
                 <SidebarTitle
                   pathComponents={reactionPathComponentsList[currentIndex]}
+                  onFormClose={onFormClose}
                 />
               )}
             </Flex>

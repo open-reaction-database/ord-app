@@ -17,6 +17,8 @@ import type { ReactionPathComponents } from '#reaction/model/reactionPathCompone
 
 export interface ReactionEntityTitleProps {
   pathComponents: ReactionPathComponents;
+  /** Closes the form this title heads; its Remove icon calls it when removing the entity. */
+  onFormClose?: () => void;
 }
 
 export interface ReactionEntityTitleConstructorProps {

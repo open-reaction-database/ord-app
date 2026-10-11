@@ -16,10 +16,17 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { renderWithReaction } from '#testing/renderWithReaction.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '#testing/renderWithReaction.tsx';
 import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
-import { type DrawerActions } from '#reaction/provider/drawer.ts';
-import { useDrawer } from '#reaction/provider/reactionProvider.hooks.ts';
+import { type DrawerActions, type DrawerStack } from '#reaction/provider/drawer.ts';
+import {
+  useDrawer,
+  useDrawerStack,
+} from '#reaction/provider/reactionProvider.hooks.ts';
+import { fullReactionSnapshot } from '#testing/fullReactionSnapshot.ts';
 import { ReactionDetailsSidebar } from './ReactionDetailsSidebar.tsx';
 
 // Holds the path it mounted with, as the real form holds the initial values it mounted with.
@@ -38,8 +45,10 @@ vi.mock(
 );
 
 let drawer: DrawerActions;
+let drawerStack: DrawerStack;
 function Probe() {
   drawer = useDrawer();
+  drawerStack = useDrawerStack();
   return null;
 }
 
@@ -72,5 +81,23 @@ describe('ReactionDetailsSidebar', () => {
 
     act(() => drawer.set([['provenance']]));
     expect(await screen.findByText('Form for provenance')).toBeInTheDocument();
+  });
+
+  it('closes the form whose entity its title removes', async () => {
+    const snapshot = fullReactionSnapshot();
+    const [inputKey] = Object.keys(snapshot.data.inputs);
+    const actions = stubReactionActions();
+    renderWithReaction(
+      <>
+        <Probe />
+        <ReactionDetailsSidebar />
+      </>,
+      { snapshot, actions },
+    );
+    act(() => drawer.set([['notes'], ['inputs', inputKey]]));
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove Input' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'OK' }));
+    expect(actions.remove).toHaveBeenCalledWith(['inputs', inputKey]);
+    expect(drawerStack).toEqual([['notes']]);
   });
 });

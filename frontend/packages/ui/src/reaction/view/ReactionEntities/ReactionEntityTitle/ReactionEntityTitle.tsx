@@ -24,6 +24,7 @@ import { useIsViewOnly } from '#reaction/provider/reactionProvider.hooks.ts';
 
 export function ReactionEntityTitle({
   pathComponents,
+  onFormClose,
   entityName,
   hasDelete,
   description,
@@ -43,7 +44,7 @@ export function ReactionEntityTitle({
           <ReactionEntityDelete
             entityName={entityName}
             pathComponents={pathComponents}
-            shouldCloseSidebar
+            onFormClose={onFormClose}
           />
         )}
         <ReactionNodeValidationResult pathComponents={pathComponents} />
