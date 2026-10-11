@@ -37,7 +37,7 @@ interface NewEntity {
 
 const ReactionWrapper = reactionWrapper({
   reactionId: 7,
-  actions: { update: vi.fn(), remove: vi.fn() },
+  actions: { update: vi.fn(), remove: vi.fn(), addIdentifierByName: vi.fn() },
 });
 
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {

@@ -33,6 +33,7 @@ import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import type { User } from 'store/entities/users/users.types.ts';
 import {
   addUpdateReactionFieldActions,
   deleteReactionFieldActions,
@@ -58,11 +59,27 @@ const slots: ReactionSlots = {
   ViewOnlyLabel: Empty,
 };
 
-/** A store holding reactions 1, 2, and template_3; `recorded`, if given, collects every action. */
-function makeStore(recorded?: Array<UnknownAction>) {
+/**
+ * A store holding reactions 1, 2, and template_3, and `self` as the signed-in user;
+ * `recorded`, if given, collects every action. Reaction 1 has an input `in1` with one
+ * component.
+ */
+function makeStore(recorded?: Array<UnknownAction>, self?: Partial<User>) {
   const reaction = (id: number | string) => ({
     id,
-    data: emptyReactionData(),
+    data:
+      id === 1
+        ? {
+            ...emptyReactionData(),
+            inputs: {
+              in1: {
+                id: 'in1',
+                name: 'in1',
+                components: [{ id: 'c1', identifiers: [] }],
+              },
+            },
+          }
+        : emptyReactionData(),
     previews: {},
     summary: { provenance: {}, summary: {}, conditions: '' },
   });
@@ -82,6 +99,7 @@ function makeStore(recorded?: Array<UnknownAction>) {
             template_3: reaction('template_3'),
           },
         },
+        users: { self: self ?? null },
       },
     } as unknown as AppState,
   });
@@ -203,7 +221,7 @@ describe('reduxReactionActions', () => {
   it('request the field update and the delete for their own reaction', async () => {
     const recorded: Array<UnknownAction> = [];
     const store = makeStore(recorded);
-    const actions = reduxReactionActions(store.dispatch, 1);
+    const actions = reduxReactionActions(store, 1);
     await actions.update(['notes'], { safetyNotes: 'gloves' });
     await actions.remove(['notes', 'safetyNotes']);
     const requestTypes = new Set([
@@ -228,7 +246,7 @@ describe('reduxReactionActions', () => {
     const recorded: Array<UnknownAction> = [];
     const store = makeStore(recorded);
     await expect(
-      reduxReactionActions(store.dispatch, 1).update(['notes'], {
+      reduxReactionActions(store, 1).update(['notes'], {
         safetyNotes: 'gloves',
       }),
     ).resolves.toBeUndefined();
@@ -246,7 +264,10 @@ describe('reduxReactionActions', () => {
         }),
     );
     const actions = reduxReactionActions(
-      dispatch as unknown as ThunkDispatch<AppState, never, Action>,
+      {
+        dispatch: dispatch as unknown as ThunkDispatch<AppState, never, Action>,
+        getState: () => ({}) as AppState,
+      },
       1,
     );
     let settled = false;
@@ -258,5 +279,54 @@ describe('reduxReactionActions', () => {
     finish();
     await pending;
     expect(settled).toBe(true);
+  });
+});
+
+describe('reduxReactionActions.addIdentifierByName', () => {
+  const path = ['inputs', 'in1', 'components', 0, 'identifiers'];
+
+  it('resolves the name and appends a SMILES identifier', async () => {
+    const recorded: Array<UnknownAction> = [];
+    const store = makeStore(recorded);
+    axiosMock.post.mockResolvedValue({ data: { smiles: 'O' } });
+    axiosMock.patch.mockResolvedValue({ data: {} });
+    await expect(
+      reduxReactionActions(store, 1).addIdentifierByName(path, 'water'),
+    ).resolves.toBe(true);
+    expect(axiosMock.post).toHaveBeenCalledWith('/resolve-compound', {
+      identifier_type: 'name',
+      identifier: 'water',
+    });
+    const request = recorded.find(addUpdateReactionFieldActions.request.match);
+    expect(request?.payload.pathComponents).toEqual([...path, 0]);
+    expect(request?.payload.newValue).toMatchObject({ value: 'O', details: 'water' });
+  });
+
+  it('resolves false and changes nothing when the name does not resolve', async () => {
+    const recorded: Array<UnknownAction> = [];
+    const store = makeStore(recorded);
+    axiosMock.post.mockRejectedValue(new Error('not found'));
+    await expect(
+      reduxReactionActions(store, 1).addIdentifierByName(path, 'unobtainium'),
+    ).resolves.toBe(false);
+    expect(recorded.some(addUpdateReactionFieldActions.request.match)).toBe(false);
+  });
+});
+
+describe('reduxReactionActions.currentPerson', () => {
+  it('maps the signed-in user to a provenance person, skipping empty fields', () => {
+    const store = makeStore(undefined, {
+      name: 'Me',
+      email: '',
+      orcid_id: '0000-0001',
+    });
+    expect(reduxReactionActions(store, 1).currentPerson?.()).toEqual({
+      name: 'Me',
+      orcid: '0000-0001',
+    });
+  });
+
+  it('returns undefined before the user loads', () => {
+    expect(reduxReactionActions(makeStore(), 1).currentPerson?.()).toBeUndefined();
   });
 });

@@ -148,7 +148,11 @@ describe('reaction hooks over a static source', () => {
   });
 
   it('are editable with actions', () => {
-    const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
+    const actions: ReactionActions = {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn(),
+    };
     const editable = wrapperFor(source, actions);
     expect(renderHook(useIsViewOnly, { wrapper: editable }).result.current).toBe(false);
     expect(renderHook(useReactionActions, { wrapper: editable }).result.current).toBe(
@@ -175,7 +179,11 @@ describe('reaction hooks before the reaction loads', () => {
 describe('ReactionProvider props', () => {
   it('pair a template with a string ID and no actions, and a dataset reaction with a number', () => {
     const source = createStaticReactionSource(snapshot);
-    const actions: ReactionActions = { update: vi.fn(), remove: vi.fn() };
+    const actions: ReactionActions = {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn(),
+    };
     // Each element below must fail to type-check; `tsc -b` reports an unused directive if one
     // compiles.
     const invalid = [

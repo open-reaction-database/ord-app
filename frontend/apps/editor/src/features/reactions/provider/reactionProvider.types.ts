@@ -23,6 +23,7 @@ import type {
   ReactionId,
 } from 'store/entities/reactions/reactions.types.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import type { ReactionPerson } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 
 /**
  * One reaction as its source holds it. A dataset reaction carries its ORD ID, validity, and
@@ -57,6 +58,17 @@ export interface ReactionSource {
 export interface ReactionActions {
   update(pathComponents: ReactionPathComponents, newValue: unknown): Promise<void>;
   remove(pathComponents: ReactionPathComponents): Promise<void>;
+  /**
+   * Resolves a compound name to a structure and appends it as a SMILES identifier to the list
+   * at `identifiersPath`. Resolves true once the identifier is added (its save reports its own
+   * failure) and false when the name does not resolve.
+   */
+  addIdentifierByName(
+    identifiersPath: ReactionPathComponents,
+    name: string,
+  ): Promise<boolean>;
+  /** The signed-in person, for filling provenance; absent when the host has none. */
+  currentPerson?(): ReactionPerson | undefined;
 }
 
 export interface ReactionLinkProps {
