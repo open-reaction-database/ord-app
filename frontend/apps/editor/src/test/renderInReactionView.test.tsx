@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useContext } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
 import {
   useIsTemplate,
   useIsViewOnly,
+  useReactionId,
   useReactionSnapshot,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { renderInReactionView } from './renderInReactionView.tsx';
 
 function Probe() {
   const snapshot = useReactionSnapshot();
-  const legacy = useContext(reactionContext);
+  const reactionId = useReactionId();
   return (
     <dl>
       <dt>view only</dt>
       <dd>{String(useIsViewOnly())}</dd>
       <dt>template</dt>
       <dd>{String(useIsTemplate())}</dd>
-      <dt>legacy id</dt>
-      <dd>{String(legacy.reactionId)}</dd>
+      <dt>id</dt>
+      <dd>{String(reactionId)}</dd>
       <dt>pb id</dt>
       <dd>{snapshot?.pb_reaction_id ?? 'none'}</dd>
     </dl>
