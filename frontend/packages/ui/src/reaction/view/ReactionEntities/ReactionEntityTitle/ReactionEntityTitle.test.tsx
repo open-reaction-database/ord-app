@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { renderWithReaction } from '#testing/renderWithReaction.tsx';
 import { ReactionEntityTitle } from './ReactionEntityTitle.tsx';
 
-// Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
+// Smoke test: mounts within seeded reaction and entity contexts without throwing.
 const Component = ReactionEntityTitle as unknown as () => JSX.Element;
 
 describe('ReactionEntityTitle', () => {

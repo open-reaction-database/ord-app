@@ -22,8 +22,6 @@ import {
 import type { ReactionActions } from '#reaction/provider/reactionProvider.types.ts';
 import { ComponentsLookup } from './ComponentsLookup.tsx';
 
-vi.mock('#display/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
-
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = ComponentsLookup as unknown as () => JSX.Element;
 

@@ -35,7 +35,7 @@ const EDITABLE_SLOTS: ReactionSlots = {
   ValueLabel: DatasetReactionValueLabel,
   ViewOnlyLabel: DatasetReactionValueLabel,
   ReactionLink: SearchReactionLink,
-  MoleculeEditor: ComponentsKetcherEditor,
+  MoleculeEditor: { name: 'Ketcher', Editor: ComponentsKetcherEditor },
 };
 
 const VIEW_ONLY_SLOTS: ReactionSlots = {

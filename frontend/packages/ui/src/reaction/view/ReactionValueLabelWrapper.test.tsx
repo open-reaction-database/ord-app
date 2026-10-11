@@ -19,7 +19,7 @@ import { ReactionValueLabelWrapper } from './ReactionValueLabelWrapper.tsx';
 import type { ReactionValueLabelProps } from '#reaction/provider/reactionValueLabel.types.ts';
 import { VariableType } from '#reaction/model/variableType.ts';
 
-// Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
+// Smoke test: mounts within seeded reaction and entity contexts without throwing.
 const Component = ReactionValueLabelWrapper as unknown as () => JSX.Element;
 
 describe('ReactionValueLabelWrapper', () => {

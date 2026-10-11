@@ -83,6 +83,12 @@ export interface MoleculeEditorProps {
   identifier: MoleculeIdentifier | null;
 }
 
+export interface MoleculeEditorSlot {
+  /** The editor's name, on the button that opens it: "Via <name>". */
+  name: string;
+  Editor: FC<MoleculeEditorProps>;
+}
+
 export interface ReactionLinkProps {
   /** The linked reaction's ORD ID. */
   pbReactionId: string;
@@ -96,7 +102,7 @@ export interface ReactionSlots {
   /** Links another reaction by its ORD ID; without it the ID shows as text. */
   ReactionLink?: FC<ReactionLinkProps>;
   /** Draws a molecule for a molblock identifier; without it, molblocks cannot be drawn. */
-  MoleculeEditor?: FC<MoleculeEditorProps>;
+  MoleculeEditor?: MoleculeEditorSlot;
 }
 
 export interface ReactionProviderValue {

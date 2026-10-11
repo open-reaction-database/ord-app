@@ -18,10 +18,7 @@ import {
   ReactionPreview,
   ReactionHeader,
   ReactionContent,
-  reactionNodeToComponent,
-  ReactionEntityForm,
-  nodeToComponentContext,
-  getSidebarInfo,
+  ReactionDrawerForm,
   type ReactionSnapshot,
   ReactionProvider,
   createStaticReactionSource,
@@ -63,22 +60,6 @@ describe('the reaction view over either source', () => {
     expect(overStatic.length).toBeGreaterThan(0);
   });
 });
-
-function FormAt({
-  pathComponents,
-}: Readonly<{ pathComponents: ReactionPathComponents }>) {
-  return (
-    <nodeToComponentContext.Provider value={reactionNodeToComponent}>
-      <ReactionEntityForm
-        reactionPathComponents={pathComponents}
-        sidebarInfo={getSidebarInfo([...pathComponents].reverse())}
-        isHidden={false}
-        onFormClose={() => undefined}
-        onSetFormDirty={() => undefined}
-      />
-    </nodeToComponentContext.Provider>
-  );
-}
 
 /** Drawer forms in the fixture to compare; inputs and analyses are keyed by generated IDs. */
 const FORMS: Array<
@@ -122,7 +103,7 @@ describe('the drawer forms over either source', () => {
   it.each(FORMS)('render %s the same', (_name, pathTo) => {
     const snapshot = fullReactionSnapshot();
     const [overStatic, overRedux] = renderOverBothSources(
-      <FormAt pathComponents={pathTo(snapshot.data)} />,
+      <ReactionDrawerForm pathComponents={pathTo(snapshot.data)} />,
       snapshot,
     );
     expect(overStatic).toBe(overRedux);
@@ -139,26 +120,6 @@ function isReadOnlyControl(label: string): boolean {
     label === 'Copy Chunk' ||
     label === 'Close' ||
     /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(label)
-  );
-}
-
-/** The drawer's title, where the Delete icon lives, above the form. */
-function DrawerAt({
-  pathComponents,
-}: Readonly<{ pathComponents: ReactionPathComponents }>) {
-  const sidebarInfo = getSidebarInfo([...pathComponents].reverse());
-  const Title = sidebarInfo.sidebarTitle;
-  return (
-    <nodeToComponentContext.Provider value={reactionNodeToComponent}>
-      <Title pathComponents={pathComponents} />
-      <ReactionEntityForm
-        reactionPathComponents={pathComponents}
-        sidebarInfo={sidebarInfo}
-        isHidden={false}
-        onFormClose={() => undefined}
-        onSetFormDirty={() => undefined}
-      />
-    </nodeToComponentContext.Provider>
   );
 }
 
@@ -186,7 +147,10 @@ describe('a read-only drawer', () => {
   it.each(FORMS)('shows no edit control on %s', (_name, pathTo) => {
     const snapshot = fullReactionSnapshot();
     const { queryAllByRole } = render(
-      <DrawerAt pathComponents={pathTo(snapshot.data)} />,
+      <ReactionDrawerForm
+        showTitle
+        pathComponents={pathTo(snapshot.data)}
+      />,
       {
         wrapper: readOnlyWrapper(snapshot),
       },

@@ -46,7 +46,10 @@ describe('useDatasetReactionProviderProps', () => {
     });
     expect(result.current.actions).toBeDefined();
     expect(result.current.slots.ViewDeleteButtons).toBe(ReactionEditDeleteButtons);
-    expect(result.current.slots.MoleculeEditor).toBe(ComponentsKetcherEditor);
+    expect(result.current.slots.MoleculeEditor).toEqual({
+      name: 'Ketcher',
+      Editor: ComponentsKetcherEditor,
+    });
   });
 
   it('gives a read-only dataset no actions and the view button', () => {

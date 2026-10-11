@@ -11,6 +11,8 @@ no build step of its own and is not published.
 
 - The stylesheets: `@mantine/core/styles.css`, `@mantine/dates/styles.css`,
   `@mantine/notifications/styles.css`, and `@open-reaction-database/ui/theme/global.scss`.
+- A `MantineProvider` given the package's `theme` from `@open-reaction-database/ui/theme`, which the
+  view's colors and type come from.
 - A mounted `<Notifications />` from `@mantine/notifications`, which shows the view's notices.
 - `svgr()` from `vite-plugin-svgr` among its Vite plugins, which turns the icons' `*.svg?react` imports
   into components.

@@ -22,8 +22,8 @@ export type { DrawerActions, DrawerStack } from './provider/drawer.ts';
 export { createStaticReactionSource } from './provider/staticReactionSource.ts';
 export { ReactionCard } from './view/ReactionCard/ReactionCard.tsx';
 export { ReactionDetailsSidebar } from './view/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+export { ReactionDrawerForm } from './view/ReactionDetailsSidebar/ReactionDrawerForm.tsx';
 export { ReactionEntityDelete } from './view/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
-export { ReactionEntityForm } from './view/ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
 export { ReactionContent } from './view/ReactionEntities/ReactionTabs/ReactionContent.tsx';
 export { ReactionTabs } from './view/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 export { findReactionEntityUniqueName } from './view/ReactionEntities/findReactionEntityUniqueName.ts';
@@ -35,9 +35,6 @@ export {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from './view/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-export { nodeToComponentContext } from './view/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
-export { reactionNodeToComponent } from './view/ReactionEntities/reactionEntityNode/reactionNodeToComponent.ts';
-export { getSidebarInfo } from './view/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
 export { ReactionHeader } from './view/ReactionHeader/ReactionHeader.tsx';
 export { DatasetReactionValueLabel } from './view/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 export { default as reactionValueLabelClasses } from './view/ReactionInteractions/ReactionValueLabel/reactionValueLabel.module.scss';

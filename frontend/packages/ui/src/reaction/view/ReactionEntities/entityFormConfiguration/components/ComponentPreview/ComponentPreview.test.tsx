@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { renderWithReaction } from '#testing/renderWithReaction.tsx';
 import { ComponentPreview } from './ComponentPreview.tsx';
 
-// Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
+// Smoke test: mounts within seeded reaction and entity contexts without throwing.
 const Component = ComponentPreview as unknown as () => JSX.Element;
 
 describe('ComponentPreview', () => {

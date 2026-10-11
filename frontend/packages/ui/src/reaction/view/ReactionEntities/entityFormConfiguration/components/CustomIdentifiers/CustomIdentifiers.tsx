@@ -69,8 +69,8 @@ export function CustomIdentifiers() {
   const { MoleculeEditor } = useReactionSlots();
   const { pathComponents } = useContext(reactionEntityContext);
   const [
-    componentsEditorOpened,
-    { open: openComponentsEditor, close: closeComponentsEditor },
+    moleculeEditorOpened,
+    { open: openMoleculeEditor, close: closeMoleculeEditor },
   ] = useDisclosure();
   const [editedMolblock, setEditedMolblock] = useState<number | null>(null);
   const createNewMolblockIdentifier = useCreateNewMolblockIdentifier();
@@ -78,14 +78,14 @@ export function CustomIdentifiers() {
 
   const identifiers = useSelectIdentifiers();
 
-  const handleCloseKetcher = useCallback(() => {
+  const handleCloseMoleculeEditor = useCallback(() => {
     setEditedMolblock(null);
-    closeComponentsEditor();
-  }, [closeComponentsEditor]);
+    closeMoleculeEditor();
+  }, [closeMoleculeEditor]);
 
   const onEditMolblock = (molblockIndex: number) => {
     setEditedMolblock(molblockIndex);
-    openComponentsEditor();
+    openMoleculeEditor();
   };
 
   const onSaveMolblock = (value: MoleculeIdentifier) => {
@@ -125,10 +125,10 @@ export function CustomIdentifiers() {
             <Grid.Col span={6}>
               <PaperButton
                 title="Add Molblock Identifier"
-                description="Via Ketcher"
+                description={`Via ${MoleculeEditor.name}`}
                 icon={<StylusNoteIcon />}
                 color={colorToCssVariable['green']}
-                onClick={openComponentsEditor}
+                onClick={openMoleculeEditor}
               />
             </Grid.Col>
           )}
@@ -153,10 +153,10 @@ export function CustomIdentifiers() {
       </ReactionEntityBlock>
 
       {MoleculeEditor && (
-        <MoleculeEditor
-          opened={componentsEditorOpened}
+        <MoleculeEditor.Editor
+          opened={moleculeEditorOpened}
           onSave={onSaveMolblock}
-          onClose={handleCloseKetcher}
+          onClose={handleCloseMoleculeEditor}
           identifier={selectedMolblockIdentifier}
         />
       )}

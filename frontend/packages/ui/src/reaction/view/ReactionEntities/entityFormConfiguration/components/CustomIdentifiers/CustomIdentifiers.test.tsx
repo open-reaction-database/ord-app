@@ -67,6 +67,8 @@ function FakeMoleculeEditor({ opened }: Readonly<MoleculeEditorProps>) {
   return opened ? <p>editor open</p> : null;
 }
 
+const fakeMoleculeEditor = { name: 'Fake Draw', Editor: FakeMoleculeEditor };
+
 describe('CustomIdentifiers', () => {
   it('opens the name lookup from Add Identifier and closes it on Cancel', async () => {
     const { getByText, getByRole, queryByLabelText, findByLabelText } =
@@ -89,9 +91,10 @@ describe('CustomIdentifiers', () => {
       editable: true,
       reaction,
       pathComponents: componentPath,
-      slots: { MoleculeEditor: FakeMoleculeEditor },
+      slots: { MoleculeEditor: fakeMoleculeEditor },
     });
     expect(queryByText('editor open')).not.toBeInTheDocument();
+    expect(getByText('Via Fake Draw')).toBeInTheDocument();
     fireEvent.click(getByText('Add Molblock Identifier'));
     expect(getByText('editor open')).toBeInTheDocument();
   });
@@ -123,7 +126,7 @@ describe('CustomIdentifiers', () => {
     plain.unmount();
     const withEditor = renderWithReaction(<CustomIdentifiers />, {
       ...options,
-      slots: { ViewDeleteButtons: EditButton, MoleculeEditor: FakeMoleculeEditor },
+      slots: { ViewDeleteButtons: EditButton, MoleculeEditor: fakeMoleculeEditor },
     });
     expect(withEditor.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
   });
