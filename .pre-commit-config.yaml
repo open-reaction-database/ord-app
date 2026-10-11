@@ -14,11 +14,12 @@
 
 # Run `uv run pre-commit install` once to enable these hooks locally.
 repos:
-  # License headers. addlicense stamps the Apache header on any file missing it
-  # and (in CI, via `addlicense -check`) treats the copyright year as a wildcard,
-  # so new files use the current year without tripping the check.
+  # License headers. addlicense stamps the Apache header on any file whose first
+  # lines name no copyright or SPDX license, and leaves the rest alone whatever
+  # their year, so new files use the current year without tripping the check.
+  # CI runs this hook.
   - repo: https://github.com/google/addlicense
-    rev: v1.2.0
+    rev: b289835c0741ba2fb92dd5f61af070e79c69a55e  # frozen: v1.2.0
     hooks:
       - id: addlicense
         args:
@@ -32,7 +33,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Keep in sync with the ruff version pinned in uv.lock so the hook and the
     # `ruff format --check` CI step never disagree.
-    rev: v0.9.10
+    rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98  # frozen: v0.9.10
     hooks:
       - id: ruff
         args: [--fix]
