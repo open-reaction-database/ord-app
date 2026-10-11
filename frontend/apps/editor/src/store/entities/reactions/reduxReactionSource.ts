@@ -96,17 +96,16 @@ export function reduxReactionActions(
       await dispatch(deleteReactionField({ reactionId, pathComponents }));
     },
     addIdentifierByName: async (identifiersPath, name) => {
-      let smiles: string;
-      try {
-        const response = await axiosInstance.post<{ smiles: string }>(
-          '/resolve-compound',
-          {
-            identifier_type: 'name',
-            identifier: name,
-          },
+      const smiles = await axiosInstance
+        .post<{ smiles: string }>('/resolve-compound', {
+          identifier_type: 'name',
+          identifier: name,
+        })
+        .then(
+          response => response.data.smiles,
+          () => null,
         );
-        smiles = response.data.smiles;
-      } catch (_e) {
+      if (smiles === null) {
         // The name did not resolve, or the request failed; either way nothing is added.
         return false;
       }
