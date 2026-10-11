@@ -15,17 +15,19 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { within } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { PageContainer } from './PageContainer.tsx';
 
 // Stub the router-aware Breadcrumbs and the Footer so this test focuses on PageContainer's own
 // layout (logo, header controls, badge, children).
-vi.mock('./Breadcrumbs/Breadcrumbs', () => ({
+vi.mock('#shell/Breadcrumbs/Breadcrumbs.tsx', () => ({
   Breadcrumbs: ({ items }: Readonly<{ items: Array<unknown> }>) => (
     <nav data-testid="breadcrumbs">{items.length}</nav>
   ),
 }));
-vi.mock('./Footer/Footer', () => ({ Footer: () => <div data-testid="footer" /> }));
+vi.mock('#shell/Footer/Footer.tsx', () => ({
+  Footer: () => <div data-testid="footer" />,
+}));
 
 describe('PageContainer', () => {
   it('renders the logo, header controls, chrome, optional badge, and its children', () => {

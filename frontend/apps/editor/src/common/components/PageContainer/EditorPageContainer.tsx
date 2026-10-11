@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PageContainer, type PageContainerProps } from './PageContainer.tsx';
+import {
+  PageContainer,
+  type PageContainerProps,
+} from '@open-reaction-database/ui/shell';
 import UserMenu from './UserMenu/UserMenu';
 
 /** The page shell with the editor's header controls. */

@@ -17,7 +17,7 @@ import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { Flex, Paper, Title } from '@mantine/core';
 import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
 import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
 import { selectTemplatesOrder } from 'store/entities/templates/templates.selectors.ts';

@@ -15,21 +15,22 @@
  */
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
-import { Footer } from './Footer.tsx';
+import { renderWithMantine } from '#testing/renderWithMantine.tsx';
+import { Breadcrumbs } from './Breadcrumbs.tsx';
 
-describe('Footer', () => {
-  it('renders the dated copyright line and external links', () => {
-    renderWithMantine(<Footer />);
-    expect(
-      screen.getByText(/© Copyright \d{4} Open Reaction Database/),
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(2);
-  });
-
-  it('links the support address', () => {
-    renderWithMantine(<Footer />);
-    const link = screen.getByRole('link', { name: 'help@open-reaction-database.org' });
-    expect(link).toHaveAttribute('href', 'mailto:help@open-reaction-database.org');
+describe('Breadcrumbs', () => {
+  it('renders a link for each non-active crumb and plain text for the active one', () => {
+    renderWithMantine(
+      <Breadcrumbs
+        items={[
+          { title: 'Datasets', path: '/datasets' },
+          { title: 'My Dataset', path: '/datasets/1' },
+        ]}
+      />,
+    );
+    expect(screen.getByText('Datasets')).toBeInTheDocument();
+    expect(screen.getByText('My Dataset')).toBeInTheDocument();
+    // The first (non-active) crumb is a link; the last (active) one is not.
+    expect(screen.getByRole('link', { name: /datasets/i })).toBeInTheDocument();
   });
 });

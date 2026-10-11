@@ -16,7 +16,7 @@
 import classes from './reactionPage.module.scss';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo, useState } from 'react';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { DatasetReactionHeader } from 'features/reactions/ReactionHeader/DatasetReactionHeader/DatasetReactionHeader.tsx';
 import {

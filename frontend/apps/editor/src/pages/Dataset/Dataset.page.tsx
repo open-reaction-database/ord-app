@@ -17,7 +17,7 @@ import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Flex, Loader } from '@mantine/core';
 import classes from './dataset.page.module.scss';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { ReactionList } from 'features/reactions/ReactionList/ReactionList.tsx';
 import { DatasetHeader } from 'features/datasets/DatasetHeader/DatasetHeader.tsx';

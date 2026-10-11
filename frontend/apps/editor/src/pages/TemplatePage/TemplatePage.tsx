@@ -23,7 +23,7 @@ import {
   ReactionTabs,
 } from '@open-reaction-database/ui/reaction';
 import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { selectAreTemplatesLoaded } from 'store/entities/templates/templates.selectors.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
