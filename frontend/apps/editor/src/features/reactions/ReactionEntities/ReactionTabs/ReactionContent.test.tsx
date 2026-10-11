@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionContent } from './ReactionContent.tsx';
 
-// In "tabs" mode the content is the tabbed editor, which pulls in the Ketcher/d3 node registry;
-// stub it so this test exercises ReactionContent's own view-mode branching.
+// Stub the tabbed editor so this test exercises ReactionContent's own view-mode branching.
 vi.mock('./ReactionTabs', () => ({
   ReactionTabs: () => <div data-testid="reaction-tabs" />,
 }));
 
 describe('ReactionContent', () => {
   it('renders the tabbed editor in "tabs" mode', () => {
-    const { getByTestId, queryByText } = renderInReactionView(
+    const { getByTestId, queryByText } = renderWithReaction(
       <ReactionContent viewMode="tabs" />,
-      {
-        reactionId: 1,
-      },
+      { editable: true, reactionId: 1 },
     );
     expect(getByTestId('reaction-tabs')).toBeInTheDocument();
     // The flat section list is not rendered in tabs mode.
@@ -37,11 +34,9 @@ describe('ReactionContent', () => {
   });
 
   it('renders the flat section list in "list" mode', () => {
-    const { getByText, queryByTestId } = renderInReactionView(
+    const { getByText, queryByTestId } = renderWithReaction(
       <ReactionContent viewMode="list" />,
-      {
-        reactionId: 1,
-      },
+      { editable: true, reactionId: 1 },
     );
     expect(queryByTestId('reaction-tabs')).not.toBeInTheDocument();
     // A few of the stacked view sections render their titles.

@@ -21,15 +21,15 @@ import {
   ReactionEntityBaseNode,
   reactionEntityToForm,
 } from 'features/reactions/ReactionEntities';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { type KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import {
+  reactionEntityContext,
+  type ReactionEntityContext,
   useIsTemplate,
   useIsViewOnly,
   useReactionActions,
 } from '@open-reaction-database/ui/reaction';
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
 import { copyReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
 import { useDisclosure } from '@mantine/hooks';

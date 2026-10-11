@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityVPU } from './ReactionEntityVPU.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValuePrecisionUnit } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -24,7 +24,7 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps<ReactionFormValuePrecisionUnit>['formMethods'];
 
 const renderVPU = (isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <ReactionEntityVPU
       node={
         {
@@ -34,7 +34,7 @@ const renderVPU = (isViewOnly = false) =>
       }
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('ReactionEntityVPU', () => {

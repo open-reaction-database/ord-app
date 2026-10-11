@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { createContext } from 'react';
-import type { ReactionEntityContext } from './reactionEntities.types.ts';
+import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
+
+/** The entity whose form is open: its fields' paths start with `pathComponents`. */
+export interface ReactionEntityContext {
+  pathComponents: ReactionPathComponents;
+}
 
 export const reactionEntityContext = createContext<ReactionEntityContext>({
   pathComponents: [],

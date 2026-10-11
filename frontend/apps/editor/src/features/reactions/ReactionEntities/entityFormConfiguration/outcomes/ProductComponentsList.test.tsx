@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { ProductsComponentsList } from './ProductComponentsList.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
@@ -25,11 +27,11 @@ const reaction = {
 } as unknown as AppReaction;
 
 const renderList = (isViewOnly = false) =>
-  renderInReactionView(<ProductsComponentsList />, {
+  renderWithReaction(<ProductsComponentsList />, {
     reactionId: 1,
     reaction,
     pathComponents: ['outcomes', 0],
-    isViewOnly,
+    editable: !isViewOnly,
   });
 
 describe('ProductsComponentsList', () => {

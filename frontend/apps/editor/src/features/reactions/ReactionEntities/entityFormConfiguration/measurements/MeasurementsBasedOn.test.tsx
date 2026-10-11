@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { MeasurementsBasedOn } from './MeasurementsBasedOn.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
@@ -30,7 +32,7 @@ const reaction = {
 } as unknown as AppReaction;
 
 const renderBasedOn = (isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <MeasurementsBasedOn
       name="basedOn"
       formMethods={formMethods}
@@ -39,7 +41,7 @@ const renderBasedOn = (isViewOnly = false) =>
       reactionId: 1,
       reaction,
       pathComponents: ['outcomes', 0, 'measurements', 0],
-      isViewOnly,
+      editable: !isViewOnly,
     },
   );
 

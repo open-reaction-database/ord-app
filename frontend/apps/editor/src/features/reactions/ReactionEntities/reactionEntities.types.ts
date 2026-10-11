@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 import type { InputProps } from '@mantine/core';
-import type {
-  SelectOptions,
-  ReactionPathComponents,
-  WithId,
-} from '@open-reaction-database/ui/reaction/model';
+import type { SelectOptions, WithId } from '@open-reaction-database/ui/reaction/model';
 import type { FC, ReactNode } from 'react';
 import type { useForm } from '@mantine/form';
 import type { ReactionFormStandaloneField } from '@open-reaction-database/ui/reaction';
@@ -167,7 +163,3 @@ export type ReactionFormNode =
   | ReactionFormEmpty
   | ReactionFormCustom
   | ReactionFormDateTime;
-
-export interface ReactionEntityContext {
-  pathComponents: ReactionPathComponents;
-}

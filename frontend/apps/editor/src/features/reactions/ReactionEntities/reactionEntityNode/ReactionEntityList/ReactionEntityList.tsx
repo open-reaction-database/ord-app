@@ -24,9 +24,11 @@ import { Button, Flex } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useCallback, useContext, useMemo } from 'react';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
-import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
+import {
+  useIsViewOnly,
+  reactionEntityContext,
+} from '@open-reaction-database/ui/reaction';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { reactionEntityContext } from '../../reactionEntity.context.ts';
 
 interface ReactionEntityAddButtonProps extends Required<
   Pick<ReactionFormList, 'addItem'>

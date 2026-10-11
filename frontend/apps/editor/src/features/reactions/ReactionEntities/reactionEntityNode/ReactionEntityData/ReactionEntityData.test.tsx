@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityData } from './ReactionEntityData.tsx';
 import { AppDataType } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
@@ -34,11 +34,12 @@ const formMethods = {
 
 describe('ReactionEntityData', () => {
   it('renders the data-type selector and a text value control for Text data', () => {
-    const { getByText, getByRole } = renderInReactionView(
+    const { getByText, getByRole } = renderWithReaction(
       <ReactionEntityData
         node={node}
         formMethods={formMethods}
       />,
+      { editable: true },
     );
     // Segmented control exposes each data type as a radio option.
     expect(getByText('Text')).toBeInTheDocument();

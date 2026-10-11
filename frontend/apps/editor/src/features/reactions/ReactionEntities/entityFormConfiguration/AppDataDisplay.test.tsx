@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { AppDataDisplay } from './AppDataDisplay.tsx';
 import { AppDataType, type AppData } from '@open-reaction-database/ui/reaction/model';
 

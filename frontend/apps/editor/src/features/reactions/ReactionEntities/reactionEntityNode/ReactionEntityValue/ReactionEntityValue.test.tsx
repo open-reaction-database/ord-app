@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityValue } from './ReactionEntityValue.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -25,12 +25,12 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps<ReactionFormValue>['formMethods'];
 
 const renderValue = (inputType: string, isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <ReactionEntityValue
       node={{ name: 'field', inputType } as unknown as ReactionFormValue}
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('ReactionEntityValue', () => {
@@ -56,7 +56,7 @@ describe('ReactionEntityValue', () => {
     ['integer', 25],
   ])('%s field reads a typed 2.5 as %s', async (inputType, expected) => {
     const onChange = vi.fn();
-    const { container } = renderInReactionView(
+    const { container } = renderWithReaction(
       <ReactionEntityValue
         node={{ name: 'field', inputType } as unknown as ReactionFormValue}
         formMethods={
@@ -65,6 +65,7 @@ describe('ReactionEntityValue', () => {
           } as unknown as ReactionEntityNodeProps<ReactionFormValue>['formMethods']
         }
       />,
+      { editable: true },
     );
     await userEvent.type(container.querySelector('input') as HTMLInputElement, '2.5');
     expect(onChange).toHaveBeenLastCalledWith(expected);

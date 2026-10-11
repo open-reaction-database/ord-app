@@ -21,7 +21,7 @@ import classes from 'features/reactions/ReactionEntities/reactionEntityNode/Reac
 import { ReactionEntityBaseNode } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBaseNode/ReactionEntityBaseNode.tsx';
 import { ReactionEntityLabel } from '../ReactionEntityLabel/ReactionEntityLabel.tsx';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { reactionEntityContext } from '../../reactionEntity.context.ts';
+import { reactionEntityContext } from '@open-reaction-database/ui/reaction';
 
 interface ReactionEntityBlockProps extends PropsWithChildren {
   renderedTitle: ReactNode;

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ReactionValidationBadge } from './ReactionValidationBadge.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
+// Smoke test: the component mounts under MantineProvider without throwing.
 const Component = ReactionValidationBadge as unknown as () => JSX.Element;
 
 describe('ReactionValidationBadge', () => {
   it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
+    const { container } = renderWithMantine(<Component />);
     expect(container).toBeInTheDocument();
   });
 });

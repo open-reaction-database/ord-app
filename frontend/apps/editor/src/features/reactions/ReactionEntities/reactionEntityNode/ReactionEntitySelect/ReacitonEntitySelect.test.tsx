@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntitySelect } from './ReacitonEntitySelect.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -24,7 +24,7 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps<ReactionFormSelect>['formMethods'];
 
 const renderSelect = (selectType: string, isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <ReactionEntitySelect
       node={
         {
@@ -35,7 +35,7 @@ const renderSelect = (selectType: string, isViewOnly = false) =>
       }
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('ReactionEntitySelect', () => {

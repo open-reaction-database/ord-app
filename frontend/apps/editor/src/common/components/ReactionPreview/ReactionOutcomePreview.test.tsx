@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { ReactionOutcomePreview } from './ReactionOutcomePreview.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
@@ -35,24 +37,18 @@ describe('ReactionOutcomePreview', () => {
       reactionTime: { value: 5, units: 'HOUR' },
       conversion: { value: 90 },
     });
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionOutcomePreview outcomeIndex={0} />,
-      {
-        reactionId: 1,
-        reaction,
-      },
+      { editable: true, reactionId: 1, reaction },
     );
     expect(getByText(/Outcome \(5 h, 90% conversion\)/)).toBeInTheDocument();
   });
 
   it('shows a bare "Outcome" label when there is no time or conversion', () => {
     const reaction = reactionWith({});
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionOutcomePreview outcomeIndex={0} />,
-      {
-        reactionId: 1,
-        reaction,
-      },
+      { editable: true, reactionId: 1, reaction },
     );
     expect(getByText('Outcome')).toBeInTheDocument();
   });

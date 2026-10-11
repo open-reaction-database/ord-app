@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { ReactionInputPreview } from './ReactionInputPreview.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
@@ -29,12 +31,9 @@ describe('ReactionInputPreview', () => {
       ...emptyReactionData(),
       inputs: { in1: { id: 'in1', name: 'My Input', components: [] } },
     } as unknown as AppReaction;
-    const { getByText, getByTestId } = renderInReactionView(
+    const { getByText, getByTestId } = renderWithReaction(
       <ReactionInputPreview inputId="in1" />,
-      {
-        reactionId: 1,
-        reaction,
-      },
+      { editable: true, reactionId: 1, reaction },
     );
     expect(getByText('My Input')).toBeInTheDocument();
     expect(getByTestId('component-preview')).toBeInTheDocument();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityList } from './ReactionEntityList.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormList } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -33,25 +33,24 @@ const makeNode = () =>
 
 describe('ReactionEntityList', () => {
   it('renders the list title and the add button when editable', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionEntityList
         node={makeNode()}
         formMethods={formMethods}
       />,
+      { editable: true },
     );
     expect(getByText('Items')).toBeInTheDocument();
     expect(getByText('Add')).toBeInTheDocument();
   });
 
   it('hides the add button in view-only mode', () => {
-    const { queryByText } = renderInReactionView(
+    const { queryByText } = renderWithReaction(
       <ReactionEntityList
         node={makeNode()}
         formMethods={formMethods}
       />,
-      {
-        isViewOnly: true,
-      },
+      {},
     );
     expect(queryByText('Add')).not.toBeInTheDocument();
   });

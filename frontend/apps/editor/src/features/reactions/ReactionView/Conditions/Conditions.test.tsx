@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { Conditions } from './Conditions.tsx';
 
 describe('Conditions', () => {
   it('renders the conditions section with each condition-group heading', () => {
-    const { getByText } = renderInReactionView(<Conditions />);
+    const { getByText } = renderWithReaction(<Conditions />, { editable: true });
     expect(getByText('Conditions')).toBeInTheDocument();
     for (const heading of [
       'Temperature',

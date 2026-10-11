@@ -15,24 +15,20 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '@open-reaction-database/ui/testing';
 import { ReactionEntityForm } from './ReactionEntityForm.tsx';
 import { reactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.models.ts';
 import { ReactionNodeEntity } from '@open-reaction-database/ui/reaction/model';
 
-// The real form registry eagerly imports every node form, including the Ketcher/d3 structure
-// editor (a CJS/ESM break under vitest). Stub the registry to a single plain text field — the
-// field nodes aren't what's under test here; the save-and-close wiring is. A real input gives
-// the keyboard-shortcut test a realistic focus target (a field, not the button).
+// Stub the form registry to a single plain text field: the field nodes aren't what's under test
+// here; the save-and-close wiring is. A real input gives the keyboard-shortcut test a realistic
+// focus target (a field, not the button).
 vi.mock('features/reactions/ReactionEntities', () => ({
   ReactionEntityBaseNode: () => <input aria-label="Field" />,
   reactionEntityToForm: new Proxy({}, { get: () => [{ name: 'field' }] }),
-}));
-
-const addUpdateReactionFieldMock = vi.fn((_arg: unknown) => ({ type: 'test/noop' }));
-vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
-  ...((await importActual()) as Record<string, unknown>),
-  addUpdateReactionField: (arg: unknown) => addUpdateReactionFieldMock(arg),
 }));
 
 const provenanceSidebarInfo = reactionSidebarInfo.find(
@@ -42,7 +38,8 @@ const provenanceSidebarInfo = reactionSidebarInfo.find(
 const onFormClose = vi.fn();
 
 function renderForm() {
-  renderInReactionView(
+  const actions = stubReactionActions();
+  renderWithReaction(
     <ReactionEntityForm
       isHidden={false}
       reactionPathComponents={provenanceSidebarInfo.pathComponents}
@@ -50,16 +47,19 @@ function renderForm() {
       onFormClose={onFormClose}
       onSetFormDirty={() => {}}
     />,
+    { actions },
   );
+  return actions;
 }
 
 describe('ReactionEntityForm — Save and Close (#550)', () => {
   it('saves the form and closes the sidebar when clicked', async () => {
-    renderForm();
+    const actions = renderForm();
 
     fireEvent.click(screen.getByRole('button', { name: 'Save and Close' }));
 
-    await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(actions.update).toHaveBeenCalledTimes(1));
+    expect(actions.update.mock.calls[0][0]).toEqual(['provenance']);
     expect(onFormClose).toHaveBeenCalledTimes(1);
   });
 
@@ -67,13 +67,14 @@ describe('ReactionEntityForm — Save and Close (#550)', () => {
     { label: 'Ctrl+Enter', mods: { ctrlKey: true } },
     { label: 'Cmd+Enter', mods: { metaKey: true } },
   ])('saves and closes on $label from a focused field', async ({ mods }) => {
-    renderForm();
+    const actions = renderForm();
 
     // Fire from a real form field (where a user would be typing), not the button — the handler
     // lives on the parent <form> and catches the bubbling keydown.
     fireEvent.keyDown(screen.getByLabelText('Field'), { key: 'Enter', ...mods });
 
-    await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(actions.update).toHaveBeenCalledTimes(1));
+    expect(actions.update.mock.calls[0][0]).toEqual(['provenance']);
     expect(onFormClose).toHaveBeenCalledTimes(1);
   });
 });

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { Setup } from './Setup.tsx';
 
 describe('Setup', () => {
   it('renders the setup section with the vessel and material fields', () => {
-    const { getByText } = renderInReactionView(<Setup />);
+    const { getByText } = renderWithReaction(<Setup />, { editable: true });
     expect(getByText('Setup')).toBeInTheDocument();
     // KeyValueDisplay renders each label with a trailing colon.
     expect(getByText('Vessel:')).toBeInTheDocument();

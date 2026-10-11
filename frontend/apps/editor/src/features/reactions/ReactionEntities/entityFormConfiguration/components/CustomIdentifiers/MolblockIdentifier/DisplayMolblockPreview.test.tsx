@@ -16,7 +16,7 @@
 import { act } from '@testing-library/react';
 import type { PreviewsById } from '@open-reaction-database/ui/reaction/previews';
 import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 
 const { renderPreviewsMock } = vi.hoisted(() => ({ renderPreviewsMock: vi.fn() }));

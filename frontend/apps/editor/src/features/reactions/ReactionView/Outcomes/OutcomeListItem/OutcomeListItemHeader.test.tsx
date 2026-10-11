@@ -15,12 +15,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import { Accordion } from '@mantine/core';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { OutcomeListItemHeader } from './OutcomeListItemHeader.tsx';
 import type { ReactionOutcome } from '@open-reaction-database/ui/reaction/model';
 
 const renderHeader = (outcome: Partial<ReactionOutcome>) =>
-  renderInReactionView(
+  renderWithReaction(
     <Accordion>
       <Accordion.Item value="outcome">
         <OutcomeListItemHeader
@@ -29,6 +29,7 @@ const renderHeader = (outcome: Partial<ReactionOutcome>) =>
         />
       </Accordion.Item>
     </Accordion>,
+    { editable: true },
   );
 
 describe('OutcomeListItemHeader', () => {

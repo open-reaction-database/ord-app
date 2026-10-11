@@ -15,38 +15,42 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '@open-reaction-database/ui/testing';
 import { UpdatePersonInfo } from './UpdatePersonInfo.tsx';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionActions } from '@open-reaction-database/ui/reaction';
-
-// selectSelf is a (state) => user selector; return a populated user so the click handler has data.
-vi.mock('store/entities/users/users.selectors.ts', () => ({
-  selectSelf: () => ({ name: 'Me', email: 'me@example.com', orcid_id: '0000-0001' }),
-}));
 
 const setValues = vi.fn();
 const formMethods = { setValues } as unknown as ReactionEntityNodeProps['formMethods'];
 
 const renderButton = (isViewOnly = false, actions?: ReactionActions) =>
-  renderInReactionView(
+  renderWithReaction(
     <UpdatePersonInfo
       name="provenance.recordCreated.person"
       formMethods={formMethods}
       text="Use my info"
     />,
-    { isViewOnly, actions },
+    { editable: !isViewOnly, actions },
   );
 
 describe('UpdatePersonInfo', () => {
   it('renders the action button and merges the user info on click when editable', () => {
-    const { getByRole } = renderButton();
+    const actions = stubReactionActions();
+    actions.currentPerson.mockReturnValue({
+      name: 'Me',
+      email: 'me@example.com',
+      orcid: '0000-0001',
+    });
+    const { getByRole } = renderButton(false, actions);
     const button = getByRole('button', { name: 'Use my info' });
     expect(button).toBeInTheDocument();
     fireEvent.click(button);
     expect(setValues).toHaveBeenCalledTimes(1);
     // setValues receives an updater; applying it to an empty form should populate the person at the
-    // node's path from the mocked user (name/email, and orcid_id mapped to the proto `orcid` key).
+    // node's path with the host's current person.
     const updater = setValues.mock.calls[0][0] as (prev: object) => unknown;
     const result = updater({}) as { provenance: { recordCreated: { person: object } } };
     expect(result.provenance.recordCreated.person).toEqual({

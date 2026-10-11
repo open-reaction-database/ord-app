@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ReactionEntityGroup } from './ReactionEntityGroup.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormGroup } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
-// Keep the group off the recursive node registry (which pulls in the Ketcher/d3 editor).
+// Keep the group off the recursive node registry, so the test sees only the group.
 vi.mock('../ReactionEntityBaseNode/ReactionEntityBaseNode.tsx', () => ({
   ReactionEntityBaseNode: ({ node }: Readonly<{ node: { type?: string } }>) => (
     <div data-testid="base-node">{node?.type ?? 'node'}</div>

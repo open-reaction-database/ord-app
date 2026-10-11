@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ComponentMetadata } from './ComponentMetadata.tsx';
 import type { ReactionInputComponent } from '@open-reaction-database/ui/reaction/model';
 

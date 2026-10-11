@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { Accordion } from '@mantine/core';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { InputComponentsListItem } from './InputComponentsListItem.tsx';
 import type { ReactionInputWithoutName } from '@open-reaction-database/ui/reaction/model';
 
@@ -25,7 +25,7 @@ vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => 
 }));
 
 const renderItem = (input: ReactionInputWithoutName) =>
-  renderInReactionView(
+  renderWithReaction(
     <Accordion defaultValue="in1">
       <InputComponentsListItem
         input={input}
@@ -34,6 +34,7 @@ const renderItem = (input: ReactionInputWithoutName) =>
         historyPathComponents={[]}
       />
     </Accordion>,
+    { editable: true },
   );
 
 describe('InputComponentsListItem', () => {

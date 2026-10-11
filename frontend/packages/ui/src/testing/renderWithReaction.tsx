@@ -18,6 +18,10 @@
 import { MantineProvider } from '@mantine/core';
 import { render, type RenderOptions } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
+import { vi } from 'vitest';
+import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
+import type { ReactionPerson } from '#reaction/model/reactionProvenance/reactionProvenance.types.ts';
+import type { AppReaction } from '#reaction/model/reactions.types.ts';
 import { ReactionProvider } from '#reaction/provider/ReactionProvider.tsx';
 import type {
   ReactionActions,
@@ -26,6 +30,8 @@ import type {
   ReactionSource,
 } from '#reaction/provider/reactionProvider.types.ts';
 import { createStaticReactionSource } from '#reaction/provider/staticReactionSource.ts';
+import { reactionEntityContext } from '#reaction/view/ReactionEntities/reactionEntity.context.ts';
+import { emptyReactionData } from './emptyReactionData.ts';
 
 const Empty = () => null;
 
@@ -35,30 +41,77 @@ const EMPTY_SLOTS: ReactionSlots = {
   ViewOnlyLabel: Empty,
 };
 
-/** A dataset reaction, editable when given actions, or a read-only template. */
+/**
+ * A dataset reaction, editable when given actions or `editable` (which supplies stub
+ * actions), or a read-only template.
+ */
 type ReactionTarget =
-  | { reactionId?: number; isTemplate?: false; actions?: ReactionActions }
-  | { reactionId: string; isTemplate: true; actions?: never };
+  | {
+      reactionId?: number;
+      isTemplate?: false;
+      actions?: ReactionActions;
+      editable?: boolean;
+    }
+  | { reactionId: string; isTemplate: true; actions?: never; editable?: never };
 
 type ReactionWrapperOptions = ReactionTarget & {
+  /** The whole snapshot; without it, one is built from `reaction` and `record`. */
   snapshot?: ReactionSnapshot;
+  /** The reaction's data; an empty reaction by default. */
+  reaction?: AppReaction;
+  /** Stored fields beside `data`, such as `summary`, `pb_reaction_id`, or `validation`. */
+  record?: Partial<Omit<ReactionSnapshot, 'data'>>;
   source?: ReactionSource;
   slots?: Partial<ReactionSlots>;
+  /** The path of the entity whose form is open, for `reactionEntityContext`. */
+  pathComponents?: ReactionPathComponents;
 };
 
 type RenderWithReactionOptions = Omit<RenderOptions, 'wrapper'> &
   ReactionWrapperOptions;
 
+/** Actions that settle at once and change nothing, as `vi.fn` mocks for assertions. */
+export function stubReactionActions() {
+  return {
+    update: vi.fn((_pathComponents: ReactionPathComponents, _newValue: unknown) =>
+      Promise.resolve(),
+    ),
+    remove: vi.fn((_pathComponents: ReactionPathComponents) => Promise.resolve()),
+    addIdentifierByName: vi.fn(
+      (_identifiersPath: ReactionPathComponents, _name: string) =>
+        Promise.resolve(false),
+    ),
+    currentPerson: vi.fn((): ReactionPerson | undefined => undefined),
+  } satisfies ReactionActions;
+}
+
+function snapshotFor({ snapshot, reaction, record }: ReactionWrapperOptions) {
+  return (
+    snapshot ?? {
+      data: reaction ?? emptyReactionData(),
+      previews: {},
+      summary: { provenance: {}, summary: {}, conditions: '' },
+      ...record,
+    }
+  );
+}
+
 /**
  * A wrapper component, for `render` or `renderHook`, that puts its children under a
- * ReactionProvider: a static source over `snapshot` unless a source is given.
+ * ReactionProvider: a static source over the reaction the options describe unless a source
+ * is given, and `reactionEntityContext` at `pathComponents`.
  */
 export function reactionWrapper(options: ReactionWrapperOptions = {}) {
-  const { snapshot, source = createStaticReactionSource(snapshot), slots } = options;
+  const { source = createStaticReactionSource(snapshotFor(options)), slots } = options;
   const target = options.isTemplate
     ? { reactionId: options.reactionId, isTemplate: true as const }
-    : { reactionId: options.reactionId ?? 1, actions: options.actions };
+    : {
+        reactionId: options.reactionId ?? 1,
+        actions:
+          options.actions ?? (options.editable ? stubReactionActions() : undefined),
+      };
   const allSlots = { ...EMPTY_SLOTS, ...slots };
+  const entityContextValue = { pathComponents: options.pathComponents ?? [] };
   return function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <MantineProvider>
@@ -67,19 +120,32 @@ export function reactionWrapper(options: ReactionWrapperOptions = {}) {
           source={source}
           slots={allSlots}
         >
-          {children}
+          <reactionEntityContext.Provider value={entityContextValue}>
+            {children}
+          </reactionEntityContext.Provider>
         </ReactionProvider>
       </MantineProvider>
     );
   };
 }
 
-/** Renders under a ReactionProvider: a static source over `snapshot` unless a source is given. */
+/** Renders `ui` under the wrapper `reactionWrapper(options)` describes. */
 export function renderWithReaction(
   ui: ReactElement,
   options: RenderWithReactionOptions = {},
 ) {
-  const { reactionId, isTemplate, actions, snapshot, source, slots, ...renderOptions } =
-    options;
+  const {
+    reactionId,
+    isTemplate,
+    actions,
+    editable,
+    snapshot,
+    reaction,
+    record,
+    source,
+    slots,
+    pathComponents,
+    ...renderOptions
+  } = options;
   return render(ui, { wrapper: reactionWrapper(options), ...renderOptions });
 }

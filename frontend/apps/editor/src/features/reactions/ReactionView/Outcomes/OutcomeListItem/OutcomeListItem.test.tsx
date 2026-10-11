@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { Accordion } from '@mantine/core';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { OutcomeListItem } from './OutcomeListItem.tsx';
 import type { ReactionOutcome } from '@open-reaction-database/ui/reaction/model';
 
@@ -26,13 +26,14 @@ describe('OutcomeListItem', () => {
       products: [],
       analyses: {},
     } as unknown as ReactionOutcome;
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <Accordion defaultValue="o1">
         <OutcomeListItem
           outcome={outcome}
           outcomeIndex={0}
         />
       </Accordion>,
+      { editable: true },
     );
     expect(getByText('Outcome')).toBeInTheDocument();
   });

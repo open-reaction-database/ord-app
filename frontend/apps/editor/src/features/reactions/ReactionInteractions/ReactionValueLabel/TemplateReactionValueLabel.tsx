@@ -16,9 +16,9 @@
 import {
   type ReactionValueLabelProps,
   useReactionId,
+  reactionEntityContext,
 } from '@open-reaction-database/ui/reaction';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { reactionEntityContext } from '../../ReactionEntities/reactionEntity.context.ts';
 import { ActionIcon, Button, Flex, Text } from '@mantine/core';
 import { CloseIcon, EditIcon } from 'common/icons';
 import classes from './reactionValueLabel.module.scss';

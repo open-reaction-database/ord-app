@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 import { useCallback, useContext, useMemo } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import {
+  reactionEntityContext,
+  useIsViewOnly,
+  useReactionPart,
+} from '@open-reaction-database/ui/reaction';
 import {
   type ReactionOutcome,
   itemsById,
@@ -23,7 +27,6 @@ import {
 import { Select } from '@mantine/core';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
-import { useIsViewOnly, useReactionPart } from '@open-reaction-database/ui/reaction';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const NO_ANALYSES: ReactionOutcome['analyses'] = {};

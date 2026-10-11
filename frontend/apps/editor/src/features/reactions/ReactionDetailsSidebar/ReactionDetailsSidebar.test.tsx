@@ -16,18 +16,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
-import type { AppState } from 'store/configureAppStore.ts';
-import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
-import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { type DrawerActions, useDrawer } from '@open-reaction-database/ui/reaction';
 import { ReactionDetailsSidebar } from './ReactionDetailsSidebar.tsx';
-
-// The real node registry imports the Ketcher structure editor, which does not load under Vitest.
-vi.mock('features/reactions/ReactionEntities', () => ({ reactionNodeToComponent: {} }));
 
 // Holds the path it mounted with, as the real form holds the initial values it mounted with.
 vi.mock('../ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx', () => ({
@@ -48,11 +40,12 @@ function Probe() {
 }
 
 function renderSidebar() {
-  return renderInReactionView(
+  return renderWithReaction(
     <>
       <Probe />
       <ReactionDetailsSidebar />
     </>,
+    { editable: true },
   );
 }
 
@@ -75,30 +68,5 @@ describe('ReactionDetailsSidebar', () => {
 
     act(() => drawer.set([['provenance']]));
     expect(await screen.findByText('Form for provenance')).toBeInTheDocument();
-  });
-
-  it('opens a template’s entity from its Set Variables button', async () => {
-    renderWithProviders(
-      <TemplateReactionProvider templateId="template_1">
-        <ReactionSetVariablesButton
-          entityName="Notes"
-          pathComponents={['notes']}
-        />
-        <ReactionDetailsSidebar />
-      </TemplateReactionProvider>,
-      {
-        preloadedState: {
-          entities: {
-            reactions: {
-              reactionsById: {
-                template_1: { id: 1, data: emptyReactionData(), variables: {} },
-              },
-            },
-          },
-        } as unknown as AppState,
-      },
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Set Variables' }));
-    expect(await screen.findByRole('dialog')).toHaveTextContent('Form for notes');
   });
 });

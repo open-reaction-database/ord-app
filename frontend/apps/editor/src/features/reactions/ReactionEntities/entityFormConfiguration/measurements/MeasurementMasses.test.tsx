@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { MeasurementMasses } from './MeasurementMasses.tsx';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 
@@ -23,12 +23,12 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps['formMethods'];
 
 const renderMasses = (isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <MeasurementMasses
       name="masses"
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('MeasurementMasses', () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { EntityListItem } from './EntityListItem.tsx';
 
 interface Analysis {
@@ -23,7 +23,7 @@ interface Analysis {
 
 describe('EntityListItem', () => {
   it('renders a "<title> <key>" heading and the required fields for a string title', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <EntityListItem<Analysis>
         entityKey="a1"
         entity={{ type: 'NMR' }}
@@ -32,7 +32,7 @@ describe('EntityListItem', () => {
         requiredFields={[{ label: 'Type', render: entity => entity.type }]}
         historyPathComponents={[]}
       />,
-      { pathComponents: ['outcomes', 0] },
+      { editable: true, pathComponents: ['outcomes', 0] },
     );
     expect(getByText('Analysis a1')).toBeInTheDocument();
     expect(getByText('Type:')).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe('EntityListItem', () => {
   });
 
   it('offsets a numeric key by one for a string title (1-based display)', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <EntityListItem<Analysis>
         entityKey={0}
         entity={{ type: 'NMR' }}
@@ -49,13 +49,13 @@ describe('EntityListItem', () => {
         requiredFields={[]}
         historyPathComponents={[]}
       />,
-      { pathComponents: ['outcomes', 0] },
+      { editable: true, pathComponents: ['outcomes', 0] },
     );
     expect(getByText('Measurement 1')).toBeInTheDocument();
   });
 
   it('uses a function title when provided', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <EntityListItem<Analysis>
         entityKey={0}
         entity={{ type: 'HPLC' }}
@@ -64,7 +64,7 @@ describe('EntityListItem', () => {
         requiredFields={[]}
         historyPathComponents={[]}
       />,
-      { pathComponents: ['outcomes', 0] },
+      { editable: true, pathComponents: ['outcomes', 0] },
     );
     expect(getByText('Custom HPLC')).toBeInTheDocument();
   });

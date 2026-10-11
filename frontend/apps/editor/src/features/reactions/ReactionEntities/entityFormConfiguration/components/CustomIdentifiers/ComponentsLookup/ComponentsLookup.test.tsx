@@ -15,34 +15,22 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
-import axiosInstance from 'store/axiosInstance.ts';
-import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '@open-reaction-database/ui/testing';
 import type { ReactionActions } from '@open-reaction-database/ui/reaction';
 import { ComponentsLookup } from './ComponentsLookup.tsx';
 
-vi.mock('store/axiosInstance.ts', () => ({
-  default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
-}));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
-
-// axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc.
-const axiosMock = axiosInstance as unknown as Record<
-  'get' | 'post' | 'patch' | 'delete',
-  ReturnType<typeof vi.fn>
->;
 
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = ComponentsLookup as unknown as () => JSX.Element;
 
-// A whole reaction, so the edit converts to a protobuf for its save.
-const reaction = fullReactionSnapshot().data;
-const inputId = Object.keys(reaction.inputs)[0];
-const componentPath = ['inputs', inputId, 'components', 0];
+const componentPath = ['inputs', 'in1', 'components', 0];
 
-function lookUp(name: string, onClose: () => void, actions?: ReactionActions) {
-  const view = renderInReactionView(<ComponentsLookup onClose={onClose} />, {
-    reaction,
+function lookUp(name: string, onClose: () => void, actions: ReactionActions) {
+  const view = renderWithReaction(<ComponentsLookup onClose={onClose} />, {
     pathComponents: componentPath,
     actions,
   });
@@ -53,30 +41,25 @@ function lookUp(name: string, onClose: () => void, actions?: ReactionActions) {
 
 describe('ComponentsLookup', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 
   it('adds the resolved compound and closes', async () => {
-    axiosMock.post.mockResolvedValue({ data: { smiles: 'O' } });
-    // The save stays pending, so the store holds the edit as applied, before the server answers.
-    axiosMock.patch.mockReturnValue(new Promise(() => undefined));
+    const actions = stubReactionActions();
+    actions.addIdentifierByName.mockResolvedValue(true);
     const onClose = vi.fn();
-    const { store } = lookUp('water', onClose);
+    lookUp('water', onClose, actions);
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const component =
-      store.getState().entities.reactions.reactionsById[1].data.inputs[inputId]
-        .components[0];
-    expect(component.identifiers.at(-1)).toMatchObject({
-      value: 'O',
-      details: 'water',
-    });
+    expect(actions.addIdentifierByName).toHaveBeenCalledWith(
+      [...componentPath, 'identifiers'],
+      'water',
+    );
   });
 
   it('says so when the name does not resolve, and stays open', async () => {
-    axiosMock.post.mockRejectedValue(new Error('not found'));
     const onClose = vi.fn();
-    const { findByText } = lookUp('unobtainium', onClose);
+    const { findByText } = lookUp('unobtainium', onClose, stubReactionActions());
     expect(await findByText('Compound not found')).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
   });

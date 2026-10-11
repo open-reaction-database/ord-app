@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ComponentPreview } from './ComponentPreview.tsx';
 
 // Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
@@ -22,7 +22,7 @@ const Component = ComponentPreview as unknown as () => JSX.Element;
 
 describe('ComponentPreview', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 });

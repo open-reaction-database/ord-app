@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { Observation } from './Observation.tsx';
 
 describe('Observation', () => {
   it('renders the observations section with the add button when editable', () => {
-    const { getByText, getByRole } = renderInReactionView(<Observation />);
+    const { getByText, getByRole } = renderWithReaction(<Observation />, {
+      editable: true,
+    });
     expect(getByText('Observations')).toBeInTheDocument();
     expect(getByText(/Observations are time-stamped comments/)).toBeInTheDocument();
     expect(getByRole('button', { name: /Observation/ })).toBeInTheDocument();
   });
 
   it('hides the add button in view-only mode', () => {
-    const { queryByRole } = renderInReactionView(<Observation />, {
-      isViewOnly: true,
-    });
+    const { queryByRole } = renderWithReaction(<Observation />, {});
     expect(queryByRole('button', { name: /Observation/ })).not.toBeInTheDocument();
   });
 });

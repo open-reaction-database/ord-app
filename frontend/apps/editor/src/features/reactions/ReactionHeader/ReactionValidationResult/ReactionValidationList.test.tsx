@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionValidationList } from './ReactionValidationList.tsx';
 import type { ReactionValidation } from '@open-reaction-database/ui/reaction/model';
 
@@ -25,12 +25,13 @@ const validation: ReactionValidation = {
 
 describe('ReactionValidationList', () => {
   it('renders the drawer with the error and warning messages when opened', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionValidationList
         opened
         onClose={() => {}}
         validation={validation}
       />,
+      { editable: true },
     );
     expect(getByText('Validation Results')).toBeInTheDocument();
     expect(getByText('Reaction inputs are required')).toBeInTheDocument();
@@ -38,12 +39,13 @@ describe('ReactionValidationList', () => {
   });
 
   it('does not render the drawer contents when closed', () => {
-    const { queryByText } = renderInReactionView(
+    const { queryByText } = renderWithReaction(
       <ReactionValidationList
         opened={false}
         onClose={() => {}}
         validation={validation}
       />,
+      { editable: true },
     );
     expect(queryByText('Reaction inputs are required')).not.toBeInTheDocument();
   });

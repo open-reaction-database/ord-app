@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { DatasetReactionValueLabel } from './DatasetReactionValueLable.tsx';
 import { VariableType } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionValueLabelProps } from '@open-reaction-database/ui/reaction';
 
 const render = (wrapperConfig: ReactionValueLabelProps['wrapperConfig']) =>
-  renderInReactionView(
+  renderWithReaction(
     <DatasetReactionValueLabel
       name="ph"
       type={VariableType.Number}
       wrapperConfig={wrapperConfig}
     />,
-    { pathComponents: ['conditions'] },
+    { editable: true, pathComponents: ['conditions'] },
   );
 
 describe('DatasetReactionValueLabel', () => {

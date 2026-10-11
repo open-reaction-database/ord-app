@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityDateTime } from './ReactionEntityDateTime.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormDateTime } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
@@ -24,12 +24,12 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps<ReactionFormDateTime>['formMethods'];
 
 const renderDateTime = (isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <ReactionEntityDateTime
       node={{ name: 'when', wrapperConfig: {} } as unknown as ReactionFormDateTime}
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('ReactionEntityDateTime', () => {

@@ -58,7 +58,14 @@ vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
 }));
 ```
 
-**Ketcher / d3 CJS break.** Rendering most `ReactionView/` editor components pulls in `reactionEntityToForm`, which eagerly imports every node form including the Ketcher/d3 structure editor → `require() of ES Module d3 … not supported` under vitest. If the field nodes aren't what you're testing, stub the registry barrel:
+**Ketcher needs a canvas.** The Ketcher structure editor (`ComponentsKetcherEditor`) does not load under vitest. The drawer gets it only as the `MoleculeEditor` slot, so the view's tests never load it; a test that imports the editor's slot table (`useDatasetReactionProviderProps`, and so `ReactionPage`) stubs it:
+```ts
+vi.mock(
+  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  () => ({ ComponentsKetcherEditor: () => null }),
+);
+```
+When the form's field nodes aren't what a test is about, stub the form registry instead of rendering every node:
 ```ts
 vi.mock('features/reactions/ReactionEntities', () => ({
   ReactionEntityBaseNode: () => null,

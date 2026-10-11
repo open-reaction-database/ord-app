@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import type { ReactionLinkProps } from '@open-reaction-database/ui/reaction';
 import type { ReactionCrudeComponent } from '@open-reaction-database/ui/reaction/model';
 import { CrudeComponentView } from './CrudeComponentView.tsx';
@@ -27,9 +27,9 @@ function TestLink({ pbReactionId }: Readonly<ReactionLinkProps>) {
 
 describe('CrudeComponentView', () => {
   it('links the reaction through the host app’s link slot', () => {
-    const { getByRole } = renderInReactionView(
+    const { getByRole } = renderWithReaction(
       <CrudeComponentView crudeComponent={crude} />,
-      { slots: { ReactionLink: TestLink } },
+      { editable: true, slots: { ReactionLink: TestLink } },
     );
     expect(getByRole('link', { name: 'rxn-123' })).toHaveAttribute(
       'href',
@@ -38,8 +38,9 @@ describe('CrudeComponentView', () => {
   });
 
   it('shows the reaction ID as text when the host supplies no link', () => {
-    const { getByText, queryByRole } = renderInReactionView(
+    const { getByText, queryByRole } = renderWithReaction(
       <CrudeComponentView crudeComponent={crude} />,
+      { editable: true },
     );
     expect(getByText('rxn-123')).toBeInTheDocument();
     expect(queryByRole('link')).not.toBeInTheDocument();

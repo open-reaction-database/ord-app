@@ -25,7 +25,13 @@ import {
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import {
+  reactionEntityContext,
+  useIsViewOnly,
+  useReactionActions,
+  useReactionSlots,
+  type MoleculeIdentifier,
+} from '@open-reaction-database/ui/reaction';
 import { MolblockIdentifier } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/MolblockIdentifier/MolblockIdentifier.tsx';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
@@ -33,12 +39,6 @@ import {
   ordCompoundIdentifierToReaction,
   type ReactionCompoundIdentifier,
 } from '@open-reaction-database/ui/reaction/model';
-import {
-  useIsViewOnly,
-  useReactionActions,
-  useReactionSlots,
-  type MoleculeIdentifier,
-} from '@open-reaction-database/ui/reaction';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { OpenSingleEntityButton } from './OpenSingleEntityButton.tsx';
 
 describe('OpenSingleEntityButton', () => {
   it.each([
-    [{}, 'Edit'],
-    [{ isViewOnly: true }, 'View'],
-    [{ reactionId: 'template_1' }, 'Set variables'],
+    [{ editable: true }, 'Edit'],
+    [{}, 'View'],
+    [{ reactionId: 'template_1', isTemplate: true }, 'Set variables'],
   ] as const)('with %o reads %s', (options, label) => {
-    const { getByRole } = renderInReactionView(
+    const { getByRole } = renderWithReaction(
       <OpenSingleEntityButton pathComponents={['notes']} />,
       options,
     );

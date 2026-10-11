@@ -16,10 +16,12 @@
 import { Form, useForm } from '@mantine/form';
 import { Anchor, Button, Flex, Modal, Text, TextInput } from '@mantine/core';
 import { useContext, useEffect, useState, type FormEvent } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import {
+  reactionEntityContext,
+  useReactionActions,
+} from '@open-reaction-database/ui/reaction';
 import classes from './componentsLookup.module.scss';
 import { NavigateOutsideIcon } from 'common/icons';
-import { useReactionActions } from '@open-reaction-database/ui/reaction';
 
 interface ComponentsLookupProps {
   onClose: () => void;

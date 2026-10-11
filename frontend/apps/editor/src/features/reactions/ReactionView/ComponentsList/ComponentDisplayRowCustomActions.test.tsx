@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ReactionComponentBase } from '@open-reaction-database/ui/reaction/model';
 
@@ -31,12 +31,13 @@ const component = {
 
 describe('ComponentDisplayRowCustomActions', () => {
   it('renders the identifiers, reaction role, rendered details, and actions', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ComponentDisplayRowCustomActions
         component={component}
         renderDetails={() => '10 mL'}
         actions={<span>row-actions</span>}
       />,
+      { editable: true },
     );
     expect(getByText('SMILES:')).toBeInTheDocument();
     expect(getByText('O')).toBeInTheDocument();

@@ -20,3 +20,7 @@ export type * from './provider/reactionValueLabel.types.ts';
 export type * from './provider/reactionViewDeleteButtons.types.ts';
 export type { DrawerActions, DrawerStack } from './provider/drawer.ts';
 export { createStaticReactionSource } from './provider/staticReactionSource.ts';
+export {
+  reactionEntityContext,
+  type ReactionEntityContext,
+} from './view/ReactionEntities/reactionEntity.context.ts';

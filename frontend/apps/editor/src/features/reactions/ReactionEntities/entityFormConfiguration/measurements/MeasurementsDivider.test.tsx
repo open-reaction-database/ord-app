@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { MeasurementsDivider } from './MeasurementsDivider.tsx';
 
 describe('MeasurementsDivider', () => {
   it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<MeasurementsDivider />);
+    const { container } = renderWithMantine(<MeasurementsDivider />);
     expect(container).toBeInTheDocument();
   });
 });

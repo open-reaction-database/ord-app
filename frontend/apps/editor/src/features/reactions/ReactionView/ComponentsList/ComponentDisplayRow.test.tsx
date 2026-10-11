@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ComponentDisplayRow } from './ComponentDisplayRow.tsx';
 import type { ReactionComponentBase } from '@open-reaction-database/ui/reaction/model';
 
@@ -31,12 +31,13 @@ const component = {
 
 describe('ComponentDisplayRow', () => {
   it('renders the component identifiers, role, and rendered details', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ComponentDisplayRow
         component={component}
         renderDetails={() => '10 mL'}
         componentPath={['inputs', 0]}
       />,
+      { editable: true },
     );
     expect(getByText('SMILES:')).toBeInTheDocument();
     expect(getByText('O')).toBeInTheDocument();

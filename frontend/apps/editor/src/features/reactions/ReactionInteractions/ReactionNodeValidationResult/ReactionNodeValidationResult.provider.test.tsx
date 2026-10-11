@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionNodeValidationResult } from './ReactionNodeValidationResult.tsx';
 
 describe('ReactionNodeValidationResult under a provider', () => {
   it('counts the errors under its path', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionNodeValidationResult pathComponents={['notes']} />,
       {
+        editable: true,
         record: {
           validation: {
             errors: [
@@ -39,9 +40,9 @@ describe('ReactionNodeValidationResult under a provider', () => {
   });
 
   it('renders nothing for a template, which has no validation', () => {
-    const { container } = renderInReactionView(
+    const { container } = renderWithReaction(
       <ReactionNodeValidationResult pathComponents={['notes']} />,
-      { reactionId: 'template_1' },
+      { reactionId: 'template_1', isTemplate: true },
     );
     // MantineProvider injects a <style> tag, so look for the badge itself.
     expect(container.querySelector('.mantine-Badge-root')).toBeNull();

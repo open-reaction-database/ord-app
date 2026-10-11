@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { ReactionPreview } from './ReactionPreview.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
@@ -25,7 +27,8 @@ vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => 
 
 describe('ReactionPreview', () => {
   it('shows the empty placeholder when the reaction has no inputs or outcomes', () => {
-    const { getByText } = renderInReactionView(<ReactionPreview />, {
+    const { getByText } = renderWithReaction(<ReactionPreview />, {
+      editable: true,
       reaction: emptyReactionData(),
     });
     expect(getByText('There are no Inputs and Outcomes yet')).toBeInTheDocument();
@@ -36,7 +39,8 @@ describe('ReactionPreview', () => {
       ...emptyReactionData(),
       inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
     } as unknown as AppReaction;
-    const { getByText } = renderInReactionView(<ReactionPreview />, {
+    const { getByText } = renderWithReaction(<ReactionPreview />, {
+      editable: true,
       reaction: data,
     });
     expect(getByText('Input A')).toBeInTheDocument();
@@ -52,10 +56,10 @@ describe('ReactionPreview', () => {
         summary: { provenance: {}, summary: {}, conditions: 'Stirred at 25 C' },
       },
     };
-    const plain = renderInReactionView(<ReactionPreview />, options);
+    const plain = renderWithReaction(<ReactionPreview />, options);
     expect(plain.queryByText('Stirred at 25 C')).not.toBeInTheDocument();
     plain.unmount();
-    const detailed = renderInReactionView(<ReactionPreview showDetails />, options);
+    const detailed = renderWithReaction(<ReactionPreview showDetails />, options);
     expect(detailed.getByText('Stirred at 25 C')).toBeInTheDocument();
   });
 });

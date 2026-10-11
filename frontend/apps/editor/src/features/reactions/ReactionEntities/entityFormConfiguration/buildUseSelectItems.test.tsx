@@ -17,8 +17,10 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ReactNode } from 'react';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import type { ReactionSnapshot } from '@open-reaction-database/ui/reaction';
+import {
+  reactionEntityContext,
+  type ReactionSnapshot,
+} from '@open-reaction-database/ui/reaction';
 import { reactionWrapper, emptyReactionData } from '@open-reaction-database/ui/testing';
 import {
   buildUseSelectItems,

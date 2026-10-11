@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  emptyReactionData,
+  renderWithReaction,
+} from '@open-reaction-database/ui/testing';
 import { ReactionCard } from './ReactionCard.tsx';
 
 describe('ReactionCard', () => {
   it('renders the title, the actions, and the reaction preview', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionCard
         title={<span>Card title</span>}
         actions={<button type="button">Act</button>}
       />,
+      { editable: true },
     );
     expect(getByText('Card title')).toBeInTheDocument();
     expect(getByText('Act')).toBeInTheDocument();
@@ -52,12 +55,12 @@ describe('ReactionCard', () => {
         showDetails={showDetails}
       />
     );
-    const plain = renderInReactionView(card(), options);
+    const plain = renderWithReaction(card(), options);
     expect(plain.queryByText('Provenance:')).not.toBeInTheDocument();
     expect(plain.queryByText('Summary:')).not.toBeInTheDocument();
     expect(plain.queryByText('Stirred at 25 C')).not.toBeInTheDocument();
     plain.unmount();
-    const detailed = renderInReactionView(card(true), options);
+    const detailed = renderWithReaction(card(true), options);
     expect(detailed.getByText('Provenance:')).toBeInTheDocument();
     expect(detailed.getByText('Ada')).toBeInTheDocument();
     expect(detailed.getByText('Summary:')).toBeInTheDocument();

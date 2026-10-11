@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionValueLabelWrapper } from './ReactionValueLabelWrapper.tsx';
 import type { ReactionValueLabelProps } from '@open-reaction-database/ui/reaction';
 import { VariableType } from '@open-reaction-database/ui/reaction/model';
@@ -24,7 +24,7 @@ const Component = ReactionValueLabelWrapper as unknown as () => JSX.Element;
 
 describe('ReactionValueLabelWrapper', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 
@@ -37,48 +37,48 @@ describe('ReactionValueLabelWrapper', () => {
   const slots = { ValueLabel: Label, ViewOnlyLabel: ViewOnly };
 
   it('shows the view-only label on a template field that cannot be a variable', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionValueLabelWrapper
         name="mass"
         type={VariableType.Number}
         wrapperConfig={{ cannotBeVariable: true }}
       />,
-      { reactionId: 'template_1', slots },
+      { reactionId: 'template_1', isTemplate: true, slots },
     );
     expect(getByText('fixed mass')).toBeInTheDocument();
   });
 
   it('shows the value label on a template field that can be a variable', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionValueLabelWrapper
         name="mass"
         type={VariableType.Number}
       />,
-      { reactionId: 'template_1', slots },
+      { reactionId: 'template_1', isTemplate: true, slots },
     );
     expect(getByText('value mass')).toBeInTheDocument();
   });
 
   it('shows the value label on a dataset reaction the user may only view', () => {
-    const { getByText } = renderInReactionView(
-      <ReactionValueLabelWrapper
-        name="mass"
-        type={VariableType.Number}
-        wrapperConfig={{ cannotBeVariable: true }}
-      />,
-      { isViewOnly: true, slots },
-    );
-    expect(getByText('value mass')).toBeInTheDocument();
-  });
-
-  it('shows the value label on a dataset reaction', () => {
-    const { getByText } = renderInReactionView(
+    const { getByText } = renderWithReaction(
       <ReactionValueLabelWrapper
         name="mass"
         type={VariableType.Number}
         wrapperConfig={{ cannotBeVariable: true }}
       />,
       { slots },
+    );
+    expect(getByText('value mass')).toBeInTheDocument();
+  });
+
+  it('shows the value label on a dataset reaction', () => {
+    const { getByText } = renderWithReaction(
+      <ReactionValueLabelWrapper
+        name="mass"
+        type={VariableType.Number}
+        wrapperConfig={{ cannotBeVariable: true }}
+      />,
+      { editable: true, slots },
     );
     expect(getByText('value mass')).toBeInTheDocument();
   });

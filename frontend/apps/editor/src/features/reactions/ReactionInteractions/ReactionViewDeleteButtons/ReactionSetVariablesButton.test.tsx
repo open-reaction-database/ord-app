@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
+import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import type { AppState } from 'store/configureAppStore.ts';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
 
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
@@ -24,5 +30,30 @@ describe('ReactionSetVariablesButton', () => {
   it('mounts without crashing', () => {
     const { container } = renderInReactionView(<Component />);
     expect(container).toBeInTheDocument();
+  });
+
+  it('opens the template’s entity in the drawer', async () => {
+    renderWithProviders(
+      <TemplateReactionProvider templateId="template_1">
+        <ReactionSetVariablesButton
+          entityName="Notes"
+          pathComponents={['notes']}
+        />
+        <ReactionDetailsSidebar />
+      </TemplateReactionProvider>,
+      {
+        preloadedState: {
+          entities: {
+            reactions: {
+              reactionsById: {
+                template_1: { id: 1, data: emptyReactionData(), variables: {} },
+              },
+            },
+          },
+        } as unknown as AppState,
+      },
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Set Variables' }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Notes');
   });
 });

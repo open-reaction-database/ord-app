@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionEntityTitle } from './ReactionEntityTitle.tsx';
 
 // Smoke test: mounts within seeded reaction/entity contexts + store without throwing.
@@ -22,12 +22,12 @@ const Component = ReactionEntityTitle as unknown as () => JSX.Element;
 
 describe('ReactionEntityTitle', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 
-  const title = (options: Parameters<typeof renderInReactionView>[1]) =>
-    renderInReactionView(
+  const title = (options: Parameters<typeof renderWithReaction>[1]) =>
+    renderWithReaction(
       <ReactionEntityTitle
         pathComponents={['notes']}
         entityName="Notes"
@@ -37,12 +37,14 @@ describe('ReactionEntityTitle', () => {
     );
 
   it('offers Delete when the reaction can be edited', () => {
-    expect(title({}).getByRole('button', { name: 'Remove Notes' })).toBeInTheDocument();
+    expect(
+      title({ editable: true }).getByRole('button', { name: 'Remove Notes' }),
+    ).toBeInTheDocument();
   });
 
   it.each([
-    ['a read-only dataset', { isViewOnly: true }],
-    ['a template', { reactionId: 'template_1' }],
+    ['a read-only dataset', {}],
+    ['a template', { reactionId: 'template_1', isTemplate: true }],
   ] as const)('offers no Delete on %s', (_name, options) => {
     expect(
       title(options).queryByRole('button', { name: 'Remove Notes' }),

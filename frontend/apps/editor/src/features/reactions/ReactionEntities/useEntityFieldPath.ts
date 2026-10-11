@@ -15,7 +15,7 @@
  */
 import { useContext, useMemo } from 'react';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import { reactionEntityContext } from './reactionEntity.context.ts';
+import { reactionEntityContext } from '@open-reaction-database/ui/reaction';
 
 /** The path of the field `name` of the entity whose form is open. */
 export function useEntityFieldPath(name: string): ReactionPathComponents {

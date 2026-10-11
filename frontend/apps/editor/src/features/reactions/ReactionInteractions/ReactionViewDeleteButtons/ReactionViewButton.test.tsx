@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionViewButton } from './ReactionViewButton.tsx';
 
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
@@ -22,7 +22,7 @@ const Component = ReactionViewButton as unknown as () => JSX.Element;
 
 describe('ReactionViewButton', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 });

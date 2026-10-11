@@ -15,30 +15,26 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '@open-reaction-database/ui/testing';
 import { ReactionEntityForm } from './ReactionEntityForm.tsx';
 import { reactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.models.ts';
 import { ReactionNodeEntity } from '@open-reaction-database/ui/reaction/model';
 
-// The real form registry eagerly imports every node form, including the Ketcher/d3 structure
-// editor (a CJS/ESM break under vitest). Stub the registry to an empty form — the field nodes
-// aren't what's under test here; the paste-submit wiring is.
+// Stub the form registry to an empty form: the field nodes aren't what's under test here; the
+// paste-submit wiring is.
 vi.mock('features/reactions/ReactionEntities', () => ({
   ReactionEntityBaseNode: () => null,
   reactionEntityToForm: new Proxy({}, { get: () => [] }),
 }));
 
-// Drive the paste flow through a stubbed clipboard read and capture what the form dispatches.
+// Drive the paste flow through a stubbed clipboard read and capture what the form saves.
 const pasteReactionPartMock = vi.fn();
 vi.mock('./reactionEntityForm.utils.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   pasteReactionPart: (...args: Array<unknown>) => pasteReactionPartMock(...args),
-}));
-
-const addUpdateReactionFieldMock = vi.fn((_arg: unknown) => ({ type: 'test/noop' }));
-vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
-  ...((await importActual()) as Record<string, unknown>),
-  addUpdateReactionField: (arg: unknown) => addUpdateReactionFieldMock(arg),
 }));
 
 const provenanceSidebarInfo = reactionSidebarInfo.find(
@@ -54,7 +50,8 @@ describe('ReactionEntityForm — Paste Chunk filtering', () => {
       'clipboard-text',
     ]);
 
-    renderInReactionView(
+    const actions = stubReactionActions();
+    renderWithReaction(
       <ReactionEntityForm
         isHidden={false}
         reactionPathComponents={provenanceSidebarInfo.pathComponents}
@@ -62,16 +59,16 @@ describe('ReactionEntityForm — Paste Chunk filtering', () => {
         onFormClose={() => {}}
         onSetFormDirty={() => {}}
       />,
+      { actions },
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Paste Chunk' }));
     fireEvent.click(screen.getByRole('button', { name: 'Paste' }));
 
-    await waitFor(() => expect(addUpdateReactionFieldMock).toHaveBeenCalled());
+    await waitFor(() => expect(actions.update).toHaveBeenCalled());
 
-    const { newValue } = addUpdateReactionFieldMock.mock.calls[0][0] as {
-      newValue: Record<string, unknown>;
-    };
+    const [pathComponents, newValue] = actions.update.mock.calls[0];
+    expect(pathComponents).toEqual(['provenance']);
     // The bug submitted the raw chunk, leaking recordModified into the merge; the fix submits filtered values.
     expect(newValue).not.toHaveProperty('recordModified');
     expect(newValue).toHaveProperty('doi', '10.0000/paste-test');

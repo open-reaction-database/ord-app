@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ReactionNodeValidationResultDisplay } from './ReactionNodeValidationResult.tsx';
 import type { ReactionValidation } from '@open-reaction-database/ui/reaction/model';
 

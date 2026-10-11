@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { ReactionValidationResult } from './ReactionValidationResult.tsx';
 
 describe('ReactionValidationResult', () => {
   it('shows pluralized error and warning counts when the reaction is invalid', () => {
-    const { getByText } = renderInReactionView(<ReactionValidationResult />, {
+    const { getByText } = renderWithReaction(<ReactionValidationResult />, {
+      editable: true,
       record: {
         is_valid: false,
         validation: {
@@ -33,14 +34,16 @@ describe('ReactionValidationResult', () => {
   });
 
   it('shows no badge for a reaction that carries no validity, such as a template', () => {
-    const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
+    const { queryByText } = renderWithReaction(<ReactionValidationResult />, {
       reactionId: 'template_1',
+      isTemplate: true,
     });
     expect(queryByText(/Reaction is/)).not.toBeInTheDocument();
   });
 
   it('shows neither an error nor a warning count when the reaction is valid', () => {
-    const { queryByText } = renderInReactionView(<ReactionValidationResult />, {
+    const { queryByText } = renderWithReaction(<ReactionValidationResult />, {
+      editable: true,
       record: { is_valid: true, validation: null },
     });
     expect(queryByText(/error/)).not.toBeInTheDocument();

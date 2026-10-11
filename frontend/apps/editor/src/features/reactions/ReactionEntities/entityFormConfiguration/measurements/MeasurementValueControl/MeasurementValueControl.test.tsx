@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { MeasurementValueControl } from './MeasurementValueControl.tsx';
 import { ReactionMeasurementValueType } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
@@ -30,12 +30,12 @@ const formMethods = {
 } as unknown as ReactionEntityNodeProps['formMethods'];
 
 const renderControl = (isViewOnly = false) =>
-  renderInReactionView(
+  renderWithReaction(
     <MeasurementValueControl
       name="measurement"
       formMethods={formMethods}
     />,
-    { isViewOnly },
+    { editable: !isViewOnly },
   );
 
 describe('MeasurementValueControl', () => {

@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  emptyReactionData,
+  renderWithReaction,
+} from '@open-reaction-database/ui/testing';
 import { ReactionHeader } from './ReactionHeader.tsx';
 
 describe('ReactionHeader', () => {
   it('shows the reaction ID, the actions it is given, and the preview', () => {
-    const { getByRole, getByText } = renderInReactionView(
+    const { getByRole, getByText } = renderWithReaction(
       <ReactionHeader
         actions={<button type="button">Page action</button>}
         titleActions={<button type="button">Title action</button>}
       />,
-      { record: { pb_reaction_id: 'ord-123', is_valid: true, validation: null } },
+      {
+        editable: true,
+        record: { pb_reaction_id: 'ord-123', is_valid: true, validation: null },
+      },
     );
     expect(getByRole('heading', { name: 'ord-123' })).toBeInTheDocument();
     expect(getByText('Page action')).toBeInTheDocument();
@@ -35,7 +40,8 @@ describe('ReactionHeader', () => {
   });
 
   it('passes the request for details to its preview', () => {
-    const { getByText } = renderInReactionView(<ReactionHeader showDetails />, {
+    const { getByText } = renderWithReaction(<ReactionHeader showDetails />, {
+      editable: true,
       reaction: {
         ...emptyReactionData(),
         inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },

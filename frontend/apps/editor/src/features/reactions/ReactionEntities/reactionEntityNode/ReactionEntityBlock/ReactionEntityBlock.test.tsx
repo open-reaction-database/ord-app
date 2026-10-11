@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ReactionEntityBlock } from './ReactionEntityBlock.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
+// Smoke test: the component mounts under MantineProvider without throwing.
 const Component = ReactionEntityBlock as unknown as () => JSX.Element;
 
 describe('ReactionEntityBlock', () => {
   it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
+    const { container } = renderWithMantine(<Component />);
     expect(container).toBeInTheDocument();
   });
 });

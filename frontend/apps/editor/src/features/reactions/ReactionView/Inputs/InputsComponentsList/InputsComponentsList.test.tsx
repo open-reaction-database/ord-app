@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { InputsComponentsList } from './InputsComponentsList.tsx';
 import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
 
@@ -24,9 +24,9 @@ const inputs = [
 
 describe('InputsComponentsList', () => {
   it('renders the column headers and one accordion item per input', () => {
-    const { getByText } = renderInReactionView(
-      <InputsComponentsList inputs={inputs} />,
-    );
+    const { getByText } = renderWithReaction(<InputsComponentsList inputs={inputs} />, {
+      editable: true,
+    });
     for (const header of ['Input', 'Identifiers', 'Preview', 'Role', 'Amount']) {
       expect(getByText(header)).toBeInTheDocument();
     }

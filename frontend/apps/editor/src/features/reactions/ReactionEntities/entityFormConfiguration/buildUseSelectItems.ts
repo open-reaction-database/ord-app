@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 import { useContext, useMemo } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
+import {
+  reactionEntityContext,
+  useReactionPart,
+} from '@open-reaction-database/ui/reaction';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const NO_ITEMS: Array<never> = [];
 

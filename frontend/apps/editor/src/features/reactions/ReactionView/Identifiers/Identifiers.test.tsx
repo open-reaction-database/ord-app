@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { renderWithReaction } from '@open-reaction-database/ui/testing';
 import { Identifiers } from './Identifiers.tsx';
 
 describe('Identifiers', () => {
   it('renders the identifiers section with the add button when editable', () => {
-    const { getByText, getByRole } = renderInReactionView(<Identifiers />);
+    const { getByText, getByRole } = renderWithReaction(<Identifiers />, {
+      editable: true,
+    });
     expect(getByText('Identifiers')).toBeInTheDocument();
     expect(getByText(/Reaction identifiers define/)).toBeInTheDocument();
     expect(getByRole('button', { name: /Identifier/ })).toBeInTheDocument();
   });
 
   it('hides the add button in view-only mode', () => {
-    const { queryByRole } = renderInReactionView(<Identifiers />, {
-      isViewOnly: true,
-    });
+    const { queryByRole } = renderWithReaction(<Identifiers />, {});
     expect(queryByRole('button', { name: /Identifier/ })).not.toBeInTheDocument();
   });
 });

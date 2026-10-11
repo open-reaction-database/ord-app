@@ -18,8 +18,8 @@ import { create } from '@bufbuild/protobuf';
 import { ProductCompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { AddCircleIcon, EmptyIcon } from 'common/icons';
 import { useCallback, useContext } from 'react';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import {
+  reactionEntityContext,
   useDrawer,
   useIsViewOnly,
   useReactionActions,

@@ -17,8 +17,10 @@ import { describe, it, expect } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
 import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  renderWithReaction,
+  emptyReactionData,
+} from '@open-reaction-database/ui/testing';
 import { CustomIdentifiers } from './CustomIdentifiers.tsx';
 
 const reaction = {
@@ -37,7 +39,8 @@ function FakeMoleculeEditor({ opened }: Readonly<MoleculeEditorProps>) {
 describe('CustomIdentifiers', () => {
   it('opens the name lookup from Add Identifier and closes it on Cancel', async () => {
     const { getByText, getByRole, queryByLabelText, findByLabelText } =
-      renderInReactionView(<CustomIdentifiers />, {
+      renderWithReaction(<CustomIdentifiers />, {
+        editable: true,
         reaction,
         pathComponents: ['inputs', 'in1', 'components', 0],
       });
@@ -51,7 +54,8 @@ describe('CustomIdentifiers', () => {
   });
 
   it('opens the host’s molecule editor from Add Molblock Identifier', () => {
-    const { getByText, queryByText } = renderInReactionView(<CustomIdentifiers />, {
+    const { getByText, queryByText } = renderWithReaction(<CustomIdentifiers />, {
+      editable: true,
       reaction,
       pathComponents: componentPath,
       slots: { MoleculeEditor: FakeMoleculeEditor },
@@ -62,7 +66,8 @@ describe('CustomIdentifiers', () => {
   });
 
   it('offers no molblock drawing without a molecule editor', () => {
-    const { getByText, queryByText } = renderInReactionView(<CustomIdentifiers />, {
+    const { getByText, queryByText } = renderWithReaction(<CustomIdentifiers />, {
+      editable: true,
       reaction,
       pathComponents: componentPath,
     });

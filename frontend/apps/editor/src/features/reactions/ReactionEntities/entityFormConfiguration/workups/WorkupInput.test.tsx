@@ -19,8 +19,10 @@ import {
   useDrawerStack,
   type ReactionViewDeleteButtonsProps,
 } from '@open-reaction-database/ui/reaction';
-import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
-import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import {
+  fullReactionSnapshot,
+  renderWithReaction,
+} from '@open-reaction-database/ui/testing';
 import type { ReactionFormCustomProps } from '../../reactionEntities.types.ts';
 import { WorkupInput } from './WorkupInput.tsx';
 
@@ -45,17 +47,18 @@ function EditButtons({ onEdit }: Readonly<ReactionViewDeleteButtonsProps>) {
 
 describe('WorkupInput', () => {
   it('mounts without crashing', () => {
-    const { container } = renderInReactionView(<Component />);
+    const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
 
   it('opens the workup input, then the component, when a component is edited', () => {
-    const { getByRole } = renderInReactionView(
+    const { getByRole } = renderWithReaction(
       <>
         <WorkupInput {...({ name: 'input' } as ReactionFormCustomProps)} />
         <StackProbe />
       </>,
       {
+        editable: true,
         reaction: fullReactionSnapshot().data,
         pathComponents: ['workups', 0],
         slots: { ViewDeleteButtons: EditButtons },

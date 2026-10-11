@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithMantine } from '@open-reaction-database/ui/testing';
 import { ReactionEntityEmpty } from './ReactionEntityEmpty.tsx';
 import type { ReactionEntityNodeProps } from './reactionEntityNode.types.ts';
 import type { ReactionFormEmpty } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 
 // The empty node is a thin pass-through that renders its child fields via the recursive registry;
-// stub the base node so the test stays off the Ketcher/d3 path.
+// stub the base node so the test sees only the pass-through.
 vi.mock(
   'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBaseNode/ReactionEntityBaseNode.tsx',
   () => ({
