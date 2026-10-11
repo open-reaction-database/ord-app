@@ -49,8 +49,10 @@ vi.mock('@open-reaction-database/ui/reaction', async importActual => ({
   ReactionDetailsSidebar: () => null,
 }));
 // The page shell's user menu needs Auth0 and the signed-in user; neither matters here.
-vi.mock('common/components/PageContainer/PageContainer.tsx', () => ({
-  PageContainer: ({ children }: Readonly<{ children: ReactNode }>) => <>{children}</>,
+vi.mock('common/components/PageContainer/EditorPageContainer.tsx', () => ({
+  EditorPageContainer: ({ children }: Readonly<{ children: ReactNode }>) => (
+    <>{children}</>
+  ),
 }));
 vi.mock('store/entities/reactions/reactions.thunks.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),

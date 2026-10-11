@@ -18,19 +18,21 @@ import { AppShell, Flex } from '@mantine/core';
 import classes from './PageContainer.module.scss';
 import ORDLogo from './ORDLogo.png';
 import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
-import UserMenu from './UserMenu/UserMenu';
 import type { Breadcrumb } from 'common/types/breadcrumbs';
 import { Footer } from './Footer/Footer';
 
-interface PageContainerProps extends PropsWithChildren {
+export interface PageContainerProps extends PropsWithChildren {
   breadcrumbs: Array<Breadcrumb>;
   badge?: ReactNode;
+  /** Controls at the right of the header, such as the signed-in user's menu. */
+  headerActions?: ReactNode;
 }
 
 export function PageContainer({
   children,
   breadcrumbs,
   badge,
+  headerActions,
 }: Readonly<PageContainerProps>) {
   return (
     <AppShell
@@ -47,7 +49,7 @@ export function PageContainer({
           alt="Open Reaction Database logo"
         />
 
-        <UserMenu />
+        {headerActions}
       </AppShell.Header>
 
       <AppShell.Main>

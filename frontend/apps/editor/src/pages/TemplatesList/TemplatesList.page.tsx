@@ -16,7 +16,7 @@
 import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { Flex, Paper, Title } from '@mantine/core';
-import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { useSelector } from 'react-redux';
 import classes from './templatesList.page.module.scss';
@@ -61,7 +61,7 @@ export function TemplatesListPage() {
   }, []);
 
   return (
-    <PageContainer breadcrumbs={breadcrumbs}>
+    <EditorPageContainer breadcrumbs={breadcrumbs}>
       <Flex
         direction="column"
         gap="sm"
@@ -110,6 +110,6 @@ export function TemplatesListPage() {
           </Flex>
         </div>
       </Flex>
-    </PageContainer>
+    </EditorPageContainer>
   );
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
 import { Title, Text, Button, Flex } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
 import { HomeIcon } from '@open-reaction-database/ui/theme';
@@ -29,7 +29,7 @@ export function NotFoundPage({ rejectValue }: Readonly<NotFoundPageProps>) {
   const errorMessage =
     rejectValue?.errorMessage ?? 'The requested page or resource could not be found';
   return (
-    <PageContainer breadcrumbs={[]}>
+    <EditorPageContainer breadcrumbs={[]}>
       <Flex className={classes.container}>
         <Title
           order={1}
@@ -52,6 +52,6 @@ export function NotFoundPage({ rejectValue }: Readonly<NotFoundPageProps>) {
           Go to Datasets Page
         </Button>
       </Flex>
-    </PageContainer>
+    </EditorPageContainer>
   );
 }

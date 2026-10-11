@@ -22,7 +22,7 @@ import {
   ReactionDetailsSidebar,
   ReactionTabs,
 } from '@open-reaction-database/ui/reaction';
-import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { selectAreTemplatesLoaded } from 'store/entities/templates/templates.selectors.ts';
@@ -58,7 +58,7 @@ export function TemplatePage() {
   }
 
   return (
-    <PageContainer
+    <EditorPageContainer
       breadcrumbs={breadcrumbs}
       badge={
         <Badge
@@ -88,6 +88,6 @@ export function TemplatePage() {
           </Flex>
         )}
       </TemplateReactionProvider>
-    </PageContainer>
+    </EditorPageContainer>
   );
 }

@@ -41,8 +41,8 @@ vi.mock('pages/NotFound/NotFoundPage.tsx', () => ({
     <div data-testid="not-found">{rejectValue?.errorCode}</div>
   ),
 }));
-vi.mock('common/components/PageContainer/PageContainer.tsx', () => ({
-  PageContainer: ({ children }: Readonly<{ children: React.ReactNode }>) => (
+vi.mock('common/components/PageContainer/EditorPageContainer.tsx', () => ({
+  EditorPageContainer: ({ children }: Readonly<{ children: React.ReactNode }>) => (
     <div data-testid="page-container">{children}</div>
   ),
 }));
