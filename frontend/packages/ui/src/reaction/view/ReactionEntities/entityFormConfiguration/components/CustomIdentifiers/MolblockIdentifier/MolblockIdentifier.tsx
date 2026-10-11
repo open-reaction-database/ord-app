@@ -19,7 +19,11 @@ import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 import { KeyValueDisplay } from '#display/KeyValueDisplay/KeyValueDisplay.tsx';
 import { useContext } from 'react';
 import { reactionEntityContext } from '#reaction/view/ReactionEntities/reactionEntity.context.ts';
-import { useReactionSlots } from '#reaction/provider/reactionProvider.hooks.ts';
+import {
+  useIsViewOnly,
+  useReactionSlots,
+} from '#reaction/provider/reactionProvider.hooks.ts';
+import { ReactionEntityDelete } from '#reaction/view/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import type { ReactionCompoundIdentifier } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
 
 interface MolblockIdentifierProps {
@@ -35,8 +39,10 @@ export function MolblockIdentifier({
   index,
   onEdit,
 }: Readonly<MolblockIdentifierProps>) {
-  const { ViewDeleteButtons } = useReactionSlots();
+  const { ViewDeleteButtons, MoleculeEditor } = useReactionSlots();
+  const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
+  const identifierPath = [...pathComponents, 'molBlockIdentifiers', itemKey];
   return (
     <Flex
       key={identifier.value}
@@ -65,11 +71,19 @@ export function MolblockIdentifier({
           />
         </Flex>
         <Flex>
-          <ViewDeleteButtons
-            entityName="Identifier"
-            pathComponents={[...pathComponents, 'molBlockIdentifiers', itemKey]}
-            onEdit={() => onEdit(index)}
-          />
+          {/* Without a molecule editor, an editable molblock can be removed but not redrawn. */}
+          {MoleculeEditor || isViewOnly ? (
+            <ViewDeleteButtons
+              entityName="Identifier"
+              pathComponents={identifierPath}
+              onEdit={() => onEdit(index)}
+            />
+          ) : (
+            <ReactionEntityDelete
+              entityName="Identifier"
+              pathComponents={identifierPath}
+            />
+          )}
         </Flex>
       </Flex>
     </Flex>

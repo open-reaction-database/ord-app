@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import type { ReactionViewDeleteButtonsProps } from '#reaction/provider/reactionViewDeleteButtons.types.ts';
 import { fireEvent, waitFor } from '@testing-library/react';
 import type { MoleculeEditorProps } from '#reaction/provider/reactionProvider.types.ts';
 import type { AppReaction } from '#reaction/model/reactions.types.ts';
@@ -29,6 +30,38 @@ const reaction = {
 } as unknown as AppReaction;
 
 const componentPath = ['inputs', 'in1', 'components', 0];
+
+vi.mock('#reaction/previews/renderPreviews.ts', () => ({
+  renderPreviews: () => new Promise(() => undefined),
+}));
+
+const withMolblock = {
+  ...emptyReactionData(),
+  inputs: {
+    in1: {
+      id: 'in1',
+      name: 'in1',
+      components: [
+        {
+          id: 'c1',
+          identifiers: [],
+          molBlockIdentifiers: [{ id: 'm1', value: 'MOL', details: 'drawn' }],
+        },
+      ],
+    },
+  },
+} as unknown as AppReaction;
+
+function EditButton({ onEdit }: Readonly<ReactionViewDeleteButtonsProps>) {
+  return onEdit ? (
+    <button
+      type="button"
+      onClick={onEdit}
+    >
+      Edit
+    </button>
+  ) : null;
+}
 
 function FakeMoleculeEditor({ opened }: Readonly<MoleculeEditorProps>) {
   return opened ? <p>editor open</p> : null;
@@ -71,5 +104,27 @@ describe('CustomIdentifiers', () => {
     });
     expect(getByText('Add Identifier')).toBeInTheDocument();
     expect(queryByText('Add Molblock Identifier')).not.toBeInTheDocument();
+  });
+
+  it('offers Edit on a molblock only with a molecule editor', () => {
+    const options = {
+      editable: true,
+      reaction: withMolblock,
+      pathComponents: componentPath,
+    };
+    const plain = renderWithReaction(<CustomIdentifiers />, {
+      ...options,
+      slots: { ViewDeleteButtons: EditButton },
+    });
+    expect(plain.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
+    expect(
+      plain.getByRole('button', { name: 'Remove Identifier' }),
+    ).toBeInTheDocument();
+    plain.unmount();
+    const withEditor = renderWithReaction(<CustomIdentifiers />, {
+      ...options,
+      slots: { ViewDeleteButtons: EditButton, MoleculeEditor: FakeMoleculeEditor },
+    });
+    expect(withEditor.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
   });
 });
