@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 import { createContext } from 'react';
+import type { DrawerActions, DrawerStack } from './drawer.ts';
 import type { ReactionProviderValue } from './reactionProvider.types.ts';
 
 export const reactionProviderContext = createContext<ReactionProviderValue | null>(
   null,
 );
+
+/** The drawer's stack, apart from its actions so writers do not re-render on each change. */
+export const drawerStackContext = createContext<DrawerStack | null>(null);
+
+export const drawerActionsContext = createContext<DrawerActions | null>(null);

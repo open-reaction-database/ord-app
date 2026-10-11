@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useContext, type ReactNode } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { emptyReactionData } from 'test/renderInReactionView.tsx';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import {
+  useDrawer,
+  useDrawerStack,
   useIsTemplate,
   useIsViewOnly,
   useOrderedInputs,
@@ -204,6 +206,65 @@ describe('ReactionProvider props', () => {
       </ReactionProvider>,
     ];
     expect(invalid).toHaveLength(3);
+  });
+});
+
+describe('the drawer', () => {
+  const wrapper = wrapperFor(createStaticReactionSource(snapshot));
+
+  it('opens forms and keeps the same actions across renders', () => {
+    const { result, rerender } = renderHook(
+      () => ({ stack: useDrawerStack(), drawer: useDrawer() }),
+      { wrapper },
+    );
+    const { drawer } = result.current;
+    act(() => drawer.push(['notes']));
+    rerender();
+    expect(result.current.stack).toEqual([['notes']]);
+    expect(result.current.drawer).toBe(drawer);
+  });
+
+  it('does not re-render a component that only changes the stack', () => {
+    let renders = 0;
+    const { result } = renderHook(
+      () => {
+        renders += 1;
+        return useDrawer();
+      },
+      { wrapper },
+    );
+    const rendersAfterMount = renders;
+    act(() => result.current.push(['notes']));
+    expect(renders).toBe(rendersAfterMount);
+  });
+
+  it('starts empty under a provider for another reaction', () => {
+    const source = createStaticReactionSource(snapshot);
+    function Keyed({ id, children }: Readonly<{ id: number; children: ReactNode }>) {
+      return (
+        <ReactionProvider
+          key={id}
+          reactionId={id}
+          source={source}
+          slots={slots}
+        >
+          {children}
+        </ReactionProvider>
+      );
+    }
+    let id = 1;
+    function KeyedWrapper({ children }: Readonly<{ children: ReactNode }>) {
+      return <Keyed id={id}>{children}</Keyed>;
+    }
+    const { result, rerender } = renderHook(
+      () => ({ stack: useDrawerStack(), drawer: useDrawer() }),
+      { wrapper: KeyedWrapper },
+    );
+    act(() => result.current.drawer.push(['notes']));
+    expect(result.current.stack).toHaveLength(1);
+    id = 2;
+    rerender();
+    expect(result.current.stack).toEqual([]);
   });
 });
 

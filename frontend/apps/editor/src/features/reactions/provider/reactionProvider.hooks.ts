@@ -21,7 +21,12 @@ import type { PreviewStatesById } from 'store/entities/reactions/reactionsPrevie
 import { getDeepReactionPart } from './getDeepReactionPart.ts';
 import { shallowEqualArrays, shallowEqualRecords } from './equality.ts';
 import { orderInputs } from './orderInputs.ts';
-import { reactionProviderContext } from './reactionProvider.context.ts';
+import type { DrawerActions, DrawerStack } from './drawer.ts';
+import {
+  drawerActionsContext,
+  drawerStackContext,
+  reactionProviderContext,
+} from './reactionProvider.context.ts';
 import type {
   ReactionActions,
   ReactionProviderValue,
@@ -29,10 +34,12 @@ import type {
   ReactionSnapshot,
 } from './reactionProvider.types.ts';
 
+const OUTSIDE_PROVIDER = 'Reaction hooks must be used inside a ReactionProvider.';
+
 function useProviderValue(): ReactionProviderValue {
   const value = useContext(reactionProviderContext);
   if (!value) {
-    throw new Error('Reaction hooks must be used inside a ReactionProvider.');
+    throw new Error(OUTSIDE_PROVIDER);
   }
   return value;
 }
@@ -104,4 +111,22 @@ export function useIsTemplate(): boolean {
 
 export function useReactionSlots(): ReactionSlots {
   return useProviderValue().slots;
+}
+
+/** The forms open in the drawer, bottom first. */
+export function useDrawerStack(): DrawerStack {
+  const stack = useContext(drawerStackContext);
+  if (stack === null) {
+    throw new Error(OUTSIDE_PROVIDER);
+  }
+  return stack;
+}
+
+/** Opens and closes drawer forms; the same object for the life of the provider. */
+export function useDrawer(): DrawerActions {
+  const drawer = useContext(drawerActionsContext);
+  if (drawer === null) {
+    throw new Error(OUTSIDE_PROVIDER);
+  }
+  return drawer;
 }
