@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
+import { SAVE_TIMEOUT_MS } from 'store/utils/saveQueue.ts';
 import { deferred } from 'test/deferred.ts';
 import { navigate } from 'wouter/use-browser-location';
 import {
@@ -94,27 +95,29 @@ describe('importFromFile', () => {
   });
 });
 
+const kept = { path: ['notes', 'safetyNotes'], name: 'notes' };
+
+/** A store holding template_5, whose one variable is `kept`. */
+function storeWithTemplate() {
+  const recording = makeRecordingStore();
+  recording.store.dispatch(
+    getAllTemplatesActions.success([
+      {
+        id: 'template_5',
+        name: 'template',
+        data: emptyReactionData(),
+        previews: {},
+        summary: { provenance: {}, summary: {}, conditions: '' },
+        variables: { 'notes.safetyNotes': kept },
+        modified_at: '',
+      },
+    ] as never),
+  );
+  return recording;
+}
+
 describe('a failed save', () => {
   const failed = (message: string) => ({ message, variant: NotificationVariant.ERROR });
-  const kept = { path: ['notes', 'safetyNotes'], name: 'notes' };
-
-  function storeWithTemplate() {
-    const recording = makeRecordingStore();
-    recording.store.dispatch(
-      getAllTemplatesActions.success([
-        {
-          id: 'template_5',
-          name: 'template',
-          data: emptyReactionData(),
-          previews: {},
-          summary: { provenance: {}, summary: {}, conditions: '' },
-          variables: { 'notes.safetyNotes': kept },
-          modified_at: '',
-        },
-      ] as never),
-    );
-    return recording;
-  }
 
   it('of a template removal says so and stays on the template', async () => {
     axiosMock.delete.mockRejectedValue(new Error('offline'));
@@ -187,8 +190,10 @@ describe('a failed save', () => {
       'conditions.temperature': temperature,
     });
   });
+});
 
-  it('of variables edited together is sent once', async () => {
+describe('variable saves', () => {
+  it('send variables edited together once', async () => {
     axiosMock.patch.mockResolvedValue({ data: {} });
     const { store } = storeWithTemplate();
     await Promise.all(
@@ -203,6 +208,46 @@ describe('a failed save', () => {
           } as never) as unknown as UnknownAction,
         ),
       ),
+    );
+    expect(axiosMock.patch).toHaveBeenCalledTimes(1);
+  });
+
+  it('give up after the save timeout', async () => {
+    axiosMock.patch.mockResolvedValue({ data: {} });
+    const { store } = storeWithTemplate();
+    await store.dispatch(
+      addUpdateVariable({
+        templateId: 'template_5',
+        variable: { path: ['conditions', 'temperature'], name: 'temp' },
+      } as never) as unknown as UnknownAction,
+    );
+    expect(axiosMock.patch).toHaveBeenCalledWith('templates/5', expect.anything(), {
+      timeout: SAVE_TIMEOUT_MS,
+    });
+  });
+
+  it('end quietly when the template is removed while they wait', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockResolvedValue({ data: {} });
+    const { store } = storeWithTemplate();
+    const save = (variable: { path: Array<string>; name: string }) =>
+      store.dispatch(
+        addUpdateVariable({
+          templateId: 'template_5',
+          variable,
+        } as never) as unknown as UnknownAction,
+      );
+    const first = save({ path: ['conditions', 'temperature'], name: 'temp' });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const second = save({ path: ['conditions', 'pressure'], name: 'pressure' });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    store.dispatch(removeTemplateActions.success(5 as never));
+    firstSave.resolve({ data: {} });
+    await Promise.all([first, second]);
+    expect(showNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ variant: NotificationVariant.ERROR }),
     );
     expect(axiosMock.patch).toHaveBeenCalledTimes(1);
   });

@@ -52,6 +52,11 @@ export interface RenameReactionPayload {
   name: string;
 }
 
+/** A saved rename: the data it read, which the backend now holds under the new name. */
+export interface RenamedReactionPayload extends RenameReactionPayload {
+  savedData: DatasetReaction['data'];
+}
+
 export interface UpdateReactionPayload {
   reactionId: ReactionId;
   pathComponents: ReactionPathComponents;

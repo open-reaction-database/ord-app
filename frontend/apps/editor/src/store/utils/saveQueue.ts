@@ -35,3 +35,23 @@ export function createSaveQueue<Key>() {
     return result;
   };
 }
+
+/**
+ * Returns a function from a store to its own `enqueue`, so separate stores (as in tests) never
+ * wait on each other's saves. Key a store by its `getState`, which thunks receive and which stays
+ * the same function for the store's life.
+ */
+export function createStoreSaveQueues<Key>() {
+  const queues = new WeakMap<object, ReturnType<typeof createSaveQueue<Key>>>();
+  return (store: object) => {
+    let enqueue = queues.get(store);
+    if (enqueue === undefined) {
+      enqueue = createSaveQueue<Key>();
+      queues.set(store, enqueue);
+    }
+    return enqueue;
+  };
+}
+
+/** How long a save waits for the backend before failing, so one request cannot hold a queue. */
+export const SAVE_TIMEOUT_MS = 60_000;

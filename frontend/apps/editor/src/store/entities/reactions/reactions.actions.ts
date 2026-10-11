@@ -24,6 +24,7 @@ import type {
   UpdateReactionPayload,
   SavedReactionPayload,
   RenameReactionPayload,
+  RenamedReactionPayload,
 } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
@@ -58,7 +59,7 @@ export const importReactionFromFileActions = createAsyncAction<
 
 export const renameReactionActions = createAsyncAction<
   RenameReactionPayload,
-  RenameReactionPayload
+  RenamedReactionPayload
 >('rename');
 
 export const addUpdateReactionFieldActions = createAsyncAction<

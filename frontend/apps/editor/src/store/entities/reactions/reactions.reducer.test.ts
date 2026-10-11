@@ -204,12 +204,17 @@ describe('reactions.reducer — reactionsById field edits', () => {
     };
     const state = reduce(
       seeded,
-      renameReactionActions.success({ reactionId: 1, name: 'new-name' } as never),
+      renameReactionActions.success({
+        reactionId: 1,
+        name: 'new-name',
+        savedData: asEntry(reduce(seeded, { type: '@@probe' }).reactionsById[1]).data,
+      } as never),
     );
     expect(state.reactionsById[1]).toMatchObject({
       pb_reaction_id: 'new-name',
       data: { reactionId: 'new-name' },
     });
+    expect(asEntry(state.reactionsById[1]).dataBeforeEdit).toBeUndefined();
   });
 });
 
@@ -217,6 +222,15 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
   const seedNotes = (text: string) => ({
     reactionsById: { 1: reaction(1, { notes: { text } }) } as never,
   });
+  const editNotes = (state: Partial<ReactionsState>, text: string) =>
+    reduce(
+      state,
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: text,
+      } as never),
+    );
 
   it('snapshots the pre-edit data when an edit is dispatched', () => {
     const state = reduce(
@@ -304,18 +318,9 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
   });
 
   it('rolls back to what a save sent when edits made during it are rejected', () => {
-    const edit = (state: Partial<ReactionsState>, text: string) =>
-      reduce(
-        state,
-        addUpdateReactionFieldActions.request({
-          reactionId: 1,
-          pathComponents: ['notes', 'text'],
-          newValue: text,
-        } as never),
-      );
-    const first = edit(seedNotes('original'), 'first');
+    const first = editNotes(seedNotes('original'), 'first');
     const sent = asEntry(first.reactionsById[1]).data;
-    const second = edit(first, 'second');
+    const second = editNotes(first, 'second');
     const saved = reduce(
       second,
       addUpdateReactionFieldActions.success({
@@ -329,21 +334,27 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     expect(asEntry(restored.reactionsById[1]).data.notes).toEqual({ text: 'first' });
   });
 
-  it('renames the saved data too, so a failed save keeps the new name', () => {
-    const afterEdit = reduce(
-      seedNotes('original'),
-      addUpdateReactionFieldActions.request({
+  it('counts the edits a rename sent as saved, under the new name', () => {
+    const first = editNotes(seedNotes('original'), 'first');
+    const sent = asEntry(first.reactionsById[1]).data;
+    const second = editNotes(first, 'second');
+    const renamed = reduce(
+      second,
+      renameReactionActions.success({
         reactionId: 1,
-        pathComponents: ['notes', 'text'],
-        newValue: 'edited',
+        name: 'renamed',
+        savedData: sent,
       } as never),
     );
-    const renamed = reduce(
-      afterEdit,
-      renameReactionActions.success({ reactionId: 1, name: 'renamed' } as never),
-    );
+    expect(asEntry(renamed.reactionsById[1]).data).toMatchObject({
+      reactionId: 'renamed',
+      notes: { text: 'second' },
+    });
     const restored = reduce(renamed, restoreSavedReaction(1));
-    expect(asEntry(restored.reactionsById[1]).data.reactionId).toBe('renamed');
+    expect(asEntry(restored.reactionsById[1]).data).toMatchObject({
+      reactionId: 'renamed',
+      notes: { text: 'first' },
+    });
   });
 });
 

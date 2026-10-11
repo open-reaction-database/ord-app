@@ -32,7 +32,6 @@ import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import {
-  type AppReaction,
   type ReactionId,
   type ReactionResponse,
   reactionToOrdBinpb,
@@ -41,7 +40,7 @@ import {
   parseValidation,
 } from '@open-reaction-database/ui/reaction/model';
 import type { SavedReactionPayload } from 'store/entities/reactions/reactionsStore.types.ts';
-import { createSaveQueue } from 'store/utils/saveQueue.ts';
+import { createStoreSaveQueues, SAVE_TIMEOUT_MS } from 'store/utils/saveQueue.ts';
 import {
   selectActiveDatasetId,
   selectReactionById,
@@ -162,13 +161,13 @@ export const importReactionFromFile = createThunkWithExplicitResult(
 );
 
 // Each save sends the whole reaction, so saves of one reaction run one at a time, in order.
-const enqueueReactionSave = createSaveQueue<ReactionId>();
+const reactionSaveQueues = createStoreSaveQueues<ReactionId>();
 
 async function updateReaction(
   reactionId: ReactionId,
+  datasetId: number,
   getState: () => AppState,
 ): Promise<SavedReactionPayload> {
-  const datasetId = selectActiveDatasetId(getState());
   const reaction = selectReactionById(reactionId)(getState());
   const payload = reactionToOrdBinpb(reaction.data);
   const {
@@ -182,6 +181,7 @@ async function updateReaction(
       {
         binpb: payload,
       },
+      { timeout: SAVE_TIMEOUT_MS },
     )
   ).data;
   const updatedValidation = validation
@@ -196,9 +196,9 @@ async function updateReaction(
 }
 
 /**
- * Saves the reaction's unsaved edits once earlier saves of it settle, and records the outcome
- * before the next save starts. Saves nothing when none are left: an earlier save sent them, or
- * a failed one rolled them back.
+ * Saves the reaction's unsaved edits, to the dataset open when they were made, once earlier saves
+ * of it settle, and records the outcome before the next save starts. Saves nothing when none are
+ * left: an earlier save sent them, a failed one rolled them back, or the reaction was removed.
  */
 const saveEditedReaction: ThunkCustomWrapper<
   {
@@ -208,13 +208,14 @@ const saveEditedReaction: ThunkCustomWrapper<
   Promise<void>
 > =
   ({ reactionId, succeeded }) =>
-  (dispatch, getState) =>
-    enqueueReactionSave(reactionId, async () => {
-      if (selectReactionById(reactionId)(getState()).dataBeforeEdit === undefined) {
+  (dispatch, getState) => {
+    const datasetId = selectActiveDatasetId(getState());
+    return reactionSaveQueues(getState)(reactionId, async () => {
+      if (selectReactionById(reactionId)(getState())?.dataBeforeEdit === undefined) {
         return;
       }
       try {
-        dispatch(succeeded(await updateReaction(reactionId, getState)));
+        dispatch(succeeded(await updateReaction(reactionId, datasetId, getState)));
       } catch (e) {
         dispatch(restoreSavedReaction(reactionId));
         throw e;
@@ -224,24 +225,27 @@ const saveEditedReaction: ThunkCustomWrapper<
         variant: NotificationVariant.SUCCESS,
       });
     });
+  };
 
-export const renameReaction = createThunk(
+export const renameReaction = createThunkWithExplicitResult(
   renameReactionActions,
   ({ reactionId, name }) =>
-    async (_d, getState) => {
-      await enqueueReactionSave(reactionId, async () => {
-        const datasetId = selectActiveDatasetId(getState());
+    async (dispatch, getState) => {
+      const datasetId = selectActiveDatasetId(getState());
+      await reactionSaveQueues(getState)(reactionId, async () => {
         const reaction = selectReactionById(reactionId)(getState());
-        const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
-        const payload = reactionToOrdBinpb(updatedReaction);
+        if (reaction === undefined) {
+          return;
+        }
+        // A rename sends the whole reaction, unsaved edits included, so it records what it sent.
+        const savedData = reaction.data;
         await axiosInstance.patch<ReactionResponse>(
           `datasets/${datasetId}/reactions/${reactionId}`,
-          {
-            binpb: payload,
-          },
+          { binpb: reactionToOrdBinpb({ ...savedData, reactionId: name }) },
+          { timeout: SAVE_TIMEOUT_MS },
         );
+        dispatch(renameReactionActions.success({ reactionId, name, savedData }));
       });
-      return renameReactionActions.success({ reactionId, name });
     },
   { failureMessage: 'Failed to rename reaction.' },
 );

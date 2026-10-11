@@ -186,32 +186,37 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     const { variablesBeforeEdit, ...rest } = template;
     return { ...state, [templateId]: { ...rest, variables: variablesBeforeEdit } };
   });
-  builder.addCase(renameReactionActions.success, (state, action) => {
-    const { reactionId, name } = action.payload;
-    const reaction = state[reactionId];
-
-    return {
-      ...state,
-      [action.payload.reactionId]: {
-        ...reaction,
-        pb_reaction_id: name,
-        data: {
-          ...reaction.data,
-          reactionId: name,
+  builder.addCase(
+    renameReactionActions.success,
+    (state, { payload: { reactionId, name, savedData } }) => {
+      // The state is an Immer draft: compare the stored data, not its proxy, with what was sent.
+      const stored = original(state)![reactionId];
+      if (stored === undefined) {
+        return state;
+      }
+      const reaction = state[reactionId];
+      return {
+        ...state,
+        [reactionId]: {
+          ...reaction,
+          pb_reaction_id: name,
+          data: { ...reaction.data, reactionId: name },
+          // The backend now holds the data the rename sent, under the new name. Edits made since
+          // stay unsaved, and a failed save of them rolls back to it. (#615)
+          dataBeforeEdit:
+            stored.data === savedData ? undefined : { ...savedData, reactionId: name },
         },
-        // The saved copy that a failed edit restores carries the new name too.
-        dataBeforeEdit: reaction.dataBeforeEdit && {
-          ...reaction.dataBeforeEdit,
-          reactionId: name,
-        },
-      },
-    };
-  });
+      };
+    },
+  );
   builder.addMatcher(
     isAnyOf(addUpdateVariableActions.success, removeVariableActions.success),
     (state, { payload: { templateId, savedVariables } }) => {
       // The state is an Immer draft: compare the stored variables, not their proxy.
-      const template = original(state)![templateId] as ReactionTemplate;
+      const template = original(state)![templateId] as ReactionTemplate | undefined;
+      if (template === undefined) {
+        return state;
+      }
       // The backend now holds the variables this save sent; edits made since stay unsaved.
       return {
         ...state,
@@ -238,7 +243,11 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, { payload: { savedData, ...payload } }) => {
       const { id } = payload;
       // The state is an Immer draft: compare the stored data, not its proxy, with what was sent.
-      const { data } = original(state)![id];
+      const stored = original(state)![id];
+      if (stored === undefined) {
+        return state;
+      }
+      const { data } = stored;
       // The backend now holds the data this save sent. Edits made since stay unsaved, and a failed
       // save of them rolls back to it. (#615)
       return {

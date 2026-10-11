@@ -32,7 +32,7 @@ import type {
 import type { Action } from '@reduxjs/toolkit';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
-import { createSaveQueue } from 'store/utils/saveQueue.ts';
+import { createStoreSaveQueues, SAVE_TIMEOUT_MS } from 'store/utils/saveQueue.ts';
 import {
   ordBinpbToReaction,
   reactionToOrdBinpb,
@@ -142,12 +142,12 @@ export const renameTemplate = createThunk(
 );
 
 // Each save sends every variable, so saves of one template run one at a time, in order.
-const enqueueVariablesSave = createSaveQueue<string>();
+const variablesSaveQueues = createStoreSaveQueues<string>();
 
 /**
  * Saves the template's unsaved variable edits once earlier saves settle, and records the outcome
  * before the next save starts. Saves nothing when none are left: an earlier save sent them, or a
- * failed one rolled them back.
+ * failed one rolled them back, or the template was removed.
  */
 const saveEditedVariables: ThunkCustomWrapper<
   {
@@ -158,20 +158,20 @@ const saveEditedVariables: ThunkCustomWrapper<
 > =
   ({ templateId, succeeded }) =>
   (dispatch, getState) =>
-    enqueueVariablesSave(templateId, async () => {
-      const {
-        variables,
-        variablesBeforeEdit,
-        data: reaction,
-      } = selectReactionById(templateId)(getState()) as ReactionTemplate;
-      if (variablesBeforeEdit === undefined) {
+    variablesSaveQueues(getState)(templateId, async () => {
+      const template = selectReactionById(templateId)(getState()) as
+        | ReactionTemplate
+        | undefined;
+      if (template?.variablesBeforeEdit === undefined) {
         return;
       }
+      const { variables, data: reaction } = template;
       try {
         const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
         await axiosInstance.patch<TemplateResponse>(
           `templates/${getTemplateIdNumber(templateId)}`,
           { variables: JSON.stringify(variablesList) },
+          { timeout: SAVE_TIMEOUT_MS },
         );
       } catch (e) {
         dispatch(restoreSavedVariables(templateId));
