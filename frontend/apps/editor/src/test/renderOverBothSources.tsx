@@ -92,11 +92,14 @@ function renderOver(
 /**
  * Renders `ui` over a static source with an empty store, and over the Redux source with the
  * reaction in the store, and returns both HTML strings. A component that reads the reaction
- * from the store renders differently over the two.
+ * from the store renders differently over the two. Each conversion of the fixture generates
+ * new entity IDs, so a caller that addresses an entity by ID passes the snapshot it read the
+ * ID from.
  */
-export function renderOverBothSources(ui: ReactElement): [string, string] {
-  // One conversion, so both sides see the same generated entity IDs.
-  const snapshot = fullReactionSnapshot();
+export function renderOverBothSources(
+  ui: ReactElement,
+  snapshot: ReactionSnapshot = fullReactionSnapshot(),
+): [string, string] {
   const seededStore = makeContractStore(snapshot);
   return [
     renderOver(createStaticReactionSource(snapshot), makeContractStore(), ui),
