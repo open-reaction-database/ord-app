@@ -134,29 +134,17 @@ describe('the drawer forms over either source', () => {
   });
 });
 
-/** Buttons a drawer form or its title shows only when the reaction can be edited. */
-const EDIT_CONTROLS = [
-  'Add component',
-  'Add IdentifierVia Look up Name',
-  'Add Molblock IdentifierVia Ketcher',
-  'Analysis',
-  'Analytical Data',
-  'Automation code',
-  'Crude Component',
-  'Feature',
-  'I am contributor',
-  'I am experimenter',
-  'Identifier',
-  'Measurement',
-  'Paste Chunk',
-  'Preparation',
-  'Product',
-  'Record Modification',
-  'Save',
-  'Save and Close',
-  'Vessel Attachment',
-  'Vessel Preparation',
-];
+/**
+ * The only buttons a read-only drawer may show: copying a chunk, closing, and the provenance
+ * date's display. Anything else, such as a new add control, fails the check below.
+ */
+function isReadOnlyControl(label: string): boolean {
+  return (
+    label === 'Copy Chunk' ||
+    label === 'Close' ||
+    /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(label)
+  );
+}
 
 /** The drawer's title, where the Delete icon lives, above the form. */
 function DrawerAt({
@@ -210,10 +198,6 @@ describe('a read-only drawer', () => {
     const labels = queryAllByRole('button').map(button =>
       (button.getAttribute('aria-label') ?? button.textContent ?? '').trim(),
     );
-    expect(
-      labels.filter(
-        label => EDIT_CONTROLS.includes(label) || label.startsWith('Remove '),
-      ),
-    ).toEqual([]);
+    expect(labels.filter(label => !isReadOnlyControl(label))).toEqual([]);
   });
 });

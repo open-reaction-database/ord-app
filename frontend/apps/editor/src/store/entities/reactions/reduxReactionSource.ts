@@ -77,7 +77,9 @@ function smilesIdentifier(name: string, smiles: string): ReactionCompoundIdentif
 }
 
 /**
- * Edits one reaction through the thunks that apply a change optimistically and save it.
+ * Edits one reaction through the thunks that apply a change optimistically and save it;
+ * the compound lookup resolves the name through the API first, and the current person comes
+ * from the signed-in user in the store.
  *
  * The thunks are async, so dispatching one returns a promise, though `ThunkWrapper` types
  * the result as void; awaiting it makes each action settle when the save does. The thunk

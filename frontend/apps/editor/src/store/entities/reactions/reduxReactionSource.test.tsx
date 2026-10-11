@@ -302,6 +302,25 @@ describe('reduxReactionActions.addIdentifierByName', () => {
     expect(request?.payload.newValue).toMatchObject({ value: 'O', details: 'water' });
   });
 
+  it('appends after any identifier added while the name was resolving', async () => {
+    const recorded: Array<UnknownAction> = [];
+    const store = makeStore(recorded);
+    axiosMock.post.mockImplementation(async () => {
+      store.dispatch(
+        addUpdateReactionFieldActions.request({
+          reactionId: 1,
+          pathComponents: [...path, 0],
+          newValue: { id: 'meanwhile' },
+        }),
+      );
+      return { data: { smiles: 'O' } };
+    });
+    axiosMock.patch.mockReturnValue(new Promise(() => undefined));
+    await reduxReactionActions(store, 1).addIdentifierByName(path, 'water');
+    const requests = recorded.filter(addUpdateReactionFieldActions.request.match);
+    expect(requests.at(-1)?.payload.pathComponents).toEqual([...path, 1]);
+  });
+
   it('resolves false and changes nothing when the name does not resolve', async () => {
     const recorded: Array<UnknownAction> = [];
     const store = makeStore(recorded);

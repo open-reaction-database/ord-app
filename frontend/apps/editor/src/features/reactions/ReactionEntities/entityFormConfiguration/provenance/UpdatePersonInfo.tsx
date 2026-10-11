@@ -32,12 +32,11 @@ export function UpdatePersonInfo({
   formMethods,
   text,
 }: Readonly<UpdatePersonInfoProps>) {
-  // Without actions the reaction is read-only, and the button does not show.
-  const currentPerson = useReactionActions()?.currentPerson;
+  const actions = useReactionActions();
   const { setValues } = formMethods;
 
   const updateFields = useCallback(() => {
-    const person = currentPerson?.();
+    const person = actions?.currentPerson?.();
     if (!person) {
       return;
     }
@@ -48,7 +47,8 @@ export function UpdatePersonInfo({
         generateDeepPartialReactionByPath(pathComponents, person),
       ),
     );
-  }, [currentPerson, name, setValues]);
+  }, [actions, name, setValues]);
 
-  return currentPerson ? <Button onClick={updateFields}>{text}</Button> : null;
+  // The button shows only on an editable reaction whose host can name the current person.
+  return actions?.currentPerson ? <Button onClick={updateFields}>{text}</Button> : null;
 }

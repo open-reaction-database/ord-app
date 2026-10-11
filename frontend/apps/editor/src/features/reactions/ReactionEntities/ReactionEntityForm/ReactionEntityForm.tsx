@@ -131,12 +131,12 @@ export function ReactionEntityForm({
   // Save the form and, only if it validated, return to the parent sidebar level. Mirrors the
   // validate-then-submit gating the Save button gets from <Form>, then closes on success. (#550)
   const handleSaveAndClose = useCallback(() => {
-    if (isViewOnly) return;
+    if (!actions) return;
     const { hasErrors } = form.validate();
     if (hasErrors) return;
     onSubmit(form.getValues());
     onFormClose();
-  }, [form, isViewOnly, onSubmit, onFormClose]);
+  }, [actions, form, onSubmit, onFormClose]);
 
   // Cmd/Ctrl+Enter triggers Save and Close. Scoped to this form's DOM subtree (not a global
   // hotkey) so hidden sibling forms in the mounted sidebar stack don't also fire. (#550)

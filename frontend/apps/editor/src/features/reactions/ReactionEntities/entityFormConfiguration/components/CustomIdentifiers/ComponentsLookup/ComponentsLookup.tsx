@@ -58,10 +58,10 @@ export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
       return;
     }
     setIsLoading(true);
-    const found = await actions.addIdentifierByName(
-      pathComponents.concat('identifiers'),
-      name,
-    );
+    // A lookup that fails outright reads as a name that did not resolve.
+    const found = await actions
+      .addIdentifierByName(pathComponents.concat('identifiers'), name)
+      .catch(() => false);
     setIsLoading(false);
     if (found) {
       onClose();

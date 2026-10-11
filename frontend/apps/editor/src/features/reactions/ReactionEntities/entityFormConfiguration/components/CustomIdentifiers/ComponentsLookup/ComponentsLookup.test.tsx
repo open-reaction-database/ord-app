@@ -18,6 +18,7 @@ import { fireEvent, waitFor } from '@testing-library/react';
 import axiosInstance from 'store/axiosInstance.ts';
 import { fullReactionSnapshot } from 'test/fullReactionSnapshot.ts';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
 import { ComponentsLookup } from './ComponentsLookup.tsx';
 
 vi.mock('store/axiosInstance.ts', () => ({
@@ -39,10 +40,11 @@ const reaction = fullReactionSnapshot().data;
 const inputId = Object.keys(reaction.inputs)[0];
 const componentPath = ['inputs', inputId, 'components', 0];
 
-function lookUp(name: string, onClose: () => void) {
+function lookUp(name: string, onClose: () => void, actions?: ReactionActions) {
   const view = renderInReactionView(<ComponentsLookup onClose={onClose} />, {
     reaction,
     pathComponents: componentPath,
+    actions,
   });
   fireEvent.change(view.getByLabelText('Compound name'), { target: { value: name } });
   fireEvent.click(view.getByRole('button', { name: 'Save' }));
@@ -76,6 +78,18 @@ describe('ComponentsLookup', () => {
     const onClose = vi.fn();
     const { findByText } = lookUp('unobtainium', onClose);
     expect(await findByText('Compound not found')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('stops loading and says so when the lookup itself fails', async () => {
+    const onClose = vi.fn();
+    const { findByText, getByRole } = lookUp('water', onClose, {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn().mockRejectedValue(new Error('offline')),
+    });
+    expect(await findByText('Compound not found')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Save' })).not.toHaveAttribute('data-loading');
     expect(onClose).not.toHaveBeenCalled();
   });
 });

@@ -17,7 +17,7 @@ import { expect, test } from '@playwright/test';
 import { seedReadOnlyReaction } from './seed.ts';
 
 /** Buttons the reaction page shows only when the user may edit the reaction. */
-const PAGE_EDIT_CONTROLS = ['Remove', 'Rename reaction', 'Input', 'Edit'];
+const PAGE_EDIT_CONTROLS = ['Remove', 'Rename reaction', 'Edit'];
 
 /** Buttons a drawer form shows only when the user may edit the reaction. */
 const DRAWER_EDIT_CONTROLS = ['Save', 'Save and Close', 'Paste Chunk'];
@@ -44,6 +44,14 @@ test('a read-only reaction shows no edit controls, in the page or the drawer', a
     await expect(page.getByRole('button', { name, exact: true })).toHaveCount(0);
   }
   await expect(page.getByRole('button', { name: /^Remove / })).toHaveCount(0);
+  // The add button sits beside the Inputs heading; other buttons may also be named "Input".
+  const inputsHeading = page.getByRole('heading', { name: 'Inputs', level: 2 });
+  await expect(inputsHeading).toBeVisible();
+  await expect(
+    inputsHeading
+      .locator('xpath=../..')
+      .getByRole('button', { name: 'Input', exact: true }),
+  ).toHaveCount(0);
 
   await page.getByRole('button', { name: 'View', exact: true }).first().click();
   const drawer = page.getByRole('dialog');
