@@ -102,4 +102,18 @@ describe('ReactionDrawerForm', () => {
       closable.getByRole('button', { name: 'Save and Close' }),
     ).toBeInTheDocument();
   });
+
+  it('saves on Cmd+Enter when it has nowhere to close to', async () => {
+    const actions = stubReactionActions();
+    const { container } = renderWithReaction(
+      <ReactionDrawerForm pathComponents={['notes']} />,
+      { actions },
+    );
+    fireEvent.keyDown(container.querySelector('form') as HTMLFormElement, {
+      key: 'Enter',
+      metaKey: true,
+    });
+    await waitFor(() => expect(actions.update).toHaveBeenCalled());
+    expect(actions.update.mock.calls[0][0]).toEqual(['notes']);
+  });
 });

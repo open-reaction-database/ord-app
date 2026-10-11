@@ -131,8 +131,9 @@ export function ReactionEntityForm({
     [filterValues, form, onSubmit],
   );
 
-  // Save the form and, only if it validated, return to the parent sidebar level. Mirrors the
-  // validate-then-submit gating the Save button gets from <Form>, then closes on success. (#550)
+  // Save the form and, only if it validated, close it (returning to the parent sidebar level),
+  // when it has an onFormClose. Mirrors the validate-then-submit gating the Save button gets from
+  // <Form>. (#550)
   const handleSaveAndClose = useCallback(() => {
     if (!actions) return;
     const { hasErrors } = form.validate();
@@ -141,8 +142,9 @@ export function ReactionEntityForm({
     onFormClose?.();
   }, [actions, form, onSubmit, onFormClose]);
 
-  // Cmd/Ctrl+Enter triggers Save and Close. Scoped to this form's DOM subtree (not a global
-  // hotkey) so hidden sibling forms in the mounted sidebar stack don't also fire. (#550)
+  // Cmd/Ctrl+Enter triggers Save and Close, which only saves when the form has no onFormClose.
+  // Scoped to this form's DOM subtree (not a global hotkey) so hidden sibling forms in the mounted
+  // sidebar stack don't also fire. (#550)
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLFormElement>) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
