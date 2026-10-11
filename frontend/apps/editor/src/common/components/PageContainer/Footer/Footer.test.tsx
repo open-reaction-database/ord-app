@@ -26,4 +26,10 @@ describe('Footer', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(2);
   });
+
+  it('links the support address', () => {
+    renderWithMantine(<Footer />);
+    const link = screen.getByRole('link', { name: 'help@open-reaction-database.org' });
+    expect(link).toHaveAttribute('href', 'mailto:help@open-reaction-database.org');
+  });
 });
