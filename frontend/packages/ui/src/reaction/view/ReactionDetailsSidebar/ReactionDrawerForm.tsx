@@ -38,6 +38,7 @@ export function ReactionDrawerForm({
     <nodeToComponentContext.Provider value={reactionNodeToComponent}>
       {showTitle && Title && <Title pathComponents={pathComponents} />}
       <ReactionEntityForm
+        key={pathComponents.join('.')}
         reactionPathComponents={pathComponents}
         sidebarInfo={sidebarInfo}
         isHidden={false}

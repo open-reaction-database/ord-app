@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 import { describe, expect, it } from 'vitest';
-import { renderWithReaction } from '#testing/renderWithReaction.tsx';
+import { fireEvent, waitFor } from '@testing-library/react';
+import { create } from '@bufbuild/protobuf';
+import {
+  ReactionIdentifier_ReactionIdentifierType,
+  ReactionSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import { ordReactionToReaction } from '#reaction/model/reactions.converters.ts';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '#testing/renderWithReaction.tsx';
 import { ReactionDrawerForm } from './ReactionDrawerForm.tsx';
 
 describe('ReactionDrawerForm', () => {
@@ -36,5 +46,27 @@ describe('ReactionDrawerForm', () => {
       { editable: true },
     );
     expect(getByRole('heading', { name: 'Notes' })).toBeInTheDocument();
+  });
+
+  it('saves the entity it shows after switching to another one', async () => {
+    const reaction = ordReactionToReaction(
+      create(ReactionSchema, {
+        identifiers: [
+          { type: ReactionIdentifier_ReactionIdentifierType.NAME, value: 'first' },
+          { type: ReactionIdentifier_ReactionIdentifierType.NAME, value: 'second' },
+        ],
+      }),
+    );
+    const actions = stubReactionActions();
+    const { getByRole, rerender } = renderWithReaction(
+      <ReactionDrawerForm pathComponents={['identifiers', 0]} />,
+      { reaction, actions },
+    );
+    rerender(<ReactionDrawerForm pathComponents={['identifiers', 1]} />);
+    fireEvent.click(getByRole('button', { name: 'Save and Close' }));
+    await waitFor(() => expect(actions.update).toHaveBeenCalled());
+    const [pathComponents, newValue] = actions.update.mock.calls[0];
+    expect(pathComponents).toEqual(['identifiers', 1]);
+    expect(newValue).toMatchObject({ value: 'second' });
   });
 });
