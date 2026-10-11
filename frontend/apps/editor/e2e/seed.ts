@@ -22,6 +22,21 @@ const API = process.env.VITE_API_ENDPOINT ?? 'http://127.0.0.1:8000/service_api/
 const TOKEN = 'e2e-dev-token';
 const headers = { Authorization: `Bearer ${TOKEN}` };
 
+async function call<T>(
+  request: APIRequestContext,
+  method: 'get' | 'patch',
+  url: string,
+  options: object = {},
+): Promise<T> {
+  const response = await request[method](`${API}${url}`, { headers, ...options });
+  if (!response.ok()) {
+    throw new Error(
+      `${method.toUpperCase()} ${url} returned ${response.status()}: ${await response.text()}`,
+    );
+  }
+  return (await response.json()) as T;
+}
+
 async function post<T>(
   request: APIRequestContext,
   url: string,
@@ -65,4 +80,17 @@ export async function seedReaction(
     },
   );
   return { groupId: group.id, datasetId: dataset.id, reactionId: reaction.id };
+}
+
+/** Seeds the fixture reaction in a dataset the e2e user may only view. */
+export async function seedReadOnlyReaction(
+  request: APIRequestContext,
+): Promise<{ datasetId: number; reactionId: number }> {
+  const { groupId, datasetId, reactionId } = await seedReaction(request);
+  const me = await call<{ id: number }>(request, 'get', '/users/me');
+  // The user created the group, so it is the group's admin and may change its own role.
+  await call(request, 'patch', `/groups/${groupId}/members`, {
+    data: { user_id: me.id, role: 'viewer' },
+  });
+  return { datasetId, reactionId };
 }
