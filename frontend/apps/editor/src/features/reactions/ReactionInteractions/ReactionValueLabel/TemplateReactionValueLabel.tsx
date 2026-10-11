@@ -30,6 +30,7 @@ import {
 import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 import { findReactionEntityUniqueName } from '../../ReactionEntities/findReactionEntityUniqueName.ts';
+import { useReactionId } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 type ReactionValueLabelPropsMandatoryLabel = Omit<
   ReactionValueLabelProps,
@@ -50,8 +51,9 @@ function TemplateReactionValueLabel({
   name,
   type,
 }: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
-  const templateId = reactionId as string;
+  const { pathComponents } = useContext(reactionEntityContext);
+  // This slot renders only under a template's provider, whose ID is a string.
+  const templateId = useReactionId() as string;
   const dispatch = useAppDispatch();
   const [variableNameValue, setVariableNameValue] = useState<string | null>(null);
 

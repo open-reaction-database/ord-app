@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 import type { ReactionFormCustomProps } from '../../reactionEntities.types.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
-import { useCallback, useContext, useMemo } from 'react';
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import { reactionEntityContext } from '../../reactionEntity.context.ts';
+import { useCallback } from 'react';
+import { useEntityFieldPath } from '../../useEntityFieldPath.ts';
 import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import {
   ReactionEntityBlock,
@@ -35,7 +31,13 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import {
+  useDrawer,
+  useIsViewOnly,
+  useReactionId,
+  useReactionPart,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ComponentsListHeader } from 'features/reactions/ReactionView/ComponentsList';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
@@ -50,13 +52,10 @@ const renderDetails = ({ amount }: ReactionInputComponent) =>
 export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  const { reactionId, ViewDeleteButtonsComponent, isViewOnly } =
-    useContext(reactionContext);
-  const { pathComponents } = useContext(reactionEntityContext);
-
-  const currentPath = useMemo(() => {
-    return pathComponents.concat(name);
-  }, [pathComponents, name]);
+  const reactionId = useReactionId();
+  const isViewOnly = useIsViewOnly();
+  const { ViewDeleteButtons } = useReactionSlots();
+  const currentPath = useEntityFieldPath(name);
 
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
@@ -66,9 +65,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
     [currentPath, drawer],
   );
 
-  const input: Optional<ReactionInputWithoutName> = useSelector(
-    selectReactionPartByPath(reactionId, currentPath),
-  );
+  const input = useReactionPart<ReactionInputWithoutName>(currentPath);
 
   const onRemove = useCallback(() => {
     dispatch(
@@ -98,7 +95,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
           leftSection={<Title order={4}>{ENTITY_NAME}</Title>}
           rightSection={
             input ? (
-              <ViewDeleteButtonsComponent
+              <ViewDeleteButtons
                 entityName={ENTITY_NAME}
                 pathComponents={currentPath}
                 onRemove={onRemove}
@@ -130,7 +127,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
                 component={item}
                 renderDetails={renderDetails}
                 actions={
-                  <ViewDeleteButtonsComponent
+                  <ViewDeleteButtons
                     entityName="Component"
                     pathComponents={currentPath.concat([COMPONENTS_FIELD, index])}
                     onEdit={() => onWorkupComponentEdit(index)}

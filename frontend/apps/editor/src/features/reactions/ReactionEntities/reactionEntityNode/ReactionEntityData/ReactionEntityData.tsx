@@ -21,11 +21,11 @@ import {
   AppDataType,
 } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
-import { type ChangeEvent, type ReactNode, useCallback, useContext } from 'react';
+import { type ChangeEvent, type ReactNode, useCallback } from 'react';
 import { NumberInput, TextInput } from '@mantine/core';
 import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
@@ -89,7 +89,7 @@ export function ReactionEntityData({
   formMethods,
   node,
 }: Readonly<ReactionEntityNodeProps<ReactionFormData>>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const { getInputProps } = formMethods;
   const [dataValue, onChange] = useUncontrolled<AppData['data']>({
     ...getInputProps(node.fieldName),

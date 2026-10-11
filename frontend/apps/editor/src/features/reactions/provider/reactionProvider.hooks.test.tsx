@@ -27,6 +27,7 @@ import {
   useOrderedInputs,
   usePreviews,
   useReactionActions,
+  useReactionId,
   useReactionPart,
   useReactionSnapshot,
 } from './reactionProvider.hooks.ts';
@@ -85,6 +86,10 @@ describe('reaction hooks over a static source', () => {
       wrapper,
     });
     expect(result.current).toBe(snapshot.data.inputs.first);
+  });
+
+  it('return the host’s reaction ID', () => {
+    expect(renderHook(useReactionId, { wrapper }).result.current).toBe(7);
   });
 
   it('return null for a path that does not exist', () => {

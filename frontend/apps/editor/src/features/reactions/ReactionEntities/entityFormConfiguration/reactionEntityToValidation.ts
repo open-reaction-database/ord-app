@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  type ReactionId,
-  ReactionNodeEntity,
-} from 'store/entities/reactions/reactions.types.ts';
+import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import { yupResolver } from '@mantine/form';
 import * as yup from 'yup';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import { useMemo } from 'react';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const defaultValidate = yupResolver(yup.object({}));
+
+const NO_SIBLINGS: Record<string, WithIdName<unknown>> = {};
 
 function useDefaultValidate() {
   return useMemo(() => {
@@ -50,16 +48,12 @@ function useUniqueNameSchema(names: Array<string>, entityName = 'Entity') {
 }
 
 const createNamedEntityValidation = (entityName: string) =>
-  function useNamedEntityValidation(
-    reactionId: ReactionId,
-    pathComponents: ReactionPathComponents,
-  ) {
+  function useNamedEntityValidation(pathComponents: ReactionPathComponents) {
     const objectsPath = pathComponents.slice(0, -1);
     const itemId = pathComponents.at(-1) as string;
 
-    const objects: Record<string, WithIdName<unknown>> = useSelector(
-      selectReactionPartByPath(reactionId, objectsPath),
-    );
+    const objects =
+      useReactionPart<Record<string, WithIdName<unknown>>>(objectsPath) ?? NO_SIBLINGS;
 
     const names = useMemo(() => {
       return Object.values(objects).reduce((acc: Array<string>, input) => {
@@ -75,10 +69,7 @@ const createNamedEntityValidation = (entityName: string) =>
 
 export const reactionEntityToValidation: Record<
   string,
-  (
-    reactionId: ReactionId,
-    pathComponents: ReactionPathComponents,
-  ) => ReturnType<typeof yupResolver>
+  (pathComponents: ReactionPathComponents) => ReturnType<typeof yupResolver>
 > = {
   [ReactionNodeEntity.Inputs]: createNamedEntityValidation('Input'),
   [ReactionNodeEntity.Features]: createNamedEntityValidation('Data'),
@@ -86,10 +77,9 @@ export const reactionEntityToValidation: Record<
 };
 
 export function useReactionEntityValidation(
-  reactionId: ReactionId,
   pathComponents: ReactionPathComponents,
   nodeEntity: ReactionNodeEntity,
 ) {
   const useSchema = reactionEntityToValidation[nodeEntity] ?? useDefaultValidate;
-  return useSchema(reactionId, pathComponents);
+  return useSchema(pathComponents);
 }

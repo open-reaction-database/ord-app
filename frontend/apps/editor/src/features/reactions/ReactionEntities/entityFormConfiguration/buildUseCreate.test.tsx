@@ -43,9 +43,7 @@ const ReactionWrapper = reactionWrapper({
 function ContextWrapper({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ReactionWrapper>
-      <reactionEntityContext.Provider
-        value={{ reactionId: 7, pathComponents: ['inputs', 0] }}
-      >
+      <reactionEntityContext.Provider value={{ pathComponents: ['inputs', 0] }}>
         {children}
       </reactionEntityContext.Provider>
     </ReactionWrapper>

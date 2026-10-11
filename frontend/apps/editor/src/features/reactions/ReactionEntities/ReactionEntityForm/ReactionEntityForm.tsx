@@ -24,17 +24,14 @@ import {
   reactionEntityToForm,
 } from 'features/reactions/ReactionEntities';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import {
-  type KeyboardEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.types.ts';
-import { reactionContext } from '../../reactions.context.ts';
+import {
+  useIsTemplate,
+  useIsViewOnly,
+  useReactionId,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { copyReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
 import { useDisclosure } from '@mantine/hooks';
@@ -57,7 +54,9 @@ export function ReactionEntityForm({
   onFormClose,
   onSetFormDirty,
 }: Readonly<ReactionEntityFormProps>) {
-  const { reactionId, isViewOnly, isTemplate } = useContext(reactionContext);
+  const reactionId = useReactionId();
+  const isViewOnly = useIsViewOnly();
+  const isTemplate = useIsTemplate();
   const dispatch = useAppDispatch();
   const [pasteOpened, { open, close }] = useDisclosure();
   // Dirty hack to reset all the components within form during paste operation
@@ -66,22 +65,15 @@ export function ReactionEntityForm({
   const [formKey, setFormKey] = useState(crypto.randomUUID());
 
   const contextValue = useMemo(
-    (): ReactionEntityContext => ({
-      reactionId,
-      pathComponents: reactionPathComponents,
-    }),
-    [reactionId, reactionPathComponents],
+    (): ReactionEntityContext => ({ pathComponents: reactionPathComponents }),
+    [reactionPathComponents],
   );
 
   const formEntity = sidebarInfo.entityName;
-  const validate = useReactionEntityValidation(
-    reactionId,
-    reactionPathComponents,
-    formEntity,
-  );
+  const validate = useReactionEntityValidation(reactionPathComponents, formEntity);
 
   const [initialValues, reactionPartWithNestedEntities, filterValues] =
-    sidebarInfo.useInitialValues(reactionId, reactionPathComponents);
+    sidebarInfo.useInitialValues(reactionPathComponents);
 
   const form = useForm({
     mode: 'uncontrolled',

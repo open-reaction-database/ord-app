@@ -18,6 +18,7 @@
 import { MantineProvider } from '@mantine/core';
 import { configureStore } from '@reduxjs/toolkit';
 import { render } from '@testing-library/react';
+import { vi } from 'vitest';
 import type { ReactElement, ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
@@ -53,14 +54,20 @@ export function makeContractStore(snapshot?: ReactionSnapshot) {
 }
 
 /**
- * Generated IDs differ between two mounts: React's useId output (and Mantine's style classes
- * built from it) and Mantine's random element IDs. Nothing else may.
+ * React's useId output (and Mantine's style classes built from it) differs between two mounts.
+ * Nothing else may: Mantine's random element IDs match because each render seeds Math.random.
  */
-function normalizeIds(html: string): string {
-  return html.replaceAll(
-    /«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_|mantine-[0-9a-z]{9}\b/g,
-    'ID',
-  );
+export function normalizeIds(html: string): string {
+  return html.replaceAll(/«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_/g, 'ID');
+}
+
+/** A linear congruential generator, so both renders draw the same numbers. */
+function seededRandom(): () => number {
+  let state = 1;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 2 ** 32;
+    return state / 2 ** 32;
+  };
 }
 
 function renderOver(
@@ -83,20 +90,28 @@ function renderOver(
       </Provider>
     );
   }
-  const { container, unmount } = render(ui, { wrapper: Wrapper });
-  const html = normalizeIds(container.innerHTML);
-  unmount();
-  return html;
+  const random = vi.spyOn(Math, 'random').mockImplementation(seededRandom());
+  try {
+    const { container, unmount } = render(ui, { wrapper: Wrapper });
+    const html = normalizeIds(container.innerHTML);
+    unmount();
+    return html;
+  } finally {
+    random.mockRestore();
+  }
 }
 
 /**
  * Renders `ui` over a static source with an empty store, and over the Redux source with the
  * reaction in the store, and returns both HTML strings. A component that reads the reaction
- * from the store renders differently over the two.
+ * from the store renders differently over the two. Each conversion of the fixture generates
+ * new entity IDs, so a caller that addresses an entity by ID passes the snapshot it read the
+ * ID from.
  */
-export function renderOverBothSources(ui: ReactElement): [string, string] {
-  // One conversion, so both sides see the same generated entity IDs.
-  const snapshot = fullReactionSnapshot();
+export function renderOverBothSources(
+  ui: ReactElement,
+  snapshot: ReactionSnapshot = fullReactionSnapshot(),
+): [string, string] {
   const seededStore = makeContractStore(snapshot);
   return [
     renderOver(createStaticReactionSource(snapshot), makeContractStore(), ui),

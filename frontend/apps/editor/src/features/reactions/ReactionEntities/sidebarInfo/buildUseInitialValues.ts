@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export function buildUseInitialValues<Result extends object, Input extends Result>(
   filterInitialValues: (values: Input) => Result,
 ) {
   return function useInitialValues(
-    reactionId: ReactionId,
     pathComponents: ReactionPathComponents,
   ): [object, object, (values: object) => object] {
-    const { id: _, ...reactionPart } = useSelector(
-      selectReactionPartByPath(reactionId, pathComponents),
-    );
+    // A drawer form opens only for an entity that exists.
+    const { id: _, ...reactionPart } =
+      useReactionPart<Record<string, unknown>>(pathComponents)!;
 
     const originalValue = useMemo(
-      (): Input => structuredClone(reactionPart),
+      // The part at the form's path is the shape the form's sidebar info describes.
+      (): Input => structuredClone(reactionPart) as Input,
       [reactionPart],
     );
 

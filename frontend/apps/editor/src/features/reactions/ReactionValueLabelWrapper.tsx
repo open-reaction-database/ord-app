@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
-import { useContext } from 'react';
-import { reactionContext } from './reactions.context.ts';
+import {
+  useIsTemplate,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export function ReactionValueLabelWrapper({
   wrapperConfig,
   name,
   type,
 }: Readonly<ReactionValueLabelProps>) {
-  const { isTemplate, ValueLabelComponent, ViewOnlyLabelComponent } =
-    useContext(reactionContext);
+  const isTemplate = useIsTemplate();
+  const { ValueLabel, ViewOnlyLabel } = useReactionSlots();
 
   return isTemplate && wrapperConfig?.cannotBeVariable ? (
-    <ViewOnlyLabelComponent
+    <ViewOnlyLabel
       name={name}
       wrapperConfig={wrapperConfig}
       type={type}
     />
   ) : (
-    <ValueLabelComponent
+    <ValueLabel
       name={name}
       type={type}
       wrapperConfig={wrapperConfig}

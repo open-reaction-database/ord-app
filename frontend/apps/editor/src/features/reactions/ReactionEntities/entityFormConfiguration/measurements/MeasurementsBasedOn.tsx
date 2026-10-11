@@ -15,22 +15,25 @@
  */
 import { useCallback, useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
-import { useSelector } from 'react-redux';
 import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
 import { Select } from '@mantine/core';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
 import { itemsById } from 'common/utils';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  useIsViewOnly,
+  useReactionPart,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
+
+const NO_ANALYSES: ReactionOutcome['analyses'] = {};
 
 export function MeasurementsBasedOn({
   formMethods,
   name,
 }: Readonly<ReactionFormCustomProps>) {
-  const { reactionId, isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
 
   const label = (
@@ -43,9 +46,8 @@ export function MeasurementsBasedOn({
 
   const outcomePath = pathComponents.slice(0, 2);
   const analysesPath = [...outcomePath, 'analyses'];
-  const analyses: ReactionOutcome['analyses'] = useSelector(
-    selectReactionPartByPath(reactionId, analysesPath),
-  );
+  const analyses =
+    useReactionPart<ReactionOutcome['analyses']>(analysesPath) ?? NO_ANALYSES;
   const [basedOnOptions, analysesByNames] = useMemo(() => {
     const analysesArray = Object.values(analyses);
     return [

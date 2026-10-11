@@ -24,7 +24,7 @@ import { Button, Flex } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { useCallback, useContext, useMemo } from 'react';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import { reactionEntityContext } from '../../reactionEntity.context.ts';
 
@@ -61,8 +61,8 @@ function ReactionEntityAddButton({
 export function ReactionEntityList({
   node,
 }: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
-  const items = node.useSelectItems() ?? [];
-  const { isViewOnly } = useContext(reactionContext);
+  const items = node.useSelectItems();
+  const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const title = useReactionEntityLabel(node.title);
   const nextIndex = items.length;

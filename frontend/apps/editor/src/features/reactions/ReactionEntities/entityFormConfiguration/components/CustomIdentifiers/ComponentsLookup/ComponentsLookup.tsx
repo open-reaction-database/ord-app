@@ -27,6 +27,7 @@ import {
 import { resetReactionLookupErrorAction } from 'store/features/reactionLookup/reactionLookup.actions.ts';
 import classes from './componentsLookup.module.scss';
 import { NavigateOutsideIcon } from 'common/icons';
+import { useReactionId } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface ComponentsLookupProps {
   onClose: () => void;
@@ -34,7 +35,8 @@ interface ComponentsLookupProps {
 
 export function ComponentsLookup({ onClose }: Readonly<ComponentsLookupProps>) {
   const dispatch = useAppDispatch();
-  const { reactionId, pathComponents } = useContext(reactionEntityContext);
+  const reactionId = useReactionId();
+  const { pathComponents } = useContext(reactionEntityContext);
   const isLoading = useSelector(selectReactionLookupIsLoading);
   const hasError = useSelector(selectHasReactionLookupError);
 

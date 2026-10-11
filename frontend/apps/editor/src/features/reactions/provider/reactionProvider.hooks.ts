@@ -18,6 +18,7 @@ import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-s
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 import { getDeepReactionPart } from './getDeepReactionPart.ts';
 import { shallowEqualArrays, shallowEqualRecords } from './equality.ts';
 import { orderInputs } from './orderInputs.ts';
@@ -129,4 +130,9 @@ export function useDrawer(): DrawerActions {
     throw new Error(OUTSIDE_PROVIDER);
   }
   return drawer;
+}
+
+/** The ID the host gave the provider, which host-supplied slots use to reach host state. */
+export function useReactionId(): ReactionId {
+  return useProviderValue().reactionId;
 }

@@ -38,7 +38,7 @@ interface ReactionProviderBaseProps {
 
 /** A dataset reaction: a numeric ID, editable when actions are given. */
 interface DatasetReactionProviderProps extends ReactionProviderBaseProps {
-  /** The ID that components reading `reactionContext` select by. */
+  /** The ID `useReactionId()` returns, which components reading `reactionContext` select by. */
   reactionId: number;
   isTemplate?: false;
   actions?: ReactionActions;
@@ -46,7 +46,7 @@ interface DatasetReactionProviderProps extends ReactionProviderBaseProps {
 
 /** A template: a string ID, and always read-only. */
 interface TemplateReactionProviderProps extends ReactionProviderBaseProps {
-  /** The ID that components reading `reactionContext` select by. */
+  /** The ID `useReactionId()` returns, which components reading `reactionContext` select by. */
   reactionId: string;
   isTemplate: true;
   actions?: never;
@@ -66,8 +66,8 @@ export function ReactionProvider(props: Readonly<ReactionProviderProps>) {
   const { reactionId, source, actions, slots, children } = props;
   const isTemplate = props.isTemplate === true;
   const value = useMemo(
-    (): ReactionProviderValue => ({ source, actions, isTemplate, slots }),
-    [source, actions, isTemplate, slots],
+    (): ReactionProviderValue => ({ reactionId, source, actions, isTemplate, slots }),
+    [reactionId, source, actions, isTemplate, slots],
   );
   const legacyValue = useMemo((): ReactionsContext => {
     const components = {

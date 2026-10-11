@@ -17,8 +17,10 @@ import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { reactionContext } from '../../reactions.context.ts';
+import {
+  useDrawer,
+  useReactionId,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
 export const buildUseCreate = <T = unknown>(
@@ -33,7 +35,7 @@ export const buildUseCreate = <T = unknown>(
   function useCreate() {
     const dispatch = useAppDispatch();
     const drawer = useDrawer();
-    const { reactionId } = useContext(reactionContext);
+    const reactionId = useReactionId();
     const { pathComponents } = useContext(reactionEntityContext);
 
     return useCallback(

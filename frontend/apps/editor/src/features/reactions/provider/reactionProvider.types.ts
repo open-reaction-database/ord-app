@@ -20,6 +20,7 @@ import type { ReactionViewDeleteButtonsProps } from 'features/reactions/Reaction
 import type {
   BaseReaction,
   DatasetReaction,
+  ReactionId,
 } from 'store/entities/reactions/reactions.types.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
 
@@ -73,6 +74,7 @@ export interface ReactionSlots {
 }
 
 export interface ReactionProviderValue {
+  reactionId: ReactionId;
   source: ReactionSource;
   actions?: ReactionActions;
   isTemplate: boolean;

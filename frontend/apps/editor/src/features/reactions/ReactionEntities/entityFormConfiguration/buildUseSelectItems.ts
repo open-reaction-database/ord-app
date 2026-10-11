@@ -15,18 +15,20 @@
  */
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useSelector } from 'react-redux';
-import { selectReactionPartByPath } from 'store/entities/reactions/reactions.selectors.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
-export const buildUseSelectItems = (entityPath: ReactionPathComponents | string) =>
-  function useSelectItems() {
-    const { reactionId, pathComponents } = useContext(reactionEntityContext);
+const NO_ITEMS: Array<never> = [];
+
+/** Selects the list at `entityPath` under the entity in context; a missing list is empty. */
+export const buildUseSelectItems = <T>(entityPath: ReactionPathComponents | string) =>
+  function useSelectItems(): Array<T> {
+    const { pathComponents } = useContext(reactionEntityContext);
     const entityPathComponents: ReactionPathComponents =
       typeof entityPath === 'string' ? [entityPath] : entityPath;
 
-    return useSelector(
-      selectReactionPartByPath(reactionId, pathComponents.concat(entityPathComponents)),
+    return (
+      useReactionPart<Array<T>>(pathComponents.concat(entityPathComponents)) ?? NO_ITEMS
     );
   };
 
@@ -35,12 +37,9 @@ export const buildUseSelectItemsListFromMap = <T>(
   compareFn: (a: T, b: T) => number,
 ) =>
   function useSelectItems() {
-    const { reactionId, pathComponents } = useContext(reactionEntityContext);
-    const map = useSelector(
-      selectReactionPartByPath(reactionId, [...pathComponents, entityName]),
-    );
+    const { pathComponents } = useContext(reactionEntityContext);
+    const map = useReactionPart<Record<string, T>>([...pathComponents, entityName]);
 
-    return useMemo(() => {
-      return (Object.values(map) as Array<T>).sort(compareFn);
-    }, [map]);
+    // A missing map lists nothing.
+    return useMemo(() => Object.values(map ?? {}).sort(compareFn), [map]);
   };

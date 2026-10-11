@@ -33,9 +33,12 @@ import {
 } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
-import { type ChangeEvent, useContext, useMemo } from 'react';
+import { type ChangeEvent, useMemo } from 'react';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import {
+  useIsViewOnly,
+  useReactionSlots,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
@@ -188,7 +191,8 @@ export function MeasurementValueControl({
   name,
   formMethods,
 }: Readonly<ReactionFormCustomProps>) {
-  const { isViewOnly, ValueLabelComponent } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
+  const { ValueLabel } = useReactionSlots();
   const [measurementValue, onChange] = useUncontrolled<ReactionMeasurementValue>({
     ...formMethods.getInputProps(name),
   });
@@ -238,7 +242,7 @@ export function MeasurementValueControl({
   return (
     <Input.Wrapper
       label={
-        <ValueLabelComponent
+        <ValueLabel
           name={valueName}
           type={valueType}
           wrapperConfig={{ label: 'Value' }}

@@ -16,8 +16,8 @@
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { TagsInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
-import { useContext, useMemo } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useMemo } from 'react';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
@@ -25,7 +25,7 @@ export function MeasurementMasses({
   name,
   formMethods,
 }: Readonly<ReactionFormCustomProps>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const [values, onChange] = useUncontrolled<Array<number>>({
     ...formMethods.getInputProps(name),
   });

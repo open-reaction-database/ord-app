@@ -24,11 +24,10 @@ import {
   useState,
   type FocusEvent,
   type MouseEvent,
-  useContext,
   useMemo,
 } from 'react';
 import dayjs from 'dayjs';
-import { reactionContext } from 'features/reactions/reactions.context.ts';
+import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { VariableType } from 'store/entities/templates/templates.types.ts';
 import classes from './reactionEntityDateTime.module.scss';
@@ -49,7 +48,7 @@ function ReactionEntityDateTimeLabel({
   node,
   onChange,
 }: Readonly<ReactionEntityDateTimeLabelProps>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
   const baseLabel = (
     <ReactionValueLabelWrapper
       wrapperConfig={node.wrapperConfig}
@@ -84,7 +83,7 @@ export function ReactionEntityDateTime({
   node,
   formMethods,
 }: Readonly<ReactionEntityNodeProps<ReactionFormDateTime>>) {
-  const { isViewOnly } = useContext(reactionContext);
+  const isViewOnly = useIsViewOnly();
 
   const [value, onChange] = useUncontrolled<string>({
     ...formMethods.getInputProps(node.name),
