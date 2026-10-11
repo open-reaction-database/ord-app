@@ -22,9 +22,11 @@ import { create } from '@bufbuild/protobuf';
 import { RecordEventSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { formatDateToDisplay } from 'common/utils/date.ts';
-import { ordRecordEventToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
-import type { ReactionRecordEvent } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import {
+  formatDateToDisplay,
+  ordRecordEventToReaction,
+  type ReactionRecordEvent,
+} from '@open-reaction-database/ui/reaction/model';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import {
   createReactionPerson,

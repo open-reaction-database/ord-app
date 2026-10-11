@@ -21,7 +21,7 @@ import {
   useReactionPart,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionInputComponent } from '@open-reaction-database/ui/reaction/model';
 
 export function ComponentPreview() {
   const { pathComponents } = useContext(reactionEntityContext);

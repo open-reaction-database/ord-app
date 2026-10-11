@@ -29,10 +29,12 @@ import {
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
-import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import {
+  type ReactionProduct,
+  ordProductToReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
-import { ordProductToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { TitleDelimiterAmount } from 'common/components/display/TitleDelimiterAmount/TitleDelimiterAmount.tsx';
 import { MeasurementsPreview } from 'features/reactions/ReactionView/Outcomes/MeasurementsPreview/MeasurementsPreview.tsx';
 import { ReactionNodeValidationResult } from 'features/reactions/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';

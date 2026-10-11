@@ -19,7 +19,7 @@ import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvi
 import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
 import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { useReactionEntityValidation } from './reactionEntityToValidation.ts';
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import { ReactionNodeEntity } from '@open-reaction-database/ui/reaction/model';
 
 const wrapper = reactionWrapper({
   snapshot: {

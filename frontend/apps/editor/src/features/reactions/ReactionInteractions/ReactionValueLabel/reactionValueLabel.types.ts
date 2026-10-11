@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities';
-import type { VariableType } from 'store/entities/reactions/variableType.ts';
+import type { VariableType } from '@open-reaction-database/ui/reaction/model';
 
 export interface ReactionValueLabelProps {
   name: string;

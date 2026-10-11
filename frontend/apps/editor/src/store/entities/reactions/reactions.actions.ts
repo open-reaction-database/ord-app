@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { DatasetReaction } from './reactions.types.ts';
+import type { DatasetReaction } from '@open-reaction-database/ui/reaction/model';
 import type {
   AddEditReactionFieldPayload,
   ImportReactionFromFilePayload,

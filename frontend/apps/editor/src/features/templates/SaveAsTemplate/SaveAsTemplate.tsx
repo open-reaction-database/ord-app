@@ -24,7 +24,7 @@ import {
 import type { SaveAsTemplatePayload } from 'store/entities/templates/templates.types.ts';
 import { createTemplate } from 'store/entities/templates/templates.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionId } from '@open-reaction-database/ui/reaction/model';
 
 interface SaveAsTemplateProps {
   reactionId: ReactionId;

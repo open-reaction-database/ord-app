@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 import type { FC } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionValueLabelProps } from 'features/reactions/ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
-import type { ReactionViewDeleteButtonsProps } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
 import type {
+  ReactionPathComponents,
   BaseReaction,
   DatasetReaction,
   ReactionId,
-} from 'store/entities/reactions/reactions.types.ts';
+  ReactionPerson,
+} from '@open-reaction-database/ui/reaction/model';
+import type { ReactionValueLabelProps } from 'features/reactions/ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
+import type { ReactionViewDeleteButtonsProps } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
 import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
-import type { ReactionPerson } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
 
 /**
  * One reaction as its source holds it. A dataset reaction carries its ORD ID, validity, and

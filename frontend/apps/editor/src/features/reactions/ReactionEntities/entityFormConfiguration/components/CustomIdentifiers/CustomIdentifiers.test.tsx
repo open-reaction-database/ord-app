@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { CustomIdentifiers } from './CustomIdentifiers.tsx';

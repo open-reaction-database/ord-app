@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { WithIdName } from '@open-reaction-database/ui/reaction/model';
 
 export const compareNamedEntities = <T = unknown>(a: WithIdName<T>, b: WithIdName<T>) =>
   a.name.localeCompare(b.name);

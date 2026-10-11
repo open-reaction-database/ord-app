@@ -18,7 +18,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionEntityForm } from './ReactionEntityForm.tsx';
 import { reactionSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/sidebarInfo.models.ts';
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import { ReactionNodeEntity } from '@open-reaction-database/ui/reaction/model';
 
 // The real form registry eagerly imports every node form, including the Ketcher/d3 structure
 // editor (a CJS/ESM break under vitest). Stub the registry to a single plain text field — the

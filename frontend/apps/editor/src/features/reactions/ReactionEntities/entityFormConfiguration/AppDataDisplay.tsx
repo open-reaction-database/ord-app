@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  AppDataType,
-  type AppData,
-} from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { AppDataType, type AppData } from '@open-reaction-database/ui/reaction/model';
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
 

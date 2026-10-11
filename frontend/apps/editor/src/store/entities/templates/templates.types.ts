@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionSummary, ReactionMolBlocks } from '../reactions/reactions.types';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-import type { VariableType } from 'store/entities/reactions/variableType.ts';
+import type {
+  ReactionSummary,
+  ReactionMolBlocks,
+  ReactionPathComponents,
+  VariableType,
+} from '@open-reaction-database/ui/reaction/model';
 
 export interface Variable {
   name: string;

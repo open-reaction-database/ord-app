@@ -21,8 +21,8 @@ import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid
 import {
   amountTypeOptions,
   volumeUnitNames,
-} from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
-import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
+  type ReactionAmount,
+} from '@open-reaction-database/ui/reaction/model';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 
 export const reactionAmounts: Array<ReactionFormNode> = [

@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { Accordion } from '@mantine/core';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { OutcomeListItemHeader } from './OutcomeListItemHeader.tsx';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionOutcome } from '@open-reaction-database/ui/reaction/model';
 
 const renderHeader = (outcome: Partial<ReactionOutcome>) =>
   renderInReactionView(

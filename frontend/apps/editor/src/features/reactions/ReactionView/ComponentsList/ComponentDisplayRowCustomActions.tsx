@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 import type { ComponentsDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/componentsList.types.ts';
-import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import {
+  type ReactionComponentBase,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
 import { Badge, Flex } from '@mantine/core';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';

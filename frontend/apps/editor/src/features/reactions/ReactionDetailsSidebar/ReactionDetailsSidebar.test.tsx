@@ -22,7 +22,7 @@ import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import type { AppState } from 'store/configureAppStore.ts';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import type { DrawerActions } from 'features/reactions/provider/drawer.ts';
 import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ReactionDetailsSidebar } from './ReactionDetailsSidebar.tsx';

@@ -17,8 +17,10 @@ import {
   ReactionFormNodeType,
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { compoundIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
-import type { SelectOptions } from 'common/types/selectOptions.ts';
+import {
+  compoundIdentifierTypeOptions,
+  type SelectOptions,
+} from '@open-reaction-database/ui/reaction/model';
 
 const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(
   item => item !== 'MOLBLOCK',

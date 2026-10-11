@@ -17,7 +17,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { ReactionPreview } from './ReactionPreview.tsx';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
 vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => ({
   ReactionComponentPreview: () => <div data-testid="component-preview" />,

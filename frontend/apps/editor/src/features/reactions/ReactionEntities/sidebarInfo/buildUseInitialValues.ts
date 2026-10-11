@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useMemo } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 export function buildUseInitialValues<Result extends object, Input extends Result>(

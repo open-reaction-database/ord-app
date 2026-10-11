@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { Variable } from 'store/entities/templates/templates.types.ts';
 import type {
+  ReactionPathComponents,
   BaseReaction,
   DatasetReaction,
   ReactionId,
-} from 'store/entities/reactions/reactions.types.ts';
+} from '@open-reaction-database/ui/reaction/model';
+import type { Variable } from 'store/entities/templates/templates.types.ts';
 
 export interface ReactionTemplate extends BaseReaction {
   id: string;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionCrudeComponent } from '@open-reaction-database/ui/reaction/model';
 import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface CrudeComponentViewProps {

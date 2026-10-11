@@ -17,7 +17,7 @@ import type { MRT_ColumnDef } from 'mantine-react-table';
 import { type MouseEvent } from 'react';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
-import { formatUtcDateToDisplay } from 'common/utils/date.ts';
+import { formatUtcDateToDisplay } from '@open-reaction-database/ui/reaction/model';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ActionIcon, Tooltip } from '@mantine/core';

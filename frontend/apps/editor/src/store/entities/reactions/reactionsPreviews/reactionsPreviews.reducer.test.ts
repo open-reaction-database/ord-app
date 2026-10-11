@@ -22,7 +22,7 @@ import {
   getReactionsListActions,
 } from 'store/entities/reactions/reactions.actions.ts';
 import type { PreviewsById } from './reactionsPreviews.types.ts';
-import type { DatasetReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { DatasetReaction } from '@open-reaction-database/ui/reaction/model';
 import type { UpdateReactionSuccessPayload } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { Pages } from 'common/types';
 

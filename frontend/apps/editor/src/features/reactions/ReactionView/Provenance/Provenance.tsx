@@ -15,8 +15,10 @@
  */
 import { Flex, Title } from '@mantine/core';
 import classes from './provenance.module.scss';
-import { formatDateToDisplay } from 'common/utils/date.ts';
-import type { ReactionProvenance } from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
+import {
+  formatDateToDisplay,
+  type ReactionProvenance,
+} from '@open-reaction-database/ui/reaction/model';
 import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem.tsx';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';

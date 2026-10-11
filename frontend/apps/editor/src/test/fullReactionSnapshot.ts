@@ -17,8 +17,8 @@ import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvi
 import {
   linkReactionEntities,
   ordReactionToReaction,
-} from 'store/entities/reactions/reactions.converters.ts';
-import { fullReaction } from './fullReaction.ts';
+} from '@open-reaction-database/ui/reaction/model';
+import { fullReaction } from '@open-reaction-database/ui/testing';
 
 /** The full-reaction fixture as the store holds a loaded dataset reaction: valid, no previews. */
 export function fullReactionSnapshot(): ReactionSnapshot {

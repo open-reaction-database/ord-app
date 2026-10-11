@@ -17,7 +17,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { emptyReactionData } from 'test/emptyReactionData.ts';
 import { MeasurementsBasedOn } from './MeasurementsBasedOn.tsx';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 
 const formMethods = {

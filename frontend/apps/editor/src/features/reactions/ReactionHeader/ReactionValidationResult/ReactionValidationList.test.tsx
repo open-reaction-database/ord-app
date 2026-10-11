@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionValidationList } from './ReactionValidationList.tsx';
-import type { ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionValidation } from '@open-reaction-database/ui/reaction/model';
 
 const validation: ReactionValidation = {
   errors: [{ text: 'Reaction inputs are required' }],

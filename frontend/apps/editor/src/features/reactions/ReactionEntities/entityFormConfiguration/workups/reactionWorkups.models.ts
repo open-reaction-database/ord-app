@@ -20,18 +20,18 @@ import {
 import {
   timeUnitOptions,
   workupTypeOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+  amountTypeOptions,
+  type WorkupType,
+  WorkupConstants,
+} from '@open-reaction-database/ui/reaction/model';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { booleanOptions } from '../booleanOptions.ts';
-import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import { WorkupInput } from './WorkupInput.tsx';
 import {
   reactionStirringCondition,
   reactionTemperatureCondition,
 } from '../reactionConditions.model.tsx';
 import { createConditionFactory } from '../../reactionEntities.utils.ts';
-import type { WorkupType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
 
 const createCondition = createConditionFactory<WorkupType>();
 

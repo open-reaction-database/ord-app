@@ -18,8 +18,10 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { preparationTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
-import type { CompoundPreparationType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+import {
+  preparationTypeOptions,
+  type CompoundPreparationType,
+} from '@open-reaction-database/ui/reaction/model';
 
 export const reactionComponentsPreparations: Array<ReactionFormNode> = [
   wrapInputsWithGrid(

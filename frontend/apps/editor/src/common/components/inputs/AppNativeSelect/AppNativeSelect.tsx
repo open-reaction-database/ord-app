@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { NativeSelect, type NativeSelectProps } from '@mantine/core';
-import type { SelectOptions } from 'common/types/selectOptions';
+import type { SelectOptions } from '@open-reaction-database/ui/reaction/model';
 import { useUncontrolled } from '@mantine/hooks';
 import { useCallback, type ChangeEvent } from 'react';
 

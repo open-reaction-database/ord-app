@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import type { ReactionLinkProps } from 'features/reactions/provider/reactionProvider.types.ts';
-import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionCrudeComponent } from '@open-reaction-database/ui/reaction/model';
 import { CrudeComponentView } from './CrudeComponentView.tsx';
 
 const crude = { reactionId: 'rxn-123' } as ReactionCrudeComponent;

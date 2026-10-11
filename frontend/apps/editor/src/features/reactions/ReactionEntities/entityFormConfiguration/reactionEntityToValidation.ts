@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import {
+  ReactionNodeEntity,
+  type ReactionPathComponents,
+  type WithIdName,
+} from '@open-reaction-database/ui/reaction/model';
 import { yupResolver } from '@mantine/form';
 import * as yup from 'yup';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { useMemo } from 'react';
 import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { WithIdName } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 const defaultValidate = yupResolver(yup.object({}));
 

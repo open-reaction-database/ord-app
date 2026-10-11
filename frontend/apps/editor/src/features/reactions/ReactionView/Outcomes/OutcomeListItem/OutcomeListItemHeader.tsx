@@ -20,8 +20,10 @@ import { FlaskIcon, TimeIcon } from 'common/icons';
 import clsx from 'clsx';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type {
+  ReactionOutcome,
+  ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
 import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface OutcomeListItemHeaderProps {

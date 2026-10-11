@@ -21,12 +21,14 @@ import { create } from '@bufbuild/protobuf';
 import { AnalysisSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { ReactionAnalysis } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import {
+  type ReactionAnalysis,
+  ordAnalysisToReaction,
+  timeUnitOptions,
+} from '@open-reaction-database/ui/reaction/model';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
-import { ordAnalysisToReaction } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { ProductsComponentsList } from 'features/reactions/ReactionEntities/entityFormConfiguration/outcomes/ProductComponentsList.tsx';
 
 const createEmptyAnalysis = (

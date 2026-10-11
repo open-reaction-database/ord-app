@@ -30,7 +30,10 @@ import { reactionEntityContext } from 'features/reactions/ReactionEntities/react
 import { MolblockIdentifier } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/MolblockIdentifier/MolblockIdentifier.tsx';
 import { ComponentsLookup } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsLookup/ComponentsLookup.tsx';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
-import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import {
+  ordCompoundIdentifierToReaction,
+  type ReactionCompoundIdentifier,
+} from '@open-reaction-database/ui/reaction/model';
 import {
   useIsViewOnly,
   useReactionActions,
@@ -39,7 +42,6 @@ import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import type { Pages } from 'common/types/pages.ts';
-import type {
-  DatasetReaction,
-  ReactionResponse,
-} from 'store/entities/reactions/reactions.types.ts';
-import { parseReaction } from 'store/entities/reactions/reactions.utils.ts';
+import {
+  type DatasetReaction,
+  type ReactionResponse,
+  parseReaction,
+} from '@open-reaction-database/ui/reaction/model';
 
 export const parseReactionList = (
   pages: Pages<ReactionResponse>,

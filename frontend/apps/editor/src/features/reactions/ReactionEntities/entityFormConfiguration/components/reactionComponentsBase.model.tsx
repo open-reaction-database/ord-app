@@ -26,16 +26,18 @@ import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormCo
 import { create } from '@bufbuild/protobuf';
 import { CompoundIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { CustomIdentifiers } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/CustomIdentifiers.tsx';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  type AppData,
+  type ReactionCompoundIdentifier,
+  ordCompoundIdentifierToReaction,
+  textureTypeOptions,
+} from '@open-reaction-database/ui/reaction/model';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import {
   createReactionDataAddItem,
   reactionDataDisplay,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import { textureTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { ComponentPreview } from './ComponentPreview/ComponentPreview.tsx';
 
 export const componentPreview: ReactionFormNode = {

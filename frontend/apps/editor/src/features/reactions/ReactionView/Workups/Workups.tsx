@@ -20,14 +20,16 @@ import {
   type FieldConfiguration,
 } from '@open-reaction-database/ui/display';
 import { AddCircleIcon } from 'common/icons';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import {
+  type ReactionPathComponents,
+  ordWorkupToReaction,
+  type ReactionWorkup,
+  ReactionBoolean,
+  WorkupConstants,
+} from '@open-reaction-database/ui/reaction/model';
 import { create } from '@bufbuild/protobuf';
 import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
-import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit.ts';
-import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reactionWorkups.constants.ts';
 import { InputComponentsListItem } from '../Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {

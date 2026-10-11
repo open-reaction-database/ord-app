@@ -16,11 +16,11 @@
 import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionPreview.module.scss';
 import { useMemo } from 'react';
-import type {
-  ReactionInputComponent,
-  ReactionProduct,
-} from 'store/entities/reactions/reactionComponent/reactionComponent.types';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types';
+import {
+  type ReactionInputComponent,
+  type ReactionProduct,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 import { getProductYieldPercent } from 'common/components/ReactionPreview/reactionPreview.utils';
 

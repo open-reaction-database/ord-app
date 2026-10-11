@@ -17,7 +17,7 @@ import { Textarea, TextInput } from '@mantine/core';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormValue } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import { useAppUncontrolled } from 'common/hooks/useAppUncontrolled.ts';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';

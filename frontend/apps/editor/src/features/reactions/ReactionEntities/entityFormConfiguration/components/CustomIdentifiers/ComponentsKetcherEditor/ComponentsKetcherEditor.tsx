@@ -23,7 +23,7 @@ import classes from './componentsKetcherEditor.module.scss';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import { useField } from '@mantine/form';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
 
 type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 

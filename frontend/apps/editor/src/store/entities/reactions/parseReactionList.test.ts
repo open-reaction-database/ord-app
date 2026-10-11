@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import type { Pages } from 'common/types/pages.ts';
-import type { ReactionResponse } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionResponse } from '@open-reaction-database/ui/reaction/model';
 import { parseReactionList } from './parseReactionList.ts';
 
 // An empty binpb decodes to the app's default reaction, so parseReaction runs unstubbed.

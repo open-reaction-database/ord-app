@@ -16,7 +16,7 @@
 import type {
   SelectOptions,
   SelectOptionWithoutGroup,
-} from 'common/types/selectOptions';
+} from '@open-reaction-database/ui/reaction/model';
 import { Input, SegmentedControl, type SegmentedControlProps } from '@mantine/core';
 import { useMemo, type ReactNode } from 'react';
 import { inputWrapperClasses } from 'common/components/display/InputWrapper';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Flex, Title } from '@mantine/core';
-import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types';
+import type { ReactionConditions } from '@open-reaction-database/ui/reaction/model';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import classes from './conditions.module.scss';

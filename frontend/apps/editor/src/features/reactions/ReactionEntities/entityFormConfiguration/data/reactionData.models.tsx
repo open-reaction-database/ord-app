@@ -18,11 +18,13 @@ import {
   ReactionFormNodeType,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  type AppData,
+  ordDataToReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
-import { ordDataToReaction } from 'store/entities/reactions/reactionData/reactionData.converters.ts';
 import { create } from '@bufbuild/protobuf';
 import { DataSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 

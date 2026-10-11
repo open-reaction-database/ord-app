@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
 import { useMemo } from 'react';
 import classes from 'common/components/ReactionPreview/reactionPreview.module.scss';
 import { Badge, Flex } from '@mantine/core';

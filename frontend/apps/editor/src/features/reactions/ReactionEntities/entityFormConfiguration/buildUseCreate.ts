@@ -19,7 +19,7 @@ import {
   useDrawer,
   useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 export const buildUseCreate = <T = unknown>(
   entityName: string | ReactionPathComponents,

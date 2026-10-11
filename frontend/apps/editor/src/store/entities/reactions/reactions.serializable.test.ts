@@ -18,8 +18,8 @@ import { toBinary } from '@bufbuild/protobuf';
 import { findNonSerializableValue } from '@reduxjs/toolkit';
 import { base64Encode } from '@bufbuild/protobuf/wire';
 import { ReactionSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { fullReaction } from 'test/fullReaction.ts';
-import { ordBinpbToReaction } from './reactions.converters.ts';
+import { fullReaction } from '@open-reaction-database/ui/testing';
+import { ordBinpbToReaction } from '@open-reaction-database/ui/reaction/model';
 
 // The store holds app reactions, so a decoded one must pass Redux's serializability check.
 describe('binpb conversion', () => {

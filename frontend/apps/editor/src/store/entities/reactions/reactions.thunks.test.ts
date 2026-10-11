@@ -38,8 +38,8 @@ vi.mock('store/axiosInstance.ts', () => ({
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 // Reaction responses carry base64-encoded protobufs; stub the parse so tests need no real binpb,
-// and keep the rest of the module (merge helpers used by the reducer) intact.
-vi.mock('./reactions.utils.ts', async importActual => ({
+// and keep the rest of the model (merge helpers used by the reducer) intact.
+vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   parseReaction: () => ({
     id: 99,
@@ -48,13 +48,10 @@ vi.mock('./reactions.utils.ts', async importActual => ({
     previews: {},
     validation: null,
   }),
+  linkReactionEntities: (data: unknown) => data,
 }));
 vi.mock('./parseReactionList.ts', () => ({
   parseReactionList: (pages: unknown) => pages,
-}));
-vi.mock('./reactions.converters.ts', async importActual => ({
-  ...((await importActual()) as Record<string, unknown>),
-  linkReactionEntities: (data: unknown) => data,
 }));
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc;

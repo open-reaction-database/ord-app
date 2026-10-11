@@ -17,7 +17,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Accordion } from '@mantine/core';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { InputComponentsListItem } from './InputComponentsListItem.tsx';
-import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInputWithoutName } from '@open-reaction-database/ui/reaction/model';
 
 // Structure preview is exercised elsewhere; stub it so the rows stay simple.
 vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => ({

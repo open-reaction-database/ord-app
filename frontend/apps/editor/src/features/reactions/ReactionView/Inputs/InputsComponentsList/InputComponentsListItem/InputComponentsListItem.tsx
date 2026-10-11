@@ -20,9 +20,11 @@ import clsx from 'clsx';
 import classes from '../inputsComponentsList.module.scss';
 import { useMemo } from 'react';
 import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type {
+  ReactionInputWithoutName,
+  ReactionInputComponent,
+  ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 
 interface InputComponentsListItemProps {

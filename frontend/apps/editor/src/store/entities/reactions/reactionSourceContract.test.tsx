@@ -21,7 +21,7 @@ import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { ReactionEntityForm } from 'features/reactions/ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
 import { fullReactionSnapshot } from 'test/fullReactionSnapshot.ts';
 import {

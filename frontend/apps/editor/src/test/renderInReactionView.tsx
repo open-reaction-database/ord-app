@@ -34,8 +34,8 @@ import {
 import type {
   AppReaction,
   DatasetReaction,
-} from 'store/entities/reactions/reactions.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+  ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
 import type { ReactElement, ReactNode } from 'react';
 import { emptyReactionData } from './emptyReactionData.ts';
 

@@ -18,14 +18,17 @@ import {
   ordTemplateVariablesToReaction,
   reactionTemplateVariablesToOrd,
 } from './templates.converters.ts';
-import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
+import {
+  replaceNameIdInReactionComponentPath,
+  VariableType,
+  type AppReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
 import type { Variable } from './templates.types.ts';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
-import type { AppReaction } from '../reactions/reactions.types.ts';
 
-vi.mock('../../utils/replaceNameIdInReactionComponentPath.ts', () => ({
+vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
   replaceNameIdInReactionComponentPath: vi.fn(),
 }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));

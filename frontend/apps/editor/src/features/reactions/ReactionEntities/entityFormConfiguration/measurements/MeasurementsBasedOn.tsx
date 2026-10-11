@@ -15,16 +15,18 @@
  */
 import { useCallback, useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import {
+  type ReactionOutcome,
+  itemsById,
+  VariableType,
+} from '@open-reaction-database/ui/reaction/model';
 import { Select } from '@mantine/core';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useUncontrolled } from '@mantine/hooks';
-import { itemsById } from 'common/utils/itemsById.ts';
 import {
   useIsViewOnly,
   useReactionPart,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const NO_ANALYSES: ReactionOutcome['analyses'] = {};

@@ -22,9 +22,8 @@ import { Input, TextInput } from '@mantine/core';
 import { type FocusEvent, useCallback, useState } from 'react';
 import dayjs from 'dayjs';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
+import { VariableType, DATE_FORMAT } from '@open-reaction-database/ui/reaction/model';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
-import { DATE_FORMAT } from 'common/reactionFormats.ts';
 
 export function ReactionEntityDate({
   node,

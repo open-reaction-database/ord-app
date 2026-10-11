@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { MeasurementsPreview } from './MeasurementsPreview.tsx';
-import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionProduct } from '@open-reaction-database/ui/reaction/model';
 
 const product = {
   measurements: [

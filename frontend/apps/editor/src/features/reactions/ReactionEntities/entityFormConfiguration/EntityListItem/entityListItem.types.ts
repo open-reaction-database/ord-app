@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactNode } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import type { RequiredOptionalFieldsProps } from '@open-reaction-database/ui/display';
 
 interface FieldConfiguration<T> {

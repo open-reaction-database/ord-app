@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ReactionFormNodeType, type ReactionFormNode } from '../reactionEntities.types';
-import { timeUnitOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+import { timeUnitOptions } from '@open-reaction-database/ui/reaction/model';
 
 export const reactionObservations: Array<ReactionFormNode> = [
   {

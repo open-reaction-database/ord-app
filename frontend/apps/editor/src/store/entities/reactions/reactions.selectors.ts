@@ -16,14 +16,14 @@
 import { createSelectorFactory } from 'store/utils';
 import { createSelector } from '@reduxjs/toolkit';
 import type { AppState } from 'store/configureAppStore.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type {
-  DatasetReaction,
-  ReactionId,
-} from 'store/entities/reactions/reactions.types.ts';
+import {
+  type ReactionPathComponents,
+  type DatasetReaction,
+  type ReactionId,
+  getDeepReactionPart,
+} from '@open-reaction-database/ui/reaction/model';
 import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import { orderInputs } from 'features/reactions/provider/orderInputs.ts';
-import { getDeepReactionPart } from './reactions.utils.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 

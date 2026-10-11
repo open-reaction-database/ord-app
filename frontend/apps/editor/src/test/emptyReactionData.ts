@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ordSetupToReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.converter.ts';
-import { ordConditionsToReaction } from 'store/entities/reactions/reactionConditions/reactionConditions.converter.ts';
-import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
-import { ordProvenanceToReaction } from 'store/entities/reactions/reactionProvenance/reactionProvenance.converters.ts';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import {
+  ordSetupToReactionSetup,
+  ordConditionsToReaction,
+  ordNotesToReaction,
+  ordProvenanceToReaction,
+  type AppReaction,
+} from '@open-reaction-database/ui/reaction/model';
 
 /** A structurally-valid empty reaction, built from the same default converters the app uses. */
 export function emptyReactionData(): AppReaction {

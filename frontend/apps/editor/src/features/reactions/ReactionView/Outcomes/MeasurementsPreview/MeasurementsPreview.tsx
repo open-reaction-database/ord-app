@@ -16,7 +16,7 @@
 import type {
   ReactionMeasurement,
   ReactionProduct,
-} from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+} from '@open-reaction-database/ui/reaction/model';
 import { useMemo } from 'react';
 import { renderValuePrecisionUnit } from '../../renderValuePrecisionUnit.ts';
 import { Flex, Text, Tooltip } from '@mantine/core';

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
 
 /** Sorts inputs by addition order, then by name; inputs without an order go last. */
 export function orderInputs(

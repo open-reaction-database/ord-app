@@ -19,14 +19,14 @@ import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedContro
 import {
   type AppData,
   AppDataType,
-} from 'store/entities/reactions/reactionData/reactionData.types.ts';
+  VariableType,
+} from '@open-reaction-database/ui/reaction/model';
 import { useUncontrolled } from '@mantine/hooks';
 import { type ChangeEvent, type ReactNode, useCallback } from 'react';
 import { NumberInput, TextInput } from '@mantine/core';
 import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
 import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const options = Object.values(AppDataType);

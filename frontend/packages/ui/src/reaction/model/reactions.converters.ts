@@ -1,0 +1,159 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  create,
+  fromBinary,
+  toBinary,
+  type MessageInitShape,
+} from '@bufbuild/protobuf';
+import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
+import {
+  ReactionSchema,
+  type Reaction,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import {
+  ordInputsToReactionInputs,
+  reactionInputsToOrdInputs,
+} from '#reaction/model/reactionsInputs/reactionsInputs.converters.ts';
+import {
+  linkReactionOutcome,
+  ordOutcomesListToReactionOutcomesList,
+  reactionOutcomesListToOrdOutcomesList,
+} from '#reaction/model/reactionsOutcomes/reactionOutcomes.converters.ts';
+import {
+  ordReactionIdentifierToReaction,
+  ordScalarToReaction,
+  reactionIdentifierToOrd,
+} from '#reaction/model/reactionEntity/reactionEntity.converters.ts';
+import {
+  ordNotesToReaction,
+  reactionNotesToOrd,
+} from '#reaction/model/reactionNotes/reactionNotes.converters.ts';
+import type { AppReaction } from './reactions.types.ts';
+import {
+  ordObservationToReaction,
+  reactionObservationToOrd,
+} from '#reaction/model/reactionObservation/reactionObservation.converter.ts';
+import {
+  ordProvenanceToReaction,
+  reactionProvenanceToOrd,
+} from '#reaction/model/reactionProvenance/reactionProvenance.converters.ts';
+import {
+  ordConditionsToReaction,
+  reactionConditionsToOrd,
+} from '#reaction/model/reactionConditions/reactionConditions.converter.ts';
+import {
+  ordWorkupToReaction,
+  reactionWorkupToOrd,
+} from '#reaction/model/reactionWorkups/reactionWorkups.converters.ts';
+import {
+  ordSetupToReactionSetup,
+  reactionSetupToOrd,
+} from '#reaction/model/reactionSetup/reactionSetup.converter.ts';
+
+export function ordReactionToReaction(reaction: Reaction): AppReaction {
+  return {
+    reactionId: ordScalarToReaction(reaction.reactionId),
+    inputs: ordInputsToReactionInputs(reaction.inputs),
+    outcomes: ordOutcomesListToReactionOutcomesList(reaction.outcomes || []),
+    identifiers: (reaction.identifiers || []).map(ordReactionIdentifierToReaction),
+    setup: ordSetupToReactionSetup(reaction.setup),
+    observations: (reaction.observations || []).map(ordObservationToReaction),
+    conditions: ordConditionsToReaction(reaction.conditions),
+    notes: ordNotesToReaction(reaction.notes),
+    provenance: ordProvenanceToReaction(reaction.provenance),
+    workups: (reaction.workups || []).map(ordWorkupToReaction),
+  };
+}
+
+export function reactionToOrdReaction({
+  reactionId,
+  inputs,
+  outcomes,
+  identifiers,
+  setup,
+  observations,
+  conditions,
+  notes,
+  provenance,
+  workups,
+}: AppReaction): MessageInitShape<typeof ReactionSchema> {
+  return {
+    reactionId: reactionId ?? undefined,
+    inputs: reactionInputsToOrdInputs(inputs),
+    outcomes: reactionOutcomesListToOrdOutcomesList(outcomes),
+    identifiers:
+      identifiers.length > 0 ? identifiers.map(reactionIdentifierToOrd) : undefined,
+    setup: reactionSetupToOrd(setup),
+    observations:
+      observations.length > 0 ? observations.map(reactionObservationToOrd) : undefined,
+    conditions: reactionConditionsToOrd(conditions),
+    notes: reactionNotesToOrd(notes),
+    provenance: reactionProvenanceToOrd(provenance),
+    workups: workups.length > 0 ? workups.map(reactionWorkupToOrd) : undefined,
+  };
+}
+
+// The API carries reactions as base64-encoded binary ord.Reaction messages (`binpb`).
+export function ordBinpbToReaction(binpb: string): AppReaction {
+  const reaction = ordReactionToReaction(
+    fromBinary(ReactionSchema, base64Decode(binpb)),
+  );
+  convertReactionFloatsToDoubles(reaction);
+  return reaction;
+}
+
+export function reactionToOrdBinpb(reaction: AppReaction): string {
+  const ordReaction = create(ReactionSchema, reactionToOrdReaction(reaction));
+  return base64Encode(toBinary(ReactionSchema, ordReaction));
+}
+
+export function linkReactionEntities(reaction: AppReaction): AppReaction {
+  return {
+    ...reaction,
+    outcomes: reaction.outcomes.map(linkReactionOutcome),
+  };
+}
+
+const PRECISION = 7;
+
+// Since ord-schema uses floats instead of doubles for all numbers we have to patch all the numbers to try to restore user's input
+// Accuracy is not guaranteed
+// Original issue
+// https://github.com/open-reaction-database/ord-interface/blob/main/ord_interface/editor/js/utils.js#L397
+export function convertReactionFloatsToDoubles(reactionPart: unknown): void {
+  if (typeof reactionPart !== 'object' || reactionPart === null) {
+    return;
+  }
+
+  if (Array.isArray(reactionPart)) {
+    reactionPart.forEach(item => convertReactionFloatsToDoubles(item));
+  } else {
+    Object.keys(reactionPart).forEach(key => {
+      const dynamicReactionPart = reactionPart as Record<string, unknown>;
+      const value = dynamicReactionPart[key];
+      if (typeof value === 'object') {
+        convertReactionFloatsToDoubles(value);
+      } else if (typeof value === 'number') {
+        if (Number.isInteger(value)) {
+          dynamicReactionPart[key] = Number.parseInt(value.toString(), 10);
+        } else {
+          dynamicReactionPart[key] = Number.parseFloat(value.toPrecision(PRECISION));
+        }
+      }
+    });
+  }
+}

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Optional } from '../reactions/reactionEntity/reactionEntity.types.ts';
+import type { Optional } from '@open-reaction-database/ui/reaction/model';
 import type { CreateNewDatasetPayload } from '../datasets/datasets.types.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { Variable } from '../templates/templates.types.ts';

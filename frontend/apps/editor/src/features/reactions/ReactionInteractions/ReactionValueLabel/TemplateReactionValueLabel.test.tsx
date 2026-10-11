@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { TemplateReactionValueLabelWrapper } from './TemplateReactionValueLabel.tsx';
-import { VariableType } from 'store/entities/reactions/variableType.ts';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
 
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = TemplateReactionValueLabelWrapper as unknown as () => JSX.Element;

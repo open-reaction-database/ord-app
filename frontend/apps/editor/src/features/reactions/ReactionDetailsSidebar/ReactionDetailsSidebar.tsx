@@ -26,7 +26,7 @@ import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reac
 import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmationModal } from 'common/components/interactions/ConfirmationModal/ConfirmationModal.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 function ReactionDetailsSidebarComponent() {
   const reactionPathComponentsList = useDrawerStack();
