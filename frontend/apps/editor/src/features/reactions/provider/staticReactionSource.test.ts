@@ -17,6 +17,11 @@ import { emptyReactionData } from 'test/renderInReactionView.tsx';
 import type { ReactionSnapshot } from './reactionProvider.types.ts';
 import { createStaticReactionSource } from './staticReactionSource.ts';
 
+const { renderPreviewsMock } = vi.hoisted(() => ({ renderPreviewsMock: vi.fn() }));
+vi.mock('@open-reaction-database/ui/reaction/previews', () => ({
+  renderPreviews: renderPreviewsMock,
+}));
+
 const snapshot = {
   data: emptyReactionData(),
   previews: {},
@@ -48,5 +53,67 @@ describe('createStaticReactionSource', () => {
     const unsubscribe = createStaticReactionSource(snapshot).subscribe(listener);
     unsubscribe();
     expect(listener).not.toHaveBeenCalled();
+  });
+});
+
+describe('a static source without given previews', () => {
+  const withMolblocks = {
+    ...snapshot,
+    previews: { a: 'MOL A', b: null },
+  } as ReactionSnapshot;
+
+  it('starts with previews loading, renders them on first subscription, and notifies', async () => {
+    renderPreviewsMock.mockResolvedValue({ a: 'SVG A', b: null });
+    const source = createStaticReactionSource(withMolblocks);
+    const before = source.getPreviews();
+    expect(before).toEqual({
+      a: { isLoading: true, svg: null },
+      b: { isLoading: false, svg: null },
+    });
+    expect(source.getPreviews()).toBe(before);
+    expect(renderPreviewsMock).not.toHaveBeenCalled();
+
+    const listener = vi.fn();
+    source.subscribe(listener);
+    source.subscribe(vi.fn());
+    expect(renderPreviewsMock).toHaveBeenCalledTimes(1);
+    expect(renderPreviewsMock).toHaveBeenCalledWith({ a: 'MOL A', b: null });
+    await vi.waitFor(() => expect(listener).toHaveBeenCalledTimes(1));
+    const after = source.getPreviews();
+    expect(after).toEqual({
+      a: { isLoading: false, svg: 'SVG A' },
+      b: { isLoading: false, svg: null },
+    });
+    expect(source.getPreviews()).toBe(after);
+  });
+
+  it('stops loading when the render fails', async () => {
+    renderPreviewsMock.mockRejectedValue(new Error('no wasm'));
+    const source = createStaticReactionSource(withMolblocks);
+    const listener = vi.fn();
+    source.subscribe(listener);
+    await vi.waitFor(() => expect(listener).toHaveBeenCalled());
+    expect(source.getPreviews()).toEqual({
+      a: { isLoading: false, svg: null },
+      b: { isLoading: false, svg: null },
+    });
+  });
+
+  it('stops notifying after unsubscribing', async () => {
+    renderPreviewsMock.mockResolvedValue({ a: 'SVG A', b: null });
+    const source = createStaticReactionSource(withMolblocks);
+    const listener = vi.fn();
+    source.subscribe(listener)();
+    await vi.waitFor(() => expect(source.getPreviews().a.svg).toBe('SVG A'));
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing when no molblock needs rendering', () => {
+    const source = createStaticReactionSource({ ...snapshot, previews: { b: null } });
+    const before = source.getPreviews();
+    source.subscribe(vi.fn());
+    expect(renderPreviewsMock).not.toHaveBeenCalled();
+    expect(source.getPreviews()).toBe(before);
+    expect(before).toEqual({ b: { isLoading: false, svg: null } });
   });
 });
