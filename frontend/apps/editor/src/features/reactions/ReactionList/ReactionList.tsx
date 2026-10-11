@@ -35,6 +35,35 @@ import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.t
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { setShowInvalidOnly } from 'store/entities/reactions/reactions.actions.ts';
 
+/** A spinner while the page loads, or a note that the dataset has no reactions. */
+function ReactionListPlaceholder({ isLoading }: Readonly<{ isLoading: boolean }>) {
+  return isLoading ? (
+    <Flex
+      justify="center"
+      align="center"
+      className={classes.loaderContainer}
+    >
+      <Loader size="lg" />
+    </Flex>
+  ) : (
+    <Flex
+      align="center"
+      justify="center"
+    >
+      <Flex
+        direction="column"
+        align="center"
+        gap="sm"
+      >
+        <EmptyIcon />
+        <div className={classes.emptyText}>
+          There are no reactions in the dataset yet
+        </div>
+      </Flex>
+    </Flex>
+  );
+}
+
 export function ReactionList() {
   const dispatch = useAppDispatch();
   const reactionsIds = useSelector(selectReactionsOrder);
@@ -113,30 +142,8 @@ export function ReactionList() {
         </Flex>
       </Paper>
 
-      {isLoading ? (
-        <Flex
-          justify="center"
-          align="center"
-          className={classes.loaderContainer}
-        >
-          <Loader size="lg" />
-        </Flex>
-      ) : !hasReactions ? (
-        <Flex
-          align="center"
-          justify="center"
-        >
-          <Flex
-            direction="column"
-            align="center"
-            gap="sm"
-          >
-            <EmptyIcon />
-            <div className={classes.emptyText}>
-              There are no reactions in the dataset yet
-            </div>
-          </Flex>
-        </Flex>
+      {isLoading || !hasReactions ? (
+        <ReactionListPlaceholder isLoading={isLoading} />
       ) : (
         <>
           {reactionsIds.map((id, index) => (

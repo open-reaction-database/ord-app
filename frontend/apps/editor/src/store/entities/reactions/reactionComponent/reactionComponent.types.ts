@@ -20,7 +20,6 @@ import type {
 } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import type {
   Optional,
-  OrdOptional,
   ReactionBoolean,
   ReactionCompoundIdentifier,
   ReactionEntity,
@@ -76,8 +75,8 @@ export enum ReactionMeasurementValueType {
 export interface ReactionMeasurementValueNumber {
   type: ReactionMeasurementValueType.Number | ReactionMeasurementValueType.Percent;
   value: {
-    value?: OrdOptional<number>;
-    precision?: OrdOptional<number>;
+    value?: number | null;
+    precision?: number | null;
   };
 }
 

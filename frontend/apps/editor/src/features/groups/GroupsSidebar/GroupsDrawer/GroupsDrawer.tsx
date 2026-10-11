@@ -50,7 +50,7 @@ export function GroupsDrawer() {
   const isGroupUpdating = useSelector(selectIsGroupUpdating);
   const { isAdmin } = useSelector(selectMemberRoles);
 
-  const handleGroupRename = async (value: string) => {
+  const handleGroupRename = (value: string) => {
     dispatch(renameGroup({ id: group.id, name: value }));
   };
 

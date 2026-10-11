@@ -58,6 +58,7 @@ export const addIdentifierByName = createThunkWithExplicitResult(
           }),
         );
       } catch (_e) {
+        // The name did not resolve, or the request failed; the lookup reports it as not found.
         dispatch(addIdentifierByNameActions.failure());
       }
     },

@@ -28,7 +28,7 @@ export function GroupsSidebar() {
   const dispatch = useAppDispatch();
   const [opened, { open, close }] = useDisclosure(false);
 
-  const handleGroupAddition = async (value: string) => {
+  const handleGroupAddition = (value: string) => {
     dispatch(createGroup(value));
   };
 

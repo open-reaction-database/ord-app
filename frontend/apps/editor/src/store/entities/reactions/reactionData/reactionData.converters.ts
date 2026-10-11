@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
 import {
   DataSchema,
   type Data,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { AppDataType, type AppData } from './reactionData.types.ts';
-import { Buffer } from 'buffer';
 import {
   ordScalarToReaction,
   withIdName,
@@ -49,7 +49,7 @@ function ordDataValueToReaction(
     case 'bytesValue':
       return {
         type: AppDataType.Upload,
-        value: Buffer.from(kind.value).toString('base64'),
+        value: base64Encode(kind.value),
       };
     case 'floatValue':
     case 'integerValue':
@@ -92,7 +92,7 @@ function reactionDataValueToOrd({
   if (type === AppDataType.Upload) {
     return {
       case: 'bytesValue',
-      value: Uint8Array.from(Buffer.from(String(value), 'base64')),
+      value: base64Decode(String(value)),
     };
   }
   const number = Number(value);

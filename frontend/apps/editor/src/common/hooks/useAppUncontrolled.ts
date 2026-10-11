@@ -64,7 +64,7 @@ export function useAppUncontrolled<T>({
   onChange = () => {},
 }: UseUncontrolledInput<T>): [T, (value: T, ...payload: Array<any>) => void, boolean] {
   const [uncontrolledValue, setUncontrolledValue] = useState(
-    defaultValue !== undefined ? defaultValue : finalValue,
+    defaultValue ?? finalValue,
   );
 
   const handleUncontrolledChange = (val: T | ChangeEvent, ...payload: Array<any>) => {

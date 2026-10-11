@@ -231,6 +231,7 @@ function parseErrorWarning(text: string, reaction: AppReaction): ErrorWarningMes
     );
     return { text: updatedText, path: convertedPath, originalPath: path };
   } catch (_: unknown) {
+    // A path that names no entity in the reaction keeps the message, without the path.
     return { text };
   }
 }

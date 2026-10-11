@@ -60,7 +60,7 @@ export function useAuth() {
     if (noAuth) {
       // The axios interceptor only ever calls this with no args; cast to satisfy Auth0's
       // overloaded getter type (which also has a detailed-response variant).
-      setAccessTokenGetter((async () => e2eDevToken) as GetAccessToken);
+      setAccessTokenGetter((() => Promise.resolve(e2eDevToken)) as GetAccessToken);
       return;
     }
     if (isAuthenticated) {
@@ -109,7 +109,8 @@ export function useAuth() {
           createUser({ access_token: accessToken, id_token: idToken?.__raw as string }),
         );
       } catch (_: unknown) {
-        loginWithRedirect({
+        // Without tokens the session has expired or never began; sign in again.
+        void loginWithRedirect({
           appState: {
             returnTo: globalThis.location.href,
           },
@@ -118,7 +119,7 @@ export function useAuth() {
     };
 
     if (user) {
-      provisionUser();
+      void provisionUser();
     }
   }, [dispatch, user, getAccessTokenSilently, getIdTokenClaims, loginWithRedirect]);
 

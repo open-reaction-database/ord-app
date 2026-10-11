@@ -123,7 +123,7 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
   }, [areSidebarFormsDirty, currentPath, onFormClose, openCloseConfirmation]);
 
   const onActualSidebarClose = useMemo(() => {
-    return Object.values(areSidebarFormsDirty).some(item => item)
+    return Object.values(areSidebarFormsDirty).some(Boolean)
       ? openCloseAllConfirmation
       : onSidebarClose;
   }, [areSidebarFormsDirty, onSidebarClose, openCloseAllConfirmation]);
@@ -176,7 +176,7 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
           <nodeToComponentContext.Provider value={reactionNodeToComponent}>
             {reactionPathComponentsList.map((sidebarForm, index) => (
               <ReactionEntityForm
-                key={index}
+                key={sidebarForm.join('.')}
                 reactionPathComponents={sidebarForm}
                 sidebarInfo={sidebarInfos[index]}
                 isHidden={index !== reactionPathComponentsList.length - 1}

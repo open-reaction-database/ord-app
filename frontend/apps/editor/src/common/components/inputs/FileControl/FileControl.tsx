@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { useFileNameHref } from 'common/components/inputs/FileControl/useFileNameHref.ts';
-import { type ReactNode, useCallback, useState } from 'react';
+import { type ReactNode, useCallback, useRef, useState } from 'react';
 import mime from 'mime/lite';
-import { Buffer } from 'buffer';
+import { base64Encode } from '@bufbuild/protobuf/wire';
 import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
 import { inputWrapperClasses } from '../../display/InputWrapper';
 import { RemoveIcon } from 'common/icons';
@@ -43,6 +43,8 @@ export function FileControl({
 }: Readonly<FileControlProps>) {
   const { fileName, href } = useFileNameHref(name, value);
   const [file, setFile] = useState<File | null>(null);
+  // The latest pick; a read that finishes after another pick or a removal is ignored.
+  const latestFile = useRef<File | null>(null);
 
   const handleChange = useCallback(
     (file: File | null) => {
@@ -54,21 +56,35 @@ export function FileControl({
           });
           return;
         }
+        latestFile.current = file;
         setFile(file);
         const fileParts = file.name.split('.');
         const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
-        file.arrayBuffer().then(buffer => {
-          const formatFromBlob = mime.getExtension(file.type);
-          const format = extensionFromFile ?? formatFromBlob ?? 'txt';
-          const newValue = Buffer.from(buffer).toString('base64');
-          onChange({ value: newValue, format });
-        });
+        file.arrayBuffer().then(
+          buffer => {
+            if (latestFile.current !== file) return;
+            const formatFromBlob = mime.getExtension(file.type);
+            const format = extensionFromFile ?? formatFromBlob ?? 'txt';
+            const newValue = base64Encode(new Uint8Array(buffer));
+            onChange({ value: newValue, format });
+          },
+          () => {
+            if (latestFile.current !== file) return;
+            latestFile.current = null;
+            setFile(null);
+            showNotification({
+              variant: NotificationVariant.ERROR,
+              message: `File ${file.name} could not be read.`,
+            });
+          },
+        );
       }
     },
     [onChange],
   );
 
   const handleRemoveFile = useCallback(() => {
+    latestFile.current = null;
     setFile(null);
     onChange(null);
   }, [onChange]);

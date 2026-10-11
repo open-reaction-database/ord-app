@@ -43,7 +43,7 @@ axiosInstance.interceptors.request.use(async config => {
 // Exported for unit testing; registered as the response error interceptor below. A 403 means the
 // user is authenticated but no longer authorized for the action, so trigger a permission refresh.
 // (401 is an authentication failure handled by the Auth0 token-refresh/redirect path, not here.)
-export async function handleResponseError(error: unknown): Promise<never> {
+export function handleResponseError(error: unknown): Promise<never> {
   if (axios.isAxiosError(error) && error.response?.status === 403) {
     onPermissionDenied?.();
   }

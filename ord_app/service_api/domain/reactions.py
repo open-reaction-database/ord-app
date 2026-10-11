@@ -136,7 +136,7 @@ class ReactionsUseCase:
         }
 
         # create orm object
-        db_reaction = await self.reaction_repo.create(
+        db_reaction = await self.reaction_repo.create_in_dataset(
             dataset_id, self.current_user.id, payload=insert_data
         )
 

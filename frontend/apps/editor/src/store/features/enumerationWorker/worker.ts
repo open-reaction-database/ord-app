@@ -190,11 +190,10 @@ onmessage = event => {
       reactions = reactions.concat(
         enumerateReaction(template, variables, matching, templateCSVRows[index]),
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: Error | any) {
+    } catch (e: unknown) {
       errors = errors.concat({
         line: baseIndex + index + 2,
-        message: e.message,
+        message: e instanceof Error ? e.message : String(e),
       });
     }
   }

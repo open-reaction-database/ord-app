@@ -37,5 +37,5 @@ export const selectCanDatasetBeEdited = createSelector(
 // Deleting a dataset is Admin-only — Editors can edit but must not see/use the Remove action. (#610)
 export const selectCanDatasetBeDeleted = createSelector(
   [selectActiveDatasetRoles],
-  roles => roles.some(role => role === USER_ROLES.ADMIN),
+  roles => roles.includes(USER_ROLES.ADMIN),
 );

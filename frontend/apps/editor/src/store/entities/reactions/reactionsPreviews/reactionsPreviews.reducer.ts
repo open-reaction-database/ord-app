@@ -34,7 +34,7 @@ const updatePreviewState = (
         value === null
           ? { isLoading: false, svg: null }
           : {
-              ...(state[key] || {}),
+              ...state[key],
               isLoading: true,
             },
     }),

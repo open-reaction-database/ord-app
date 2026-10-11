@@ -20,7 +20,6 @@ import classes from '../enumerationSetup.module.scss';
 import { useSelector } from 'react-redux';
 import { selectTemplates } from 'store/entities/templates/templates.selectors.ts';
 import { useCallback, useMemo, useState, type MouseEvent } from 'react';
-import { Buffer } from 'buffer';
 import { parse } from 'csv-parse/sync';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { guessDelimiter } from './templateFileSelector.utils.ts';
@@ -140,8 +139,7 @@ export function TemplateFileSelector({
     setIsCsvFileParsing(true);
     if (file) {
       try {
-        const buffer = await file.arrayBuffer();
-        const newValue = Buffer.from(buffer).toString();
+        const newValue = await file.text();
         const delimiter = guessDelimiter(newValue);
         const [headers] = parse(newValue, { delimiter });
         if (!validateHeaders(headers)) {

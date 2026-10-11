@@ -157,7 +157,10 @@ export function reactionBooleanToOrd(value: ReactionBoolean): boolean | undefine
 export function ordScalarToReaction<T extends string | number>(
   value: OrdOptional<T>,
 ): T | undefined {
-  return value || undefined;
+  if (!value) {
+    return undefined;
+  }
+  return value;
 }
 
 // Encoding an int32 field that holds a decimal throws. The form inputs for these fields

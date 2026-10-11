@@ -101,7 +101,7 @@ export const getReactionsPage = createThunk(
   },
 );
 
-// TODO only update metadata when reaction is already in the store
+// Fetches the whole reaction even when the store already holds it.
 export const getReaction = createThunk(
   getReactionActions,
   ({ reactionId }) =>
@@ -276,6 +276,7 @@ export const searchReaction = createThunkWithExplicitResult(
       dispatch(searchReactionActions.success(parsedReaction));
       navigate(`/datasets/${datasetId}/reactions/${parsedReaction.id}`);
     } catch (_e: unknown) {
+      // The dataset has no reaction with that ID, or the search failed; either way, say so.
       dispatch(searchReactionActions.failure(null));
       showNotification({
         message: 'Reaction with this ID do not exist in this dataset',

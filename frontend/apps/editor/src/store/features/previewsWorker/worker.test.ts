@@ -76,6 +76,16 @@ describe('previews worker', () => {
     });
   });
 
+  it('posts no preview for every key when Indigo fails to load', async () => {
+    waitForIndigoMock.mockImplementationOnce(() =>
+      Promise.reject(new Error('no wasm')),
+    );
+    handler({ data: { a: 'molA', b: null } });
+    await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));
+    expect(renderSvgMock).not.toHaveBeenCalled();
+    expect(postMessageMock).toHaveBeenCalledWith({ a: null, b: null });
+  });
+
   it('posts an empty object for an empty preview map', async () => {
     handler({ data: {} });
     await vi.waitFor(() => expect(postMessageMock).toHaveBeenCalledTimes(1));

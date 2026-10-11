@@ -30,11 +30,20 @@ from ord_app.service_api.repositories.base import BaseRepository
 class GroupRepository(BaseRepository[GroupModel]):
     model = GroupModel
 
-    # Group creation needs an owner and seeds an admin membership, so this override
-    # deliberately takes a wider signature than the base create(payload).
-    async def create(  # ty: ignore[invalid-method-override]
+    async def create_owned(
         self, owner_id: int, payload: dict, autocommit: bool = True
     ) -> GroupModel:
+        """Creates a group whose owner becomes its first admin member.
+
+        Args:
+            owner_id: ID of the user who owns the group.
+            payload: The group's other columns, such as ``name``.
+            autocommit: If True, add the group to the session, commit, and refresh it; if
+                False, return it unsaved and outside the session.
+
+        Returns:
+            The new group.
+        """
         group = GroupModel(
             owner_id=owner_id,
             groups_member=[UserGroupsMembershipModel(user_id=owner_id, role="admin")],
@@ -60,7 +69,7 @@ class GroupRepository(BaseRepository[GroupModel]):
         )
         rows = (await self.db.execute(stmt)).all()
         groups = [
-            dict(id=group.id, name=group.name, role=user_group.role)
+            {"id": group.id, "name": group.name, "role": user_group.role}
             for group, user_group in rows
         ]
         return groups
@@ -111,9 +120,7 @@ class GroupMembersRepository:
             await self.db.commit()
             logger.debug(f"Member {user_id} added to {group_id} with role: {role}")
 
-    async def update_member(
-        self, user_id: int, group_id: int, role: str, autocommit: bool = True
-    ) -> None:
+    async def update_member(self, user_id: int, group_id: int, role: str) -> None:
         stmt = (
             update(UserGroupsMembershipModel)
             .where(

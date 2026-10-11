@@ -18,7 +18,7 @@ Revises:
 Create Date: 2025-02-18 13:01:50.335883
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 from alembic import op
 import sqlalchemy as sa
@@ -26,9 +26,13 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '10ec23a511a7'
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
+
+NOW = 'now()'
+USER_ID = 'user.id'
+SET_NULL = 'SET NULL'
 
 
 def upgrade() -> None:
@@ -41,8 +45,8 @@ def upgrade() -> None:
     sa.Column('email', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('avatar_url', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -54,9 +58,9 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('owner_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ondelete='SET NULL'),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.ForeignKeyConstraint(['owner_id'], [USER_ID], ondelete=SET_NULL),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_dataset_owner_id'), 'dataset', ['owner_id'], unique=False)
@@ -64,17 +68,17 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('owner_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ondelete='SET NULL'),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.ForeignKeyConstraint(['owner_id'], [USER_ID], ondelete=SET_NULL),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('dataset_group_association',
     sa.Column('dataset_id', sa.Integer(), nullable=False),
     sa.Column('group_id', sa.Integer(), nullable=False),
     sa.Column('is_primary', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
     sa.ForeignKeyConstraint(['dataset_id'], ['dataset.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['group_id'], ['group.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('dataset_id', 'group_id')
@@ -86,10 +90,10 @@ def upgrade() -> None:
     sa.Column('is_valid', sa.Boolean(), nullable=True),
     sa.Column('dataset_id', sa.Integer(), nullable=False),
     sa.Column('owner_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
     sa.ForeignKeyConstraint(['dataset_id'], ['dataset.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['owner_id'], [USER_ID], ondelete=SET_NULL),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('pb_reaction_id', 'dataset_id', name='uq_pb_reaction_id_dataset_id')
     )
@@ -99,10 +103,10 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('group_id', sa.Integer(), nullable=False),
     sa.Column('role', sa.Enum('admin', 'editor', 'viewer', name='user_group_role_enum', create_constraint=True), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
+    sa.Column('modified_at', sa.DateTime(), server_default=sa.text(NOW), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['group.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], [USER_ID], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('user_id', 'group_id')
     )
     # ### end Alembic commands ###

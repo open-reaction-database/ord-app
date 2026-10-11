@@ -27,14 +27,20 @@ onmessage = event => {
 
   const previews: PreviewsById = event.data;
 
-  waitForIndigo().then(() => {
-    const svgPreviews = Object.entries(previews).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: renderSvg(value),
-      }),
-      {},
-    );
-    postMessage(svgPreviews);
-  });
+  waitForIndigo().then(
+    () => {
+      const svgPreviews = Object.entries(previews).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key]: renderSvg(value),
+        }),
+        {},
+      );
+      postMessage(svgPreviews);
+    },
+    // Without Indigo nothing renders; answer every ID with no preview so loading ends.
+    () => {
+      postMessage(Object.fromEntries(Object.keys(previews).map(key => [key, null])));
+    },
+  );
 };

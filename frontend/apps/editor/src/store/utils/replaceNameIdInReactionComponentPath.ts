@@ -68,7 +68,9 @@ export function replaceNameIdInReactionComponentPath(
       }
       index++;
     }
-    // TODO move somewhere or rewrite - quite fix necessary because of fields renaming
+    // The store keeps each condition's measurements under `<condition>Measurements` (for
+    // example `temperatureMeasurements`), where the ORD schema calls them `measurements`;
+    // map either name to the other.
     const currentValue = updatedPath[index];
     if (
       index > 0 &&

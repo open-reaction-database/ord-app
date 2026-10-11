@@ -41,7 +41,7 @@ export function MeasurementMasses({
   const handleChange = (value: Array<string | number>) => {
     const numericValues = value
       .map(item => (typeof item === 'string' ? Number.parseFloat(item) : item))
-      .filter(item => !isNaN(item));
+      .filter(item => !Number.isNaN(item));
     onChange(numericValues);
   };
 

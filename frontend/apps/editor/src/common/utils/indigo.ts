@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 // ketcher-indigo package doesn't provide types
-// eslint-disable-next-line
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import indigoInit from 'indigo-ketcher';
-import { Buffer } from 'buffer';
+import { base64Decode, base64Encode } from '@bufbuild/protobuf/wire';
 
 let indigoModule: ReturnType<indigoInit>;
 let indigoPromise: Promise<void>;
@@ -46,9 +46,7 @@ export function renderSvg(component: string | null, size: number = 120) {
   options.set('ignore-stereochemistry-errors', 'true');
   options.set('render-coloring', 'true');
   try {
-    return Buffer.from(indigoModule.render(component, options), 'base64').toString(
-      'base64',
-    );
+    return base64Encode(base64Decode(indigoModule.render(component, options)));
   } catch (e) {
     console.error(e);
     return null;

@@ -30,6 +30,9 @@ from ord_app.service_api.services.pb_utils import load_message
 
 UserRolesList = Literal["admin", "editor", "viewer"]
 
+USER_ID = "user.id"
+SET_NULL = "SET NULL"
+
 
 class BaseModel(DeclarativeBase):
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
@@ -78,7 +81,7 @@ class GroupModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     owner_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="SET NULL"), nullable=True
+        ForeignKey(USER_ID, ondelete=SET_NULL), nullable=True
     )
     owner: Mapped[UserModel] = relationship(UserModel, backref="owner_groups")
 
@@ -100,7 +103,7 @@ class GroupModel(BaseModel):
 
 class UserGroupsMembershipModel(BaseModel):
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
+        ForeignKey(USER_ID, ondelete="CASCADE"), primary_key=True
     )
     user: Mapped[UserModel] = relationship(
         UserModel, backref="groups_member", overlaps="groups,members"
@@ -131,7 +134,7 @@ class DatasetModel(BaseModel):
     name: Mapped[str] = mapped_column(nullable=True)
     description: Mapped[str] = mapped_column(nullable=True)
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey(USER_ID, ondelete=SET_NULL))
     owner: Mapped[UserModel] = relationship(UserModel, backref="datasets")
 
     reactions: Mapped[list["ReactionModel"]] = relationship(
@@ -201,7 +204,7 @@ class ReactionModel(BaseModel):
         DatasetModel, back_populates="reactions"
     )
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey(USER_ID, ondelete=SET_NULL))
     owner: Mapped[UserModel] = relationship(UserModel, backref="reactions")
 
     __table_args__ = (
@@ -227,7 +230,7 @@ class TemplateModel(BaseModel):
     binpb: Mapped[bytes] = mapped_column(LargeBinary)
     variables: Mapped[JSONB] = mapped_column(JSONB)
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey(USER_ID))
     owner: Mapped[UserModel] = relationship(UserModel, back_populates="templates")
 
     __table_args__ = (

@@ -65,7 +65,7 @@ export function ReactionEntityValue({
     ...inputProps,
     value: valueControlled,
     onChange: onControlledChange,
-    ...(node.inputConfig ?? {}),
+    ...node.inputConfig,
   };
 
   switch (node.inputType) {

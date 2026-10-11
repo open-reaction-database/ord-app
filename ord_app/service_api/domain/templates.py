@@ -27,6 +27,8 @@ from ord_app.service_api.schemas.templates import (
 from ord_app.service_api.services.exceptions import EntityNotFoundError
 from ord_app.service_api.services.postgresql import get_db_session
 
+TEMPLATE_NOT_FOUND = "Template not found"
+
 
 class TemplatesUseCase:
     def __init__(self, db: AsyncSession, current_user: UserModel) -> None:
@@ -46,7 +48,7 @@ class TemplatesUseCase:
             id=template_id, owner_id=self.current_user.id
         ):
             return template
-        raise EntityNotFoundError("Template not found")
+        raise EntityNotFoundError(TEMPLATE_NOT_FOUND)
 
     async def update(
         self, template_id: int, payload: TemplateUpdateModel
@@ -56,14 +58,14 @@ class TemplatesUseCase:
             data, id=template_id, owner_id=self.current_user.id
         ):
             return template
-        raise EntityNotFoundError("Template not found")
+        raise EntityNotFoundError(TEMPLATE_NOT_FOUND)
 
     async def delete(self, template_id: int) -> int:
         if count := await self.template_repo.delete(
             id=template_id, owner_id=self.current_user.id
         ):
             return count
-        raise EntityNotFoundError("Template not found")
+        raise EntityNotFoundError(TEMPLATE_NOT_FOUND)
 
 
 def get_templates_use_case(
