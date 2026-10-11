@@ -30,10 +30,15 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '>=1.16'
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.12"
       - name: Install dependencies
-        run: go install github.com/google/addlicense@v1.2.0
+        run: uv sync --frozen --no-build
+      # The pre-commit hook pins addlicense's version and arguments for CI and local commits alike.
       - name: addlicense
-        run: addlicense -check -c "Open Reaction Database Project Authors" -l apache .
+        run: uv run --frozen --no-build pre-commit run addlicense --all-files --show-diff-on-failure
 
   check_python:
     runs-on: ubuntu-latest
