@@ -16,7 +16,7 @@
 import { Flex } from '@mantine/core';
 import { GroupsSidebar } from 'features/groups';
 import { DatasetTable } from 'features/datasets';
-import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
 import { DatasetsListTopActions } from './DatasetsListTopActions/DatasetsListTopActions.tsx';
 import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu.tsx';
 import { useEffect } from 'react';
@@ -35,7 +35,7 @@ export function DatasetsListPage() {
   }, [activeGroupId, dispatch]);
 
   return (
-    <PageContainer breadcrumbs={[{ title: 'Datasets', path: '~/' }]}>
+    <EditorPageContainer breadcrumbs={[{ title: 'Datasets', path: '~/' }]}>
       <Flex
         direction="column"
         gap="sm"
@@ -56,6 +56,6 @@ export function DatasetsListPage() {
           <DatasetTable />
         </Flex>
       </Flex>
-    </PageContainer>
+    </EditorPageContainer>
   );
 }

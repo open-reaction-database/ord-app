@@ -16,7 +16,7 @@
 import classes from './reactionPage.module.scss';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useEffect, useMemo, useState } from 'react';
-import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
 import { getReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { DatasetReactionHeader } from 'features/reactions/ReactionHeader/DatasetReactionHeader/DatasetReactionHeader.tsx';
 import {
@@ -33,7 +33,7 @@ import {
   ReactionProvider,
   ReactionContent,
 } from '@open-reaction-database/ui/reaction';
-import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
@@ -87,7 +87,7 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
   }
 
   return (
-    <PageContainer breadcrumbs={breadcrumbs}>
+    <EditorPageContainer breadcrumbs={breadcrumbs}>
       <ReactionProvider
         key={reactionId}
         {...providerProps}
@@ -127,6 +127,6 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
           </Flex>
         )}
       </ReactionProvider>
-    </PageContainer>
+    </EditorPageContainer>
   );
 }

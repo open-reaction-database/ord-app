@@ -15,6 +15,10 @@
  */
 export interface Breadcrumb {
   title: string;
+  /**
+   * A wouter link target: relative to the enclosing router or nested route, or `~/…`
+   * from the app root.
+   */
   path: string;
 }
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
-import { screen } from '@testing-library/react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
-import { Footer } from './Footer.tsx';
+import {
+  PageContainer,
+  type PageContainerProps,
+} from '@open-reaction-database/ui/shell';
+import UserMenu from './UserMenu/UserMenu';
 
-describe('Footer', () => {
-  it('renders the dated copyright line and external links', () => {
-    renderWithMantine(<Footer />);
-    expect(
-      screen.getByText(/© Copyright \d{4} Open Reaction Database/),
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(2);
-  });
-});
+/** The page shell with the editor's header controls. */
+export function EditorPageContainer(
+  props: Readonly<Omit<PageContainerProps, 'headerActions'>>,
+) {
+  return (
+    <PageContainer
+      {...props}
+      headerActions={<UserMenu />}
+    />
+  );
+}

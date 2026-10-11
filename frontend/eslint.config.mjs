@@ -26,6 +26,22 @@ import tseslint from 'typescript-eslint';
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import sonarjs from 'eslint-plugin-sonarjs';
 
+// How files inside the shared package may import each other.
+const PACKAGE_IMPORT_PATTERNS = [
+  {
+    group: ['../*', '@open-reaction-database/ui', '@open-reaction-database/ui/*'],
+    message: 'Import package files through #… instead.',
+  },
+  {
+    regex: String.raw`^#(reaction(/[^/]+)?|testing|theme|display|shell)/index\.ts$`,
+    message:
+      'Import the module itself: an app test that mocks a barrel must not reach package code.',
+  },
+];
+
+// App state and transport, which the shared package leaves to its hosts.
+const APP_STATE_IMPORTS = ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*'];
+
 export default tseslint.config(
   { ignores: ['**/dist', '**/coverage', '**/playwright-report', '**/test-results'] },
   {
@@ -137,23 +153,29 @@ export default tseslint.config(
         'error',
         {
           patterns: [
+            ...PACKAGE_IMPORT_PATTERNS,
             {
-              group: [
-                '../*',
-                '@open-reaction-database/ui',
-                '@open-reaction-database/ui/*',
-              ],
-              message: 'Import package files through #… instead.',
-            },
-            {
-              regex: String.raw`^#(reaction(/[^/]+)?|testing|theme|display)/index\.ts$`,
-              message:
-                'Import the module itself: an app test that mocks a barrel must not reach package code.',
-            },
-            {
-              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
+              group: [...APP_STATE_IMPORTS, 'wouter'],
               message:
                 'The shared package stays free of app state, transport, and routing.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The page shell links between pages, so it alone may use the router.
+    files: ['packages/ui/src/shell/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            ...PACKAGE_IMPORT_PATTERNS,
+            {
+              group: APP_STATE_IMPORTS,
+              message: 'The page shell stays free of app state and transport.',
             },
           ],
         },
