@@ -27,12 +27,17 @@ import {
   usePreviews,
   useReactionPart,
   useReactionSnapshot,
+  type ReactionActions,
   type ReactionSlots,
 } from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   addUpdateReactionFieldActions,
@@ -256,6 +261,42 @@ describe('reduxReactionActions', () => {
     expect(recorded.map(action => action.type)).toContain(
       addUpdateReactionFieldActions.failure.type,
     );
+  });
+
+  it.each([
+    [
+      'an update',
+      (actions: ReactionActions) =>
+        actions.update(['notes'], { safetyNotes: 'gloves' }),
+    ],
+    ['a removal', (actions: ReactionActions) => actions.remove(['inputs', 'in1'])],
+  ])(
+    'say so when the save of %s fails, and restore the reaction',
+    async (_name, edit) => {
+      axiosMock.patch.mockRejectedValue(new Error('offline'));
+      const store = makeStore();
+      const before = store.getState().entities.reactions.reactionsById[1].data;
+      await edit(reduxReactionActions(store, 1));
+      expect(showNotification).toHaveBeenCalledTimes(1);
+      expect(showNotification).toHaveBeenCalledWith({
+        message: 'Failed to update reaction.',
+        variant: NotificationVariant.ERROR,
+      });
+      expect(store.getState().entities.reactions.reactionsById[1].data).toEqual(before);
+    },
+  );
+
+  it('show only the backend’s message when a failed save has one', async () => {
+    axiosMock.patch.mockRejectedValue({
+      isAxiosError: true,
+      response: { data: { detail: 'Access forbidden' } },
+    });
+    await reduxReactionActions(makeStore(), 1).remove(['inputs', 'in1']);
+    expect(showNotification).toHaveBeenCalledTimes(1);
+    expect(showNotification).toHaveBeenCalledWith({
+      message: 'Access forbidden',
+      variant: NotificationVariant.ERROR,
+    });
   });
 
   it('settle when the dispatched thunk does', async () => {

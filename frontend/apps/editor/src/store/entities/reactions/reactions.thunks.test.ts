@@ -23,6 +23,7 @@ import {
   getReactionsList,
   getReactionsPage,
   removeReaction,
+  renameReaction,
 } from './reactions.thunks.ts';
 import {
   createEmptyReactionActions,
@@ -31,6 +32,11 @@ import {
   removeReactionActions,
 } from './reactions.actions.ts';
 import { getDatasetActions } from '../datasets/datasets.actions.ts';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -165,5 +171,38 @@ describe('createEmptyReaction', () => {
     expect(types()).toContain(createEmptyReactionActions.success.type);
     expect(navigate).toHaveBeenCalledWith('/datasets/5/reactions/99');
     expect(types()).not.toContain(getReactionPageActions.request.type);
+  });
+});
+
+describe('a failed save', () => {
+  const failed = (message: string) => ({ message, variant: NotificationVariant.ERROR });
+
+  it('of a reaction removal says so and stays on the reaction', async () => {
+    axiosMock.delete.mockRejectedValue(new Error('offline'));
+    const { store } = makeStore();
+    store.dispatch(getReactionsListActions.request(5));
+    await store.dispatch(removeReaction(42) as unknown as UnknownAction);
+    expect(showNotification).toHaveBeenCalledWith(failed('Failed to remove reaction.'));
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('of a reaction rename says so', async () => {
+    axiosMock.patch.mockRejectedValue(new Error('offline'));
+    const { store } = makeStore();
+    store.dispatch(getReactionsListActions.request(5));
+    store.dispatch(
+      createEmptyReactionActions.success({
+        id: 42,
+        pb_reaction_id: 'old',
+        data: emptyReactionData(),
+        previews: {},
+        summary: { provenance: {}, summary: {}, conditions: '' },
+      } as never),
+    );
+    await store.dispatch(
+      renameReaction({ reactionId: 42, name: 'new' }) as unknown as UnknownAction,
+    );
+    expect(axiosMock.patch).toHaveBeenCalled();
+    expect(showNotification).toHaveBeenCalledWith(failed('Failed to rename reaction.'));
   });
 });

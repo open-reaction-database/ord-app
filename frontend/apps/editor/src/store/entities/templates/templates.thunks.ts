@@ -111,6 +111,7 @@ export const removeTemplate = createThunkWithExplicitResult(
     dispatch(removeTemplateActions.success(templateId));
     navigate(`/templates`);
   },
+  { failureMessage: 'Failed to remove template.' },
 );
 
 export const renameTemplate = createThunk(
@@ -130,6 +131,7 @@ export const renameTemplate = createThunk(
 
       return renameTemplateActions.success(template);
     },
+  { failureMessage: 'Failed to rename template.' },
 );
 
 const syncVariablesWithBackend: ThunkCustomWrapper<string, Promise<void>> =
@@ -153,6 +155,7 @@ export const addUpdateVariable = createThunk(
       await dispatch(syncVariablesWithBackend(templateId));
       return addUpdateVariableActions.success();
     },
+  { failureMessage: 'Failed to update template variables.' },
 );
 
 export const removeVariable = createThunk(
@@ -162,6 +165,7 @@ export const removeVariable = createThunk(
       await dispatch(syncVariablesWithBackend(templateId));
       return removeVariableActions.success();
     },
+  { failureMessage: 'Failed to update template variables.' },
 );
 
 export const downloadTemplateCsv: ThunkCustomWrapper<string> =

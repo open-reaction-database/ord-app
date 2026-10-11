@@ -18,11 +18,22 @@ import { type UnknownAction } from '@reduxjs/toolkit';
 import axiosInstance from 'store/axiosInstance.ts';
 import { makeRecordingStore } from 'test/recordingStore.ts';
 import { navigate } from 'wouter/use-browser-location';
-import { removeTemplate, importFromFile } from './templates.thunks.ts';
 import {
+  addUpdateVariable,
+  importFromFile,
+  removeTemplate,
+  renameTemplate,
+} from './templates.thunks.ts';
+import {
+  getAllTemplatesActions,
   removeTemplateActions,
   importTemplateFromFileActions,
 } from './templates.actions.ts';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -79,5 +90,67 @@ describe('importFromFile', () => {
     ) as { payload?: string };
     expect(failure?.payload).toBe('Incorrect template file provided');
     expect(axiosMock.post).not.toHaveBeenCalled();
+  });
+});
+
+describe('a failed save', () => {
+  const failed = (message: string) => ({ message, variant: NotificationVariant.ERROR });
+  const kept = { path: ['notes', 'safetyNotes'], name: 'notes' };
+
+  function storeWithTemplate() {
+    const recording = makeRecordingStore();
+    recording.store.dispatch(
+      getAllTemplatesActions.success([
+        {
+          id: 'template_5',
+          name: 'template',
+          data: emptyReactionData(),
+          previews: {},
+          summary: { provenance: {}, summary: {}, conditions: '' },
+          variables: { 'notes.safetyNotes': kept },
+          modified_at: '',
+        },
+      ] as never),
+    );
+    return recording;
+  }
+
+  it('of a template removal says so and stays on the template', async () => {
+    axiosMock.delete.mockRejectedValue(new Error('offline'));
+    const { store } = makeRecordingStore();
+    await store.dispatch(removeTemplate('template_5') as unknown as UnknownAction);
+    expect(showNotification).toHaveBeenCalledWith(failed('Failed to remove template.'));
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('of a template rename says so', async () => {
+    axiosMock.patch.mockRejectedValue(new Error('offline'));
+    const { store } = makeRecordingStore();
+    await store.dispatch(
+      renameTemplate({
+        templateId: 'template_5',
+        name: 'new',
+      }) as unknown as UnknownAction,
+    );
+    expect(showNotification).toHaveBeenCalledWith(failed('Failed to rename template.'));
+  });
+
+  it('of a template variable says so and restores the variables', async () => {
+    axiosMock.patch.mockRejectedValue(new Error('offline'));
+    const { store } = storeWithTemplate();
+    await store.dispatch(
+      addUpdateVariable({
+        templateId: 'template_5',
+        variable: { path: ['conditions', 'temperature'], name: 'temp' },
+      } as never) as unknown as UnknownAction,
+    );
+    expect(axiosMock.patch).toHaveBeenCalled();
+    expect(showNotification).toHaveBeenCalledWith(
+      failed('Failed to update template variables.'),
+    );
+    const template = store.getState().entities.reactions.reactionsById.template_5 as {
+      variables: unknown;
+    };
+    expect(template.variables).toEqual({ 'notes.safetyNotes': kept });
   });
 });

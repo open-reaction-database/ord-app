@@ -203,27 +203,21 @@ export const renameReaction = createThunk(
       );
       return renameReactionActions.success({ reactionId, name });
     },
+  { failureMessage: 'Failed to rename reaction.' },
 );
 
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   ({ reactionId }) =>
     async (dispatch, getState) => {
-      try {
-        const result = await updateReaction(reactionId, getState);
-        dispatch(addUpdateReactionFieldActions.success(result));
-        showNotification({
-          message: 'Reaction updated.',
-          variant: NotificationVariant.SUCCESS,
-        });
-      } catch (e) {
-        showNotification({
-          message: 'Failed to update reaction.',
-          variant: NotificationVariant.ERROR,
-        });
-        throw e;
-      }
+      const result = await updateReaction(reactionId, getState);
+      dispatch(addUpdateReactionFieldActions.success(result));
+      showNotification({
+        message: 'Reaction updated.',
+        variant: NotificationVariant.SUCCESS,
+      });
     },
+  { failureMessage: 'Failed to update reaction.' },
 );
 
 export const deleteReactionField = createThunkWithExplicitResult(
@@ -237,6 +231,7 @@ export const deleteReactionField = createThunkWithExplicitResult(
         variant: NotificationVariant.SUCCESS,
       });
     },
+  { failureMessage: 'Failed to update reaction.' },
 );
 
 export const removeReaction = createThunkWithExplicitResult(
@@ -257,6 +252,7 @@ export const removeReaction = createThunkWithExplicitResult(
     }
     navigate(`/datasets/${datasetId}`);
   },
+  { failureMessage: 'Failed to remove reaction.' },
 );
 
 export const searchReaction = createThunkWithExplicitResult(

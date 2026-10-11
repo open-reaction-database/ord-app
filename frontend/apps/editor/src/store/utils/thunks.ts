@@ -35,9 +35,27 @@ function processAxiosError(error: unknown): string | null {
   return null;
 }
 
+export interface ThunkOptions {
+  /** Shown when the thunk fails without a message of its own from the backend. */
+  failureMessage?: string;
+}
+
+/**
+ * Shows the backend's message for a failure, or else `failureMessage`. Returns the backend's
+ * message, or null when there is none.
+ */
+function reportFailure(error: unknown, failureMessage?: string): string | null {
+  const detail = processAxiosError(error);
+  if (detail === null && failureMessage) {
+    showNotification({ variant: NotificationVariant.ERROR, message: failureMessage });
+  }
+  return detail;
+}
+
 export function createThunk<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
   appThunk: AppThunk<AsyncAction>,
+  { failureMessage }: ThunkOptions = {},
 ): ThunkWrapper<AsyncAction> {
   return extraArgument => {
     return async dispatch => {
@@ -47,7 +65,7 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
         dispatch(result);
         return result;
       } catch (e) {
-        const result = processAxiosError(e);
+        const result = reportFailure(e, failureMessage);
         dispatch(asyncActionCreator.failure(result));
         return;
       }
@@ -58,6 +76,7 @@ export function createThunk<AsyncAction extends AnyAsyncAction>(
 export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction>(
   asyncActionCreator: AsyncAction,
   appThunk: AppVoidThunk<AsyncAction>,
+  { failureMessage }: ThunkOptions = {},
 ): ThunkWrapper<AsyncAction> {
   return extraArgument => {
     return async dispatch => {
@@ -65,7 +84,7 @@ export function createThunkWithExplicitResult<AsyncAction extends AnyAsyncAction
       try {
         await dispatch(appThunk(extraArgument));
       } catch (e) {
-        const result = processAxiosError(e);
+        const result = reportFailure(e, failureMessage);
         dispatch(asyncActionCreator.failure(result));
         return;
       }

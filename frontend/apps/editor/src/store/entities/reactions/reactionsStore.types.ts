@@ -25,6 +25,8 @@ export interface ReactionTemplate extends BaseReaction {
   id: string;
   name: string;
   variables: Record<string, Variable>;
+  /** The variables before an unsaved edit, restored if the save fails; client-only. */
+  variablesBeforeEdit?: Record<string, Variable>;
   modified_at: string;
 }
 

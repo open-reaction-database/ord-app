@@ -59,6 +59,25 @@ const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
+/** Applies `update` to each template with an unsaved variable edit, leaving the rest as they are. */
+function mapTemplatesWithPendingVariables(
+  state: ItemsById<ReactionOrTemplate>,
+  update: (template: ReactionTemplate) => ReactionTemplate,
+): ItemsById<ReactionOrTemplate> {
+  const pending = Object.entries(state).filter(
+    ([, entry]) => (entry as ReactionTemplate).variablesBeforeEdit !== undefined,
+  );
+  if (pending.length === 0) {
+    return state;
+  }
+  return {
+    ...state,
+    ...Object.fromEntries(
+      pending.map(([id, entry]) => [id, update(entry as ReactionTemplate)]),
+    ),
+  };
+}
+
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
   builder.addCase(getReactionsListActions.request, (_, action) => action.payload);
@@ -135,6 +154,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
         ...state,
         [templateId]: {
           ...template,
+          variablesBeforeEdit: template.variablesBeforeEdit ?? template.variables,
           variables: {
             ...template.variables,
             [getVariableId(variable)]: variable,
@@ -153,6 +173,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
         ...state,
         [templateId]: {
           ...template,
+          variablesBeforeEdit: template.variablesBeforeEdit ?? template.variables,
           variables,
         },
       };
@@ -174,6 +195,26 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       },
     };
   });
+  builder.addMatcher(
+    isAnyOf(addUpdateVariableActions.success, removeVariableActions.success),
+    state =>
+      mapTemplatesWithPendingVariables(
+        state,
+        ({ variablesBeforeEdit: _, ...template }) => template,
+      ),
+  );
+  builder.addMatcher(
+    isAnyOf(addUpdateVariableActions.failure, removeVariableActions.failure),
+    // The backend rejected a variable edit: put back the variables from before it.
+    state =>
+      mapTemplatesWithPendingVariables(
+        state,
+        ({ variablesBeforeEdit, ...template }) => ({
+          ...template,
+          variables: variablesBeforeEdit ?? template.variables,
+        }),
+      ),
+  );
   builder.addMatcher(
     isAnyOf(createNewTemplateActions.success, importTemplateFromFileActions.success),
     (state, action) => ({
@@ -205,8 +246,8 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure),
     state => {
       // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
-      // the optimistic change by restoring the snapshot, so the UI never shows an unsaved edit as
-      // applied. Edits are issued one at a time, so at most one reaction is ever pending. (#615)
+      // the optimistic change by restoring the snapshot. Only the open reaction is edited, so at
+      // most one reaction has a snapshot, which overlapping edits to it share. (#615)
       const restored = { ...state };
       let didRollback = false;
       for (const [id, reaction] of Object.entries(state)) {
