@@ -18,6 +18,7 @@ import { fireEvent } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { UpdatePersonInfo } from './UpdatePersonInfo.tsx';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
+import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
 
 // selectSelf is a (state) => user selector; return a populated user so the click handler has data.
 vi.mock('store/entities/users/users.selectors.ts', () => ({
@@ -27,14 +28,14 @@ vi.mock('store/entities/users/users.selectors.ts', () => ({
 const setValues = vi.fn();
 const formMethods = { setValues } as unknown as ReactionEntityNodeProps['formMethods'];
 
-const renderButton = (isViewOnly = false) =>
+const renderButton = (isViewOnly = false, actions?: ReactionActions) =>
   renderInReactionView(
     <UpdatePersonInfo
       name="provenance.recordCreated.person"
       formMethods={formMethods}
       text="Use my info"
     />,
-    { isViewOnly },
+    { isViewOnly, actions },
   );
 
 describe('UpdatePersonInfo', () => {
@@ -57,6 +58,35 @@ describe('UpdatePersonInfo', () => {
 
   it('renders nothing in view-only mode', () => {
     const { queryByRole } = renderButton(true);
+    expect(queryByRole('button', { name: 'Use my info' })).not.toBeInTheDocument();
+  });
+
+  it('asks a host written as a class for the person', () => {
+    class HostActions implements ReactionActions {
+      private readonly person = { name: 'Host' };
+      update = vi.fn();
+      remove = vi.fn();
+      addIdentifierByName = vi.fn();
+      currentPerson() {
+        return this.person;
+      }
+    }
+    fireEvent.click(
+      renderButton(false, new HostActions()).getByRole('button', {
+        name: 'Use my info',
+      }),
+    );
+    const updater = setValues.mock.calls[0][0] as (prev: object) => unknown;
+    const result = updater({}) as { provenance: { recordCreated: { person: object } } };
+    expect(result.provenance.recordCreated.person).toEqual({ name: 'Host' });
+  });
+
+  it('renders nothing for a host that cannot name the current person', () => {
+    const { queryByRole } = renderButton(false, {
+      update: vi.fn(),
+      remove: vi.fn(),
+      addIdentifierByName: vi.fn(),
+    });
     expect(queryByRole('button', { name: 'Use my info' })).not.toBeInTheDocument();
   });
 });

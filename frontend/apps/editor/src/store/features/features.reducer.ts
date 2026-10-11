@@ -15,7 +15,6 @@
  */
 import { combineReducers } from '@reduxjs/toolkit';
 import { groupsSidebar } from './groups/groups.reducer.ts';
-import { reactionLookupReducer } from 'store/features/reactionLookup/reactionLookup.reducer.ts';
 import { errorPageReducer } from 'store/features/errorPage/errorPage.reducer.ts';
 import { enumerationSetupReducer } from './enumerationSetup/enumerationSetup.reducer.tsx';
 import { variablesSidebarReducer } from './variablesSidebar/variablesSidebar.reducer.ts';
@@ -24,7 +23,6 @@ import { reactionRenameReducer } from './reactionRename/reactionRename.reducer.t
 
 export const featuresReducer = combineReducers({
   groupsSidebar: groupsSidebar,
-  reactionLookup: reactionLookupReducer,
   errorPage: errorPageReducer,
   enumerationSetup: enumerationSetupReducer,
   variablesSidebar: variablesSidebarReducer,

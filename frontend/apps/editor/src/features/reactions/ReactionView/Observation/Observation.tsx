@@ -16,10 +16,7 @@
 import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { Counter } from '@open-reaction-database/ui/display';
-import { useCallback, useContext } from 'react';
-import { reactionContext } from 'features/reactions/reactions.context';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks';
-import { useAppDispatch } from 'store/useAppDispatch';
+import { useCallback } from 'react';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { create } from '@bufbuild/protobuf';
 import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
@@ -34,16 +31,15 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 import {
   useDrawer,
   useIsViewOnly,
+  useReactionActions,
   useReactionPart,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 const ENTITY_FIELD = 'observations';
 
 export function Observation() {
-  const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  // The ID addresses only the dispatch below.
-  const { reactionId } = useContext(reactionContext);
+  const actions = useReactionActions();
   const observations =
     useReactionPart<Array<ReactionObservation>>([ENTITY_FIELD]) ?? [];
   const isViewOnly = useIsViewOnly();
@@ -55,15 +51,9 @@ export function Observation() {
     ];
     const newObservation = ordObservationToReaction(create(ReactionObservationSchema));
 
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: newIdentifierPath,
-        newValue: newObservation,
-      }),
-    );
+    void actions?.update(newIdentifierPath, newObservation);
     drawer.set([newIdentifierPath]);
-  }, [reactionId, observations.length, dispatch, drawer]);
+  }, [actions, observations.length, drawer]);
 
   return (
     <Flex direction="column">

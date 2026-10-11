@@ -22,8 +22,6 @@ import {
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,
 } from './reactionViewDeleteButtons.utils.ts';
-import { useContext } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
 
 export function ReactionEditDeleteButtons({
   entityName,
@@ -32,7 +30,6 @@ export function ReactionEditDeleteButtons({
   onEdit,
   onRemove,
 }: Readonly<ReactionViewDeleteButtonsProps>) {
-  const { reactionId } = useContext(reactionContext);
   const handleEdit = useOnViewEdit({ pathComponents, historyPathComponents });
   const editCallback = onEdit ?? handleEdit;
 
@@ -43,7 +40,6 @@ export function ReactionEditDeleteButtons({
       className={classes.buttonsWrapper}
     >
       <ReactionEntityDelete
-        reactionId={reactionId}
         entityName={entityName}
         pathComponents={pathComponents}
         onRemove={onRemove}

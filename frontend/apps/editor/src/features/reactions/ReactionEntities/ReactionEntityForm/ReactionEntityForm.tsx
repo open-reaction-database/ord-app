@@ -16,8 +16,6 @@
 import { Form, useForm } from '@mantine/form';
 import { Button, Flex } from '@mantine/core';
 import classes from './reactionEntityForm.module.scss';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import {
   ReactionEntityBaseNode,
@@ -30,7 +28,7 @@ import type { ReactionSidebarInfo } from 'features/reactions/ReactionEntities/si
 import {
   useIsTemplate,
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { copyReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
@@ -54,10 +52,9 @@ export function ReactionEntityForm({
   onFormClose,
   onSetFormDirty,
 }: Readonly<ReactionEntityFormProps>) {
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const isTemplate = useIsTemplate();
-  const dispatch = useAppDispatch();
   const [pasteOpened, { open, close }] = useDisclosure();
   // Dirty hack to reset all the components within form during paste operation
   // Since form is uncontrolled some components are not visually updated when form is reset
@@ -102,26 +99,13 @@ export function ReactionEntityForm({
 
   const onSubmit = useCallback(
     (values: object) => {
-      // Safeguard to prevent submitting template or view only reaction in case some field is editable
-      if (isViewOnly) return;
+      // A form is submitted only for an editable reaction, even if some field stayed editable.
+      if (!actions) return;
       formMethods.resetDirty();
       onSetFormDirty(reactionPathComponents, false);
-      dispatch(
-        addUpdateReactionField({
-          reactionId,
-          pathComponents: reactionPathComponents,
-          newValue: values,
-        }),
-      );
+      void actions.update(reactionPathComponents, values);
     },
-    [
-      dispatch,
-      formMethods,
-      isViewOnly,
-      onSetFormDirty,
-      reactionId,
-      reactionPathComponents,
-    ],
+    [actions, formMethods, onSetFormDirty, reactionPathComponents],
   );
 
   const onPasteChunk = useCallback(
@@ -147,12 +131,12 @@ export function ReactionEntityForm({
   // Save the form and, only if it validated, return to the parent sidebar level. Mirrors the
   // validate-then-submit gating the Save button gets from <Form>, then closes on success. (#550)
   const handleSaveAndClose = useCallback(() => {
-    if (isViewOnly) return;
+    if (!actions) return;
     const { hasErrors } = form.validate();
     if (hasErrors) return;
     onSubmit(form.getValues());
     onFormClose();
-  }, [form, isViewOnly, onSubmit, onFormClose]);
+  }, [actions, form, onSubmit, onFormClose]);
 
   // Cmd/Ctrl+Enter triggers Save and Close. Scoped to this form's DOM subtree (not a global
   // hotkey) so hidden sibling forms in the mounted sidebar stack don't also fire. (#550)

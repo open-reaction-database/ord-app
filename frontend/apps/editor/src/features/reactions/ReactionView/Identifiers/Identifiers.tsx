@@ -19,17 +19,15 @@ import { Counter, KeyValueDisplay } from '@open-reaction-database/ui/display';
 import { AddCircleIcon } from 'common/icons';
 import { create } from '@bufbuild/protobuf';
 import { ReactionIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordReactionIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
-import { useCallback, useContext } from 'react';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
+import { useCallback } from 'react';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { reactionContext } from '../../reactions.context.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {
   useDrawer,
   useIsViewOnly,
+  useReactionActions,
   useReactionPart,
   useReactionSlots,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -37,10 +35,8 @@ import {
 const ENTITY_FIELD = 'identifiers';
 
 export function Identifiers() {
-  const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  // The ID addresses only the dispatch below.
-  const { reactionId } = useContext(reactionContext);
+  const actions = useReactionActions();
   const identifiers = useReactionPart<Array<ReactionIdentifier>>([ENTITY_FIELD]) ?? [];
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
@@ -53,15 +49,9 @@ export function Identifiers() {
       create(ReactionIdentifierSchema),
     );
 
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: newIdentifierPath,
-        newValue: newIdentifier,
-      }),
-    );
+    void actions?.update(newIdentifierPath, newIdentifier);
     drawer.set([newIdentifierPath]);
-  }, [reactionId, identifiers.length, dispatch, drawer]);
+  }, [actions, identifiers.length, drawer]);
 
   return (
     <Flex

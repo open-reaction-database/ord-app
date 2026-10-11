@@ -17,19 +17,17 @@ import { Button, Flex } from '@mantine/core';
 import { create } from '@bufbuild/protobuf';
 import { CompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { AddCircleIcon } from 'common/icons';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import {
   useDrawer,
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { ComponentsList } from 'features/reactions/ReactionView/ComponentsList/ComponentsList.tsx';
@@ -45,9 +43,8 @@ const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';
 
 export function InputsComponentList() {
-  const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const components = useSelectData();
@@ -56,15 +53,9 @@ export function InputsComponentList() {
   const onCreateComponent = useCallback(() => {
     const newComponent = ordInputComponentToReaction(create(CompoundSchema));
     const newPath = [...pathComponents, 'components', length];
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: newPath,
-        newValue: newComponent,
-      }),
-    );
+    void actions?.update(newPath, newComponent);
     drawer.push(newPath);
-  }, [dispatch, drawer, reactionId, pathComponents, length]);
+  }, [drawer, actions, pathComponents, length]);
 
   return (
     <ReactionEntityBlock

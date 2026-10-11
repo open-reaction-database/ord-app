@@ -24,17 +24,15 @@ import {
 import { Button, Flex, Title } from '@mantine/core';
 import classes from '../measurements/AuthenticStandard/authenticStandard.module.scss';
 import { AddCircleIcon } from 'common/icons';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { create } from '@bufbuild/protobuf';
 import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import {
   useDrawer,
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
   useReactionPart,
   useReactionSlots,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -50,9 +48,8 @@ const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';
 
 export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
-  const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
   const currentPath = useEntityFieldPath(name);
@@ -68,25 +65,13 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const input = useReactionPart<ReactionInputWithoutName>(currentPath);
 
   const onRemove = useCallback(() => {
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: currentPath,
-        newValue: null,
-      }),
-    );
-  }, [currentPath, dispatch, reactionId]);
+    void actions?.update(currentPath, null);
+  }, [currentPath, actions]);
 
   const onCreate = useCallback(() => {
     const input = ordInputWithoutNameToReaction(create(ReactionInputSchema));
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: currentPath,
-        newValue: input,
-      }),
-    );
-  }, [currentPath, dispatch, reactionId]);
+    void actions?.update(currentPath, input);
+  }, [currentPath, actions]);
 
   return !!input || !isViewOnly ? (
     <ReactionEntityBlock

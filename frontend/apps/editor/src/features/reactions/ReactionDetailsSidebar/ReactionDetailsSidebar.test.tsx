@@ -51,7 +51,7 @@ function renderSidebar() {
   return renderInReactionView(
     <>
       <Probe />
-      <ReactionDetailsSidebar reactionId={1} />
+      <ReactionDetailsSidebar />
     </>,
   );
 }
@@ -84,7 +84,7 @@ describe('ReactionDetailsSidebar', () => {
           entityName="Notes"
           pathComponents={['notes']}
         />
-        <ReactionDetailsSidebar reactionId="template_1" />
+        <ReactionDetailsSidebar />
       </TemplateReactionProvider>,
       {
         preloadedState: {

@@ -24,7 +24,17 @@ import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
 import { fullReactionSnapshot } from 'test/fullReactionSnapshot.ts';
-import { renderOverBothSources } from 'test/renderOverBothSources.tsx';
+import {
+  EMPTY_SLOTS,
+  makeContractStore,
+  renderOverBothSources,
+} from 'test/renderOverBothSources.tsx';
+import { MantineProvider } from '@mantine/core';
+import { render } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { Provider } from 'react-redux';
+import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
 
 // Ketcher needs a canvas to load; its editor opens only on demand and reads no reaction state.
 vi.mock(
@@ -121,5 +131,73 @@ describe('the drawer forms over either source', () => {
     );
     expect(overStatic).toBe(overRedux);
     expect(overStatic.length).toBeGreaterThan(0);
+  });
+});
+
+/**
+ * The only buttons a read-only drawer may show: copying a chunk, closing, and the provenance
+ * date's display. Anything else, such as a new add control, fails the check below.
+ */
+function isReadOnlyControl(label: string): boolean {
+  return (
+    label === 'Copy Chunk' ||
+    label === 'Close' ||
+    /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(label)
+  );
+}
+
+/** The drawer's title, where the Delete icon lives, above the form. */
+function DrawerAt({
+  pathComponents,
+}: Readonly<{ pathComponents: ReactionPathComponents }>) {
+  const sidebarInfo = getSidebarInfo([...pathComponents].reverse());
+  const Title = sidebarInfo.sidebarTitle;
+  return (
+    <nodeToComponentContext.Provider value={reactionNodeToComponent}>
+      <Title pathComponents={pathComponents} />
+      <ReactionEntityForm
+        reactionPathComponents={pathComponents}
+        sidebarInfo={sidebarInfo}
+        isHidden={false}
+        onFormClose={() => undefined}
+        onSetFormDirty={() => undefined}
+      />
+    </nodeToComponentContext.Provider>
+  );
+}
+
+/** A provider with no actions, over a static source, as a host that only shows reactions. */
+function readOnlyWrapper(snapshot: ReactionSnapshot) {
+  const source = createStaticReactionSource(snapshot);
+  return function ReadOnlyWrapper({ children }: Readonly<{ children: ReactNode }>) {
+    return (
+      <Provider store={makeContractStore()}>
+        <MantineProvider>
+          <ReactionProvider
+            reactionId={1}
+            source={source}
+            slots={EMPTY_SLOTS}
+          >
+            {children}
+          </ReactionProvider>
+        </MantineProvider>
+      </Provider>
+    );
+  };
+}
+
+describe('a read-only drawer', () => {
+  it.each(FORMS)('shows no edit control on %s', (_name, pathTo) => {
+    const snapshot = fullReactionSnapshot();
+    const { queryAllByRole } = render(
+      <DrawerAt pathComponents={pathTo(snapshot.data)} />,
+      {
+        wrapper: readOnlyWrapper(snapshot),
+      },
+    );
+    const labels = queryAllByRole('button').map(button =>
+      (button.getAttribute('aria-label') ?? button.textContent ?? '').trim(),
+    );
+    expect(labels.filter(label => !isReadOnlyControl(label))).toEqual([]);
   });
 });

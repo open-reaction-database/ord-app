@@ -27,13 +27,8 @@ import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmationModal } from 'common/components/interactions/ConfirmationModal/ConfirmationModal.tsx';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
 
-interface EditSidebarProps {
-  reactionId: ReactionId;
-}
-
-function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarProps>) {
+function ReactionDetailsSidebarComponent() {
   const reactionPathComponentsList = useDrawerStack();
   const drawer = useDrawer();
   const [
@@ -162,7 +157,6 @@ function ReactionDetailsSidebarComponent({ reactionId }: Readonly<EditSidebarPro
               </Breadcrumbs>
               {SidebarTitle && (
                 <SidebarTitle
-                  reactionId={reactionId}
                   pathComponents={reactionPathComponentsList[currentIndex]}
                 />
               )}

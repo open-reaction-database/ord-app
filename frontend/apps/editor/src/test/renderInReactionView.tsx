@@ -125,7 +125,7 @@ export function renderInReactionView(
           reactionId,
           actions: isViewOnly
             ? undefined
-            : (actions ?? reduxReactionActions(store.dispatch, reactionId)),
+            : (actions ?? reduxReactionActions(store, reactionId)),
         };
   const allSlots = { ...DUMMY_SLOTS, ...slots };
   const entityContextValue = { pathComponents };
