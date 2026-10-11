@@ -108,7 +108,7 @@ export function useAuth() {
         dispatch(
           createUser({ access_token: accessToken, id_token: idToken?.__raw as string }),
         );
-      } catch (_: unknown) {
+      } catch {
         // Without tokens the session has expired or never began; sign in again.
         void loginWithRedirect({
           appState: {

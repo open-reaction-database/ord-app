@@ -166,7 +166,7 @@ export function TemplateFileSelector({
           },
         );
         form.setFieldValue('matching', matching);
-      } catch (_e: unknown) {
+      } catch {
         showNotification({
           variant: NotificationVariant.ERROR,
           message: 'Invalid CSV file',

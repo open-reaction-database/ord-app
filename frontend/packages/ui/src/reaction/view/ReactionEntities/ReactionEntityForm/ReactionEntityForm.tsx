@@ -121,7 +121,7 @@ export function ReactionEntityForm({
         form.setValues(formValues);
         onSubmit(formValues);
         setFormKey(crypto.randomUUID());
-      } catch (_e: unknown) {
+      } catch {
         showNotification({
           variant: NotificationVariant.ERROR,
           message: 'Failed to paste chunk',

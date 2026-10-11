@@ -65,7 +65,6 @@ export default tseslint.config(
           ignoreRestSiblings: true,
           varsIgnorePattern: '^_',
           argsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
         },
       ],
       '@typescript-eslint/array-type': ['error', { default: 'generic' }],
@@ -75,7 +74,6 @@ export default tseslint.config(
       'sonarjs/no-unused-vars': 'off', // redundant with @typescript-eslint/no-unused-vars (configured above with the project's ignore patterns)
       'sonarjs/todo-tag': 'off', // to-do and fix-me comments are a legitimate tracking practice here, not a defect
       'sonarjs/void-use': 'off', // the project intentionally `void`s fire-and-forget promises (pairs with no-floating-promises); flagging that is counterproductive
-      'sonarjs/no-ignored-exceptions': 'off', // deliberate best-effort `catch (_e)` fallbacks; the unused binding is already enforced via caughtErrorsIgnorePattern
       'sonarjs/assertions-in-tests': 'off', // false-positives on custom assertion helpers (e.g. expectNotified), which this suite uses heavily
       'sonarjs/no-nested-conditional': 'off', // nested ternaries are the idiomatic JSX conditional-render pattern; the rule can't scope itself to non-JSX
     },

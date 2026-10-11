@@ -29,7 +29,7 @@ export function getDeepReactionPart(
     return pathComponents.reduce((reactionPart: any, key) => {
       return reactionPart[key];
     }, reaction);
-  } catch (_e) {
+  } catch {
     return null;
   }
 }
