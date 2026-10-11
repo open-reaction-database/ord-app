@@ -74,7 +74,7 @@ function FormAt({
   );
 }
 
-/** The path of a drawer form for each entity the fixture holds; inputs are keyed by generated ID. */
+/** Drawer forms in the fixture to compare; inputs and analyses are keyed by generated IDs. */
 const FORMS: Array<
   [string, (data: ReactionSnapshot['data']) => ReactionPathComponents]
 > = [
@@ -83,8 +83,24 @@ const FORMS: Array<
     'an input component',
     data => ['inputs', Object.keys(data.inputs)[0], 'components', 0],
   ],
+  [
+    'a component identifier',
+    data => ['inputs', Object.keys(data.inputs)[0], 'components', 0, 'identifiers', 0],
+  ],
   ['an outcome', () => ['outcomes', 0]],
   ['a product', () => ['outcomes', 0, 'products', 0]],
+  // The product's measurements hold the "Based on" select and the authentic standard.
+  ['a yield measurement', () => ['outcomes', 0, 'products', 0, 'measurements', 0]],
+  ['a custom measurement', () => ['outcomes', 0, 'products', 0, 'measurements', 1]],
+  [
+    'a selectivity measurement',
+    () => ['outcomes', 0, 'products', 0, 'measurements', 2],
+  ],
+  ['an amount measurement', () => ['outcomes', 0, 'products', 0, 'measurements', 3]],
+  [
+    'an analysis',
+    data => ['outcomes', 0, 'analyses', Object.keys(data.outcomes[0].analyses)[0]],
+  ],
   ['the conditions', () => ['conditions']],
   ['the setup', () => ['setup']],
   ['the notes', () => ['notes']],
@@ -92,6 +108,8 @@ const FORMS: Array<
   ['an identifier', () => ['identifiers', 0]],
   ['an observation', () => ['observations', 0]],
   ['a workup', () => ['workups', 0]],
+  ['a workup input', () => ['workups', 0, 'input']],
+  ['a workup input component', () => ['workups', 0, 'input', 'components', 0]],
 ];
 
 describe('the drawer forms over either source', () => {

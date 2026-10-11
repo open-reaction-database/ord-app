@@ -16,6 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { TemplateReactionValueLabelWrapper } from './TemplateReactionValueLabel.tsx';
+import { VariableType } from 'store/entities/templates/templates.types.ts';
 
 // Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = TemplateReactionValueLabelWrapper as unknown as () => JSX.Element;
@@ -26,5 +27,31 @@ describe('TemplateReactionValueLabelWrapper', () => {
       reactionId: 'template_1',
     });
     expect(container).toBeInTheDocument();
+  });
+
+  it('shows the variable the template binds to the field', () => {
+    const { getByText } = renderInReactionView(
+      <TemplateReactionValueLabelWrapper
+        name="safetyNotes"
+        type={VariableType.String}
+        wrapperConfig={{ label: 'Safety notes' }}
+      />,
+      {
+        reactionId: 'template_1',
+        pathComponents: ['notes'],
+        // A template's record carries its variables, keyed by the field's path.
+        record: {
+          variables: {
+            'notes.safetyNotes': {
+              name: 'SafetyVar',
+              field: 'safetyNotes',
+              path: ['notes', 'safetyNotes'],
+              type: VariableType.String,
+            },
+          },
+        } as never,
+      },
+    );
+    expect(getByText('@SafetyVar')).toBeInTheDocument();
   });
 });

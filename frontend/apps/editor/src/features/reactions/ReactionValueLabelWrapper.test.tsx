@@ -59,6 +59,18 @@ describe('ReactionValueLabelWrapper', () => {
     expect(getByText('value mass')).toBeInTheDocument();
   });
 
+  it('shows the value label on a dataset reaction the user may only view', () => {
+    const { getByText } = renderInReactionView(
+      <ReactionValueLabelWrapper
+        name="mass"
+        type={VariableType.Number}
+        wrapperConfig={{ cannotBeVariable: true }}
+      />,
+      { isViewOnly: true, slots },
+    );
+    expect(getByText('value mass')).toBeInTheDocument();
+  });
+
   it('shows the value label on a dataset reaction', () => {
     const { getByText } = renderInReactionView(
       <ReactionValueLabelWrapper

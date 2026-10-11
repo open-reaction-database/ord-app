@@ -40,6 +40,6 @@ export const buildUseSelectItemsListFromMap = <T>(
     const { pathComponents } = useContext(reactionEntityContext);
     const map = useReactionPart<Record<string, T>>([...pathComponents, entityName]);
 
-    // A missing map, as in a reaction still loading, lists nothing.
+    // A missing map lists nothing.
     return useMemo(() => Object.values(map ?? {}).sort(compareFn), [map]);
   };

@@ -61,7 +61,7 @@ function ReactionEntityAddButton({
 export function ReactionEntityList({
   node,
 }: Readonly<ReactionEntityNodeProps<ReactionFormList>>) {
-  const items = node.useSelectItems() ?? [];
+  const items = node.useSelectItems();
   const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const title = useReactionEntityLabel(node.title);

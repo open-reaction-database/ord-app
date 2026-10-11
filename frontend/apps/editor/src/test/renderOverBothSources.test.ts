@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 import { describe, expect, it } from 'vitest';
-import { normalizeIds } from './renderOverBothSources.tsx';
+import { createElement } from 'react';
+import { TextInput } from '@mantine/core';
+import { normalizeIds, renderOverBothSources } from './renderOverBothSources.tsx';
+
+describe('renderOverBothSources', () => {
+  it('gives Mantine inputs the same random IDs over both sources', () => {
+    const [overStatic, overRedux] = renderOverBothSources(
+      createElement(TextInput, { label: 'Name' }),
+    );
+    expect(overStatic).toMatch(/id="mantine-[0-9a-z]+"/);
+    expect(overStatic).toBe(overRedux);
+  });
+});
 
 describe('normalizeIds', () => {
-  it('normalizes Mantine random IDs of any length, with their suffixes', () => {
-    // Mantine takes up to nine base-36 digits of Math.random(), and fewer when it has fewer.
-    expect(normalizeIds('id="mantine-a1b2c3d4e" for="mantine-a1b2c3d4e-label"')).toBe(
-      normalizeIds('id="mantine-k3j2" for="mantine-k3j2-label"'),
-    );
-  });
-
   it('normalizes the React useId forms', () => {
     expect(normalizeIds('«r1» :r2: _r_3_')).toBe('ID ID ID');
+  });
+
+  it('leaves Mantine class names and variables alone', () => {
+    const html = 'class="mantine-hidden-from-sm" style="--mantine-spacing-xs"';
+    expect(normalizeIds(html)).toBe(html);
   });
 });

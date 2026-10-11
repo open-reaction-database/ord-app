@@ -18,6 +18,7 @@
 import { MantineProvider } from '@mantine/core';
 import { configureStore } from '@reduxjs/toolkit';
 import { render } from '@testing-library/react';
+import { vi } from 'vitest';
 import type { ReactElement, ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
@@ -53,15 +54,20 @@ export function makeContractStore(snapshot?: ReactionSnapshot) {
 }
 
 /**
- * Generated IDs differ between two mounts: React's useId output (and Mantine's style classes
- * built from it) and Mantine's random element IDs, which take up to nine base-36 digits of
- * Math.random() and so are sometimes shorter. Nothing else may.
+ * React's useId output (and Mantine's style classes built from it) differs between two mounts.
+ * Nothing else may: Mantine's random element IDs match because each render seeds Math.random.
  */
 export function normalizeIds(html: string): string {
-  return html.replaceAll(
-    /«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_|mantine-[0-9a-z]{1,9}\b/g,
-    'ID',
-  );
+  return html.replaceAll(/«r[0-9a-z]+»|:r[0-9a-z]+:|_r_[0-9a-z]+_/g, 'ID');
+}
+
+/** A linear congruential generator, so both renders draw the same numbers. */
+function seededRandom(): () => number {
+  let state = 1;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 2 ** 32;
+    return state / 2 ** 32;
+  };
 }
 
 function renderOver(
@@ -84,10 +90,15 @@ function renderOver(
       </Provider>
     );
   }
-  const { container, unmount } = render(ui, { wrapper: Wrapper });
-  const html = normalizeIds(container.innerHTML);
-  unmount();
-  return html;
+  const random = vi.spyOn(Math, 'random').mockImplementation(seededRandom());
+  try {
+    const { container, unmount } = render(ui, { wrapper: Wrapper });
+    const html = normalizeIds(container.innerHTML);
+    unmount();
+    return html;
+  } finally {
+    random.mockRestore();
+  }
 }
 
 /**
