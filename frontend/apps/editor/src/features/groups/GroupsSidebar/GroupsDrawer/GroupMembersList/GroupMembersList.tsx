@@ -30,14 +30,13 @@ import {
 } from 'store/entities/groups/groups.thunks.ts';
 import { USER_ROLES } from 'common/types';
 import { PermissionsModal } from '../PermissionModal/PermissionModal.tsx';
-import { InfoCircleIcon } from 'common/icons';
+import { InfoCircleIcon, typographyClasses } from '@open-reaction-database/ui/theme';
 import classes from './GroupMembersList.module.scss';
 import { UserDataField } from './UserDataField/UserDataField.tsx';
 import {
   selectEditingGroupId,
   selectIsAddingMember,
 } from 'store/features/groups/groups.selectors.ts';
-import { typographyClasses } from '@open-reaction-database/ui/theme';
 
 const roleOrder = [USER_ROLES.ADMIN, USER_ROLES.EDITOR, USER_ROLES.VIEWER];
 

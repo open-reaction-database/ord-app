@@ -19,8 +19,10 @@ import {
   type ReactionPathComponents,
   replaceNameIdInReactionComponentPath,
 } from '@open-reaction-database/ui/reaction/model';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 
 type VariableMap = Record<string, Variable>;
 

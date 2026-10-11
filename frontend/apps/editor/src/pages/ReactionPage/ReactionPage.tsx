@@ -28,16 +28,18 @@ import {
 } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
-import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import {
+  ReactionDetailsSidebar,
+  ReactionProvider,
+  ReactionContent,
+} from '@open-reaction-database/ui/reaction';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
-import { ReactionProvider } from '@open-reaction-database/ui/reaction';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
-import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
 import { useDatasetReactionProviderProps } from './useDatasetReactionProviderProps.ts';
 
 const VIEW_MODE_OPTIONS: Array<SegmentedControlItem> = [

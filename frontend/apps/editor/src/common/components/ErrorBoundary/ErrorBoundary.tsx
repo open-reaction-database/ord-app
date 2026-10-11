@@ -17,7 +17,7 @@ import { Component } from 'react';
 import { Button, Container, Title } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
 import classes from './errorBoundary.module.scss';
-import { HomeIcon } from 'common/icons';
+import { HomeIcon } from '@open-reaction-database/ui/theme';
 
 interface ErrorBoundaryState {
   hasError: boolean;

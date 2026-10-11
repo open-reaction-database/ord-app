@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 import { Grid } from '@mantine/core';
-import { AddCircleIcon, UploadProgressIcon } from 'common/icons';
+import {
+  AddCircleIcon,
+  UploadProgressIcon,
+  colorToCssVariable,
+} from '@open-reaction-database/ui/theme';
 import { CreateNewDataset } from 'features/datasets/CreateNewDataset/CreateNewDataset.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { CreateDatasetFromFile } from 'features/datasets/CreateDatasetFromFile/CreateDatasetFromFile.tsx';
-import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
-import { colorToCssVariable } from '@open-reaction-database/ui/theme';
+import { PaperButton } from '@open-reaction-database/ui/display';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 import { EnumerationWizard } from 'features/enumeration/EnumerationWizard.tsx';
 

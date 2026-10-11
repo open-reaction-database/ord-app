@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { EnumerationForm } from '../enumerationSetup.types.ts';
-import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import { ReactionEntityBlockTitle } from '@open-reaction-database/ui/reaction';
 import { Anchor, FileInput, Flex, Select, Title } from '@mantine/core';
 import classes from '../enumerationSetup.module.scss';
 import { useSelector } from 'react-redux';
@@ -29,11 +29,13 @@ import type {
 } from 'store/entities/enumeration/enumeration.types.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadTemplateCsv } from 'store/entities/templates/templates.thunks.ts';
-import { DownloadIcon } from 'common/icons';
+import { DownloadIcon } from '@open-reaction-database/ui/theme';
 import type { CastingContext } from 'csv-parse';
 import { NUMBER_REGEX } from 'common/constants.ts';
-import { NotificationVariant } from 'common/types/notification.ts';
-import { showNotification } from 'common/utils/showNotification.tsx';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
 
 interface TemplateFileSelectorProps {
   templateDisabled: boolean;

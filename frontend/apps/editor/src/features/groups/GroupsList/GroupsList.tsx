@@ -27,7 +27,7 @@ import {
   GroupArrowIcon,
   SearchIcon,
   SettingsIcon,
-} from 'common/icons';
+} from '@open-reaction-database/ui/theme';
 import clsx from 'clsx';
 import { setGroupSearchAction } from 'store/entities/groups/groups.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';

@@ -23,15 +23,20 @@ import {
   VariableType,
   type AppReaction,
 } from '@open-reaction-database/ui/reaction/model';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import type { Variable } from './templates.types.ts';
 
 vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   replaceNameIdInReactionComponentPath: vi.fn(),
 }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 const replaceMock = vi.mocked(replaceNameIdInReactionComponentPath);
 const notifyMock = vi.mocked(showNotification);

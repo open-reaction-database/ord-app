@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DataField } from '@open-reaction-database/ui/display';
+import { DataField, ConfirmPopover } from '@open-reaction-database/ui/display';
 import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { ActionIcon, Button, Flex, Paper, Title, Tooltip } from '@mantine/core';
 import {
@@ -23,7 +23,13 @@ import {
 import { formatUtcDateToDisplay } from '@open-reaction-database/ui/reaction/model';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { downloadDatasetThroughLink } from 'store/utils/downloadFile.thunks.ts';
-import { ChevronDownIcon, EditIcon, RemoveIcon } from 'common/icons';
+import {
+  ChevronDownIcon,
+  EditIcon,
+  RemoveIcon,
+  buttonClasses,
+  typographyClasses,
+} from '@open-reaction-database/ui/theme';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 import { useCallback, useMemo } from 'react';
 import { useLocation, useRouter } from 'wouter';
@@ -33,7 +39,6 @@ import { selectIsDatasetOpened } from 'store/entities/datasets/datasets.selector
 import { setDatasetEditOpenedAction } from 'store/entities/datasets/datasets.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { datasetFileDownloadOptions } from 'common/constants.ts';
-import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { removeDataset } from 'store/entities/datasets/datasets.thunks.ts';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
@@ -43,7 +48,6 @@ import {
   selectCanDatasetBeEdited,
 } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { domain } from 'common/configuration.constants.ts';
-import { buttonClasses, typographyClasses } from '@open-reaction-database/ui/theme';
 import { ShareDataset } from '../ShareDataset/ShareDataset.tsx';
 
 interface DatasetHeaderProps {

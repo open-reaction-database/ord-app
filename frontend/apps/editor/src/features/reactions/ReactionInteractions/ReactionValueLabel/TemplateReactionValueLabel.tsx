@@ -17,11 +17,12 @@ import {
   type ReactionValueLabelProps,
   useReactionId,
   reactionEntityContext,
+  reactionValueLabelClasses as classes,
+  findReactionEntityUniqueName,
 } from '@open-reaction-database/ui/reaction';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import { ActionIcon, Button, Flex, Text } from '@mantine/core';
-import { CloseIcon, EditIcon } from 'common/icons';
-import classes from './reactionValueLabel.module.scss';
+import { CloseIcon, EditIcon } from '@open-reaction-database/ui/theme';
 import { useSelector } from 'react-redux';
 import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
 import clsx from 'clsx';
@@ -32,7 +33,6 @@ import {
 } from 'store/entities/templates/templates.thunks.ts';
 import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
-import { findReactionEntityUniqueName } from '../../ReactionEntities/findReactionEntityUniqueName.ts';
 
 type ReactionValueLabelPropsMandatoryLabel = Omit<
   ReactionValueLabelProps,

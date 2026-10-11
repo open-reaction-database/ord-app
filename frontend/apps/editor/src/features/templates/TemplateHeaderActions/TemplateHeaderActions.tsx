@@ -15,7 +15,7 @@
  */
 import { Button } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { EnumerateIcon, DownloadIcon } from 'common/icons';
+import { EnumerateIcon, DownloadIcon } from '@open-reaction-database/ui/theme';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { useCallback } from 'react';

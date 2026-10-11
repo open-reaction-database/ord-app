@@ -21,10 +21,10 @@ cd frontend/apps/editor
 npx vitest run                         # whole suite (~20s)
 npx vitest run <path-or-substring>     # subset
 
-cd frontend/packages/ui                # the shared package: theme, display, reaction model and provider
+cd frontend/packages/ui                # the shared package: theme, display, the reaction model and view
 npx vitest run                         # its own suite and coverage floors
 ```
-Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (`KeyValueDisplay`, `RequiredOptionalFields`, `DataField`, `Counter`, the theme, the reaction model and converters, `ReactionProvider`, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
+Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (the theme and icons, the display primitives and form controls, the reaction model and converters, `ReactionProvider`, the reaction view and its drawer forms, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
 
 ## Render helpers
 
@@ -32,12 +32,13 @@ In the editor (`apps/editor/src/test/`):
 
 - `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it). `packages/ui` has its own copy, imported as `#testing/renderWithMantine.tsx`; package files import each other through `#…` or from the same folder, never `../` or `test/…`.
 - `renderWithProviders(ui, { preloadedState })` — fresh `configureStore({ reducer: rootReducer, preloadedState })` + Mantine. Returns `{ store, ...renderResult }`. Seed only the slices the component reads.
-- `renderInReactionView(ui, { reactionId, reaction, record, isViewOnly, actions, slots, pathComponents })` — seeds a reaction in the store (`emptyReactionData()` by default) and mounts `ReactionProvider` over a Redux source of it, plus `reactionEntityContext`. The reaction is editable (real `reduxReactionActions`) unless `isViewOnly` is set; a string `reactionId` renders a template; `record` sets stored fields beside `data` (`pb_reaction_id`, `is_valid`, `validation`); `slots` replaces the null slot components. Use for components under `ReactionView/` / `reactionEntityNode/` and anything that calls the provider's hooks, which throw outside a provider.
+- `renderInReactionView(ui, { reactionId, reaction, record, isViewOnly, actions, slots, pathComponents })` — seeds a reaction in the store (`emptyReactionData()` by default) and mounts `ReactionProvider` over a Redux source of it, plus `reactionEntityContext`. The reaction is editable (real `reduxReactionActions`) unless `isViewOnly` is set; a string `reactionId` renders a template; `record` sets stored fields beside `data` (`pb_reaction_id`, `is_valid`, `validation`); `slots` replaces the null slot components. Use for the editor's own components that read the reaction from the store or act on it through Redux, such as the template and dataset slots; the provider's hooks throw outside a provider.
 - `renderOverBothSources(ui)` (`test/renderOverBothSources.tsx`) — the contract check: renders `ui` over a static source with an empty store and over the Redux source, and returns both HTML strings with generated IDs normalized; they must be equal.
 
 From the shared package (`@open-reaction-database/ui/testing`, or `#testing/…` inside the package):
 
-- `renderWithReaction(ui, { reactionId, isTemplate, actions, snapshot, source, slots })` and `reactionWrapper(options)` (the same wrapper, for `renderHook`) — mount `ReactionProvider` over a static source of `snapshot`, with no Redux; read-only unless given `actions`.
+- `renderWithReaction(ui, { reactionId, isTemplate, actions, editable, reaction, record, snapshot, source, slots, pathComponents })` and `reactionWrapper(options)` (the same wrapper, for `renderHook`) — mount `ReactionProvider` over a static source, with no Redux: `reaction` (an empty one by default) plus `record` (stored fields such as `summary`, `pb_reaction_id`, `validation`), or a whole `snapshot`. `pathComponents` sets `reactionEntityContext`. Read-only unless given `actions` or `editable`.
+- `stubReactionActions()` — actions that settle at once and change nothing, as `vi.fn` mocks. Pass them as `actions` and assert on `actions.update.mock.calls`: a static source never changes. The view's tests use these and never build a store.
 - `emptyReactionData()` (an empty `AppReaction` from the default converters), `fullReaction` (an ord `Reaction` that sets every field the app edits), and `fullReactionSnapshot()` (`fullReaction` as the store holds a loaded reaction).
 
 ## Mocking patterns (the ones that cost time)
@@ -61,19 +62,19 @@ vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
 **Ketcher needs a canvas.** The Ketcher structure editor (`ComponentsKetcherEditor`) does not load under vitest. The drawer gets it only as the `MoleculeEditor` slot, so the view's tests never load it; a test that imports the editor's slot table (`useDatasetReactionProviderProps`, and so `ReactionPage`) stubs it:
 ```ts
 vi.mock(
-  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
   () => ({ ComponentsKetcherEditor: () => null }),
 );
 ```
-When the form's field nodes aren't what a test is about, stub the form registry instead of rendering every node:
+When the form's field nodes aren't what a package test is about, stub the form registry instead of rendering every node:
 ```ts
-vi.mock('features/reactions/ReactionEntities', () => ({
+vi.mock('#reaction/view/ReactionEntities/index.ts', () => ({
   ReactionEntityBaseNode: () => null,
   reactionEntityToForm: new Proxy({}, { get: () => [] }),
 }));
 ```
 
-A mock of a package barrel replaces what editor files import through it, not the calls the package's modules make to each other: inside the package, the reaction model, provider, previews, and test helpers import each other by file, never through a barrel.
+A mock of a package entry file (`@open-reaction-database/ui/display`, `…/reaction`, …) replaces what editor files import through it, not the calls the package's modules make to each other: inside the package, modules import each other by file, never through an entry file. Make it a partial mock (above), since the editor imports much more than the mocked name from each entry file.
 
 **Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction` and `linkReactionEntities` on the model barrel, and `parseReactionList` (`store/entities/reactions/parseReactionList.ts`), to plain objects, keeping the reducer's merge helpers intact; or pass an empty `binpb`, which decodes to the default reaction. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (from `@open-reaction-database/ui/testing`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
 
@@ -84,7 +85,10 @@ The store uses RTK `createThunk`/`createThunkWithExplicitResult` (not RTK Query)
 ```ts
 vi.mock('store/axiosInstance.ts', () => ({ default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() } }));
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 function makeStore() {
   const actions: Array<UnknownAction> = [];

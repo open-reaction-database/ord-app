@@ -26,13 +26,18 @@ import {
 } from './enumeration.actions.ts';
 import type { StartEnumeration } from './enumeration.types.ts';
 import { getGroupsInitialDatasetListActions } from '../datasets/datasets.actions.ts';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 const axiosMock = axiosInstance as unknown as Record<
   'get' | 'post' | 'patch' | 'delete',

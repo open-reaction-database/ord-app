@@ -17,15 +17,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
+import { ComponentsKetcherEditor } from 'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
-import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+import { ReactionViewButton } from '@open-reaction-database/ui/reaction';
 import { rootReducer } from 'store/rootReducer.ts';
 import { useDatasetReactionProviderProps } from './useDatasetReactionProviderProps.ts';
 
 // Ketcher needs a canvas to load; the slot table only refers to its editor.
 vi.mock(
-  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
   () => ({
     ComponentsKetcherEditor: () => null,
   }),

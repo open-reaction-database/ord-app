@@ -18,7 +18,7 @@ import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useForm } from '@mantine/form';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
-import { showNotification } from 'common/utils/showNotification.tsx';
+import { showNotification } from '@open-reaction-database/ui/display';
 import { TemplateFileSelector } from './TemplateFileSelector.tsx';
 import type {
   EnumerationForm,
@@ -26,7 +26,10 @@ import type {
   EnumerationSetupForm,
 } from '../enumerationSetup.types.ts';
 
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 vi.mock('store/entities/reactions/reactions.selectors.ts', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   // The selected template: its variables are what the CSV's columns are matched to.

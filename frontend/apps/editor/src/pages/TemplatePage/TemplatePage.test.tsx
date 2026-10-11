@@ -49,11 +49,11 @@ vi.mock('common/components/PageContainer/PageContainer.tsx', () => ({
 vi.mock('features/templates/TemplateHeader/TemplateHeader.tsx', () => ({
   TemplateHeader: () => <div data-testid="template-header" />,
 }));
-vi.mock('features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx', () => ({
+vi.mock('@open-reaction-database/ui/reaction', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
   ReactionTabs: () => null,
-}));
-vi.mock('features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx', () => ({
   ReactionDetailsSidebar: () => null,
+  DatasetReactionValueLabel: () => null,
 }));
 vi.mock('features/templates/VariablesSidebar/VariablesSidebar.tsx', () => ({
   VariablesSidebar: () => null,
@@ -68,12 +68,6 @@ vi.mock(
   'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx',
   () => ({
     ReactionSetVariablesButton: () => null,
-  }),
-);
-vi.mock(
-  'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx',
-  () => ({
-    DatasetReactionValueLabel: () => null,
   }),
 );
 

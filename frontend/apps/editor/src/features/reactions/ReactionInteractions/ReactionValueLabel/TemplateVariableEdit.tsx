@@ -21,7 +21,7 @@ import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
 import { useTemplateVariableEditSchema } from './templateVariableEdit.schema.ts';
 import { ValidationError } from 'yup';
-import classes from './reactionValueLabel.module.scss';
+import { reactionValueLabelClasses as classes } from '@open-reaction-database/ui/reaction';
 
 interface TemplateVariableEditProps {
   templateId: string;

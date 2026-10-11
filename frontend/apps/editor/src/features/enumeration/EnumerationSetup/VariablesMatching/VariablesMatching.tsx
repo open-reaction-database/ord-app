@@ -15,7 +15,7 @@
  */
 import { Flex, Select, Text, Title } from '@mantine/core';
 import classes from '../enumerationSetup.module.scss';
-import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import { ReactionEntityBlockTitle } from '@open-reaction-database/ui/reaction';
 import clsx from 'clsx';
 import type { EnumerationForm } from '../enumerationSetup.types.ts';
 import { useSelector } from 'react-redux';

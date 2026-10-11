@@ -19,7 +19,12 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useRouter } from 'wouter';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
-import { CheckListIcon, ChevronDownIcon, DownloadIcon, EditIcon } from 'common/icons';
+import {
+  CheckListIcon,
+  ChevronDownIcon,
+  DownloadIcon,
+  EditIcon,
+} from '@open-reaction-database/ui/theme';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { fileDownloadOptions } from 'common/constants.ts';
@@ -27,6 +32,7 @@ import { domain, showReactionPreviewDetails } from 'common/configuration.constan
 import {
   useIsViewOnly,
   useReactionSnapshot,
+  ReactionHeader,
 } from '@open-reaction-database/ui/reaction';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
@@ -35,7 +41,6 @@ import { setReactionRenameOpenedAction } from 'store/features/reactionRename/rea
 import { selectIsReactionRenameOpened } from 'store/features/reactionRename/reactionRename.selector.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
 
 interface DatasetReactionHeaderProps {
   datasetId: number;

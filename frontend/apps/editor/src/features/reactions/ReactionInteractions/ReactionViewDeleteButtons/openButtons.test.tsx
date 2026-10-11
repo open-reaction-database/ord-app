@@ -19,10 +19,10 @@ import type { FC } from 'react';
 import {
   useDrawerStack,
   type ReactionViewDeleteButtonsProps,
+  ReactionViewButton,
 } from '@open-reaction-database/ui/reaction';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
-import { ReactionViewButton } from './ReactionViewButton.tsx';
 
 function StackProbe() {
   return <output>{JSON.stringify(useDrawerStack())}</output>;

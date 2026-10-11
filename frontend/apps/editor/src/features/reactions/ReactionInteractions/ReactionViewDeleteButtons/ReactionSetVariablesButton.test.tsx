@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
-import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import { ReactionDetailsSidebar } from '@open-reaction-database/ui/reaction';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import type { AppState } from 'store/configureAppStore.ts';

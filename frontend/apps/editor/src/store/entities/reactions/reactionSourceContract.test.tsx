@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
-import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
-import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
-import { ReactionEntityForm } from 'features/reactions/ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
-import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
-import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
-import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import {
+  ReactionCard,
+  ReactionPreview,
+  ReactionHeader,
+  ReactionContent,
+  reactionNodeToComponent,
+  ReactionEntityForm,
+  nodeToComponentContext,
+  getSidebarInfo,
   type ReactionSnapshot,
   ReactionProvider,
   createStaticReactionSource,
 } from '@open-reaction-database/ui/reaction';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
 import {
   EMPTY_SLOTS,

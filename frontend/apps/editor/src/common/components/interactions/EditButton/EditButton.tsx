@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Button, type ButtonProps } from '@mantine/core';
-import { EditIcon } from 'common/icons';
+import { EditIcon } from '@open-reaction-database/ui/theme';
 import classes from './editButton.module.scss';
 import type { ReactNode } from 'react';
 

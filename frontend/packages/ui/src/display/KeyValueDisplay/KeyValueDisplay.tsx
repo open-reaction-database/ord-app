@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Flex, Text, Tooltip } from '@mantine/core';
-import { typographyClasses } from '#theme/index.ts';
+import typographyClasses from '#theme/typography.module.scss';
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import classes from './keyValueDisplay.module.scss';

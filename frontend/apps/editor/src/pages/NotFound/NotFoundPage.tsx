@@ -16,7 +16,7 @@
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import { Title, Text, Button, Flex } from '@mantine/core';
 import { navigate } from 'wouter/use-browser-location';
-import { HomeIcon } from 'common/icons';
+import { HomeIcon } from '@open-reaction-database/ui/theme';
 import classes from './notFoundPage.module.scss';
 import type { RejectValue } from 'store/utils/handleApiError';
 

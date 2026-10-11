@@ -1,0 +1,141 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from '#reaction/view/ReactionEntities/reactionEntities.types.ts';
+import { create } from '@bufbuild/protobuf';
+import { CompoundPreparationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import { wrapInputsWithGrid } from '#display/utils/reactionForm/wrapInputsWithGrid.ts';
+import { buildUseSelectItems } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { buildUseCreate } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
+import { createEntityListItemComponent } from '#reaction/view/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
+import { booleanOptions } from '#reaction/view/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
+import { reactionAmounts } from '#reaction/view/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
+import { reactionRoleOptions } from '#reaction/model/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { type ReactionRole } from '#reaction/model/reactionEntityTypes/reactionEntityTypes.types.ts';
+import { ordPreparationToReaction } from '#reaction/model/reactionComponent/reactionComponent.converters.ts';
+import { type ReactionComponentPreparation } from '#reaction/model/reactionComponent/reactionComponent.types.ts';
+import {
+  componentPreview,
+  featuresList,
+  identifiersList,
+  molBlockIdentifiers,
+  textureDetails,
+} from './reactionComponentsBase.model.tsx';
+
+const emptyPreparation = (newIndex: number): [number, ReactionComponentPreparation] => {
+  return [newIndex, ordPreparationToReaction(create(CompoundPreparationSchema))];
+};
+
+export const reactionComponents: Array<ReactionFormNode> = [
+  componentPreview,
+  {
+    type: ReactionFormNodeType.wrapper,
+    grid: 2,
+    fields: [
+      {
+        type: ReactionFormNodeType.select,
+        name: 'reactionRole',
+        selectType: 'dropdown',
+        options: reactionRoleOptions,
+        wrapperConfig: {
+          label: 'Reaction role',
+        },
+      },
+      {
+        type: ReactionFormNodeType.select,
+        name: 'isLimiting',
+        selectType: 'dropdown',
+        options: booleanOptions,
+        wrapperConfig: {
+          label: 'Limiting reactant',
+        },
+        condition: {
+          name: 'reactionRole',
+          isHidden: reactionRole => (reactionRole as ReactionRole) !== 'REACTANT',
+        },
+      },
+    ],
+  },
+  ...reactionAmounts,
+  molBlockIdentifiers,
+  identifiersList,
+  {
+    type: ReactionFormNodeType.block,
+    name: 'source',
+    title: {
+      label: 'Source',
+    },
+    fields: [
+      wrapInputsWithGrid(
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.vendor',
+          wrapperConfig: {
+            label: 'Vendor',
+          },
+          inputType: 'string',
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.catalogId',
+          wrapperConfig: {
+            label: 'Catalog ID',
+          },
+          inputType: 'string',
+        },
+        {
+          type: ReactionFormNodeType.value,
+          name: 'source.lot',
+          wrapperConfig: {
+            label: 'Lot number',
+          },
+          inputType: 'string',
+        },
+      ),
+    ],
+  },
+  {
+    type: ReactionFormNodeType.list,
+    name: 'preparations',
+    title: {
+      label: 'Preparations',
+    },
+    getKey: (_, index) => index,
+    useSelectItems: buildUseSelectItems('preparations'),
+    ItemDisplay: createEntityListItemComponent<ReactionComponentPreparation>({
+      entityField: 'preparations',
+      title: 'Preparation',
+      requiredFields: [
+        {
+          label: 'Type',
+          render: item => item.type,
+        },
+        {
+          label: 'Details',
+          render: item => item.details,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Preparation',
+      useCreate: buildUseCreate('preparations', emptyPreparation),
+    },
+  },
+  featuresList,
+  textureDetails,
+];

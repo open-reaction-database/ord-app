@@ -17,7 +17,7 @@ import { type JSX, type MouseEvent, useCallback, useState, cloneElement } from '
 import type { DownloadThunk } from 'store/utils/downloadFile.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch';
 import { Menu } from '@mantine/core';
-import { DownloadIcon } from 'common/icons';
+import { DownloadIcon } from '@open-reaction-database/ui/theme';
 import classes from './DownloadMenu.module.scss';
 import type { DownloadMenuOptions } from 'common/types/downloadMenuOptions';
 

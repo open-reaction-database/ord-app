@@ -15,7 +15,7 @@
  */
 import { Flex, Paper } from '@mantine/core';
 import classes from './EntitiesMenu.module.scss';
-import { DatasetsIcon, TemplatesIcon } from 'common/icons';
+import { DatasetsIcon, TemplatesIcon } from '@open-reaction-database/ui/theme';
 import { useLocation, useRouter } from 'wouter';
 import { SelectableButton } from 'common/components/SelectableButton/SelectableButton.tsx';
 
