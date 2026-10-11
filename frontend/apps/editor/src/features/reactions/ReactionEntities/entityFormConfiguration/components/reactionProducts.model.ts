@@ -20,8 +20,10 @@ import {
 import {
   reactionRoleOptions,
   textureTypeOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
-import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
+  type ReactionRole,
+  type ReactionMeasurement,
+  ordMeasurementToReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
 import {
   componentPreview,
@@ -30,13 +32,11 @@ import {
   molBlockIdentifiers,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/reactionComponentsBase.model.tsx';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
-import type { ReactionMeasurement } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { create } from '@bufbuild/protobuf';
 import { ProductMeasurementSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordMeasurementToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 
 export const reactionProducts: Array<ReactionFormNode> = [
   componentPreview,

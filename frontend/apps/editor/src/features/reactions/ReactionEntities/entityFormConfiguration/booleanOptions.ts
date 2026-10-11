@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SelectOptions } from 'common/types/selectOptions.ts';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import {
+  type SelectOptions,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
 
 export const booleanOptions: SelectOptions = [
   ReactionBoolean.Unspecified,

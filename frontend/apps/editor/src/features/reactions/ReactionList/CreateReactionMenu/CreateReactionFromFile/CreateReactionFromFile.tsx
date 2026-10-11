@@ -25,7 +25,7 @@ import {
   type CreateReactionFromFileFormValues,
   createReactionFromFileSchema,
 } from './createReactionFromFile.schema.ts';
-import { type ImportReactionFromFilePayload } from 'store/entities/reactions/reactions.types.ts';
+import type { ImportReactionFromFilePayload } from 'store/entities/reactions/reactionsStore.types.ts';
 import classes from './CreateReactionFromFile.module.scss';
 
 interface CreateReactionFromFileProps {

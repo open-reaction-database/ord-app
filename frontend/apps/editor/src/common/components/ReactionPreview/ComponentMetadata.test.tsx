@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { ComponentMetadata } from './ComponentMetadata.tsx';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types';
+import type { ReactionInputComponent } from '@open-reaction-database/ui/reaction/model';
 
 describe('ComponentMetadata', () => {
   it('renders the NAME identifier value and the reaction role', () => {

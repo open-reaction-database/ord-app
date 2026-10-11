@@ -15,7 +15,7 @@
  */
 import { act } from '@testing-library/react';
 import type { PreviewsById } from '@open-reaction-database/ui/reaction/previews';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 

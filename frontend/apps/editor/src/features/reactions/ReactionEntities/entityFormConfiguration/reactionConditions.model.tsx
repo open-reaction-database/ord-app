@@ -33,14 +33,16 @@ import {
   tubingTypeOptions,
   voltageUnitOptions,
   waveLengthTypeOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+  type ElectrochemistryMeasurement,
+  type PressureMeasurement,
+  type TemperatureMeasurement,
+  ordElectrochemistryMeasurementToReaction,
+  ordPressureMeasurementToReaction,
+  ordTemperatureMeasurementToReaction,
+  type ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
 import { buildUseSelectItems } from './buildUseSelectItems.ts';
 import { createEntityListItemComponent } from './EntityListItem/entityListItem.utils.tsx';
-import type {
-  ElectrochemistryMeasurement,
-  PressureMeasurement,
-  TemperatureMeasurement,
-} from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
 import { buildUseCreate } from './buildUseCreate.ts';
 import { create } from '@bufbuild/protobuf';
 import {
@@ -48,12 +50,6 @@ import {
   PressureConditions_PressureMeasurementSchema,
   TemperatureConditions_TemperatureMeasurementSchema,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import {
-  ordElectrochemistryMeasurementToReaction,
-  ordPressureMeasurementToReaction,
-  ordTemperatureMeasurementToReaction,
-} from 'store/entities/reactions/reactionConditions/reactionConditions.converter.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type { FieldConfiguration } from '@open-reaction-database/ui/display';
 import { renderValuePrecisionUnit } from '../../ReactionView/renderValuePrecisionUnit.ts';
 

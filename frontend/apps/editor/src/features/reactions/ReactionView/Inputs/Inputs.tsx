@@ -18,16 +18,15 @@ import { Counter } from '@open-reaction-database/ui/display';
 import { AddCircleIcon, NoData } from 'common/icons';
 import classes from './inputs.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
-import { createEmptyReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.utils.ts';
+import {
+  createEmptyReactionInput,
+  type ReactionInput,
+} from '@open-reaction-database/ui/reaction/model';
 import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntities/findReactionEntityUniqueName.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import {
-  useIsViewOnly,
-  useOrderedInputs,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useOrderedInputs } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'inputs';
 

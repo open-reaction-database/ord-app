@@ -17,14 +17,13 @@ import classes from 'common/components/ReactionPreview/reactionPreview.module.sc
 import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { useMemo } from 'react';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
 import {
-  usePreviews,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+  type ReactionOutcome,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
+import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
+import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
+import { usePreviews, useReactionPart } from '@open-reaction-database/ui/reaction';
 
 interface ReactionOutcomePreviewProps {
   outcomeIndex: number;

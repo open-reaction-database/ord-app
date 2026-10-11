@@ -23,17 +23,17 @@ import {
   selectivityTypeOptions,
   timeUnitOptions,
   waveLengthTypeOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+  type ReactionMeasurementType,
+  ReactionBoolean,
+  MeasurementConstants,
+} from '@open-reaction-database/ui/reaction/model';
 import { booleanOptions } from 'features/reactions/ReactionEntities/entityFormConfiguration/booleanOptions.ts';
-import type { ReactionMeasurementType } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { MeasurementsBasedOn } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementsBasedOn.tsx';
 import { MeasurementValueControl } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementValueControl/MeasurementValueControl.tsx';
 import { MeasurementMasses } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementMasses.tsx';
 import { MeasurementsDivider } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/MeasurementsDivider.tsx';
 import { AuthenticStandard } from 'features/reactions/ReactionEntities/entityFormConfiguration/measurements/AuthenticStandard/AuthenticStandard.tsx';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { MeasurementConstants } from 'store/entities/reactions/reactionsMeasurement/reactionMeasurements.constants.ts';
 import { createConditionFactory } from '../../reactionEntities.utils.ts';
 
 const createCondition = createConditionFactory<ReactionMeasurementType>();

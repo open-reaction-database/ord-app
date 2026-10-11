@@ -20,11 +20,11 @@ import type {
   TemplateCSVRow,
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
-  type Variable,
+  type AppReaction,
   VariableType,
-} from 'store/entities/templates/templates.types.ts';
+} from '@open-reaction-database/ui/reaction/model';
+import type { Variable } from 'store/entities/templates/templates.types.ts';
 
 // reactionToOrdBinpb (the conversion to ord and the protobuf encode) is the heavy tail
 // of enumerateReaction; mocking it lets us capture the *coerced & merged* template
@@ -33,7 +33,8 @@ import {
 const { reactionToOrdBinpbMock } = vi.hoisted(() => ({
   reactionToOrdBinpbMock: vi.fn((_template: unknown) => ''),
 }));
-vi.mock('store/entities/reactions/reactions.converters.ts', () => ({
+vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
   reactionToOrdBinpb: reactionToOrdBinpbMock,
 }));
 

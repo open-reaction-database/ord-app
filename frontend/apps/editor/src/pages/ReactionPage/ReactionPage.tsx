@@ -34,7 +34,7 @@ import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage';
 import { selectErrorPage } from 'store/features/errorPage/errorPage.selectors.ts';
 import { resetErrorPageAction } from 'store/features/errorPage/errorPage.actions.ts';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import { ReactionProvider } from '@open-reaction-database/ui/reaction';
 import { selectCanDatasetBeEdited } from '../../store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';

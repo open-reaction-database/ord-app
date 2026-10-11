@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types';
-import type { ReactionValidation } from 'store/entities/reactions/reactions.types.ts';
+import type {
+  Optional,
+  ReactionValidation,
+} from '@open-reaction-database/ui/reaction/model';
 import { CheckCircleIcon, CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
 import { Badge, Flex, Text, Button, type ButtonProps } from '@mantine/core';

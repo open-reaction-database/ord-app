@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderInReactionView, emptyReactionData } from 'test/renderInReactionView.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { ProductsComponentsList } from './ProductComponentsList.tsx';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
+import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 
 const reaction = {
   ...emptyReactionData(),

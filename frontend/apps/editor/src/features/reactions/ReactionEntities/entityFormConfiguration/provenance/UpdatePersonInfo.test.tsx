@@ -18,7 +18,7 @@ import { fireEvent } from '@testing-library/react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { UpdatePersonInfo } from './UpdatePersonInfo.tsx';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
-import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
+import type { ReactionActions } from '@open-reaction-database/ui/reaction';
 
 // selectSelf is a (state) => user selector; return a populated user so the click handler has data.
 vi.mock('store/entities/users/users.selectors.ts', () => ({

@@ -19,10 +19,12 @@ import { Counter, KeyValueDisplay } from '@open-reaction-database/ui/display';
 import { AddCircleIcon } from 'common/icons';
 import { create } from '@bufbuild/protobuf';
 import { ReactionIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordReactionIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+import {
+  ordReactionIdentifierToReaction,
+  type ReactionPathComponents,
+  type ReactionIdentifier,
+} from '@open-reaction-database/ui/reaction/model';
 import { useCallback } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {
   useDrawer,
@@ -30,7 +32,7 @@ import {
   useReactionActions,
   useReactionPart,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'identifiers';
 

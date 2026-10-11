@@ -16,7 +16,11 @@
 import type { ReactionFormCustomProps } from '../../reactionEntities.types.ts';
 import { useCallback } from 'react';
 import { useEntityFieldPath } from '../../useEntityFieldPath.ts';
-import type { ReactionInputWithoutName } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import {
+  type ReactionInputWithoutName,
+  ordInputWithoutNameToReaction,
+  type ReactionInputComponent,
+} from '@open-reaction-database/ui/reaction/model';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
@@ -26,8 +30,6 @@ import classes from '../measurements/AuthenticStandard/authenticStandard.module.
 import { AddCircleIcon } from 'common/icons';
 import { create } from '@bufbuild/protobuf';
 import { ReactionInputSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
 import {
   useDrawer,
@@ -35,7 +37,7 @@ import {
   useReactionActions,
   useReactionPart,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { ComponentsListHeader } from 'features/reactions/ReactionView/ComponentsList';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
@@ -56,8 +58,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
 
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
-      drawer.push(currentPath);
-      drawer.push(currentPath.concat([COMPONENTS_FIELD, index]));
+      drawer.push(currentPath, currentPath.concat([COMPONENTS_FIELD, index]));
     },
     [currentPath, drawer],
   );

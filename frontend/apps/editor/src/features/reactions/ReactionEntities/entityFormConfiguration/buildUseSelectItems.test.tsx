@@ -16,11 +16,10 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ReactNode } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
-import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
-import { emptyReactionData } from 'test/renderInReactionView.tsx';
+import type { ReactionSnapshot } from '@open-reaction-database/ui/reaction';
+import { reactionWrapper, emptyReactionData } from '@open-reaction-database/ui/testing';
 import {
   buildUseSelectItems,
   buildUseSelectItemsListFromMap,

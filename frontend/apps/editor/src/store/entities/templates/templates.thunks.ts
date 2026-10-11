@@ -29,19 +29,19 @@ import axiosInstance from 'store/axiosInstance.ts';
 import {
   ordBinpbToReaction,
   reactionToOrdBinpb,
-} from '../reactions/reactions.converters.ts';
+  getReactionPreviews,
+} from '@open-reaction-database/ui/reaction/model';
 import { navigate } from 'wouter/use-browser-location';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import {
   ordTemplateVariablesToReaction,
   reactionTemplateVariablesToOrd,
 } from './templates.converters.ts';
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
-import { getReactionPreviews } from '../reactions/reactions.utils.ts';
 
 const getTemplateIdNumber = (templateId: string): number =>
   Number.parseInt(templateId.split('_')[1]);

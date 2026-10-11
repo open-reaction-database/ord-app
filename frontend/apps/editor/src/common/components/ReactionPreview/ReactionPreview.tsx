@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionOutcome } from '@open-reaction-database/ui/reaction/model';
 import { forwardRef, Fragment } from 'react';
 import classes from './reactionPreview.module.scss';
 import {
   useOrderedInputs,
   useReactionPart,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { ReactionInputPreview } from 'common/components/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'common/components/ReactionPreview/ReactionOutcomePreview.tsx';
 import { ArrowIcon, EmptyPreview } from '../../icons';

@@ -23,24 +23,19 @@ import {
   type ReactionMeasurementValueNumber,
   type ReactionMeasurementValueString,
   ReactionMeasurementValueType,
-} from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+  appAmountUnspecified,
+  massUnitNames,
+  type ReactionAmount,
+  VariableType,
+  type Optional,
+} from '@open-reaction-database/ui/reaction/model';
 import { InputGroup } from 'common/components/inputs/InputGroup/InputGroup.tsx';
 import { Input, TextInput } from '@mantine/core';
 import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisionUnitControl/ValuePrecisionUnitControl.tsx';
-import {
-  appAmountUnspecified,
-  massUnitNames,
-} from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
-import type { ReactionAmount } from 'store/entities/reactions/reactionAmount/reactionAmount.types.ts';
 import { type ChangeEvent, useMemo } from 'react';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
-import {
-  useIsViewOnly,
-  useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { useIsViewOnly, useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 

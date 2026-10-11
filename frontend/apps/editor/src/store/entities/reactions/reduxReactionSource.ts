@@ -22,17 +22,19 @@ import type { Action, Store, ThunkDispatch } from '@reduxjs/toolkit';
 import type {
   ReactionActions,
   ReactionSource,
-} from 'features/reactions/provider/reactionProvider.types.ts';
+} from '@open-reaction-database/ui/reaction';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';
 import type { User } from 'store/entities/users/users.types.ts';
-import { ordCompoundIdentifierToReaction } from './reactionEntity/reactionEntity.converters.ts';
-import type { ReactionCompoundIdentifier } from './reactionEntity/reactionEntity.types.ts';
-import type { ReactionPerson } from './reactionProvenance/reactionProvenance.types.ts';
+import {
+  ordCompoundIdentifierToReaction,
+  type ReactionCompoundIdentifier,
+  type ReactionPerson,
+  type ReactionId,
+} from '@open-reaction-database/ui/reaction/model';
 import { selectReactionById, selectReactionPartByPath } from './reactions.selectors.ts';
 import { addUpdateReactionField, deleteReactionField } from './reactions.thunks.ts';
-import type { ReactionId } from './reactions.types.ts';
 import { selectReactionsPreviews } from './reactionsPreviews/reactionsPreviews.selectors.ts';
 
 /** Reads one reaction, dataset or template, and the rendered previews from the editor's store. */

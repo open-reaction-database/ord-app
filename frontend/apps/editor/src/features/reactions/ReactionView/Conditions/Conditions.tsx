@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import { Flex, Title } from '@mantine/core';
-import type { ReactionConditions } from 'store/entities/reactions/reactionConditions/reactionConditions.types';
+import type { ReactionConditions } from '@open-reaction-database/ui/reaction/model';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import classes from './conditions.module.scss';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'conditions';
 

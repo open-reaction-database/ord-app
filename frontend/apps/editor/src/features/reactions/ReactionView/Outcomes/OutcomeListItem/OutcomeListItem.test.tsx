@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { Accordion } from '@mantine/core';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { OutcomeListItem } from './OutcomeListItem.tsx';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
+import type { ReactionOutcome } from '@open-reaction-database/ui/reaction/model';
 
 describe('OutcomeListItem', () => {
   it('renders the outcome header within the accordion', () => {

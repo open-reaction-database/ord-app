@@ -16,7 +16,10 @@
 import type { ValuePrecisionUnit } from './valuePrecisionUnitControl.types';
 import { Input } from '@mantine/core';
 import { InputGroup } from '../InputGroup/InputGroup';
-import type { SelectOptions } from 'common/types/selectOptions';
+import type {
+  SelectOptions,
+  Optional,
+} from '@open-reaction-database/ui/reaction/model';
 import { AppSegmentedControl } from '../AppSegmentedControl/AppSegmentedControl';
 import classes from './valuePrecisionUnitControl.module.scss';
 import { useUncontrolled } from '@mantine/hooks';
@@ -24,7 +27,6 @@ import { AppNativeSelect } from '../AppNativeSelect/AppNativeSelect';
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
-import type { Optional } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 interface ValuePrecisionUnitControlProps {
   value?: ValuePrecisionUnit;

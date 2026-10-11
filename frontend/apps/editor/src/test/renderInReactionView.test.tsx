@@ -18,7 +18,7 @@ import {
   useIsViewOnly,
   useReactionId,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { renderInReactionView } from './renderInReactionView.tsx';
 
 function Probe() {

@@ -15,7 +15,7 @@
  */
 import { Button, Flex, Modal, Text } from '@mantine/core';
 import { useCallback } from 'react';
-import type { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionNodeEntity } from '@open-reaction-database/ui/reaction/model';
 import { pasteReactionPart } from './reactionEntityForm.utils.ts';
 
 interface ReactionEntityPasteProps {

@@ -16,9 +16,11 @@
 import { ReactionHeaderActions } from '../../ReactionHeader/ReactionHeaderActions/ReactionHeaderActions.tsx';
 import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
 import { Link, useParams } from 'wouter';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
+import {
+  ReactionProvider,
+  useReactionSnapshot,
+  type ReactionSlots,
+} from '@open-reaction-database/ui/reaction';
 import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';

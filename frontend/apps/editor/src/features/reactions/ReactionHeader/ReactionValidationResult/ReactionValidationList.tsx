@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 import { Anchor, Drawer, Flex, Text } from '@mantine/core';
-import type {
-  ErrorWarningMessage,
-  ReactionValidation,
-} from 'store/entities/reactions/reactions.types.ts';
+import {
+  type ErrorWarningMessage,
+  type ReactionValidation,
+  reactionFlatPathToSidebars,
+} from '@open-reaction-database/ui/reaction/model';
 import { CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
+import { useDrawer } from '@open-reaction-database/ui/reaction';
 
 interface ReactionValidationListProps {
   opened: boolean;

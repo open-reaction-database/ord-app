@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import type { ReactionFormStandaloneField } from '@open-reaction-database/ui/reaction';
 import { Flex, Tooltip } from '@mantine/core';
 import { InfoCircleIcon } from 'common/icons';
 import classes from './reactionEntityLabel.module.scss';

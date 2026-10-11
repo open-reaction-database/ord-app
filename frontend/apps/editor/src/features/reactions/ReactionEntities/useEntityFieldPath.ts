@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { useContext, useMemo } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { reactionEntityContext } from './reactionEntity.context.ts';
 
 /** The path of the field `name` of the entity whose form is open. */

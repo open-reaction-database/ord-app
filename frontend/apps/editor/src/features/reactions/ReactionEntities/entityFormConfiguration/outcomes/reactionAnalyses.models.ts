@@ -19,14 +19,16 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { buildUseSelectItemsListFromMap } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import {
+  type AppData,
+  analysisOptions,
+} from '@open-reaction-database/ui/reaction/model';
 import { booleanOptions } from '../booleanOptions.ts';
 import {
   createReactionDataAddItem,
   reactionDataDisplay,
 } from 'features/reactions/ReactionEntities/entityFormConfiguration/data/reactionData.models.tsx';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
-import { analysisOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
 
 export const reactionAnalyses: Array<ReactionFormNode> = [
   wrapInputsWithGrid(

@@ -25,12 +25,12 @@ import {
   flowRateOptions,
   temperatureOptions,
   timeUnitOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+  type ReactionCrudeComponent,
+  ordCrudeComponentToReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import { buildUseSelectItems } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
-import type { ReactionCrudeComponent } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
-import { ordCrudeComponentToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import { create } from '@bufbuild/protobuf';
 import { CrudeComponentSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { CrudeComponentView } from 'features/reactions/ReactionView/CrudeComponentView/CrudeComponentView.tsx';

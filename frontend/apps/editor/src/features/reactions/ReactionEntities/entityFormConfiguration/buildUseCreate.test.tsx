@@ -17,8 +17,8 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
+import { useDrawerStack } from '@open-reaction-database/ui/reaction';
+import { reactionWrapper } from '@open-reaction-database/ui/testing';
 import type { AppState } from 'store/configureAppStore.ts';
 import { reduxReactionActions } from 'store/entities/reactions/reduxReactionSource.ts';
 

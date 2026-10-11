@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { ActionIcon } from '@mantine/core';
 import { RemoveIcon } from 'common/icons';
 import classes from './reactionEntityDelete.module.scss';
@@ -22,10 +22,7 @@ import clsx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
-import {
-  useDrawer,
-  useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useDrawer, useReactionActions } from '@open-reaction-database/ui/reaction';
 
 interface ReactionEntityDeleteProps {
   entityName: string;

@@ -17,8 +17,8 @@ import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisi
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 import type { ReactionFormValuePrecisionUnit } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { useMemo } from 'react';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntityVPU({

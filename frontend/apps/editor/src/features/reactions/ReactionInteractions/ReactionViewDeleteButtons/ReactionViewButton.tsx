@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
+import type { ReactionViewDeleteButtonsProps } from '@open-reaction-database/ui/reaction';
 import { useOnViewEditButton } from './reactionViewDeleteButtons.utils.ts';
 import { ViewIcon } from 'common/icons';
 import classes from './reactionViewDeleteButtons.module.scss';

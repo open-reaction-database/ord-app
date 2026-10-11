@@ -17,10 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { AppDataDisplay } from './AppDataDisplay.tsx';
-import {
-  AppDataType,
-  type AppData,
-} from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { AppDataType, type AppData } from '@open-reaction-database/ui/reaction/model';
 
 const appData = (data: AppData['data'], name = 'field'): AppData =>
   ({ id: 'x', name, data }) as AppData;

@@ -25,7 +25,12 @@ import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormCo
 import { createEntityListItemComponent } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
 import { booleanOptions } from '../booleanOptions.ts';
 import { reactionAmounts } from 'features/reactions/ReactionEntities/entityFormConfiguration/amount/reactionAmounts.models.ts';
-import { reactionRoleOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import {
+  reactionRoleOptions,
+  type ReactionRole,
+  ordPreparationToReaction,
+  type ReactionComponentPreparation,
+} from '@open-reaction-database/ui/reaction/model';
 import {
   componentPreview,
   featuresList,
@@ -33,9 +38,6 @@ import {
   molBlockIdentifiers,
   textureDetails,
 } from './reactionComponentsBase.model.tsx';
-import type { ReactionRole } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.types.ts';
-import { ordPreparationToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
-import type { ReactionComponentPreparation } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 
 const emptyPreparation = (newIndex: number): [number, ReactionComponentPreparation] => {
   return [newIndex, ordPreparationToReaction(create(CompoundPreparationSchema))];

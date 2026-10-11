@@ -16,8 +16,8 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { DatasetReactionValueLabel } from './DatasetReactionValueLable.tsx';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
-import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
+import type { ReactionValueLabelProps } from '@open-reaction-database/ui/reaction';
 
 const render = (wrapperConfig: ReactionValueLabelProps['wrapperConfig']) =>
   renderInReactionView(

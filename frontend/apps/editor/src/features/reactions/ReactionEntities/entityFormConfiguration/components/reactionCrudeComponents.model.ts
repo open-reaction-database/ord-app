@@ -19,7 +19,7 @@ import {
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { wrapInputsWithGrid } from 'common/utils/reactionForm/wrapInputsWithGrid.ts';
 import { createBooleanInput } from 'common/utils/reactionForm/createBooleanInput.ts';
-import { amountTypeOptions } from 'store/entities/reactions/reactionAmount/reactionAmount.models.ts';
+import { amountTypeOptions } from '@open-reaction-database/ui/reaction/model';
 import { textureDetails } from './reactionComponentsBase.model.tsx';
 
 const amountTypeOptionsWithoutVolume = amountTypeOptions.filter(

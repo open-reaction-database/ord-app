@@ -31,15 +31,4 @@ export const datasetFileDownloadOptions: Array<DownloadMenuOptions> = [
   { label: '.parquet', format: 'parquet' },
 ];
 
-export const DOT_DELIMITER = '·';
-
-export const DATE_FORMAT = 'YYYY-MM-DD';
-
-export const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
-
-export const DATE_TIME_HUMAN_FORMAT = 'DD.MM.YYYY hh:mm a';
-
 export const NUMBER_REGEX = /^\d+(?:[.,]\d+)?$/;
-
-// 1 MB
-export const MAX_DATA_FILE_SIZE = 1024 * 1024;

@@ -16,7 +16,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
-import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionComponentBase } from '@open-reaction-database/ui/reaction/model';
 
 // The structure preview is exercised elsewhere; stub it so this test focuses on the row layout.
 vi.mock('common/components/ReactionPreview/ReactionComponentPreview.tsx', () => ({

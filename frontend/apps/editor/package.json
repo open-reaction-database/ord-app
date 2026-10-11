@@ -16,7 +16,6 @@
     "@auth0/auth0-react": "^2.3.0",
     "@buf/open-reaction-database_ord-schema.bufbuild_es": "2.16.0-00000000000000-2a4e5a8d72a2.1",
     "@bufbuild/protobuf": "^2.16.0",
-    "@fastify/deepmerge": "^2.0.2",
     "@mantine/core": "^7.15.3",
     "@mantine/dates": "^7.15.3",
     "@mantine/form": "^7.15.3",
@@ -39,7 +38,6 @@
     "react-dom": "^19.0.0",
     "react-lazy-with-preload": "^2.2.1",
     "react-redux": "^9.2.0",
-    "use-sync-external-store": "^1.6.0",
     "uuid": "^11.0.5",
     "wouter": "^3.3.5",
     "yup": "^1.6.1"
@@ -51,7 +49,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@types/use-sync-external-store": "^0.0.6",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "@vitest/coverage-v8": "^4.1.11",
     "happy-dom": "^20.9.0",

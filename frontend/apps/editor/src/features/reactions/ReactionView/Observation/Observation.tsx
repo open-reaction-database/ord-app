@@ -17,13 +17,13 @@ import { Button, Flex, Title } from '@mantine/core';
 import { AddCircleIcon } from 'common/icons';
 import { Counter } from '@open-reaction-database/ui/display';
 import { useCallback } from 'react';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
-import { create } from '@bufbuild/protobuf';
-import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
+  type ReactionPathComponents,
   ordObservationToReaction,
   type ReactionObservation,
-} from 'store/entities/reactions/reactionObservation/reactionObservation.converter';
+} from '@open-reaction-database/ui/reaction/model';
+import { create } from '@bufbuild/protobuf';
+import { ReactionObservationSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
@@ -33,7 +33,7 @@ import {
   useIsViewOnly,
   useReactionActions,
   useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'observations';
 

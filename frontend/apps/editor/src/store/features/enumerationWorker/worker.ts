@@ -20,20 +20,19 @@ import type {
   TemplateCSVRow,
   VariableMatch,
 } from 'store/entities/enumeration/enumeration.types.ts';
-import type { AppReaction } from 'store/entities/reactions/reactions.types.ts';
 import {
-  type Variable,
+  type AppReaction,
   VariableType,
-} from 'store/entities/templates/templates.types.ts';
-import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
-} from 'store/entities/reactions/reactions.utils.ts';
-import { reactionToOrdBinpb } from 'store/entities/reactions/reactions.converters.ts';
-import { ordBooleanToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
+  reactionToOrdBinpb,
+  ordBooleanToReaction,
+  DATE_FORMAT,
+  DATE_TIME_FORMAT,
+} from '@open-reaction-database/ui/reaction/model';
+import type { Variable } from 'store/entities/templates/templates.types.ts';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
-import { DATE_FORMAT, DATE_TIME_FORMAT } from 'common/constants.ts';
 
 // customParseFormat gives dayjs strict parsing against an explicit format list. Without it dayjs
 // falls back to the lenient native Date parser, which silently coerces garbage like "Aprillllll,

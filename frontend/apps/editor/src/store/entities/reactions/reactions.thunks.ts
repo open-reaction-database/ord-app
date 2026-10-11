@@ -28,12 +28,16 @@ import {
 } from './reactions.actions.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
-import type {
-  AppReaction,
-  ReactionId,
-  ReactionResponse,
-  UpdateReactionSuccessPayload,
-} from './reactions.types.ts';
+import {
+  type AppReaction,
+  type ReactionId,
+  type ReactionResponse,
+  reactionToOrdBinpb,
+  getReactionPreviews,
+  parseReaction,
+  parseValidation,
+} from '@open-reaction-database/ui/reaction/model';
+import type { UpdateReactionSuccessPayload } from 'store/entities/reactions/reactionsStore.types.ts';
 import {
   selectActiveDatasetId,
   selectReactionById,
@@ -42,18 +46,12 @@ import {
 } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
-import { reactionToOrdBinpb } from './reactions.converters.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 import { getDataset } from '../datasets/datasets.thunks.ts';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
 import { NotificationVariant } from 'common/types/notification.ts';
-import {
-  getReactionPreviews,
-  parseReaction,
-  parseReactionList,
-  parseValidation,
-} from './reactions.utils.ts';
+import { parseReactionList } from './parseReactionList.ts';
 
 export const getReactionsList = createThunk(
   getReactionsListActions,

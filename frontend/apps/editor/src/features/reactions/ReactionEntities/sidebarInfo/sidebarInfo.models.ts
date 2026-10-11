@@ -15,29 +15,23 @@
  */
 import type { ReactionSidebarInfo } from './sidebarInfo.types.ts';
 import { buildUseInitialValues } from 'features/reactions/ReactionEntities/sidebarInfo/buildUseInitialValues.ts';
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
-import type {
-  ReactionAnalysis,
-  ReactionOutcome,
-} from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import type {
-  ReactionInputComponent,
-  ReactionMeasurement,
-  ReactionProduct,
-} from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
-import type {
-  ReactionProvenance,
-  ReactionRecordEvent,
-} from 'store/entities/reactions/reactionProvenance/reactionProvenance.types.ts';
-import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
+import {
+  type ReactionInput,
+  type ReactionAnalysis,
+  type ReactionOutcome,
+  type ReactionInputComponent,
+  type ReactionMeasurement,
+  type ReactionProduct,
+  ReactionNodeEntity,
+  type ReactionProvenance,
+  type ReactionRecordEvent,
+  type ReactionNotes,
+  type ReactionWorkup,
+  type ReactionConditions,
+  type ReactionTemperatureCondition,
+  type ReactionSetup,
+} from '@open-reaction-database/ui/reaction/model';
 import { createReactionEntityTitle } from '../ReactionEntityTitle/reactionEntityTitle.utils.tsx';
-import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
-import type {
-  ReactionConditions,
-  ReactionTemperatureCondition,
-} from 'store/entities/reactions/reactionConditions/reactionConditions.types.ts';
-import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types.ts';
 
 const withoutNestedArray = <T extends object, K extends keyof T>(
   object: T,

@@ -22,7 +22,7 @@ import { RemoveIcon } from 'common/icons';
 import { buttonClasses } from '@open-reaction-database/ui/theme';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { removeTemplate } from 'store/entities/templates/templates.thunks.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionId } from '@open-reaction-database/ui/reaction/model';
 
 interface RemoveReactionProps {
   reactionId: ReactionId;

@@ -21,16 +21,15 @@ import { AddCircleIcon, NoData } from 'common/icons';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import classes from './outcomes.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types.ts';
-import { ordOutcomeToReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.converters.ts';
-import { sortOutcomesByReactionTime } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.utils.ts';
+import {
+  type ReactionOutcome,
+  ordOutcomeToReactionOutcome,
+  sortOutcomesByReactionTime,
+} from '@open-reaction-database/ui/reaction/model';
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
 import { useMemo } from 'react';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import {
-  useIsViewOnly,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,

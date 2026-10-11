@@ -16,7 +16,7 @@
 import { Form, useForm } from '@mantine/form';
 import { Button, Flex } from '@mantine/core';
 import classes from './reactionEntityForm.module.scss';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import {
   ReactionEntityBaseNode,
   reactionEntityToForm,
@@ -29,7 +29,7 @@ import {
   useIsTemplate,
   useIsViewOnly,
   useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { copyReactionPart } from './reactionEntityForm.utils.ts';
 import { ReactionEntityPaste } from './ReactionEntityPaste.tsx';
 import { useDisclosure } from '@mantine/hooks';

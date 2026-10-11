@@ -16,7 +16,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionEntityData } from './ReactionEntityData.tsx';
-import { AppDataType } from 'store/entities/reactions/reactionData/reactionData.types.ts';
+import { AppDataType } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormData } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 

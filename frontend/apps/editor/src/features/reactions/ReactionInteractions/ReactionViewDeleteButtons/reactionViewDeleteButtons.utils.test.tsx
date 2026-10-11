@@ -16,9 +16,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { MouseEvent } from 'react';
-import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
-import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
+import {
+  useDrawerStack,
+  type ReactionViewDeleteButtonsProps,
+} from '@open-reaction-database/ui/reaction';
+import { reactionWrapper } from '@open-reaction-database/ui/testing';
 import {
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,

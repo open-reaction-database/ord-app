@@ -15,11 +15,8 @@
  */
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import {
-  useDrawer,
-  useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import { useDrawer, useReactionActions } from '@open-reaction-database/ui/reaction';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 export const buildUseCreate = <T = unknown>(
   entityName: string | ReactionPathComponents,

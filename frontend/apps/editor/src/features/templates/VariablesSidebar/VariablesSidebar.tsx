@@ -21,9 +21,11 @@ import { useCallback, useMemo } from 'react';
 import { setVariablesSidebarOpenedAction } from 'store/features/variablesSidebar/variablesSidebar.actions.ts';
 import classes from './variablesSidebar.module.scss';
 import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
-import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import {
+  reactionFlatPathToSidebars,
+  type ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
+import { useDrawer } from '@open-reaction-database/ui/reaction';
 
 interface VariablesSidebarProps {
   templateId: string;

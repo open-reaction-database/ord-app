@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type {
+  ReactionComponentBase,
+  ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
 import { ComponentDisplayRow } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRow.tsx';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';

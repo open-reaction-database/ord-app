@@ -21,9 +21,13 @@ import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { ReactionEntityForm } from 'features/reactions/ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { ReactionSnapshot } from 'features/reactions/provider/reactionProvider.types.ts';
-import { fullReactionSnapshot } from 'test/fullReactionSnapshot.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
+import {
+  type ReactionSnapshot,
+  ReactionProvider,
+  createStaticReactionSource,
+} from '@open-reaction-database/ui/reaction';
+import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
 import {
   EMPTY_SLOTS,
   makeContractStore,
@@ -33,8 +37,6 @@ import { MantineProvider } from '@mantine/core';
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
-import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
 
 // Ketcher needs a canvas to load; its editor opens only on demand and reads no reaction state.
 vi.mock(

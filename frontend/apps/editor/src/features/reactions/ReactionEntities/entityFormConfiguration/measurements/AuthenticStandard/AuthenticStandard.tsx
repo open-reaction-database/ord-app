@@ -15,12 +15,14 @@
  */
 import { useCallback } from 'react';
 import { useEntityFieldPath } from 'features/reactions/ReactionEntities/useEntityFieldPath.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import {
+  type ReactionInputComponent,
+  ordInputComponentToReaction,
+} from '@open-reaction-database/ui/reaction/model';
 import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
 import { Button, Flex, Title } from '@mantine/core';
 import { create } from '@bufbuild/protobuf';
 import { CompoundSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
 import { AddCircleIcon } from 'common/icons';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
 import classes from './authenticStandard.module.scss';
@@ -34,7 +36,7 @@ import {
   useReactionActions,
   useReactionPart,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';

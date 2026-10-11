@@ -21,7 +21,7 @@ import {
   pressureMeasurementTypeOptions,
   pressureUnitOptions,
   timeUnitOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+} from '@open-reaction-database/ui/reaction/model';
 
 export const reactionPressureMeasurements: Array<ReactionFormNode> = [
   {

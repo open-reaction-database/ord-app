@@ -17,8 +17,8 @@ import type { ReactionFormCustomProps } from 'features/reactions/ReactionEntitie
 import { TagsInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 import { useMemo } from 'react';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function MeasurementMasses({

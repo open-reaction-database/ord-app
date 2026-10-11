@@ -16,13 +16,13 @@
 import { useCallback, type ReactNode } from 'react';
 import { Button } from '@mantine/core';
 import { EditIcon, ViewIcon } from 'common/icons';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import classes from './openSingleEntityButton.module.scss';
 import {
   useDrawer,
   useIsTemplate,
   useIsViewOnly,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 interface OpenSingleEntityButtonProps {
   pathComponents: ReactionPathComponents;

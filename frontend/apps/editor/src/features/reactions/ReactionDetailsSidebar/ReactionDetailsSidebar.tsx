@@ -17,16 +17,13 @@ import classes from './editSidebar.module.scss';
 import { Anchor, Breadcrumbs, Drawer, Flex } from '@mantine/core';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { ReactionEntityForm } from '../ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
-import {
-  useDrawer,
-  useDrawerStack,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useDrawer, useDrawerStack } from '@open-reaction-database/ui/reaction';
 import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
 import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
 import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmationModal } from 'common/components/interactions/ConfirmationModal/ConfirmationModal.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 function ReactionDetailsSidebarComponent() {
   const reactionPathComponentsList = useDrawerStack();

@@ -17,11 +17,13 @@ import { Flex, Title } from '@mantine/core';
 import { Fragment, useMemo } from 'react';
 import classes from 'features/reactions/ReactionView/Notes/notes.module.scss';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
-import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import {
+  type ReactionNotes,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const notesFields: Array<[keyof ReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],

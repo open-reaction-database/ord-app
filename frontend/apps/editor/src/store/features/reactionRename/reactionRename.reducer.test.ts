@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { reactionRenameReducer } from './reactionRename.reducer.ts';
 import { setReactionRenameOpenedAction } from './reactionRename.actions.ts';
 import { renameReactionActions } from 'store/entities/reactions/reactions.actions.ts';
-import type { RenameReactionPayload } from 'store/entities/reactions/reactions.types.ts';
+import type { RenameReactionPayload } from 'store/entities/reactions/reactionsStore.types.ts';
 
 describe('reactionRenameReducer', () => {
   it('starts closed', () => {

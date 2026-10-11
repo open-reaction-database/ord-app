@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 import type { InputProps } from '@mantine/core';
-import type { SelectOptions } from 'common/types/selectOptions.ts';
+import type {
+  SelectOptions,
+  ReactionPathComponents,
+  WithId,
+} from '@open-reaction-database/ui/reaction/model';
 import type { FC, ReactNode } from 'react';
 import type { useForm } from '@mantine/form';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionFormStandaloneField } from '@open-reaction-database/ui/reaction';
 import type { EntityListItemRuntimeProps } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.types.ts';
-import type { WithId } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export enum ReactionFormNodeType {
   group = 'group',
@@ -50,14 +53,6 @@ export interface ReactionFormNodeBase extends ReactionFormConditionalRendering {
 export interface ReactionFormGroup extends ReactionFormNodeBase {
   type: ReactionFormNodeType.group;
   fields: Array<ReactionFormNode>;
-}
-
-export interface ReactionFormStandaloneField {
-  label?: string;
-  cannotBeVariable?: boolean;
-  templateLabel?: string;
-  hint?: string;
-  children?: ReactNode;
 }
 
 export interface ReactionFormTitle extends ReactionFormStandaloneField {

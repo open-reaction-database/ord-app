@@ -16,7 +16,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { createReactionEntityTitle } from './reactionEntityTitle.utils.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 // Capture the props the factory forwards to the underlying title component.
 vi.mock('./ReactionEntityTitle.tsx', () => ({

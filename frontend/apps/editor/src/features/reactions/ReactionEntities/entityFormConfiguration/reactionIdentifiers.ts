@@ -17,7 +17,7 @@ import {
   ReactionFormNodeType,
   type ReactionFormNode,
 } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { reactionIdentifierTypeOptions } from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models.ts';
+import { reactionIdentifierTypeOptions } from '@open-reaction-database/ui/reaction/model';
 
 export const reactionIdentifiers: Array<ReactionFormNode> = [
   {

@@ -19,8 +19,8 @@ import { DisplayMolblockPreview } from './DisplayMolblockPreview.tsx';
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 import { useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
+import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
 
 interface MolblockIdentifierProps {
   index: number;

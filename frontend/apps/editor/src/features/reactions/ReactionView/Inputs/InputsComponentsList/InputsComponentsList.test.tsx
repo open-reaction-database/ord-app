@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { InputsComponentsList } from './InputsComponentsList.tsx';
-import type { ReactionInput } from 'store/entities/reactions/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
 
 const inputs = [
   { id: 'in1', name: 'Input 1', components: [] },

@@ -15,7 +15,7 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import type { ItemsById } from 'common/types';
-import { itemsById } from 'common/utils';
+import { itemsById } from '@open-reaction-database/ui/reaction/model';
 import type { GroupMember, GroupItem } from './groups.types.ts';
 import {
   addGroupMemberActions,

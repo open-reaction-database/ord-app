@@ -16,7 +16,7 @@
 import { createSelectorFactory } from 'store/utils/createSelectorFactory.ts';
 import { createSelector } from '@reduxjs/toolkit';
 import { selectReactions } from 'store/entities/reactions/reactions.selectors.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.templates);
 

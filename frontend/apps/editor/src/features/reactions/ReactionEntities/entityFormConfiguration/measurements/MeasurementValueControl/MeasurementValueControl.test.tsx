@@ -16,7 +16,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { MeasurementValueControl } from './MeasurementValueControl.tsx';
-import { ReactionMeasurementValueType } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import { ReactionMeasurementValueType } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionEntityNodeProps } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.types.ts';
 
 const formMethods = {

@@ -35,22 +35,22 @@ import {
   createNewTemplateActions,
   importTemplateFromFileActions,
 } from 'store/entities/templates/templates.actions.ts';
-import { itemsById } from 'common/utils';
-import type {
-  ReactionOrTemplate,
-  AppReaction,
-  DatasetReaction,
-  ReactionTemplate,
-} from './reactions.types.ts';
-import type { ItemsById, Pagination } from 'common/types';
-import { emptyPagination } from 'common/constants.ts';
 import {
+  itemsById,
+  type AppReaction,
+  type DatasetReaction,
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
   removeDeepReactionPart,
-} from './reactions.utils.ts';
+  linkReactionEntities,
+} from '@open-reaction-database/ui/reaction/model';
+import type {
+  ReactionOrTemplate,
+  ReactionTemplate,
+} from 'store/entities/reactions/reactionsStore.types.ts';
+import type { ItemsById, Pagination } from 'common/types';
+import { emptyPagination } from 'common/constants.ts';
 import { reactionsPreviewsReducer } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.reducer.ts';
-import { linkReactionEntities } from 'store/entities/reactions/reactions.converters.ts';
 import type { Variable } from '../templates/templates.types.ts';
 
 const getReactionId = (reaction: DatasetReaction) => reaction.id;

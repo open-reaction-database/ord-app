@@ -18,7 +18,7 @@ import * as htmlToImage from 'html-to-image';
 import { copyPreviewAsImage, getProductYieldPercent } from './reactionPreview.utils.ts';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionProduct } from '@open-reaction-database/ui/reaction/model';
 
 vi.mock('html-to-image', () => ({ toBlob: vi.fn() }));
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));

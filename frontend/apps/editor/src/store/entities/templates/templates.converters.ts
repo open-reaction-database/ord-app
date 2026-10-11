@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 import type { Variable } from './templates.types.ts';
-import type { AppReaction } from '../reactions/reactions.types.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import {
+  type AppReaction,
+  type ReactionPathComponents,
+  replaceNameIdInReactionComponentPath,
+} from '@open-reaction-database/ui/reaction/model';
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import { replaceNameIdInReactionComponentPath } from '../../utils/replaceNameIdInReactionComponentPath.ts';
 
 type VariableMap = Record<string, Variable>;
 

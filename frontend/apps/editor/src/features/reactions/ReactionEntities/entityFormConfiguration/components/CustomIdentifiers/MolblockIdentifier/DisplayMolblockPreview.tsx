@@ -17,7 +17,7 @@ import { memo, useEffect, useState } from 'react';
 import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
 import classes from './molblockIdentifier.module.scss';
 import { Flex } from '@mantine/core';
-import type { ReactionCompoundIdentifier } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
+import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
 
 interface DisplayMolblockPreviewProps {
   identifier: ReactionCompoundIdentifier;

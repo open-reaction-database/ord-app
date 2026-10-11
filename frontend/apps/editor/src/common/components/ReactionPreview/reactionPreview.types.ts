@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionInputComponent } from '@open-reaction-database/ui/reaction/model';
 
 export type RenderedSvg = string | null;
 

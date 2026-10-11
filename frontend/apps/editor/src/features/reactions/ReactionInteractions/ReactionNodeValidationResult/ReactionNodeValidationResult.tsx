@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import type {
+  ReactionPathComponents,
   ErrorWarningMessage,
   ErrorWarningMessageWithPath,
   ReactionValidation,
-} from 'store/entities/reactions/reactions.types.ts';
+} from '@open-reaction-database/ui/reaction/model';
 import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionNodeValidationResult.module.scss';
 import { useMemo } from 'react';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
 
 interface ReactionNodeValidationResultProps {
   pathComponents: ReactionPathComponents;

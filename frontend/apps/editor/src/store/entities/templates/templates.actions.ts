@@ -19,7 +19,7 @@ import type {
   ImportTemplatePayload,
   TemplateCreator,
 } from './templates.types.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 
 const { createAsyncAction } = createActionFactory('templates');
 

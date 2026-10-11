@@ -15,10 +15,10 @@
  */
 import { useMemo } from 'react';
 import { useStore } from 'react-redux';
-import type { ReactionSource } from 'features/reactions/provider/reactionProvider.types.ts';
+import type { ReactionSource } from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { reduxReactionSource } from 'store/entities/reactions/reduxReactionSource.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionId } from '@open-reaction-database/ui/reaction/model';
 
 /** A source over one reaction in the editor's store, rebuilt only when the reaction ID changes. */
 export function useReduxReactionSource(reactionId: ReactionId): ReactionSource {

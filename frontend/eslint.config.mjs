@@ -113,8 +113,13 @@ export default tseslint.config(
           project: path.join(import.meta.dirname, 'packages/ui/tsconfig.json'),
         }),
       ],
+      // Lets import-x/no-cycle parse the TypeScript modules an import leads to.
+      'import-x/parsers': { '@typescript-eslint/parser': ['.ts', '.tsx'] },
     },
     rules: {
+      // In an import cycle, the other modules run before the one an importer reaches first,
+      // and read its exports as undefined.
+      'import-x/no-cycle': 'error',
       // Every import, type-only ones included, must be declared in the package's own
       // package.json; hoisting would otherwise let an undeclared dependency resolve from
       // the workspace root.
@@ -143,6 +148,11 @@ export default tseslint.config(
               message: 'Import package files through #… instead.',
             },
             {
+              regex: String.raw`^#(reaction(/[^/]+)?|testing)/index\.ts$`,
+              message:
+                'Import the module itself: an app test that mocks a barrel must not reach package code.',
+            },
+            {
               group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
               message:
                 'The shared package stays free of app state, transport, and routing.',
@@ -162,30 +172,6 @@ export default tseslint.config(
             {
               group: ['@open-reaction-database/ui/src/*', '**/packages/ui/*'],
               message: 'Import the shared package only through its exports.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ['apps/editor/src/features/reactions/provider/**/*.{ts,tsx}'],
-    rules: {
-      '@typescript-eslint/no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],
-              allowTypeImports: true,
-              message:
-                'The provider is bound for @open-reaction-database/ui; keep it free of app state, transport, and routing.',
-            },
-            {
-              regex: '^store/',
-              allowTypeImports: true,
-              message:
-                'The provider is bound for @open-reaction-database/ui; import only types from the editor store.',
             },
           ],
         },

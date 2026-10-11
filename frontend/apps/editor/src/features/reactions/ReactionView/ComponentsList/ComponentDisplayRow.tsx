@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionComponentBase } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
+import type { ReactionComponentBase } from '@open-reaction-database/ui/reaction/model';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ComponentDisplayRowProps } from './componentsList.types.ts';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
   component,

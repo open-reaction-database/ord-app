@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import { Accordion, Flex, Text } from '@mantine/core';
-import type { ReactionOutcome } from 'store/entities/reactions/reactionsOutcomes/reactionOutcomes.types';
+import type {
+  ReactionOutcome,
+  ReactionProduct,
+} from '@open-reaction-database/ui/reaction/model';
 import { useMemo } from 'react';
 import {
   ComponentDisplayRow,
@@ -24,7 +27,6 @@ import clsx from 'clsx';
 import classes from './outcomeListItem.module.scss';
 import { compareNamedEntities } from 'features/reactions/ReactionEntities/entityFormConfiguration/compareNamedEntities.ts';
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
-import type { ReactionProduct } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { OutcomeListItemHeader } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItemHeader.tsx';
 import { MeasurementsPreview } from '../MeasurementsPreview/MeasurementsPreview.tsx';
 

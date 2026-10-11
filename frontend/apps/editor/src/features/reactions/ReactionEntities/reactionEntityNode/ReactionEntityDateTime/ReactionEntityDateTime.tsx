@@ -27,11 +27,13 @@ import {
   useMemo,
 } from 'react';
 import dayjs from 'dayjs';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import {
+  VariableType,
+  DATE_TIME_FORMAT,
+} from '@open-reaction-database/ui/reaction/model';
 import classes from './reactionEntityDateTime.module.scss';
-import { DATE_TIME_FORMAT } from 'common/constants.ts';
 
 function formatDate(inputDate: string | Date): string {
   return dayjs(inputDate).format(DATE_TIME_FORMAT);

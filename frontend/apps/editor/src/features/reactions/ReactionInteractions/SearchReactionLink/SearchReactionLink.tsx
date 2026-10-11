@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Anchor } from '@mantine/core';
-import type { ReactionLinkProps } from 'features/reactions/provider/reactionProvider.types.ts';
+import type { ReactionLinkProps } from '@open-reaction-database/ui/reaction';
 import { searchReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 

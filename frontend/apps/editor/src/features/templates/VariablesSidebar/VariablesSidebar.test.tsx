@@ -16,8 +16,8 @@
 import { describe, it, expect } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
-import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
+import { useDrawerStack } from '@open-reaction-database/ui/reaction';
+import { reactionFlatPathToSidebars } from '@open-reaction-database/ui/reaction/model';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { VariablesSidebar } from './VariablesSidebar.tsx';
 import type { AppState } from 'store/configureAppStore.ts';

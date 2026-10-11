@@ -21,7 +21,7 @@ import {
   removeTemplateActions,
   importTemplateFromFileActions,
 } from './templates.actions.ts';
-import type { ReactionTemplate } from 'store/entities/reactions/reactions.types.ts';
+import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 
 const getTemplateId = (template: ReactionTemplate) => template.id;
 

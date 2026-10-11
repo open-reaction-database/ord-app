@@ -19,9 +19,9 @@ import { useCallback } from 'react';
 import {
   deepMergeWithArrayMerge,
   generateDeepPartialReactionByPath,
-} from 'store/entities/reactions/reactions.utils.ts';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import { useReactionActions } from 'features/reactions/provider/reactionProvider.hooks.ts';
+  type ReactionPathComponents,
+} from '@open-reaction-database/ui/reaction/model';
+import { useReactionActions } from '@open-reaction-database/ui/reaction';
 
 export interface UpdatePersonInfoProps extends ReactionFormCustomProps {
   text: string;

@@ -17,8 +17,8 @@ import { AppNativeSelect } from 'common/components/inputs/AppNativeSelect/AppNat
 import { AppSegmentedControl } from 'common/components/inputs/AppSegmentedControl/AppSegmentedControl.tsx';
 import type { ReactionEntityNodeProps } from '../reactionEntityNode.types.ts';
 import type { ReactionFormSelect } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { VariableType } from 'store/entities/templates/templates.types.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 export function ReactionEntitySelect({

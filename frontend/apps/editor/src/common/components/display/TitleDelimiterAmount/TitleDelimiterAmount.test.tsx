@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { TitleDelimiterAmount } from './TitleDelimiterAmount.tsx';
-import { DOT_DELIMITER } from 'common/constants.ts';
+import { DOT_DELIMITER } from '@open-reaction-database/ui/reaction/model';
 
 describe('TitleDelimiterAmount', () => {
   it('renders the title, the delimiter, and the amount', () => {

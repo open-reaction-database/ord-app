@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type {
+  ReactionPathComponents,
+  ReactionNodeEntity,
+} from '@open-reaction-database/ui/reaction/model';
 import type { FC } from 'react';
 import type { ReactionEntityTitleProps } from 'features/reactions/ReactionEntities/ReactionEntityTitle/reactionEntityTitle.types.ts';
-import type { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 
 export interface ReactionSidebarInfo {
   pathComponents: ReactionPathComponents;

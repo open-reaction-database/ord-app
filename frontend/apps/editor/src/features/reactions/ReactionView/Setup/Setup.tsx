@@ -16,13 +16,12 @@
 import { Flex, Title } from '@mantine/core';
 import classes from './setup.module.scss';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
-import type { ReactionSetup } from 'store/entities/reactions/reactionSetup/reactionSetup.types';
+import type { ReactionSetup, AppData } from '@open-reaction-database/ui/reaction/model';
 import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/EntityListItem';
 import { OpenSingleEntityButton } from 'features/reactions/ReactionView/OpenSingleEntityButton/OpenSingleEntityButton';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types';
 import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'setup';
 

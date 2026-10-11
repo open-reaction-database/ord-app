@@ -22,18 +22,18 @@ import {
   ReactionRole_ReactionRoleType,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { copyReactionPart, pasteReactionPart } from './reactionEntityForm.utils.ts';
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
-import { ordNotesToReaction } from 'store/entities/reactions/reactionNotes/reactionNotes.converters.ts';
-import { ordInputComponentToReaction } from 'store/entities/reactions/reactionComponent/reactionComponent.converters.ts';
-import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import {
+  ReactionNodeEntity,
+  ordNotesToReaction,
+  ordInputComponentToReaction,
+  type ReactionInputComponent,
   AppDataType,
   type AppData,
-} from 'store/entities/reactions/reactionData/reactionData.types.ts';
-import type { ReactionNotes } from 'store/entities/reactions/reactionNotes/reactionNotes.types.ts';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
-import { ordReactionToReaction } from 'store/entities/reactions/reactions.converters.ts';
-import { fullReaction } from 'test/fullReaction.ts';
+  type ReactionNotes,
+  ReactionBoolean,
+  ordReactionToReaction,
+} from '@open-reaction-database/ui/reaction/model';
+import { fullReaction } from '@open-reaction-database/ui/testing';
 
 vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
 

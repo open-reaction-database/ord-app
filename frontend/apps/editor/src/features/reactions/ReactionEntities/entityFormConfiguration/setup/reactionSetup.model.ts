@@ -18,7 +18,14 @@ import {
   vesselMaterialTypeOptions,
   vesselTypeOptions,
   volumeTypeOptions,
-} from 'store/entities/reactions/reactionEntityTypes/reactionEntityTypes.models';
+  type ReactionVesselAttachment,
+  type ReactionVesselPreparation,
+  ordVesselPreparationToReaction,
+  ordVesselAttachmentToReaction,
+  type ReactionPathComponents,
+  type AppData,
+  ReactionBoolean,
+} from '@open-reaction-database/ui/reaction/model';
 import {
   ReactionFormNodeType,
   type ReactionFormNode,
@@ -36,22 +43,11 @@ import {
   VesselAttachmentSchema,
   VesselPreparationSchema,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import type {
-  ReactionVesselAttachment,
-  ReactionVesselPreparation,
-} from 'store/entities/reactions/reactionSetup/reactionSetup.types';
-import {
-  ordVesselPreparationToReaction,
-  ordVesselAttachmentToReaction,
-} from 'store/entities/reactions/reactionSetup/reactionSetup.converter';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
-import type { AppData } from 'store/entities/reactions/reactionData/reactionData.types.ts';
 import { compareNamedEntities } from '../compareNamedEntities.ts';
 import {
   createReactionDataAddItem,
   reactionDataDisplay,
 } from '../data/reactionData.models.tsx';
-import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
 
 export const vesselPreparationEntityPath: ReactionPathComponents = [
   'vessel',

@@ -15,12 +15,12 @@
  */
 import { showNotification } from 'common/utils/showNotification.tsx';
 import { NotificationVariant } from 'common/types/notification.ts';
-import { ReactionNodeEntity } from 'store/entities/reactions/reactions.types.ts';
 import {
+  ReactionNodeEntity,
   ordSchemaByNodeEntity,
   ordToReactionConvertersByNodeEntity,
   reactionToOrdConvertersByNodeEntity,
-} from 'store/entities/reactions/reactions.models.ts';
+} from '@open-reaction-database/ui/reaction/model';
 import { create, fromJson, toJson, type JsonValue } from '@bufbuild/protobuf';
 
 // The clipboard holds the entity as the proto3 JSON of its ord message.

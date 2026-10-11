@@ -15,13 +15,13 @@
  */
 import { Flex, Tooltip } from '@mantine/core';
 import { InfoCircleIcon } from 'common/icons';
-import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
+import type { ReactionValueLabelProps } from '@open-reaction-database/ui/reaction';
 import classes from './reactionValueLabel.module.scss';
 import clsx from 'clsx';
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from '../../ReactionEntities/reactionEntity.context.ts';
 import { ReactionNodeValidationResult } from '../ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 
 export function DatasetReactionValueLabel({
   wrapperConfig,
