@@ -25,4 +25,20 @@ describe('ReactionEntityDelete', () => {
     const { container } = renderWithReaction(<Component />, { editable: true });
     expect(container).toBeInTheDocument();
   });
+
+  it('offers removal only on an editable reaction', () => {
+    const remove = (
+      <ReactionEntityDelete
+        entityName="Notes"
+        pathComponents={['notes']}
+      />
+    );
+    const editable = renderWithReaction(remove, { editable: true });
+    expect(editable.getByRole('button', { name: 'Remove Notes' })).toBeInTheDocument();
+    editable.unmount();
+    const readOnly = renderWithReaction(remove);
+    expect(
+      readOnly.queryByRole('button', { name: 'Remove Notes' }),
+    ).not.toBeInTheDocument();
+  });
 });

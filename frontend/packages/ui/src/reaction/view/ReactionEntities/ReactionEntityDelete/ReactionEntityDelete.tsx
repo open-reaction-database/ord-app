@@ -24,6 +24,7 @@ import { ConfirmPopover } from '#display/interactions/ConfirmPopover/ConfirmPopo
 import { useCallback, useRef } from 'react';
 import {
   useDrawer,
+  useIsViewOnly,
   useReactionActions,
 } from '#reaction/provider/reactionProvider.hooks.ts';
 
@@ -34,6 +35,7 @@ interface ReactionEntityDeleteProps {
   onRemove?: () => void;
 }
 
+/** A Remove icon that asks for confirmation; it renders nothing on a read-only reaction. */
 export function ReactionEntityDelete({
   entityName,
   pathComponents,
@@ -41,6 +43,7 @@ export function ReactionEntityDelete({
   onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
   const actions = useReactionActions();
+  const isViewOnly = useIsViewOnly();
   const drawer = useDrawer();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
     useDisclosure();
@@ -64,6 +67,10 @@ export function ReactionEntityDelete({
     pathComponents,
     shouldCloseSidebar,
   ]);
+
+  if (isViewOnly) {
+    return null;
+  }
 
   return (
     <ConfirmPopover

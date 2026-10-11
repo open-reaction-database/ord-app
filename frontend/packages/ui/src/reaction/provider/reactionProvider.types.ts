@@ -94,7 +94,7 @@ export interface ReactionLinkProps {
   pbReactionId: string;
 }
 
-/** Components the host app supplies for the parts of the view it owns. */
+/** What the host app supplies for the parts of the view it owns. */
 export interface ReactionSlots {
   ViewDeleteButtons: FC<ReactionViewDeleteButtonsProps>;
   ValueLabel: FC<ReactionValueLabelProps>;
