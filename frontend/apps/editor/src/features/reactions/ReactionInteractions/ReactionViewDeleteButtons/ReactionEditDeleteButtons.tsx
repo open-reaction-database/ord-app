@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionViewDeleteButtonsProps } from '@open-reaction-database/ui/reaction';
-import { EditButton } from 'common/components/interactions/EditButton/EditButton.tsx';
-import { Divider, Flex } from '@mantine/core';
-import classes from './reactionViewDeleteButtons.module.scss';
-import { ReactionEntityDelete } from '../../ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import {
+  type ReactionViewDeleteButtonsProps,
+  reactionViewDeleteButtonsClasses as classes,
+  ReactionEntityDelete,
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,
-} from './reactionViewDeleteButtons.utils.ts';
+} from '@open-reaction-database/ui/reaction';
+import { EditButton } from 'common/components/interactions/EditButton/EditButton.tsx';
+import { Divider, Flex } from '@mantine/core';
 
 export function ReactionEditDeleteButtons({
   entityName,

@@ -33,8 +33,10 @@ import {
 } from '@open-reaction-database/ui/reaction/model';
 import { navigate } from 'wouter/use-browser-location';
 import { selectReactionById } from '../reactions/reactions.selectors.ts';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 import {
   ordTemplateVariablesToReaction,

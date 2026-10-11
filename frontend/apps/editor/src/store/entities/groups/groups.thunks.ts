@@ -32,9 +32,11 @@ import {
 } from './groups.actions.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import { USER_ROLES } from 'common/types';
-import { showNotification } from 'common/utils/showNotification.tsx';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
-import { NotificationVariant } from 'common/types/notification.ts';
 
 export const getGroupList = createThunk(getGroupListActions, () => async () => {
   const groups = (await axiosInstance.get<Array<GroupItem>>(`/groups`)).data;

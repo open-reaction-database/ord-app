@@ -18,7 +18,7 @@ import { Button, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { createEmptyReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { AddCircleIcon, ChevronDownIcon } from 'common/icons';
+import { AddCircleIcon, ChevronDownIcon } from '@open-reaction-database/ui/theme';
 import { CreateReactionFromFile } from './CreateReactionFromFile/CreateReactionFromFile.tsx';
 import classes from './createReactionMenu.module.scss';
 import { useSelector } from 'react-redux';

@@ -16,17 +16,18 @@
 import { useMemo } from 'react';
 import { useStore } from 'react-redux';
 import type { AppState } from 'store/configureAppStore.ts';
-import type {
-  ReactionActions,
-  ReactionSlots,
-  ReactionSource,
+import {
+  type ReactionActions,
+  type ReactionSlots,
+  type ReactionSource,
+  DatasetReactionValueLabel,
+  ReactionViewButton,
 } from '@open-reaction-database/ui/reaction';
-import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
 import { SearchReactionLink } from 'features/reactions/ReactionInteractions/SearchReactionLink/SearchReactionLink.tsx';
-import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { reduxReactionActions } from 'store/entities/reactions/reduxReactionSource.ts';
 import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
+import { ComponentsKetcherEditor } from 'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 const EDITABLE_SLOTS: ReactionSlots = {
@@ -34,6 +35,7 @@ const EDITABLE_SLOTS: ReactionSlots = {
   ValueLabel: DatasetReactionValueLabel,
   ViewOnlyLabel: DatasetReactionValueLabel,
   ReactionLink: SearchReactionLink,
+  MoleculeEditor: { name: 'Ketcher', Editor: ComponentsKetcherEditor },
 };
 
 const VIEW_ONLY_SLOTS: ReactionSlots = {

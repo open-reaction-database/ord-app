@@ -16,7 +16,7 @@
 import { useCallback, useMemo } from 'react';
 import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
 import { Flex, Paper, Title, Loader, Switch, Text } from '@mantine/core';
-import { EmptyIcon } from 'common/icons';
+import { EmptyIcon } from '@open-reaction-database/ui/theme';
 import classes from './reactionsList.module.scss';
 import { useSelector } from 'react-redux';
 import {

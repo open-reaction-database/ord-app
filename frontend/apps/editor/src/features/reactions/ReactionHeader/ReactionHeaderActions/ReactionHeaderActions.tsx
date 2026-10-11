@@ -23,14 +23,14 @@ import {
   ChevronDownIcon,
   CopyImageIcon,
   DownloadIcon,
-} from 'common/icons';
+} from '@open-reaction-database/ui/theme';
 import classes from './reactionCard.module.scss';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
+import { copyPreviewAsImage } from '@open-reaction-database/ui/reaction';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 

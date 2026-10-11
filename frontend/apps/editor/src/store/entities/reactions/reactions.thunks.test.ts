@@ -36,7 +36,10 @@ vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 // Reaction responses carry base64-encoded protobufs; stub the parse so tests need no real binpb,
 // and keep the rest of the model (merge helpers used by the reducer) intact.
 vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({

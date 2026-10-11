@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Flex } from '@mantine/core';
-import { Github, Linkedin } from 'common/icons';
+import { Github, Linkedin } from '@open-reaction-database/ui/theme';
 import classes from './footer.module.scss';
 
 export function Footer() {

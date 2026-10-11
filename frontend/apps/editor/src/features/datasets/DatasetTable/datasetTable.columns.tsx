@@ -19,11 +19,14 @@ import { UserField } from 'common/components/display/UserField/UserField.tsx';
 import { GroupsListWithRoles } from 'common/components/GroupsListWithRoles/GroupsListWithRoles.tsx';
 import { formatUtcDateToDisplay } from '@open-reaction-database/ui/reaction/model';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
-import { typographyClasses } from '@open-reaction-database/ui/theme';
+import {
+  typographyClasses,
+  DotsIcon,
+  AlertCircleIcon,
+} from '@open-reaction-database/ui/theme';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import classes from './datasetTable.module.scss';
-import { DotsIcon, AlertCircleIcon } from 'common/icons';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { downloadDatasetThroughLink } from 'store/utils/downloadFile.thunks.ts';
 import { datasetFileDownloadOptions } from 'common/constants.ts';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Button, Flex, Paper, Title } from '@mantine/core';
-import { AddCircleIcon } from 'common/icons';
+import { AddCircleIcon } from '@open-reaction-database/ui/theme';
 import { useDisclosure } from '@mantine/hooks';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';

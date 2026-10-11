@@ -36,10 +36,16 @@ vi.mock(
   'features/reactions/ReactionHeader/DatasetReactionHeader/DatasetReactionHeader.tsx',
   () => ({ DatasetReactionHeader: () => <DrawerProbe /> }),
 );
-vi.mock('features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx', () => ({
+// Ketcher needs a canvas to load; the page supplies its editor as a slot.
+vi.mock(
+  'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  () => ({
+    ComponentsKetcherEditor: () => null,
+  }),
+);
+vi.mock('@open-reaction-database/ui/reaction', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
   ReactionContent: () => null,
-}));
-vi.mock('features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx', () => ({
   ReactionDetailsSidebar: () => null,
 }));
 // The page shell's user menu needs Auth0 and the signed-in user; neither matters here.

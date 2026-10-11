@@ -18,13 +18,15 @@ import { useMemo } from 'react';
 import { Badge, Flex, Paper } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import classes from './templatePage.module.scss';
-import { ReactionDetailsSidebar } from 'features/reactions/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+import {
+  ReactionDetailsSidebar,
+  ReactionTabs,
+} from '@open-reaction-database/ui/reaction';
 import { PageContainer } from 'common/components/PageContainer/PageContainer.tsx';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { selectAreTemplatesLoaded } from 'store/entities/templates/templates.selectors.ts';
 import { NotFoundPage } from 'pages/NotFound/NotFoundPage.tsx';
-import { ReactionTabs } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
 import { TemplateHeader } from 'features/templates/TemplateHeader/TemplateHeader.tsx';
 import { VariablesSidebar } from '../../features/templates/VariablesSidebar/VariablesSidebar.tsx';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';

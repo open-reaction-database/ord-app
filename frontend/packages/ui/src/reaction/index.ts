@@ -20,3 +20,30 @@ export type * from './provider/reactionValueLabel.types.ts';
 export type * from './provider/reactionViewDeleteButtons.types.ts';
 export type { DrawerActions, DrawerStack } from './provider/drawer.ts';
 export { createStaticReactionSource } from './provider/staticReactionSource.ts';
+export { ReactionCard } from './view/ReactionCard/ReactionCard.tsx';
+export { ReactionDetailsSidebar } from './view/ReactionDetailsSidebar/ReactionDetailsSidebar.tsx';
+export { ReactionDrawerForm } from './view/ReactionDetailsSidebar/ReactionDrawerForm.tsx';
+export { ReactionEntityDelete } from './view/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
+export { ReactionContent } from './view/ReactionEntities/ReactionTabs/ReactionContent.tsx';
+export { ReactionTabs } from './view/ReactionEntities/ReactionTabs/ReactionTabs.tsx';
+export { findReactionEntityUniqueName } from './view/ReactionEntities/findReactionEntityUniqueName.ts';
+export {
+  reactionEntityContext,
+  type ReactionEntityContext,
+} from './view/ReactionEntities/reactionEntity.context.ts';
+export {
+  ReactionEntityBlock,
+  ReactionEntityBlockTitle,
+} from './view/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+export { ReactionHeader } from './view/ReactionHeader/ReactionHeader.tsx';
+export { DatasetReactionValueLabel } from './view/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
+export { default as reactionValueLabelClasses } from './view/ReactionInteractions/ReactionValueLabel/reactionValueLabel.module.scss';
+export { ReactionViewButton } from './view/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
+export {
+  onViewDeleteButtonsWrapperClick,
+  useOnViewEdit,
+  useOnViewEditButton,
+} from './view/ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.utils.ts';
+export { default as reactionViewDeleteButtonsClasses } from './view/ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.module.scss';
+export { ReactionPreview } from './view/ReactionPreview/ReactionPreview.tsx';
+export { copyPreviewAsImage } from './view/ReactionPreview/reactionPreview.utils.ts';

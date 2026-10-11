@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Menu, ThemeIcon } from '@mantine/core';
-import { CopyIcon } from 'common/icons';
+import { CopyIcon } from '@open-reaction-database/ui/theme';
 import { copyToClipboard } from 'common/utils/copyToClipboard.ts';
 import classes from './copyButton.module.scss';
 

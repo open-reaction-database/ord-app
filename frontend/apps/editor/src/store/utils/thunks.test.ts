@@ -16,15 +16,20 @@
 import type { AppThunk, AppVoidThunk } from 'common/types/store/thunk.ts';
 import { describe, it, expect, vi } from 'vitest';
 import { type UnknownAction } from '@reduxjs/toolkit';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import { makeRecordingStore } from 'test/recordingStore.ts';
 import { createAsyncAction } from './actions.ts';
 import { createThunk, createThunkWithExplicitResult } from './thunks.ts';
 
 // createThunk shows an error toast on axios failures; mock it so this file stays insulated from the
 // toast infrastructure and we can assert when (and only when) it fires.
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 const notifyMock = vi.mocked(showNotification);
 

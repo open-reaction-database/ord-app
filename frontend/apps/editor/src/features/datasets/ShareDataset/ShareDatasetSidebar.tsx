@@ -37,11 +37,17 @@ import {
 import { useSelector } from 'react-redux';
 import { useField } from '@mantine/form';
 import classes from './shareDataset.module.scss';
-import { RemoveIcon } from 'common/icons';
-import { Counter, KeyValueDisplay } from '@open-reaction-database/ui/display';
-import { buttonClasses, typographyClasses } from '@open-reaction-database/ui/theme';
+import {
+  RemoveIcon,
+  buttonClasses,
+  typographyClasses,
+} from '@open-reaction-database/ui/theme';
+import {
+  Counter,
+  KeyValueDisplay,
+  ConfirmPopover,
+} from '@open-reaction-database/ui/display';
 import { clearDatasetGroupsListAction } from 'store/entities/datasets/datasets.actions.ts';
-import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import type { DatasetGroup } from 'store/entities/datasets/datasets.types.ts';
 

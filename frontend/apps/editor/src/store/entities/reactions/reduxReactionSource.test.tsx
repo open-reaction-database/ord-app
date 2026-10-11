@@ -44,7 +44,10 @@ import { reduxReactionActions, reduxReactionSource } from './reduxReactionSource
 vi.mock('store/axiosInstance.ts', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 // axios methods are overloaded, so vi.mocked() doesn't surface the mock helpers under tsc.
 const axiosMock = axiosInstance as unknown as Record<

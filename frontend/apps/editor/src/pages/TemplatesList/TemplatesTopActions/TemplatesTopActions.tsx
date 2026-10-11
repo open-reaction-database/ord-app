@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 import { Grid } from '@mantine/core';
-import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
-import { colorToCssVariable } from '@open-reaction-database/ui/theme';
-import { UploadProgressIcon } from 'common/icons';
+import { PaperButton } from '@open-reaction-database/ui/display';
+import {
+  colorToCssVariable,
+  UploadProgressIcon,
+} from '@open-reaction-database/ui/theme';
 import { EnumerateButton } from 'features/enumeration/EnumerateButton.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ImportFromJSON } from 'features/templates/ImportFromJSON/ImportFromJSON.tsx';

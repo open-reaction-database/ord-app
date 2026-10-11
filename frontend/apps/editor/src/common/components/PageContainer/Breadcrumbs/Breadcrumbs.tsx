@@ -16,7 +16,7 @@
 import { Breadcrumbs as MantineBreadcrumbs, Flex, Tooltip } from '@mantine/core';
 import { Link, useLocation } from 'wouter';
 import classes from './Breadcrumbs.module.scss';
-import { HomeIcon } from 'common/icons';
+import { HomeIcon } from '@open-reaction-database/ui/theme';
 import type { Breadcrumbs } from 'common/types/breadcrumbs.ts';
 
 interface BreadcrumbsProps {

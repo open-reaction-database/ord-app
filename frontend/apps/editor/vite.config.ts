@@ -82,8 +82,8 @@ const config: ViteUserConfig = {
         'src/test/**',
         'src/**/*.module.scss',
       ],
-      // Total-coverage floor enforced in CI (a regression backstop). Set a few points below
-      // current (lines 71%, statements 71%, branches 61%, functions 64%) so routine churn
+      // Total-coverage floor enforced in CI (a regression backstop), well below the measured
+      // coverage (lines 78%, statements 79%, branches 67%, functions 73%) so routine churn
       // doesn't trip it; ratchet up later.
       thresholds: {
         lines: 60,

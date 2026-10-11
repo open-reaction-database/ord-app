@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
+import { CheckCircleIcon, CrossCircleIcon } from '@open-reaction-database/ui/theme';
 import classes from './validityButton.module.scss';
 import { Badge, Button } from '@mantine/core';
 

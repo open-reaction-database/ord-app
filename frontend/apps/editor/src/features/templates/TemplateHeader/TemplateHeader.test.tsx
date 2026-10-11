@@ -20,7 +20,8 @@ import type { AppState } from 'store/configureAppStore.ts';
 
 // The reaction preview and the action menu are exercised elsewhere; stub them so this test focuses
 // on the header's name + enumeration-readiness badge.
-vi.mock('common/components/ReactionPreview/ReactionPreview.tsx', () => ({
+vi.mock('@open-reaction-database/ui/reaction', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
   ReactionPreview: () => <div data-testid="reaction-preview" />,
 }));
 vi.mock('features/templates/TemplateHeaderActions/TemplateHeaderActions', () => ({

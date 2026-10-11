@@ -18,9 +18,8 @@ import { removeReaction } from 'store/entities/reactions/reactions.thunks.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { Button } from '@mantine/core';
-import { RemoveIcon } from 'common/icons';
-import { buttonClasses } from '@open-reaction-database/ui/theme';
-import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
+import { RemoveIcon, buttonClasses } from '@open-reaction-database/ui/theme';
+import { ConfirmPopover } from '@open-reaction-database/ui/display';
 import { removeTemplate } from 'store/entities/templates/templates.thunks.ts';
 import type { ReactionId } from '@open-reaction-database/ui/reaction/model';
 

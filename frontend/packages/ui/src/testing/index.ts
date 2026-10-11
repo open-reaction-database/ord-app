@@ -17,4 +17,8 @@ export { emptyReactionData } from './emptyReactionData.ts';
 export { fullReaction } from './fullReaction.ts';
 export { fullReactionSnapshot } from './fullReactionSnapshot.ts';
 export { renderWithMantine } from './renderWithMantine.tsx';
-export { reactionWrapper, renderWithReaction } from './renderWithReaction.tsx';
+export {
+  reactionWrapper,
+  renderWithReaction,
+  stubReactionActions,
+} from './renderWithReaction.tsx';

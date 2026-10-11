@@ -15,7 +15,7 @@
  */
 import React from 'react';
 import { Flex, Modal, Table } from '@mantine/core';
-import { CheckCircleIcon, CrossCircleIcon } from 'common/icons';
+import { CheckCircleIcon, CrossCircleIcon } from '@open-reaction-database/ui/theme';
 import classes from './permissionModal.module.scss';
 
 interface Permission {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { LogoIcon } from 'common/icons';
+import { LogoIcon } from '@open-reaction-database/ui/theme';
 import classes from './pageLoader.module.scss';
 import { Flex, Loader } from '@mantine/core';
 

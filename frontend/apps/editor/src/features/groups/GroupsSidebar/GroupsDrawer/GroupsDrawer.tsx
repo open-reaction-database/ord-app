@@ -17,7 +17,7 @@ import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Drawer, Flex, Text, Tooltip } from '@mantine/core';
-import { EditIcon } from 'common/icons';
+import { EditIcon, typographyClasses } from '@open-reaction-database/ui/theme';
 import { InputModal } from 'common/components/InputModal/InputModal.tsx';
 import { MAX_CRITICAL_FIELD_LENGTH } from 'common/constants/fieldLimits.ts';
 import { getGroupMembers, renameGroup } from 'store/entities/groups/groups.thunks.ts';
@@ -37,7 +37,6 @@ import classes from './GroupsDrawer.module.scss';
 import { selectEditingGroupId } from 'store/features/groups/groups.selectors.ts';
 import { setEditingGroupIdAction } from 'store/features/groups/groups.actions.ts';
 import clsx from 'clsx';
-import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { CopyButton } from 'common/components/interactions/CopyButton/CopyButton.tsx';
 
 export function GroupsDrawer() {

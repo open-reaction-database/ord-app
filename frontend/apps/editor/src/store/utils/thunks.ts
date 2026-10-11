@@ -16,8 +16,10 @@
 import type { AnyAsyncAction } from 'common/types';
 import type { AppThunk, AppVoidThunk, ThunkWrapper } from 'common/types/store/thunk.ts';
 import { isAxiosError } from 'axios';
-import { showNotification } from '../../common/utils/showNotification.tsx';
-import { NotificationVariant } from '../../common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 
 function processAxiosError(error: unknown): string | null {
   if (isAxiosError(error)) {

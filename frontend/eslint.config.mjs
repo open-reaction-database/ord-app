@@ -148,7 +148,7 @@ export default tseslint.config(
               message: 'Import package files through #… instead.',
             },
             {
-              regex: String.raw`^#(reaction(/[^/]+)?|testing)/index\.ts$`,
+              regex: String.raw`^#(reaction(/[^/]+)?|testing|theme|display)/index\.ts$`,
               message:
                 'Import the module itself: an app test that mocks a barrel must not reach package code.',
             },

@@ -21,8 +21,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from 'store/rootReducer.ts';
 import type { AppState } from 'store/configureAppStore.ts';
-import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import {
+  reactionEntityContext,
   ReactionProvider,
   type ReactionActions,
   type ReactionSlots,

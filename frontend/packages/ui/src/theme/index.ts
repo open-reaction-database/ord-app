@@ -17,3 +17,4 @@ export * from './theme.ts';
 export { colorToCssVariable } from './colors.ts';
 export { default as typographyClasses } from './typography.module.scss';
 export { default as buttonClasses } from './buttons.module.scss';
+export * from './icons/index.ts';

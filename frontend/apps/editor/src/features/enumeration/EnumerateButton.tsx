@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ArticleIcon } from 'common/icons';
-import { colorToCssVariable } from '@open-reaction-database/ui/theme';
-import { PaperButton } from 'common/components/interactions/PaperButton/PaperButton.tsx';
+import { ArticleIcon, colorToCssVariable } from '@open-reaction-database/ui/theme';
+import { PaperButton } from '@open-reaction-database/ui/display';
 import { useCallback } from 'react';
 import { setEnumerationSetupOpenedAction } from 'store/features/enumerationSetup/enumerationSetup.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';

@@ -17,11 +17,13 @@ import { Button, Drawer, Flex, Textarea, TextInput, Title } from '@mantine/core'
 import classes from './enumerationSetup.module.scss';
 import { GroupSelector } from 'features/groups/GroupSelector/GroupSelector.tsx';
 import { useForm, yupResolver } from '@mantine/form';
-import { ReactionEntityBlockTitle } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
+import {
+  ReactionEntityBlockTitle,
+  ReactionPreview,
+} from '@open-reaction-database/ui/reaction';
 import { useSelector } from 'react-redux';
 import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
-import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
 import { VariablesMatching } from './VariablesMatching/VariablesMatching.tsx';
 import type {
   EnumerationForm,
@@ -29,7 +31,7 @@ import type {
   EnumerationSetupForm,
 } from './enumerationSetup.types.ts';
 import { TemplateFileSelector } from './TemplateFileSelector/TemplateFileSelector.tsx';
-import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
+import { ConfirmPopover } from '@open-reaction-database/ui/display';
 import { useDisclosure } from '@mantine/hooks';
 import { useCallback } from 'react';
 import {
@@ -44,6 +46,7 @@ import {
   MAX_CRITICAL_FIELD_LENGTH,
   MAX_FIELD_LENGTH,
 } from 'common/constants/fieldLimits.ts';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
 
 export interface CreateDatasetFromEnumerationProps {
   datasetId?: number;
@@ -159,7 +162,7 @@ export function EnumerationSetup({
           <ReactionEntityBlockTitle leftSection={<Title order={3}>Reaction</Title>} />
           {template && (
             <TemplateReactionProvider templateId={form.values.templateId}>
-              <ReactionPreview />
+              <ReactionPreview showDetails={showReactionPreviewDetails} />
             </TemplateReactionProvider>
           )}
 

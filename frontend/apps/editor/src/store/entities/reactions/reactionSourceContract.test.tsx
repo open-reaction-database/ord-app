@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReactionCard } from 'common/components/ReactionCard/ReactionCard.tsx';
-import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPreview.tsx';
-import { ReactionHeader } from 'features/reactions/ReactionHeader/ReactionHeader.tsx';
-import { ReactionContent } from 'features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx';
-import { reactionNodeToComponent } from 'features/reactions/ReactionEntities';
-import { ReactionEntityForm } from 'features/reactions/ReactionEntities/ReactionEntityForm/ReactionEntityForm.tsx';
-import { nodeToComponentContext } from 'features/reactions/ReactionEntities/reactionEntityNode/reactionEntityNode.context.ts';
-import { getSidebarInfo } from 'features/reactions/ReactionEntities/sidebarInfo/getSidebarInfo.tsx';
-import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import {
+  ReactionCard,
+  ReactionPreview,
+  ReactionHeader,
+  ReactionContent,
+  ReactionDrawerForm,
   type ReactionSnapshot,
   ReactionProvider,
   createStaticReactionSource,
 } from '@open-reaction-database/ui/reaction';
+import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
 import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
 import {
   EMPTY_SLOTS,
@@ -37,12 +34,6 @@ import { MantineProvider } from '@mantine/core';
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
-
-// Ketcher needs a canvas to load; its editor opens only on demand and reads no reaction state.
-vi.mock(
-  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
-  () => ({ ComponentsKetcherEditor: () => null }),
-);
 
 describe('the reaction view over either source', () => {
   it.each([
@@ -69,22 +60,6 @@ describe('the reaction view over either source', () => {
     expect(overStatic.length).toBeGreaterThan(0);
   });
 });
-
-function FormAt({
-  pathComponents,
-}: Readonly<{ pathComponents: ReactionPathComponents }>) {
-  return (
-    <nodeToComponentContext.Provider value={reactionNodeToComponent}>
-      <ReactionEntityForm
-        reactionPathComponents={pathComponents}
-        sidebarInfo={getSidebarInfo([...pathComponents].reverse())}
-        isHidden={false}
-        onFormClose={() => undefined}
-        onSetFormDirty={() => undefined}
-      />
-    </nodeToComponentContext.Provider>
-  );
-}
 
 /** Drawer forms in the fixture to compare; inputs and analyses are keyed by generated IDs. */
 const FORMS: Array<
@@ -128,7 +103,7 @@ describe('the drawer forms over either source', () => {
   it.each(FORMS)('render %s the same', (_name, pathTo) => {
     const snapshot = fullReactionSnapshot();
     const [overStatic, overRedux] = renderOverBothSources(
-      <FormAt pathComponents={pathTo(snapshot.data)} />,
+      <ReactionDrawerForm pathComponents={pathTo(snapshot.data)} />,
       snapshot,
     );
     expect(overStatic).toBe(overRedux);
@@ -145,26 +120,6 @@ function isReadOnlyControl(label: string): boolean {
     label === 'Copy Chunk' ||
     label === 'Close' ||
     /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(label)
-  );
-}
-
-/** The drawer's title, where the Delete icon lives, above the form. */
-function DrawerAt({
-  pathComponents,
-}: Readonly<{ pathComponents: ReactionPathComponents }>) {
-  const sidebarInfo = getSidebarInfo([...pathComponents].reverse());
-  const Title = sidebarInfo.sidebarTitle;
-  return (
-    <nodeToComponentContext.Provider value={reactionNodeToComponent}>
-      <Title pathComponents={pathComponents} />
-      <ReactionEntityForm
-        reactionPathComponents={pathComponents}
-        sidebarInfo={sidebarInfo}
-        isHidden={false}
-        onFormClose={() => undefined}
-        onSetFormDirty={() => undefined}
-      />
-    </nodeToComponentContext.Provider>
   );
 }
 
@@ -192,7 +147,10 @@ describe('a read-only drawer', () => {
   it.each(FORMS)('shows no edit control on %s', (_name, pathTo) => {
     const snapshot = fullReactionSnapshot();
     const { queryAllByRole } = render(
-      <DrawerAt pathComponents={pathTo(snapshot.data)} />,
+      <ReactionDrawerForm
+        showTitle
+        pathComponents={pathTo(snapshot.data)}
+      />,
       {
         wrapper: readOnlyWrapper(snapshot),
       },

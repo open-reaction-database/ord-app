@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import { notifyApiError } from './notifyApiError.ts';
 
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 const showMock = vi.mocked(showNotification);
 
 function axiosError(status: number, data?: unknown) {

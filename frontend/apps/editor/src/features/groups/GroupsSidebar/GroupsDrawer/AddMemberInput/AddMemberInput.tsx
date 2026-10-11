@@ -16,7 +16,7 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Group, TextInput } from '@mantine/core';
-import { AlertCircleIcon } from 'common/icons';
+import { AlertCircleIcon } from '@open-reaction-database/ui/theme';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import {
   selectAddMemberError,

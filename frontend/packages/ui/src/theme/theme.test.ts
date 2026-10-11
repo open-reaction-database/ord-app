@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { theme } from '#theme/index.ts';
+import { theme } from './theme.ts';
 
 describe('theme', () => {
   it('uses the ORD blue as its primary color', () => {

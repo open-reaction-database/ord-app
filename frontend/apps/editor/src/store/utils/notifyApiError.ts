@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { showNotification } from 'common/utils/showNotification.tsx';
-import { NotificationVariant } from 'common/types/notification.ts';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import { getErrorDetails } from './handleApiError.ts';
 
 /**

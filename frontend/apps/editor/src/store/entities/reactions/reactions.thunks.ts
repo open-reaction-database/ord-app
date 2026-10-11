@@ -46,11 +46,13 @@ import {
 } from './reactions.selectors.ts';
 import { navigate } from 'wouter/use-browser-location';
 import type { AppState } from '../../configureAppStore.ts';
-import { showNotification } from 'common/utils/showNotification.tsx';
+import {
+  showNotification,
+  NotificationVariant,
+} from '@open-reaction-database/ui/display';
 import { handleApiError } from 'store/utils/handleApiError.ts';
 import { getDataset } from '../datasets/datasets.thunks.ts';
 import { selectDatasetById } from '../datasets/datasets.selectors.ts';
-import { NotificationVariant } from 'common/types/notification.ts';
 import { parseReactionList } from './parseReactionList.ts';
 
 export const getReactionsList = createThunk(
