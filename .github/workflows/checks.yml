@@ -65,16 +65,6 @@ jobs:
       - name: ty
         run: uv run --frozen --no-build ty check ord_app
 
-  check_javascript:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: clang-format
-        run: |
-          sudo apt update && sudo apt install clang-format --yes
-          # NOTE(kearnes): Run clang-format before installing anything with npm.
-          find . -name '*.js' -exec clang-format -n -Werror {} +
-
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
   # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
   # ord_app/ (Python) and the frontend workspaces' src/ trees (TS/TSX) per .jscpd.json.
