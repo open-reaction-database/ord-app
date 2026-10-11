@@ -40,7 +40,10 @@ export interface ThunkOptions {
   failureMessage?: string;
 }
 
-/** Shows the backend's message for a failure, or else `failureMessage`; returns the former. */
+/**
+ * Shows the backend's message for a failure, or else `failureMessage`. Returns the backend's
+ * message, or null when there is none.
+ */
 function reportFailure(error: unknown, failureMessage?: string): string | null {
   const detail = processAxiosError(error);
   if (detail === null && failureMessage) {

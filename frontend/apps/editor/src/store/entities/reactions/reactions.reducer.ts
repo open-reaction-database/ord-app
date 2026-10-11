@@ -246,8 +246,8 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure),
     state => {
       // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
-      // the optimistic change by restoring the snapshot, so the UI never shows an unsaved edit as
-      // applied. Edits are issued one at a time, so at most one reaction is ever pending. (#615)
+      // the optimistic change by restoring the snapshot. Only the open reaction is edited, so at
+      // most one reaction has a snapshot, which overlapping edits to it share. (#615)
       const restored = { ...state };
       let didRollback = false;
       for (const [id, reaction] of Object.entries(state)) {
