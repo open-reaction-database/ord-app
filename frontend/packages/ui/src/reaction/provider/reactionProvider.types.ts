@@ -20,6 +20,7 @@ import type {
   DatasetReaction,
   ReactionId,
 } from '#reaction/model/reactions.types.ts';
+import type { ReactionCompoundIdentifier } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
 import type { ReactionPerson } from '#reaction/model/reactionProvenance/reactionProvenance.types.ts';
 import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
@@ -71,6 +72,17 @@ export interface ReactionActions {
   currentPerson?(): ReactionPerson | undefined;
 }
 
+/** A compound identifier's value and details, as a molecule editor reads and saves them. */
+export type MoleculeIdentifier = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
+
+export interface MoleculeEditorProps {
+  opened: boolean;
+  onClose: () => void;
+  onSave: (identifier: MoleculeIdentifier) => void;
+  /** The identifier to edit, or null to draw a new one. */
+  identifier: MoleculeIdentifier | null;
+}
+
 export interface ReactionLinkProps {
   /** The linked reaction's ORD ID. */
   pbReactionId: string;
@@ -83,6 +95,8 @@ export interface ReactionSlots {
   ViewOnlyLabel: FC<ReactionValueLabelProps>;
   /** Links another reaction by its ORD ID; without it the ID shows as text. */
   ReactionLink?: FC<ReactionLinkProps>;
+  /** Draws a molecule for a molblock identifier; without it, molblocks cannot be drawn. */
+  MoleculeEditor?: FC<MoleculeEditorProps>;
 }
 
 export interface ReactionProviderValue {

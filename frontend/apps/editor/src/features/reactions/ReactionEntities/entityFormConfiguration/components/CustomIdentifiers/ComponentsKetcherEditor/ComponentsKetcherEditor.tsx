@@ -23,16 +23,7 @@ import classes from './componentsKetcherEditor.module.scss';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import { useField } from '@mantine/form';
-import type { ReactionCompoundIdentifier } from '@open-reaction-database/ui/reaction/model';
-
-type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
-
-interface ComponentsKetcherEditorProps {
-  opened: boolean;
-  onClose: () => void;
-  onSave: (identifier: IdentifierData) => void;
-  identifier: IdentifierData | null;
-}
+import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
 
 const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 
@@ -43,7 +34,7 @@ export function ComponentsKetcherEditor({
   onClose,
   identifier,
   onSave,
-}: Readonly<ComponentsKetcherEditorProps>) {
+}: Readonly<MoleculeEditorProps>) {
   const [ketcherInstance, setKetcherInstance] = useState<Ketcher | null>(null);
   const initialValue = identifier?.details || 'Drawn with Ketcher';
   const { getInputProps, getValue, setValue } = useField({

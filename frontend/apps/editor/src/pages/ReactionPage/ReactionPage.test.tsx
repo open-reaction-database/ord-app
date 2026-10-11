@@ -36,6 +36,13 @@ vi.mock(
   'features/reactions/ReactionHeader/DatasetReactionHeader/DatasetReactionHeader.tsx',
   () => ({ DatasetReactionHeader: () => <DrawerProbe /> }),
 );
+// Ketcher needs a canvas to load; the page supplies its editor as a slot.
+vi.mock(
+  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  () => ({
+    ComponentsKetcherEditor: () => null,
+  }),
+);
 vi.mock('features/reactions/ReactionEntities/ReactionTabs/ReactionContent.tsx', () => ({
   ReactionContent: () => null,
 }));

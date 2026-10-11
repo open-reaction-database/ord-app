@@ -23,7 +23,6 @@ import {
   CompoundIdentifier_CompoundIdentifierType,
   CompoundIdentifierSchema,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
@@ -34,13 +33,16 @@ import {
   ordCompoundIdentifierToReaction,
   type ReactionCompoundIdentifier,
 } from '@open-reaction-database/ui/reaction/model';
-import { useIsViewOnly, useReactionActions } from '@open-reaction-database/ui/reaction';
+import {
+  useIsViewOnly,
+  useReactionActions,
+  useReactionSlots,
+  type MoleculeIdentifier,
+} from '@open-reaction-database/ui/reaction';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from 'features/reactions/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
-
-type IdentifierData = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
 
 const ENTITY_FIELD = 'molBlockIdentifiers';
 
@@ -50,7 +52,7 @@ const useSelectIdentifiers =
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
   (newIndex, _, value?: unknown) => {
-    const { value: identifierValue, details } = (value as IdentifierData) || {};
+    const { value: identifierValue, details } = (value as MoleculeIdentifier) || {};
     const newIdentifier = ordCompoundIdentifierToReaction(
       create(CompoundIdentifierSchema, {
         type: CompoundIdentifier_CompoundIdentifierType.MOLBLOCK,
@@ -66,6 +68,7 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 export function CustomIdentifiers() {
   const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
+  const { MoleculeEditor } = useReactionSlots();
   const { pathComponents } = useContext(reactionEntityContext);
   const [
     componentsEditorOpened,
@@ -87,7 +90,7 @@ export function CustomIdentifiers() {
     openComponentsEditor();
   };
 
-  const onSaveMolblock = (value: IdentifierData) => {
+  const onSaveMolblock = (value: MoleculeIdentifier) => {
     if (editedMolblock !== null) {
       const identifier = {
         ...identifiers[editedMolblock],
@@ -111,7 +114,7 @@ export function CustomIdentifiers() {
       />
       {!isViewOnly && (
         <Grid>
-          <Grid.Col span={6}>
+          <Grid.Col span={MoleculeEditor ? 6 : 12}>
             <PaperButton
               title="Add Identifier"
               description="Via Look up Name"
@@ -120,15 +123,17 @@ export function CustomIdentifiers() {
               onClick={openLookup}
             />
           </Grid.Col>
-          <Grid.Col span={6}>
-            <PaperButton
-              title="Add Molblock Identifier"
-              description="Via Ketcher"
-              icon={<StylusNoteIcon />}
-              color={colorToCssVariable['green']}
-              onClick={openComponentsEditor}
-            />
-          </Grid.Col>
+          {MoleculeEditor && (
+            <Grid.Col span={6}>
+              <PaperButton
+                title="Add Molblock Identifier"
+                description="Via Ketcher"
+                icon={<StylusNoteIcon />}
+                color={colorToCssVariable['green']}
+                onClick={openComponentsEditor}
+              />
+            </Grid.Col>
+          )}
         </Grid>
       )}
       <ReactionEntityBlock
@@ -149,12 +154,14 @@ export function CustomIdentifiers() {
         ))}
       </ReactionEntityBlock>
 
-      <ComponentsKetcherEditor
-        opened={componentsEditorOpened}
-        onSave={onSaveMolblock}
-        onClose={handleCloseKetcher}
-        identifier={selectedMolblockIdentifier}
-      />
+      {MoleculeEditor && (
+        <MoleculeEditor
+          opened={componentsEditorOpened}
+          onSave={onSaveMolblock}
+          onClose={handleCloseKetcher}
+          identifier={selectedMolblockIdentifier}
+        />
+      )}
 
       {isLookupOpened && <ComponentsLookup onClose={closeLookup} />}
     </>

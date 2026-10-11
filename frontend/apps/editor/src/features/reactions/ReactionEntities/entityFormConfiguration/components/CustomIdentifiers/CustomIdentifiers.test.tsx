@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
+import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { CustomIdentifiers } from './CustomIdentifiers.tsx';
-
-// Ketcher needs a canvas to load; its editor stays closed here.
-vi.mock('./ComponentsKetcherEditor/ComponentsKetcherEditor.tsx', () => ({
-  ComponentsKetcherEditor: () => null,
-}));
 
 const reaction = {
   ...emptyReactionData(),
@@ -31,6 +27,12 @@ const reaction = {
     in1: { id: 'in1', name: 'in1', components: [{ id: 'c1', identifiers: [] }] },
   },
 } as unknown as AppReaction;
+
+const componentPath = ['inputs', 'in1', 'components', 0];
+
+function FakeMoleculeEditor({ opened }: Readonly<MoleculeEditorProps>) {
+  return opened ? <p>editor open</p> : null;
+}
 
 describe('CustomIdentifiers', () => {
   it('opens the name lookup from Add Identifier and closes it on Cancel', async () => {
@@ -46,5 +48,25 @@ describe('CustomIdentifiers', () => {
     await waitFor(() =>
       expect(queryByLabelText('Compound name')).not.toBeInTheDocument(),
     );
+  });
+
+  it('opens the host’s molecule editor from Add Molblock Identifier', () => {
+    const { getByText, queryByText } = renderInReactionView(<CustomIdentifiers />, {
+      reaction,
+      pathComponents: componentPath,
+      slots: { MoleculeEditor: FakeMoleculeEditor },
+    });
+    expect(queryByText('editor open')).not.toBeInTheDocument();
+    fireEvent.click(getByText('Add Molblock Identifier'));
+    expect(getByText('editor open')).toBeInTheDocument();
+  });
+
+  it('offers no molblock drawing without a molecule editor', () => {
+    const { getByText, queryByText } = renderInReactionView(<CustomIdentifiers />, {
+      reaction,
+      pathComponents: componentPath,
+    });
+    expect(getByText('Add Identifier')).toBeInTheDocument();
+    expect(queryByText('Add Molblock Identifier')).not.toBeInTheDocument();
   });
 });

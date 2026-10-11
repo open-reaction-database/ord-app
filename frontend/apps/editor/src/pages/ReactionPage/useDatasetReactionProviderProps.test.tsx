@@ -17,10 +17,19 @@ import { configureStore } from '@reduxjs/toolkit';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
+import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { rootReducer } from 'store/rootReducer.ts';
 import { useDatasetReactionProviderProps } from './useDatasetReactionProviderProps.ts';
+
+// Ketcher needs a canvas to load; the slot table only refers to its editor.
+vi.mock(
+  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  () => ({
+    ComponentsKetcherEditor: () => null,
+  }),
+);
 
 /** A wrapper over one store, so a rerender keeps the store the hook reads. */
 function makeWrapper() {
@@ -31,12 +40,13 @@ function makeWrapper() {
 }
 
 describe('useDatasetReactionProviderProps', () => {
-  it('gives an editable dataset actions and the edit buttons', () => {
+  it('gives an editable dataset actions, the edit buttons, and the Ketcher editor', () => {
     const { result } = renderHook(() => useDatasetReactionProviderProps(1, true), {
       wrapper: makeWrapper(),
     });
     expect(result.current.actions).toBeDefined();
     expect(result.current.slots.ViewDeleteButtons).toBe(ReactionEditDeleteButtons);
+    expect(result.current.slots.MoleculeEditor).toBe(ComponentsKetcherEditor);
   });
 
   it('gives a read-only dataset no actions and the view button', () => {

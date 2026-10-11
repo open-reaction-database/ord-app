@@ -38,12 +38,6 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 
-// Ketcher needs a canvas to load; its editor opens only on demand and reads no reaction state.
-vi.mock(
-  'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
-  () => ({ ComponentsKetcherEditor: () => null }),
-);
-
 describe('the reaction view over either source', () => {
   it.each([
     [

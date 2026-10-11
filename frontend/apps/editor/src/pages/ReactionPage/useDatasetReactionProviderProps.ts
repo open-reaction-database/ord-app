@@ -27,6 +27,7 @@ import { SearchReactionLink } from 'features/reactions/ReactionInteractions/Sear
 import { ReactionViewButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionViewButton.tsx';
 import { reduxReactionActions } from 'store/entities/reactions/reduxReactionSource.ts';
 import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
+import { ComponentsKetcherEditor } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 const EDITABLE_SLOTS: ReactionSlots = {
@@ -34,6 +35,7 @@ const EDITABLE_SLOTS: ReactionSlots = {
   ValueLabel: DatasetReactionValueLabel,
   ViewOnlyLabel: DatasetReactionValueLabel,
   ReactionLink: SearchReactionLink,
+  MoleculeEditor: ComponentsKetcherEditor,
 };
 
 const VIEW_ONLY_SLOTS: ReactionSlots = {
