@@ -27,12 +27,17 @@ import {
   usePreviews,
   useReactionPart,
   useReactionSnapshot,
+  type ReactionActions,
   type ReactionSlots,
 } from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import { emptyReactionData } from '@open-reaction-database/ui/testing';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   addUpdateReactionFieldActions,
@@ -257,6 +262,31 @@ describe('reduxReactionActions', () => {
       addUpdateReactionFieldActions.failure.type,
     );
   });
+
+  it.each([
+    [
+      'an update',
+      (actions: ReactionActions) =>
+        actions.update(['notes'], { safetyNotes: 'gloves' }),
+    ],
+    [
+      'a removal',
+      (actions: ReactionActions) => actions.remove(['notes', 'safetyNotes']),
+    ],
+  ])(
+    'say so when the save of %s fails, and restore the reaction',
+    async (_name, edit) => {
+      axiosMock.patch.mockRejectedValue(new Error('offline'));
+      const store = makeStore();
+      const before = store.getState().entities.reactions.reactionsById[1].data;
+      await edit(reduxReactionActions(store, 1));
+      expect(showNotification).toHaveBeenCalledWith({
+        message: 'Failed to update reaction.',
+        variant: NotificationVariant.ERROR,
+      });
+      expect(store.getState().entities.reactions.reactionsById[1].data).toEqual(before);
+    },
+  );
 
   it('settle when the dispatched thunk does', async () => {
     let finish: () => void = () => undefined;

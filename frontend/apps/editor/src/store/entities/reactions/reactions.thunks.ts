@@ -205,24 +205,32 @@ export const renameReaction = createThunk(
     },
 );
 
+/** Saves an edited reaction; a failed save says so and rethrows, so the edit rolls back. */
+async function saveEditedReaction(
+  reactionId: ReactionId,
+  getState: () => AppState,
+): Promise<UpdateReactionSuccessPayload> {
+  try {
+    return await updateReaction(reactionId, getState);
+  } catch (e) {
+    showNotification({
+      message: 'Failed to update reaction.',
+      variant: NotificationVariant.ERROR,
+    });
+    throw e;
+  }
+}
+
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   ({ reactionId }) =>
     async (dispatch, getState) => {
-      try {
-        const result = await updateReaction(reactionId, getState);
-        dispatch(addUpdateReactionFieldActions.success(result));
-        showNotification({
-          message: 'Reaction updated.',
-          variant: NotificationVariant.SUCCESS,
-        });
-      } catch (e) {
-        showNotification({
-          message: 'Failed to update reaction.',
-          variant: NotificationVariant.ERROR,
-        });
-        throw e;
-      }
+      const result = await saveEditedReaction(reactionId, getState);
+      dispatch(addUpdateReactionFieldActions.success(result));
+      showNotification({
+        message: 'Reaction updated.',
+        variant: NotificationVariant.SUCCESS,
+      });
     },
 );
 
@@ -230,7 +238,7 @@ export const deleteReactionField = createThunkWithExplicitResult(
   deleteReactionFieldActions,
   ({ reactionId }) =>
     async (dispatch, getState) => {
-      const result = await updateReaction(reactionId, getState);
+      const result = await saveEditedReaction(reactionId, getState);
       dispatch(deleteReactionFieldActions.success(result));
       showNotification({
         message: 'Reaction updated.',
