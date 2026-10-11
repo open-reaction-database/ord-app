@@ -203,48 +203,35 @@ export const renameReaction = createThunk(
       );
       return renameReactionActions.success({ reactionId, name });
     },
+  { failureMessage: 'Failed to rename reaction.' },
 );
-
-/** Saves an edited reaction; a failed save says so and rethrows, so the edit rolls back. */
-async function saveEditedReaction(
-  reactionId: ReactionId,
-  getState: () => AppState,
-): Promise<UpdateReactionSuccessPayload> {
-  try {
-    return await updateReaction(reactionId, getState);
-  } catch (e) {
-    showNotification({
-      message: 'Failed to update reaction.',
-      variant: NotificationVariant.ERROR,
-    });
-    throw e;
-  }
-}
 
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   ({ reactionId }) =>
     async (dispatch, getState) => {
-      const result = await saveEditedReaction(reactionId, getState);
+      const result = await updateReaction(reactionId, getState);
       dispatch(addUpdateReactionFieldActions.success(result));
       showNotification({
         message: 'Reaction updated.',
         variant: NotificationVariant.SUCCESS,
       });
     },
+  { failureMessage: 'Failed to update reaction.' },
 );
 
 export const deleteReactionField = createThunkWithExplicitResult(
   deleteReactionFieldActions,
   ({ reactionId }) =>
     async (dispatch, getState) => {
-      const result = await saveEditedReaction(reactionId, getState);
+      const result = await updateReaction(reactionId, getState);
       dispatch(deleteReactionFieldActions.success(result));
       showNotification({
         message: 'Reaction updated.',
         variant: NotificationVariant.SUCCESS,
       });
     },
+  { failureMessage: 'Failed to update reaction.' },
 );
 
 export const removeReaction = createThunkWithExplicitResult(
@@ -265,6 +252,7 @@ export const removeReaction = createThunkWithExplicitResult(
     }
     navigate(`/datasets/${datasetId}`);
   },
+  { failureMessage: 'Failed to remove reaction.' },
 );
 
 export const searchReaction = createThunkWithExplicitResult(

@@ -269,10 +269,7 @@ describe('reduxReactionActions', () => {
       (actions: ReactionActions) =>
         actions.update(['notes'], { safetyNotes: 'gloves' }),
     ],
-    [
-      'a removal',
-      (actions: ReactionActions) => actions.remove(['notes', 'safetyNotes']),
-    ],
+    ['a removal', (actions: ReactionActions) => actions.remove(['inputs', 'in1'])],
   ])(
     'say so when the save of %s fails, and restore the reaction',
     async (_name, edit) => {
@@ -280,6 +277,7 @@ describe('reduxReactionActions', () => {
       const store = makeStore();
       const before = store.getState().entities.reactions.reactionsById[1].data;
       await edit(reduxReactionActions(store, 1));
+      expect(showNotification).toHaveBeenCalledTimes(1);
       expect(showNotification).toHaveBeenCalledWith({
         message: 'Failed to update reaction.',
         variant: NotificationVariant.ERROR,
@@ -287,6 +285,19 @@ describe('reduxReactionActions', () => {
       expect(store.getState().entities.reactions.reactionsById[1].data).toEqual(before);
     },
   );
+
+  it('show only the backend’s message when a failed save has one', async () => {
+    axiosMock.patch.mockRejectedValue({
+      isAxiosError: true,
+      response: { data: { detail: 'Access forbidden' } },
+    });
+    await reduxReactionActions(makeStore(), 1).remove(['inputs', 'in1']);
+    expect(showNotification).toHaveBeenCalledTimes(1);
+    expect(showNotification).toHaveBeenCalledWith({
+      message: 'Access forbidden',
+      variant: NotificationVariant.ERROR,
+    });
+  });
 
   it('settle when the dispatched thunk does', async () => {
     let finish: () => void = () => undefined;

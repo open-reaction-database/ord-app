@@ -194,3 +194,43 @@ describe('createThunkWithExplicitResult', () => {
     expect(notifyMock).not.toHaveBeenCalled();
   });
 });
+
+describe.each([
+  ['createThunk', createThunk],
+  ['createThunkWithExplicitResult', createThunkWithExplicitResult],
+] as const)('%s with a failure message', (_name, factory) => {
+  const failing = (error: unknown) => () => async () => {
+    throw error;
+  };
+
+  it.each([
+    ['a non-axios error', new Error('offline')],
+    ['an axios error without a string detail', axiosErrorWithDetail([{ msg: 'bad' }])],
+  ])('shows it for %s', async (_case, error) => {
+    const { store } = makeRecordingStore();
+    await store.dispatch(
+      factory(testActions, failing(error), {
+        failureMessage: 'Failed to save.',
+      })(1) as unknown as UnknownAction,
+    );
+    expect(notifyMock).toHaveBeenCalledTimes(1);
+    expect(notifyMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Failed to save.',
+    });
+  });
+
+  it('shows only the backend’s detail when there is one', async () => {
+    const { store } = makeRecordingStore();
+    await store.dispatch(
+      factory(testActions, failing(axiosErrorWithDetail('Access forbidden')), {
+        failureMessage: 'Failed to save.',
+      })(1) as unknown as UnknownAction,
+    );
+    expect(notifyMock).toHaveBeenCalledTimes(1);
+    expect(notifyMock).toHaveBeenCalledWith({
+      variant: NotificationVariant.ERROR,
+      message: 'Access forbidden',
+    });
+  });
+});

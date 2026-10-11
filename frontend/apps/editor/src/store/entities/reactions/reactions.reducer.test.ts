@@ -354,6 +354,44 @@ describe('reactions.reducer — templates', () => {
     );
     expect(asEntry(state.reactionsById.t1).variables).toEqual({});
   });
+
+  const kept = { path: ['notes', 'safetyNotes'], name: 'notes' };
+  const added = { path: ['conditions', 'temperature'], name: 'temp' };
+  const seededVariables = () => ({
+    reactionsById: {
+      t1: { id: 't1', variables: { 'notes.safetyNotes': kept } },
+    } as never,
+  });
+
+  it.each([
+    ['an added variable', addUpdateVariableActions, added],
+    ['a removed variable', removeVariableActions, kept],
+  ] as const)(
+    'restores the variables when %s fails to save',
+    (_name, actions, variable) => {
+      const pending = reduce(
+        seededVariables(),
+        actions.request({ templateId: 't1', variable } as never),
+      );
+      const failed = reduce(pending, actions.failure(null as never));
+      expect(asEntry(failed.reactionsById.t1).variables).toEqual({
+        'notes.safetyNotes': kept,
+      });
+    },
+  );
+
+  it('keeps saved variables when a later save fails with none pending', () => {
+    const pending = reduce(
+      seededVariables(),
+      addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
+    );
+    const saved = reduce(pending, addUpdateVariableActions.success());
+    const failed = reduce(saved, removeVariableActions.failure(null as never));
+    expect(asEntry(failed.reactionsById.t1).variables).toEqual({
+      'notes.safetyNotes': kept,
+      'conditions.temperature': added,
+    });
+  });
 });
 
 describe('reactions.reducer — showInvalidOnly', () => {
