@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 import type { ReactionSnapshot } from '#reaction/provider/reactionProvider.types.ts';
-import { linkReactionEntities, ordReactionToReaction } from '#reaction/model/index.ts';
+import {
+  linkReactionEntities,
+  ordReactionToReaction,
+} from '#reaction/model/reactions.converters.ts';
 import { fullReaction } from './fullReaction.ts';
 
 /** The full-reaction fixture as the store holds a loaded dataset reaction: valid, no previews. */

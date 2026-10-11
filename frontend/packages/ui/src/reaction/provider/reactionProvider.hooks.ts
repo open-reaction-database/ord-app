@@ -15,13 +15,11 @@
  */
 import { useContext } from 'react';
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-selector';
-import {
-  type ReactionPathComponents,
-  type ReactionInput,
-  type ReactionId,
-  getDeepReactionPart,
-} from '#reaction/model/index.ts';
-import type { PreviewStatesById } from '#reaction/previews/index.ts';
+import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
+import type { ReactionInput } from '#reaction/model/reactionsInputs/reactionInputs.types.ts';
+import type { ReactionId } from '#reaction/model/reactions.types.ts';
+import { getDeepReactionPart } from '#reaction/model/getDeepReactionPart.ts';
+import type { PreviewStatesById } from '#reaction/previews/previews.types.ts';
 import { shallowEqualArrays, shallowEqualRecords } from './equality.ts';
 import { orderInputs } from '#reaction/model/orderInputs.ts';
 import type { DrawerActions, DrawerStack } from './drawer.ts';

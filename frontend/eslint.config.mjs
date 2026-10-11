@@ -113,8 +113,13 @@ export default tseslint.config(
           project: path.join(import.meta.dirname, 'packages/ui/tsconfig.json'),
         }),
       ],
+      // Lets import-x/no-cycle parse the TypeScript modules an import leads to.
+      'import-x/parsers': { '@typescript-eslint/parser': ['.ts', '.tsx'] },
     },
     rules: {
+      // In an import cycle, the other modules run before the one an importer reaches first,
+      // and read its exports as undefined.
+      'import-x/no-cycle': 'error',
       // Every import, type-only ones included, must be declared in the package's own
       // package.json; hoisting would otherwise let an undeclared dependency resolve from
       // the workspace root.
@@ -141,6 +146,11 @@ export default tseslint.config(
                 '@open-reaction-database/ui/*',
               ],
               message: 'Import package files through #… instead.',
+            },
+            {
+              regex: String.raw`^#(reaction(/[^/]+)?|testing)/index\.ts$`,
+              message:
+                'Import the module itself: an app test that mocks a barrel must not reach package code.',
             },
             {
               group: ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*', 'wouter'],

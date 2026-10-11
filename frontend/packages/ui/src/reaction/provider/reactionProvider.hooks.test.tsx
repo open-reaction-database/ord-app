@@ -15,7 +15,7 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import type { ReactionInput } from '#reaction/model/index.ts';
+import type { ReactionInput } from '#reaction/model/reactionsInputs/reactionInputs.types.ts';
 import { emptyReactionData } from '#testing/emptyReactionData.ts';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import {

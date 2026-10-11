@@ -26,7 +26,7 @@ import type {
   ReactionResponse,
   ReactionValidation,
 } from './reactions.types.ts';
-import type { PreviewsById } from '#reaction/previews/index.ts';
+import type { PreviewsById } from '#reaction/previews/previews.types.ts';
 import type { ReactionInput } from '#reaction/model/reactionsInputs/reactionInputs.types.ts';
 import { ordBinpbToReaction } from './reactions.converters.ts';
 import { replaceNameIdInReactionComponentPath } from '#reaction/model/utils/replaceNameIdInReactionComponentPath.ts';

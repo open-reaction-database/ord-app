@@ -18,7 +18,7 @@ import type { ReactionSnapshot } from './reactionProvider.types.ts';
 import { createStaticReactionSource } from './staticReactionSource.ts';
 
 const { renderPreviewsMock } = vi.hoisted(() => ({ renderPreviewsMock: vi.fn() }));
-vi.mock('#reaction/previews/index.ts', () => ({
+vi.mock('#reaction/previews/renderPreviews.ts', () => ({
   renderPreviews: renderPreviewsMock,
 }));
 

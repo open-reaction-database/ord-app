@@ -18,7 +18,7 @@ import type { ReactionInput } from '#reaction/model/reactionsInputs/reactionInpu
 import type {
   ComponentProductPreview,
   PreviewsById,
-} from '#reaction/previews/index.ts';
+} from '#reaction/previews/previews.types.ts';
 import type { ReactionOutcome } from '#reaction/model/reactionsOutcomes/reactionOutcomes.types.ts';
 import type {
   Optional,

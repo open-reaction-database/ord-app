@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { renderPreviews } from '#reaction/previews/renderPreviews.ts';
 import {
-  renderPreviews,
   type ComponentProductPreview,
   type PreviewsById,
   type PreviewStatesById,
-} from '#reaction/previews/index.ts';
+} from '#reaction/previews/previews.types.ts';
 import type { ReactionSnapshot, ReactionSource } from './reactionProvider.types.ts';
 
 function unsubscribe(): void {

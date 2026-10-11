@@ -66,7 +66,7 @@ vi.mock('features/reactions/ReactionEntities', () => ({
 }));
 ```
 
-A mock of a package barrel replaces what editor files import through it, not the calls the package's modules make to each other, which import their neighbors directly.
+A mock of a package barrel replaces what editor files import through it, not the calls the package's modules make to each other: inside the package, the reaction model, provider, previews, and test helpers import each other by file, never through a barrel.
 
 **Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction` and `linkReactionEntities` on the model barrel, and `parseReactionList` (`store/entities/reactions/parseReactionList.ts`), to plain objects, keeping the reducer's merge helpers intact; or pass an empty `binpb`, which decodes to the default reaction. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (from `@open-reaction-database/ui/testing`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
 

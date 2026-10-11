@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactNode } from 'react';
-import type { VariableType } from '#reaction/model/index.ts';
+import type { VariableType } from '#reaction/model/variableType.ts';
 
 export interface ReactionFormStandaloneField {
   label?: string;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from '#reaction/model/index.ts';
+import type { ReactionPathComponents } from '#reaction/model/reactionPathComponents.ts';
 
 export interface ReactionViewDeleteButtonsProps {
   entityName: string;
