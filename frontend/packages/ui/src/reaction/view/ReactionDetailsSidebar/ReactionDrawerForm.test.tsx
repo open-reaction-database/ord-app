@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { create } from '@bufbuild/protobuf';
 import {
@@ -33,7 +33,7 @@ describe('ReactionDrawerForm', () => {
       <ReactionDrawerForm pathComponents={['notes']} />,
       { editable: true },
     );
-    expect(getByRole('button', { name: 'Save and Close' })).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Save' })).toBeInTheDocument();
     expect(queryByRole('heading', { name: 'Notes' })).not.toBeInTheDocument();
   });
 
@@ -69,10 +69,37 @@ describe('ReactionDrawerForm', () => {
       { reaction, actions },
     );
     rerender(<ReactionDrawerForm pathComponents={['identifiers', 1]} />);
-    fireEvent.click(getByRole('button', { name: 'Save and Close' }));
+    fireEvent.click(getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(actions.update).toHaveBeenCalled());
     const [pathComponents, newValue] = actions.update.mock.calls[0];
     expect(pathComponents).toEqual(['identifiers', 1]);
     expect(newValue).toMatchObject({ value: 'C>>D' });
+  });
+
+  it('offers Close and Save and Close only with an onClose to call', () => {
+    const plain = renderWithReaction(
+      <ReactionDrawerForm pathComponents={['notes']} />,
+      {
+        editable: true,
+      },
+    );
+    expect(plain.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(
+      plain.queryByRole('button', { name: 'Save and Close' }),
+    ).not.toBeInTheDocument();
+    plain.unmount();
+    const onClose = vi.fn();
+    const closable = renderWithReaction(
+      <ReactionDrawerForm
+        pathComponents={['notes']}
+        onClose={onClose}
+      />,
+      { editable: true },
+    );
+    fireEvent.click(closable.getByRole('button', { name: 'Close' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(
+      closable.getByRole('button', { name: 'Save and Close' }),
+    ).toBeInTheDocument();
   });
 });

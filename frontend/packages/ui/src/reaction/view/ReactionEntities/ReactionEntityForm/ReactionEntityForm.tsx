@@ -43,7 +43,8 @@ interface ReactionEntityFormProps {
   isHidden: boolean;
   reactionPathComponents: ReactionPathComponents;
   sidebarInfo: ReactionSidebarInfo;
-  onFormClose: () => void;
+  /** Closes the form; without it, the form offers no Close or Save and Close. */
+  onFormClose?: () => void;
   onSetFormDirty: (pathComponents: ReactionPathComponents, value: boolean) => void;
 }
 
@@ -137,7 +138,7 @@ export function ReactionEntityForm({
     const { hasErrors } = form.validate();
     if (hasErrors) return;
     onSubmit(form.getValues());
-    onFormClose();
+    onFormClose?.();
   }, [actions, form, onSubmit, onFormClose]);
 
   // Cmd/Ctrl+Enter triggers Save and Close. Scoped to this form's DOM subtree (not a global
@@ -195,12 +196,14 @@ export function ReactionEntityForm({
               </Button>
             )}
             {!isViewOnly && <Button onClick={open}>Paste Chunk</Button>}
-            <Button
-              variant="default"
-              onClick={onFormClose}
-            >
-              Close
-            </Button>
+            {onFormClose && (
+              <Button
+                variant="default"
+                onClick={onFormClose}
+              >
+                Close
+              </Button>
+            )}
             {!isViewOnly && (
               <Button
                 type="submit"
@@ -209,7 +212,7 @@ export function ReactionEntityForm({
                 Save
               </Button>
             )}
-            {!isViewOnly && (
+            {!isViewOnly && onFormClose && (
               <Button
                 color="primary"
                 onClick={handleSaveAndClose}

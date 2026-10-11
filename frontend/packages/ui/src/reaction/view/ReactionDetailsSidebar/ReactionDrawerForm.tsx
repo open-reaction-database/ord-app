@@ -23,6 +23,8 @@ interface ReactionDrawerFormProps {
   pathComponents: ReactionPathComponents;
   /** Shows the entity's title, with its Delete icon, above the form. */
   showTitle?: boolean;
+  /** Closes the form; without it, the form offers no Close or Save and Close. */
+  onClose?: () => void;
 }
 
 const ignore = () => undefined;
@@ -31,6 +33,7 @@ const ignore = () => undefined;
 export function ReactionDrawerForm({
   pathComponents,
   showTitle = false,
+  onClose,
 }: Readonly<ReactionDrawerFormProps>) {
   const sidebarInfo = getSidebarInfo([...pathComponents].reverse());
   const Title = sidebarInfo.sidebarTitle;
@@ -42,7 +45,7 @@ export function ReactionDrawerForm({
         reactionPathComponents={pathComponents}
         sidebarInfo={sidebarInfo}
         isHidden={false}
-        onFormClose={ignore}
+        onFormClose={onClose}
         onSetFormDirty={ignore}
       />
     </nodeToComponentContext.Provider>
