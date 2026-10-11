@@ -16,9 +16,9 @@
 import {
   useIsTemplate,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { TemplateReactionProvider } from './TemplateReactionProvider.tsx';
 

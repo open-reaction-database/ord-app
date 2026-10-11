@@ -37,7 +37,7 @@ import {
   useReactionActions,
   useReactionPart,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { ComponentsListHeader } from 'features/reactions/ReactionView/ComponentsList';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';

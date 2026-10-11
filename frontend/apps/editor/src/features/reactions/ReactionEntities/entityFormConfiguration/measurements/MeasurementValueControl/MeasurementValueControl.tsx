@@ -35,10 +35,7 @@ import { ValuePrecisionUnitControl } from 'common/components/inputs/ValuePrecisi
 import type { ValuePrecisionUnit } from 'common/components/inputs/ValuePrecisionUnitControl/valuePrecisionUnitControl.types.ts';
 import { type ChangeEvent, useMemo } from 'react';
 import { AppNumberInput } from 'common/components/inputs/AppNumberInput/AppNumberInput.tsx';
-import {
-  useIsViewOnly,
-  useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 const valueTypeOptions = Object.values(ReactionMeasurementValueType);
 

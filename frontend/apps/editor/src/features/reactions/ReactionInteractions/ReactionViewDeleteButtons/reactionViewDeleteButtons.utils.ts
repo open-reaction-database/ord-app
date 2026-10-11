@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import { useCallback, type MouseEvent } from 'react';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
+import {
+  useDrawer,
+  type ReactionViewDeleteButtonsProps,
+} from '@open-reaction-database/ui/reaction';
 
 export const onViewDeleteButtonsWrapperClick = (event: MouseEvent) => {
   event.stopPropagation();

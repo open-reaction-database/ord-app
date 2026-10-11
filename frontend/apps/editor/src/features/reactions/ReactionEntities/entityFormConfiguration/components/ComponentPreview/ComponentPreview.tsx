@@ -16,10 +16,7 @@
 import classes from './componentPreview.module.scss';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { useContext } from 'react';
-import {
-  usePreviews,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { usePreviews, useReactionPart } from '@open-reaction-database/ui/reaction';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { ReactionInputComponent } from '@open-reaction-database/ui/reaction/model';
 

@@ -23,7 +23,7 @@ import {
   useDrawer,
   useIsViewOnly,
   useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,

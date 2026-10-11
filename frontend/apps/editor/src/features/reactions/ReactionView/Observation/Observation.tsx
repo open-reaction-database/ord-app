@@ -33,7 +33,7 @@ import {
   useIsViewOnly,
   useReactionActions,
   useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'observations';
 

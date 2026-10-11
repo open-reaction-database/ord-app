@@ -20,7 +20,7 @@ import { ReactionPreview } from 'common/components/ReactionPreview/ReactionPrevi
 import { ReactionValidationResult } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationResult.tsx';
 import { copyPreviewAsImage } from 'common/components/ReactionPreview/reactionPreview.utils.ts';
 import classes from 'common/components/ReactionCard/reactionCard.module.scss';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
 
 interface ReactionHeaderProps {
   /** Controls beside the validation badge, such as remove and download. */

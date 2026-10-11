@@ -20,7 +20,7 @@ import type {
 import { Flex, Text, Title } from '@mantine/core';
 import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/ReactionEntityDelete/ReactionEntityDelete.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
 
 export function ReactionEntityTitle({
   pathComponents,

@@ -29,10 +29,7 @@ import {
 import { OutcomeListItem } from 'features/reactions/ReactionView/Outcomes/OutcomeListItem/OutcomeListItem.tsx';
 import { useMemo } from 'react';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import {
-  useIsViewOnly,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const useCreate = buildUseCreate('outcomes', newIndex => [
   newIndex,

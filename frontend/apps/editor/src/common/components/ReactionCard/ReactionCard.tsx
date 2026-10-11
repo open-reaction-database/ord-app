@@ -19,7 +19,7 @@ import classes from './reactionCard.module.scss';
 import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import { typographyClasses } from '@open-reaction-database/ui/theme';
 import { ReactionPreview } from '../ReactionPreview/ReactionPreview.tsx';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
 import { showReactionPreviewDetails } from '../../configuration.constants.ts';
 
 interface DescriptorsListProps {

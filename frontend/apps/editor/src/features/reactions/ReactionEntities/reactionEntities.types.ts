@@ -21,6 +21,7 @@ import type {
 } from '@open-reaction-database/ui/reaction/model';
 import type { FC, ReactNode } from 'react';
 import type { useForm } from '@mantine/form';
+import type { ReactionFormStandaloneField } from '@open-reaction-database/ui/reaction';
 import type { EntityListItemRuntimeProps } from 'features/reactions/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.types.ts';
 
 export enum ReactionFormNodeType {
@@ -52,14 +53,6 @@ export interface ReactionFormNodeBase extends ReactionFormConditionalRendering {
 export interface ReactionFormGroup extends ReactionFormNodeBase {
   type: ReactionFormNodeType.group;
   fields: Array<ReactionFormNode>;
-}
-
-export interface ReactionFormStandaloneField {
-  label?: string;
-  cannotBeVariable?: boolean;
-  templateLabel?: string;
-  hint?: string;
-  children?: ReactNode;
 }
 
 export interface ReactionFormTitle extends ReactionFormStandaloneField {

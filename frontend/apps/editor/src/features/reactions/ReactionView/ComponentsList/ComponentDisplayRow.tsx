@@ -16,7 +16,7 @@
 import type { ReactionComponentBase } from '@open-reaction-database/ui/reaction/model';
 import { ComponentDisplayRowCustomActions } from './ComponentDisplayRowCustomActions.tsx';
 import type { ComponentDisplayRowProps } from './componentsList.types.ts';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 export function ComponentDisplayRow<T extends ReactionComponentBase>({
   component,

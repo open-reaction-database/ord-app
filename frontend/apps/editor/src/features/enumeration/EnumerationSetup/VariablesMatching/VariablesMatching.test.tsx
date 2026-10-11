@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { VariablesMatching } from './VariablesMatching.tsx';
 import type { EnumerationForm } from '../enumerationSetup.types.ts';
 

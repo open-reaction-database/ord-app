@@ -18,7 +18,7 @@ import {
   type ComponentProductPreview,
   type PreviewsById,
   type PreviewStatesById,
-} from '@open-reaction-database/ui/reaction/previews';
+} from '#reaction/previews/index.ts';
 import type { ReactionSnapshot, ReactionSource } from './reactionProvider.types.ts';
 
 function unsubscribe(): void {

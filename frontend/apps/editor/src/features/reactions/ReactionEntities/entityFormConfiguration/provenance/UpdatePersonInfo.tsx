@@ -21,7 +21,7 @@ import {
   generateDeepPartialReactionByPath,
   type ReactionPathComponents,
 } from '@open-reaction-database/ui/reaction/model';
-import { useReactionActions } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionActions } from '@open-reaction-database/ui/reaction';
 
 export interface UpdatePersonInfoProps extends ReactionFormCustomProps {
   text: string;

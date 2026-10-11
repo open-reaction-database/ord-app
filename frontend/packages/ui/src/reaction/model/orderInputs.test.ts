@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
+import type { ReactionInput } from '#reaction/model/index.ts';
 import { orderInputs } from './orderInputs.ts';
 
 const input = (name: string, additionOrder?: number) =>

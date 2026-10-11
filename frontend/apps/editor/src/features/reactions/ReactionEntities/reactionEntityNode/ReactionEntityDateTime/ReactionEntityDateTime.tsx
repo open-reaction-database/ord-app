@@ -27,7 +27,7 @@ import {
   useMemo,
 } from 'react';
 import dayjs from 'dayjs';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 import {
   VariableType,

@@ -23,7 +23,7 @@ import { EntityListItem } from '../../ReactionEntities/entityFormConfiguration/E
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'provenance';
 

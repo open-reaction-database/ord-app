@@ -20,10 +20,10 @@ import type {
   DatasetReaction,
   ReactionId,
   ReactionPerson,
-} from '@open-reaction-database/ui/reaction/model';
-import type { ReactionValueLabelProps } from 'features/reactions/ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
-import type { ReactionViewDeleteButtonsProps } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/reactionViewDeleteButtons.types.ts';
-import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+} from '#reaction/model/index.ts';
+import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
+import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
+import type { PreviewStatesById } from '#reaction/previews/index.ts';
 
 /**
  * One reaction as its source holds it. A dataset reaction carries its ORD ID, validity, and

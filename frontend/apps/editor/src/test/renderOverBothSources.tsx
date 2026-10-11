@@ -21,17 +21,17 @@ import { render } from '@testing-library/react';
 import { vi } from 'vitest';
 import type { ReactElement, ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
-import type {
-  ReactionSlots,
-  ReactionSnapshot,
-  ReactionSource,
-} from 'features/reactions/provider/reactionProvider.types.ts';
-import { createStaticReactionSource } from 'features/reactions/provider/staticReactionSource.ts';
+import {
+  ReactionProvider,
+  type ReactionSlots,
+  type ReactionSnapshot,
+  type ReactionSource,
+  createStaticReactionSource,
+} from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { reduxReactionSource } from 'store/entities/reactions/reduxReactionSource.ts';
 import { rootReducer } from 'store/rootReducer.ts';
-import { fullReactionSnapshot } from './fullReactionSnapshot.ts';
+import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
 
 const Empty = () => null;
 

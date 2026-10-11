@@ -20,7 +20,7 @@ import {
   useOrderedInputs,
   useReactionPart,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { ReactionInputPreview } from 'common/components/ReactionPreview/ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from 'common/components/ReactionPreview/ReactionOutcomePreview.tsx';
 import { ArrowIcon, EmptyPreview } from '../../icons';

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '#testing/emptyReactionData.ts';
 import type { ReactionSnapshot } from './reactionProvider.types.ts';
 import { createStaticReactionSource } from './staticReactionSource.ts';
 
 const { renderPreviewsMock } = vi.hoisted(() => ({ renderPreviewsMock: vi.fn() }));
-vi.mock('@open-reaction-database/ui/reaction/previews', () => ({
+vi.mock('#reaction/previews/index.ts', () => ({
   renderPreviews: renderPreviewsMock,
 }));
 
@@ -106,6 +106,13 @@ describe('a static source without given previews', () => {
     source.subscribe(listener)();
     await vi.waitFor(() => expect(source.getPreviews().a.svg).toBe('SVG A'));
     expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('returns its snapshot while previews render', () => {
+    renderPreviewsMock.mockReturnValue(new Promise(() => undefined));
+    const source = createStaticReactionSource(withMolblocks);
+    source.subscribe(vi.fn());
+    expect(source.getSnapshot()).toBe(withMolblocks);
   });
 
   it('renders nothing when no molblock needs rendering', () => {

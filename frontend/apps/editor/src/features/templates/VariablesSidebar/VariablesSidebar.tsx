@@ -25,7 +25,7 @@ import {
   reactionFlatPathToSidebars,
   type ReactionPathComponents,
 } from '@open-reaction-database/ui/reaction/model';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useDrawer } from '@open-reaction-database/ui/reaction';
 
 interface VariablesSidebarProps {
   templateId: string;

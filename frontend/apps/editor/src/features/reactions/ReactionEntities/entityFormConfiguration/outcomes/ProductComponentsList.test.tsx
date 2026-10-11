@@ -15,7 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { ProductsComponentsList } from './ProductComponentsList.tsx';
 import type { AppReaction } from '@open-reaction-database/ui/reaction/model';
 

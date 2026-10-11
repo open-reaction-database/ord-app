@@ -21,9 +21,9 @@ import {
   type DatasetReaction,
   type ReactionId,
   getDeepReactionPart,
+  orderInputs,
 } from '@open-reaction-database/ui/reaction/model';
 import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
-import { orderInputs } from 'features/reactions/provider/orderInputs.ts';
 
 const { buildSelector } = createSelectorFactory(state => state.entities.reactions);
 

@@ -21,7 +21,7 @@ import { EntityListItem } from 'features/reactions/ReactionEntities/entityFormCo
 import { OpenSingleEntityButton } from 'features/reactions/ReactionView/OpenSingleEntityButton/OpenSingleEntityButton';
 import { AppDataDisplay } from '../../ReactionEntities/entityFormConfiguration/AppDataDisplay.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'setup';
 

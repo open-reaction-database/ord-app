@@ -21,7 +21,7 @@ import {
 import { yupResolver } from '@mantine/form';
 import * as yup from 'yup';
 import { useMemo } from 'react';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const defaultValidate = yupResolver(yup.object({}));
 

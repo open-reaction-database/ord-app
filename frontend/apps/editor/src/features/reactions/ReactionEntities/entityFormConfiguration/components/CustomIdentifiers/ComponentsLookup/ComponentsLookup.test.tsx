@@ -16,9 +16,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, waitFor } from '@testing-library/react';
 import axiosInstance from 'store/axiosInstance.ts';
-import { fullReactionSnapshot } from 'test/fullReactionSnapshot.ts';
+import { fullReactionSnapshot } from '@open-reaction-database/ui/testing';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import type { ReactionActions } from 'features/reactions/provider/reactionProvider.types.ts';
+import type { ReactionActions } from '@open-reaction-database/ui/reaction';
 import { ComponentsLookup } from './ComponentsLookup.tsx';
 
 vi.mock('store/axiosInstance.ts', () => ({

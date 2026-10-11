@@ -16,9 +16,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 import type { FC } from 'react';
-import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import {
+  useDrawerStack,
+  type ReactionViewDeleteButtonsProps,
+} from '@open-reaction-database/ui/reaction';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
 import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
 import { ReactionViewButton } from './ReactionViewButton.tsx';
 

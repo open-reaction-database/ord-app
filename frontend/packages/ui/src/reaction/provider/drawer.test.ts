@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, expect, it } from 'vitest';
-import { drawerReducer, EMPTY_DRAWER_STACK } from './drawer.ts';
+import { describe, expect, it, vi } from 'vitest';
+import { createDrawerActions, drawerReducer, EMPTY_DRAWER_STACK } from './drawer.ts';
 
 describe('drawerReducer', () => {
   it('replaces the stack with set', () => {
@@ -46,5 +46,24 @@ describe('drawerReducer', () => {
 
   it('empties the stack with clear', () => {
     expect(drawerReducer([['a']], { type: 'clear' })).toBe(EMPTY_DRAWER_STACK);
+  });
+});
+
+describe('createDrawerActions', () => {
+  it('dispatches the matching action for each operation', () => {
+    const dispatch = vi.fn();
+    const drawer = createDrawerActions(dispatch);
+    drawer.set([['a']]);
+    drawer.push(['b', 1]);
+    drawer.pop();
+    drawer.truncate(0);
+    drawer.clear();
+    expect(dispatch.mock.calls.map(([action]) => action)).toEqual([
+      { type: 'set', stack: [['a']] },
+      { type: 'push', pathComponents: ['b', 1] },
+      { type: 'pop' },
+      { type: 'truncate', index: 0 },
+      { type: 'clear' },
+    ]);
   });
 });

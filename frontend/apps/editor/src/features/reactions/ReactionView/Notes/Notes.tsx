@@ -23,7 +23,7 @@ import {
 } from '@open-reaction-database/ui/reaction/model';
 import { OpenSingleEntityButton } from '../OpenSingleEntityButton/OpenSingleEntityButton.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const notesFields: Array<[keyof ReactionNotes, string]> = [
   ['procedureDetails', 'Procedure details'],

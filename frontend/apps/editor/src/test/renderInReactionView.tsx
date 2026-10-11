@@ -22,11 +22,11 @@ import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from 'store/rootReducer.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
-import type {
-  ReactionActions,
-  ReactionSlots,
-} from 'features/reactions/provider/reactionProvider.types.ts';
+import {
+  ReactionProvider,
+  type ReactionActions,
+  type ReactionSlots,
+} from '@open-reaction-database/ui/reaction';
 import {
   reduxReactionActions,
   reduxReactionSource,
@@ -37,7 +37,7 @@ import type {
   ReactionPathComponents,
 } from '@open-reaction-database/ui/reaction/model';
 import type { ReactElement, ReactNode } from 'react';
-import { emptyReactionData } from './emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 
 const Dummy = () => null;
 

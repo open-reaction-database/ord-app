@@ -17,7 +17,7 @@ import { Flex, Title } from '@mantine/core';
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { EntityListItemProps } from './entityListItem.types.ts';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 import { RequiredOptionalFields } from '@open-reaction-database/ui/display';
 
 export function EntityListItem<T>({

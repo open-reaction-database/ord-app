@@ -19,7 +19,7 @@ import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import classes from './componentsLookup.module.scss';
 import { NavigateOutsideIcon } from 'common/icons';
-import { useReactionActions } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionActions } from '@open-reaction-database/ui/reaction';
 
 interface ComponentsLookupProps {
   onClose: () => void;

@@ -16,7 +16,7 @@
 import { useContext, useMemo } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 const NO_ITEMS: Array<never> = [];
 

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
 import {
+  type ReactionValueLabelProps,
   useIsTemplate,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 export function ReactionValueLabelWrapper({
   wrapperConfig,

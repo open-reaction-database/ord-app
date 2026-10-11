@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 export * from './getDeepReactionPart.ts';
+export * from './orderInputs.ts';
 export * from './reactionAmount/reactionAmount.converters.ts';
 export * from './reactionAmount/reactionAmount.models.ts';
 export * from './reactionAmount/reactionAmount.types.ts';

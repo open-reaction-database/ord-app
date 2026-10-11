@@ -22,7 +22,7 @@ import { Badge, Flex } from '@mantine/core';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
-import { usePreviews } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { usePreviews } from '@open-reaction-database/ui/reaction';
 import { KeyValueDisplay } from '@open-reaction-database/ui/display';
 
 export function ComponentDisplayRowCustomActions<T extends ReactionComponentBase>({

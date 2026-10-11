@@ -27,7 +27,7 @@ import { domain } from 'common/configuration.constants.ts';
 import {
   useIsViewOnly,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { renameReaction } from 'store/entities/reactions/reactions.thunks.ts';

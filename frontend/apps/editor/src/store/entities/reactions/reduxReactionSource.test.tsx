@@ -22,17 +22,17 @@ import {
 } from '@reduxjs/toolkit';
 import { act, render, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
 import {
+  ReactionProvider,
   usePreviews,
   useReactionPart,
   useReactionSnapshot,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { ReactionSlots } from 'features/reactions/provider/reactionProvider.types.ts';
+  type ReactionSlots,
+} from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { rootReducer } from 'store/rootReducer.ts';
 import axiosInstance from 'store/axiosInstance.ts';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import type { User } from 'store/entities/users/users.types.ts';
 import {
   addUpdateReactionFieldActions,

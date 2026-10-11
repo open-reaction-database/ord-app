@@ -22,7 +22,7 @@ import type { Action, Store, ThunkDispatch } from '@reduxjs/toolkit';
 import type {
   ReactionActions,
   ReactionSource,
-} from 'features/reactions/provider/reactionProvider.types.ts';
+} from '@open-reaction-database/ui/reaction';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { AppState } from 'store/configureAppStore.ts';
 import { selectSelf } from 'store/entities/users/users.selectors.ts';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { Dispatch } from 'react';
-import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
+import type { ReactionPathComponents } from '#reaction/model/index.ts';
 
 /** Open drawer forms, bottom first; the last one is the visible form. */
 export type DrawerStack = ReadonlyArray<ReactionPathComponents>;

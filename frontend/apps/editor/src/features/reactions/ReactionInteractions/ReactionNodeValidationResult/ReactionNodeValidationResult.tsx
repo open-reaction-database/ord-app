@@ -22,7 +22,7 @@ import type {
 import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionNodeValidationResult.module.scss';
 import { useMemo } from 'react';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
 
 interface ReactionNodeValidationResultProps {
   pathComponents: ReactionPathComponents;

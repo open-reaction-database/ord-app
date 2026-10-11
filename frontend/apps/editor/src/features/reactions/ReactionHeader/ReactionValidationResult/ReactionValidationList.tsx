@@ -21,7 +21,7 @@ import {
 } from '@open-reaction-database/ui/reaction/model';
 import { CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useDrawer } from '@open-reaction-database/ui/reaction';
 
 interface ReactionValidationListProps {
   opened: boolean;

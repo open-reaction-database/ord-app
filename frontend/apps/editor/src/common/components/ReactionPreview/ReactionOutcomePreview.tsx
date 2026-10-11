@@ -23,10 +23,7 @@ import {
 } from '@open-reaction-database/ui/reaction/model';
 import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit.ts';
-import {
-  usePreviews,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { usePreviews, useReactionPart } from '@open-reaction-database/ui/reaction';
 
 interface ReactionOutcomePreviewProps {
   outcomeIndex: number;

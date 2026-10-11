@@ -15,8 +15,8 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import type { ReactionInput } from '#reaction/model/index.ts';
+import { emptyReactionData } from '#testing/emptyReactionData.ts';
 import { ReactionProvider } from './ReactionProvider.tsx';
 import {
   useDrawer,
@@ -28,6 +28,7 @@ import {
   useReactionActions,
   useReactionId,
   useReactionPart,
+  useReactionSlots,
   useReactionSnapshot,
 } from './reactionProvider.hooks.ts';
 import type {
@@ -89,6 +90,10 @@ describe('reaction hooks over a static source', () => {
 
   it('return the host’s reaction ID', () => {
     expect(renderHook(useReactionId, { wrapper }).result.current).toBe(7);
+  });
+
+  it('return the host’s slots', () => {
+    expect(renderHook(useReactionSlots, { wrapper }).result.current).toBe(slots);
   });
 
   it('return null for a path that does not exist', () => {

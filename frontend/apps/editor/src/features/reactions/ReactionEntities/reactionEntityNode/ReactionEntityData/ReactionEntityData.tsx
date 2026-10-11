@@ -26,7 +26,7 @@ import { type ChangeEvent, type ReactNode, useCallback } from 'react';
 import { NumberInput, TextInput } from '@mantine/core';
 import { FileControl } from 'common/components/inputs/FileControl/FileControl.tsx';
 import type { FileControlValue } from 'common/components/inputs/FileControl/fileControl.types.ts';
-import { useIsViewOnly } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly } from '@open-reaction-database/ui/reaction';
 import { ReactionValueLabelWrapper } from 'features/reactions/ReactionValueLabelWrapper.tsx';
 
 const options = Object.values(AppDataType);

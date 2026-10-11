@@ -20,7 +20,7 @@ import type {
   ReactionActions,
   ReactionSlots,
   ReactionSource,
-} from 'features/reactions/provider/reactionProvider.types.ts';
+} from '@open-reaction-database/ui/reaction';
 import { DatasetReactionValueLabel } from 'features/reactions/ReactionInteractions/ReactionValueLabel/DatasetReactionValueLable.tsx';
 import { ReactionEditDeleteButtons } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionEditDeleteButtons.tsx';
 import { SearchReactionLink } from 'features/reactions/ReactionInteractions/SearchReactionLink/SearchReactionLink.tsx';

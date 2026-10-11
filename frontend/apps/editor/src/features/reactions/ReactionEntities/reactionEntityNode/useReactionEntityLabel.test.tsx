@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { isValidElement } from 'react';
 import { useReactionEntityLabel } from './useReactionEntityLabel.tsx';
-import type { ReactionFormStandaloneField } from 'features/reactions/ReactionEntities/reactionEntities.types.ts';
+import type { ReactionFormStandaloneField } from '@open-reaction-database/ui/reaction';
 
 const field = (label: unknown): ReactionFormStandaloneField =>
   ({ label }) as ReactionFormStandaloneField;

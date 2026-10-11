@@ -36,7 +36,7 @@ import {
   useReactionActions,
   useReactionPart,
   useReactionSlots,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 const renderDetails = ({ amount }: ReactionInputComponent) =>
   amount ? renderValuePrecisionUnit(amount) : '';

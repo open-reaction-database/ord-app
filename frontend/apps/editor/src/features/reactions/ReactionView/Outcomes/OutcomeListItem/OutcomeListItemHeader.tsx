@@ -24,7 +24,7 @@ import type {
   ReactionOutcome,
   ReactionPathComponents,
 } from '@open-reaction-database/ui/reaction/model';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 interface OutcomeListItemHeaderProps {
   outcome: ReactionOutcome;

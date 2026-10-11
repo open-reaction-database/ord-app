@@ -19,7 +19,7 @@ import { ComponentDisplayRow } from 'features/reactions/ReactionView/ComponentsL
 import clsx from 'clsx';
 import classes from '../inputsComponentsList.module.scss';
 import { useMemo } from 'react';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 import type {
   ReactionInputWithoutName,
   ReactionInputComponent,

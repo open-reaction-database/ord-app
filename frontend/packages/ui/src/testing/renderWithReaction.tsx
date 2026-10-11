@@ -18,14 +18,14 @@
 import { MantineProvider } from '@mantine/core';
 import { render, type RenderOptions } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
-import { ReactionProvider } from './ReactionProvider.tsx';
+import { ReactionProvider } from '#reaction/provider/ReactionProvider.tsx';
 import type {
   ReactionActions,
   ReactionSlots,
   ReactionSnapshot,
   ReactionSource,
-} from './reactionProvider.types.ts';
-import { createStaticReactionSource } from './staticReactionSource.ts';
+} from '#reaction/provider/reactionProvider.types.ts';
+import { createStaticReactionSource } from '#reaction/provider/staticReactionSource.ts';
 
 const Empty = () => null;
 

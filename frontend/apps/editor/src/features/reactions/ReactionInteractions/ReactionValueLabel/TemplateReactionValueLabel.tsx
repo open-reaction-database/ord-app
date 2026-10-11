@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
+import {
+  type ReactionValueLabelProps,
+  useReactionId,
+} from '@open-reaction-database/ui/reaction';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import { reactionEntityContext } from '../../ReactionEntities/reactionEntity.context.ts';
 import { ActionIcon, Button, Flex, Text } from '@mantine/core';
@@ -30,7 +33,6 @@ import {
 import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 import { findReactionEntityUniqueName } from '../../ReactionEntities/findReactionEntityUniqueName.ts';
-import { useReactionId } from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 type ReactionValueLabelPropsMandatoryLabel = Omit<
   ReactionValueLabelProps,

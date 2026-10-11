@@ -26,10 +26,7 @@ import { findReactionEntityUniqueName } from 'features/reactions/ReactionEntitie
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { InputsComponentsList } from 'features/reactions/ReactionView/Inputs/InputsComponentsList/InputsComponentsList.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
-import {
-  useIsViewOnly,
-  useOrderedInputs,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useOrderedInputs } from '@open-reaction-database/ui/reaction';
 
 const ENTITY_FIELD = 'inputs';
 

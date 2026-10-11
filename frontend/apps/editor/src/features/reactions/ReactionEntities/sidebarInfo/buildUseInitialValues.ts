@@ -15,7 +15,7 @@
  */
 import { useMemo } from 'react';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import { useReactionPart } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionPart } from '@open-reaction-database/ui/reaction';
 
 export function buildUseInitialValues<Result extends object, Input extends Result>(
   filterInitialValues: (values: Input) => Result,

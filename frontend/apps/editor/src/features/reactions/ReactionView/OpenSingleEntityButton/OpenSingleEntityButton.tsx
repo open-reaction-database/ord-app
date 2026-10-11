@@ -22,7 +22,7 @@ import {
   useDrawer,
   useIsTemplate,
   useIsViewOnly,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+} from '@open-reaction-database/ui/reaction';
 
 interface OpenSingleEntityButtonProps {
   pathComponents: ReactionPathComponents;

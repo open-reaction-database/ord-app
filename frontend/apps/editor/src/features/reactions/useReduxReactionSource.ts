@@ -15,7 +15,7 @@
  */
 import { useMemo } from 'react';
 import { useStore } from 'react-redux';
-import type { ReactionSource } from 'features/reactions/provider/reactionProvider.types.ts';
+import type { ReactionSource } from '@open-reaction-database/ui/reaction';
 import type { AppState } from 'store/configureAppStore.ts';
 import { reduxReactionSource } from 'store/entities/reactions/reduxReactionSource.ts';
 import type { ReactionId } from '@open-reaction-database/ui/reaction/model';

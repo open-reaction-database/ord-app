@@ -16,7 +16,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { ReactionValueLabelWrapper } from './ReactionValueLabelWrapper.tsx';
-import type { ReactionValueLabelProps } from './ReactionInteractions/ReactionValueLabel/reactionValueLabel.types.ts';
+import type { ReactionValueLabelProps } from '@open-reaction-database/ui/reaction';
 import { VariableType } from '@open-reaction-database/ui/reaction/model';
 
 // Smoke test: mounts within seeded reaction/entity contexts + store without throwing.

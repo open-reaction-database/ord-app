@@ -19,10 +19,7 @@ import classes from 'common/components/ReactionPreview/reactionPreview.module.sc
 import { Badge, Flex } from '@mantine/core';
 import { ReactionComponentPreview } from 'common/components/ReactionPreview/ReactionComponentPreview.tsx';
 import { ComponentMetadata } from 'common/components/ReactionPreview/ComponentMetadata.tsx';
-import {
-  usePreviews,
-  useReactionPart,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { usePreviews, useReactionPart } from '@open-reaction-database/ui/reaction';
 
 interface ReactionInputPreviewProps {
   inputId: string;

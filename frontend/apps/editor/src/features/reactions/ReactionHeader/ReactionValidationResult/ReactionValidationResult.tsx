@@ -18,7 +18,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect } from 'react';
 import { ReactionValidationBadge } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationBadge.tsx';
 import { ReactionValidationList } from 'features/reactions/ReactionHeader/ReactionValidationResult/ReactionValidationList.tsx';
-import { useReactionSnapshot } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshot } from '@open-reaction-database/ui/reaction';
 
 export function ReactionValidationResult() {
   const [opened, { toggle, close }] = useDisclosure();

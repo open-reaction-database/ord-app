@@ -17,14 +17,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { renderInReactionView } from 'test/renderInReactionView.tsx';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import type { AppState } from 'store/configureAppStore.ts';
 import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
-import type { DrawerActions } from 'features/reactions/provider/drawer.ts';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { type DrawerActions, useDrawer } from '@open-reaction-database/ui/reaction';
 import { ReactionDetailsSidebar } from './ReactionDetailsSidebar.tsx';
 
 // The real node registry imports the Ketcher structure editor, which does not load under Vitest.

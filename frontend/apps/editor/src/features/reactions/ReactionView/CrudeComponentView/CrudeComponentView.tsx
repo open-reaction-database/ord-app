@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionCrudeComponent } from '@open-reaction-database/ui/reaction/model';
-import { useReactionSlots } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useReactionSlots } from '@open-reaction-database/ui/reaction';
 
 interface CrudeComponentViewProps {
   crudeComponent: ReactionCrudeComponent;

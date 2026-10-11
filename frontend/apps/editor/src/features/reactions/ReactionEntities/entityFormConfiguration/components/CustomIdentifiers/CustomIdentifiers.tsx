@@ -34,10 +34,7 @@ import {
   ordCompoundIdentifierToReaction,
   type ReactionCompoundIdentifier,
 } from '@open-reaction-database/ui/reaction/model';
-import {
-  useIsViewOnly,
-  useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useIsViewOnly, useReactionActions } from '@open-reaction-database/ui/reaction';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,

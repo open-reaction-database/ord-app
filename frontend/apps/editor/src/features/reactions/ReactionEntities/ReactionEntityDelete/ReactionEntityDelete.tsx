@@ -22,10 +22,7 @@ import clsx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
-import {
-  useDrawer,
-  useReactionActions,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { useDrawer, useReactionActions } from '@open-reaction-database/ui/reaction';
 
 interface ReactionEntityDeleteProps {
   entityName: string;

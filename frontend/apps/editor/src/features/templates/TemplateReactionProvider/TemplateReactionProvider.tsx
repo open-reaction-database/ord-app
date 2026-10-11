@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactNode } from 'react';
-import { ReactionProvider } from 'features/reactions/provider/ReactionProvider.tsx';
+import { ReactionProvider } from '@open-reaction-database/ui/reaction';
 import { useReduxReactionSource } from 'features/reactions/useReduxReactionSource.ts';
 import { TEMPLATE_SLOTS } from './templateReactionSlots.ts';
 

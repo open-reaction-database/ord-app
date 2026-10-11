@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionInput } from '@open-reaction-database/ui/reaction/model';
+import type { ReactionSnapshot } from '#reaction/provider/reactionProvider.types.ts';
+import { linkReactionEntities, ordReactionToReaction } from '#reaction/model/index.ts';
+import { fullReaction } from './fullReaction.ts';
 
-/** Sorts inputs by addition order, then by name; inputs without an order go last. */
-export function orderInputs(
-  inputs: Record<string, ReactionInput>,
-): Array<ReactionInput> {
-  return Object.values(inputs).sort((a, b) => {
-    const aOrder = a.additionOrder ?? Infinity;
-    const bOrder = b.additionOrder ?? Infinity;
-    return aOrder === bOrder ? a.name.localeCompare(b.name) : aOrder - bOrder;
-  });
+/** The full-reaction fixture as the store holds a loaded dataset reaction: valid, no previews. */
+export function fullReactionSnapshot(): ReactionSnapshot {
+  return {
+    data: linkReactionEntities(ordReactionToReaction(fullReaction)),
+    previews: {},
+    summary: { provenance: {}, summary: {}, conditions: '' },
+    pb_reaction_id: 'ord-full',
+    is_valid: true,
+    validation: null,
+  };
 }

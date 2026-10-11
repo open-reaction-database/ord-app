@@ -18,12 +18,12 @@ import { act } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import type { AppState } from 'store/configureAppStore.ts';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import {
   useDrawer,
   useDrawerStack,
-} from 'features/reactions/provider/reactionProvider.hooks.ts';
-import type { DrawerActions } from 'features/reactions/provider/drawer.ts';
+  type DrawerActions,
+} from '@open-reaction-database/ui/reaction';
 import { ReactionPage } from './ReactionPage.tsx';
 
 let drawer: DrawerActions | undefined;

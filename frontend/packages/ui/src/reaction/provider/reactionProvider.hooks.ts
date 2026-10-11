@@ -20,10 +20,10 @@ import {
   type ReactionInput,
   type ReactionId,
   getDeepReactionPart,
-} from '@open-reaction-database/ui/reaction/model';
-import type { PreviewStatesById } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.types.ts';
+} from '#reaction/model/index.ts';
+import type { PreviewStatesById } from '#reaction/previews/index.ts';
 import { shallowEqualArrays, shallowEqualRecords } from './equality.ts';
-import { orderInputs } from './orderInputs.ts';
+import { orderInputs } from '#reaction/model/orderInputs.ts';
 import type { DrawerActions, DrawerStack } from './drawer.ts';
 import {
   drawerActionsContext,

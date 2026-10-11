@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ReactionPathComponents } from '@open-reaction-database/ui/reaction/model';
+import type { ReactNode } from 'react';
+import type { VariableType } from '#reaction/model/index.ts';
 
-export interface ReactionViewDeleteButtonsProps {
-  entityName: string;
-  onEdit?: () => void;
-  onRemove?: () => void;
-  pathComponents: ReactionPathComponents;
-  historyPathComponents?: Array<ReactionPathComponents>;
+export interface ReactionFormStandaloneField {
+  label?: string;
+  cannotBeVariable?: boolean;
+  templateLabel?: string;
+  hint?: string;
+  children?: ReactNode;
+}
+
+export interface ReactionValueLabelProps {
+  name: string;
+  type: VariableType;
+  wrapperConfig?: ReactionFormStandaloneField;
 }

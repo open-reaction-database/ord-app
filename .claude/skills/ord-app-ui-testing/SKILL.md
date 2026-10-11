@@ -21,10 +21,10 @@ cd frontend/apps/editor
 npx vitest run                         # whole suite (~20s)
 npx vitest run <path-or-substring>     # subset
 
-cd frontend/packages/ui                # the shared package: theme, display primitives
+cd frontend/packages/ui                # the shared package: theme, display, reaction model and provider
 npx vitest run                         # its own suite and coverage floors
 ```
-Each workspace's Vitest is scoped to its own `src/**`, so a component that lives in `packages/ui` (`KeyValueDisplay`, `RequiredOptionalFields`, `DataField`, `Counter`, the theme) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
+Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (`KeyValueDisplay`, `RequiredOptionalFields`, `DataField`, `Counter`, the theme, the reaction model and converters, `ReactionProvider`, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
 
 ## Render helpers
 
@@ -34,6 +34,11 @@ In the editor (`apps/editor/src/test/`):
 - `renderWithProviders(ui, { preloadedState })` — fresh `configureStore({ reducer: rootReducer, preloadedState })` + Mantine. Returns `{ store, ...renderResult }`. Seed only the slices the component reads.
 - `renderInReactionView(ui, { reactionId, reaction, record, isViewOnly, actions, slots, pathComponents })` — seeds a reaction in the store (`emptyReactionData()` by default) and mounts `ReactionProvider` over a Redux source of it, plus `reactionEntityContext`. The reaction is editable (real `reduxReactionActions`) unless `isViewOnly` is set; a string `reactionId` renders a template; `record` sets stored fields beside `data` (`pb_reaction_id`, `is_valid`, `validation`); `slots` replaces the null slot components. Use for components under `ReactionView/` / `reactionEntityNode/` and anything that calls the provider's hooks, which throw outside a provider.
 - `renderOverBothSources(ui)` (`test/renderOverBothSources.tsx`) — the contract check: renders `ui` over a static source with an empty store and over the Redux source, and returns both HTML strings with generated IDs normalized; they must be equal.
+
+From the shared package (`@open-reaction-database/ui/testing`, or `#testing/…` inside the package):
+
+- `renderWithReaction(ui, { reactionId, isTemplate, actions, snapshot, source, slots })` and `reactionWrapper(options)` (the same wrapper, for `renderHook`) — mount `ReactionProvider` over a static source of `snapshot`, with no Redux; read-only unless given `actions`.
+- `emptyReactionData()` (an empty `AppReaction` from the default converters), `fullReaction` (an ord `Reaction` that sets every field the app edits), and `fullReactionSnapshot()` (`fullReaction` as the store holds a loaded reaction).
 
 ## Mocking patterns (the ones that cost time)
 
@@ -47,7 +52,7 @@ const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 
 
 **Partial mocks without inline `import()` types** (eslint forbids them):
 ```ts
-vi.mock('./reactions.utils.ts', async importActual => ({
+vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   parseReaction: () => ({ id: 99, data: {}, previews: {}, validation: null }),
 }));
@@ -61,7 +66,9 @@ vi.mock('features/reactions/ReactionEntities', () => ({
 }));
 ```
 
-**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction`/`parseReactionList` (in `reactions.utils.ts`) and `linkReactionEntities` (in `reactions.converters.ts`) to plain objects, keeping the reducer's merge helpers intact. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (`src/test/fullReaction.ts`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
+A mock of a package barrel replaces what editor files import through it, not the calls the package's modules make to each other, which import their neighbors directly.
+
+**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction` and `linkReactionEntities` on the model barrel, and `parseReactionList` (`store/entities/reactions/parseReactionList.ts`), to plain objects, keeping the reducer's merge helpers intact; or pass an empty `binpb`, which decodes to the default reaction. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (from `@open-reaction-database/ui/testing`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
 
 ## Thunk test harness (mocked axios + action recorder)
 

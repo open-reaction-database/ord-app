@@ -19,7 +19,7 @@ import {
   ordNotesToReaction,
   ordProvenanceToReaction,
   type AppReaction,
-} from '@open-reaction-database/ui/reaction/model';
+} from '#reaction/model/index.ts';
 
 /** A structurally-valid empty reaction, built from the same default converters the app uses. */
 export function emptyReactionData(): AppReaction {

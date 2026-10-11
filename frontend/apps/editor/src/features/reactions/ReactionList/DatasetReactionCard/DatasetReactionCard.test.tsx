@@ -16,7 +16,7 @@
 import { Route, Router } from 'wouter';
 import { memoryLocation } from 'wouter/memory-location';
 import type { AppState } from 'store/configureAppStore.ts';
-import { emptyReactionData } from 'test/emptyReactionData.ts';
+import { emptyReactionData } from '@open-reaction-database/ui/testing';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { DatasetReactionCard } from './DatasetReactionCard.tsx';
 
