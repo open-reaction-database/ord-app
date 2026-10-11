@@ -58,8 +58,7 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
 
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
-      drawer.push(currentPath);
-      drawer.push(currentPath.concat([COMPONENTS_FIELD, index]));
+      drawer.push(currentPath, currentPath.concat([COMPONENTS_FIELD, index]));
     },
     [currentPath, drawer],
   );

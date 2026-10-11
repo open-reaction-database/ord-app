@@ -29,7 +29,8 @@ export type DrawerAction =
 export interface DrawerActions {
   /** Replaces the stack, for example with the chain of entities leading to a field. */
   set(stack: ReadonlyArray<ReactionPathComponents>): void;
-  push(pathComponents: ReactionPathComponents): void;
+  /** Opens each form in turn on top of the stack, so the last one is visible. */
+  push(...forms: Array<ReactionPathComponents>): void;
   pop(): void;
   /** Keeps the entries up to and including `index`. */
   truncate(index: number): void;
@@ -57,7 +58,11 @@ export function drawerReducer(stack: DrawerStack, action: DrawerAction): DrawerS
 export function createDrawerActions(dispatch: Dispatch<DrawerAction>): DrawerActions {
   return {
     set: stack => dispatch({ type: 'set', stack }),
-    push: pathComponents => dispatch({ type: 'push', pathComponents }),
+    push: (...forms) => {
+      for (const pathComponents of forms) {
+        dispatch({ type: 'push', pathComponents });
+      }
+    },
     pop: () => dispatch({ type: 'pop' }),
     truncate: index => dispatch({ type: 'truncate', index }),
     clear: () => dispatch({ type: 'clear' }),

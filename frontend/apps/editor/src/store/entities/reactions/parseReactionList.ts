@@ -24,6 +24,6 @@ export const parseReactionList = (
   pages: Pages<ReactionResponse>,
 ): Pages<DatasetReaction> => {
   const { items, ...pagination } = pages;
-  const wrappedItems = items.map(parseReaction);
+  const wrappedItems = items.map(item => parseReaction(item));
   return { ...pagination, items: wrappedItems };
 };

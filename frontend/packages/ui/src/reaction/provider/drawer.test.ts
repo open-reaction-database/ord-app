@@ -50,17 +50,20 @@ describe('drawerReducer', () => {
 });
 
 describe('createDrawerActions', () => {
-  it('dispatches the matching action for each operation', () => {
+  it('dispatches the matching action for each operation, and a push for each form', () => {
     const dispatch = vi.fn();
     const drawer = createDrawerActions(dispatch);
     drawer.set([['a']]);
     drawer.push(['b', 1]);
+    drawer.push(['c'], ['d', 2]);
     drawer.pop();
     drawer.truncate(0);
     drawer.clear();
     expect(dispatch.mock.calls.map(([action]) => action)).toEqual([
       { type: 'set', stack: [['a']] },
       { type: 'push', pathComponents: ['b', 1] },
+      { type: 'push', pathComponents: ['c'] },
+      { type: 'push', pathComponents: ['d', 2] },
       { type: 'pop' },
       { type: 'truncate', index: 0 },
       { type: 'clear' },
