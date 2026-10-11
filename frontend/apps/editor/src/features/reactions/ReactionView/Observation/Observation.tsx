@@ -19,7 +19,6 @@ import { Counter } from '@open-reaction-database/ui/display';
 import { useCallback, useContext } from 'react';
 import { reactionContext } from 'features/reactions/reactions.context';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions';
 import { useAppDispatch } from 'store/useAppDispatch';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents';
 import { create } from '@bufbuild/protobuf';
@@ -33,6 +32,7 @@ import { renderValuePrecisionUnit } from '../renderValuePrecisionUnit';
 import { AppDataDisplay } from 'features/reactions/ReactionEntities/entityFormConfiguration/AppDataDisplay';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {
+  useDrawer,
   useIsViewOnly,
   useReactionPart,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -41,6 +41,7 @@ const ENTITY_FIELD = 'observations';
 
 export function Observation() {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   // The ID addresses only the dispatch below.
   const { reactionId } = useContext(reactionContext);
   const observations =
@@ -61,8 +62,8 @@ export function Observation() {
         newValue: newObservation,
       }),
     );
-    dispatch(setReactionPathComponentsList([newIdentifierPath]));
-  }, [reactionId, observations.length, dispatch]);
+    drawer.set([newIdentifierPath]);
+  }, [reactionId, observations.length, dispatch, drawer]);
 
   return (
     <Flex direction="column">

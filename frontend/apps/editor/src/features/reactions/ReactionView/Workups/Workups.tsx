@@ -26,7 +26,6 @@ import type { ReactionPathComponents } from 'common/types/reaction/reactionPathC
 import { create } from '@bufbuild/protobuf';
 import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
@@ -36,6 +35,7 @@ import { WorkupConstants } from 'store/entities/reactions/reactionWorkups/reacti
 import { InputComponentsListItem } from '../Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {
+  useDrawer,
   useIsViewOnly,
   useReactionPart,
   useReactionSlots,
@@ -146,6 +146,7 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
 
 export function Workups() {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   // The ID addresses only the dispatch below.
   const { reactionId } = useContext(reactionContext);
   const isViewOnly = useIsViewOnly();
@@ -163,7 +164,7 @@ export function Workups() {
         newValue: newWorkup,
       }),
     );
-    dispatch(setReactionPathComponentsList([newIdentifierPath]));
+    drawer.set([newIdentifierPath]);
   };
 
   return (

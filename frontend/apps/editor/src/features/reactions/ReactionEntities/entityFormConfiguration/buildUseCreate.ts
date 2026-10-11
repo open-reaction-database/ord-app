@@ -17,7 +17,7 @@ import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
 import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { reactionContext } from '../../reactions.context.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
@@ -32,6 +32,7 @@ export const buildUseCreate = <T = unknown>(
 ) =>
   function useCreate() {
     const dispatch = useAppDispatch();
+    const drawer = useDrawer();
     const { reactionId } = useContext(reactionContext);
     const { pathComponents } = useContext(reactionEntityContext);
 
@@ -58,9 +59,9 @@ export const buildUseCreate = <T = unknown>(
           }),
         );
         if (shouldOpenSidebar) {
-          dispatch(addReactionPathComponentToList(updatedPathComponents));
+          drawer.push(updatedPathComponents);
         }
       },
-      [dispatch, pathComponents, reactionId],
+      [dispatch, drawer, pathComponents, reactionId],
     );
   };

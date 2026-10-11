@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { MouseEvent } from 'react';
-
-const dispatch = vi.hoisted(() => vi.fn());
-vi.mock('store/useAppDispatch.ts', () => ({ useAppDispatch: () => dispatch }));
-vi.mock('store/features/reactionForm/reactionForm.actions.ts', () => ({
-  addReactionPathComponentToList: (path: unknown) => ({
-    type: 'addReactionPathComponentToList',
-    payload: path,
-  }),
-  setReactionPathComponentsList: (list: unknown) => ({
-    type: 'setReactionPathComponentsList',
-    payload: list,
-  }),
-}));
-
+import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { reactionWrapper } from 'features/reactions/provider/renderWithReaction.tsx';
+import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
 import {
   onViewDeleteButtonsWrapperClick,
   useOnViewEdit,
 } from './reactionViewDeleteButtons.utils.ts';
+
+function openWith(props: Omit<ReactionViewDeleteButtonsProps, 'entityName'>) {
+  const { result } = renderHook(
+    () => ({ open: useOnViewEdit(props), stack: useDrawerStack() }),
+    { wrapper: reactionWrapper() },
+  );
+  act(() => result.current.open());
+  return result.current.stack;
+}
 
 describe('onViewDeleteButtonsWrapperClick', () => {
   it('stops event propagation', () => {
@@ -44,28 +42,16 @@ describe('onViewDeleteButtonsWrapperClick', () => {
 });
 
 describe('useOnViewEdit', () => {
-  it('appends the path to the list when there is no history', () => {
-    const { result } = renderHook(() =>
-      useOnViewEdit({ pathComponents: ['inputs', 0] }),
-    );
-    result.current();
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'addReactionPathComponentToList',
-      payload: ['inputs', 0],
-    });
+  it('appends the path to the stack when there is no history', () => {
+    expect(openWith({ pathComponents: ['inputs', 0] })).toEqual([['inputs', 0]]);
   });
 
-  it('replaces the list with history plus the current path when history is provided', () => {
-    const { result } = renderHook(() =>
-      useOnViewEdit({
+  it('replaces the stack with the history plus the current path', () => {
+    expect(
+      openWith({
         pathComponents: ['inputs', 0],
         historyPathComponents: [['setup'], ['conditions']],
       }),
-    );
-    result.current();
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'setReactionPathComponentsList',
-      payload: [['setup'], ['conditions'], ['inputs', 0]],
-    });
+    ).toEqual([['setup'], ['conditions'], ['inputs', 0]]);
   });
 });

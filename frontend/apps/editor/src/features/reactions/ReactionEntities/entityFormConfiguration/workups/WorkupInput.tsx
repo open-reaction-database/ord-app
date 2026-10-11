@@ -35,7 +35,7 @@ import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordInputWithoutNameToReaction } from 'store/entities/reactions/reactionsInputs/reactionsInputs.converters.ts';
 import type { ReactionInputComponent } from 'store/entities/reactions/reactionComponent/reactionComponent.types.ts';
 import { ComponentDisplayRowCustomActions } from 'features/reactions/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
-import { addReactionPathComponentToList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { ComponentsListHeader } from 'features/reactions/ReactionView/ComponentsList';
 import { ComponentsListOrEmpty } from 'common/components/display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from 'features/reactions/ReactionView/renderValuePrecisionUnit';
@@ -49,6 +49,7 @@ const renderDetails = ({ amount }: ReactionInputComponent) =>
 
 export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
   const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   const { reactionId, ViewDeleteButtonsComponent, isViewOnly } =
     useContext(reactionContext);
   const { pathComponents } = useContext(reactionEntityContext);
@@ -59,12 +60,10 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
 
   const onWorkupComponentEdit = useCallback(
     (index: number) => {
-      dispatch(addReactionPathComponentToList(currentPath));
-      dispatch(
-        addReactionPathComponentToList(currentPath.concat([COMPONENTS_FIELD, index])),
-      );
+      drawer.push(currentPath);
+      drawer.push(currentPath.concat([COMPONENTS_FIELD, index]));
     },
-    [currentPath, dispatch],
+    [currentPath, drawer],
   );
 
   const input: Optional<ReactionInputWithoutName> = useSelector(

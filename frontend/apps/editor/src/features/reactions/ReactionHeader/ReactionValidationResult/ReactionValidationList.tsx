@@ -20,9 +20,8 @@ import type {
 } from 'store/entities/reactions/reactions.types.ts';
 import { CrossCircleIcon, WarningIcon } from 'common/icons';
 import classes from './reactionValidationResult.module.scss';
-import { setReactionPathComponentsList } from 'store/features/reactionForm/reactionForm.actions.ts';
+import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 
 interface ReactionValidationListProps {
   opened: boolean;
@@ -41,11 +40,11 @@ function ErrorWarningMessageDisplay({
   type,
   onClose,
 }: Readonly<ErrorWarningMessageDisplayProps>) {
-  const dispatch = useAppDispatch();
+  const drawer = useDrawer();
   const onClick = () => {
     if ('path' in message) {
       onClose();
-      dispatch(setReactionPathComponentsList(reactionFlatPathToSidebars(message.path)));
+      drawer.set(reactionFlatPathToSidebars(message.path));
     }
   };
   return (

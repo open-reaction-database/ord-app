@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
+import { fireEvent, waitFor } from '@testing-library/react';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { reactionFlatPathToSidebars } from 'store/entities/reactions/reactions.utils.ts';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
 import { VariablesSidebar } from './VariablesSidebar.tsx';
 import type { AppState } from 'store/configureAppStore.ts';
 
@@ -27,7 +31,7 @@ const buildState = (isOpened: boolean): { preloadedState: AppState } => ({
           template_1: {
             id: 1,
             data: {},
-            variables: { v1: { name: 'reagent', path: [] } },
+            variables: { v1: { name: 'reagent', path: ['notes', 'procedureDetails'] } },
           },
         },
       },
@@ -38,7 +42,9 @@ const buildState = (isOpened: boolean): { preloadedState: AppState } => ({
 describe('VariablesSidebar', () => {
   it('lists the template variables when the drawer is open', () => {
     const { getByText } = renderWithProviders(
-      <VariablesSidebar templateId="template_1" />,
+      <TemplateReactionProvider templateId="template_1">
+        <VariablesSidebar templateId="template_1" />
+      </TemplateReactionProvider>,
       buildState(true),
     );
     expect(getByText('Variables')).toBeInTheDocument();
@@ -47,10 +53,30 @@ describe('VariablesSidebar', () => {
 
   it('does not render the drawer title or the variable list while closed', () => {
     const { queryByText } = renderWithProviders(
-      <VariablesSidebar templateId="template_1" />,
+      <TemplateReactionProvider templateId="template_1">
+        <VariablesSidebar templateId="template_1" />
+      </TemplateReactionProvider>,
       buildState(false),
     );
     expect(queryByText('Variables')).not.toBeInTheDocument();
     expect(queryByText('@reagent')).not.toBeInTheDocument();
+  });
+
+  it('closes and opens the variable’s entity in the reaction drawer when a variable is clicked', async () => {
+    function StackProbe() {
+      return <output>{JSON.stringify(useDrawerStack())}</output>;
+    }
+    const { getByText, queryByText, getByRole } = renderWithProviders(
+      <TemplateReactionProvider templateId="template_1">
+        <VariablesSidebar templateId="template_1" />
+        <StackProbe />
+      </TemplateReactionProvider>,
+      buildState(true),
+    );
+    fireEvent.click(getByText('@reagent'));
+    expect(getByRole('status')).toHaveTextContent(
+      JSON.stringify(reactionFlatPathToSidebars(['notes', 'procedureDetails'])),
+    );
+    await waitFor(() => expect(queryByText('@reagent')).not.toBeInTheDocument());
   });
 });

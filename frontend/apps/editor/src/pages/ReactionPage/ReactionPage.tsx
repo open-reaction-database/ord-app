@@ -86,7 +86,10 @@ export function ReactionPage({ reactionId, datasetId }: Readonly<ReactionPagePro
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <ReactionProvider {...providerProps}>
+      <ReactionProvider
+        key={reactionId}
+        {...providerProps}
+      >
         {!reaction ? (
           <Flex
             justify="center"

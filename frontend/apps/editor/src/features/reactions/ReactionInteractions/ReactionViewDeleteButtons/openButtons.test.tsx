@@ -16,10 +16,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 import type { FC } from 'react';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { useDrawerStack } from 'features/reactions/provider/reactionProvider.hooks.ts';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
 import { ReactionSetVariablesButton } from './ReactionSetVariablesButton.tsx';
 import { ReactionViewButton } from './ReactionViewButton.tsx';
+
+function StackProbe() {
+  return <output>{JSON.stringify(useDrawerStack())}</output>;
+}
 
 describe.each<[string, FC<ReactionViewDeleteButtonsProps>, string]>([
   ['ReactionViewButton', ReactionViewButton, 'View'],
@@ -27,19 +32,20 @@ describe.each<[string, FC<ReactionViewDeleteButtonsProps>, string]>([
 ])('%s', (_name, Button, label) => {
   it('opens the entity without the click reaching the row around it', () => {
     const onRowClick = vi.fn();
-    const { getByRole, store } = renderWithProviders(
-      // Stands in for a row that toggles when clicked, like an accordion control.
-      <div onClick={onRowClick}>
-        <Button
-          entityName="Notes"
-          pathComponents={['notes']}
-        />
-      </div>,
+    const { getByRole } = renderInReactionView(
+      <>
+        {/* Stands in for a row that toggles when clicked, like an accordion control. */}
+        <div onClick={onRowClick}>
+          <Button
+            entityName="Notes"
+            pathComponents={['notes']}
+          />
+        </div>
+        <StackProbe />
+      </>,
     );
     fireEvent.click(getByRole('button', { name: label }));
     expect(onRowClick).not.toHaveBeenCalled();
-    expect(store.getState().features.reactionForm.reactionPathComponentsList).toEqual([
-      ['notes'],
-    ]);
+    expect(getByRole('status')).toHaveTextContent(JSON.stringify([['notes']]));
   });
 });

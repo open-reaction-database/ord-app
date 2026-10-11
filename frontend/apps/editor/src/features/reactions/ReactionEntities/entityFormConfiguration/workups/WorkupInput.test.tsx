@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { renderWithProviders } from 'test/renderWithProviders.tsx';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
 import { WorkupInput } from './WorkupInput.tsx';
 
-// Smoke test: the component mounts inside the store/Mantine providers without throwing.
+// Smoke test: the component mounts inside the reaction view's providers without throwing.
 const Component = WorkupInput as unknown as () => JSX.Element;
 
 describe('WorkupInput', () => {
   it('mounts without crashing', () => {
-    const { container } = renderWithProviders(<Component />);
+    const { container } = renderInReactionView(<Component />);
     expect(container).toBeInTheDocument();
   });
 });
