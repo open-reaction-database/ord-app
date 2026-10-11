@@ -22,13 +22,12 @@ import clsx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import { ConfirmPopover } from 'common/components/interactions/ConfirmPopover/ConfirmPopover.tsx';
 import { useCallback, useRef } from 'react';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
-import { useDrawer } from 'features/reactions/provider/reactionProvider.hooks.ts';
-import { deleteReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import type { ReactionId } from 'store/entities/reactions/reactions.types.ts';
+import {
+  useDrawer,
+  useReactionActions,
+} from 'features/reactions/provider/reactionProvider.hooks.ts';
 
 interface ReactionEntityDeleteProps {
-  reactionId: ReactionId;
   entityName: string;
   pathComponents: ReactionPathComponents;
   shouldCloseSidebar?: true;
@@ -36,13 +35,12 @@ interface ReactionEntityDeleteProps {
 }
 
 export function ReactionEntityDelete({
-  reactionId,
   entityName,
   pathComponents,
   shouldCloseSidebar,
   onRemove,
 }: Readonly<ReactionEntityDeleteProps>) {
-  const dispatch = useAppDispatch();
+  const actions = useReactionActions();
   const drawer = useDrawer();
   const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
     useDisclosure();
@@ -55,16 +53,15 @@ export function ReactionEntityDelete({
     if (onRemove) {
       onRemove();
     } else {
-      dispatch(deleteReactionField({ reactionId, pathComponents }));
+      void actions?.remove(pathComponents);
     }
     closeConfirmation();
   }, [
+    actions,
     closeConfirmation,
-    dispatch,
     drawer,
     onRemove,
     pathComponents,
-    reactionId,
     shouldCloseSidebar,
   ]);
 

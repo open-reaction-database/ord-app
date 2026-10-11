@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useContext } from 'react';
-import { reactionContext } from '../../reactions.context.ts';
 import { Accordion, Button, Flex, Title } from '@mantine/core';
 import {
   Counter,
@@ -25,8 +23,6 @@ import { AddCircleIcon } from 'common/icons';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 import { create } from '@bufbuild/protobuf';
 import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { ordWorkupToReaction } from 'store/entities/reactions/reactionWorkups/reactionWorkups.converters.ts';
 import type { ReactionWorkup } from 'store/entities/reactions/reactionWorkups/reactionWorkups.types.ts';
 import { ReactionBoolean } from 'store/entities/reactions/reactionEntity/reactionEntity.types.ts';
@@ -37,6 +33,7 @@ import { ReactionNodeValidationResult } from '../../ReactionInteractions/Reactio
 import {
   useDrawer,
   useIsViewOnly,
+  useReactionActions,
   useReactionPart,
   useReactionSlots,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
@@ -145,10 +142,8 @@ const workupOptionalFields: Array<FieldConfiguration<ReactionWorkup>> = [
 ];
 
 export function Workups() {
-  const dispatch = useAppDispatch();
   const drawer = useDrawer();
-  // The ID addresses only the dispatch below.
-  const { reactionId } = useContext(reactionContext);
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { ViewDeleteButtons } = useReactionSlots();
   const workups = useReactionPart<Array<ReactionWorkup>>([ENTITY_FIELD])!;
@@ -157,13 +152,7 @@ export function Workups() {
     const newIdentifierPath: ReactionPathComponents = [ENTITY_FIELD, workups.length];
     const newWorkup = ordWorkupToReaction(create(ReactionWorkupSchema));
 
-    dispatch(
-      addUpdateReactionField({
-        reactionId,
-        pathComponents: newIdentifierPath,
-        newValue: newWorkup,
-      }),
-    );
+    void actions?.update(newIdentifierPath, newWorkup);
     drawer.set([newIdentifierPath]);
   };
 

@@ -28,7 +28,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from 'features/reactions/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { useAppDispatch } from 'store/useAppDispatch.ts';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
 import { MolblockIdentifier } from 'features/reactions/ReactionEntities/entityFormConfiguration/components/CustomIdentifiers/MolblockIdentifier/MolblockIdentifier.tsx';
 import { setReactionLookupOpenedAction } from 'store/features/reactionLookup/reactionLookup.actions.ts';
 import { useSelector } from 'react-redux';
@@ -38,7 +37,7 @@ import { colorToCssVariable } from '@open-reaction-database/ui/theme';
 import { ordCompoundIdentifierToReaction } from 'store/entities/reactions/reactionEntity/reactionEntity.converters.ts';
 import {
   useIsViewOnly,
-  useReactionId,
+  useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import {
   ReactionEntityBlock,
@@ -71,7 +70,7 @@ const useCreateNewMolblockIdentifier = buildUseCreate(
 
 export function CustomIdentifiers() {
   const dispatch = useAppDispatch();
-  const reactionId = useReactionId();
+  const actions = useReactionActions();
   const isViewOnly = useIsViewOnly();
   const { pathComponents } = useContext(reactionEntityContext);
   const [
@@ -109,13 +108,7 @@ export function CustomIdentifiers() {
         ...value,
       };
       const newPathComponents = [...pathComponents, ENTITY_FIELD, editedMolblock];
-      dispatch(
-        addUpdateReactionField({
-          reactionId,
-          pathComponents: newPathComponents,
-          newValue: identifier,
-        }),
-      );
+      void actions?.update(newPathComponents, identifier);
     } else {
       createNewMolblockIdentifier(identifiers.length, identifiers, value);
     }

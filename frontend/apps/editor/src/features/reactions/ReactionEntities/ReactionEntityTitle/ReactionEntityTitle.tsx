@@ -22,7 +22,6 @@ import { ReactionEntityDelete } from 'features/reactions/ReactionEntities/Reacti
 import { ReactionNodeValidationResult } from '../../ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 
 export function ReactionEntityTitle({
-  reactionId,
   pathComponents,
   entityName,
   hasDelete,
@@ -41,7 +40,6 @@ export function ReactionEntityTitle({
         {hasDelete && (
           <ReactionEntityDelete
             entityName={entityName}
-            reactionId={reactionId}
             pathComponents={pathComponents}
             shouldCloseSidebar
           />

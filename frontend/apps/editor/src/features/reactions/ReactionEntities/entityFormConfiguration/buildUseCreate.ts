@@ -15,11 +15,9 @@
  */
 import { useCallback, useContext } from 'react';
 import { reactionEntityContext } from 'features/reactions/ReactionEntities/reactionEntity.context.ts';
-import { addUpdateReactionField } from 'store/entities/reactions/reactions.thunks.ts';
-import { useAppDispatch } from 'store/useAppDispatch.ts';
 import {
   useDrawer,
-  useReactionId,
+  useReactionActions,
 } from 'features/reactions/provider/reactionProvider.hooks.ts';
 import type { ReactionPathComponents } from 'common/types/reaction/reactionPathComponents.ts';
 
@@ -33,9 +31,8 @@ export const buildUseCreate = <T = unknown>(
   shouldOpenSidebar = true,
 ) =>
   function useCreate() {
-    const dispatch = useAppDispatch();
     const drawer = useDrawer();
-    const reactionId = useReactionId();
+    const actions = useReactionActions();
     const { pathComponents } = useContext(reactionEntityContext);
 
     return useCallback(
@@ -53,17 +50,11 @@ export const buildUseCreate = <T = unknown>(
           .concat(entityPathComponents)
           .concat(key);
 
-        dispatch(
-          addUpdateReactionField({
-            reactionId,
-            pathComponents: updatedPathComponents,
-            newValue: newEntity,
-          }),
-        );
+        void actions?.update(updatedPathComponents, newEntity);
         if (shouldOpenSidebar) {
           drawer.push(updatedPathComponents);
         }
       },
-      [dispatch, drawer, pathComponents, reactionId],
+      [actions, drawer, pathComponents],
     );
   };
