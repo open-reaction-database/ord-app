@@ -25,6 +25,7 @@ import {
   getReactionActions,
   getReactionPageActions,
   getReactionsListActions,
+  renameReactionActions,
 } from 'store/entities/reactions/reactions.actions.ts';
 import {
   getAllTemplatesActions,
@@ -38,6 +39,7 @@ const singleReactionActionsMatcher = isAnyOf(
   getReactionActions.success,
   addUpdateReactionFieldActions.success,
   deleteReactionFieldActions.success,
+  renameReactionActions.success,
   createNewTemplateActions.success,
   importTemplateFromFileActions.success,
   renameTemplateActions.success,

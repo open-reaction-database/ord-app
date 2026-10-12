@@ -205,6 +205,7 @@ describe('reactions.reducer — reactionsById field edits', () => {
     const state = reduce(
       seeded,
       renameReactionActions.success({
+        previews: {},
         reactionId: 1,
         name: 'new-name',
         savedData: asEntry(reduce(seeded, { type: '@@probe' }).reactionsById[1]).data,
@@ -341,6 +342,7 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     const renamed = reduce(
       second,
       renameReactionActions.success({
+        previews: {},
         reactionId: 1,
         name: 'renamed',
         savedData: sent,

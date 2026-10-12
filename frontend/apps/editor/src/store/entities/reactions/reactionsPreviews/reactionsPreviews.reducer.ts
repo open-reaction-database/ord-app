@@ -19,6 +19,7 @@ import {
   addUpdateReactionFieldActions,
   getReactionActions,
   getReactionsListActions,
+  renameReactionActions,
 } from 'store/entities/reactions/reactions.actions.ts';
 import { setPreviewsByIds } from 'store/entities/reactions/reactionsPreviews/reactionsPreviews.actions.ts';
 
@@ -66,7 +67,11 @@ const previewsByEntityId = createReducer<PreviewStatesById>({}, builder => {
   });
 
   builder.addMatcher(
-    isAnyOf(getReactionActions.success, addUpdateReactionFieldActions.success),
+    isAnyOf(
+      getReactionActions.success,
+      addUpdateReactionFieldActions.success,
+      renameReactionActions.success,
+    ),
     (state, { payload }) => updatePreviewState(state, payload.previews),
   );
 });

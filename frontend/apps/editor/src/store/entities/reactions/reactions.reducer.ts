@@ -188,7 +188,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   });
   builder.addCase(
     renameReactionActions.success,
-    (state, { payload: { reactionId, name, savedData } }) => {
+    (state, { payload: { reactionId, name, savedData, ...saved } }) => {
       // The state is an Immer draft: compare the stored data, not its proxy, with what was sent.
       const stored = original(state)![reactionId];
       if (stored === undefined) {
@@ -199,6 +199,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
         ...state,
         [reactionId]: {
           ...reaction,
+          ...saved,
           pb_reaction_id: name,
           data: { ...reaction.data, reactionId: name },
           // The backend now holds the data the rename sent, under the new name. Edits made since

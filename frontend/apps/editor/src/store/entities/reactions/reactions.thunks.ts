@@ -32,6 +32,7 @@ import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import {
+  type AppReaction,
   type ReactionId,
   type ReactionResponse,
   reactionToOrdBinpb,
@@ -163,13 +164,19 @@ export const importReactionFromFile = createThunkWithExplicitResult(
 // Each save sends the whole reaction, so saves of one reaction run one at a time, in order.
 const reactionSaveQueues = createStoreSaveQueues<ReactionId>();
 
+/**
+ * Sends the reaction's current data, through `prepare` (a rename sets its name there), and
+ * returns the backend's view of what it saved, with the data it read as `savedData`.
+ */
 async function updateReaction(
   reactionId: ReactionId,
   datasetId: number,
   getState: () => AppState,
+  prepare: (data: AppReaction) => AppReaction = data => data,
 ): Promise<SavedReactionPayload> {
   const reaction = selectReactionById(reactionId)(getState());
-  const payload = reactionToOrdBinpb(reaction.data);
+  const sent = prepare(reaction.data);
+  const payload = reactionToOrdBinpb(sent);
   const {
     binpb: _,
     molblocks,
@@ -184,12 +191,10 @@ async function updateReaction(
       { timeout: SAVE_TIMEOUT_MS },
     )
   ).data;
-  const updatedValidation = validation
-    ? parseValidation(validation, reaction.data)
-    : null;
+  const updatedValidation = validation ? parseValidation(validation, sent) : null;
   return {
     ...reactionMetadata,
-    previews: getReactionPreviews(reaction.data, molblocks),
+    previews: getReactionPreviews(sent, molblocks),
     validation: updatedValidation,
     savedData: reaction.data,
   };
@@ -233,18 +238,16 @@ export const renameReaction = createThunkWithExplicitResult(
     async (dispatch, getState) => {
       const datasetId = selectActiveDatasetId(getState());
       await reactionSaveQueues(getState)(reactionId, async () => {
-        const reaction = selectReactionById(reactionId)(getState());
-        if (reaction === undefined) {
+        if (selectReactionById(reactionId)(getState()) === undefined) {
           return;
         }
-        // A rename sends the whole reaction, unsaved edits included, so it records what it sent.
-        const savedData = reaction.data;
-        await axiosInstance.patch<ReactionResponse>(
-          `datasets/${datasetId}/reactions/${reactionId}`,
-          { binpb: reactionToOrdBinpb({ ...savedData, reactionId: name }) },
-          { timeout: SAVE_TIMEOUT_MS },
-        );
-        dispatch(renameReactionActions.success({ reactionId, name, savedData }));
+        // A rename sends the whole reaction, unsaved edits included, so it takes the backend's
+        // validation and previews and records what it sent, as a field save does.
+        const saved = await updateReaction(reactionId, datasetId, getState, data => ({
+          ...data,
+          reactionId: name,
+        }));
+        dispatch(renameReactionActions.success({ ...saved, reactionId, name }));
       });
     },
   { failureMessage: 'Failed to rename reaction.' },

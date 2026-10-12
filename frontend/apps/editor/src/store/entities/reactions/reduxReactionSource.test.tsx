@@ -534,7 +534,7 @@ describe('overlapping edits to one reaction', () => {
       safetyNotes: 'gloves',
     });
     await flush();
-    renaming.resolve({});
+    renaming.resolve(accepted());
     await Promise.all([rename, edit]);
     expect(axiosMock.patch).toHaveBeenCalledTimes(2);
     expect(sentReaction(1).reactionId).toBe('renamed');
@@ -560,7 +560,7 @@ describe('overlapping edits to one reaction', () => {
     await flush();
     const third = actions.remove(['inputs', 'in1']);
     await flush();
-    renaming.resolve({});
+    renaming.resolve(accepted());
     await Promise.all([first, rename, second, third]);
     // The rename sent the second edit, so the failed third save keeps it and the name.
     expect(dataOf(store).notes.procedureDetails).toBe('stir');
@@ -629,5 +629,28 @@ describe('overlapping edits to one reaction', () => {
       expect.anything(),
       { timeout: SAVE_TIMEOUT_MS },
     );
+  });
+
+  it('take validation and previews from a rename’s response', async () => {
+    axiosMock.patch.mockResolvedValue({
+      data: {
+        ...accepted().data,
+        is_valid: false,
+        validation: { errors: ['Reaction: needs an outcome'], warnings: [] },
+        molblocks: { inputs: { in1: ['molblock'] }, outcomes: [], workups: [] },
+      },
+    });
+    const store = makeStore();
+    await store.dispatch(
+      renameReaction({ reactionId: 1, name: 'renamed' }) as unknown as UnknownAction,
+    );
+    const reactions = store.getState().entities.reactions;
+    expect(reactions.reactionsById[1]).toMatchObject({
+      is_valid: false,
+      validation: { errors: [expect.anything()] },
+    });
+    expect(reactions.reactionsPreviews.previewsByEntityId.c1).toMatchObject({
+      isLoading: true,
+    });
   });
 });
