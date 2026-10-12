@@ -45,4 +45,17 @@ describe('CrudeComponentView', () => {
     expect(getByText('rxn-123')).toBeInTheDocument();
     expect(queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it.each([
+    ['empty', ''],
+    ['unset', undefined],
+  ])('offers no link when the reaction ID is %s', (_label, reactionId) => {
+    const { queryByRole } = renderWithReaction(
+      <CrudeComponentView
+        crudeComponent={{ ...crude, reactionId } as ReactionCrudeComponent}
+      />,
+      { editable: true, slots: { ReactionLink: TestLink } },
+    );
+    expect(queryByRole('link')).not.toBeInTheDocument();
+  });
 });

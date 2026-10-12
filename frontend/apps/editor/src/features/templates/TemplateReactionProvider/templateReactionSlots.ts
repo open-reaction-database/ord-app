@@ -18,13 +18,14 @@ import {
   DatasetReactionValueLabel,
 } from '@open-reaction-database/ui/reaction';
 import { TemplateReactionValueLabelWrapper } from 'features/reactions/ReactionInteractions/ReactionValueLabel/TemplateReactionValueLabel.tsx';
-import { SearchReactionLink } from 'features/reactions/ReactionInteractions/SearchReactionLink/SearchReactionLink.tsx';
 import { ReactionSetVariablesButton } from 'features/reactions/ReactionInteractions/ReactionViewDeleteButtons/ReactionSetVariablesButton.tsx';
 
-/** The slots of a template, where a field's label can make it a variable. */
+/**
+ * The slots of a template, where a field's label can make it a variable. A template belongs to no
+ * dataset, so a crude component's reaction id stays text rather than a search.
+ */
 export const TEMPLATE_SLOTS: ReactionSlots = {
   ViewDeleteButtons: ReactionSetVariablesButton,
   ValueLabel: TemplateReactionValueLabelWrapper,
   ViewOnlyLabel: DatasetReactionValueLabel,
-  ReactionLink: SearchReactionLink,
 };

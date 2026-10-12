@@ -31,7 +31,7 @@ import { fileDownloadOptions } from 'common/constants.ts';
 import { domain, showReactionPreviewDetails } from 'common/configuration.constants.ts';
 import {
   useIsViewOnly,
-  useReactionSnapshot,
+  useReactionSnapshotField,
   ReactionHeader,
 } from '@open-reaction-database/ui/reaction';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
@@ -56,7 +56,7 @@ export function DatasetReactionHeader({
   const { base } = useRouter();
   const dispatch = useAppDispatch();
   const isViewOnly = useIsViewOnly();
-  const pbReactionId = useReactionSnapshot()?.pb_reaction_id ?? '';
+  const pbReactionId = useReactionSnapshotField('pb_reaction_id') ?? '';
   const isRenameOpened = useSelector(selectIsReactionRenameOpened);
 
   const onRenameOpen = useCallback(() => {

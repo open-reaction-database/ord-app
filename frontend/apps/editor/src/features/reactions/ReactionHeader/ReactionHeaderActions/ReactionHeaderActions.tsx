@@ -28,9 +28,11 @@ import classes from './reactionCard.module.scss';
 import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
 import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
 import { fileDownloadOptions } from 'common/constants.ts';
-import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
 import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
-import { copyPreviewAsImage } from '@open-reaction-database/ui/reaction';
+import {
+  copyPreviewAsImage,
+  useReactionSnapshotField,
+} from '@open-reaction-database/ui/reaction';
 import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
 import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
 
@@ -45,7 +47,7 @@ export function ReactionHeaderActions({
 }: Readonly<ReactionHeaderActionsProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
   const datasetId = Number.parseInt(rawDatasetId);
-  const reaction = useSelector(selectReactionById(reactionId));
+  const pbReactionId = useReactionSnapshotField('pb_reaction_id') ?? '';
   const onPreviewSave = useCallback(() => {
     // It reports its own success or failure in a notification.
     void copyPreviewAsImage(previewRef.current);
@@ -60,12 +62,12 @@ export function ReactionHeaderActions({
     <>
       {saveAsTemplateOpened && (
         <SaveAsTemplate
-          reactionId={reaction.id}
-          reactionPbId={reaction.pb_reaction_id}
+          reactionId={reactionId}
+          reactionPbId={pbReactionId}
           onClose={closeSaveAsTemplate}
         />
       )}
-      {canDatasetBeEdited && <RemoveReaction reactionId={reaction.id} />}
+      {canDatasetBeEdited && <RemoveReaction reactionId={reactionId} />}
       <Button
         leftSection={<CheckListIcon className={classes.buttonIcon} />}
         variant="transparent"
@@ -86,7 +88,7 @@ export function ReactionHeaderActions({
         options={fileDownloadOptions}
         download={format =>
           downloadFileFromUrl(
-            `/datasets/${datasetId}/reactions/${reaction.id}/download?file_format=${format}`,
+            `/datasets/${datasetId}/reactions/${reactionId}/download?file_format=${format}`,
           )
         }
         target={

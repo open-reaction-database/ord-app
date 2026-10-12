@@ -20,7 +20,7 @@ import { ReactionPreview } from '#reaction/view/ReactionPreview/ReactionPreview.
 import { ReactionValidationResult } from '#reaction/view/ReactionHeader/ReactionValidationResult/ReactionValidationResult.tsx';
 import { copyPreviewAsImage } from '#reaction/view/ReactionPreview/reactionPreview.utils.ts';
 import classes from '#reaction/view/ReactionCard/reactionCard.module.scss';
-import { useReactionSnapshot } from '#reaction/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshotField } from '#reaction/provider/reactionProvider.hooks.ts';
 
 interface ReactionHeaderProps {
   /** Controls beside the validation badge, such as remove and download. */
@@ -37,7 +37,7 @@ export function ReactionHeader({
   titleActions,
   showDetails = false,
 }: Readonly<ReactionHeaderProps>) {
-  const pbReactionId = useReactionSnapshot()?.pb_reaction_id;
+  const pbReactionId = useReactionSnapshotField('pb_reaction_id');
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const onPreviewSave = useCallback(() => {

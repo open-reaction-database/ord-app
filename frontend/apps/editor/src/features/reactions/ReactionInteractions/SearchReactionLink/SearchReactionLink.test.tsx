@@ -35,4 +35,11 @@ describe('SearchReactionLink', () => {
     fireEvent.click(getByText('rxn-123'));
     expect(searchReaction).toHaveBeenCalledWith('rxn-123');
   });
+
+  it('is a button, so the keyboard can reach and press it', () => {
+    const { getByRole } = renderWithProviders(
+      <SearchReactionLink pbReactionId="rxn-123" />,
+    );
+    expect(getByRole('button', { name: 'rxn-123' })).toBeInTheDocument();
+  });
 });

@@ -59,6 +59,16 @@ function useSnapshotSelector<T>(
   );
 }
 
+/**
+ * One top-level field of the reaction's snapshot, such as `pb_reaction_id`; re-renders only when
+ * that field changes.
+ */
+export function useReactionSnapshotField<K extends keyof ReactionSnapshot>(
+  field: K,
+): ReactionSnapshot[K] | undefined {
+  return useSnapshotSelector(snapshot => snapshot?.[field]);
+}
+
 /** The whole reaction; re-renders whenever any part of it changes. */
 export function useReactionSnapshot(): ReactionSnapshot | undefined {
   return useSnapshotSelector(snapshot => snapshot);
@@ -84,14 +94,13 @@ export function useOrderedInputs(): Array<ReactionInput> {
 }
 
 /** The previews for `entityIds`; an ID with no preview maps to undefined. */
-export function usePreviews(entityIds: Array<string>): PreviewStatesById {
+export function usePreviews(entityIds: Array<string>): Partial<PreviewStatesById> {
   const { source } = useProviderValue();
   return useSyncExternalStoreWithSelector(
     source.subscribe,
     source.getPreviews,
     source.getPreviews,
-    previews =>
-      Object.fromEntries(entityIds.map(id => [id, previews[id]])) as PreviewStatesById,
+    previews => Object.fromEntries(entityIds.map(id => [id, previews[id]])),
     shallowEqualRecords,
   );
 }

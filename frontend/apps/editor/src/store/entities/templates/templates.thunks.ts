@@ -136,7 +136,7 @@ export const renameTemplate = createThunk(
 );
 
 // Each save sends every variable, so saves of one template run one at a time, in order.
-const variablesSaveQueues = createStoreSaveQueues<string>();
+const variablesSaveQueues = createStoreSaveQueues<string>('template variables');
 
 /**
  * Saves the template's unsaved variable edits once earlier saves settle, and records the outcome

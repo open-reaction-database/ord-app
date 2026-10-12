@@ -21,7 +21,7 @@ import type { EnumerationForm } from '../enumerationSetup.types.ts';
 
 const form = {
   values: {
-    templateId: 1,
+    templateId: 'template_1',
     matching: [{ variable: 'reagent' }],
     templateCSV: { headers: ['col1', 'col2'] },
   },
@@ -31,7 +31,7 @@ const form = {
 describe('VariablesMatching', () => {
   it('renders a matching row per template variable when the template and headers are available', () => {
     const { getByText } = renderInReactionView(<VariablesMatching form={form} />, {
-      reactionId: 1,
+      reactionId: 'template_1',
       reaction: emptyReactionData(),
     });
     expect(getByText('Matching')).toBeInTheDocument();
