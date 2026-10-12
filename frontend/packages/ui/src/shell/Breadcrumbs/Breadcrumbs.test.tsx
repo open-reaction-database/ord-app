@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
 import { Router } from 'wouter';
 import { memoryLocation } from 'wouter/memory-location';
@@ -99,5 +99,21 @@ describe('Breadcrumbs', () => {
       />,
     );
     expect(container.querySelector('[id^="~"]')).toBeNull();
+  });
+
+  it('renders crumbs that share a path without a duplicate key', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderWithMantine(
+      <Breadcrumbs
+        items={[
+          { title: 'Datasets', path: '~/' },
+          { title: 'My Dataset', path: '~/datasets/1' },
+          { title: 'New reaction', path: '~/datasets/1' },
+        ]}
+      />,
+    );
+    expect(screen.getByText('My Dataset')).toBeInTheDocument();
+    expect(screen.getByText('New reaction')).toBeInTheDocument();
+    expect(error).not.toHaveBeenCalled();
   });
 });

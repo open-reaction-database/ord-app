@@ -34,8 +34,8 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
           breadcrumb: classes.breadcrumb,
         }}
       >
-        {/* Inline: Mantine styles only its direct children, so a crumb component would lose the class. */}
-        {/* Crumbs never reorder and two can share a path, so each is keyed by its position. */}
+        {/* Mantine clones each crumb to add its class, so a crumb component would have to pass on `className`. */}
+        {/* The clones are keyed by position, so two crumbs may share a path. */}
         {items.map((breadcrumb, index) => {
           const isActive = index === items.length - 1;
 
@@ -57,12 +57,12 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
             <Link
               className={classes.link}
               to={breadcrumb.path}
-              key={index}
+              key={breadcrumb.path}
             >
               {children}
             </Link>
           ) : (
-            <Flex key={index}>{children}</Flex>
+            <Flex key={breadcrumb.path}>{children}</Flex>
           );
         })}
       </MantineBreadcrumbs>

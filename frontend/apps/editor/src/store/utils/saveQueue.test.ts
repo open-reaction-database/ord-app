@@ -85,14 +85,36 @@ describe('createStoreSaveQueues', () => {
     blocked.resolve();
   });
 
-  it('keeps stores and names apart', async () => {
+  it.each<
+    [string, () => Array<ReturnType<ReturnType<typeof createStoreSaveQueues<number>>>>]
+  >([
+    [
+      'names in one store',
+      () => {
+        const store = {};
+        return [
+          createStoreSaveQueues<number>('test-name-a')(store),
+          createStoreSaveQueues<number>('test-name-b')(store),
+        ];
+      },
+    ],
+    [
+      'stores under one name',
+      () => {
+        const forStore = createStoreSaveQueues<number>('test-stores');
+        return [forStore({}), forStore({})];
+      },
+    ],
+  ])('keeps the queues of different %s apart', async (_label, makeQueues) => {
+    const [blockedQueue, otherQueue] = makeQueues();
     const blocked = deferred<void>();
-    void createStoreSaveQueues<number>('test-a')({})(1, () => blocked.promise);
     const started: Array<string> = [];
-    await createStoreSaveQueues<number>('test-b')({})(1, async () => {
-      started.push('other name');
+    void blockedQueue(1, () => blocked.promise);
+    void otherQueue(1, async () => {
+      started.push('other');
     });
-    expect(started).toEqual(['other name']);
+    await flush();
+    expect(started).toEqual(['other']);
     blocked.resolve();
   });
 });
