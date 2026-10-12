@@ -34,13 +34,19 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
           breadcrumb: classes.breadcrumb,
         }}
       >
-        {/* Cannot be moved to the separate component because otherwise mantine class not being applied (even with forwardRef) */}
+        {/* Mantine clones each crumb to add its class, so a crumb component would have to pass on `className`. */}
+        {/* The clones are keyed by position, so two crumbs may share a path. */}
         {items.map((breadcrumb, index) => {
           const isActive = index === items.length - 1;
 
           const children = (
             <>
-              {index === 0 && <HomeIcon className={classes.homeIcon} />}
+              {index === 0 && (
+                <HomeIcon
+                  className={classes.homeIcon}
+                  aria-hidden
+                />
+              )}
               <Tooltip label={breadcrumb.title}>
                 <span className={classes.text}>{breadcrumb.title}</span>
               </Tooltip>
@@ -51,7 +57,6 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
             <Link
               className={classes.link}
               to={breadcrumb.path}
-              id={breadcrumb.path}
               key={breadcrumb.path}
             >
               {children}

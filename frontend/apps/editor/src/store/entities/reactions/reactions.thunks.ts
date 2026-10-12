@@ -162,7 +162,7 @@ export const importReactionFromFile = createThunkWithExplicitResult(
 );
 
 // Each save sends the whole reaction, so saves of one reaction run one at a time, in order.
-const reactionSaveQueues = createStoreSaveQueues<ReactionId>();
+const reactionSaveQueues = createStoreSaveQueues<ReactionId>('reactions');
 
 /**
  * Sends the reaction's current data, through `prepare` (a rename sets its name there), and

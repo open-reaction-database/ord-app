@@ -48,7 +48,7 @@ const forms: Array<EnumerationForm> = [];
 function Harness() {
   const form = useForm<EnumerationSetupForm, EnumerationFormTransform>({
     initialValues: {
-      templateId: 'template-1',
+      templateId: 'template_1',
       csvFile: null,
       templateCSV: null,
       matching: [],

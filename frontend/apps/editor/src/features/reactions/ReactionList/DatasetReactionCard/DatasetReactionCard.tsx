@@ -17,7 +17,7 @@ import { ReactionHeaderActions } from '../../ReactionHeader/ReactionHeaderAction
 import {
   ReactionCard,
   ReactionProvider,
-  useReactionSnapshot,
+  useReactionSnapshotField,
   type ReactionSlots,
   DatasetReactionValueLabel,
   ReactionViewButton,
@@ -43,8 +43,8 @@ interface ReactionTitleProps {
 function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
   const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
   const datasetId = Number.parseInt(rawDatasetId);
-  const snapshot = useReactionSnapshot();
-  const pbReactionId = snapshot?.pb_reaction_id ?? '';
+  const pbReactionId = useReactionSnapshotField('pb_reaction_id') ?? '';
+  const isValid = useReactionSnapshotField('is_valid');
   const copyToClipboardOptions: Array<CopyButtonOptions> = [
     {
       label: 'Copy Reaction Link',
@@ -70,7 +70,7 @@ function ReactionTitle({ index, id }: Readonly<ReactionTitleProps>) {
         </Link>
       </Tooltip>
       <CopyButton options={copyToClipboardOptions} />
-      {!snapshot?.is_valid && (
+      {!isValid && (
         <Flex
           align="center"
           gap="4px"
@@ -121,7 +121,7 @@ function DatasetReactionCardBody({
   index,
 }: Readonly<DatasetReactionCardProps>) {
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const isValid = useReactionSnapshot()?.is_valid ?? false;
+  const isValid = useReactionSnapshotField('is_valid') ?? false;
   return (
     <ReactionCard
       showDetails={showReactionPreviewDetails}
