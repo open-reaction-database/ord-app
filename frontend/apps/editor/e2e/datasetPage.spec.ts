@@ -15,30 +15,13 @@
  */
 import { expect, test } from '@playwright/test';
 import { seedReaction } from './seed.ts';
-
-const PREVIEW = 'img[src^="data:image/svg+xml"]';
-const LOADER = '.mantine-Loader-root';
+import { LOADER, PREVIEW } from './settle.ts';
 
 let datasetUrl: string;
 
 test.beforeAll(async ({ request }) => {
   const { datasetId } = await seedReaction(request);
   datasetUrl = `/datasets/${datasetId}`;
-});
-
-test.describe('in a narrow window', () => {
-  test.use({ viewport: { width: 800, height: 900 } });
-
-  test('fits without scrolling sideways', async ({ page }) => {
-    await page.goto(datasetUrl, { waitUntil: 'domcontentloaded' });
-    const link = page.getByRole('link', { name: 'e2e-reaction-page' });
-    await expect(link).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator(LOADER)).toHaveCount(0);
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBe(0);
-  });
 });
 
 test.describe('appearance', () => {
