@@ -38,7 +38,7 @@ jobs:
           python-version: "3.12"
       # The pre-commit hook pins addlicense's version and arguments for CI and local commits alike.
       - name: addlicense
-        run: uvx --from 'pre-commit>=4,<5' pre-commit run addlicense --all-files --show-diff-on-failure
+        run: uvx --no-build --from 'pre-commit==4.6.0' pre-commit run addlicense --all-files --show-diff-on-failure
 
   check_python:
     runs-on: ubuntu-latest
