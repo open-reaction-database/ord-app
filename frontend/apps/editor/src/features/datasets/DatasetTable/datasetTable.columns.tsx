@@ -140,6 +140,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
           download={format => downloadDatasetThroughLink(row.original.id, format)}
           target={
             <ActionIcon
+              aria-label="Download dataset"
               onClick={handleMenu}
               variant="transparent"
               color="default"
