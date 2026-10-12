@@ -6,6 +6,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 - `backend/editor/` — the editor's backend, its own uv project (Python 3.12): `pyproject.toml`, `uv.lock`, `alembic.ini`, `migrations/` (Alembic), and the compose image's `Dockerfile`.
   - `ord_editor/service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`. Tests sit beside the code as `*_test.py`; shared fixtures in `ord_editor/conftest.py`, data in `ord_editor/testdata/`.
+- `deploy/editor/` — the editor's production image: `Dockerfile` (the editor's bundle and backend behind nginx, under supervisord), `Dockerfile.dockerignore`, `nginx.conf`, `supervisord.conf`, `entrypoint.sh`.
 - `ruff.toml` — the ruff config for every Python project. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + the editor's backend.
 - `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, a `tsconfig.base.json` every project extends, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
   - `apps/editor/` — the editor: React 19 + Vite 6, Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths`, one entry per top-level directory (write `store/…`, `common/…`, `features/…`, not `../../`).
@@ -41,6 +42,6 @@ Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` onc
 ## Conventions
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
-- Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `frontend/apps/editor/.env`, and fail without them; the backend reads them from the environment or `backend/editor/ord_editor/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
+- Image builds (`deploy/editor/Dockerfile`) take the Auth0 settings as build arguments or from `frontend/apps/editor/.env`, and fail without them; the backend reads them from the environment or `backend/editor/ord_editor/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
 - Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `backend/editor/pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts` and `frontend/packages/ui/vitest.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.

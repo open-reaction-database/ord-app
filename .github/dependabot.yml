@@ -29,8 +29,8 @@ updates:
           - "*"
   - package-ecosystem: docker
     directories:
-      - /
       - /backend/editor
+      - /deploy/editor
     schedule:
       interval: monthly
     groups:

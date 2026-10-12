@@ -15,7 +15,7 @@
  */
 import { Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useCallback, type MutableRefObject } from 'react';
+import { useCallback, type RefObject } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'wouter';
 import {
@@ -38,7 +38,7 @@ import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canD
 
 interface ReactionHeaderActionsProps {
   reactionId: number;
-  previewRef: MutableRefObject<HTMLDivElement | null>;
+  previewRef: RefObject<HTMLDivElement | null>;
 }
 
 export function ReactionHeaderActions({

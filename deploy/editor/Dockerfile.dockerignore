@@ -12,21 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+.git/
 .idea/
 .github/
 
-.dockerignore
 .gitignore
 
 **/__pycache__/
 **/.venv/
-.coverage
-.pytype/
 docker-compose.yml
-Dockerfile.single
 Makefile
 
 **/node_modules/
+
+# Build outputs and test reports from local runs.
+frontend/**/dist/
+frontend/**/coverage/
+frontend/**/playwright-report/
+frontend/**/test-results/
+
+# The viewer's backend and image. Every frontend workspace stays in the context:
+# npm ci installs each one the lockfile names.
+backend/viewer/
+deploy/viewer/
 
 # Local settings and the test suite stay out of the image.
 backend/editor/ord_editor/.env

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { JSX } from 'react';
 import { Button, Flex, Popover, type PopoverProps, Text } from '@mantine/core';
 import { AlertCircleIcon } from '#theme/icons/index.ts';
 import classes from './ConfirmPopover.module.scss';

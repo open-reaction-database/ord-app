@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { JSX } from 'react';
 import { describe, it, expect } from 'vitest';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { EnumerationWizard } from './EnumerationWizard.tsx';

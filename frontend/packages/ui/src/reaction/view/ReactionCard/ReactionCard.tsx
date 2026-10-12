@@ -16,7 +16,7 @@
 import { Flex, Paper, Title } from '@mantine/core';
 import clsx from 'clsx';
 import classes from './reactionCard.module.scss';
-import { useMemo, type ReactNode, type MutableRefObject } from 'react';
+import { useMemo, type ReactNode, type RefObject } from 'react';
 import typographyClasses from '#theme/typography.module.scss';
 import { ReactionPreview } from '#reaction/view/ReactionPreview/ReactionPreview.tsx';
 import { useReactionSnapshotField } from '#reaction/provider/reactionProvider.hooks.ts';
@@ -56,7 +56,7 @@ function DescriptorsList({ title, items }: Readonly<DescriptorsListProps>) {
 interface ReactionCardProps {
   title: ReactNode;
   actions: ReactNode;
-  previewRef?: MutableRefObject<HTMLDivElement | null>;
+  previewRef?: RefObject<HTMLDivElement | null>;
   isInvalid?: boolean;
   /** Shows the provenance, the summary, and the conditions over the preview's arrow. */
   showDetails?: boolean;

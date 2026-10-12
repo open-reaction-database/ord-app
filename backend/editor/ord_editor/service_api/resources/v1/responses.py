@@ -27,8 +27,8 @@ from ord_editor.service_api.schemas.datasets import DatasetDownloadFileFormats
 _UNSAFE_FILENAME_CHARACTERS = re.compile(r"[^\x20\x21\x23-\x5b\x5d-\x7e]")
 
 # Content type of each download format. nginx compresses responses by content type
-# (gzip_types in nginx.conf), so a download without one is sent uncompressed. Parquet
-# is already compressed, and nginx.conf leaves it out.
+# (gzip_types in deploy/editor/nginx.conf), so a download without one is sent
+# uncompressed. Parquet is already compressed, and the config leaves it out.
 DOWNLOAD_MEDIA_TYPES: dict[DatasetDownloadFileFormats, str] = {
     "binpb": "application/x-protobuf",
     "json": "application/json",
