@@ -44,8 +44,6 @@
       "react-dom": "^19.0.0"
     },
     "ketcher-core": "^3.15.0",
-    "@types/react": "~19.2.18",
-    "@types/react-dom": "~19.2.7",
     "draft-js": {
       "immutable": "3.8.3"
     },
