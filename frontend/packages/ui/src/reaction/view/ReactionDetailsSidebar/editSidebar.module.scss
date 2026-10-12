@@ -19,7 +19,7 @@
 }
 
 .sidebar {
-  min-width: var(--sidebar-width);
+  min-width: min(var(--sidebar-width), 100vw);
   display: flex;
   flex-direction: column;
 }

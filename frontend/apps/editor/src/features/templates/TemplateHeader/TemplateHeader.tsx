@@ -62,6 +62,8 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
       <Flex
         align="center"
         justify="space-between"
+        wrap="wrap"
+        gap="sm"
       >
         <ValidityButton
           validText="Template is valid"
@@ -70,7 +72,10 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           onClick={onVariablesSidebarOpen}
           isNotClickable={!isReadyForEnumeration}
         />
-        <Flex align="center">
+        <Flex
+          align="center"
+          wrap="wrap"
+        >
           <TemplateHeaderActions
             templateId={templateId}
             showEnumeration={true}

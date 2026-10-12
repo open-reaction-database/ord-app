@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 .shareSidebar {
-  min-width: var(--sidebar-width);
+  min-width: min(var(--sidebar-width), 100vw);
 }
 
 .inputWrapper {

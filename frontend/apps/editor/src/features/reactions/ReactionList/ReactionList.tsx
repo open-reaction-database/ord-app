@@ -111,7 +111,11 @@ export function ReactionList() {
         radius="sm"
         p="lg"
       >
-        <Flex justify="space-between">
+        <Flex
+          justify="space-between"
+          wrap="wrap"
+          gap="sm"
+        >
           <Flex
             align="center"
             gap="sm"
