@@ -15,6 +15,7 @@
  */
 import { expect, test, type Page } from '@playwright/test';
 import { seedReaction } from './seed.ts';
+import { LOADER, PREVIEW, waitForReactionPageToSettle } from './settle.ts';
 
 /**
  * What differs between runs: the footer's year. The fixture sets its own reaction ID, since
@@ -22,21 +23,6 @@ import { seedReaction } from './seed.ts';
  */
 function changingContent(page: Page) {
   return [page.getByText(/Copyright \d{4}/)];
-}
-
-const PREVIEW = 'img[src^="data:image/svg+xml"]';
-const LOADER = '.mantine-Loader-root';
-
-/** Waits for what the page loads after the reaction itself, so a screenshot shows it all. */
-async function waitForPageToSettle(page: Page) {
-  // Edit controls appear once the dataset loads and grants the dev user edit rights.
-  await expect(page.getByRole('button', { name: 'Remove', exact: true })).toBeVisible();
-  // The user menu appears once the signed-in user loads.
-  await expect(page.getByText('E2E User', { exact: true })).toBeVisible();
-  // The Indigo worker renders the molecule previews: three in the header and two in the
-  // inputs list.
-  await expect(page.locator(LOADER)).toHaveCount(0);
-  await expect(page.locator(PREVIEW).filter({ visible: true })).toHaveCount(5);
 }
 
 let reactionUrl: string;
@@ -84,7 +70,7 @@ test.describe('appearance', () => {
       !process.env.CI,
       'Screenshots are compared only in CI, where the baselines are made.',
     );
-    await waitForPageToSettle(page);
+    await waitForReactionPageToSettle(page);
     await expect(page).toHaveScreenshot('reaction-page.png', {
       mask: changingContent(page),
     });

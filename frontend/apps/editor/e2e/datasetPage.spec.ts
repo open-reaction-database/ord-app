@@ -15,9 +15,7 @@
  */
 import { expect, test } from '@playwright/test';
 import { seedReaction } from './seed.ts';
-
-const PREVIEW = 'img[src^="data:image/svg+xml"]';
-const LOADER = '.mantine-Loader-root';
+import { LOADER, PREVIEW } from './settle.ts';
 
 let datasetUrl: string;
 

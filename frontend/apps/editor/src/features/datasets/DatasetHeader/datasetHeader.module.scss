@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* The buttons wrap below the details once the details would have less than 480 px. */
 .header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 16px;
   overflow: hidden;
 }
 
 .leftTitlePart {
+  flex: 1 1 480px;
   overflow: hidden;
 }
 

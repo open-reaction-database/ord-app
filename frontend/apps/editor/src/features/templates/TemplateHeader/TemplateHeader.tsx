@@ -62,6 +62,8 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
       <Flex
         align="center"
         justify="space-between"
+        wrap="wrap"
+        gap="sm"
       >
         <ValidityButton
           validText="Template is valid"
