@@ -26,6 +26,8 @@ export interface PageContainerProps extends PropsWithChildren {
   badge?: ReactNode;
   /** Controls at the right of the header, such as the signed-in user's menu. */
   headerActions?: ReactNode;
+  /** The page's footer: the Open Reaction Database footer by default, and none for `null`. */
+  footer?: ReactNode;
 }
 
 export function PageContainer({
@@ -33,12 +35,14 @@ export function PageContainer({
   breadcrumbs,
   badge,
   headerActions,
+  footer = <Footer />,
 }: Readonly<PageContainerProps>) {
+  const hasFooter = footer !== null;
   return (
     <AppShell
       classNames={{
         header: classes.header,
-        main: classes.main,
+        main: hasFooter ? classes.main : `${classes.main} ${classes.mainWithoutFooter}`,
         footer: classes.footer,
       }}
     >
@@ -70,9 +74,7 @@ export function PageContainer({
         </Flex>
       </AppShell.Main>
 
-      <AppShell.Footer withBorder={true}>
-        <Footer />
-      </AppShell.Footer>
+      {hasFooter && <AppShell.Footer withBorder={true}>{footer}</AppShell.Footer>}
     </AppShell>
   );
 }

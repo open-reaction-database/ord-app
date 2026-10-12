@@ -30,6 +30,7 @@ import {
   useReactionPart,
   useReactionSlots,
   useReactionSnapshot,
+  useReactionSnapshotField,
 } from './reactionProvider.hooks.ts';
 import type {
   ReactionActions,
@@ -48,6 +49,8 @@ const slots: ReactionSlots = {
 
 const input = (name: string, additionOrder: number) =>
   ({ name, additionOrder }) as unknown as ReactionInput;
+
+const NO_PREVIEWS = {};
 
 const snapshot = {
   data: {
@@ -154,6 +157,43 @@ describe('reaction hooks over a static source', () => {
     expect(renderHook(useReactionActions, { wrapper: editable }).result.current).toBe(
       actions,
     );
+  });
+});
+
+describe('useReactionSnapshotField', () => {
+  it('re-renders only when its field changes', () => {
+    let current: ReactionSnapshot = { ...snapshot, pb_reaction_id: 'ord-1' };
+    const listeners = new Set<() => void>();
+    const source: ReactionSource = {
+      getSnapshot: () => current,
+      getPreviews: () => NO_PREVIEWS,
+      subscribe: listener => {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+    };
+    const replace = (next: ReactionSnapshot) => {
+      current = next;
+      for (const listener of listeners) {
+        listener();
+      }
+    };
+    let renders = 0;
+    const { result } = renderHook(
+      () => {
+        renders += 1;
+        return useReactionSnapshotField('pb_reaction_id');
+      },
+      { wrapper: wrapperFor(source) },
+    );
+    expect(result.current).toBe('ord-1');
+    const before = renders;
+    act(() => replace({ ...current, data: { ...current.data, inputs: {} } }));
+    expect(renders).toBe(before);
+    act(() => replace({ ...current, pb_reaction_id: 'ord-2' }));
+    expect(result.current).toBe('ord-2');
   });
 });
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
 import { Router } from 'wouter';
 import { memoryLocation } from 'wouter/memory-location';
@@ -80,5 +80,40 @@ describe('Breadcrumbs', () => {
     const history = renderNested([{ title: 'Datasets', path: '~/' }]);
     fireEvent.click(screen.getByText('Datasets').parentElement!.querySelector('svg')!);
     expect(history).toEqual(['/datasets/1']);
+  });
+
+  it('hides the decorative Home icon from assistive technology', () => {
+    const { container } = renderWithMantine(
+      <Breadcrumbs items={[{ title: 'Datasets', path: '~/' }]} />,
+    );
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('gives no crumb a DOM id built from its path', () => {
+    const { container } = renderWithMantine(
+      <Breadcrumbs
+        items={[
+          { title: 'Datasets', path: '~/' },
+          { title: 'My Dataset', path: '~/datasets/1' },
+        ]}
+      />,
+    );
+    expect(container.querySelector('[id^="~"]')).toBeNull();
+  });
+
+  it('renders crumbs that share a path without a duplicate key', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderWithMantine(
+      <Breadcrumbs
+        items={[
+          { title: 'Datasets', path: '~/' },
+          { title: 'My Dataset', path: '~/datasets/1' },
+          { title: 'New reaction', path: '~/datasets/1' },
+        ]}
+      />,
+    );
+    expect(screen.getByText('My Dataset')).toBeInTheDocument();
+    expect(screen.getByText('New reaction')).toBeInTheDocument();
+    expect(error).not.toHaveBeenCalled();
   });
 });

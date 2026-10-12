@@ -25,7 +25,8 @@ export function CrudeComponentView({
 }: Readonly<CrudeComponentViewProps>) {
   const { ReactionLink } = useReactionSlots();
   const pbReactionId = crudeComponent.reactionId ?? '';
-  return ReactionLink ? (
+  // Without an ID there is nothing to link to.
+  return ReactionLink && pbReactionId ? (
     <ReactionLink pbReactionId={pbReactionId} />
   ) : (
     <span>{pbReactionId}</span>

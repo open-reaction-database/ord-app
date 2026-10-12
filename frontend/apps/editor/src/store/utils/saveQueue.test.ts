@@ -15,7 +15,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { deferred } from 'test/deferred.ts';
-import { createSaveQueue } from './saveQueue.ts';
+import { createSaveQueue, createStoreSaveQueues } from './saveQueue.ts';
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -61,6 +61,60 @@ describe('createSaveQueue', () => {
     });
     await flush();
     expect(started).toEqual([1, 2]);
+    blocked.resolve();
+  });
+});
+
+describe('createStoreSaveQueues', () => {
+  it('gives a store the same queues each time a module asks by the same name', async () => {
+    // As after a hot reload, when the module that made the queues runs again.
+    const store = {};
+    const first = createStoreSaveQueues<number>('test-reload')(store);
+    const again = createStoreSaveQueues<number>('test-reload')(store);
+    const blocked = deferred<void>();
+    const started: Array<string> = [];
+    void first(1, () => {
+      started.push('first');
+      return blocked.promise;
+    });
+    void again(1, async () => {
+      started.push('again');
+    });
+    await flush();
+    expect(started).toEqual(['first']);
+    blocked.resolve();
+  });
+
+  it.each<
+    [string, () => Array<ReturnType<ReturnType<typeof createStoreSaveQueues<number>>>>]
+  >([
+    [
+      'names in one store',
+      () => {
+        const store = {};
+        return [
+          createStoreSaveQueues<number>('test-name-a')(store),
+          createStoreSaveQueues<number>('test-name-b')(store),
+        ];
+      },
+    ],
+    [
+      'stores under one name',
+      () => {
+        const forStore = createStoreSaveQueues<number>('test-stores');
+        return [forStore({}), forStore({})];
+      },
+    ],
+  ])('keeps the queues of different %s apart', async (_label, makeQueues) => {
+    const [blockedQueue, otherQueue] = makeQueues();
+    const blocked = deferred<void>();
+    const started: Array<string> = [];
+    void blockedQueue(1, () => blocked.promise);
+    void otherQueue(1, async () => {
+      started.push('other');
+    });
+    await flush();
+    expect(started).toEqual(['other']);
     blocked.resolve();
   });
 });
