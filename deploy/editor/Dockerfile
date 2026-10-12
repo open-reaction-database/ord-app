@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# uv from its release image, pinned by version and digest. A FROM line, unlike a
+# COPY --from image reference, is one Dependabot updates.
+FROM ghcr.io/astral-sh/uv:0.13.0@sha256:cdc6093146eb3ff6a40107b38f008b789e050e77ad87865e381d9917da55a168 AS uv
+
 # Stage 1: Build the React app
 FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS react-build
 
@@ -33,8 +37,8 @@ ARG VITE_API_ENDPOINT=/api/v1
 ENV VITE_API_ENDPOINT=${VITE_API_ENDPOINT}
 
 # The Auth0 settings are compiled into the bundle. They come from these build arguments
-# or, for any not passed, from frontend/apps/editor/.env. ORD_APP_REQUIRE_AUTH0 fails the
-# build when one is missing (see frontend/apps/editor/vite.config.ts).
+# or, for any not passed, from frontend/apps/editor/.env. ORD_APP_REQUIRE_AUTH0 fails
+# the build when one is missing (see frontend/apps/editor/vite.config.ts).
 ARG VITE_AUTH0_DOMAIN
 ARG VITE_AUTH0_CLIENT_ID
 ARG VITE_AUTH0_AUDIENCE
@@ -76,8 +80,7 @@ RUN groupadd --gid 1001 appgroup && \
     zlib1g-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# uv from its release image, pinned by version.
-COPY --from=ghcr.io/astral-sh/uv:0.13.0@sha256:cdc6093146eb3ff6a40107b38f008b789e050e77ad87865e381d9917da55a168 /uv /uvx /bin/
+COPY --from=uv /uv /uvx /bin/
 
 ENV UV_PROJECT_ENVIRONMENT=/usr/local \
     UV_COMPILE_BYTECODE=1 \
@@ -110,12 +113,13 @@ RUN (chown -R appuser:appgroup /app /var/www/html /etc/nginx || ls -lah /app) &&
 COPY deploy/editor/entrypoint.sh ./
 RUN chmod +x ./entrypoint.sh
 
-# Expose both FastAPI and Nginx ports
-EXPOSE 8000 80
+# nginx serves the bundle and proxies the API on this port (nginx.conf).
+EXPOSE 5173
 
 # Record the source commit so the deployed image is traceable to a commit. The infra
-# build (ord-infrastructure) passes --build-arg GIT_COMMIT=$(git rev-parse HEAD) from
-# the checkout; defaults to "unknown" for local/manual builds. Declared last so only
+# build (ord-infrastructure's sibling_head) passes the checkout's HEAD, suffixed
+# -dirty when the tree has changes or git cannot tell, or "unknown" when it cannot
+# read HEAD; local and manual builds default to "unknown". Declared last so only
 # this layer rebuilds per commit.
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT

@@ -16,6 +16,7 @@
 # images to digests. Dependabot rewrites the SHA or digest along with its version,
 # which is what keeps a pinned workflow or image from freezing on whatever was
 # current the day it was written (a base image's tag is rebuilt for OS fixes).
+# docker-compose.yml's images are tracked by tag.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -42,4 +43,16 @@ updates:
       - dependency-name: python
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: node
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      compose-images:
+        patterns:
+          - "*"
+    ignore:
+      # A Postgres major upgrade is a deliberate change, not a monthly bump.
+      - dependency-name: "*postgres*"
         update-types: ["version-update:semver-major"]
