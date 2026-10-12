@@ -49,4 +49,5 @@ testpaths = ["ord_viewer"]
 python_files = ["*_test.py"]
 
 [tool.coverage.report]
-fail_under = 80
+# A few points below the measured total, as a regression backstop; ratchet up over time.
+fail_under = 90

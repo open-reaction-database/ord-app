@@ -37,9 +37,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^backend/editor/ord_editor/
+        files: ^backend/(editor/ord_editor|viewer/ord_viewer)/
       - id: ruff-format
-        files: ^backend/editor/ord_editor/
+        files: ^backend/(editor/ord_editor|viewer/ord_viewer)/
 
   # Type checking. ty resolves imports through the project's uv environment, so each
   # project's hook runs from that project's directory.
@@ -50,6 +50,12 @@ repos:
         entry: uv run --directory backend/editor --frozen --no-build ty check ord_editor
         language: system
         files: ^backend/editor/ord_editor/.*\.py$
+        pass_filenames: false
+      - id: ty-viewer
+        name: ty check (backend/viewer)
+        entry: uv run --directory backend/viewer --frozen --no-build ty check ord_viewer
+        language: system
+        files: ^backend/viewer/ord_viewer/.*\.py$
         pass_filenames: false
 
   # UI lint, format, and type check. Delegated to the tools installed under
@@ -93,5 +99,5 @@ repos:
         name: jscpd (duplication)
         entry: frontend/node_modules/.bin/jscpd --config .jscpd.json
         language: system
-        files: ^(backend/editor/ord_editor|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
+        files: ^(backend/(editor/ord_editor|viewer/ord_viewer)|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
         pass_filenames: false

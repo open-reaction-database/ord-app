@@ -25,6 +25,18 @@
 
     The server starts at http://localhost:8000 against the Postgres that `PG_DSN` names (default: the docker-compose database on localhost:5400), and `alembic upgrade head` creates its schema. Navigate to http://localhost:8000/service_api/docs for the interactive Swagger docs.
 
+### Viewer backend
+
+The viewer's backend is a separate uv project that serves one corpus directory and needs no Postgres.
+
+```shell
+cd backend/viewer && uv sync --frozen
+uv run pytest -n auto
+ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001
+```
+
+Opening a full corpus takes about 40 s and 7 GiB.
+
 ## Code style
 
 Formatting and linting run through [pre-commit](https://pre-commit.com): license headers via
