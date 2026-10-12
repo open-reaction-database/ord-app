@@ -38,6 +38,12 @@ COMPOUND_NAMES = {"pyridine": "c1ccncc1"}
 def offline_resolver(name: str) -> str:
     """Resolve a compound name from COMPOUND_NAMES without the network.
 
+    Args:
+        name: A compound name from a query.
+
+    Returns:
+        The SMILES for the name.
+
     Raises:
         ValueError: If the name is not in COMPOUND_NAMES.
     """
@@ -55,7 +61,18 @@ def _reaction(
     yield_percent: float | None = None,
     catalyst_name: str | None = None,
 ) -> reaction_pb2.Reaction:
-    """Build a reaction from reactant SMILES, one product, and an optional yield."""
+    """Build a reaction with an optional yield and an optional named catalyst.
+
+    Args:
+        reaction_id: The reaction's ID.
+        reactants: SMILES of the reactants.
+        product: SMILES of the one product.
+        yield_percent: The product's percent yield, if any.
+        catalyst_name: The name of a catalyst input, if any.
+
+    Returns:
+        The reaction.
+    """
     reaction = reaction_pb2.Reaction(reaction_id=reaction_id)
     for smiles in reactants:
         component = reaction.inputs["reactants"].components.add(
@@ -124,7 +141,11 @@ DATASETS = (
 
 
 def derive_corpus(root: pathlib.Path) -> None:
-    """Write DATASETS as sources under root and derive every artifact the viewer reads."""
+    """Write DATASETS as sources under root and derive every artifact to read.
+
+    Args:
+        root: The directory to build the corpus in.
+    """
     for dataset in DATASETS:
         source = root / "sources" / "aa" / f"{dataset.dataset_id}.parquet"
         source.parent.mkdir(parents=True, exist_ok=True)
@@ -161,7 +182,15 @@ def derive_corpus(root: pathlib.Path) -> None:
 
 
 def make_client(corpus_dir: pathlib.Path, **settings: Any) -> TestClient:
-    """Return an unentered client over corpus_dir, with any settings overridden."""
+    """Return an unentered client over corpus_dir, with any settings overridden.
+
+    Args:
+        corpus_dir: The corpus the app serves.
+        **settings: Settings fields to set beyond corpus_dir.
+
+    Returns:
+        A client whose app opens the corpus when the client is entered.
+    """
     app = create_app(
         lambda: Settings(corpus_dir=corpus_dir, **settings), resolver=offline_resolver
     )

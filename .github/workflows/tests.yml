@@ -108,7 +108,24 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run tests
-        run: uv run --frozen --no-build pytest -n auto -vv --cov=ord_viewer --cov-report=term-missing --durations=10
+        run: uv run --frozen --no-build pytest -n auto -vv --cov=ord_viewer --cov-report=term-missing --cov-report=html --durations=10
+
+      - name: Coverage summary
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        run: |
+          {
+            echo "### Python viewer test coverage"
+            echo ""
+            uv run --frozen --no-build coverage report --format=markdown || echo "_coverage data unavailable_"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Python viewer coverage report
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-viewer-coverage
+          path: backend/viewer/htmlcov/
+          retention-days: 7
 
   test_e2e:
     runs-on: ubuntu-latest

@@ -31,5 +31,12 @@ class ViewerState:
 
 
 def get_state(request: Request) -> ViewerState:
-    """Return the state the lifespan stored on the app."""
+    """Return the state the lifespan stored on the app.
+
+    Args:
+        request: The request being served.
+
+    Returns:
+        The settings and open corpus.
+    """
     return request.app.state.viewer

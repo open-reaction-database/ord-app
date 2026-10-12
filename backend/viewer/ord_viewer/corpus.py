@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Opening the corpus a deployment serves, and resolving the compound names queries use."""
+"""Opening the corpus a deployment serves, and resolving the names queries use."""
 
 import os
 from collections.abc import Callable
@@ -22,8 +22,9 @@ from ord_schema.search import execute
 
 from ord_viewer.settings import Settings
 
-# The trees under the corpus directory. Each artifact tree holds one shard level of
-# files, as ord-data's data/<shard>/ does and the derive scripts mirror.
+# The trees under the corpus directory. projections/, structures/, and sources/ each
+# hold one shard level of files, as ord-data's data/<shard>/ does; pivots/ and
+# occurrences/ hold one subdirectory per level, each sharded the same way.
 _TREES = ("projections", "structures", "pivots", "occurrences", "sources")
 
 

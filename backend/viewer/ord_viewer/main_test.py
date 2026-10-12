@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Startup, shutdown, and /api/health."""
+"""Startup, shutdown, settings, and the /api routes."""
 
+import asyncio
 import re
 import shutil
 
@@ -40,7 +41,9 @@ def test_startup_fails_without_a_corpus_directory():
         pass
 
 
-@pytest.mark.parametrize("missing", ["pivots", "occurrences", "sources"])
+@pytest.mark.parametrize(
+    "missing", ["projections", "structures", "pivots", "occurrences", "sources"]
+)
 def test_startup_names_a_missing_tree(corpus_dir, tmp_path, missing):
     partial = tmp_path / "corpus"
     shutil.copytree(corpus_dir, partial)
@@ -53,7 +56,14 @@ def test_startup_names_a_missing_tree(corpus_dir, tmp_path, missing):
 
 
 def _record_closes(monkeypatch):
-    """Wrap Corpus.close so each call is counted, then runs the original."""
+    """Wrap Corpus.close to count each call, then run the original.
+
+    Args:
+        monkeypatch: The fixture that installs the wrapper.
+
+    Returns:
+        The list of corpora closed so far, appended to on each call.
+    """
     original = execute.Corpus.close
     calls = []
 
@@ -81,3 +91,42 @@ def test_shutdown_closes_the_corpus(monkeypatch, corpus_dir):
     with make_client(corpus_dir):
         assert closes == []
     assert len(closes) == 1
+
+
+def test_serving_exception_still_closes_the_corpus(monkeypatch, corpus_dir):
+    app = create_app(lambda: Settings(corpus_dir=corpus_dir), resolver=offline_resolver)
+    closes = _record_closes(monkeypatch)
+
+    async def serve_and_fail() -> None:
+        async with app.router.lifespan_context(app):
+            raise RuntimeError("serving failed")
+
+    with pytest.raises(RuntimeError, match="serving failed"):
+        asyncio.run(serve_and_fail())
+    assert len(closes) == 1
+
+
+def test_api_docs_are_served_under_api(client):
+    openapi = client.get("/api/openapi.json")
+    assert openapi.status_code == 200
+    assert "/api/health" in openapi.json()["paths"]
+    assert client.get("/api/docs").status_code == 200
+
+
+def test_settings_come_from_the_environment(monkeypatch, corpus_dir):
+    monkeypatch.setenv("ORD_VIEWER_CORPUS_DIR", str(corpus_dir))
+    monkeypatch.setenv("ORD_VIEWER_MAX_CONCURRENT", "2")
+    app = create_app(resolver=offline_resolver)
+    with TestClient(app):
+        settings = app.state.viewer.settings
+        assert settings.max_concurrent == 2
+        assert settings.corpus_dir == corpus_dir
+
+
+def test_an_empty_corpus_directory_variable_counts_as_unset(monkeypatch):
+    monkeypatch.setenv("ORD_VIEWER_CORPUS_DIR", "")
+    with (
+        pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"),
+        TestClient(create_app(resolver=offline_resolver)),
+    ):
+        pass

@@ -35,7 +35,13 @@ uv run pytest -n auto
 ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001
 ```
 
-Opening a full corpus takes about 40 s and 7 GiB.
+Opening a full corpus takes about 40 s and 7 GiB. The API docs are at http://localhost:8001/api/docs.
+
+ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `derive_structures`, `derive_pivots`, and `derive_occurrences`) produce a corpus's trees from source Parquet. For a local smoke run, `ord_viewer.testing.derive_corpus(path)` writes the five-reaction test corpus:
+
+```shell
+uv run python -c "import pathlib; from ord_viewer.testing import derive_corpus; derive_corpus(pathlib.Path('/tmp/corpus'))"
+```
 
 ## Code style
 

@@ -46,14 +46,17 @@ def create_app(
     @contextlib.asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         settings = settings_factory()
-        corpus = open_corpus(settings, resolver=resolver)
-        app.state.viewer = ViewerState(settings=settings, corpus=corpus)
-        try:
+        with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
+            app.state.viewer = ViewerState(settings=settings, corpus=corpus)
             yield
-        finally:
-            corpus.close()
 
-    app = FastAPI(title="Open Reaction Database viewer", lifespan=lifespan)
+    app = FastAPI(
+        title="Open Reaction Database viewer",
+        lifespan=lifespan,
+        openapi_url="/api/openapi.json",
+        docs_url="/api/docs",
+        redoc_url=None,
+    )
     app.include_router(health.router)
     return app
 

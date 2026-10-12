@@ -1,12 +1,16 @@
 # ord-app
 
-Web application for the [Open Reaction Database](https://open-reaction-database.org): browse, create, and edit reaction datasets. Python/FastAPI backend + React UI, Auth0-gated, backed by Postgres.
+Two web applications for the [Open Reaction Database](https://open-reaction-database.org).
+
+The editor: browse, create, and edit reaction datasets; Python/FastAPI backend + React UI, Auth0-gated, backed by Postgres.
+
+The viewer's backend: search and browse over one published corpus with `ord_schema.search`; no database.
 
 ## Layout
 
 - `backend/editor/` — the editor's backend, its own uv project (Python 3.12): `pyproject.toml`, `uv.lock`, `alembic.ini`, `migrations/` (Alembic), and the compose image's `Dockerfile`.
   - `ord_editor/service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`. Tests sit beside the code as `*_test.py`; shared fixtures in `ord_editor/conftest.py`, data in `ord_editor/testdata/`.
-- `backend/viewer/` — the viewer's backend, its own uv project (Python 3.12), pinned to `ord-schema[search,nl]==0.9.1` and `rdkit==2026.3.5` because `Corpus` opens only artifacts stamped with those exact versions. `ord_viewer/` — a FastAPI app with every route under `/api/`, serving one corpus directory (`ORD_VIEWER_CORPUS_DIR`: `projections/`, `structures/`, `pivots/`, `occurrences/`, `sources/`, each with one shard level). Tests derive a small corpus (`ord_viewer/testing.py`) and need no Postgres.
+- `backend/viewer/` — the viewer's backend, its own uv project (Python 3.12), pinned to `ord-schema[search,nl]==0.9.1` and `rdkit==2026.3.5` because `Corpus` opens only artifacts stamped with those exact versions. `ord_viewer/` — a FastAPI app with every route under `/api/`, serving one corpus directory (`ORD_VIEWER_CORPUS_DIR`: `projections/`, `structures/`, `pivots/`, `occurrences/`, `sources/`; `projections/`, `structures/`, and `sources/` each hold one shard level of files, while `pivots/` and `occurrences/` hold one subdirectory per level, each sharded the same way). Tests derive a small corpus (`ord_viewer/testing.py`) and need no Postgres.
 - `deploy/editor/` — the editor's production image: `Dockerfile` (the editor's bundle and backend behind nginx, under supervisord), `Dockerfile.dockerignore`, `nginx.conf`, `supervisord.conf`, `entrypoint.sh`.
 - `ruff.toml` — the ruff config for every Python project. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + the editor's backend.
 - `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, a `tsconfig.base.json` every project extends, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
@@ -21,7 +25,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate (from `backend/editor`): `uv run alembic upgrade head`.
 - Run dev server (from `backend/editor`): `APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload` → http://localhost:8000 (`/service_api/docs`).
 - Tests (from `backend/editor`): `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
-- Viewer: `cd backend/viewer && uv sync --frozen`; tests `uv run pytest -n auto`; serve with `ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001` (opening a full corpus takes about 40 s and 7 GiB).
+- Viewer: `cd backend/viewer && uv sync --frozen`; tests `uv run pytest -n auto`; serve with `ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001` (opening a full corpus takes about 40 s and 7 GiB); the API docs are at `/api/docs`.
 - Lint/type: `ruff` + `ruff format` (config in the root `ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
 
 ## Frontend (`frontend/`)

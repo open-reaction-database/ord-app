@@ -31,6 +31,16 @@ class Health(BaseModel):
 
 
 @router.get("/health")
-def health(state: Annotated[ViewerState, Depends(get_state)]) -> Health:
-    """Return the open corpus's fingerprint."""
+async def health(state: Annotated[ViewerState, Depends(get_state)]) -> Health:
+    """Return the open corpus's fingerprint.
+
+    The fingerprint is a precomputed string, so the handler never blocks the event
+    loop and does not queue behind blocking handlers on the threadpool.
+
+    Args:
+        state: The settings and open corpus the lifespan stored on the app.
+
+    Returns:
+        The fingerprint of the corpus the process serves.
+    """
     return Health(fingerprint=state.corpus.fingerprint)

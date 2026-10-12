@@ -44,7 +44,7 @@ dev = [
 package = false
 
 [tool.pytest.ini_options]
-# Tests sit beside the code as <module>_test.py; fixtures live in ord_viewer/conftest.py.
+# Tests sit beside the code as <module>_test.py; fixtures are in ord_viewer/conftest.py.
 testpaths = ["ord_viewer"]
 python_files = ["*_test.py"]
 
