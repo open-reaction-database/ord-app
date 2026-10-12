@@ -257,7 +257,7 @@ describe('variable saves', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
     const second = save({ path: ['conditions', 'pressure'], name: 'pressure' });
     await new Promise(resolve => setTimeout(resolve, 0));
-    store.dispatch(removeTemplateActions.success(5 as never));
+    store.dispatch(removeTemplateActions.success('template_5'));
     firstSave.resolve({ data: {} });
     await Promise.all([first, second]);
     expect(showNotification).not.toHaveBeenCalledWith(
