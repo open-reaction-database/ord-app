@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import type { APIRequestContext } from '@playwright/test';
-import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -73,24 +72,6 @@ export async function seedReaction(
     },
   );
   return { groupId: group.id, datasetId: dataset.id, reactionId: reaction.id };
-}
-
-/** Saves a seeded reaction as a template, as the e2e dev user. */
-export async function seedTemplate(
-  request: APIRequestContext,
-  { datasetId, reactionId }: { datasetId: number; reactionId: number },
-): Promise<{ templateId: number; name: string }> {
-  const reaction = await call<{ binpb: string }>(
-    request,
-    'get',
-    `/datasets/${datasetId}/reactions/${reactionId}`,
-  );
-  // Each worker seeds its own template, so the name must not repeat across workers.
-  const name = `e2e template ${randomUUID()}`;
-  const template = await call<{ id: number }>(request, 'post', '/templates', {
-    data: { name, binpb: reaction.binpb, variables: '[]' },
-  });
-  return { templateId: template.id, name };
 }
 
 /** Seeds the fixture reaction in a dataset the e2e user may only view. */

@@ -23,17 +23,13 @@
   min-width: 0;
 }
 
-/* In a narrow card the actions wrap below the title instead of squeezing it out. */
 .topContainer {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 8px 16px;
 }
 
 .titleContainer {
   display: flex;
-  flex: 1 1 200px;
   flex-direction: column;
   gap: 4px;
 }
