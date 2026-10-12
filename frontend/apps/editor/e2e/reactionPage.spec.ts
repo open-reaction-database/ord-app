@@ -68,6 +68,18 @@ test('opens an entity in the drawer and closes it', async ({ page }) => {
   await expect(drawer).toBeHidden();
 });
 
+test.describe('in a narrow window', () => {
+  test.use({ viewport: { width: 800, height: 900 } });
+
+  test('fits without scrolling sideways', async ({ page }) => {
+    await waitForPageToSettle(page);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(0);
+  });
+});
+
 test.describe('appearance', () => {
   // A missing baseline is written by the attempt that finds it missing; a retry would then
   // match it and pass, so this test does not retry.

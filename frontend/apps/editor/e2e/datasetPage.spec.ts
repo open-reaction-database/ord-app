@@ -26,6 +26,21 @@ test.beforeAll(async ({ request }) => {
   datasetUrl = `/datasets/${datasetId}`;
 });
 
+test.describe('in a narrow window', () => {
+  test.use({ viewport: { width: 800, height: 900 } });
+
+  test('fits without scrolling sideways', async ({ page }) => {
+    await page.goto(datasetUrl, { waitUntil: 'domcontentloaded' });
+    const link = page.getByRole('link', { name: 'e2e-reaction-page' });
+    await expect(link).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator(LOADER)).toHaveCount(0);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(0);
+  });
+});
+
 test.describe('appearance', () => {
   // A missing baseline is written by the attempt that finds it missing; a retry would then
   // match it and pass, so this test does not retry.
