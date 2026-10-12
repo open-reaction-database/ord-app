@@ -350,6 +350,28 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     });
   });
 
+  it('keeps the validation of a reaction with unsaved edits when it loads again', () => {
+    const stored = {
+      ...reaction(1, { notes: { text: 'original' } }),
+      validation: { errors: [{ text: 'stored', path: ['notes'] }], warnings: [] },
+    };
+    const edited = editNotes({ reactionsById: { 1: stored } as never }, 'edited');
+    const reloaded = reduce(
+      edited,
+      getReactionActions.success({
+        ...reaction(1, { notes: { text: 'original' } }),
+        validation: {
+          errors: [{ text: 'loaded', path: ['inputs', 'fresh'] }],
+          warnings: [],
+        },
+        previews: {},
+      } as never),
+    );
+    expect(reloaded.reactionsById[1]).toMatchObject({
+      validation: { errors: [{ text: 'stored' }] },
+    });
+  });
+
   it('takes a loaded reaction as is when nothing is unsaved', () => {
     const reloaded = reduce(
       seedNotes('original'),
@@ -444,7 +466,11 @@ describe('reactions.reducer — templates', () => {
   const added = { path: ['conditions', 'temperature'], name: 'temp' };
   const seededVariables = () => ({
     reactionsById: {
-      t1: { id: 't1', variables: { 'notes.safetyNotes': kept } },
+      t1: {
+        id: 't1',
+        data: { outcomes: [], inputs: { stored: { id: 'stored' } } },
+        variables: { 'notes.safetyNotes': kept },
+      },
     } as never,
   });
 
@@ -489,6 +515,10 @@ describe('reactions.reducer — templates', () => {
       addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
     );
     const reloaded = reduce(pending, action());
+    // The variables' paths name the stored data's entities, so that data stays with them.
+    expect(asEntry(reloaded.reactionsById.t1).data).toBe(
+      asEntry(pending.reactionsById.t1).data,
+    );
     expect(asEntry(reloaded.reactionsById.t1).variables).toEqual({
       'notes.safetyNotes': kept,
       'conditions.temperature': added,

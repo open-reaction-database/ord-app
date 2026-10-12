@@ -62,27 +62,19 @@ const getTemplateId = (template: ReactionTemplate) => template.id;
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
 /**
- * A loaded reaction or template, keeping the unsaved edits the store holds for it and their saved
- * copy: they are newer than the load, and queued saves still have to send them. (#615)
+ * A loaded reaction or template, unless the store holds unsaved edits for it; then the stored entry
+ * stays whole. A load gives every entity a new id, and the stored entry's edits, saved copy,
+ * validation paths, previews, and template variable paths all name its own ids, which queued saves
+ * will send. Their responses bring the backend's fields. (#615)
  */
 function keepUnsavedEdits<T extends ReactionOrTemplate>(
   stored: ReactionOrTemplate | undefined,
   loaded: T,
 ): T {
-  let merged = loaded;
-  if (stored?.dataBeforeEdit !== undefined) {
-    merged = { ...merged, data: stored.data, dataBeforeEdit: stored.dataBeforeEdit };
-  }
-  const variablesBeforeEdit = (stored as ReactionTemplate | undefined)
-    ?.variablesBeforeEdit;
-  if (variablesBeforeEdit !== undefined) {
-    merged = {
-      ...merged,
-      variables: (stored as ReactionTemplate).variables,
-      variablesBeforeEdit,
-    };
-  }
-  return merged;
+  const hasUnsavedEdits =
+    stored?.dataBeforeEdit !== undefined ||
+    (stored as ReactionTemplate | undefined)?.variablesBeforeEdit !== undefined;
+  return hasUnsavedEdits ? (stored as T) : loaded;
 }
 
 const activeDatasetId = createReducer<number>(0, builder => {
