@@ -41,7 +41,7 @@ test('fills each truncating column with its text', async ({ page }) => {
   ).toBeVisible({
     timeout: 30_000,
   });
-  for (const header of ['Dataset Name', 'Owner', 'Description']) {
+  for (const header of ['Dataset Name', 'Group', 'Owner', 'Description']) {
     // How much the first row's text differs in width from its cell's content box.
     const gap = () =>
       page.evaluate(name => {
@@ -53,7 +53,10 @@ test('fills each truncating column with its text', async ({ page }) => {
           cell.clientWidth -
           parseFloat(style.paddingLeft) -
           parseFloat(style.paddingRight);
-        const text = cell.querySelector(':scope > div')!.getBoundingClientRect().width;
+        // The group's name is a paragraph inside the cell's wrapper.
+        const box =
+          cell.querySelector(':scope > div > p') ?? cell.querySelector(':scope > div');
+        const text = box!.getBoundingClientRect().width;
         return Math.abs(content - text);
       }, header);
     await expect
@@ -65,7 +68,7 @@ test('fills each truncating column with its text', async ({ page }) => {
 test.describe('in a window too narrow for the table', () => {
   test.use({ viewport: { width: 640, height: 900 } });
 
-  test('takes the description and owner to their minimums, and keeps the name whole', async ({
+  test('takes the description and owner to their minimums, and the others to their sizes', async ({
     page,
   }) => {
     await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
@@ -80,5 +83,6 @@ test.describe('in a window too narrow for the table', () => {
     await expect.poll(() => width('Description')).toBe(120);
     await expect.poll(() => width('Owner')).toBe(100);
     await expect.poll(() => width('Dataset Name')).toBe(230);
+    await expect.poll(() => width('Group')).toBe(145);
   });
 });

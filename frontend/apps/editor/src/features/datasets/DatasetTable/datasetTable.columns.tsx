@@ -106,7 +106,11 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'group',
     header: 'Group',
     Cell: ({ row }) => {
-      return <GroupsListWithRoles data={row.original.groups} />;
+      return (
+        <div className={clsx(classes.fillsColumn, classes.groupsCell)}>
+          <GroupsListWithRoles data={row.original.groups} />
+        </div>
+      );
     },
     size: 145,
   },

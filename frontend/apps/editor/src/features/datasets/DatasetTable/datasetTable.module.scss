@@ -51,6 +51,11 @@
   min-width: 100%;
 }
 
+/* The group's one-line name would take the wrapper's zero width; it fills the wrapper instead. */
+.groupsCell p {
+  width: auto;
+}
+
 .row:hover {
   cursor: pointer;
 }
