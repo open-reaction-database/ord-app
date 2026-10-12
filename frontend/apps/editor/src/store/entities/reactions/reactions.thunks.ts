@@ -24,8 +24,11 @@ import {
   importReactionFromFileActions,
   removeReactionActions,
   renameReactionActions,
+  restoreSavedReaction,
   searchReactionActions,
 } from './reactions.actions.ts';
+import type { Action } from '@reduxjs/toolkit';
+import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import axiosInstance from 'store/axiosInstance.ts';
 import type { Pages } from 'common/types';
 import {
@@ -37,7 +40,8 @@ import {
   parseReaction,
   parseValidation,
 } from '@open-reaction-database/ui/reaction/model';
-import type { UpdateReactionSuccessPayload } from 'store/entities/reactions/reactionsStore.types.ts';
+import type { SavedReactionPayload } from 'store/entities/reactions/reactionsStore.types.ts';
+import { createStoreSaveQueues, SAVE_TIMEOUT_MS } from 'store/utils/saveQueue.ts';
 import {
   selectActiveDatasetId,
   selectReactionById,
@@ -157,13 +161,22 @@ export const importReactionFromFile = createThunkWithExplicitResult(
     },
 );
 
+// Each save sends the whole reaction, so saves of one reaction run one at a time, in order.
+const reactionSaveQueues = createStoreSaveQueues<ReactionId>();
+
+/**
+ * Sends the reaction's current data, through `prepare` (a rename sets its name there), and
+ * returns the backend's view of what it saved, with the data it read as `savedData`.
+ */
 async function updateReaction(
   reactionId: ReactionId,
+  datasetId: number,
   getState: () => AppState,
-): Promise<UpdateReactionSuccessPayload> {
-  const datasetId = selectActiveDatasetId(getState());
+  prepare: (data: AppReaction) => AppReaction = data => data,
+): Promise<SavedReactionPayload> {
   const reaction = selectReactionById(reactionId)(getState());
-  const payload = reactionToOrdBinpb(reaction.data);
+  const sent = prepare(reaction.data);
+  const payload = reactionToOrdBinpb(sent);
   const {
     binpb: _,
     molblocks,
@@ -175,33 +188,67 @@ async function updateReaction(
       {
         binpb: payload,
       },
+      { timeout: SAVE_TIMEOUT_MS },
     )
   ).data;
-  const updatedValidation = validation
-    ? parseValidation(validation, reaction.data)
-    : null;
+  const updatedValidation = validation ? parseValidation(validation, sent) : null;
   return {
     ...reactionMetadata,
-    previews: getReactionPreviews(reaction.data, molblocks),
+    previews: getReactionPreviews(sent, molblocks),
     validation: updatedValidation,
+    savedData: reaction.data,
   };
 }
 
-export const renameReaction = createThunk(
+/**
+ * Saves the reaction's unsaved edits, to the dataset open when they were made, once earlier saves
+ * of it settle, and records the outcome before the next save starts. Saves nothing when none are
+ * left: an earlier save sent them, a failed one rolled them back, or the reaction was removed.
+ */
+const saveEditedReaction: ThunkCustomWrapper<
+  {
+    reactionId: ReactionId;
+    succeeded: (payload: SavedReactionPayload) => Action;
+  },
+  Promise<void>
+> =
+  ({ reactionId, succeeded }) =>
+  (dispatch, getState) => {
+    const datasetId = selectActiveDatasetId(getState());
+    return reactionSaveQueues(getState)(reactionId, async () => {
+      if (selectReactionById(reactionId)(getState())?.dataBeforeEdit === undefined) {
+        return;
+      }
+      try {
+        dispatch(succeeded(await updateReaction(reactionId, datasetId, getState)));
+      } catch (e) {
+        dispatch(restoreSavedReaction(reactionId));
+        throw e;
+      }
+      showNotification({
+        message: 'Reaction updated.',
+        variant: NotificationVariant.SUCCESS,
+      });
+    });
+  };
+
+export const renameReaction = createThunkWithExplicitResult(
   renameReactionActions,
   ({ reactionId, name }) =>
-    async (_d, getState) => {
+    async (dispatch, getState) => {
       const datasetId = selectActiveDatasetId(getState());
-      const reaction = selectReactionById(reactionId)(getState());
-      const updatedReaction: AppReaction = { ...reaction.data, reactionId: name };
-      const payload = reactionToOrdBinpb(updatedReaction);
-      await axiosInstance.patch<ReactionResponse>(
-        `datasets/${datasetId}/reactions/${reactionId}`,
-        {
-          binpb: payload,
-        },
-      );
-      return renameReactionActions.success({ reactionId, name });
+      await reactionSaveQueues(getState)(reactionId, async () => {
+        if (selectReactionById(reactionId)(getState()) === undefined) {
+          return;
+        }
+        // A rename sends the whole reaction, unsaved edits included, so it takes the backend's
+        // validation and previews and records what it sent, as a field save does.
+        const saved = await updateReaction(reactionId, datasetId, getState, data => ({
+          ...data,
+          reactionId: name,
+        }));
+        dispatch(renameReactionActions.success({ ...saved, reactionId, name }));
+      });
     },
   { failureMessage: 'Failed to rename reaction.' },
 );
@@ -209,13 +256,13 @@ export const renameReaction = createThunk(
 export const addUpdateReactionField = createThunkWithExplicitResult(
   addUpdateReactionFieldActions,
   ({ reactionId }) =>
-    async (dispatch, getState) => {
-      const result = await updateReaction(reactionId, getState);
-      dispatch(addUpdateReactionFieldActions.success(result));
-      showNotification({
-        message: 'Reaction updated.',
-        variant: NotificationVariant.SUCCESS,
-      });
+    async dispatch => {
+      await dispatch(
+        saveEditedReaction({
+          reactionId,
+          succeeded: addUpdateReactionFieldActions.success,
+        }),
+      );
     },
   { failureMessage: 'Failed to update reaction.' },
 );
@@ -223,13 +270,13 @@ export const addUpdateReactionField = createThunkWithExplicitResult(
 export const deleteReactionField = createThunkWithExplicitResult(
   deleteReactionFieldActions,
   ({ reactionId }) =>
-    async (dispatch, getState) => {
-      const result = await updateReaction(reactionId, getState);
-      dispatch(deleteReactionFieldActions.success(result));
-      showNotification({
-        message: 'Reaction updated.',
-        variant: NotificationVariant.SUCCESS,
-      });
+    async dispatch => {
+      await dispatch(
+        saveEditedReaction({
+          reactionId,
+          succeeded: deleteReactionFieldActions.success,
+        }),
+      );
     },
   { failureMessage: 'Failed to update reaction.' },
 );

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 import { createActionFactory } from 'store/utils';
-import type { DatasetReaction } from '@open-reaction-database/ui/reaction/model';
+import type {
+  DatasetReaction,
+  ReactionId,
+} from '@open-reaction-database/ui/reaction/model';
 import type {
   AddEditReactionFieldPayload,
   ImportReactionFromFilePayload,
   UpdateReactionPayload,
-  UpdateReactionSuccessPayload,
+  SavedReactionPayload,
   RenameReactionPayload,
+  RenamedReactionPayload,
 } from 'store/entities/reactions/reactionsStore.types.ts';
 import type { CurrentPage, Pages } from 'common/types';
 import type { RejectValue } from 'store/utils/handleApiError.ts';
@@ -55,12 +59,12 @@ export const importReactionFromFileActions = createAsyncAction<
 
 export const renameReactionActions = createAsyncAction<
   RenameReactionPayload,
-  RenameReactionPayload
+  RenamedReactionPayload
 >('rename');
 
 export const addUpdateReactionFieldActions = createAsyncAction<
   AddEditReactionFieldPayload,
-  UpdateReactionSuccessPayload
+  SavedReactionPayload
 >('addUpdateField');
 
 export const searchReactionActions = createAsyncAction<string, DatasetReaction>(
@@ -69,7 +73,7 @@ export const searchReactionActions = createAsyncAction<string, DatasetReaction>(
 
 export const deleteReactionFieldActions = createAsyncAction<
   UpdateReactionPayload,
-  UpdateReactionSuccessPayload
+  SavedReactionPayload
 >('deleteField');
 
 export const removeReactionActions = createAsyncAction<number, number>(
@@ -77,3 +81,6 @@ export const removeReactionActions = createAsyncAction<number, number>(
 );
 
 export const setShowInvalidOnly = createAction<boolean>('setShowInvalidOnly');
+
+/** Restores the data the reaction's last save sent, dropping its unsaved edits. */
+export const restoreSavedReaction = createAction<ReactionId>('restoreSaved');

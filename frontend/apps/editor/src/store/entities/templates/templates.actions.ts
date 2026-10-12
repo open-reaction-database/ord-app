@@ -16,12 +16,13 @@
 import { createActionFactory } from 'store/utils';
 import type {
   AddUpdateRemoveVariablePayload,
+  SavedVariablesPayload,
   ImportTemplatePayload,
   TemplateCreator,
 } from './templates.types.ts';
 import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.types.ts';
 
-const { createAsyncAction } = createActionFactory('templates');
+const { createAsyncAction, createAction } = createActionFactory('templates');
 
 export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemplate>>(
   'get_all_templates',
@@ -44,12 +45,12 @@ export const renameTemplateActions = createAsyncAction<
 
 export const addUpdateVariableActions = createAsyncAction<
   AddUpdateRemoveVariablePayload,
-  void
+  SavedVariablesPayload
 >('addUpdateVariable');
 
 export const removeVariableActions = createAsyncAction<
   AddUpdateRemoveVariablePayload,
-  void
+  SavedVariablesPayload
 >('removeVariable');
 
 export const importTemplateFromFileActions = createAsyncAction<
@@ -57,3 +58,6 @@ export const importTemplateFromFileActions = createAsyncAction<
   ReactionTemplate,
   string
 >('importFromFile');
+
+/** Restores the variables the template's last save sent, dropping its unsaved edits. */
+export const restoreSavedVariables = createAction<string>('restoreSavedVariables');

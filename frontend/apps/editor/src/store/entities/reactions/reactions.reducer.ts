@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
+import { combineReducers, createReducer, isAnyOf, original } from '@reduxjs/toolkit';
 import {
   createEmptyReactionActions,
   getReactionActions,
@@ -24,6 +24,7 @@ import {
   deleteReactionFieldActions,
   removeReactionActions,
   renameReactionActions,
+  restoreSavedReaction,
   setShowInvalidOnly,
 } from './reactions.actions.ts';
 import {
@@ -34,6 +35,7 @@ import {
   removeVariableActions,
   createNewTemplateActions,
   importTemplateFromFileActions,
+  restoreSavedVariables,
 } from 'store/entities/templates/templates.actions.ts';
 import {
   itemsById,
@@ -59,23 +61,20 @@ const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
-/** Applies `update` to each template with an unsaved variable edit, leaving the rest as they are. */
-function mapTemplatesWithPendingVariables(
-  state: ItemsById<ReactionOrTemplate>,
-  update: (template: ReactionTemplate) => ReactionTemplate,
-): ItemsById<ReactionOrTemplate> {
-  const pending = Object.entries(state).filter(
-    ([, entry]) => (entry as ReactionTemplate).variablesBeforeEdit !== undefined,
-  );
-  if (pending.length === 0) {
-    return state;
-  }
-  return {
-    ...state,
-    ...Object.fromEntries(
-      pending.map(([id, entry]) => [id, update(entry as ReactionTemplate)]),
-    ),
-  };
+/**
+ * A loaded reaction or template, unless the store holds unsaved edits for it; then the stored entry
+ * stays whole. A load gives every entity a new id, and the stored entry's edits, saved copy,
+ * validation paths, previews, and template variable paths all name its own ids, which queued saves
+ * will send. Their responses bring the backend's fields. (#615)
+ */
+function keepUnsavedEdits<T extends ReactionOrTemplate>(
+  stored: ReactionOrTemplate | undefined,
+  loaded: T,
+): T {
+  const hasUnsavedEdits =
+    stored?.dataBeforeEdit !== undefined ||
+    (stored as ReactionTemplate | undefined)?.variablesBeforeEdit !== undefined;
+  return hasUnsavedEdits ? (stored as T) : loaded;
 }
 
 const activeDatasetId = createReducer<number>(0, builder => {
@@ -136,16 +135,23 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   builder.addCase(getAllTemplatesActions.success, (state, action) => ({
     ...state,
     ...itemsById(
-      action.payload.map(item => ({ ...item, data: linkReactionEntities(item.data) })),
+      action.payload.map(item =>
+        keepUnsavedEdits(state[getTemplateId(item)], {
+          ...item,
+          data: linkReactionEntities(item.data),
+        }),
+      ),
       getTemplateId,
     ),
   }));
-  builder.addCase(renameTemplateActions.success, (state, action) => {
-    return {
-      ...state,
-      [action.payload.id]: action.payload,
-    };
-  });
+  builder.addCase(renameTemplateActions.success, (state, { payload }) => ({
+    ...state,
+    // The new name names no entity, so it applies even when unsaved variables keep the stored entry.
+    [payload.id]: {
+      ...keepUnsavedEdits(state[payload.id], payload),
+      name: payload.name,
+    },
+  }));
   builder.addCase(
     addUpdateVariableActions.request,
     (state, { payload: { templateId, variable } }) => {
@@ -179,41 +185,72 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       };
     },
   );
-  builder.addCase(renameReactionActions.success, (state, action) => {
-    const { reactionId, name } = action.payload;
+  builder.addCase(restoreSavedReaction, (state, { payload: reactionId }) => {
+    // A save failed (e.g. role changed to viewer, or the backend is down): show the data the
+    // backend holds, dropping every unsaved edit. Later saves then find nothing to send. (#615)
     const reaction = state[reactionId];
-
+    if (reaction?.dataBeforeEdit === undefined) {
+      return state;
+    }
     return {
       ...state,
-      [action.payload.reactionId]: {
+      [reactionId]: {
         ...reaction,
-        pb_reaction_id: name,
-        data: {
-          ...reaction.data,
-          reactionId: name,
-        },
+        data: reaction.dataBeforeEdit,
+        dataBeforeEdit: undefined,
       },
     };
   });
-  builder.addMatcher(
-    isAnyOf(addUpdateVariableActions.success, removeVariableActions.success),
-    state =>
-      mapTemplatesWithPendingVariables(
-        state,
-        ({ variablesBeforeEdit: _, ...template }) => template,
-      ),
+  builder.addCase(restoreSavedVariables, (state, { payload: templateId }) => {
+    const template = state[templateId] as ReactionTemplate | undefined;
+    if (template?.variablesBeforeEdit === undefined) {
+      return state;
+    }
+    const { variablesBeforeEdit, ...rest } = template;
+    return { ...state, [templateId]: { ...rest, variables: variablesBeforeEdit } };
+  });
+  builder.addCase(
+    renameReactionActions.success,
+    (state, { payload: { reactionId, name, savedData, ...saved } }) => {
+      // The state is an Immer draft: compare the stored data, not its proxy, with what was sent.
+      const stored = original(state)![reactionId];
+      if (stored === undefined) {
+        return state;
+      }
+      const reaction = state[reactionId];
+      return {
+        ...state,
+        [reactionId]: {
+          ...reaction,
+          ...saved,
+          pb_reaction_id: name,
+          data: { ...reaction.data, reactionId: name },
+          // The backend now holds the data the rename sent, under the new name. Edits made since
+          // stay unsaved, and a failed save of them rolls back to it. (#615)
+          dataBeforeEdit:
+            stored.data === savedData ? undefined : { ...savedData, reactionId: name },
+        },
+      };
+    },
   );
   builder.addMatcher(
-    isAnyOf(addUpdateVariableActions.failure, removeVariableActions.failure),
-    // The backend rejected a variable edit: put back the variables from before it.
-    state =>
-      mapTemplatesWithPendingVariables(
-        state,
-        ({ variablesBeforeEdit, ...template }) => ({
+    isAnyOf(addUpdateVariableActions.success, removeVariableActions.success),
+    (state, { payload: { templateId, savedVariables } }) => {
+      // The state is an Immer draft: compare the stored variables, not their proxy.
+      const template = original(state)![templateId] as ReactionTemplate | undefined;
+      if (template === undefined) {
+        return state;
+      }
+      // The backend now holds the variables this save sent; edits made since stay unsaved.
+      return {
+        ...state,
+        [templateId]: {
           ...template,
-          variables: variablesBeforeEdit ?? template.variables,
-        }),
-      ),
+          variablesBeforeEdit:
+            template.variables === savedVariables ? undefined : savedVariables,
+        },
+      };
+    },
   );
   builder.addMatcher(
     isAnyOf(createNewTemplateActions.success, importTemplateFromFileActions.success),
@@ -227,41 +264,24 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   );
   builder.addMatcher(
     isAnyOf(addUpdateReactionFieldActions.success, deleteReactionFieldActions.success),
-    (state, { payload }) => {
+    (state, { payload: { savedData, ...payload } }) => {
       const { id } = payload;
-      const { data } = state[id];
-      // The edit is committed, so clear the rollback snapshot explicitly (don't rely on the server
-      // payload omitting it). (#615)
+      // The state is an Immer draft: compare the stored data, not its proxy, with what was sent.
+      const stored = original(state)![id];
+      if (stored === undefined) {
+        return state;
+      }
+      const { data } = stored;
+      // The backend now holds the data this save sent. Edits made since stay unsaved, and a failed
+      // save of them rolls back to it. (#615)
       return {
         ...state,
         [id]: {
           ...payload,
           data,
-          dataBeforeEdit: undefined,
+          dataBeforeEdit: data === savedData ? undefined : savedData,
         },
       };
-    },
-  );
-  builder.addMatcher(
-    isAnyOf(addUpdateReactionFieldActions.failure, deleteReactionFieldActions.failure),
-    state => {
-      // The backend rejected the edit (e.g. role changed to viewer, or the backend is down): undo
-      // the optimistic change by restoring the snapshot. Only the open reaction is edited, so at
-      // most one reaction has a snapshot, which overlapping edits to it share. (#615)
-      const restored = { ...state };
-      let didRollback = false;
-      for (const [id, reaction] of Object.entries(state)) {
-        if (reaction.dataBeforeEdit === undefined) {
-          continue;
-        }
-        restored[id] = {
-          ...reaction,
-          data: reaction.dataBeforeEdit,
-          dataBeforeEdit: undefined,
-        };
-        didRollback = true;
-      }
-      return didRollback ? restored : state;
     },
   );
   builder.addMatcher(
@@ -272,10 +292,10 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     ),
     (state, action) => ({
       ...state,
-      [getReactionId(action.payload)]: {
-        ...action.payload,
-        data: linkReactionEntities(action.payload.data),
-      },
+      [getReactionId(action.payload)]: keepUnsavedEdits(
+        state[getReactionId(action.payload)],
+        { ...action.payload, data: linkReactionEntities(action.payload.data) },
+      ),
     }),
   );
   builder.addMatcher(
@@ -283,10 +303,12 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, action) => ({
       ...state,
       ...itemsById(
-        action.payload.items.map(item => ({
-          ...item,
-          data: linkReactionEntities(item.data),
-        })),
+        action.payload.items.map(item =>
+          keepUnsavedEdits(state[getReactionId(item)], {
+            ...item,
+            data: linkReactionEntities(item.data),
+          }),
+        ),
         getReactionId,
       ),
     }),

@@ -26,6 +26,7 @@ import {
   importReactionFromFileActions,
   removeReactionActions,
   renameReactionActions,
+  restoreSavedReaction,
   setShowInvalidOnly,
 } from './reactions.actions.ts';
 import {
@@ -34,6 +35,7 @@ import {
   removeTemplateActions,
   removeVariableActions,
   renameTemplateActions,
+  restoreSavedVariables,
 } from 'store/entities/templates/templates.actions.ts';
 
 type ReactionsState = ReturnType<typeof reactionsReducer>;
@@ -202,12 +204,18 @@ describe('reactions.reducer — reactionsById field edits', () => {
     };
     const state = reduce(
       seeded,
-      renameReactionActions.success({ reactionId: 1, name: 'new-name' } as never),
+      renameReactionActions.success({
+        previews: {},
+        reactionId: 1,
+        name: 'new-name',
+        savedData: asEntry(reduce(seeded, { type: '@@probe' }).reactionsById[1]).data,
+      } as never),
     );
     expect(state.reactionsById[1]).toMatchObject({
       pb_reaction_id: 'new-name',
       data: { reactionId: 'new-name' },
     });
+    expect(asEntry(state.reactionsById[1]).dataBeforeEdit).toBeUndefined();
   });
 });
 
@@ -215,6 +223,15 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
   const seedNotes = (text: string) => ({
     reactionsById: { 1: reaction(1, { notes: { text } }) } as never,
   });
+  const editNotes = (state: Partial<ReactionsState>, text: string) =>
+    reduce(
+      state,
+      addUpdateReactionFieldActions.request({
+        reactionId: 1,
+        pathComponents: ['notes', 'text'],
+        newValue: text,
+      } as never),
+    );
 
   it('snapshots the pre-edit data when an edit is dispatched', () => {
     const state = reduce(
@@ -230,7 +247,7 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     });
   });
 
-  it('restores the snapshot and clears it when the backend rejects the edit', () => {
+  it('restores the saved data and clears it when a save fails', () => {
     const afterEdit = reduce(
       seedNotes('original'),
       deleteReactionFieldActions.request({
@@ -238,10 +255,7 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
         pathComponents: ['notes', 'text'],
       } as never),
     );
-    const afterFailure = reduce(
-      afterEdit,
-      deleteReactionFieldActions.failure('Access denied' as never),
-    );
+    const afterFailure = reduce(afterEdit, restoreSavedReaction(1));
     expect(asEntry(afterFailure.reactionsById[1]).data.notes).toEqual({
       text: 'original',
     });
@@ -262,7 +276,11 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     // reactionsPreviews slice also handles this action and indexes them.
     const afterSuccess = reduce(
       afterEdit,
-      addUpdateReactionFieldActions.success({ id: 1, previews: {} } as never),
+      addUpdateReactionFieldActions.success({
+        id: 1,
+        previews: {},
+        savedData: asEntry(afterEdit.reactionsById[1]).data,
+      } as never),
     );
     expect(asEntry(afterSuccess.reactionsById[1]).dataBeforeEdit).toBeUndefined();
     expect(asEntry(afterSuccess.reactionsById[1]).data.notes).toEqual({
@@ -293,11 +311,100 @@ describe('reactions.reducer — optimistic-edit rollback (#615)', () => {
     });
   });
 
-  it('is a no-op on failure when no edit is pending', () => {
+  it('is a no-op on restore when no edit is pending', () => {
     const seeded = seedNotes('x');
-    const state = reduce(seeded, deleteReactionFieldActions.failure('err' as never));
+    const state = reduce(seeded, restoreSavedReaction(1));
     expect(asEntry(state.reactionsById[1]).data.notes).toEqual({ text: 'x' });
     expect(asEntry(state.reactionsById[1]).dataBeforeEdit).toBeUndefined();
+  });
+
+  it('rolls back to what a save sent when edits made during it are rejected', () => {
+    const first = editNotes(seedNotes('original'), 'first');
+    const sent = asEntry(first.reactionsById[1]).data;
+    const second = editNotes(first, 'second');
+    const saved = reduce(
+      second,
+      addUpdateReactionFieldActions.success({
+        id: 1,
+        previews: {},
+        savedData: sent,
+      } as never),
+    );
+    expect(asEntry(saved.reactionsById[1]).data.notes).toEqual({ text: 'second' });
+    const restored = reduce(saved, restoreSavedReaction(1));
+    expect(asEntry(restored.reactionsById[1]).data.notes).toEqual({ text: 'first' });
+  });
+
+  it('keeps unsaved edits and their saved copy when the reaction loads again', () => {
+    const edited = editNotes(seedNotes('original'), 'edited');
+    const reloaded = reduce(
+      edited,
+      getReactionActions.success({
+        ...reaction(1, { notes: { text: 'original' } }),
+        previews: {},
+      } as never),
+    );
+    expect(asEntry(reloaded.reactionsById[1]).data.notes).toEqual({ text: 'edited' });
+    expect(asEntry(reloaded.reactionsById[1]).dataBeforeEdit?.notes).toEqual({
+      text: 'original',
+    });
+  });
+
+  it('keeps the validation of a reaction with unsaved edits when it loads again', () => {
+    const stored = {
+      ...reaction(1, { notes: { text: 'original' } }),
+      validation: { errors: [{ text: 'stored', path: ['notes'] }], warnings: [] },
+    };
+    const edited = editNotes({ reactionsById: { 1: stored } as never }, 'edited');
+    const reloaded = reduce(
+      edited,
+      getReactionActions.success({
+        ...reaction(1, { notes: { text: 'original' } }),
+        validation: {
+          errors: [{ text: 'loaded', path: ['inputs', 'fresh'] }],
+          warnings: [],
+        },
+        previews: {},
+      } as never),
+    );
+    expect(reloaded.reactionsById[1]).toMatchObject({
+      validation: { errors: [{ text: 'stored' }] },
+    });
+  });
+
+  it('takes a loaded reaction as is when nothing is unsaved', () => {
+    const reloaded = reduce(
+      seedNotes('original'),
+      getReactionActions.success({
+        ...reaction(1, { notes: { text: 'newer' } }),
+        previews: {},
+      } as never),
+    );
+    expect(asEntry(reloaded.reactionsById[1]).data.notes).toEqual({ text: 'newer' });
+  });
+
+  it('counts the edits a rename sent as saved, under the new name', () => {
+    const first = editNotes(seedNotes('original'), 'first');
+    const sent = asEntry(first.reactionsById[1]).data;
+    const second = editNotes(first, 'second');
+    const renamed = reduce(
+      second,
+      renameReactionActions.success({
+        previews: {},
+        reactionId: 1,
+        name: 'renamed',
+        savedData: sent,
+      } as never),
+    );
+    expect(asEntry(renamed.reactionsById[1]).data).toMatchObject({
+      reactionId: 'renamed',
+      notes: { text: 'second' },
+    });
+    const restored = reduce(renamed, restoreSavedReaction(1));
+    expect(asEntry(restored.reactionsById[1]).data).toMatchObject({
+      reactionId: 'renamed',
+      notes: { text: 'first' },
+    });
   });
 });
 
@@ -359,7 +466,11 @@ describe('reactions.reducer — templates', () => {
   const added = { path: ['conditions', 'temperature'], name: 'temp' };
   const seededVariables = () => ({
     reactionsById: {
-      t1: { id: 't1', variables: { 'notes.safetyNotes': kept } },
+      t1: {
+        id: 't1',
+        data: { outcomes: [], inputs: { stored: { id: 'stored' } } },
+        variables: { 'notes.safetyNotes': kept },
+      },
     } as never,
   });
 
@@ -373,20 +484,84 @@ describe('reactions.reducer — templates', () => {
         seededVariables(),
         actions.request({ templateId: 't1', variable } as never),
       );
-      const failed = reduce(pending, actions.failure(null as never));
+      const failed = reduce(pending, restoreSavedVariables('t1'));
       expect(asEntry(failed.reactionsById.t1).variables).toEqual({
         'notes.safetyNotes': kept,
       });
     },
   );
 
-  it('keeps saved variables when a later save fails with none pending', () => {
+  it.each([
+    [
+      'the templates load again',
+      () =>
+        getAllTemplatesActions.success([
+          { id: 't1', name: 'loaded', data: { outcomes: [] }, variables: {} },
+        ] as never),
+    ],
+    [
+      'the template is renamed',
+      () =>
+        renameTemplateActions.success({
+          id: 't1',
+          name: 'renamed',
+          data: { outcomes: [] },
+          variables: {},
+        } as never),
+    ],
+  ])('keeps unsaved variables when %s', (_name, action) => {
     const pending = reduce(
       seededVariables(),
       addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
     );
-    const saved = reduce(pending, addUpdateVariableActions.success());
-    const failed = reduce(saved, removeVariableActions.failure(null as never));
+    const reloaded = reduce(pending, action());
+    // The variables' paths name the stored data's entities, so that data stays with them.
+    expect(asEntry(reloaded.reactionsById.t1).data).toBe(
+      asEntry(pending.reactionsById.t1).data,
+    );
+    expect(asEntry(reloaded.reactionsById.t1).variables).toEqual({
+      'notes.safetyNotes': kept,
+      'conditions.temperature': added,
+    });
+    const restored = reduce(reloaded, restoreSavedVariables('t1'));
+    expect(asEntry(restored.reactionsById.t1).variables).toEqual({
+      'notes.safetyNotes': kept,
+    });
+  });
+
+  it('takes a rename’s name while unsaved variables keep the stored template', () => {
+    const pending = reduce(
+      seededVariables(),
+      addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
+    );
+    const renamed = reduce(
+      pending,
+      renameTemplateActions.success({
+        id: 't1',
+        name: 'renamed',
+        data: { outcomes: [] },
+        variables: {},
+      } as never),
+    );
+    expect(renamed.reactionsById.t1).toMatchObject({ name: 'renamed' });
+    expect(asEntry(renamed.reactionsById.t1).data).toBe(
+      asEntry(pending.reactionsById.t1).data,
+    );
+  });
+
+  it('keeps saved variables when a restore finds none pending', () => {
+    const pending = reduce(
+      seededVariables(),
+      addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
+    );
+    const saved = reduce(
+      pending,
+      addUpdateVariableActions.success({
+        templateId: 't1',
+        savedVariables: asEntry(pending.reactionsById.t1).variables as never,
+      }),
+    );
+    const failed = reduce(saved, restoreSavedVariables('t1'));
     expect(asEntry(failed.reactionsById.t1).variables).toEqual({
       'notes.safetyNotes': kept,
       'conditions.temperature': added,

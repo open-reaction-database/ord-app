@@ -56,3 +56,9 @@ export interface AddUpdateRemoveVariablePayload {
   variable: Variable;
   templateId: string;
 }
+
+/** A saved variable edit: the variables the save sent, which the backend now holds. */
+export interface SavedVariablesPayload {
+  templateId: string;
+  savedVariables: Record<string, Variable>;
+}
