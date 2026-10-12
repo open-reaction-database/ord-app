@@ -33,20 +33,20 @@ services:
       - ord_network
 
   db:
-    image: bitnamilegacy/postgresql:17
+    image: postgres:17
     environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-      POSTGRESQL_DATABASE: ord
-      POSTGRESQL_USERNAME: ord
-      POSTGRESQL_PGAUDIT_LOG: READ,WRITE
+      POSTGRES_DB: ord
+      POSTGRES_USER: ord
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - db:/bitnami/postgresql
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5400:5432"
     networks:
       - ord_network
     healthcheck:
-      test: pg_isready -U ord
+      # Over TCP: the image's first-run init server listens only on the socket.
+      test: pg_isready -h localhost -U ord
       interval: 5s
       retries: 6
       start_period: 1s
@@ -72,4 +72,4 @@ networks:
     name: ord_network
 
 volumes:
-  db:
+  pgdata:
