@@ -318,7 +318,7 @@ describe('reactions.reducer — templates', () => {
         template_6: { id: 'template_6' },
       } as never,
     };
-    const state = reduce(seeded, removeTemplateActions.success(5 as never));
+    const state = reduce(seeded, removeTemplateActions.success('template_5'));
     expect(Object.keys(state.reactionsById)).toEqual(['template_6']);
   });
 

@@ -66,6 +66,20 @@ describe('removeTemplate', () => {
     expect(types()).toContain(removeTemplateActions.success.type);
     expect(navigate).toHaveBeenCalledWith('/templates');
   });
+
+  it('drops the template from the store and the template list', async () => {
+    const { store } = makeRecordingStore();
+    store.dispatch(
+      getAllTemplatesActions.success([
+        { id: 'template_5', name: 'gone', data: emptyReactionData(), variables: {} },
+        { id: 'template_6', name: 'kept', data: emptyReactionData(), variables: {} },
+      ] as never),
+    );
+    await store.dispatch(removeTemplate('template_5') as unknown as UnknownAction);
+    const { entities } = store.getState();
+    expect(Object.keys(entities.reactions.reactionsById)).toEqual(['template_6']);
+    expect(entities.templates.templatesOrder).toEqual(['template_6']);
+  });
 });
 
 describe('importFromFile', () => {
