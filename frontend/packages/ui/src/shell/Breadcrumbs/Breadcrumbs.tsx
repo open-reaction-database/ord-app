@@ -34,13 +34,19 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
           breadcrumb: classes.breadcrumb,
         }}
       >
-        {/* Cannot be moved to the separate component because otherwise mantine class not being applied (even with forwardRef) */}
+        {/* Inline: Mantine styles only its direct children, so a crumb component would lose the class. */}
+        {/* Crumbs never reorder and two can share a path, so each is keyed by its position. */}
         {items.map((breadcrumb, index) => {
           const isActive = index === items.length - 1;
 
           const children = (
             <>
-              {index === 0 && <HomeIcon className={classes.homeIcon} />}
+              {index === 0 && (
+                <HomeIcon
+                  className={classes.homeIcon}
+                  aria-hidden
+                />
+              )}
               <Tooltip label={breadcrumb.title}>
                 <span className={classes.text}>{breadcrumb.title}</span>
               </Tooltip>
@@ -51,13 +57,12 @@ export function Breadcrumbs({ items }: Readonly<BreadcrumbsProps>) {
             <Link
               className={classes.link}
               to={breadcrumb.path}
-              id={breadcrumb.path}
-              key={breadcrumb.path}
+              key={index}
             >
               {children}
             </Link>
           ) : (
-            <Flex key={breadcrumb.path}>{children}</Flex>
+            <Flex key={index}>{children}</Flex>
           );
         })}
       </MantineBreadcrumbs>

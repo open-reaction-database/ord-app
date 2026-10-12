@@ -64,4 +64,15 @@ describe('PageContainer', () => {
     expect(getByText('help').parentElement).toBe(controls);
     expect(controls).not.toBe(getByRole('banner'));
   });
+
+  it('shows the footer a host gives instead of the default one', () => {
+    const { getByText, queryByTestId } = renderWithMantine(
+      <PageContainer
+        breadcrumbs={[]}
+        footer={<span>host footer</span>}
+      />,
+    );
+    expect(getByText('host footer')).toBeInTheDocument();
+    expect(queryByTestId('footer')).toBeNull();
+  });
 });

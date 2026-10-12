@@ -60,7 +60,7 @@ export function TemplatesListPage() {
   const templatesOrder = useSelector(selectTemplatesOrder);
 
   const breadcrumbs = useMemo((): Breadcrumbs => {
-    return [{ title: 'Templates', path: '~/' }];
+    return [{ title: 'Templates', path: '~/templates' }];
   }, []);
 
   return (

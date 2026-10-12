@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
+import { createRef } from 'react';
 import { renderWithReaction } from '#testing/renderWithReaction.tsx';
 import { emptyReactionData } from '#testing/emptyReactionData.ts';
 import { ReactionPreview } from './ReactionPreview.tsx';
@@ -42,6 +43,17 @@ describe('ReactionPreview', () => {
       reaction: data,
     });
     expect(getByText('Input A')).toBeInTheDocument();
+  });
+
+  it('hands its wrapper to a ref, for copying the preview as an image', () => {
+    const data = {
+      ...emptyReactionData(),
+      inputs: { in1: { id: 'in1', name: 'Input A', components: [] } },
+    } as unknown as AppReaction;
+    const ref = createRef<HTMLDivElement>();
+    renderWithReaction(<ReactionPreview ref={ref} />, { reaction: data });
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveTextContent('Input A');
   });
 
   it('shows the conditions over the arrow only when asked for details', () => {

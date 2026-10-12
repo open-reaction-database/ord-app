@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { ReactionOutcome } from '#reaction/model/reactionsOutcomes/reactionOutcomes.types.ts';
-import { forwardRef, Fragment } from 'react';
+import { Fragment, type Ref } from 'react';
 import classes from './reactionPreview.module.scss';
 import {
   useOrderedInputs,
@@ -32,13 +32,15 @@ const NO_OUTCOMES: Array<ReactionOutcome> = [];
 interface ReactionPreviewProps {
   /** Shows the reaction's conditions over the arrow. */
   showDetails?: boolean;
+  /** Receives the preview's wrapper, which the copy-as-image action captures. */
+  ref?: Ref<HTMLDivElement>;
 }
 
 /** The reaction as inputs, an arrow, and outcomes, each with its molecule previews. */
-export const ReactionPreview = forwardRef<
-  HTMLDivElement,
-  Readonly<ReactionPreviewProps>
->(function ReactionPreview({ showDetails = false }, ref) {
+export function ReactionPreview({
+  showDetails = false,
+  ref,
+}: Readonly<ReactionPreviewProps>) {
   const inputs = useOrderedInputs();
   const outcomes = useReactionPart<Array<ReactionOutcome>>(['outcomes']) ?? NO_OUTCOMES;
   const conditions = useReactionSnapshotField('summary')?.conditions ?? '';
@@ -96,4 +98,4 @@ export const ReactionPreview = forwardRef<
       </Flex>
     </div>
   );
-});
+}

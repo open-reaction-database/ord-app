@@ -81,4 +81,23 @@ describe('Breadcrumbs', () => {
     fireEvent.click(screen.getByText('Datasets').parentElement!.querySelector('svg')!);
     expect(history).toEqual(['/datasets/1']);
   });
+
+  it('hides the decorative Home icon from assistive technology', () => {
+    const { container } = renderWithMantine(
+      <Breadcrumbs items={[{ title: 'Datasets', path: '~/' }]} />,
+    );
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('gives no crumb a DOM id built from its path', () => {
+    const { container } = renderWithMantine(
+      <Breadcrumbs
+        items={[
+          { title: 'Datasets', path: '~/' },
+          { title: 'My Dataset', path: '~/datasets/1' },
+        ]}
+      />,
+    );
+    expect(container.querySelector('[id^="~"]')).toBeNull();
+  });
 });
