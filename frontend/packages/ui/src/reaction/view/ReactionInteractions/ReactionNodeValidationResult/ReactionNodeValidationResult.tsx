@@ -22,7 +22,7 @@ import type {
 import { Badge, Flex, Text, Tooltip } from '@mantine/core';
 import classes from './reactionNodeValidationResult.module.scss';
 import { useMemo } from 'react';
-import { useReactionSnapshot } from '#reaction/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshotField } from '#reaction/provider/reactionProvider.hooks.ts';
 
 interface ReactionNodeValidationResultProps {
   pathComponents: ReactionPathComponents;
@@ -129,7 +129,7 @@ export function ReactionNodeValidationResult({
   pathComponents,
 }: Readonly<ReactionNodeValidationResultProps>) {
   // Templates carry no validation; a reaction not yet loaded has none either.
-  const validation = useReactionSnapshot()?.validation;
+  const validation = useReactionSnapshotField('validation');
   if (!validation) {
     return null;
   }

@@ -18,13 +18,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect } from 'react';
 import { ReactionValidationBadge } from './ReactionValidationBadge.tsx';
 import { ReactionValidationList } from './ReactionValidationList.tsx';
-import { useReactionSnapshot } from '#reaction/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshotField } from '#reaction/provider/reactionProvider.hooks.ts';
 
 export function ReactionValidationResult() {
   const [opened, { toggle, close }] = useDisclosure();
-  const snapshot = useReactionSnapshot();
-  const isValid = snapshot?.is_valid;
-  const validation = snapshot?.validation ?? null;
+  const isValid = useReactionSnapshotField('is_valid');
+  const validation = useReactionSnapshotField('validation') ?? null;
   const hasErrorsWarnings =
     validation !== null &&
     (validation.errors.length > 0 || validation.warnings.length > 0);

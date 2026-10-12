@@ -19,7 +19,7 @@ import classes from './reactionCard.module.scss';
 import { useMemo, type ReactNode, type MutableRefObject } from 'react';
 import typographyClasses from '#theme/typography.module.scss';
 import { ReactionPreview } from '#reaction/view/ReactionPreview/ReactionPreview.tsx';
-import { useReactionSnapshot } from '#reaction/provider/reactionProvider.hooks.ts';
+import { useReactionSnapshotField } from '#reaction/provider/reactionProvider.hooks.ts';
 
 interface DescriptorsListProps {
   title: string;
@@ -69,7 +69,7 @@ export function ReactionCard({
   isInvalid,
   showDetails = false,
 }: Readonly<ReactionCardProps>) {
-  const summary = useReactionSnapshot()?.summary;
+  const summary = useReactionSnapshotField('summary');
   if (!summary) {
     return null;
   }

@@ -19,7 +19,7 @@ import classes from './reactionPreview.module.scss';
 import {
   useOrderedInputs,
   useReactionPart,
-  useReactionSnapshot,
+  useReactionSnapshotField,
 } from '#reaction/provider/reactionProvider.hooks.ts';
 import { ReactionInputPreview } from './ReactionInputPreview.tsx';
 import { ReactionOutcomePreview } from './ReactionOutcomePreview.tsx';
@@ -41,7 +41,7 @@ export const ReactionPreview = forwardRef<
 >(function ReactionPreview({ showDetails = false }, ref) {
   const inputs = useOrderedInputs();
   const outcomes = useReactionPart<Array<ReactionOutcome>>(['outcomes']) ?? NO_OUTCOMES;
-  const conditions = useReactionSnapshot()?.summary.conditions ?? '';
+  const conditions = useReactionSnapshotField('summary')?.conditions ?? '';
 
   const hasInputsOrOutcomes = inputs.length > 0 || outcomes.length > 0;
 
