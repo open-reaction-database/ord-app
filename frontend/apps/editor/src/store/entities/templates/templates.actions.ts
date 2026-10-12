@@ -35,6 +35,7 @@ export const createNewTemplateActions = createAsyncAction<
   ReactionTemplate
 >('create');
 
+// Both payloads are the template's id as stored, `template_<number>`.
 export const removeTemplateActions = createAsyncAction<string, string>(
   'remove_template',
 );

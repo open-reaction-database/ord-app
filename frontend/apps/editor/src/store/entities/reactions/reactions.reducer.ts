@@ -113,7 +113,7 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     return rest;
   });
   builder.addCase(removeTemplateActions.success, (state, { payload: templateId }) => {
-    const { [`template_${templateId}`]: _, ...rest } = state;
+    const { [templateId]: _, ...rest } = state;
     return rest;
   });
   builder.addCase(getAllTemplatesActions.success, (state, action) => ({
