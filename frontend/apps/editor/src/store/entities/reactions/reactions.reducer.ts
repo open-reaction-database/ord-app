@@ -61,6 +61,30 @@ const getTemplateId = (template: ReactionTemplate) => template.id;
 
 const getVariableId = (variable: Variable) => variable.path.join('.');
 
+/**
+ * A loaded reaction or template, keeping the unsaved edits the store holds for it and their saved
+ * copy: they are newer than the load, and queued saves still have to send them. (#615)
+ */
+function keepUnsavedEdits<T extends ReactionOrTemplate>(
+  stored: ReactionOrTemplate | undefined,
+  loaded: T,
+): T {
+  let merged = loaded;
+  if (stored?.dataBeforeEdit !== undefined) {
+    merged = { ...merged, data: stored.data, dataBeforeEdit: stored.dataBeforeEdit };
+  }
+  const variablesBeforeEdit = (stored as ReactionTemplate | undefined)
+    ?.variablesBeforeEdit;
+  if (variablesBeforeEdit !== undefined) {
+    merged = {
+      ...merged,
+      variables: (stored as ReactionTemplate).variables,
+      variablesBeforeEdit,
+    };
+  }
+  return merged;
+}
+
 const activeDatasetId = createReducer<number>(0, builder => {
   builder.addCase(getReactionActions.request, (_, action) => action.payload.datasetId);
   builder.addCase(getReactionsListActions.request, (_, action) => action.payload);
@@ -119,14 +143,19 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
   builder.addCase(getAllTemplatesActions.success, (state, action) => ({
     ...state,
     ...itemsById(
-      action.payload.map(item => ({ ...item, data: linkReactionEntities(item.data) })),
+      action.payload.map(item =>
+        keepUnsavedEdits(state[getTemplateId(item)], {
+          ...item,
+          data: linkReactionEntities(item.data),
+        }),
+      ),
       getTemplateId,
     ),
   }));
   builder.addCase(renameTemplateActions.success, (state, action) => {
     return {
       ...state,
-      [action.payload.id]: action.payload,
+      [action.payload.id]: keepUnsavedEdits(state[action.payload.id], action.payload),
     };
   });
   builder.addCase(
@@ -269,10 +298,10 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     ),
     (state, action) => ({
       ...state,
-      [getReactionId(action.payload)]: {
-        ...action.payload,
-        data: linkReactionEntities(action.payload.data),
-      },
+      [getReactionId(action.payload)]: keepUnsavedEdits(
+        state[getReactionId(action.payload)],
+        { ...action.payload, data: linkReactionEntities(action.payload.data) },
+      ),
     }),
   );
   builder.addMatcher(
@@ -280,10 +309,12 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
     (state, action) => ({
       ...state,
       ...itemsById(
-        action.payload.items.map(item => ({
-          ...item,
-          data: linkReactionEntities(item.data),
-        })),
+        action.payload.items.map(item =>
+          keepUnsavedEdits(state[getReactionId(item)], {
+            ...item,
+            data: linkReactionEntities(item.data),
+          }),
+        ),
         getReactionId,
       ),
     }),

@@ -653,4 +653,34 @@ describe('overlapping edits to one reaction', () => {
       isLoading: true,
     });
   });
+
+  it('keep their edits when the dataset’s reactions load meanwhile', async () => {
+    const firstSave = deferred();
+    axiosMock.patch
+      .mockReturnValueOnce(firstSave.promise)
+      .mockResolvedValue(accepted());
+    const store = makeStore();
+    const loaded = store.getState().entities.reactions.reactionsById[1];
+    const actions = reduxReactionActions(store, 1);
+    const first = actions.update(['notes'], { safetyNotes: 'gloves' });
+    await flush();
+    const second = actions.remove(['inputs', 'in1']);
+    await flush();
+    store.dispatch(
+      getReactionsListActions.success({
+        items: [loaded],
+        page: 1,
+        size: 10,
+        total: 1,
+        pages: 1,
+      } as never),
+    );
+    firstSave.resolve(accepted());
+    await Promise.all([first, second]);
+    expect(dataOf(store).notes.safetyNotes).toBe('gloves');
+    expect(dataOf(store).inputs).not.toHaveProperty('in1');
+    expect(axiosMock.patch).toHaveBeenCalledTimes(2);
+    expect(sentReaction(1).notes.safetyNotes).toBe('gloves');
+    expect(sentReaction(1).inputs).not.toHaveProperty('in1');
+  });
 });
