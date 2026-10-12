@@ -129,7 +129,9 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
         </Tooltip>
       );
     },
-    size: 280,
+    // The narrowest text column, since it truncates and shows the whole text on hover; a cell's
+    // size is also its minimum width, and these sizes keep the table inside its panel at 1280 px.
+    size: 120,
   },
   {
     id: 'menu',
@@ -140,6 +142,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
           download={format => downloadDatasetThroughLink(row.original.id, format)}
           target={
             <ActionIcon
+              aria-label="Download dataset"
               onClick={handleMenu}
               variant="transparent"
               color="default"

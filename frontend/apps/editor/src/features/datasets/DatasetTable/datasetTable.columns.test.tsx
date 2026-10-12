@@ -16,6 +16,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { JSX, MouseEvent } from 'react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
+import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { columns, handleMenu } from './datasetTable.columns.tsx';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
 
@@ -37,6 +38,14 @@ describe('datasetTable.columns', () => {
     expect(
       renderCell('datasetName', { id: 7 }).getByText('Dataset 7'),
     ).toBeInTheDocument();
+  });
+
+  it('names the row menu for assistive technology', () => {
+    const Cell = columns.find(c => c.id === 'menu')!.Cell as (props: {
+      row: { original: Partial<Dataset> };
+    }) => JSX.Element;
+    const { getByRole } = renderWithProviders(<Cell row={{ original: { id: 1 } }} />);
+    expect(getByRole('button', { name: 'Download dataset' })).toBeInTheDocument();
   });
 });
 
