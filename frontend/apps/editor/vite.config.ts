@@ -28,8 +28,8 @@ const AUTH0_VARIABLES = [
 ];
 
 // The Auth0 settings are compiled into the bundle, and a bundle built without them sends
-// every visitor to https://undefined/authorize. Image builds (Dockerfile.single) set
-// ORD_APP_REQUIRE_AUTH0 so they fail instead.
+// every visitor to https://undefined/authorize. Image builds (deploy/editor/Dockerfile)
+// set ORD_APP_REQUIRE_AUTH0 so they fail instead.
 function assertAuth0Configured(mode: string): void {
   if (process.env.ORD_APP_REQUIRE_AUTH0 !== 'true') {
     return;

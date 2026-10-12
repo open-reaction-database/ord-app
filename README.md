@@ -70,9 +70,11 @@ _Note: the database must be on the same network as docker or docker must connect
 
 1. Build the Docker image. The UI compiles the Auth0 settings in, so the build needs
    them, as build arguments or in `frontend/apps/editor/.env` (see
-   `frontend/apps/editor/.env.template`), and fails if any is missing.
+   `frontend/apps/editor/.env.template`), and fails if any is missing. The build reads
+   `deploy/editor/Dockerfile.dockerignore`, which needs BuildKit (Docker's default
+   builder since Engine 23).
    ```shell
-   docker build -f Dockerfile.single -t ord \
+   docker build -f deploy/editor/Dockerfile -t ord \
    --build-arg VITE_AUTH0_DOMAIN="..." \
    --build-arg VITE_AUTH0_CLIENT_ID="..." \
    --build-arg VITE_AUTH0_AUDIENCE="..." \
