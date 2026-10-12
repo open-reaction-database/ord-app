@@ -43,3 +43,15 @@ updates:
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: node
         update-types: ["version-update:semver-major"]
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      compose-images:
+        patterns:
+          - "*"
+    ignore:
+      # A Postgres major upgrade is a deliberate change, not a monthly bump.
+      - dependency-name: "*postgres*"
+        update-types: ["version-update:semver-major"]
