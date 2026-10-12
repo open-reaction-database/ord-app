@@ -40,6 +40,13 @@
   }
 }
 
+/* One-line text takes its cell's width by default, which would make that width the column's
+   minimum; this text fills whatever width the column gets instead. */
+.fillsColumn {
+  width: 0;
+  min-width: 100%;
+}
+
 .row:hover {
   cursor: pointer;
 }

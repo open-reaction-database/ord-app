@@ -29,6 +29,44 @@ test('shows each dataset’s download menu without scrolling the table', async (
   await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
   const menu = page.getByRole('button', { name: 'Download dataset' }).first();
   await expect(menu).toBeVisible({ timeout: 30_000 });
-  // The table scrolls in its own container, which clips what lies past its edge.
+  // Counts only the part inside the window and not clipped by the table's container.
   await expect(menu).toBeInViewport({ ratio: 1 });
+});
+
+test('fills each truncating column with its text', async ({ page }) => {
+  await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
+  // The first data row, rather than the loading skeleton the table shows before it.
+  await expect(
+    page.getByRole('button', { name: 'Download dataset' }).first(),
+  ).toBeVisible({
+    timeout: 30_000,
+  });
+  for (const header of ['Dataset Name', 'Owner', 'Description']) {
+    // How much narrower the first row's text is than its cell's content box.
+    const gap = () =>
+      page.evaluate(name => {
+        const headers = Array.from(document.querySelectorAll('thead th'));
+        const column = headers.findIndex(th => th.textContent?.trim() === name);
+        const cell = document.querySelectorAll('tbody tr')[0].children[column];
+        const style = getComputedStyle(cell);
+        const content =
+          cell.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight);
+        return content - cell.querySelector('div')!.getBoundingClientRect().width;
+      }, header);
+    await expect
+      .poll(gap, { message: `${header} text leaves its column` })
+      .toBeLessThanOrEqual(1);
+  }
+});
+
+test('lets the description narrow below its size when the table is short of room', async ({
+  page,
+}) => {
+  await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
+  const description = page.getByRole('columnheader', { name: 'Description' });
+  await expect(description).toBeVisible({ timeout: 30_000 });
+  // Its size is 280 px; the table is short of room at this width.
+  expect((await description.boundingBox())!.width).toBeLessThan(280);
 });
