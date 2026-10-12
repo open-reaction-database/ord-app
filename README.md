@@ -5,25 +5,25 @@
 1. Install dependencies
 
    * PostgreSQL
-   * Python >= 3.10
+   * Python 3.12 and [uv](https://docs.astral.sh/uv/)
 
 2. Install the package
 
     ```shell
     git clone git@github.com:open-reaction-database/ord-app.git
     cd ord-app
-    pythom -m pip install -e ".[tests]"
+    uv sync --directory backend/editor --frozen
     ```
 
 3. Run the FastAPI server
 
     ```shell
-    cd ord_app/service_api
-    ORD_APP_TESTING=TRUE fastapi dev main.py
+    cd backend/editor
+    uv run alembic upgrade head
+    APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload
     ```
-    
-    This creates a test PostgreSQL database and starts the server at http://localhost:8000. Navigate to
-    http://localhost:8000/docs for the interactive Swagger docs.
+
+    The server starts at http://localhost:8000 against the Postgres that `PG_DSN` names (default: the docker-compose database on localhost:5400), and `alembic upgrade head` creates its schema. Navigate to http://localhost:8000/service_api/docs for the interactive Swagger docs.
 
 ## Code style
 
@@ -33,10 +33,12 @@ Prettier/ESLint/Stylelint. Install the hooks once after cloning (and run `npm ci
 find their tools):
 
 ```shell
-uv run pre-commit install
+uvx pre-commit install
 ```
 
-Run them against the whole tree at any time with `uv run pre-commit run --all-files`.
+`uvx pre-commit install` records a Python inside uv's cache, so clearing that cache breaks the hook; installing pre-commit as a tool (`uv tool install pre-commit`, then `pre-commit install`) gives a hook that survives it.
+
+Run them against the whole tree at any time with `uvx pre-commit run --all-files`.
 
 ## Run in Docker
 ### docker-compose

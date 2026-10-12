@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Run `uv run pre-commit install` once to enable these hooks locally.
+# Run `uvx pre-commit install` once to enable these hooks locally.
 repos:
   # License headers. addlicense stamps the Apache header on any file whose first
   # lines name no copyright or SPDX license, and leaves the rest alone whatever
@@ -28,28 +28,28 @@ repos:
           - -l
           - apache
 
-  # Python lint + format. Scoped to ord_app/ to match CI (`ruff check ord_app/`)
-  # and to leave the generated alembic migrations untouched.
+  # Python lint + format, scoped to the packages so the generated alembic migrations
+  # stay untouched. CI runs the same checks from each project's directory.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Keep in sync with the ruff version pinned in uv.lock so the hook and the
-    # `ruff format --check` CI step never disagree.
+    # Keep in sync with the ruff version pinned in each project's uv.lock so the hook
+    # and the `ruff format --check` CI step never disagree.
     rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98  # frozen: v0.9.10
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^ord_app/
+        files: ^backend/editor/ord_editor/
       - id: ruff-format
-        files: ^ord_app/
+        files: ^backend/editor/ord_editor/
 
-  # Type checking. ty (Astral) checks ord_app/ via uv, matching the CI step. It is a
-  # local hook because ty resolves through the project's uv environment.
+  # Type checking. ty resolves imports through the project's uv environment, so each
+  # project's hook runs from that project's directory.
   - repo: local
     hooks:
-      - id: ty
-        name: ty check (ord_app)
-        entry: uv run ty check ord_app
+      - id: ty-editor
+        name: ty check (backend/editor)
+        entry: uv run --directory backend/editor --frozen --no-build ty check ord_editor
         language: system
-        files: ^ord_app/.*\.py$
+        files: ^backend/editor/ord_editor/.*\.py$
         pass_filenames: false
 
   # UI lint, format, and type check. Delegated to the tools installed under
@@ -93,5 +93,5 @@ repos:
         name: jscpd (duplication)
         entry: frontend/node_modules/.bin/jscpd --config .jscpd.json
         language: system
-        files: ^(ord_app|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
+        files: ^(backend/editor/ord_editor|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
         pass_filenames: false
