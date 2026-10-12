@@ -144,12 +144,14 @@ const reactionsById = createReducer<ItemsById<ReactionOrTemplate>>({}, builder =
       getTemplateId,
     ),
   }));
-  builder.addCase(renameTemplateActions.success, (state, action) => {
-    return {
-      ...state,
-      [action.payload.id]: keepUnsavedEdits(state[action.payload.id], action.payload),
-    };
-  });
+  builder.addCase(renameTemplateActions.success, (state, { payload }) => ({
+    ...state,
+    // The new name names no entity, so it applies even when unsaved variables keep the stored entry.
+    [payload.id]: {
+      ...keepUnsavedEdits(state[payload.id], payload),
+      name: payload.name,
+    },
+  }));
   builder.addCase(
     addUpdateVariableActions.request,
     (state, { payload: { templateId, variable } }) => {

@@ -529,6 +529,26 @@ describe('reactions.reducer — templates', () => {
     });
   });
 
+  it('takes a rename’s name while unsaved variables keep the stored template', () => {
+    const pending = reduce(
+      seededVariables(),
+      addUpdateVariableActions.request({ templateId: 't1', variable: added } as never),
+    );
+    const renamed = reduce(
+      pending,
+      renameTemplateActions.success({
+        id: 't1',
+        name: 'renamed',
+        data: { outcomes: [] },
+        variables: {},
+      } as never),
+    );
+    expect(renamed.reactionsById.t1).toMatchObject({ name: 'renamed' });
+    expect(asEntry(renamed.reactionsById.t1).data).toBe(
+      asEntry(pending.reactionsById.t1).data,
+    );
+  });
+
   it('keeps saved variables when a restore finds none pending', () => {
     const pending = reduce(
       seededVariables(),
