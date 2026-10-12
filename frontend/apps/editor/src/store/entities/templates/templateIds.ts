@@ -20,6 +20,16 @@
 export const templateIdFromNumber = (number: number | string): string =>
   `template_${number}`;
 
-/** The backend's number for a stored template id. */
-export const templateNumberFromId = (templateId: string): number =>
-  Number.parseInt(templateId.split('_')[1]);
+const STORED_ID = /^template_(\d+)$/;
+
+/** The backend's number for a stored template id; throws on anything else. */
+export function templateNumberFromId(templateId: string): number {
+  const match = STORED_ID.exec(templateId);
+  if (match === null) {
+    throw new Error(`Not a stored template id: ${templateId}`);
+  }
+  return Number(match[1]);
+}
+
+/** The editor's route for the template the backend numbers `number`. */
+export const templatePath = (number: number | string): string => `/templates/${number}`;

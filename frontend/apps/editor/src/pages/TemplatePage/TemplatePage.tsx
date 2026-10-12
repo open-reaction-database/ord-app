@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { templateIdFromNumber } from 'store/entities/templates/templateIds.ts';
+import {
+  templateIdFromNumber,
+  templatePath,
+} from 'store/entities/templates/templateIds.ts';
 import { useParams } from 'wouter';
 import { useMemo } from 'react';
 import { Badge, Flex, Paper } from '@mantine/core';
@@ -42,7 +45,7 @@ export function TemplatePage() {
     return [
       { title: 'Templates', path: '~/templates' },
       {
-        path: `~/templates/${rawTemplateId}`,
+        path: `~${templatePath(rawTemplateId)}`,
         title: template?.name ?? `Template ${rawTemplateId}`,
       },
     ];

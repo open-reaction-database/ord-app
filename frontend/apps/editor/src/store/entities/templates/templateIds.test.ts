@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 import { describe, expect, it } from 'vitest';
-import { templateIdFromNumber, templateNumberFromId } from './templateIds.ts';
+import {
+  templateIdFromNumber,
+  templateNumberFromId,
+  templatePath,
+} from './templateIds.ts';
 
 describe('template ids', () => {
   it('store the backend’s number as template_<number>', () => {
@@ -24,5 +28,20 @@ describe('template ids', () => {
 
   it('read the backend’s number back from a stored id', () => {
     expect(templateNumberFromId('template_5')).toBe(5);
+  });
+
+  it('round-trip a number through a stored id', () => {
+    expect(templateNumberFromId(templateIdFromNumber(42))).toBe(42);
+  });
+
+  it.each(['template', 'template_', 'template-1', '5', 'template_5x', 'template_5_6'])(
+    'reject %s as a stored id',
+    id => {
+      expect(() => templateNumberFromId(id)).toThrow(id);
+    },
+  );
+
+  it('give the page route for a number', () => {
+    expect(templatePath(5)).toBe('/templates/5');
   });
 });

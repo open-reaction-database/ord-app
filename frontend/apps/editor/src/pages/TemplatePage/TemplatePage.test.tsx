@@ -26,7 +26,8 @@ vi.mock('react-redux', () => ({
   useStore: () => ({ getState: () => undefined, subscribe: () => () => undefined }),
 }));
 vi.mock('store/entities/reactions/reactions.selectors.ts', () => ({
-  selectReactionById: () => () => control.template,
+  selectReactionById: (id: string) => () =>
+    id === 'template_999' ? control.template : undefined,
 }));
 vi.mock('store/entities/templates/templates.selectors.ts', () => ({
   selectAreTemplatesLoaded: () => control.loaded,
@@ -114,7 +115,7 @@ describe('TemplatePage (#496 — 404 for a missing template)', () => {
     expect(screen.getByTestId('template-header')).toBeInTheDocument();
   });
 
-  it('links the template’s crumb by its number, titled before the template loads', () => {
+  it('gives the template’s crumb its route and a title before the template loads', () => {
     renderWithMantine(<TemplatePage />);
     const crumbs = JSON.parse(
       screen.getByTestId('page-container').dataset.breadcrumbs ?? '[]',

@@ -39,14 +39,6 @@ const templatesOrder = createReducer<Array<string>>([], builder => {
   );
 });
 
-const isTemplateCreating = createReducer<boolean>(false, builder => {
-  builder.addCase(createNewTemplateActions.request, () => true);
-  builder.addMatcher(
-    isAnyOf(createNewTemplateActions.success, createNewTemplateActions.failure),
-    () => false,
-  );
-});
-
 // Whether the template-list fetch has settled. Lets the template page tell "still loading" apart
 // from "no such template" so it can show a 404 for a missing id rather than a blank page, without
 // flashing the 404 during the initial load. Set on failure too, so a failed fetch still reaches the
@@ -60,6 +52,5 @@ const areTemplatesLoaded = createReducer<boolean>(false, builder => {
 
 export const templatesReducer = combineReducers({
   templatesOrder,
-  isTemplateCreating,
   areTemplatesLoaded,
 });

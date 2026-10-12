@@ -25,7 +25,11 @@ import {
 import type { TemplateResponse, Variable } from './templates.types.ts';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
-import { templateIdFromNumber, templateNumberFromId } from './templateIds.ts';
+import {
+  templateIdFromNumber,
+  templateNumberFromId,
+  templatePath,
+} from './templateIds.ts';
 import {
   ordBinpbToReaction,
   reactionToOrdBinpb,
@@ -89,7 +93,7 @@ export const createTemplate = createThunkWithExplicitResult(
     const template = parseTemplate(templateData);
 
     dispatch(createNewTemplateActions.success(template));
-    navigate(`/templates/${templateData.id}`);
+    navigate(templatePath(templateData.id));
   },
 );
 
@@ -202,7 +206,7 @@ export const importFromFile = createThunkWithExplicitResult(
           await axiosInstance.post<TemplateResponse>(`/templates`, payload)
         ).data;
         const template = parseTemplate(templateData);
-        navigate(`/templates/${templateData.id}`);
+        navigate(templatePath(templateData.id));
         dispatch(importTemplateFromFileActions.success(template));
       } catch (e: unknown) {
         console.error(e);
