@@ -68,7 +68,7 @@ test('fills each truncating column with its text', async ({ page }) => {
 test.describe('in a window too narrow for the table', () => {
   test.use({ viewport: { width: 640, height: 900 } });
 
-  test('takes the description and owner to their minimums, and the others to their sizes', async ({
+  test('takes the description and owner to their minimums, and keeps the name and group at their sizes', async ({
     page,
   }) => {
     await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
