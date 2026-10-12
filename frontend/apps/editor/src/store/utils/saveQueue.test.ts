@@ -15,7 +15,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { deferred } from 'test/deferred.ts';
-import { createSaveQueue } from './saveQueue.ts';
+import { createSaveQueue, createStoreSaveQueues } from './saveQueue.ts';
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -61,6 +61,38 @@ describe('createSaveQueue', () => {
     });
     await flush();
     expect(started).toEqual([1, 2]);
+    blocked.resolve();
+  });
+});
+
+describe('createStoreSaveQueues', () => {
+  it('gives a store the same queues each time a module asks by the same name', async () => {
+    // As after a hot reload, when the module that made the queues runs again.
+    const store = {};
+    const first = createStoreSaveQueues<number>('test-reload')(store);
+    const again = createStoreSaveQueues<number>('test-reload')(store);
+    const blocked = deferred<void>();
+    const started: Array<string> = [];
+    void first(1, () => {
+      started.push('first');
+      return blocked.promise;
+    });
+    void again(1, async () => {
+      started.push('again');
+    });
+    await flush();
+    expect(started).toEqual(['first']);
+    blocked.resolve();
+  });
+
+  it('keeps stores and names apart', async () => {
+    const blocked = deferred<void>();
+    void createStoreSaveQueues<number>('test-a')({})(1, () => blocked.promise);
+    const started: Array<string> = [];
+    await createStoreSaveQueues<number>('test-b')({})(1, async () => {
+      started.push('other name');
+    });
+    expect(started).toEqual(['other name']);
     blocked.resolve();
   });
 });

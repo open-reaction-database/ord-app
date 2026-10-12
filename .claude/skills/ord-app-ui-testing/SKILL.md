@@ -143,10 +143,12 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 
 `e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. The reaction page spec masks what changes between runs (the footer's year; the card spec's capture does not reach the footer). Neither retries, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
 
-When a change alters the page's look on purpose, refresh the baselines from CI:
-1. Delete the outdated PNGs and push; `test_e2e` fails with "A snapshot doesn't exist … writing actual".
-2. Download the failed run's artifact (`gh run download <run-id> -n playwright-report`); it holds the new PNGs under `e2e/reactionPage.spec.ts-snapshots/`.
-3. Look at each one for anything half-loaded or run-specific, copy them into `frontend/apps/editor/e2e/reactionPage.spec.ts-snapshots/`, commit, and push; the next run should pass.
+When a change alters the page's look on purpose, refresh the baselines from CI. The spec's snapshot directory is `e2e/<spec>.spec.ts-snapshots/`: `reactionPage.spec.ts-snapshots/` or `datasetPage.spec.ts-snapshots/`.
+1. Push the change. `test_e2e` fails on the altered screenshot; download the run's artifact (`gh run download <run-id> -n playwright-report`).
+2. The artifact's `test-results/<spec>-<test>/` holds `<name>-actual.png`, `-expected.png`, and `-diff.png`. Look at the diff to confirm only the intended part changed, and the actual for anything half-loaded or run-specific.
+3. Copy the actual over `frontend/apps/editor/e2e/<spec>.spec.ts-snapshots/<name>-chromium-linux.png`, commit, and push; the next run should pass.
+
+For a new screenshot with no baseline, the run fails with "A snapshot doesn't exist … writing actual" instead, and the artifact holds the new PNG under `e2e/<spec>.spec.ts-snapshots/`.
 
 To preview a capture locally, run with `CI=1`: Playwright writes `*-chromium-darwin.png` baselines next to the Linux ones. Delete them; they are not compared in CI.
 

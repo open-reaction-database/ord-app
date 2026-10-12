@@ -36,18 +36,31 @@ export function createSaveQueue<Key>() {
   };
 }
 
+// Each named set of queues lives here, outside the modules that ask for it, so that when one of
+// them runs again after a hot reload in development, it gets its queues back and a save in flight
+// stays ordered against new ones.
+const queuesByName = new Map<
+  string,
+  WeakMap<object, ReturnType<typeof createSaveQueue>>
+>();
+
 /**
- * Returns a function from a store to its own `enqueue`, so separate stores (as in tests) never
- * wait on each other's saves. Key a store by its `getState`, which thunks receive and which stays
- * the same function for the store's life.
+ * Returns a function from a store to its own `enqueue` among the queues called `name`, so separate
+ * stores (as in tests) never wait on each other's saves. Key a store by its `getState`, which thunks
+ * receive and which stays the same function for the store's life.
  */
-export function createStoreSaveQueues<Key>() {
-  const queues = new WeakMap<object, ReturnType<typeof createSaveQueue<Key>>>();
-  return (store: object) => {
-    let enqueue = queues.get(store);
+export function createStoreSaveQueues<Key>(name: string) {
+  let queues = queuesByName.get(name);
+  if (queues === undefined) {
+    queues = new WeakMap();
+    queuesByName.set(name, queues);
+  }
+  const forName = queues;
+  return (store: object): ReturnType<typeof createSaveQueue<Key>> => {
+    let enqueue = forName.get(store);
     if (enqueue === undefined) {
-      enqueue = createSaveQueue<Key>();
-      queues.set(store, enqueue);
+      enqueue = createSaveQueue();
+      forName.set(store, enqueue);
     }
     return enqueue;
   };

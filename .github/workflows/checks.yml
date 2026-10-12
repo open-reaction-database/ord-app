@@ -37,10 +37,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: uv sync --frozen --no-build
+        # pre-commit is a dev dependency; the hook needs nothing else.
+        run: uv sync --frozen --no-build --only-dev
       # The pre-commit hook pins addlicense's version and arguments for CI and local commits alike.
       - name: addlicense
-        run: uv run --frozen --no-build pre-commit run addlicense --all-files --show-diff-on-failure
+        run: uv run --frozen --no-build --no-sync pre-commit run addlicense --all-files --show-diff-on-failure
 
   check_python:
     runs-on: ubuntu-latest
