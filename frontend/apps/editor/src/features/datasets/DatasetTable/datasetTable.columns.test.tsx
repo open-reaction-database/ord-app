@@ -40,11 +40,12 @@ describe('datasetTable.columns', () => {
   });
 
   it('names each row’s menu after its dataset', () => {
+    // The title matches the name, so screen readers do not read it again as a description.
     expect(
       renderCell('menu', { name: 'My Dataset', id: 1 }).getByRole('button', {
         name: 'Download dataset My Dataset',
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute('title', 'Download dataset My Dataset');
     expect(
       renderCell('menu', { id: 7 }).getByRole('button', {
         name: 'Download dataset Dataset 7',

@@ -71,7 +71,6 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
       );
     },
     size: 230,
-    ...shrinksTo(160),
   },
   {
     id: 'size',
@@ -170,7 +169,7 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
           target={
             <ActionIcon
               aria-label={`Download dataset ${datasetNameOf(row.original)}`}
-              title="Download dataset"
+              title={`Download dataset ${datasetNameOf(row.original)}`}
               onClick={handleMenu}
               variant="transparent"
               color="default"

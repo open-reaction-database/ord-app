@@ -42,7 +42,7 @@ test('fills each truncating column with its text', async ({ page }) => {
     timeout: 30_000,
   });
   for (const header of ['Dataset Name', 'Owner', 'Description']) {
-    // How much narrower the first row's text is than its cell's content box.
+    // How much the first row's text differs in width from its cell's content box.
     const gap = () =>
       page.evaluate(name => {
         const headers = Array.from(document.querySelectorAll('thead th'));
@@ -53,20 +53,32 @@ test('fills each truncating column with its text', async ({ page }) => {
           cell.clientWidth -
           parseFloat(style.paddingLeft) -
           parseFloat(style.paddingRight);
-        return content - cell.querySelector('div')!.getBoundingClientRect().width;
+        const text = cell.querySelector(':scope > div')!.getBoundingClientRect().width;
+        return Math.abs(content - text);
       }, header);
     await expect
-      .poll(gap, { message: `${header} text leaves its column` })
+      .poll(gap, { message: `${header} text misses its column` })
       .toBeLessThanOrEqual(1);
   }
 });
 
-test('lets the description narrow below its size when the table is short of room', async ({
-  page,
-}) => {
-  await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
-  const description = page.getByRole('columnheader', { name: 'Description' });
-  await expect(description).toBeVisible({ timeout: 30_000 });
-  // Its size is 280 px; the table is short of room at this width.
-  expect((await description.boundingBox())!.width).toBeLessThan(280);
+test.describe('in a window too narrow for the table', () => {
+  test.use({ viewport: { width: 640, height: 900 } });
+
+  test('takes the description and owner to their minimums, and keeps the name whole', async ({
+    page,
+  }) => {
+    await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('button', { name: 'Download dataset' }).first(),
+    ).toBeVisible({
+      timeout: 30_000,
+    });
+    const width = async (name: string) =>
+      (await page.getByRole('columnheader', { name, exact: true }).boundingBox())!
+        .width;
+    await expect.poll(() => width('Description')).toBe(120);
+    await expect.poll(() => width('Owner')).toBe(100);
+    await expect.poll(() => width('Dataset Name')).toBe(230);
+  });
 });
