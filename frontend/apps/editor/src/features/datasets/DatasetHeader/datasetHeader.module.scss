@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-/* The buttons wrap below the details once the details would have less than 480 px. */
+/* The buttons wrap below the details once the details would have less than 560 px, the width
+   the four fields need side by side. */
 .header {
   display: flex;
   flex-wrap: wrap;
@@ -24,7 +25,7 @@
 }
 
 .leftTitlePart {
-  flex: 1 1 480px;
+  flex: 1 1 560px;
   overflow: hidden;
 }
 

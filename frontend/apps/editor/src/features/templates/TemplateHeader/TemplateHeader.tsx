@@ -72,7 +72,10 @@ export function TemplateHeader({ templateId }: Readonly<TemplateHeaderProps>) {
           onClick={onVariablesSidebarOpen}
           isNotClickable={!isReadyForEnumeration}
         />
-        <Flex align="center">
+        <Flex
+          align="center"
+          wrap="wrap"
+        >
           <TemplateHeaderActions
             templateId={templateId}
             showEnumeration={true}
