@@ -37,8 +37,8 @@ ARG VITE_API_ENDPOINT=/api/v1
 ENV VITE_API_ENDPOINT=${VITE_API_ENDPOINT}
 
 # The Auth0 settings are compiled into the bundle. They come from these build arguments
-# or, for any not passed, from frontend/apps/editor/.env. ORD_APP_REQUIRE_AUTH0 fails the
-# build when one is missing (see frontend/apps/editor/vite.config.ts).
+# or, for any not passed, from frontend/apps/editor/.env. ORD_APP_REQUIRE_AUTH0 fails
+# the build when one is missing (see frontend/apps/editor/vite.config.ts).
 ARG VITE_AUTH0_DOMAIN
 ARG VITE_AUTH0_CLIENT_ID
 ARG VITE_AUTH0_AUDIENCE
@@ -118,9 +118,9 @@ EXPOSE 5173
 
 # Record the source commit so the deployed image is traceable to a commit. The infra
 # build (ord-infrastructure's sibling_head) passes the checkout's HEAD, suffixed
-# -dirty when the tree has changes, or "unknown" when it cannot read one; local and
-# manual builds default to "unknown". Declared last so only this layer rebuilds per
-# commit.
+# -dirty when the tree has changes or git cannot tell, or "unknown" when it cannot
+# read HEAD; local and manual builds default to "unknown". Declared last so only
+# this layer rebuilds per commit.
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 

@@ -93,7 +93,7 @@ _Note: the database must be on the same network as docker or docker must connect
    -e VITE_AUTH0_AUDIENCE="..." \
    -e VITE_AUTH0_ISSUER="..." \
    -e PG_DSN="postgresql+psycopg://ord@db:5432/ord" \
-   --rm -p 5173:5173 -p 8000:8000 ord
+   --rm -p 5173:5173 ord
    ```
 
 Envs for backend:
