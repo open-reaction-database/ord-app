@@ -76,18 +76,29 @@ describe('PageContainer', () => {
     expect(queryByTestId('footer')).toBeNull();
   });
 
-  it('leaves the footer, and the room kept for it, out when a host gives null', () => {
-    const withFooter = renderWithMantine(<PageContainer breadcrumbs={[]} />);
-    expect(withFooter.getByRole('main').className).not.toMatch(/mainWithoutFooter/);
-    withFooter.unmount();
-    const { getByRole, queryByRole, queryByTestId } = renderWithMantine(
-      <PageContainer
-        breadcrumbs={[]}
-        footer={null}
-      />,
+  it('keeps the default footer, and room for it, when a host gives none', () => {
+    const { getByRole, getByTestId } = renderWithMantine(
+      <PageContainer breadcrumbs={[]} />,
     );
-    expect(queryByRole('contentinfo')).toBeNull();
-    expect(queryByTestId('footer')).toBeNull();
-    expect(getByRole('main').className).toMatch(/mainWithoutFooter/);
+    expect(getByTestId('footer')).toBeInTheDocument();
+    expect(getByRole('main').className).not.toMatch(/mainWithoutFooter/);
   });
+
+  it.each([
+    ['null', null],
+    ['false', false],
+  ])(
+    'leaves the footer, and the room kept for it, out when a host gives %s',
+    (_label, footer) => {
+      const { getByRole, queryByRole, queryByTestId } = renderWithMantine(
+        <PageContainer
+          breadcrumbs={[]}
+          footer={footer}
+        />,
+      );
+      expect(queryByRole('contentinfo')).toBeNull();
+      expect(queryByTestId('footer')).toBeNull();
+      expect(getByRole('main').className).toMatch(/mainWithoutFooter/);
+    },
+  );
 });

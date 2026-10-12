@@ -26,7 +26,7 @@ export interface PageContainerProps extends PropsWithChildren {
   badge?: ReactNode;
   /** Controls at the right of the header, such as the signed-in user's menu. */
   headerActions?: ReactNode;
-  /** The page's footer: the Open Reaction Database footer by default, and none for `null`. */
+  /** The page's footer: the Open Reaction Database footer by default, and none for `null` or `false`. */
   footer?: ReactNode;
 }
 
@@ -37,7 +37,7 @@ export function PageContainer({
   headerActions,
   footer = <Footer />,
 }: Readonly<PageContainerProps>) {
-  const hasFooter = footer !== null;
+  const hasFooter = footer !== null && footer !== false;
   return (
     <AppShell
       classNames={{
