@@ -36,11 +36,9 @@ jobs:
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           python-version: "3.12"
-      - name: Install dependencies
-        run: uv sync --frozen --no-build
       # The pre-commit hook pins addlicense's version and arguments for CI and local commits alike.
       - name: addlicense
-        run: uv run --frozen --no-build pre-commit run addlicense --all-files --show-diff-on-failure
+        run: uvx --no-build --from 'pre-commit==4.6.0' pre-commit run addlicense --all-files --show-diff-on-failure
 
   check_python:
     runs-on: ubuntu-latest
@@ -54,20 +52,25 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
+        working-directory: backend/editor
         run: uv sync --frozen --no-build
 
       - name: ruff
-        run: uv run --frozen --no-build ruff check ord_app/
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ruff check ord_editor/
 
       - name: ruff format
-        run: uv run --frozen --no-build ruff format --check ord_app/
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ruff format --check ord_editor/
 
       - name: ty
-        run: uv run --frozen --no-build ty check ord_app
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ty check ord_editor
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
   # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
-  # ord_app/ (Python) and the frontend workspaces' src/ trees (TS/TSX) per .jscpd.json.
+  # backend/editor/ord_editor (Python) and the frontend workspaces' src/ trees (TS/TSX)
+  # per .jscpd.json.
   # Runs on every PR (not path-filtered) so Python-only changes are covered too.
   check_duplication:
     runs-on: ubuntu-latest

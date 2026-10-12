@@ -28,7 +28,9 @@ updates:
         patterns:
           - "*"
   - package-ecosystem: docker
-    directory: /
+    directories:
+      - /
+      - /backend/editor
     schedule:
       interval: monthly
     groups:

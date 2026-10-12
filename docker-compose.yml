@@ -16,7 +16,7 @@ services:
   api:
     image: ord-api
     build:
-      context: .
+      context: backend/editor
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
@@ -27,7 +27,7 @@ services:
       PG_TEST_DSN: "postgresql+psycopg://ord@db:5432/test"
       APP_ENV: "localhost"
     volumes:
-      - .:/app
+      - ./backend/editor:/app
       - /app/.venv
     networks:
       - ord_network
@@ -60,7 +60,7 @@ services:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
       PG_ALEMBIC_DSN: "postgresql+psycopg://ord@db:5432/ord"
     volumes:
-      - .:/app
+      - ./backend/editor:/app
     entrypoint: >
       sh -c "alembic upgrade head"
     networks:

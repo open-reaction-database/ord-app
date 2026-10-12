@@ -117,8 +117,8 @@ export PG_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_ALEMBIC_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_TEST_DSN="postgresql+psycopg://ord@localhost:5400/test"
 export APP_ENV=localhost ORD_APP_E2E=true CORS_ORIGINS='["http://127.0.0.1:5173"]'
-uv run alembic upgrade head
-uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
+uv run --directory backend/editor alembic upgrade head
+uv run --directory backend/editor uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
 
 # 3) UI — BOTH env vars are required
 cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \

@@ -29,6 +29,9 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: backend/editor
 
     steps:
       - name: Check out repository
@@ -60,7 +63,7 @@ jobs:
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
-        run: uv run --frozen --no-build pytest -vv --cov=ord_app --cov-report=term-missing --cov-report=html --durations=10
+        run: uv run --frozen --no-build pytest -vv --cov=ord_editor --cov-report=term-missing --cov-report=html --durations=10
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
@@ -80,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: python-coverage
-          path: htmlcov/
+          path: backend/editor/htmlcov/
           retention-days: 7
 
   test_e2e:
@@ -104,9 +107,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
+        working-directory: backend/editor
         run: uv sync --frozen --no-build
 
       - name: Run alembic migrations
+        working-directory: backend/editor
         run: uv run --frozen --no-build alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
@@ -133,7 +138,7 @@ jobs:
       - name: Start servers and run E2E
         run: |
           set -e
-          nohup uv run --frozen --no-build uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          nohup uv run --directory backend/editor --frozen --no-build uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
           nohup npm --prefix frontend -w apps/editor run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2

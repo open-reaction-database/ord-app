@@ -1,0 +1,57 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# One ruff configuration for every Python project in the repository. The projects'
+# pyproject.toml files carry no [tool.ruff] table, so ruff finds this file from any of
+# them.
+line-length = 88
+indent-width = 4
+target-version = "py312"
+# Directories holding first-party packages, for import sorting.
+src = ["backend/editor"]
+
+[lint]
+# pycodestyle errors and warnings (E/W), pyflakes (F), import sorting (I), bugbear (B),
+# pyupgrade (UP), flake8-simplify (SIM), full type annotations (ANN: arguments,
+# *args/**kwargs, return types, and no bare Any), flake8-fastapi (FAST), and
+# flake8-bandit (S: security findings).
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ANN", "FAST", "S"]
+# E501 (line length) is the formatter's job; SIM108 (ternaries aren't always clearer);
+# B008 (function calls in argument defaults are fine here, e.g. FastAPI Depends).
+# ANN401 (no bare `Any`): `Any` is the honest type for **kwargs forwarded to
+# HTTPException/SQLAlchemy filters and for pydantic "before" validators that receive raw
+# input; annotating those as `object` breaks type checking.
+ignore = ["E501", "SIM108", "B008", "ANN401"]
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+# Tests trip B011 (`assert False`) and B017 (`pytest.raises(Exception)`); annotations
+# (ANN) add little on test functions; S101 flags `assert`, which is how pytest checks.
+"**/*_test.py" = ["B011", "B017", "ANN", "S101"]
+"**/conftest.py" = ["B011", "B017", "ANN", "S101"]
+
+[lint.isort]
+# ord_schema is an external dependency; pin its classification so import ordering is
+# deterministic even when the environment is not fully resolved.
+known-third-party = ["ord_schema"]
+
+[format]
+# Like Black: double quotes, space indent, respect magic trailing commas.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
