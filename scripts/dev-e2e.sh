@@ -30,10 +30,10 @@ export ORD_APP_E2E="${ORD_APP_E2E:-true}"
 export CORS_ORIGINS="${CORS_ORIGINS:-[\"http://127.0.0.1:5173\"]}"
 
 echo "Applying database migrations..."
-uv run --frozen --no-build alembic upgrade head
+uv run --directory backend/editor --frozen --no-build alembic upgrade head
 
 echo "Starting backend (no-auth e2e mode) on http://127.0.0.1:8000 ..."
-uv run --frozen --no-build uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 &
+uv run --directory backend/editor --frozen --no-build uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 &
 backend_pid=$!
 trap 'kill "${backend_pid}" 2>/dev/null || true' EXIT
 

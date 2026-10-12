@@ -18,7 +18,7 @@
  * Character limits for user-editable text fields.
  *
  * These mirror the backend's authoritative limits in
- * `ord_app/service_api/schemas/base.py` (`MAX_CRITICAL_FIELD_LENGTH` and
+ * `backend/editor/ord_editor/service_api/schemas/base.py` (`MAX_CRITICAL_FIELD_LENGTH` and
  * `MAX_FIELD_LENGTH`). Enforcing them in the UI via `maxLength` prevents users
  * from typing past the limit instead of failing with an HTTP 422 on submit.
  */

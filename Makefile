@@ -1,18 +1,15 @@
 # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
 # Requires `npm ci` under frontend/ so the pinned jscpd binary is available.
-.PHONY: duplication
+.PHONY: duplication check-ruff python-formatting python-checking
+
 duplication:
 	frontend/node_modules/.bin/jscpd --config .jscpd.json
 
 check-ruff:
-	ruff check ord_app/
+	uv run --directory backend/editor ruff check ord_editor/
 
-check-pytype:
-	pytype -j auto
+python-formatting:
+	uv run --directory backend/editor ruff check ord_editor/ --fix
 
-.PHONY: formating
-python-formating:
-	ruff check ord_app/ --fix
-
-.PHONY: checking
-python-checking: check-ruff check-pytype
+python-checking: check-ruff
+	uv run --directory backend/editor ty check ord_editor

@@ -84,13 +84,13 @@ ENV UV_PROJECT_ENVIRONMENT=/usr/local \
     UV_LINK_MODE=copy
 
 # Copy project files
-COPY uv.lock pyproject.toml ./
+COPY backend/editor/uv.lock backend/editor/pyproject.toml ./
 
 # Install Python dependencies (production only, no dev group)
 RUN uv sync --frozen --no-dev --no-build
 
 # Copy the rest of the FastAPI app
-COPY ord_app/ ./ord_app
+COPY backend/editor/ord_editor/ ./ord_editor
 
 # Copy the built React app from the previous stage
 COPY --from=react-build /app/apps/editor/dist /var/www/html

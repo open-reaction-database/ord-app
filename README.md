@@ -5,21 +5,21 @@
 1. Install dependencies
 
    * PostgreSQL
-   * Python >= 3.10
+   * Python 3.12 and [uv](https://docs.astral.sh/uv/)
 
 2. Install the package
 
     ```shell
     git clone git@github.com:open-reaction-database/ord-app.git
     cd ord-app
-    pythom -m pip install -e ".[tests]"
+    cd backend/editor && uv sync --frozen
     ```
 
 3. Run the FastAPI server
 
     ```shell
-    cd ord_app/service_api
-    ORD_APP_TESTING=TRUE fastapi dev main.py
+    cd backend/editor/ord_editor/service_api
+    ORD_APP_TESTING=TRUE uv run fastapi dev main.py
     ```
     
     This creates a test PostgreSQL database and starts the server at http://localhost:8000. Navigate to
@@ -33,10 +33,10 @@ Prettier/ESLint/Stylelint. Install the hooks once after cloning (and run `npm ci
 find their tools):
 
 ```shell
-uv run pre-commit install
+uvx pre-commit install
 ```
 
-Run them against the whole tree at any time with `uv run pre-commit run --all-files`.
+Run them against the whole tree at any time with `uvx pre-commit run --all-files`.
 
 ## Run in Docker
 ### docker-compose

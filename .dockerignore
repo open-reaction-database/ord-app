@@ -4,16 +4,12 @@
 .dockerignore
 .gitignore
 
-__pychace__/
-.venv/
+**/__pycache__/
+**/.venv/
 .coverage
-.pylintrc
 .pytype/
-ord_app/tests/
 docker-compose.yml
-Dockerfile
 Dockerfile.single
 Makefile
-MANIFEST.in
 
 **/node_modules/
