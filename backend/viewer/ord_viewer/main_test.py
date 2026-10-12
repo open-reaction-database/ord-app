@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Startup, shutdown, and /api/health."""
+
 import re
 import shutil
 
 import pytest
 from fastapi.testclient import TestClient
+from ord_schema.search import execute
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
@@ -47,3 +50,34 @@ def test_startup_names_a_missing_tree(corpus_dir, tmp_path, missing):
         make_client(partial),
     ):
         pass
+
+
+def _record_closes(monkeypatch):
+    """Wrap Corpus.close so each call is counted, then runs the original."""
+    original = execute.Corpus.close
+    calls = []
+
+    def close(self):
+        calls.append(self)
+        original(self)
+
+    monkeypatch.setattr(execute.Corpus, "close", close)
+    return calls
+
+
+def test_startup_closes_the_corpus_when_the_pivot_check_fails(monkeypatch, corpus_dir):
+    def check_pivots(self):
+        raise execute.PairingError("stale")
+
+    monkeypatch.setattr(execute.Corpus, "check_pivots", check_pivots)
+    closes = _record_closes(monkeypatch)
+    with pytest.raises(execute.PairingError, match="stale"), make_client(corpus_dir):
+        pass
+    assert len(closes) == 1
+
+
+def test_shutdown_closes_the_corpus(monkeypatch, corpus_dir):
+    closes = _record_closes(monkeypatch)
+    with make_client(corpus_dir):
+        assert closes == []
+    assert len(closes) == 1
