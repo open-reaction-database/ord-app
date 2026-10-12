@@ -50,11 +50,14 @@ export function ReactionHeader({
       <Flex
         justify="space-between"
         align="flex-end"
+        wrap="wrap"
+        gap="sm"
       >
         <ReactionValidationResult />
         <Flex
           align="center"
           gap="sm"
+          wrap="wrap"
         >
           {actions}
         </Flex>

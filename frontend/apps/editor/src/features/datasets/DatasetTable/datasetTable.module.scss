@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* Shrinks with the window; a table wider than its share scrolls in its own container. */
 .tableContainer {
   display: flex;
   flex-direction: column;
   padding: 20px;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .buttons {

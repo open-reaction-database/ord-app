@@ -106,6 +106,7 @@ export function ReactionCard({
           <Flex
             align="center"
             gap="sm"
+            wrap="wrap"
           >
             {actions}
           </Flex>
