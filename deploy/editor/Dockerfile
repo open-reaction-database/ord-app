@@ -96,19 +96,19 @@ COPY backend/editor/ord_editor/ ./ord_editor
 COPY --from=react-build /app/apps/editor/dist /var/www/html
 
 # Copy Nginx config file
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY deploy/editor/nginx.conf /etc/nginx/nginx.conf
 
 RUN mkdir -p /var/lib/nginx /var/tmp/nginx /var/log/nginx && \
     chown -R appuser:appgroup /var/lib/nginx /var/tmp/nginx /var/log/nginx /run
 
 # Copy Supervisor config
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY deploy/editor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN (chown -R appuser:appgroup /app /var/www/html /etc/nginx || ls -lah /app) && \
     chown -R appuser:appgroup /etc/supervisor /var/log/supervisor
 
-COPY entrypoint_single.sh ./
-RUN chmod +x ./entrypoint_single.sh
+COPY deploy/editor/entrypoint.sh ./
+RUN chmod +x ./entrypoint.sh
 
 # Expose both FastAPI and Nginx ports
 EXPOSE 8000 80
@@ -120,4 +120,4 @@ EXPOSE 8000 80
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 
-ENTRYPOINT ["sh", "./entrypoint_single.sh"]
+ENTRYPOINT ["sh", "./entrypoint.sh"]
