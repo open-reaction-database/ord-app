@@ -47,7 +47,7 @@ repos:
     hooks:
       - id: ty-editor
         name: ty check (backend/editor)
-        entry: uv run --directory backend/editor ty check ord_editor
+        entry: uv run --directory backend/editor --frozen --no-build ty check ord_editor
         language: system
         files: ^backend/editor/ord_editor/.*\.py$
         pass_filenames: false

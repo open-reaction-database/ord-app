@@ -12,18 +12,17 @@
     ```shell
     git clone git@github.com:open-reaction-database/ord-app.git
     cd ord-app
-    cd backend/editor && uv sync --frozen
+    uv sync --directory backend/editor --frozen
     ```
 
 3. Run the FastAPI server
 
     ```shell
     cd backend/editor/ord_editor/service_api
-    ORD_APP_TESTING=TRUE uv run fastapi dev main.py
+    APP_ENV=localhost uv run fastapi dev main.py
     ```
-    
-    This creates a test PostgreSQL database and starts the server at http://localhost:8000. Navigate to
-    http://localhost:8000/docs for the interactive Swagger docs.
+
+    The server starts at http://localhost:8000 against the Postgres that `PG_DSN` names (default: the docker-compose database on localhost:5400). Create the schema first with `uv run --directory backend/editor alembic upgrade head`. Navigate to http://localhost:8000/docs for the interactive Swagger docs.
 
 ## Code style
 
@@ -35,6 +34,8 @@ find their tools):
 ```shell
 uvx pre-commit install
 ```
+
+`uvx pre-commit install` records a Python inside uv's cache, so clearing that cache breaks the hook; installing pre-commit as a tool (`uv tool install pre-commit`, then `pre-commit install`) gives a hook that survives it.
 
 Run them against the whole tree at any time with `uvx pre-commit run --all-files`.
 

@@ -16,10 +16,10 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 - Each project under `backend/` is its own uv project; run its commands from its directory (`cd backend/editor`) or with `uv run --directory backend/editor …`.
 - Deps: `uv sync --frozen` (pyproject.toml + uv.lock). **No lazy imports**; Google-style docstrings.
-- Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate: `uv run alembic upgrade head`.
-- Run dev server: `cd backend/editor/ord_editor/service_api && ORD_APP_TESTING=TRUE uv run fastapi dev main.py` → http://localhost:8000 (`/docs`).
-- Tests: `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
-- Lint/type: `ruff` + `ruff format`, `ty` (Astral's type checker; `uv run ty check ord_editor`; config in the root `ruff.toml`).
+- Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate (from `backend/editor`): `uv run alembic upgrade head`.
+- Run dev server: `cd backend/editor/ord_editor/service_api && APP_ENV=localhost uv run fastapi dev main.py` → http://localhost:8000 (`/docs`).
+- Tests (from `backend/editor`): `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
+- Lint/type: `ruff` + `ruff format` (config in the root `ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
 
 ## Frontend (`frontend/`)
 
@@ -30,7 +30,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 
 ## Formatting & pre-commit
 
-Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` once (and `npm ci` in `frontend/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` + `ty` (scoped to `backend/editor/ord_editor/`), UI `prettier`/`eslint`/`stylelint` and the `tsc -b` type check, and `jscpd`. Run all: `uvx pre-commit run --all-files`.
+Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` once (and `npm ci` in `frontend/` so UI hooks find their tools). Hooks: `addlicense` (Apache header, current year for new files), `ruff` + `ruff-format` + `ty-editor` (scoped to `backend/editor/ord_editor/`), UI `prettier`/`eslint`/`stylelint` and the `tsc -b` type check, and `jscpd`. Run all: `uvx pre-commit run --all-files`.
 
 ## CI gates (a PR is not mergeable until these are green)
 
@@ -42,5 +42,5 @@ Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` onc
 
 - Every source file carries the Apache 2.0 license header (enforced by addlicense).
 - Image builds (`Dockerfile.single`) take the Auth0 settings as build arguments or from `frontend/apps/editor/.env`, and fail without them; the backend reads them from the environment or `backend/editor/ord_editor/.env`. Both `.env` files are gitignored; copy each from the `.env.template` beside it.
-- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts` and `frontend/packages/ui/vitest.config.ts`); it is no longer uploaded to Codecov.
+- Coverage is measured locally in CI (`pytest --cov` + Vitest `coverage`) and enforced by floors (`[tool.coverage.report] fail_under` in `backend/editor/pyproject.toml`, Vitest `coverage.thresholds` in `frontend/apps/editor/vite.config.ts` and `frontend/packages/ui/vitest.config.ts`); it is no longer uploaded to Codecov.
 - A living issue-triage plan lives in `ISSUE_TRIAGE_PLAN.md` (synced to issue #656) and epic #662.

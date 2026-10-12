@@ -28,6 +28,8 @@ export APP_ENV="${APP_ENV:-localhost}"
 export ORD_APP_E2E="${ORD_APP_E2E:-true}"
 # Match the UI origin (127.0.0.1:5173) below; the backend default only allows localhost:5173.
 export CORS_ORIGINS="${CORS_ORIGINS:-[\"http://127.0.0.1:5173\"]}"
+# Point the UI at this backend; otherwise it calls the production API.
+export VITE_API_ENDPOINT="${VITE_API_ENDPOINT:-http://127.0.0.1:8000/service_api/api/v1}"
 
 echo "Applying database migrations..."
 uv run --directory backend/editor --frozen --no-build alembic upgrade head
