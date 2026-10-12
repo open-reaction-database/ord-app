@@ -22,12 +22,17 @@
   border-color: var(--color-background-gray);
 }
 
+/* The header and footer are fixed to the viewport, so the main area pads itself clear of both. */
 .main {
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding: 40px 20px 48px;
   background-color: var(--color-background-main);
+}
+
+.mainWithoutFooter {
+  padding-bottom: 0;
 }
 
 .content {

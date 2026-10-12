@@ -75,4 +75,19 @@ describe('PageContainer', () => {
     expect(getByText('host footer')).toBeInTheDocument();
     expect(queryByTestId('footer')).toBeNull();
   });
+
+  it('leaves the footer, and the room kept for it, out when a host gives null', () => {
+    const withFooter = renderWithMantine(<PageContainer breadcrumbs={[]} />);
+    expect(withFooter.getByRole('main').className).not.toMatch(/mainWithoutFooter/);
+    withFooter.unmount();
+    const { getByRole, queryByRole, queryByTestId } = renderWithMantine(
+      <PageContainer
+        breadcrumbs={[]}
+        footer={null}
+      />,
+    );
+    expect(queryByRole('contentinfo')).toBeNull();
+    expect(queryByTestId('footer')).toBeNull();
+    expect(getByRole('main').className).toMatch(/mainWithoutFooter/);
+  });
 });
