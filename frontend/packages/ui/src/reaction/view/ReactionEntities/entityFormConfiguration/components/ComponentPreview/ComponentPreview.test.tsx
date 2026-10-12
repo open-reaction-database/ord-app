@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { JSX } from 'react';
 import { describe, it, expect } from 'vitest';
 import { renderWithReaction } from '#testing/renderWithReaction.tsx';
 import { ComponentPreview } from './ComponentPreview.tsx';

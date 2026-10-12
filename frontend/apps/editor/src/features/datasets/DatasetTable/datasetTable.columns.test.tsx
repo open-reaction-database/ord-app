@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi } from 'vitest';
-import type { MouseEvent } from 'react';
+import type { JSX, MouseEvent } from 'react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { columns, handleMenu } from './datasetTable.columns.tsx';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
