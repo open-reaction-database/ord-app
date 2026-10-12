@@ -18,11 +18,12 @@
 3. Run the FastAPI server
 
     ```shell
-    cd backend/editor/ord_editor/service_api
-    APP_ENV=localhost uv run fastapi dev main.py
+    cd backend/editor
+    uv run alembic upgrade head
+    APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload
     ```
 
-    The server starts at http://localhost:8000 against the Postgres that `PG_DSN` names (default: the docker-compose database on localhost:5400). Create the schema first with `uv run --directory backend/editor alembic upgrade head`. Navigate to http://localhost:8000/docs for the interactive Swagger docs.
+    The server starts at http://localhost:8000 against the Postgres that `PG_DSN` names (default: the docker-compose database on localhost:5400), and `alembic upgrade head` creates its schema. Navigate to http://localhost:8000/service_api/docs for the interactive Swagger docs.
 
 ## Code style
 

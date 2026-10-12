@@ -17,7 +17,7 @@ Web application for the [Open Reaction Database](https://open-reaction-database.
 - Each project under `backend/` is its own uv project; run its commands from its directory (`cd backend/editor`) or with `uv run --directory backend/editor …`.
 - Deps: `uv sync --frozen` (pyproject.toml + uv.lock). **No lazy imports**; Google-style docstrings.
 - Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate (from `backend/editor`): `uv run alembic upgrade head`.
-- Run dev server: `cd backend/editor/ord_editor/service_api && APP_ENV=localhost uv run fastapi dev main.py` → http://localhost:8000 (`/docs`).
+- Run dev server (from `backend/editor`): `APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload` → http://localhost:8000 (`/service_api/docs`).
 - Tests (from `backend/editor`): `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
 - Lint/type: `ruff` + `ruff format` (config in the root `ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
 
