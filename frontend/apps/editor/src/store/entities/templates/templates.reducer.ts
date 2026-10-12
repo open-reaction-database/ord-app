@@ -15,7 +15,6 @@
  */
 import { combineReducers, createReducer, isAnyOf } from '@reduxjs/toolkit';
 import {
-  getTemplateActions,
   createNewTemplateActions,
   getAllTemplatesActions,
   removeTemplateActions,
@@ -41,17 +40,9 @@ const templatesOrder = createReducer<Array<string>>([], builder => {
 });
 
 const isTemplateCreating = createReducer<boolean>(false, builder => {
+  builder.addCase(createNewTemplateActions.request, () => true);
   builder.addMatcher(
-    isAnyOf(createNewTemplateActions.request, getTemplateActions.request),
-    () => true,
-  );
-  builder.addMatcher(
-    isAnyOf(
-      createNewTemplateActions.success,
-      createNewTemplateActions.failure,
-      getTemplateActions.success,
-      getTemplateActions.failure,
-    ),
+    isAnyOf(createNewTemplateActions.success, createNewTemplateActions.failure),
     () => false,
   );
 });

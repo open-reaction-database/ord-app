@@ -18,7 +18,6 @@ import { templatesReducer } from './templates.reducer.ts';
 import {
   createNewTemplateActions,
   getAllTemplatesActions,
-  getTemplateActions,
   importTemplateFromFileActions,
   removeTemplateActions,
 } from './templates.actions.ts';
@@ -120,20 +119,6 @@ describe('templatesReducer', () => {
       );
       expect(state.isTemplateCreating).toBe(true);
       state = templatesReducer(state, createNewTemplateActions.failure(new Error('x')));
-      expect(state.isTemplateCreating).toBe(false);
-    });
-
-    it('toggles around the get flow (request -> success)', () => {
-      let state = templatesReducer(initialState(), getTemplateActions.request(1));
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, getTemplateActions.success(makeTemplate('a')));
-      expect(state.isTemplateCreating).toBe(false);
-    });
-
-    it('toggles around the get flow (request -> failure)', () => {
-      let state = templatesReducer(initialState(), getTemplateActions.request(1));
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, getTemplateActions.failure(new Error('x')));
       expect(state.isTemplateCreating).toBe(false);
     });
   });
