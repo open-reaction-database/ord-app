@@ -13,12 +13,9 @@
 # limitations under the License.
 
 on:
+  # Every pull request runs these jobs, whatever it changes: the main branch's ruleset
+  # requires them, and a required check that never reports leaves the PR blocked.
   pull_request:
-    paths:
-      - 'frontend/**'
-      # PRs branched before the frontend/ move change ui/**; their checks run on the merge
-      # ref, which has frontend/.
-      - 'ui/**'
     branches:
       - '*'
   push:
