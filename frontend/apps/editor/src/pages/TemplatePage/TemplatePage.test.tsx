@@ -26,7 +26,8 @@ vi.mock('react-redux', () => ({
   useStore: () => ({ getState: () => undefined, subscribe: () => () => undefined }),
 }));
 vi.mock('store/entities/reactions/reactions.selectors.ts', () => ({
-  selectReactionById: () => () => control.template,
+  selectReactionById: (id: string) => () =>
+    id === 'template_999' ? control.template : undefined,
 }));
 vi.mock('store/entities/templates/templates.selectors.ts', () => ({
   selectAreTemplatesLoaded: () => control.loaded,
@@ -42,8 +43,16 @@ vi.mock('pages/NotFound/NotFoundPage.tsx', () => ({
   ),
 }));
 vi.mock('common/components/PageContainer/EditorPageContainer.tsx', () => ({
-  EditorPageContainer: ({ children }: Readonly<{ children: React.ReactNode }>) => (
-    <div data-testid="page-container">{children}</div>
+  EditorPageContainer: ({
+    children,
+    breadcrumbs,
+  }: Readonly<{ children: React.ReactNode; breadcrumbs: unknown }>) => (
+    <div
+      data-testid="page-container"
+      data-breadcrumbs={JSON.stringify(breadcrumbs)}
+    >
+      {children}
+    </div>
   ),
 }));
 vi.mock('features/templates/TemplateHeader/TemplateHeader.tsx', () => ({
@@ -104,5 +113,13 @@ describe('TemplatePage (#496 — 404 for a missing template)', () => {
     renderWithMantine(<TemplatePage />);
     expect(screen.queryByTestId('not-found')).toBeNull();
     expect(screen.getByTestId('template-header')).toBeInTheDocument();
+  });
+
+  it('gives the template’s crumb its route and a title before the template loads', () => {
+    renderWithMantine(<TemplatePage />);
+    const crumbs = JSON.parse(
+      screen.getByTestId('page-container').dataset.breadcrumbs ?? '[]',
+    );
+    expect(crumbs[1]).toEqual({ path: '~/templates/999', title: 'Template 999' });
   });
 });

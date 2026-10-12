@@ -15,7 +15,6 @@
  */
 import {
   createNewTemplateActions,
-  getTemplateActions,
   getAllTemplatesActions,
   removeTemplateActions,
   renameTemplateActions,
@@ -33,6 +32,11 @@ import type { Action } from '@reduxjs/toolkit';
 import { createThunk, createThunkWithExplicitResult } from 'store/utils';
 import axiosInstance from 'store/axiosInstance.ts';
 import { createStoreSaveQueues, SAVE_TIMEOUT_MS } from 'store/utils/saveQueue.ts';
+import {
+  templateIdFromNumber,
+  templateNumberFromId,
+  templatePath,
+} from './templateIds.ts';
 import {
   ordBinpbToReaction,
   reactionToOrdBinpb,
@@ -52,10 +56,6 @@ import {
 import type { ThunkCustomWrapper } from 'common/types/store/thunk.ts';
 import { downloadAsJson, downloadFile } from '../../utils/downloadFile.thunks.ts';
 
-const getTemplateIdNumber = (templateId: string): number =>
-  Number.parseInt(templateId.split('_')[1]);
-const getTemplateIdString = (templateId: number): string => `template_${templateId}`;
-
 const parseTemplate = ({
   id,
   binpb,
@@ -68,19 +68,13 @@ const parseTemplate = ({
   const variablesParsed: Array<Variable> = JSON.parse(rawVariables);
 
   return {
-    id: getTemplateIdString(id),
+    id: templateIdFromNumber(id),
     variables: ordTemplateVariablesToReaction(variablesParsed, appReaction),
     previews,
     data: appReaction,
     ...rest,
   };
 };
-
-export const getTemplate = createThunk(getTemplateActions, templateId => async () => {
-  const result = await axiosInstance.get<TemplateResponse>(`/templates/${templateId}`);
-  const template = parseTemplate(result.data);
-  return getTemplateActions.success(template);
-});
 
 export const getAllTemplates = createThunk(getAllTemplatesActions, () => async () => {
   const result = await axiosInstance.get<Array<TemplateResponse>>(`/templates`);
@@ -106,14 +100,14 @@ export const createTemplate = createThunkWithExplicitResult(
     const template = parseTemplate(templateData);
 
     dispatch(createNewTemplateActions.success(template));
-    navigate(`/templates/${templateData.id}`);
+    navigate(templatePath(templateData.id));
   },
 );
 
 export const removeTemplate = createThunkWithExplicitResult(
   removeTemplateActions,
   templateId => async (dispatch, _s) => {
-    const entityId = getTemplateIdNumber(templateId);
+    const entityId = templateNumberFromId(templateId);
     await axiosInstance.delete(`/templates/${entityId}`);
     dispatch(removeTemplateActions.success(templateId));
     navigate(`/templates`);
@@ -125,7 +119,7 @@ export const renameTemplate = createThunk(
   renameTemplateActions,
   ({ templateId, name }) =>
     async () => {
-      const entityId = getTemplateIdNumber(templateId);
+      const entityId = templateNumberFromId(templateId);
       const result = await axiosInstance.patch<TemplateResponse>(
         `templates/${entityId}`,
         { name },
@@ -169,7 +163,7 @@ const saveEditedVariables: ThunkCustomWrapper<
       try {
         const variablesList = reactionTemplateVariablesToOrd(variables, reaction);
         await axiosInstance.patch<TemplateResponse>(
-          `templates/${getTemplateIdNumber(templateId)}`,
+          `templates/${templateNumberFromId(templateId)}`,
           { variables: JSON.stringify(variablesList) },
           { timeout: SAVE_TIMEOUT_MS },
         );
@@ -253,7 +247,7 @@ export const importFromFile = createThunkWithExplicitResult(
           await axiosInstance.post<TemplateResponse>(`/templates`, payload)
         ).data;
         const template = parseTemplate(templateData);
-        navigate(`/templates/${templateData.id}`);
+        navigate(templatePath(templateData.id));
         dispatch(importTemplateFromFileActions.success(template));
       } catch (e: unknown) {
         console.error(e);

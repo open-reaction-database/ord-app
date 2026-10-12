@@ -18,7 +18,6 @@ import { templatesReducer } from './templates.reducer.ts';
 import {
   createNewTemplateActions,
   getAllTemplatesActions,
-  getTemplateActions,
   importTemplateFromFileActions,
   removeTemplateActions,
 } from './templates.actions.ts';
@@ -34,7 +33,6 @@ describe('templatesReducer', () => {
   it('returns the initial state', () => {
     expect(initialState()).toEqual({
       templatesOrder: [],
-      isTemplateCreating: false,
       areTemplatesLoaded: false,
     });
   });
@@ -99,42 +97,4 @@ describe('templatesReducer', () => {
 
   // One case per request/resolve pair so each reset branch of the isAnyOf matcher is
   // independently covered (create success, create failure, get success, get failure).
-  describe('isTemplateCreating', () => {
-    it('toggles around the create flow (request -> success)', () => {
-      let state = templatesReducer(
-        initialState(),
-        createNewTemplateActions.request({} as never),
-      );
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(
-        state,
-        createNewTemplateActions.success(makeTemplate('a')),
-      );
-      expect(state.isTemplateCreating).toBe(false);
-    });
-
-    it('toggles around the create flow (request -> failure)', () => {
-      let state = templatesReducer(
-        initialState(),
-        createNewTemplateActions.request({} as never),
-      );
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, createNewTemplateActions.failure(new Error('x')));
-      expect(state.isTemplateCreating).toBe(false);
-    });
-
-    it('toggles around the get flow (request -> success)', () => {
-      let state = templatesReducer(initialState(), getTemplateActions.request(1));
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, getTemplateActions.success(makeTemplate('a')));
-      expect(state.isTemplateCreating).toBe(false);
-    });
-
-    it('toggles around the get flow (request -> failure)', () => {
-      let state = templatesReducer(initialState(), getTemplateActions.request(1));
-      expect(state.isTemplateCreating).toBe(true);
-      state = templatesReducer(state, getTemplateActions.failure(new Error('x')));
-      expect(state.isTemplateCreating).toBe(false);
-    });
-  });
 });
