@@ -24,5 +24,13 @@ export function SearchReactionLink({ pbReactionId }: Readonly<ReactionLinkProps>
   const onClick = () => {
     dispatch(searchReaction(pbReactionId));
   };
-  return <Anchor onClick={onClick}>{pbReactionId}</Anchor>;
+  return (
+    <Anchor
+      component="button"
+      type="button"
+      onClick={onClick}
+    >
+      {pbReactionId}
+    </Anchor>
+  );
 }
