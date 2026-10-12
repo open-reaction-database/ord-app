@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+  templateNumberFromId,
+  templatePath,
+} from 'store/entities/templates/templateIds.ts';
 import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { Flex, Paper, Title } from '@mantine/core';
@@ -36,8 +40,7 @@ interface TemplateTitleProps {
 }
 
 function TemplateTitle({ index, templateId }: Readonly<TemplateTitleProps>) {
-  const id = templateId.split('_')[1];
-  const linkToPage = `~/templates/${id}`;
+  const linkToPage = `~${templatePath(templateNumberFromId(templateId))}`;
   const template = useSelector(selectReactionById(templateId));
 
   return (

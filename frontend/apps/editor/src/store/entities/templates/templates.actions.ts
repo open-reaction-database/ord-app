@@ -23,8 +23,6 @@ import type { ReactionTemplate } from 'store/entities/reactions/reactionsStore.t
 
 const { createAsyncAction } = createActionFactory('templates');
 
-export const getTemplateActions = createAsyncAction<number, ReactionTemplate>('get');
-
 export const getAllTemplatesActions = createAsyncAction<void, Array<ReactionTemplate>>(
   'get_all_templates',
 );
@@ -34,7 +32,7 @@ export const createNewTemplateActions = createAsyncAction<
   ReactionTemplate
 >('create');
 
-// Both payloads are the template's id as stored, `template_<number>`.
+// The request and success payloads are the template's id as stored, `template_<number>`.
 export const removeTemplateActions = createAsyncAction<string, string>(
   'remove_template',
 );
