@@ -86,7 +86,7 @@ Run them against the whole tree at any time with `uvx pre-commit run --all-files
 ### docker-compose
 You can run the Back-End and the Database using a single docker-compose file.
 ```shell
-docker compose up -d
+cd backend/editor && docker compose up -d
 ```
 At the same time, you need to run the Front-End separately.
 ```shell
