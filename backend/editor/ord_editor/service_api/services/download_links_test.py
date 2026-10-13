@@ -66,7 +66,8 @@ def test_signature_covers_every_field(payload):
     "token", ["", "4.json.7", f"4.json.7.{EXPIRES}.", f"4.json.7.{EXPIRES}.ünïcode"]
 )
 def test_rejects_a_malformed_token(token):
-    with pytest.raises(InvalidDownloadLinkError):
+    # A malformed token has no valid signature, so the signature check refuses it.
+    with pytest.raises(InvalidDownloadLinkError, match="Signature does not match"):
         verify_download_link(token, now=NOW)
 
 

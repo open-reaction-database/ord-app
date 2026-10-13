@@ -17,6 +17,7 @@
 import asyncio
 import re
 import shutil
+from typing import Any
 
 import httpx
 import pytest
@@ -160,3 +161,80 @@ def test_an_empty_corpus_directory_variable_counts_as_unset(monkeypatch):
     client = TestClient(create_app(resolver=offline_resolver))
     with pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"), client:
         pass
+
+
+_SEARCH_ERRORS = {"422", "503", "504"}
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "statuses"),
+    [
+        ("post", "/api/search", _SEARCH_ERRORS),
+        ("post", "/api/ask", _SEARCH_ERRORS | {"429", "502"}),
+        ("get", "/api/datasets/{dataset_id}/compounds", _SEARCH_ERRORS | {"404"}),
+        ("get", "/api/datasets/{dataset_id}", {"404", "422"}),
+        ("get", "/api/reactions/{reaction_id}", {"404", "422"}),
+        ("post", "/api/download", {"404", "422"}),
+    ],
+)
+def test_the_schema_declares_each_routes_errors(method, path, statuses):
+    operation = create_app().openapi()["paths"][path][method]
+    assert {code for code in operation["responses"] if code != "200"} == statuses
+
+
+def _component(openapi: dict[str, Any], reference: dict[str, str]) -> dict[str, Any]:
+    """Return the component schema a $ref names.
+
+    Args:
+        openapi: The app's OpenAPI document.
+        reference: A schema holding only a $ref to a component.
+
+    Returns:
+        The component's schema.
+    """
+    return openapi["components"]["schemas"][reference["$ref"].rsplit("/", 1)[-1]]
+
+
+@pytest.mark.parametrize(
+    ("method", "path"),
+    [("post", "/api/search"), ("get", "/api/datasets/{dataset_id}/compounds")],
+)
+def test_a_search_route_publishes_both_unprocessable_bodies(method, path):
+    openapi = create_app().openapi()
+    responses = openapi["paths"][path][method]["responses"]
+    schema = responses["422"]["content"]["application/json"]["schema"]
+    assert {_component(openapi, option)["title"] for option in schema["anyOf"]} == {
+        "ErrorDetail",
+        "ValidationErrors",
+    }
+
+
+def test_the_validation_errors_mirror_fastapis_own():
+    openapi = create_app().openapi()
+    schemas = openapi["components"]["schemas"]
+    item = _component(
+        openapi, schemas["ValidationErrors"]["properties"]["detail"]["items"]
+    )
+    fastapi_item = schemas["ValidationError"]
+    assert item["required"] == fastapi_item["required"]
+    assert item["properties"].keys() == fastapi_item["properties"].keys()
+
+
+def test_the_search_results_publish_their_kind_and_their_bound():
+    openapi = create_app().openapi()
+    ok = openapi["paths"]["/api/search"]["post"]["responses"]["200"]
+    options = ok["content"]["application/json"]["schema"]["oneOf"]
+    results = {
+        result["title"]: result
+        for result in (_component(openapi, option) for option in options)
+    }
+    assert results.keys() == {"ReactionsResult", "TableResult"}
+    for result in results.values():
+        assert "kind" in result["required"]
+        bound = f"{execute.DEFAULT_MAX_ROWS:,}"
+        assert bound in result["properties"]["truncated"]["description"]
+    reaction_ids = results["ReactionsResult"]["properties"]["reaction_ids"]
+    assert reaction_ids["maxItems"] == execute.DEFAULT_MAX_ROWS
+    assert results["TableResult"]["properties"]["rows"]["maxItems"] == (
+        execute.DEFAULT_MAX_ROWS
+    )

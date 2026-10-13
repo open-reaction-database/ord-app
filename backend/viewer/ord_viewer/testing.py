@@ -14,11 +14,14 @@
 
 """A small corpus built and derived the way ord-schema derives a published one."""
 
+import contextlib
 import glob
 import pathlib
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, cast
 
+from anyio.from_thread import BlockingPortal
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import parquet
 from ord_schema.artifacts.scripts import (
@@ -31,6 +34,7 @@ from ord_schema.proto import dataset_pb2, reaction_pb2
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
+from ord_viewer.slots import SearchSlots
 
 # Names offline_resolver knows; any other name raises, as ord-schema's resolvers do.
 COMPOUND_NAMES = {"pyridine": "c1ccncc1"}
@@ -184,17 +188,76 @@ def derive_corpus(root: pathlib.Path) -> None:
     )
 
 
-def make_client(corpus_dir: pathlib.Path, **settings: Any) -> TestClient:
+def portal(client: TestClient) -> BlockingPortal:
+    """Return the blocking portal to the event loop an entered client's app runs on.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The portal, for running coroutines on the app's event loop from the test thread.
+
+    Raises:
+        RuntimeError: If the client has not been entered.
+    """
+    if client.portal is None:
+        raise RuntimeError("enter the client before reaching its event loop")
+    return client.portal
+
+
+def _search_slots(client: TestClient) -> SearchSlots:
+    """Return the search slots an entered client's app holds.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The app's search slots.
+    """
+    return cast(FastAPI, client.app).state.viewer.slots
+
+
+def hold_slot(client: TestClient) -> contextlib.AbstractContextManager[None]:
+    """Hold one of the app's search slots from the test thread.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        A context manager holding the slot, on the app's event loop, for its body.
+    """
+    return portal(client).wrap_async_context_manager(_search_slots(client).hold())
+
+
+def slot_waiters(client: TestClient) -> int:
+    """Count the requests waiting for one of the app's search slots.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The number waiting, read on the app's event loop.
+    """
+    return portal(client).call(_search_slots(client).waiting)
+
+
+def make_client(
+    corpus_dir: pathlib.Path, *, ask_client: Any = None, **settings: Any
+) -> TestClient:
     """Return an unentered client over corpus_dir, with any settings overridden.
 
     Args:
         corpus_dir: The corpus the app serves.
+        ask_client: What /api/ask calls messages.create on: an anthropic.Anthropic, or a
+            stub that scripts its responses. None answers 503, as with no key.
         **settings: Settings fields to set beyond corpus_dir.
 
     Returns:
         A client whose app opens the corpus when the client is entered.
     """
     app = create_app(
-        lambda: Settings(corpus_dir=corpus_dir, **settings), resolver=offline_resolver
+        lambda: Settings(corpus_dir=corpus_dir, **settings),
+        resolver=offline_resolver,
+        ask_client_factory=lambda: ask_client,
     )
     return TestClient(app)

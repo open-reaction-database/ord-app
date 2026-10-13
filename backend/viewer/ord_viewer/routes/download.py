@@ -20,7 +20,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from ord_schema.proto import dataset_pb2, reaction_pb2
 
-from ord_viewer.schemas import DownloadRequest
+from ord_viewer.schemas import DownloadRequest, ErrorDetail
 from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api")
@@ -33,7 +33,8 @@ router = APIRouter(prefix="/api")
         200: {
             "content": {"application/gzip": {}},
             "description": "A gzipped serialized ord.Dataset",
-        }
+        },
+        404: {"model": ErrorDetail},
     },
 )
 def download(

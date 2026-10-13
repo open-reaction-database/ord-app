@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Session fixtures: one derived corpus and one client over it."""
+"""Shared fixtures: a derived corpus, a client over it, and asyncio for async tests."""
 
 import pathlib
 from collections.abc import Iterator
@@ -21,6 +21,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from ord_viewer.testing import derive_corpus, make_client
+
+
+@pytest.fixture
+def anyio_backend() -> str:
+    return "asyncio"
 
 
 @pytest.fixture(scope="session")
