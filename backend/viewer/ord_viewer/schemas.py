@@ -14,6 +14,9 @@
 
 """The bodies the routes accept and return."""
 
+from typing import Annotated, Any, Literal
+
+from ord_schema.search.query import Query
 from pydantic import BaseModel, Field
 
 
@@ -81,3 +84,30 @@ class DownloadRequest(BaseModel):
     """The reactions to download: at most one search's worth."""
 
     reaction_ids: list[str] = Field(min_length=1, max_length=1000)
+
+
+class SearchRequest(BaseModel):
+    """One query in the search grammar, as the form and /ask both produce."""
+
+    query: Query
+
+
+class ReactionsResult(BaseModel):
+    """A plain query's answer: reaction IDs to fetch a page at a time."""
+
+    kind: Literal["reactions"] = "reactions"
+    reaction_ids: list[str]
+    # True when the corpus's 1,000-row bound may have cut the answer.
+    truncated: bool
+
+
+class TableResult(BaseModel):
+    """An aggregate's answer: its group and measure columns."""
+
+    kind: Literal["table"] = "table"
+    columns: list[str]
+    rows: list[list[Any]]
+    truncated: bool
+
+
+SearchResult = Annotated[ReactionsResult | TableResult, Field(discriminator="kind")]

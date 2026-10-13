@@ -22,6 +22,7 @@ from fastapi import HTTPException, status
 from ord_schema.search import execute
 from ord_schema.search.query import Query
 
+from ord_viewer.schemas import ReactionsResult, TableResult
 from ord_viewer.state import ViewerState
 
 
@@ -66,3 +67,26 @@ def run_search(state: ViewerState, request: Query) -> pa.Table:
         return state.corpus.search(
             request, timeout_seconds=state.settings.search_timeout_seconds
         )
+
+
+def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
+    """Shape a search's table as the result the viewer reads.
+
+    Args:
+        request: The query that produced the table; an aggregate gives a table.
+        table: What Corpus.search returned.
+
+    Returns:
+        Reaction IDs for a plain query, or the columns and rows of an aggregate, each
+        saying whether the corpus's row bound may have cut it.
+    """
+    truncated = (table.schema.metadata or {}).get(execute.TRUNCATED.encode()) == b"true"
+    if request.aggregate is None:
+        return ReactionsResult(
+            reaction_ids=table.column("reaction_id").to_pylist(), truncated=truncated
+        )
+    return TableResult(
+        columns=table.column_names,
+        rows=[list(row.values()) for row in table.to_pylist()],
+        truncated=truncated,
+    )

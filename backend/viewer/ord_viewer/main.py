@@ -21,7 +21,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
-from ord_viewer.routes import datasets, download, health, reactions
+from ord_viewer.routes import datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots, SlotsBusyError
 from ord_viewer.state import ViewerState
@@ -83,6 +83,7 @@ def create_app(
     app.include_router(datasets.router)
     app.include_router(reactions.router)
     app.include_router(download.router)
+    app.include_router(search.router)
     app.add_exception_handler(SlotsBusyError, _slots_busy)
     return app
 
