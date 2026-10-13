@@ -12,13 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Generator
+
 import pytest
 from ord_schema import resolvers
 
 from ord_viewer.corpus import resolve_compound_name
 
 
-def test_caches_names_that_resolve_and_retries_names_that_do_not(monkeypatch):
+@pytest.fixture
+def fresh_resolver_cache() -> Generator[None]:
+    """Empty the resolver cache before and after the test."""
+    resolve_compound_name.cache_clear()
+    yield
+    resolve_compound_name.cache_clear()
+
+
+def test_caches_names_that_resolve_and_retries_names_that_do_not(
+    monkeypatch, fresh_resolver_cache
+):
     asked = []
 
     def resolve_name(value_type, value):
@@ -28,11 +40,9 @@ def test_caches_names_that_resolve_and_retries_names_that_do_not(monkeypatch):
         raise ValueError(f"Could not resolve {value_type} {value} to SMILES")
 
     monkeypatch.setattr(resolvers, "resolve_name", resolve_name)
-    resolve_compound_name.cache_clear()
     assert resolve_compound_name("pyridine") == "c1ccncc1"
     assert resolve_compound_name("pyridine") == "c1ccncc1"
     for _ in range(2):
         with pytest.raises(ValueError):
             resolve_compound_name("unobtainium")
     assert asked == ["pyridine", "unobtainium", "unobtainium"]
-    resolve_compound_name.cache_clear()
