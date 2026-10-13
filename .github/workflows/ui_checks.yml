@@ -39,6 +39,12 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run lint:check
       - run: npm run typecheck
+      # The viewer's API types are generated from backend/viewer/openapi.json, which
+      # test_python_viewer pins to the backend's routes.
+      - name: The viewer's API types match the backend's document
+        run: |
+          npm run generate:api -w apps/viewer
+          git diff --exit-code -- apps/viewer/src/api/schema.ts
       # deploy/editor/Dockerfile builds with ORD_APP_REQUIRE_AUTH0, which fails the build
       # when an Auth0 setting is missing (vite.config.ts). The check runs as the config
       # loads, so this step is fast; the build below passes it with placeholder values.

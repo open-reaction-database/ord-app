@@ -15,13 +15,17 @@
  */
 import { MantineProvider } from '@mantine/core';
 import { theme } from '@open-reaction-database/ui/theme';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { Router } from 'wouter';
 import { memoryLocation } from 'wouter/memory-location';
+import { createQueryClient } from '#api/queryClient.ts';
 
 /**
  * Renders ui inside the viewer's providers, at path (which may carry a query string).
+ *
+ * Each call gets its own cache, so no test sees another's responses.
  *
  * Returns Testing Library's result and `history`, every path the router has been at,
  * oldest first; a redirect with `replace` overwrites the last.
@@ -30,12 +34,14 @@ export function renderAt(path: string, ui: ReactElement) {
   const location = memoryLocation({ path, record: true });
   const result = render(
     <MantineProvider theme={theme}>
-      <Router
-        hook={location.hook}
-        searchHook={location.searchHook}
-      >
-        {ui}
-      </Router>
+      <QueryClientProvider client={createQueryClient()}>
+        <Router
+          hook={location.hook}
+          searchHook={location.searchHook}
+        >
+          {ui}
+        </Router>
+      </QueryClientProvider>
     </MantineProvider>,
   );
   return { ...result, history: location.history };
