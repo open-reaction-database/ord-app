@@ -1,0 +1,109 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { loadEnv } from 'vite';
+import { defineConfig, type ViteUserConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react-swc';
+import svgr from 'vite-plugin-svgr';
+import tsconfigPaths from 'vite-tsconfig-paths';
+
+const AUTH0_VARIABLES = [
+  'VITE_AUTH0_DOMAIN',
+  'VITE_AUTH0_CLIENT_ID',
+  'VITE_AUTH0_AUDIENCE',
+  'VITE_AUTH0_ISSUER',
+  'VITE_AUTH0_SCOPE',
+];
+
+// The Auth0 settings are compiled into the bundle, and a bundle built without them sends
+// every visitor to https://undefined/authorize. Image builds (deploy/editor/Dockerfile)
+// set ORD_APP_REQUIRE_AUTH0 so they fail instead.
+function assertAuth0Configured(mode: string): void {
+  if (process.env.ORD_APP_REQUIRE_AUTH0 !== 'true') {
+    return;
+  }
+  const env = loadEnv(mode, process.cwd(), 'VITE_AUTH0_');
+  const missing = AUTH0_VARIABLES.filter(name => !env[name]);
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing ${missing.join(', ')}: pass them as build arguments or set them in ` +
+        'frontend/apps/editor/.env (see frontend/apps/editor/.env.template).',
+    );
+  }
+}
+
+// https://vite.dev/config/
+const config: ViteUserConfig = {
+  plugins: [react(), svgr(), tsconfigPaths()],
+  worker: {
+    plugins: () => [tsconfigPaths()],
+  },
+  // The dev server pre-bundles the dependencies it finds by crawling these entries. The Web
+  // Workers, the editor's and the shared package's, are listed because the crawl from
+  // index.html does not follow `new Worker(...)`; a dependency found only when a worker
+  // first loads makes the server reload every page.
+  optimizeDeps: {
+    entries: ['index.html', 'src/**/worker.ts', '../../packages/ui/src/**/*.worker.ts'],
+  },
+  // Because ketcher needs asserts which requires super outdated package util
+  define: {
+    'process.env': {},
+  },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: ['./src/test/setup.ts'],
+    // Before each test, reset every mock: its calls, and any implementation or queued
+    // mock*Once value a test set. A vi.fn(impl) goes back to impl.
+    mockReset: true,
+    // Unit tests live under src/; e2e/ is Playwright (run via `npm run test:e2e`), not vitest.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      // text/text-summary -> console; html + lcov -> uploaded artifacts; json-summary -> CI step summary.
+      reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.d.ts',
+        'src/test/**',
+        'src/**/*.module.scss',
+      ],
+      // Total-coverage floor enforced in CI (a regression backstop), well below the measured
+      // coverage (lines 78%, statements 79%, branches 67%, functions 73%) so routine churn
+      // doesn't trip it; ratchet up later.
+      thresholds: {
+        lines: 60,
+        statements: 60,
+        branches: 57,
+        functions: 60,
+      },
+    },
+  },
+  preview: {
+    port: 5173,
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
+};
+
+export default defineConfig(({ mode }) => {
+  assertAuth0Configured(mode);
+  return config;
+});

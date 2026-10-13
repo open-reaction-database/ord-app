@@ -1,0 +1,36 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+// The theme's named colors. colors.module.scss exports them to TypeScript, and
+// global.scss includes color-variables to define a --color-<name> variable for each.
+$themeColors: (
+  'white': #ffffff,
+  'baseWhite': #fcfcfc,
+  'blue': #3c78d8,
+  'green': #15b097,
+  'orange': #eda145,
+  'hover': #ff8d00,
+  'black': #000000,
+  'primaryBackgroundActive': #2869d2,
+  'purple': #311b92,
+  'purple2': #3949ab,
+  'red': #e4626f,
+);
+
+@mixin color-variables {
+  @each $color, $value in $themeColors {
+    --color-#{$color}: #{$value};
+  }
+}

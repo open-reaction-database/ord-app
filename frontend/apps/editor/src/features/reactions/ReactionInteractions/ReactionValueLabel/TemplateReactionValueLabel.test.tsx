@@ -1,0 +1,58 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type { JSX } from 'react';
+import { describe, it, expect } from 'vitest';
+import { renderInReactionView } from 'test/renderInReactionView.tsx';
+import { TemplateReactionValueLabelWrapper } from './TemplateReactionValueLabel.tsx';
+import { VariableType } from '@open-reaction-database/ui/reaction/model';
+
+// Smoke test: the component mounts inside the reaction view's providers without throwing.
+const Component = TemplateReactionValueLabelWrapper as unknown as () => JSX.Element;
+
+describe('TemplateReactionValueLabelWrapper', () => {
+  it('mounts without crashing', () => {
+    const { container } = renderInReactionView(<Component />, {
+      reactionId: 'template_1',
+    });
+    expect(container).toBeInTheDocument();
+  });
+
+  it('shows the variable the template binds to the field', () => {
+    const { getByText } = renderInReactionView(
+      <TemplateReactionValueLabelWrapper
+        name="safetyNotes"
+        type={VariableType.String}
+        wrapperConfig={{ label: 'Safety notes' }}
+      />,
+      {
+        reactionId: 'template_1',
+        pathComponents: ['notes'],
+        // A template's record carries its variables, keyed by the field's path.
+        record: {
+          variables: {
+            'notes.safetyNotes': {
+              name: 'SafetyVar',
+              field: 'safetyNotes',
+              path: ['notes', 'safetyNotes'],
+              type: VariableType.String,
+            },
+          },
+        } as never,
+      },
+    );
+    expect(getByText('@SafetyVar')).toBeInTheDocument();
+  });
+});

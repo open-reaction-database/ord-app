@@ -1,0 +1,101 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import classes from './reactionPreview.module.scss';
+import { Badge, Flex } from '@mantine/core';
+import { ReactionComponentPreview } from './ReactionComponentPreview.tsx';
+import { useMemo } from 'react';
+import { type ReactionOutcome } from '#reaction/model/reactionsOutcomes/reactionOutcomes.types.ts';
+import { ReactionBoolean } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
+import { ComponentMetadata } from './ComponentMetadata.tsx';
+import { renderValuePrecisionUnit } from '#reaction/view/ReactionView/renderValuePrecisionUnit.ts';
+import {
+  usePreviews,
+  useReactionPart,
+} from '#reaction/provider/reactionProvider.hooks.ts';
+
+interface ReactionOutcomePreviewProps {
+  outcomeIndex: number;
+}
+
+export function ReactionOutcomePreview({
+  outcomeIndex,
+}: Readonly<ReactionOutcomePreviewProps>) {
+  // The preview lists only outcomes the reaction has.
+  const outcome = useReactionPart<ReactionOutcome>(['outcomes', outcomeIndex])!;
+  const componentsIds = useMemo(() => outcome.products.map(({ id }) => id), [outcome]);
+  const componentsPreviews = usePreviews(componentsIds);
+  const outcomeTime = useMemo(() => {
+    return outcome.reactionTime?.value
+      ? renderValuePrecisionUnit(outcome.reactionTime)
+      : '';
+  }, [outcome.reactionTime]);
+  // Top label: reaction time and the limiting-reactant conversion %, when available. (#598)
+  const outcomeLabel = useMemo(() => {
+    const conversion =
+      outcome.conversion?.value != null
+        ? `${outcome.conversion.value}% conversion`
+        : '';
+    const parts = [outcomeTime, conversion].filter(Boolean);
+    return parts.length > 0 ? ` (${parts.join(', ')})` : '';
+  }, [outcomeTime, outcome.conversion]);
+
+  return (
+    <div className={classes.inputCard}>
+      <Badge
+        variant="light"
+        color="primary"
+        size="lg"
+      >
+        Outcome{outcomeLabel}
+      </Badge>
+      <Flex
+        gap="sm"
+        align="center"
+        className={classes.componentList}
+      >
+        {componentsIds.length === 0 ? (
+          <ReactionComponentPreview previewState={null} />
+        ) : (
+          componentsIds.map((id, index) => {
+            const product = outcome.products[index];
+
+            return (
+              <div
+                key={id}
+                className={classes.component}
+              >
+                <div className={classes.molecule}>
+                  <ReactionComponentPreview previewState={componentsPreviews[id]} />
+                </div>
+                {product?.isDesiredProduct === ReactionBoolean.True && (
+                  <Badge
+                    classNames={{
+                      root: classes.desiredProductBadge,
+                      label: classes.badgeLabel,
+                    }}
+                  >
+                    ✨ Desired
+                  </Badge>
+                )}
+                <ComponentMetadata component={product} />
+              </div>
+            );
+          })
+        )}
+      </Flex>
+    </div>
+  );
+}

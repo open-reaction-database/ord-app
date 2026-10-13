@@ -1,0 +1,117 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type {
+  CompoundPreparationType,
+  ReactionMeasurementType,
+  ReactionRole,
+} from '#reaction/model/reactionEntityTypes/reactionEntityTypes.types.ts';
+import type {
+  Optional,
+  ReactionBoolean,
+  ReactionCompoundIdentifier,
+  ReactionEntity,
+  ReactionMassSpec,
+  ReactionSelectivity,
+  ReactionTexture,
+  ReactionTime,
+  ReactionWaveLength,
+  WithId,
+} from '#reaction/model/reactionEntity/reactionEntity.types.ts';
+import type { ReactionAmount } from '#reaction/model/reactionAmount/reactionAmount.types.ts';
+import type { AppData } from '#reaction/model/reactionData/reactionData.types.ts';
+
+export type ReactionComponentBase = WithId<{
+  identifiers: Array<ReactionCompoundIdentifier>;
+  molBlockIdentifiers: Array<ReactionCompoundIdentifier>;
+  reactionRole: ReactionRole;
+  texture: ReactionTexture;
+  features: Record<string, AppData>;
+}>;
+
+export interface ReactionComponentPreparation extends ReactionEntity {
+  type: CompoundPreparationType;
+  details?: Optional<string>;
+  reactionId?: Optional<string>;
+}
+
+export interface ReactionCompoundSource {
+  vendor?: Optional<string>;
+  catalogId?: Optional<string>;
+  lot?: Optional<string>;
+}
+
+export interface ReactionInputComponent extends ReactionComponentBase {
+  isLimiting: ReactionBoolean;
+  amount: ReactionAmount;
+  preparations: Array<ReactionComponentPreparation>;
+  source: ReactionCompoundSource;
+}
+
+export interface ReactionMeasurementAnalysis {
+  name: string;
+  id: string | null;
+}
+
+export enum ReactionMeasurementValueType {
+  Percent = '%',
+  Number = 'Number',
+  String = 'String',
+  Mass = 'Mass',
+}
+
+export interface ReactionMeasurementValueNumber {
+  type: ReactionMeasurementValueType.Number | ReactionMeasurementValueType.Percent;
+  value: {
+    value?: number | null;
+    precision?: number | null;
+  };
+}
+
+export interface ReactionMeasurementValueString {
+  type: ReactionMeasurementValueType.String;
+  value: string;
+}
+
+export interface ReactionMeasurementValueMass {
+  type: ReactionMeasurementValueType.Mass;
+  value: ReactionAmount;
+}
+
+export type ReactionMeasurementValue =
+  | ReactionMeasurementValueNumber
+  | ReactionMeasurementValueString
+  | ReactionMeasurementValueMass;
+
+export interface ReactionMeasurement extends ReactionEntity {
+  details?: Optional<string>;
+  analysis: Optional<ReactionMeasurementAnalysis>;
+  type: ReactionMeasurementType;
+  usesAuthenticStandard: ReactionBoolean;
+  usesInternalStandard: ReactionBoolean;
+  isNormalized: ReactionBoolean;
+  value: Optional<ReactionMeasurementValue>;
+  retentionTime: Optional<ReactionTime>;
+  selectivity: Optional<ReactionSelectivity>;
+  waveLength: Optional<ReactionWaveLength>;
+  massSpecDetails: Optional<ReactionMassSpec>;
+  authenticStandard: Optional<ReactionInputComponent>;
+}
+
+export interface ReactionProduct extends ReactionComponentBase {
+  isolatedColor?: Optional<string>;
+  isDesiredProduct: ReactionBoolean;
+  measurements: Array<ReactionMeasurement>;
+}

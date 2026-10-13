@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Run `uv run pre-commit install` once to enable these hooks locally.
+# Run `uvx pre-commit install` once to enable these hooks locally.
 repos:
-  # License headers. addlicense stamps the Apache header on any file missing it
-  # and (in CI, via `addlicense -check`) treats the copyright year as a wildcard,
-  # so new files use the current year without tripping the check.
+  # License headers. addlicense stamps the Apache header on any file whose first
+  # lines name no copyright or SPDX license, and leaves the rest alone whatever
+  # their year, so new files use the current year without tripping the check.
+  # CI runs this hook.
   - repo: https://github.com/google/addlicense
-    rev: v1.2.0
+    rev: b289835c0741ba2fb92dd5f61af070e79c69a55e  # frozen: v1.2.0
     hooks:
       - id: addlicense
         args:
@@ -27,61 +28,76 @@ repos:
           - -l
           - apache
 
-  # Python lint + format. Scoped to ord_app/ to match CI (`ruff check ord_app/`)
-  # and to leave the generated alembic migrations untouched.
+  # Python lint + format, scoped to the packages so the generated alembic migrations
+  # stay untouched. CI runs the same checks from each project's directory.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Keep in sync with the ruff version pinned in uv.lock so the hook and the
-    # `ruff format --check` CI step never disagree.
-    rev: v0.9.10
+    # Keep in sync with the ruff version pinned in each project's uv.lock so the hook
+    # and the `ruff format --check` CI step never disagree.
+    rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98  # frozen: v0.9.10
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^ord_app/
+        files: ^backend/(editor/ord_editor|viewer/ord_viewer)/
       - id: ruff-format
-        files: ^ord_app/
+        files: ^backend/(editor/ord_editor|viewer/ord_viewer)/
 
-  # Type checking. ty (Astral) checks ord_app/ via uv, matching the CI step. It is a
-  # local hook because ty resolves through the project's uv environment.
+  # Type checking. ty resolves imports through the project's uv environment, so each
+  # project's hook runs from that project's directory.
   - repo: local
     hooks:
-      - id: ty
-        name: ty check (ord_app)
-        entry: uv run ty check ord_app
+      - id: ty-editor
+        name: ty check (backend/editor)
+        entry: uv run --directory backend/editor --frozen --no-build ty check ord_editor
         language: system
-        files: ^ord_app/.*\.py$
+        files: ^backend/editor/ord_editor/.*\.py$
+        pass_filenames: false
+      - id: ty-viewer
+        name: ty check (backend/viewer)
+        entry: uv run --directory backend/viewer --frozen --no-build ty check ord_viewer
+        language: system
+        files: ^backend/viewer/ord_viewer/.*\.py$
         pass_filenames: false
 
-  # UI lint + format. Delegated to the tools already installed under ui/ via
-  # their npm scripts (run `npm ci` in ui/ first).
+  # UI lint, format, and type check. Delegated to the tools installed under
+  # frontend/ via their npm scripts (run `npm ci` in frontend/ first). The type
+  # check is `tsc -b` over every project, test files included, as in CI's
+  # lint_and_build_ui; it is incremental, so a run after a small change is quick.
   - repo: local
     hooks:
       - id: prettier
         name: prettier (ui)
-        entry: npm --prefix ui run prettier
+        entry: npm --prefix frontend run prettier
         language: system
-        files: ^ui/
+        files: ^frontend/
         pass_filenames: false
       - id: eslint
         name: eslint (ui)
-        entry: npm --prefix ui run lint:fix
+        entry: npm --prefix frontend run lint:fix
         language: system
-        files: ^ui/.*\.(ts|tsx|cjs|mjs)$
+        files: ^frontend/.*\.(ts|tsx|cjs|mjs)$
         pass_filenames: false
       - id: stylelint
         name: stylelint (ui)
-        entry: npm --prefix ui run lint:css:fix
+        entry: npm --prefix frontend run lint:css:fix
         language: system
-        files: ^ui/.*\.s?css$
+        files: ^frontend/.*\.s?css$
+        pass_filenames: false
+      - id: tsc
+        name: tsc -b (ui)
+        entry: npm --prefix frontend run typecheck
+        language: system
+        files: ^frontend/.*(\.(ts|tsx)|tsconfig[^/]*\.json)$
         pass_filenames: false
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
-  # Uses the jscpd binary installed under ui/ (run `npm ci` in ui/ first) with the
-  # root .jscpd.json; scans the configured trees rather than just the staged files.
+  # Uses the jscpd binary installed under frontend/ (run `npm ci` in frontend/ first)
+  # with the root .jscpd.json; scans the configured trees rather than just the staged
+  # files.
   - repo: local
     hooks:
       - id: jscpd
         name: jscpd (duplication)
-        entry: ui/node_modules/.bin/jscpd --config .jscpd.json
+        entry: frontend/node_modules/.bin/jscpd --config .jscpd.json
         language: system
-        files: ^(ord_app|ui/src)/.*\.(py|ts|tsx)$
+        files: ^(backend/(editor/ord_editor|viewer/ord_viewer)|frontend/(apps|packages)/[^/]+/src)/.*\.(py|ts|tsx)$
         pass_filenames: false

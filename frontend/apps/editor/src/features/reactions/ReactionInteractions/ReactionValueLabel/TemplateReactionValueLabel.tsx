@@ -1,0 +1,163 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  type ReactionValueLabelProps,
+  useReactionId,
+  reactionEntityContext,
+  reactionValueLabelClasses as classes,
+  findReactionEntityUniqueName,
+} from '@open-reaction-database/ui/reaction';
+import { useCallback, useContext, useMemo, useState } from 'react';
+import { ActionIcon, Button, Flex, Text } from '@mantine/core';
+import { CloseIcon, EditIcon } from '@open-reaction-database/ui/theme';
+import { useSelector } from 'react-redux';
+import { selectTemplateVariablesWrapper } from 'store/entities/reactions/reactions.selectors.ts';
+import clsx from 'clsx';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import {
+  addUpdateVariable,
+  removeVariable,
+} from 'store/entities/templates/templates.thunks.ts';
+import { TemplateVariableEdit } from './TemplateVariableEdit.tsx';
+import type { Variable } from 'store/entities/templates/templates.types.ts';
+
+type ReactionValueLabelPropsMandatoryLabel = Omit<
+  ReactionValueLabelProps,
+  'wrapperConfig'
+> & {
+  label: string;
+};
+
+const labelToVariableName = (label: string) => {
+  return label
+    .split(/\s/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+};
+
+function TemplateReactionValueLabel({
+  label,
+  name,
+  type,
+}: Readonly<ReactionValueLabelPropsMandatoryLabel>) {
+  const { pathComponents } = useContext(reactionEntityContext);
+  // This slot renders only under a template's provider, whose ID is a string.
+  const templateId = useReactionId() as string;
+  const dispatch = useAppDispatch();
+  const [variableNameValue, setVariableNameValue] = useState<string | null>(null);
+
+  const fieldPathComponents = useMemo(() => {
+    const nameParts = name.split('.');
+    return pathComponents.concat(nameParts);
+  }, [pathComponents, name]);
+
+  const onEditClose = useCallback(() => {
+    setVariableNameValue(null);
+  }, [setVariableNameValue]);
+
+  const onEditSave = (variableName: string) => {
+    const variable: Variable = {
+      name: variableName as string,
+      field: name,
+      path: fieldPathComponents,
+      type: type,
+    };
+    dispatch(addUpdateVariable({ templateId, variable }));
+    setVariableNameValue(null);
+  };
+
+  const variablePath = useMemo(() => {
+    return fieldPathComponents.join('.');
+  }, [fieldPathComponents]);
+
+  const templateVariables = useSelector(selectTemplateVariablesWrapper(templateId));
+  const variable = templateVariables[variablePath];
+  const hasVariable = !!variable;
+
+  const variableNames = useMemo(() => {
+    return Object.values(templateVariables).map(variable => variable.name);
+  }, [templateVariables]);
+
+  const onVariableRemove = useCallback(() => {
+    dispatch(removeVariable({ templateId, variable: variable }));
+  }, [dispatch, templateId, variable]);
+
+  const onEditOpen = useCallback(() => {
+    let name: string;
+    if (!variable?.name) {
+      name = labelToVariableName(label);
+      if (variableNames.includes(name)) {
+        name = findReactionEntityUniqueName(name, variableNames, false);
+      }
+    } else {
+      name = variable.name;
+    }
+    setVariableNameValue(name);
+  }, [variable, label, setVariableNameValue, variableNames]);
+
+  const rootClassName = clsx(classes.badge, { [classes.filled]: hasVariable });
+
+  return variableNameValue !== null ? (
+    <TemplateVariableEdit
+      templateId={templateId}
+      initialValue={variableNameValue}
+      onClose={onEditClose}
+      onSubmit={onEditSave}
+      path={fieldPathComponents}
+    />
+  ) : (
+    <Flex
+      className={classes.badgeWrapper}
+      align="flex-end"
+    >
+      <Button
+        classNames={{ root: rootClassName, label: classes.label }}
+        onClick={onEditOpen}
+        size="xs"
+      >
+        <Text className={classes.text}>{variable ? `@${variable.name}` : label}</Text>
+        <EditIcon className={classes.icon} />
+      </Button>
+      {hasVariable && (
+        <ActionIcon
+          size="xs"
+          classNames={{ root: rootClassName }}
+          onClick={onVariableRemove}
+        >
+          <CloseIcon className={classes.icon} />
+        </ActionIcon>
+      )}
+    </Flex>
+  );
+}
+
+export function TemplateReactionValueLabelWrapper({
+  wrapperConfig,
+  type,
+  name,
+}: Readonly<ReactionValueLabelProps>) {
+  const label = wrapperConfig?.label ?? wrapperConfig?.templateLabel;
+  if (!label) {
+    return null;
+  }
+  return (
+    <TemplateReactionValueLabel
+      label={label}
+      name={name}
+      type={type}
+    />
+  );
+}

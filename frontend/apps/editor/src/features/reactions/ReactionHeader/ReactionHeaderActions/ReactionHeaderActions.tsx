@@ -1,0 +1,107 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { Button } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useCallback, type RefObject } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams } from 'wouter';
+import {
+  CheckListIcon,
+  ChevronDownIcon,
+  CopyImageIcon,
+  DownloadIcon,
+} from '@open-reaction-database/ui/theme';
+import classes from './reactionCard.module.scss';
+import { DownloadMenu } from 'common/components/DownloadMenu/DownloadMenu.tsx';
+import { downloadFileFromUrl } from 'store/utils/downloadFile.thunks.ts';
+import { fileDownloadOptions } from 'common/constants.ts';
+import { RemoveReaction } from 'features/reactions/RemoveReaction/RemoveReaction.tsx';
+import {
+  copyPreviewAsImage,
+  useReactionSnapshotField,
+} from '@open-reaction-database/ui/reaction';
+import { SaveAsTemplate } from 'features/templates/SaveAsTemplate/SaveAsTemplate.tsx';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+
+interface ReactionHeaderActionsProps {
+  reactionId: number;
+  previewRef: RefObject<HTMLDivElement | null>;
+}
+
+export function ReactionHeaderActions({
+  reactionId,
+  previewRef,
+}: Readonly<ReactionHeaderActionsProps>) {
+  const { datasetId: rawDatasetId } = useParams<{ datasetId: string }>();
+  const datasetId = Number.parseInt(rawDatasetId);
+  const pbReactionId = useReactionSnapshotField('pb_reaction_id') ?? '';
+  const onPreviewSave = useCallback(() => {
+    // It reports its own success or failure in a notification.
+    void copyPreviewAsImage(previewRef.current);
+  }, [previewRef]);
+  const [
+    saveAsTemplateOpened,
+    { open: openSaveAsTemplate, close: closeSaveAsTemplate },
+  ] = useDisclosure();
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
+
+  return (
+    <>
+      {saveAsTemplateOpened && (
+        <SaveAsTemplate
+          reactionId={reactionId}
+          reactionPbId={pbReactionId}
+          onClose={closeSaveAsTemplate}
+        />
+      )}
+      {canDatasetBeEdited && <RemoveReaction reactionId={reactionId} />}
+      <Button
+        leftSection={<CheckListIcon className={classes.buttonIcon} />}
+        variant="transparent"
+        onClick={openSaveAsTemplate}
+      >
+        Save as a Template
+      </Button>
+
+      <Button
+        onClick={onPreviewSave}
+        variant="transparent"
+        leftSection={<CopyImageIcon className={classes.buttonIcon} />}
+      >
+        Copy reaction image
+      </Button>
+
+      <DownloadMenu
+        options={fileDownloadOptions}
+        download={format =>
+          downloadFileFromUrl(
+            `/datasets/${datasetId}/reactions/${reactionId}/download?file_format=${format}`,
+          )
+        }
+        target={
+          <Button
+            className={classes.target}
+            leftSection={<DownloadIcon />}
+            rightSection={<ChevronDownIcon />}
+            variant="transparent"
+          >
+            Download Reaction
+          </Button>
+        }
+      />
+    </>
+  );
+}

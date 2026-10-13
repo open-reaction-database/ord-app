@@ -1,33 +1,45 @@
 ---
 name: ord-app-ui-testing
-description: Use when writing, debugging, or running tests for the ord-app `ui/` package — Vitest unit/integration tests (components, thunks, reducers, converters), mocking patterns (axios, Ketcher, protobuf), or Playwright E2E against the live no-auth stack. Covers the CI gotchas that cause "passes locally, fails in CI".
+description: Use when writing, debugging, or running tests for the ord-app frontend (`frontend/`, the editor in `frontend/apps/editor/`) — Vitest unit/integration tests (components, thunks, reducers, converters), mocking patterns (axios, Ketcher, protobuf), or Playwright E2E against the live no-auth stack. Covers the CI gotchas that cause "passes locally, fails in CI".
 ---
 
 # ORD-App UI Testing
 
-Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Mantine v7 / Redux Toolkit / wouter. Playwright for E2E. Imports use `baseUrl: ./src` (vite-tsconfig-paths), so write `store/…`, `common/…`, `features/…`, `test/…` — not relative `../../`.
+Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Mantine v7 / Redux Toolkit / wouter. Playwright for E2E. Imports resolve from `src/` through tsconfig `paths` (vite-tsconfig-paths), so write `store/…`, `common/…`, `features/…`, `test/…` — not relative `../../`.
 
 ## Pre-flight: match CI or get a false green
 
-- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd ui && npx tsc -b --force`.
-- **Lint/format** exactly as CI: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint src *.ts *.cjs *.mjs` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
+- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
+- **Lint/format** exactly as CI, from `frontend/`: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint .` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
 - **zsh word-splitting**: a `$VAR` holding a space-separated file list does NOT split. Use `${=FILES}` (e.g. `npx eslint ${=FILES}`).
 - ESLint rules that bite tests: `no-duplicate-imports`; use `Array<string>` not `string[]`; `react-refresh/only-export-components` fires on files that export both a component and helpers (add a file-level `/* eslint-disable react-refresh/only-export-components */` to test-only render helpers); forbids inline `import()` type annotations (`@typescript-eslint/consistent-type-imports`) — see the partial-mock note below.
 
 ## Running tests
 
 ```
-cd ui
+cd frontend/apps/editor
 npx vitest run                         # whole suite (~20s)
 npx vitest run <path-or-substring>     # subset
+
+cd frontend/packages/ui                # the shared package: theme, display, the reaction model and view
+npx vitest run                         # its own suite and coverage floors
 ```
-Vitest is scoped to `src/**`; Playwright specs live in `e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
+Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (the theme and icons, the display primitives and form controls, the reaction model and converters, `ReactionProvider`, the reaction view and its drawer forms, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
 
-## Render helpers (in `src/test/`)
+## Render helpers
 
-- `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it).
+In the editor (`apps/editor/src/test/`):
+
+- `renderWithMantine(ui)` — wraps in `MantineProvider` (Mantine components throw without it). `packages/ui` has its own copy, imported as `#testing/renderWithMantine.tsx`; package files import each other through `#…` or from the same folder, never `../` or `test/…`.
 - `renderWithProviders(ui, { preloadedState })` — fresh `configureStore({ reducer: rootReducer, preloadedState })` + Mantine. Returns `{ store, ...renderResult }`. Seed only the slices the component reads.
-- `renderInReactionView(ui, { reactionId, reaction, isViewOnly, pathComponents })` — also seeds `reactionContext` + `reactionEntityContext` and a reaction in the store (`emptyReactionData()` by default). Use for components under `ReactionView/` / `reactionEntityNode/`.
+- `renderInReactionView(ui, { reactionId, reaction, record, isViewOnly, actions, slots, pathComponents })` — seeds a reaction in the store (`emptyReactionData()` by default) and mounts `ReactionProvider` over a Redux source of it, plus `reactionEntityContext`. The reaction is editable (real `reduxReactionActions`) unless `isViewOnly` is set; a string `reactionId` renders a template; `record` sets stored fields beside `data` (`pb_reaction_id`, `is_valid`, `validation`); `slots` replaces the null slot components. Use for the editor's own components that read the reaction from the store or act on it through Redux, such as the template and dataset slots; the provider's hooks throw outside a provider.
+- `renderOverBothSources(ui)` (`test/renderOverBothSources.tsx`) — the contract check: renders `ui` over a static source with an empty store and over the Redux source, and returns both HTML strings with generated IDs normalized; they must be equal.
+
+From the shared package (`@open-reaction-database/ui/testing`, or `#testing/…` inside the package):
+
+- `renderWithReaction(ui, { reactionId, isTemplate, actions, editable, reaction, record, snapshot, source, slots, pathComponents })` and `reactionWrapper(options)` (the same wrapper, for `renderHook`) — mount `ReactionProvider` over a static source, with no Redux: `reaction` (an empty one by default) plus `record` (stored fields such as `summary`, `pb_reaction_id`, `validation`), or a whole `snapshot`. `pathComponents` sets `reactionEntityContext`. Read-only unless given `actions` or `editable`.
+- `stubReactionActions()` — actions that settle at once and change nothing, as `vi.fn` mocks. Pass them as `actions` and assert on `actions.update.mock.calls`: a static source never changes. The view's tests use these and never build a store.
+- `emptyReactionData()` (an empty `AppReaction` from the default converters), `fullReaction` (an ord `Reaction` that sets every field the app edits), and `fullReactionSnapshot()` (`fullReaction` as the store holds a loaded reaction).
 
 ## Mocking patterns (the ones that cost time)
 
@@ -41,21 +53,30 @@ const axiosMock = axiosInstance as unknown as Record<'get' | 'post' | 'patch' | 
 
 **Partial mocks without inline `import()` types** (eslint forbids them):
 ```ts
-vi.mock('./reactions.utils.ts', async importActual => ({
+vi.mock('@open-reaction-database/ui/reaction/model', async importActual => ({
   ...((await importActual()) as Record<string, unknown>),
   parseReaction: () => ({ id: 99, data: {}, previews: {}, validation: null }),
 }));
 ```
 
-**Ketcher / d3 CJS break.** Rendering most `ReactionView/` editor components pulls in `reactionEntityToForm`, which eagerly imports every node form including the Ketcher/d3 structure editor → `require() of ES Module d3 … not supported` under vitest. If the field nodes aren't what you're testing, stub the registry barrel:
+**Ketcher needs a canvas.** The Ketcher structure editor (`ComponentsKetcherEditor`) does not load under vitest. The drawer gets it only as the `MoleculeEditor` slot, so the view's tests never load it; a test that imports the editor's slot table (`useDatasetReactionProviderProps`, and so `ReactionPage`) stubs it:
 ```ts
-vi.mock('features/reactions/ReactionEntities', () => ({
+vi.mock(
+  'features/reactions/ComponentsKetcherEditor/ComponentsKetcherEditor.tsx',
+  () => ({ ComponentsKetcherEditor: () => null }),
+);
+```
+When the form's field nodes aren't what a package test is about, stub the form registry instead of rendering every node:
+```ts
+vi.mock('#reaction/view/ReactionEntities/index.ts', () => ({
   ReactionEntityBaseNode: () => null,
   reactionEntityToForm: new Proxy({}, { get: () => [] }),
 }));
 ```
 
-**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction`/`parseReactionList` (in `reactions.utils.ts`) and `linkReactionEntities` (in `reactions.converters.ts`) to plain objects, keeping the reducer's merge helpers intact.
+A mock of a package entry file (`@open-reaction-database/ui/display`, `…/reaction`, …) replaces what editor files import through it, not the calls the package's modules make to each other: inside the package, modules import each other by file, never through an entry file. Make it a partial mock (above), since the editor imports much more than the mocked name from each entry file.
+
+**Reaction protobufs.** Reaction API responses carry base64 `binpb`; don't fabricate them. Partial-mock `parseReaction` and `linkReactionEntities` on the model barrel, and `parseReactionList` (`store/entities/reactions/parseReactionList.ts`), to plain objects, keeping the reducer's merge helpers intact; or pass an empty `binpb`, which decodes to the default reaction. To test a converter directly, build its ord input with protobuf-es: `create(CompoundSchema, { ... })` from `@bufbuild/protobuf`, with oneofs written as `{ case, value }`. `fullReaction` (from `@open-reaction-database/ui/testing`) is an ord `Reaction` that sets every field the app edits, for tests that need one whole reaction.
 
 ## Thunk test harness (mocked axios + action recorder)
 
@@ -64,7 +85,10 @@ The store uses RTK `createThunk`/`createThunkWithExplicitResult` (not RTK Query)
 ```ts
 vi.mock('store/axiosInstance.ts', () => ({ default: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() } }));
 vi.mock('wouter/use-browser-location', () => ({ navigate: vi.fn() }));
-vi.mock('common/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+vi.mock('@open-reaction-database/ui/display', async importActual => ({
+  ...((await importActual()) as Record<string, unknown>),
+  showNotification: vi.fn(),
+}));
 
 function makeStore() {
   const actions: Array<UnknownAction> = [];
@@ -78,6 +102,7 @@ function makeStore() {
 - **Seed selector state by dispatching, not by hand-building preloadedState**: `store.dispatch(getReactionsListActions.request(5))` sets `activeDatasetId`; `store.dispatch(setEditingGroupIdAction(3))` sets the editing group. `arrayContaining`/`toContain` tolerate the extra setup action.
 - Watch payload field names/enums: e.g. `updateGroupMembers` takes `{ user_id, role: USER_ROLES }` (snake_case, enum is `USER_ROLES.VIEWER` = `'viewer'`). `getDatasetsPage` requires its `Partial<CurrentPage>` arg.
 - Teardown belongs in `afterEach`, not `beforeEach` (else the last test's global stub — e.g. `vi.unstubAllGlobals()` / clipboard stub — is never torn down).
+- Every mock is reset before each test (`mockReset: true` in `vite.config.ts`): calls, overrides, and unused `mock*Once` values are gone, and a `vi.fn(impl)` is back to `impl`. Don't add `vi.clearAllMocks()` or `mockClear()` to hooks. Give a module-level mock its default as `vi.fn(impl)`: `vi.fn().mockResolvedValue(x)` loses `x` at the first reset. A call made at module load is gone by the first test; record it right after the import (see `previewsWorker/worker.test.ts`).
 
 ## Playwright E2E against the live no-auth stack
 
@@ -88,15 +113,15 @@ Boot the full stack with the dev/test Auth0 bypass, then drive Chromium. The **c
 docker compose up -d db   # wait for healthy
 
 # 2) migrations + backend (host), under /service_api
-export PG_DSN="postgresql+asyncpg://ord@localhost:5400/ord"
+export PG_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_ALEMBIC_DSN="postgresql+psycopg://ord@localhost:5400/ord"
 export PG_TEST_DSN="postgresql+psycopg://ord@localhost:5400/test"
 export APP_ENV=localhost ORD_APP_E2E=true CORS_ORIGINS='["http://127.0.0.1:5173"]'
-uv run alembic upgrade head
-uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
+uv run --directory backend/editor alembic upgrade head
+uv run --directory backend/editor uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
 
 # 3) UI — BOTH env vars are required
-cd ui && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
+cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
   npm run dev -- --host 127.0.0.1 --port 5173 &
 
 # 4) Playwright (config baseURL is http://127.0.0.1:5173)
@@ -111,6 +136,22 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 - Scope selectors to the dialog (`page.getByRole('dialog').getByLabel(…)`) — table headers collide with form labels. Prefer `getByRole('button', { name })` over `getByText` (the latter matches hidden icon `aria-label`s and hangs on click).
 - Create-reaction lives on the **dataset** page (`/datasets/:id` → "Reaction" button → "From Scratch"), not the reaction editor.
 - **Before/after on a one-line change**: edit the source file while the dev server runs — Vite HMR reloads it live — capture the buggy screenshot, revert, capture the fixed one. Verify the working tree is clean afterward.
+- **Seed through the API, not the UI.** `seedReaction(request)` in `e2e/seed.ts` provisions the dev user and creates a group, a dataset, and the fixture reaction (`e2e/fixtures/reaction.pbtxt`); in e2e mode the backend accepts any bearer token as that user. Each worker's `beforeAll` seeds its own copy, so specs stay independent under `fullyParallel`. `seedTemplate(request, seeded, variables?)` saves that reaction as a template under a fresh UUID name, since the templates list shows every template and a spec finds its card by name.
+- **Wait for what loads after the reaction before asserting on the page as a whole**: the dataset (which decides whether edit controls show), the user menu, and the molecule previews from the Indigo worker. `waitForReactionPageToSettle` in `e2e/settle.ts` waits for each.
+- **Narrow windows**: `e2e/narrowWindow.spec.ts` opens each page and each drawer at 640, 800, and 960 px and checks that the page does not scroll sideways and that the text it lists shows whole: inside the viewport (`toBeInViewport({ ratio: 1 })`, which counts clipping by an `overflow: hidden` ancestor) and not cut short by its own overflow (`scrollWidth` within `clientWidth`). Check the text, not its button: a Mantine button's label clips inside the button, whose own box stays whole. Scroll only the window to reach an element; `scrollIntoViewIfNeeded` also scrolls the ancestors that clip it, which hides the clip. The sideways check alone cannot see text clipped inside a card, so give a new page the text most likely to be squeezed: the last button in a row, a badge beside buttons, a label in a row of fields, a subtitle in a card.
+
+### Screenshot tests (`toHaveScreenshot`)
+
+`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. The reaction page spec masks what changes between runs (the footer's year; the card spec's capture does not reach the footer). Neither retries, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
+
+When a change alters the page's look on purpose, refresh the baselines from CI. The spec's snapshot directory is `e2e/<spec>.spec.ts-snapshots/`: `reactionPage.spec.ts-snapshots/` or `datasetPage.spec.ts-snapshots/`.
+1. Push the change. `test_e2e` fails on the altered screenshot; download the run's artifact (`gh run download <run-id> -n playwright-report`).
+2. The artifact's `test-results/<spec>-<test>/` holds `<name>-actual.png`, `-expected.png`, and `-diff.png`. Look at the diff to confirm only the intended part changed, and the actual for anything half-loaded or run-specific.
+3. Copy the actual over `frontend/apps/editor/e2e/<spec>.spec.ts-snapshots/<name>-chromium-linux.png`, commit, and push; the next run should pass.
+
+For a new screenshot with no baseline, the run fails with "A snapshot doesn't exist … writing actual" instead, and the artifact holds the new PNG under `e2e/<spec>.spec.ts-snapshots/`.
+
+To preview a capture locally, run with `CI=1`: Playwright writes `*-chromium-darwin.png` baselines next to the Linux ones. Delete them; they are not compared in CI.
 
 ## Exploratory screenshot verification (manual, not a spec)
 
@@ -118,7 +159,7 @@ For confirming a fix in the real app (e.g. "does this label/badge/unit render?")
 
 - **Standalone script import**: `@playwright/test` is CJS, so `import { chromium }` fails. Use:
   ```js
-  import pkg from '/abs/path/ui/node_modules/@playwright/test/index.js';
+  import pkg from '/abs/path/frontend/node_modules/@playwright/test/index.js';
   const { chromium } = pkg;
   ```
   Run with `node /tmp/shot.mjs`. Screenshot to `/tmp/*.png` and Read the image back.

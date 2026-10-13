@@ -30,10 +30,15 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '>=1.16'
-      - name: Install dependencies
-        run: go install github.com/google/addlicense@latest
+          # The repository has no go.sum to key a module cache on.
+          cache: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.12"
+      # The pre-commit hook pins addlicense's version and arguments for CI and local commits alike.
       - name: addlicense
-        run: addlicense -check -c "Open Reaction Database Project Authors" -l apache .
+        run: uvx --no-build --from 'pre-commit==4.6.0' pre-commit run addlicense --all-files --show-diff-on-failure
 
   check_python:
     runs-on: ubuntu-latest
@@ -47,31 +52,42 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        working-directory: backend/editor
+        run: uv sync --frozen --no-build
 
       - name: ruff
-        run: uv run ruff check ord_app/
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ruff check ord_editor/
 
       - name: ruff format
-        run: uv run ruff format --check ord_app/
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ruff format --check ord_editor/
 
       - name: ty
-        run: uv run ty check ord_app
+        working-directory: backend/editor
+        run: uv run --frozen --no-build ty check ord_editor
 
-  check_javascript:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: clang-format
-        run: |
-          sudo apt update && sudo apt install clang-format --yes
-          # NOTE(kearnes): Run clang-format before installing anything with npm.
-          find . -name '*.js' -exec clang-format -n -Werror {} +
+      - name: Install dependencies (viewer)
+        working-directory: backend/viewer
+        run: uv sync --frozen --no-build
+
+      - name: ruff (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ruff check ord_viewer/
+
+      - name: ruff format (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ruff format --check ord_viewer/
+
+      - name: ty (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ty check ord_viewer
 
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
-  # jscpd is pinned as a ui/ devDependency; run from the repo root so it scans both
-  # ord_app/ (Python) and ui/src/ (TS/TSX) per .jscpd.json. Runs on every PR (not
-  # path-filtered) so Python-only changes are covered too.
+  # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
+  # backend/editor/ord_editor and backend/viewer/ord_viewer (Python) and the frontend
+  # workspaces' src/ trees (TS/TSX) per .jscpd.json.
+  # Runs on every PR (not path-filtered) so Python-only changes are covered too.
   check_duplication:
     runs-on: ubuntu-latest
     steps:
@@ -80,8 +96,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: ui/package-lock.json
-      - name: Install jscpd (via ui devDependencies)
-        run: npm --prefix ui ci
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install jscpd (via frontend devDependencies)
+        run: npm --prefix frontend ci --ignore-scripts
       - name: jscpd
-        run: ui/node_modules/.bin/jscpd --config .jscpd.json
+        run: frontend/node_modules/.bin/jscpd --config .jscpd.json

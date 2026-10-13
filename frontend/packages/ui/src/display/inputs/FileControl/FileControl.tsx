@@ -1,0 +1,125 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { useFileNameHref } from './useFileNameHref.ts';
+import { type ReactNode, useCallback, useRef, useState } from 'react';
+import mime from 'mime/lite';
+import { base64Encode } from '@bufbuild/protobuf/wire';
+import { ActionIcon, FileInput, Flex, Input } from '@mantine/core';
+import { inputWrapperClasses } from '#display/InputWrapper/index.ts';
+import { RemoveIcon } from '#theme/icons/index.ts';
+import buttonClasses from '#theme/buttons.module.scss';
+import type { FileControlValue } from './fileControl.types.ts';
+import { showNotification } from '#display/utils/showNotification.tsx';
+import { NotificationVariant } from '#display/types/notification.ts';
+import { MAX_DATA_FILE_SIZE } from '#reaction/model/reactionFormats.ts';
+
+interface FileControlProps {
+  name: string;
+  label: ReactNode;
+  disabled?: boolean;
+  value: FileControlValue | null;
+  onChange: (value: FileControlValue | null) => void;
+}
+
+export function FileControl({
+  name,
+  value,
+  disabled,
+  onChange,
+  label,
+}: Readonly<FileControlProps>) {
+  const { fileName, href } = useFileNameHref(name, value);
+  const [file, setFile] = useState<File | null>(null);
+  // The latest pick; a read that finishes after another pick or a removal is ignored.
+  const latestFile = useRef<File | null>(null);
+
+  const handleChange = useCallback(
+    (file: File | null) => {
+      if (file) {
+        if (file.size > MAX_DATA_FILE_SIZE) {
+          showNotification({
+            variant: NotificationVariant.ERROR,
+            message: `File ${file.name} is too large. Max size is 1MB.`,
+          });
+          return;
+        }
+        latestFile.current = file;
+        setFile(file);
+        const fileParts = file.name.split('.');
+        const extensionFromFile = fileParts.length > 1 ? fileParts.at(-1) : null;
+        file.arrayBuffer().then(
+          buffer => {
+            if (latestFile.current !== file) return;
+            const formatFromBlob = mime.getExtension(file.type);
+            const format = extensionFromFile ?? formatFromBlob ?? 'txt';
+            const newValue = base64Encode(new Uint8Array(buffer));
+            onChange({ value: newValue, format });
+          },
+          () => {
+            if (latestFile.current !== file) return;
+            latestFile.current = null;
+            setFile(null);
+            showNotification({
+              variant: NotificationVariant.ERROR,
+              message: `File ${file.name} could not be read.`,
+            });
+          },
+        );
+      }
+    },
+    [onChange],
+  );
+
+  const handleRemoveFile = useCallback(() => {
+    latestFile.current = null;
+    setFile(null);
+    onChange(null);
+  }, [onChange]);
+
+  return (
+    <Input.Wrapper
+      label={label}
+      className={inputWrapperClasses.inputWrapper}
+    >
+      {value?.value ? (
+        <Flex gap="xs">
+          <a
+            download={fileName}
+            href={href}
+          >
+            {fileName}
+          </a>
+          <ActionIcon
+            aria-label="Remove file"
+            className={buttonClasses.redHover}
+            onClick={handleRemoveFile}
+            variant="transparent"
+            color="red"
+            disabled={disabled}
+          >
+            <RemoveIcon />
+          </ActionIcon>
+        </Flex>
+      ) : (
+        <FileInput
+          value={file}
+          onChange={handleChange}
+          disabled={disabled}
+        />
+      )}
+    </Input.Wrapper>
+  );
+}

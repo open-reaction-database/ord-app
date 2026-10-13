@@ -1,0 +1,171 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { useCallback, useMemo } from 'react';
+import { Pagination } from 'common/components/interactions/Pagination/Pagination.tsx';
+import { Flex, Paper, Title, Loader, Switch, Text } from '@mantine/core';
+import { EmptyIcon } from '@open-reaction-database/ui/theme';
+import classes from './reactionsList.module.scss';
+import { useSelector } from 'react-redux';
+import {
+  selectActiveDatasetId,
+  selectReactionsLoading,
+  selectReactionsOrder,
+  selectReactionsPagination,
+  selectShowInvalidOnly,
+} from 'store/entities/reactions/reactions.selectors.ts';
+import { selectDatasetById } from 'store/entities/datasets/datasets.selectors.ts';
+import { getReactionsPage } from 'store/entities/reactions/reactions.thunks.ts';
+import { useAppDispatch } from 'store/useAppDispatch.ts';
+import { CreateReactionMenu } from './CreateReactionMenu/CreateReactionMenu.tsx';
+import { Counter } from '@open-reaction-database/ui/display';
+import { DatasetReactionCard } from './DatasetReactionCard/DatasetReactionCard.tsx';
+import { selectCanDatasetBeEdited } from 'store/features/canDatasetBeEdited/canDatasetBeEdited.selectors.ts';
+import { setShowInvalidOnly } from 'store/entities/reactions/reactions.actions.ts';
+
+/** A spinner while the page loads, or a note that the dataset has no reactions. */
+function ReactionListPlaceholder({ isLoading }: Readonly<{ isLoading: boolean }>) {
+  return isLoading ? (
+    <Flex
+      justify="center"
+      align="center"
+      className={classes.loaderContainer}
+    >
+      <Loader size="lg" />
+    </Flex>
+  ) : (
+    <Flex
+      align="center"
+      justify="center"
+    >
+      <Flex
+        direction="column"
+        align="center"
+        gap="sm"
+      >
+        <EmptyIcon />
+        <div className={classes.emptyText}>
+          There are no reactions in the dataset yet
+        </div>
+      </Flex>
+    </Flex>
+  );
+}
+
+export function ReactionList() {
+  const dispatch = useAppDispatch();
+  const reactionsIds = useSelector(selectReactionsOrder);
+  const pagination = useSelector(selectReactionsPagination);
+  const isLoading = useSelector(selectReactionsLoading);
+  const canDatasetBeEdited = useSelector(selectCanDatasetBeEdited);
+  const showInvalidOnly = useSelector(selectShowInvalidOnly);
+  const activeDatasetId = useSelector(selectActiveDatasetId);
+  const dataset = useSelector(selectDatasetById(activeDatasetId));
+  // Reactions with a null validation status (still being validated server-side) are counted under
+  // `none`; while any are pending we can't trust the valid/invalid split. (#622)
+  const isValidationInProgress = (dataset?.reactions_count?.none ?? 0) > 0;
+
+  const hasReactions = reactionsIds.length > 0;
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      dispatch(getReactionsPage({ page }));
+    },
+    [dispatch],
+  );
+
+  const handleRowsPerPageChange = useCallback(
+    (size: number) => {
+      dispatch(getReactionsPage({ page: 1, size }));
+    },
+    [dispatch],
+  );
+
+  const handleToggleInvalid = useCallback(
+    (checked: boolean) => {
+      dispatch(setShowInvalidOnly(checked));
+      dispatch(getReactionsPage({ page: 1, size: pagination.size }));
+    },
+    [dispatch, pagination.size],
+  );
+
+  const pageStartIndex = useMemo(() => {
+    return (pagination.page - 1) * pagination.size;
+  }, [pagination]);
+
+  return (
+    <>
+      <Paper
+        radius="sm"
+        p="lg"
+      >
+        <Flex
+          justify="space-between"
+          wrap="wrap"
+          gap="sm"
+        >
+          <Flex
+            align="center"
+            gap="sm"
+          >
+            <Title order={2}>Dataset Reactions</Title>
+            <div className={classes.counterContainer}>
+              {isLoading ? <Loader size="sm" /> : <Counter amount={pagination.total} />}
+            </div>
+            {isValidationInProgress ? (
+              <Flex
+                align="center"
+                gap="xs"
+              >
+                <Loader size="sm" />
+                <Text size="sm">Reaction validation in progress</Text>
+              </Flex>
+            ) : (
+              <Switch
+                className={classes.switcher}
+                size="sm"
+                label="Show Invalid Only"
+                checked={showInvalidOnly}
+                onChange={event => handleToggleInvalid(event.currentTarget.checked)}
+              />
+            )}
+          </Flex>
+          {canDatasetBeEdited && <CreateReactionMenu />}
+        </Flex>
+      </Paper>
+
+      {isLoading || !hasReactions ? (
+        <ReactionListPlaceholder isLoading={isLoading} />
+      ) : (
+        <>
+          {reactionsIds.map((id, index) => (
+            <DatasetReactionCard
+              key={id}
+              reactionId={id}
+              index={pageStartIndex + index + 1}
+            />
+          ))}
+          <Pagination
+            currentPage={pagination.page}
+            onPageChange={handlePageChange}
+            rowsPerPage={pagination.size}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            totalPages={pagination.pages}
+          />
+        </>
+      )}
+    </>
+  );
+}

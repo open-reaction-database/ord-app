@@ -1,0 +1,33 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import type { ReactionSnapshot } from '#reaction/provider/reactionProvider.types.ts';
+import {
+  linkReactionEntities,
+  ordReactionToReaction,
+} from '#reaction/model/reactions.converters.ts';
+import { fullReaction } from './fullReaction.ts';
+
+/** The full-reaction fixture as the store holds a loaded dataset reaction: valid, no previews. */
+export function fullReactionSnapshot(): ReactionSnapshot {
+  return {
+    data: linkReactionEntities(ordReactionToReaction(fullReaction)),
+    previews: {},
+    summary: { provenance: {}, summary: {}, conditions: '' },
+    pb_reaction_id: 'ord-full',
+    is_valid: true,
+    validation: null,
+  };
+}

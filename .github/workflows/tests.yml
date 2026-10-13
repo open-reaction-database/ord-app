@@ -27,8 +27,11 @@ jobs:
   test_python:
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-14"]
+        os: ["ubuntu-latest", "macos-latest"]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: backend/editor
 
     steps:
       - name: Check out repository
@@ -50,19 +53,19 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: Run alembic migrations
-        run: uv run alembic upgrade head
+        run: uv run --frozen --no-build alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Run tests
-        run: uv run pytest -vv --cov=ord_app --cov-report=term-missing --cov-report=html --durations=10
+        run: uv run --frozen --no-build pytest -vv --cov=ord_editor --cov-report=term-missing --cov-report=html --durations=10
         env:
-          PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
+          PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
@@ -72,7 +75,7 @@ jobs:
           {
             echo "### Python test coverage"
             echo ""
-            uv run coverage report --format=markdown || echo "_coverage data unavailable_"
+            uv run --frozen --no-build coverage report --format=markdown || echo "_coverage data unavailable_"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Python coverage report
@@ -80,7 +83,48 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: python-coverage
-          path: htmlcov/
+          path: backend/editor/htmlcov/
+          retention-days: 7
+
+  test_python_viewer:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: backend/viewer
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-build
+
+      - name: Run tests
+        run: uv run --frozen --no-build pytest -n auto -vv --cov=ord_viewer --cov-report=term-missing --cov-report=html --durations=10
+
+      - name: Coverage summary
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        run: |
+          {
+            echo "### Python viewer test coverage"
+            echo ""
+            uv run --frozen --no-build coverage report --format=markdown || echo "_coverage data unavailable_"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Python viewer coverage report
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-viewer-coverage
+          path: backend/viewer/htmlcov/
           retention-days: 7
 
   test_e2e:
@@ -104,10 +148,12 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
-        run: uv sync --frozen
+        working-directory: backend/editor
+        run: uv sync --frozen --no-build
 
       - name: Run alembic migrations
-        run: uv run alembic upgrade head
+        working-directory: backend/editor
+        run: uv run --frozen --no-build alembic upgrade head
         env:
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
@@ -119,12 +165,12 @@ jobs:
           node-version: "20"
 
       - name: Install UI dependencies
-        working-directory: ui
-        run: npm ci
+        working-directory: frontend
+        run: npm ci --ignore-scripts
 
       - name: Install Playwright browsers
-        working-directory: ui
-        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+        run: node_modules/.bin/playwright install --with-deps chromium
 
       # The UI is served via the dev server (vite dev), not a production build: the no-auth
       # bypass is hard-gated off in production builds (import.meta.env.PROD), so e2e must use
@@ -133,8 +179,8 @@ jobs:
       - name: Start servers and run E2E
         run: |
           set -e
-          nohup uv run uvicorn ord_app.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
-          nohup npm --prefix ui run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
+          nohup uv run --directory backend/editor --frozen --no-build uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          nohup npm --prefix frontend -w apps/editor run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2
           done
@@ -143,14 +189,14 @@ jobs:
             curl -sf http://127.0.0.1:5173 > /dev/null && break || sleep 2
           done
           curl -sf http://127.0.0.1:5173 > /dev/null || { echo "ui failed"; cat /tmp/ui.log; exit 1; }
-          npm --prefix ui run test:e2e
+          npm --prefix frontend -w apps/editor run test:e2e
         env:
           APP_ENV: localhost
           ORD_APP_E2E: "true"
           CORS_ORIGINS: '["http://127.0.0.1:5173"]'
           VITE_E2E_NO_AUTH: "TRUE"
           VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
-          PG_DSN: "postgresql+asyncpg://ord:password@localhost:5432/test"
+          PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
@@ -164,6 +210,7 @@ jobs:
         with:
           name: playwright-report
           path: |
-            ui/playwright-report/
-            ui/test-results/
+            frontend/apps/editor/playwright-report/
+            frontend/apps/editor/test-results/
+            frontend/apps/editor/e2e/*-snapshots/
           retention-days: 7

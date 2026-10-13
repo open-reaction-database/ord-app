@@ -1,0 +1,118 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  templateNumberFromId,
+  templatePath,
+} from 'store/entities/templates/templateIds.ts';
+import { useMemo } from 'react';
+import { Link } from 'wouter';
+import { Flex, Paper, Title } from '@mantine/core';
+import { EditorPageContainer } from 'common/components/PageContainer/EditorPageContainer.tsx';
+import type { Breadcrumbs } from '@open-reaction-database/ui/shell';
+import { useSelector } from 'react-redux';
+import classes from './templatesList.page.module.scss';
+import { selectTemplatesOrder } from 'store/entities/templates/templates.selectors.ts';
+import { Counter } from '@open-reaction-database/ui/display';
+import { EntitiesMenu } from 'features/templates/EntitiesMenu/EntitiesMenu';
+import { ReactionCard } from '@open-reaction-database/ui/reaction';
+import { TemplateHeaderActions } from 'features/templates/TemplateHeaderActions/TemplateHeaderActions.tsx';
+import { selectReactionById } from 'store/entities/reactions/reactions.selectors.ts';
+import { TemplatesTopActions } from './TemplatesTopActions/TemplatesTopActions.tsx';
+import { TemplateReactionProvider } from 'features/templates/TemplateReactionProvider/TemplateReactionProvider.tsx';
+import { showReactionPreviewDetails } from 'common/configuration.constants.ts';
+
+interface TemplateTitleProps {
+  index: number;
+  templateId: string;
+}
+
+function TemplateTitle({ index, templateId }: Readonly<TemplateTitleProps>) {
+  const linkToPage = `~${templatePath(templateNumberFromId(templateId))}`;
+  const template = useSelector(selectReactionById(templateId));
+
+  return (
+    <>
+      <span className={classes.index}>{index}.</span>
+      <Link
+        className={classes.link}
+        to={linkToPage}
+      >
+        {template.name}
+      </Link>
+    </>
+  );
+}
+
+export function TemplatesListPage() {
+  const templatesOrder = useSelector(selectTemplatesOrder);
+
+  const breadcrumbs = useMemo((): Breadcrumbs => {
+    return [{ title: 'Templates', path: '~/templates' }];
+  }, []);
+
+  return (
+    <EditorPageContainer breadcrumbs={breadcrumbs}>
+      <Flex
+        direction="column"
+        gap="sm"
+      >
+        <TemplatesTopActions />
+        <div className={classes.container}>
+          <EntitiesMenu />
+          <Flex
+            direction="column"
+            gap="sm"
+            className={classes.templates}
+          >
+            <Paper
+              radius="sm"
+              p="lg"
+            >
+              <Flex justify="space-between">
+                <Flex
+                  align="center"
+                  gap="sm"
+                >
+                  <Title order={2}>Templates</Title>
+                  <Counter amount={templatesOrder.length} />
+                </Flex>
+              </Flex>
+            </Paper>
+            <>
+              {templatesOrder.map((templateId, index) => (
+                <TemplateReactionProvider
+                  key={templateId}
+                  templateId={templateId}
+                >
+                  <ReactionCard
+                    showDetails={showReactionPreviewDetails}
+                    actions={<TemplateHeaderActions templateId={templateId} />}
+                    title={
+                      <TemplateTitle
+                        index={index + 1}
+                        templateId={templateId}
+                      />
+                    }
+                  />
+                </TemplateReactionProvider>
+              ))}
+            </>
+          </Flex>
+        </div>
+      </Flex>
+    </EditorPageContainer>
+  );
+}

@@ -1,0 +1,143 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  type ReactionFormNode,
+  ReactionFormNodeType,
+} from '#reaction/view/ReactionEntities/reactionEntities.types.ts';
+import { buildUseSelectItems } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
+import { create } from '@bufbuild/protobuf';
+import { RecordEventSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import { createEntityListItemComponent } from '#reaction/view/ReactionEntities/entityFormConfiguration/EntityListItem/entityListItem.utils.tsx';
+import { buildUseCreate } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
+import { formatDateToDisplay } from '#reaction/model/utils/date.ts';
+import { ordRecordEventToReaction } from '#reaction/model/reactionProvenance/reactionProvenance.converters.ts';
+import { type ReactionRecordEvent } from '#reaction/model/reactionProvenance/reactionProvenance.types.ts';
+import { wrapInputsWithGrid } from '#display/utils/reactionForm/wrapInputsWithGrid.ts';
+import {
+  createReactionPerson,
+  createUpdatePersonInfoRow,
+} from './reactionPerson.models.tsx';
+
+const createEmptyModification = (newIndex: number): [number, ReactionRecordEvent] => {
+  return [newIndex, ordRecordEventToReaction(create(RecordEventSchema))];
+};
+
+export const reactionProvenance: Array<ReactionFormNode> = [
+  createUpdatePersonInfoRow('experimenter', 'I am experimenter'),
+  ...createReactionPerson('experimenter'),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.date,
+      name: 'experimentStart',
+      wrapperConfig: {
+        label: 'Experiment start',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'city',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'City',
+      },
+    },
+  ),
+  wrapInputsWithGrid(
+    {
+      type: ReactionFormNodeType.value,
+      name: 'doi',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'DOI',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'patent',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Patent',
+      },
+    },
+    {
+      type: ReactionFormNodeType.value,
+      name: 'publicationUrl',
+      inputType: 'string',
+      wrapperConfig: {
+        label: 'Publication URL',
+      },
+    },
+  ),
+  {
+    type: ReactionFormNodeType.block,
+    name: 'recordCreated',
+    title: {
+      label: 'Record Creation',
+    },
+    fields: [
+      createUpdatePersonInfoRow('recordCreated.person', 'I am contributor'),
+      {
+        type: ReactionFormNodeType.wrapper,
+        grid: 2,
+        fields: [
+          {
+            type: ReactionFormNodeType.dateTime,
+            name: 'recordCreated.time',
+            wrapperConfig: {
+              label: 'Time',
+            },
+          },
+        ],
+      },
+      ...createReactionPerson('recordCreated.person'),
+      {
+        type: ReactionFormNodeType.value,
+        name: 'recordCreated.details',
+        inputType: 'textarea',
+        wrapperConfig: {
+          label: 'Details',
+        },
+      },
+    ],
+  },
+  {
+    type: ReactionFormNodeType.list,
+    name: 'recordModified',
+    title: {
+      label: 'Record Modification',
+    },
+    getKey: (_, id) => id,
+    useSelectItems: buildUseSelectItems('recordModified'),
+    ItemDisplay: createEntityListItemComponent<ReactionRecordEvent>({
+      entityField: 'recordModified',
+      title: 'Record Modification',
+      requiredFields: [
+        {
+          label: 'Time',
+          render: item => (item.time ? formatDateToDisplay(item.time) : ''),
+        },
+        {
+          label: 'Person e-mail',
+          render: item => item.person?.email,
+        },
+      ],
+    }),
+    addItem: {
+      label: 'Record Modification',
+      useCreate: buildUseCreate('recordModified', createEmptyModification),
+    },
+  },
+];

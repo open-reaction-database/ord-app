@@ -1,0 +1,63 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import axios from 'axios';
+
+export interface RejectValue {
+  errorCode: number;
+  errorMessage?: string;
+}
+
+const ERROR_MESSAGES: Record<number, string> = {
+  403: 'Access denied',
+  404: 'Entity not found',
+  500: 'Unknown error',
+};
+
+// Statuses whose backend message is written for the user to act on: a bad request, a
+// conflict, or a request the backend will not process, such as a Parquet export of a
+// dataset without a description. Other statuses keep their generic message, since their
+// backend message can be written for developers.
+const STATUSES_WITH_USER_MESSAGES = new Set([400, 409, 422]);
+
+// FastAPI puts an error's explanation in `detail`: a sentence for an error the backend
+// raises, and a list of field errors when a request fails validation, which has no
+// short form to show.
+const messageFromBody = (data: unknown): string | undefined => {
+  if (typeof data !== 'object' || data === null) {
+    return undefined;
+  }
+  const { detail, message } = data as { detail?: unknown; message?: unknown };
+  // A blank string would show an empty notification, so it falls through too.
+  return [detail, message].find(
+    (text): text is string => typeof text === 'string' && text.trim() !== '',
+  );
+};
+
+export function getErrorDetails(error: unknown): RejectValue {
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status ?? 500;
+    const backendMessage = STATUSES_WITH_USER_MESSAGES.has(status)
+      ? messageFromBody(error.response?.data)
+      : undefined;
+    const message = backendMessage ?? ERROR_MESSAGES[status] ?? ERROR_MESSAGES[500];
+    return { errorCode: status, errorMessage: message };
+  }
+  return { errorCode: 500, errorMessage: ERROR_MESSAGES[500] };
+}
+
+export const handleApiError = (error: unknown): RejectValue => {
+  return getErrorDetails(error);
+};

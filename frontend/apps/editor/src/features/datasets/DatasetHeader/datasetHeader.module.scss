@@ -1,0 +1,83 @@
+/*
+ * Copyright 2024 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* The buttons wrap below the details once the details would have less than 560 px, the width
+   the four fields need side by side. */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.leftTitlePart {
+  flex: 1 1 560px;
+  overflow: hidden;
+}
+
+.datasetInfo {
+  display: flex;
+  gap: 40px;
+
+  & > * {
+    max-width: 25%;
+    overflow: hidden;
+  }
+}
+
+.title {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.titlePlaceholder {
+  color: var(--color-text-secondary-1);
+}
+
+.datasetDescription {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.editIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--mantine-color-primary);
+}
+
+.buttonContainer {
+  flex-shrink: 0;
+
+  button {
+    border-radius: 8px;
+    font-weight: 400;
+  }
+}
+
+.removeIcon {
+  margin-inline-end: 6px;
+}
+
+.target {
+  &:active {
+    transform: none;
+  }
+
+  &[data-expanded='true'] {
+    outline: 3px solid #3c78d899;
+  }
+}

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Actions in .github/workflows are pinned to commit SHAs. Dependabot rewrites
-# both the SHA and its trailing version comment, which is what keeps a pinned
-# workflow from freezing on whatever was current the day it was written.
+# Actions in .github/workflows are pinned to commit SHAs, and the Dockerfiles'
+# images to digests. Dependabot rewrites the SHA or digest along with its version,
+# which is what keeps a pinned workflow or image from freezing on whatever was
+# current the day it was written (a base image's tag is rebuilt for OS fixes).
+# docker-compose.yml's images are tracked by tag.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -26,3 +28,31 @@ updates:
       actions:
         patterns:
           - "*"
+  - package-ecosystem: docker
+    directories:
+      - /backend/editor
+      - /deploy/editor
+    schedule:
+      interval: monthly
+    groups:
+      images:
+        patterns:
+          - "*"
+    ignore:
+      # Python and Node versions move with pyproject.toml and CI, not on their own.
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      compose-images:
+        patterns:
+          - "*"
+    ignore:
+      # A Postgres major upgrade is a deliberate change, not a monthly bump.
+      - dependency-name: "*postgres*"
+        update-types: ["version-update:semver-major"]
