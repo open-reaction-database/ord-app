@@ -156,6 +156,7 @@ const DRAWERS: Array<{ name: string; open: (page: Page) => Promise<void> }> = [
     name: 'a reaction’s validation messages',
     open: async page => {
       await openReaction(page);
+      // The fixture reaction fails validation with one error and one warning.
       await page.getByRole('button', { name: /error/ }).click();
     },
   },
