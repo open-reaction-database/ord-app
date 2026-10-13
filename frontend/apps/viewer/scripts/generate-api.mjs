@@ -24,7 +24,7 @@ import openapiTS, { astToString } from 'openapi-typescript';
 const DOCUMENT = new URL('../../../../backend/viewer/openapi.json', import.meta.url);
 const OUTPUT = new URL('../src/api/schema.ts', import.meta.url);
 // A leading block comment naming a copyright, as addlicense writes it, and the blank line
-// after it if there is one. openapi-typescript's own leading comment names none.
+// after it if there is one.
 const LICENSE_HEADER = /^\/\*\*?\n \* Copyright [\s\S]*?\n \*\/\n\n?/;
 
 async function licenseHeader() {

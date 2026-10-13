@@ -43,6 +43,7 @@ describe('getJson', () => {
     await expect(getJson('/api/search')).rejects.toMatchObject({
       status: 422,
       detail: 'unknown path inputs.nope',
+      fromBackend: true,
     });
   });
 
@@ -64,21 +65,24 @@ describe('getJson', () => {
   });
 
   it.each([
-    ['no detail', { error: 'x' }],
-    ['a list of errors without messages', { detail: [{ type: 'missing' }] }],
-  ])('falls back to the status text for JSON with %s', async (_, body) => {
+    ['no detail, not the backend’s', { error: 'x' }, false],
+    ['a list of errors without messages', { detail: [{ type: 'missing' }] }, true],
+    ['a detail that is neither a message nor a list', { detail: { code: 1 } }, true],
+  ])('falls back to the status text for JSON with %s', async (_, body, fromBackend) => {
     respond(500, body, 'Internal Server Error');
     await expect(getJson('/api/datasets')).rejects.toMatchObject({
       status: 500,
       detail: 'Internal Server Error',
+      fromBackend,
     });
   });
 
-  it('falls back to the status text for a body that is not JSON', async () => {
+  it('falls back to the status text for a body that is not JSON, not the backend’s', async () => {
     respond(502, '<html>Bad Gateway</html>', 'Bad Gateway');
     await expect(getJson('/api/datasets')).rejects.toMatchObject({
       status: 502,
       detail: 'Bad Gateway',
+      fromBackend: false,
     });
   });
 });
@@ -114,6 +118,38 @@ describe('errorMessage', () => {
   ])('explains a %i', (status, detail, message) => {
     expect(errorMessage(new ApiError(status, detail))).toBe(message);
   });
+
+  // nginx answers 502 while the backend starts or is down, and 504 when it does not answer
+  // in time, each with its own HTML page rather than FastAPI's JSON.
+  it.each([
+    [502, 'Bad Gateway'],
+    [504, 'Gateway Time-out'],
+  ])(
+    'explains a %i from the proxy as an unavailable service',
+    async (status, statusText) => {
+      respond(status, `<html>${statusText}</html>`, statusText);
+      const error: unknown = await getJson('/api/datasets').catch(
+        (caught: unknown) => caught,
+      );
+      expect(errorMessage(error)).toBe(
+        'The service is busy or unavailable; try again shortly.',
+      );
+    },
+  );
+
+  it.each([
+    [502, 'The question could not be turned into a search.'],
+    [504, 'The search took too long; narrow it and try again.'],
+  ])(
+    'explains a %i from the backend as the backend means it',
+    async (status, message) => {
+      respond(status, { detail: 'x' });
+      const error: unknown = await postJson('/api/ask', {}).catch(
+        (caught: unknown) => caught,
+      );
+      expect(errorMessage(error)).toBe(message);
+    },
+  );
 
   it('explains a request that never reached the server', () => {
     expect(errorMessage(new TypeError('Failed to fetch'))).toBe(

@@ -63,7 +63,7 @@ export function useCompounds(datasetId: string, side: CompoundSide) {
   });
 }
 
-/** The reactions with these IDs, in order, one request for at most 100. */
+/** The known reactions among these IDs, once each, in the order given; at most 100. */
 export function useReactions(reactionIds: ReadonlyArray<string>) {
   return useQuery({
     queryKey: ['reactions', reactionIds],
