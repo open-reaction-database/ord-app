@@ -14,7 +14,7 @@
 
 """The bodies the routes accept and return."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class DatasetSummary(BaseModel):
@@ -75,3 +75,9 @@ class ReactionRecord(BaseModel):
     # The base64 serialized Reaction, as the source file stores it.
     binpb: str
     molblocks: ReactionMolblocks
+
+
+class DownloadRequest(BaseModel):
+    """The reactions to download: at most one search's worth."""
+
+    reaction_ids: list[str] = Field(min_length=1, max_length=1000)
