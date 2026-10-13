@@ -86,7 +86,7 @@ Run them against the whole tree at any time with `uvx pre-commit run --all-files
 ### docker-compose
 You can run the Back-End and the Database using a single docker-compose file.
 ```shell
-docker compose up -d
+cd backend/editor && docker compose up -d
 ```
 At the same time, you need to run the Front-End separately.
 ```shell
@@ -152,6 +152,16 @@ Envs for backend:
 | `vite_auth0_client_id`  | Auth0 config                                       | true     | -                                                       |
 | `download_link_secret`  | Key that signs download links; the same for every worker | unless `app_env` is `localhost` | -                                  |
 
+
+### The viewer's image
+The viewer's image serves its bundle and API behind nginx on port 8080, over a corpus mounted at run time. To build it and check it over the five-reaction test corpus:
+```shell
+docker build -f deploy/viewer/Dockerfile -t ord-viewer .
+(cd backend/viewer && uv run python -m ord_viewer.testing /tmp/viewer-corpus)
+docker run --rm -p 8080:8080 -v /tmp/viewer-corpus:/corpus:ro -e ORD_VIEWER_CORPUS_DIR=/corpus ord-viewer
+deploy/viewer/smoke_test.sh http://127.0.0.1:8080 ord-viewer0101
+```
+Mount a full corpus instead to serve it; the other `ORD_VIEWER_*` settings are listed under "Viewer backend" above.
 
 ## Testing
 

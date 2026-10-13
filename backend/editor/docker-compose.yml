@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# The editor's development stack: Postgres, the API, and a migration job. Run it from
+# this directory: docker compose up -d. The project keeps the name it had at the
+# repository's root, and with it the name of the pgdata volume.
+name: ord-app
+
 services:
   api:
     image: ord-api
     build:
-      context: backend/editor
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
@@ -27,7 +32,7 @@ services:
       PG_TEST_DSN: "postgresql+psycopg://ord@db:5432/test"
       APP_ENV: "localhost"
     volumes:
-      - ./backend/editor:/app
+      - .:/app
       - /app/.venv
     networks:
       - ord_network
@@ -60,7 +65,7 @@ services:
       PG_DSN: "postgresql+psycopg://ord@db:5432/ord"
       PG_ALEMBIC_DSN: "postgresql+psycopg://ord@db:5432/ord"
     volumes:
-      - ./backend/editor:/app
+      - .:/app
     entrypoint: >
       sh -c "alembic upgrade head"
     networks:

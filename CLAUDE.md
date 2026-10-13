@@ -10,11 +10,12 @@ The viewer: the public search and browse site over the viewer's backend; React U
 
 ## Layout
 
-- `backend/editor/` — the editor's backend, its own uv project (Python 3.12): `pyproject.toml`, `uv.lock`, `alembic.ini`, `migrations/` (Alembic), and the compose image's `Dockerfile`.
+- `backend/editor/` — the editor's backend, its own uv project (Python 3.12): `pyproject.toml`, `uv.lock`, `alembic.ini`, `migrations/` (Alembic), the compose image's `Dockerfile`, and `docker-compose.yml` (Postgres, the API, and a migration job, for development; run it from this directory).
   - `ord_editor/service_api/` — FastAPI app (`service_api/main.py`), `repositories/`, `services/`, `domain/`, `schemas/`, `resources/`. Served under `/service_api`. Tests sit beside the code as `*_test.py`; shared fixtures in `ord_editor/conftest.py`, data in `ord_editor/testdata/`.
 - `backend/viewer/` — the viewer's backend, its own uv project (Python 3.12), pinned to `ord-schema[search,nl]==0.9.2` and `rdkit==2026.3.5`: `Corpus` opens only artifacts stamped with its own RDKit version and artifact lineage, so RDKit follows the published corpus and ord-schema stays on a release whose artifact definitions match it. `ord_viewer/` — a FastAPI app with every route under `/api/`, serving one corpus directory (`ORD_VIEWER_CORPUS_DIR`: `projections/`, `structures/`, `pivots/`, `occurrences/`, `sources/`; `projections/`, `structures/`, and `sources/` each hold one shard level of files, while `pivots/` and `occurrences/` hold one subdirectory per level, each sharded the same way). Tests derive a small corpus (`ord_viewer/testing.py`) and need no Postgres. `openapi.json` is the API's committed OpenAPI document, which the viewer's frontend generates its types from; after changing a route or model, rewrite it with `uv run python -m ord_viewer.openapi` (a test fails until you do).
 - `deploy/editor/` — the editor's production image: `Dockerfile` (the editor's bundle and backend behind nginx, under supervisord), `Dockerfile.dockerignore`, `nginx.conf`, `supervisord.conf`, `entrypoint.sh`.
-- `ruff.toml` — the ruff config for every Python project. `scripts/` — dev/E2E helpers. `docker-compose.yml` — Postgres + the editor's backend.
+- `deploy/viewer/` — the viewer's image: its SPA and API behind nginx under supervisord, for `linux/arm64`; the corpus is mounted at run time and named by `ORD_VIEWER_CORPUS_DIR`. `smoke_test.sh <base URL> <reaction ID>` checks a running image; `uv run python -m ord_viewer.testing <directory>`, from `backend/viewer`, derives a corpus for it.
+- `backend/ruff.toml` — the ruff config for every Python project. `scripts/` — dev/E2E helpers.
 - `frontend/` — npm workspace root: the lockfile, `.npmrc`, the shared lint/format tooling and configs, a `tsconfig.base.json` every project extends, and a `tsconfig.json` that references each project. Workspaces live in `apps/` (deployables) and `packages/` (shared code).
   - `apps/editor/` — the editor: React 19 + Vite 6, Redux Toolkit store, Mantine v7, wouter routing. Imports resolve from `src/` through tsconfig `paths`, one entry per top-level directory (write `store/…`, `common/…`, `features/…`, not `../../`). It has no phone layout: `index.html` sets a 1024 px viewport, so phones and tablets lay it out as a 1024 px desktop window and scale it to fit; desktop browsers ignore the setting.
   - `apps/viewer/` — the viewer: React 19, Vite 6, Mantine v7, wouter, and TanStack Query (`src/api/`: `fetch` behind typed hooks); no Redux, axios, or Auth0. Its own files import each other through `#…` subpath imports (`#components/ViewerPage.tsx`), never `../`. wouter matches routes against the path after `decodeURI`, so read a path parameter through `routeParam` (`src/routeParams.ts`), which decodes the escapes `decodeURI` leaves. Its API types (`src/api/schema.ts`) are generated from `backend/viewer/openapi.json` with `npm run generate:api -w apps/viewer`, after `uv run python -m ord_viewer.openapi`; `lint_and_build_ui` fails when they differ. ESLint, jscpd, and SonarCloud (`.sonarcloud.properties`) skip the file.
@@ -29,7 +30,7 @@ The viewer: the public search and browse site over the viewer's backend; React U
 - Run dev server (from `backend/editor`): `APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload` → http://localhost:8000 (`/service_api/docs`).
 - Tests (from `backend/editor`): `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
 - Viewer: `cd backend/viewer && uv sync --frozen`; tests `uv run pytest -n auto`; serve with `ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001` (opening a full corpus takes about 40 s and 7 GiB); the API docs are at `/api/docs`; the other `ORD_VIEWER_*` settings are listed in `README.md`'s "Viewer backend" section; `/api/ask` needs `ORD_ANTHROPIC_API_KEY` (or `ANTHROPIC_API_KEY`) and answers 503 without one.
-- Lint/type: `ruff` + `ruff format` (config in the root `ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
+- Lint/type: `ruff` + `ruff format` (config in `backend/ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
 
 ## Frontend (`frontend/`)
 
@@ -46,7 +47,8 @@ Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` onc
 ## CI gates (a PR is not mergeable until these are green)
 
 - **Tests**: `test_python` and `test_python_viewer` (each ubuntu + macos), `test_ui` (the editor's and the shared package's tests), `test_ui_viewer`, `test_e2e` (boots the full no-auth stack).
-- **Checks**: `check_python` (ruff / ruff-format / ty), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `make duplication`), `lint_and_build_ui` (`lint:check` + `typecheck` + `npm run build`), `check_license_headers`.
+- **Images**: `build_editor_image`, and `build_viewer_image` with its smoke test through nginx (each on an arm64 runner, with its layers cached).
+- **Checks**: `check_python` (ruff / ruff-format / ty), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `uvx pre-commit run jscpd --all-files`), `lint_and_build_ui` (`lint:check` + `typecheck` + `npm run build`), `check_license_headers`.
 - **SonarCloud quality gate** and **Greptile review** also gate merges — never merge over a red Sonar check; address Greptile findings (and read its PR-body summary for sub-threshold notes) before merging.
 
 ## Conventions

@@ -16,7 +16,7 @@
 # images to digests. Dependabot rewrites the SHA or digest along with its version,
 # which is what keeps a pinned workflow or image from freezing on whatever was
 # current the day it was written (a base image's tag is rebuilt for OS fixes).
-# docker-compose.yml's images are tracked by tag.
+# backend/editor/docker-compose.yml's images are tracked by tag.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -32,6 +32,7 @@ updates:
     directories:
       - /backend/editor
       - /deploy/editor
+      - /deploy/viewer
     schedule:
       interval: monthly
     groups:
@@ -45,7 +46,7 @@ updates:
       - dependency-name: node
         update-types: ["version-update:semver-major"]
   - package-ecosystem: docker-compose
-    directory: /
+    directory: /backend/editor
     schedule:
       interval: monthly
     groups:

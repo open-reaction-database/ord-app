@@ -14,6 +14,7 @@
 
 """A small corpus built and derived the way ord-schema derives a published one."""
 
+import argparse
 import contextlib
 import glob
 import pathlib
@@ -261,3 +262,26 @@ def make_client(
         ask_client_factory=lambda: ask_client,
     )
     return TestClient(app)
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    """Derive the test corpus into a directory, for the image's smoke test.
+
+    Args:
+        argv: The command line's arguments, naming the directory; None reads sys.argv.
+            The directory may be missing, and is created.
+
+    Raises:
+        ValueError: If the directory exists and holds anything.
+    """
+    parser = argparse.ArgumentParser(description="Derive the viewer's test corpus.")
+    parser.add_argument("directory", type=pathlib.Path)
+    root = parser.parse_args(argv).directory
+    if root.exists() and any(root.iterdir()):
+        raise ValueError(f"{root} is not empty")
+    root.mkdir(parents=True, exist_ok=True)
+    derive_corpus(root)
+
+
+if __name__ == "__main__":
+    main()

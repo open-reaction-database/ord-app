@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# One ruff configuration for every Python project in the repository. The projects'
+# One ruff configuration for every Python project under backend/. The projects'
 # pyproject.toml files carry no [tool.ruff] table, so ruff finds this file from any of
 # them.
 line-length = 88
 indent-width = 4
 target-version = "py312"
 # Directories holding first-party packages, for import sorting.
-src = ["backend/editor", "backend/viewer"]
+src = ["editor", "viewer"]
 
 [lint]
 # pycodestyle errors and warnings (E/W), pyflakes (F), import sorting (I), bugbear (B),

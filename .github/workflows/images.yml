@@ -1,0 +1,121 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Images
+
+on:
+  # Every pull request runs these jobs, whatever it changes: the main branch's ruleset
+  # requires them, and a required check that never reports leaves the PR blocked.
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
+
+# Both images are built for the platform the web services run on, on runners of that
+# platform, so nothing is emulated. Layers are cached in the Actions cache, one scope per
+# image, so a change that touches neither lockfile rebuilds only the source layers.
+jobs:
+  build_editor_image:
+    runs-on: ubuntu-24.04-arm
+    # The cold build takes about 4 minutes; this stops a hung build or check.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the editor's image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: deploy/editor/Dockerfile
+          platforms: linux/arm64
+          push: false
+          # The bundle will not build without the Auth0 settings. These are placeholders,
+          # and the image is never pushed.
+          build-args: |
+            VITE_AUTH0_DOMAIN=auth0.example.com
+            VITE_AUTH0_CLIENT_ID=placeholder
+            VITE_AUTH0_AUDIENCE=https://auth0.example.com/api/v2/
+            VITE_AUTH0_ISSUER=https://auth0.example.com/
+            VITE_AUTH0_SCOPE=openid
+          cache-from: type=gha,scope=editor
+          cache-to: type=gha,mode=max,scope=editor
+
+  build_viewer_image:
+    runs-on: ubuntu-24.04-arm
+    # The cold build takes about 4 minutes; this stops a hung build or check.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the viewer's image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: deploy/viewer/Dockerfile
+          platforms: linux/arm64
+          push: false
+          load: true
+          tags: ord-viewer:ci
+          cache-from: type=gha,scope=viewer
+          cache-to: type=gha,mode=max,scope=viewer
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Derive the test corpus
+        working-directory: backend/viewer
+        run: |
+          uv sync --frozen --no-build
+          uv run --frozen --no-build python -m ord_viewer.testing "$RUNNER_TEMP/corpus"
+
+      - name: Serve the image over the test corpus
+        run: |
+          docker run -d --name viewer -p 8080:8080 \
+            -v "$RUNNER_TEMP/corpus:/corpus:ro" -e ORD_VIEWER_CORPUS_DIR=/corpus \
+            ord-viewer:ci
+
+      - name: Check the image through nginx
+        run: deploy/viewer/smoke_test.sh http://127.0.0.1:8080 ord-viewer0101
+
+      - name: A requested stop exits 0
+        run: |
+          docker stop viewer
+          code=$(docker inspect -f '{{.State.ExitCode}}' viewer)
+          if [[ $code != 0 ]]; then
+            echo "expected a requested stop to exit 0, got $code" >&2
+            exit 1
+          fi
+
+      - name: A corpus that cannot open stops the container, exiting 1
+        run: |
+          empty=$(mktemp -d)
+          docker run -d --name viewer-empty -v "$empty:/corpus:ro" \
+            -e ORD_VIEWER_CORPUS_DIR=/corpus ord-viewer:ci
+          code=$(timeout 90 docker wait viewer-empty) || true
+          if [[ $code != 1 ]]; then
+            echo "expected the container to exit 1, got ${code:-nothing within 90 s}" >&2
+            exit 1
+          fi
+          logs=$(docker logs viewer-empty 2>&1)
+          grep -qE 'no [a-z]+/ directory' <<<"$logs"
+
+      - name: Container logs (on failure)
+        if: failure()
+        run: |
+          docker logs viewer || true
+          docker logs viewer-empty || true

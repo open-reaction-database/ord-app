@@ -124,7 +124,7 @@ ORD (Open Reaction Database) is a web application built with a React frontend an
 ```bash
 # From root
 cp .env.example .env
-docker-compose up -d
+cd backend/editor && docker compose up -d
 
 # In frontend/
 npm ci
