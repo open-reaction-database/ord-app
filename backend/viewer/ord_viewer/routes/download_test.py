@@ -36,6 +36,25 @@ def test_downloads_a_gzipped_dataset(client):
     ]
 
 
+def test_describes_the_reactions_it_holds(client):
+    descriptions = []
+    for reaction_ids in (["ord-viewer0101"], ["ord-viewer0101", "ord-viewer0201"]):
+        response = client.post("/api/download", json={"reaction_ids": reaction_ids})
+        dataset = dataset_pb2.Dataset.FromString(gzip.decompress(response.content))
+        descriptions.append(dataset.description)
+    assert descriptions == [
+        "1 reaction from the Open Reaction Database",
+        "2 reactions from the Open Reaction Database",
+    ]
+
+
+def test_documents_the_gzip_response(client):
+    paths = client.get("/api/openapi.json").json()["paths"]
+    ok = paths["/api/download"]["post"]["responses"]["200"]
+    assert "application/gzip" in ok["content"]
+    assert ok["description"] == "A gzipped serialized ord.Dataset"
+
+
 _NOT_FOUND = {"detail": "none of these reactions are in the corpus"}
 
 

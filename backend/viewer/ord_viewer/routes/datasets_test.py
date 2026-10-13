@@ -14,6 +14,8 @@
 
 """The /api/datasets routes."""
 
+import pyarrow as pa
+from ord_schema.search import execute
 from rdkit import Chem
 
 
@@ -34,6 +36,25 @@ def test_lists_datasets_by_name(client):
             "reactions": 2,
         },
     ]
+
+
+def test_sorts_by_name_ignoring_case_and_skips_sources_without_an_id(
+    client, monkeypatch
+):
+    # The rows run in dataset_id order and their names the other way; "Banana" would
+    # sort before "apple" in a case-sensitive order.
+    datasets = pa.table(
+        {
+            "dataset_id": ["ord_dataset-a", "ord_dataset-b", "ord_dataset-c", None],
+            "name": ["cherry", "Banana", "apple", "aardvark"],
+            "description": ["first", "second", "third", "unaddressable"],
+            "reactions": [1, 2, 3, 4],
+        }
+    )
+    monkeypatch.setattr(execute.Corpus, "datasets", lambda self: datasets)
+    response = client.get("/api/datasets")
+    assert response.status_code == 200
+    assert [row["name"] for row in response.json()] == ["apple", "Banana", "cherry"]
 
 
 def test_gets_one_dataset(client):
@@ -74,6 +95,7 @@ def test_counts_products_and_skips_unstructured_inputs(client):
 def test_limits_the_compound_counts(client):
     url = "/api/datasets/ord_dataset-viewer01/compounds"
     assert len(client.get(url, params={"limit": 1}).json()) == 1
+    assert client.get(url, params={"limit": 100}).status_code == 200
     for bad in ({"limit": 0}, {"limit": 101}, {"side": "solvents"}):
         assert client.get(url, params=bad).status_code == 422
 

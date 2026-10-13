@@ -53,7 +53,10 @@ def _summaries(corpus: execute.Corpus) -> list[DatasetSummary]:
         for row in corpus.datasets().to_pylist()
         if row["dataset_id"] is not None
     ]
-    return sorted(summaries, key=lambda summary: summary.name)
+    return sorted(
+        summaries,
+        key=lambda summary: (summary.name.casefold(), summary.dataset_id),
+    )
 
 
 def _find(corpus: execute.Corpus, dataset_id: str) -> DatasetSummary:
@@ -150,8 +153,9 @@ def dataset_compounds(
         }
     )
     table = run_search(state, request)
-    # The query cannot order by the grouped SMILES, so ties within the returned rows
-    # are broken here; which tied compounds fall past the limit is left to the query.
+    # ord-schema 0.9.1 cannot order an element aggregate by its group key
+    # (ord-schema#1106), so ties within the returned rows are put in SMILES order
+    # here; which tied compounds a limit keeps can vary between requests.
     rows = sorted(
         table.to_pylist(), key=lambda row: (-row["occurrences"], row["smiles"])
     )

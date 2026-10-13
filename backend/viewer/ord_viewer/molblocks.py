@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Molblocks for the browser, which draws molecules with Indigo rather than SVG."""
+"""Molblocks for the browser, which draws each structure itself with Indigo."""
 
 from ord_schema import message_helpers
 from ord_schema.proto import reaction_pb2

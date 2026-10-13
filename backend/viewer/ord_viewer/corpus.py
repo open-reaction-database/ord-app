@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Opening the corpus a deployment serves, and resolving the names queries use."""
+"""Opening the corpus a deployment serves, resolving the names queries use, and
+reading its reactions."""
 
 import glob
 import os
@@ -99,8 +100,9 @@ def open_corpus(
 def read_reactions(corpus: execute.Corpus, reaction_ids: Sequence[str]) -> pa.Table:
     """Read the source records of the reactions the corpus holds.
 
-    Corpus.reactions reorders its rows with an untyped index list, which pyarrow
-    rejects when none of the asked IDs is held; that request is an empty table.
+    ord-schema 0.9.1's Corpus.reactions reorders its rows with an untyped index list,
+    which pyarrow rejects when none of the asked IDs is held (ord-schema#1107); that
+    request is an empty table.
 
     Args:
         corpus: The open corpus.
@@ -112,6 +114,7 @@ def read_reactions(corpus: execute.Corpus, reaction_ids: Sequence[str]) -> pa.Ta
 
     Raises:
         ValueError: If more distinct IDs are asked for than the corpus returns at once.
+        execute.PairingError: If a reaction is stated in more than one source.
         pa.ArrowNotImplementedError: For any Arrow failure other than that empty take.
     """
     try:

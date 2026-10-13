@@ -49,6 +49,7 @@ def fetch_records(
 
     Raises:
         ValueError: If more IDs are asked for than the corpus returns in one call.
+        execute.PairingError: If a reaction is stated in more than one source.
     """
     records = []
     for row in read_reactions(corpus, reaction_ids).to_pylist():
@@ -67,7 +68,7 @@ def fetch_records(
 @router.get("")
 def list_reactions(
     state: Annotated[ViewerState, Depends(get_state)],
-    reaction_ids: Annotated[list[str], Query(alias="id")],
+    reaction_ids: Annotated[list[str], Query(alias="id", max_length=_MAX_IDS)],
 ) -> list[ReactionRecord]:
     """Return up to 100 reactions, named by repeated id parameters.
 
@@ -77,15 +78,7 @@ def list_reactions(
 
     Returns:
         The known reactions, once each, in the order first asked.
-
-    Raises:
-        HTTPException: 422, if more than 100 IDs are asked for.
     """
-    if len(reaction_ids) > _MAX_IDS:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_CONTENT,
-            f"asked for {len(reaction_ids)} reactions; ask for at most {_MAX_IDS}",
-        )
     return fetch_records(state.corpus, reaction_ids)
 
 

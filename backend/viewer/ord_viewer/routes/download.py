@@ -27,7 +27,16 @@ from ord_viewer.state import ViewerState, get_state
 router = APIRouter(prefix="/api")
 
 
-@router.post("/download")
+@router.post(
+    "/download",
+    response_class=Response,
+    responses={
+        200: {
+            "content": {"application/gzip": {}},
+            "description": "A gzipped serialized ord.Dataset",
+        }
+    },
+)
 def download(
     body: DownloadRequest, state: Annotated[ViewerState, Depends(get_state)]
 ) -> Response:
@@ -51,7 +60,10 @@ def download(
         )
     dataset = dataset_pb2.Dataset(
         name="ORD search results",
-        description=f"{table.num_rows} reactions from the Open Reaction Database",
+        description=(
+            f"{table.num_rows} reaction{'s' if table.num_rows != 1 else ''} "
+            "from the Open Reaction Database"
+        ),
         reactions=[
             reaction_pb2.Reaction.FromString(blob)
             for blob in table.column("reaction").to_pylist()

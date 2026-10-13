@@ -59,7 +59,9 @@ def test_repeated_and_unknown_ids(client):
 def test_one_reaction(client):
     response = client.get("/api/reactions/ord-viewer0201")
     assert response.json()["dataset_id"] == "ord_dataset-viewer02"
-    assert client.get("/api/reactions/ord-unknown").status_code == 404
+    missing = client.get("/api/reactions/ord-unknown")
+    assert missing.status_code == 404
+    assert missing.json() == {"detail": "no reaction ord-unknown"}
 
 
 def test_asks_for_at_least_one_reaction(client):
@@ -69,3 +71,19 @@ def test_asks_for_at_least_one_reaction(client):
 def test_bounds_the_batch(client):
     too_many = _get(client, *[f"ord-{index}" for index in range(101)])
     assert too_many.status_code == 422
+
+
+def test_accepts_the_largest_batch(client):
+    response = _get(client, *[f"ord-{index}" for index in range(100)])
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_documents_the_batch_bound(client):
+    parameters = client.get("/api/openapi.json").json()["paths"]["/api/reactions"][
+        "get"
+    ]["parameters"]
+    (reaction_ids,) = [
+        parameter for parameter in parameters if parameter["name"] == "id"
+    ]
+    assert reaction_ids["schema"]["maxItems"] == 100
