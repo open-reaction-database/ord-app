@@ -160,3 +160,21 @@ def test_an_empty_corpus_directory_variable_counts_as_unset(monkeypatch):
     client = TestClient(create_app(resolver=offline_resolver))
     with pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"), client:
         pass
+
+
+_SEARCH_ERRORS = {"422", "503", "504"}
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "statuses"),
+    [
+        ("post", "/api/search", _SEARCH_ERRORS),
+        ("get", "/api/datasets/{dataset_id}/compounds", _SEARCH_ERRORS | {"404"}),
+        ("get", "/api/datasets/{dataset_id}", {"404", "422"}),
+        ("get", "/api/reactions/{reaction_id}", {"404", "422"}),
+        ("post", "/api/download", {"404", "422"}),
+    ],
+)
+def test_the_schema_declares_each_routes_errors(method, path, statuses):
+    operation = create_app().openapi()["paths"][path][method]
+    assert {code for code in operation["responses"] if code != "200"} == statuses

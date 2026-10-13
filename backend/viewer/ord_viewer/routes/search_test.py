@@ -124,6 +124,7 @@ def test_no_match_is_an_empty_answer(client):
     where = {"op": "substructure", "path": "smiles", "smarts": "[Xe]"}
     query = {"where": {**_PYRIDINE_INPUT, "where": where}}
     response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 200
     assert response.json() == {
         "kind": "reactions",
         "reaction_ids": [],
@@ -147,13 +148,30 @@ def test_an_aggregate_is_a_table(client):
     ]
 
 
-def test_bad_queries_are_unprocessable(client):
-    unknown_path = {
-        "where": {"op": "eq", "path": "no_such_field", "value": {"literal": 1}}
-    }
-    assert client.post("/api/search", json={"query": unknown_path}).status_code == 422
-    extra_key = {"where": _PYRIDINE_INPUT, "page": 2}
-    assert client.post("/api/search", json={"query": extra_key}).status_code == 422
+def test_an_unknown_path_is_unprocessable_with_a_message(client):
+    query = {"where": {"op": "eq", "path": "no_such_field", "value": {"literal": 1}}}
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 422
+    assert isinstance(response.json()["detail"], str)
+    assert "no_such_field" in response.json()["detail"]
+
+
+def test_an_extra_key_is_unprocessable_with_a_list(client):
+    query = {"where": _PYRIDINE_INPUT, "page": 2}
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 422
+    (error,) = response.json()["detail"]
+    assert error["type"] == "extra_forbidden"
+    assert error["loc"] == ["body", "query", "page"]
+
+
+def test_repeated_measure_names_keep_every_row_aligned(client):
+    measure = {"fn": "count", "name": "n"}
+    query = {"aggregate": {"group_by": ["dataset_id"], "measures": [measure, measure]}}
+    body = client.post("/api/search", json={"query": query}).json()
+    assert body["columns"] == ["dataset_id", "n", "n"]
+    assert body["rows"]
+    assert all(len(row) == len(body["columns"]) for row in body["rows"])
 
 
 def test_a_search_past_its_timeout(corpus_dir):

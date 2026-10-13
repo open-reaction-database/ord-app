@@ -19,7 +19,9 @@ import pytest
 from fastapi import HTTPException, status
 from ord_schema.search import execute
 from ord_schema.search.query import Query, QueryError
+from pydantic import TypeAdapter
 
+from ord_viewer.schemas import SearchResult, TableResult
 from ord_viewer.searching import search_errors, to_result
 
 
@@ -72,3 +74,28 @@ def test_an_aggregate_gives_a_table():
     assert result.columns == ["dataset_id", "reactions"]
     assert result.rows == [["ord_dataset-x", 3]]
     assert not result.truncated
+
+
+def test_repeated_column_names_keep_every_row_aligned():
+    request = Query.model_validate(
+        {
+            "aggregate": {
+                "group_by": ["dataset_id"],
+                "measures": [{"fn": "count", "name": "n"}],
+            }
+        }
+    )
+    table = pa.Table.from_arrays(
+        [pa.array(["a", "b"]), pa.array([3, 2]), pa.array([4, 1])],
+        names=["dataset_id", "n", "n"],
+    )
+    result = to_result(request, table)
+    assert isinstance(result, TableResult)
+    assert result.columns == ["dataset_id", "n", "n"]
+    assert result.rows == [["a", 3, 4], ["b", 2, 1]]
+
+
+def test_a_bytes_cell_is_base64_in_json():
+    result = TableResult(columns=["image"], rows=[[b"\xff"]], truncated=False)
+    dumped = TypeAdapter(SearchResult).dump_python(result, mode="json")
+    assert dumped["rows"] == [["/w=="]]

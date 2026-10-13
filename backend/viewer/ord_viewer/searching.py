@@ -16,14 +16,33 @@
 
 import contextlib
 from collections.abc import Generator
+from typing import Any
 
 import pyarrow as pa
 from fastapi import HTTPException, status
 from ord_schema.search import execute
 from ord_schema.search.query import Query
 
-from ord_viewer.schemas import ReactionsResult, TableResult
+from ord_viewer.schemas import (
+    ErrorDetail,
+    ReactionsResult,
+    TableResult,
+    ValidationErrors,
+)
 from ord_viewer.state import ViewerState
+
+# The errors every route that runs a search can return, for its published schema.
+SEARCH_ERRORS: dict[int | str, dict[str, Any]] = {
+    422: {
+        "model": ErrorDetail | ValidationErrors,
+        "description": (
+            "The request fails validation (a list of errors), or the query does not "
+            "compile or names an unknown compound (a message)"
+        ),
+    },
+    503: {"model": ErrorDetail, "description": "Every search slot stayed busy"},
+    504: {"model": ErrorDetail, "description": "The search ran past its timeout"},
+}
 
 
 @contextlib.contextmanager
@@ -78,7 +97,8 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
 
     Returns:
         Reaction IDs for a plain query, or the columns and rows of an aggregate, each
-        saying whether the corpus's row bound may have cut it.
+        saying whether the corpus's row bound may have cut it. Rows are built by
+        position, so repeated column names stay aligned.
     """
     truncated = (table.schema.metadata or {}).get(execute.TRUNCATED.encode()) == b"true"
     if request.aggregate is None:
@@ -87,6 +107,11 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
         )
     return TableResult(
         columns=table.column_names,
-        rows=[list(row.values()) for row in table.to_pylist()],
+        rows=[
+            list(row)
+            for row in zip(
+                *(column.to_pylist() for column in table.columns), strict=False
+            )
+        ],
         truncated=truncated,
     )

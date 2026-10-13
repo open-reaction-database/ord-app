@@ -21,8 +21,8 @@ from ord_schema.search import execute
 from ord_schema.search.query import Query as SearchQuery
 
 from ord_viewer.molblocks import smiles_molblock
-from ord_viewer.schemas import CompoundCount, DatasetSummary
-from ord_viewer.searching import run_search
+from ord_viewer.schemas import CompoundCount, DatasetSummary, ErrorDetail
+from ord_viewer.searching import SEARCH_ERRORS, run_search
 from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api/datasets")
@@ -93,7 +93,7 @@ def list_datasets(
     return _summaries(state.corpus)
 
 
-@router.get("/{dataset_id}")
+@router.get("/{dataset_id}", responses={404: {"model": ErrorDetail}})
 def get_dataset(
     dataset_id: str, state: Annotated[ViewerState, Depends(get_state)]
 ) -> DatasetSummary:
@@ -112,7 +112,10 @@ def get_dataset(
     return _find(state.corpus, dataset_id)
 
 
-@router.get("/{dataset_id}/compounds")
+@router.get(
+    "/{dataset_id}/compounds",
+    responses={**SEARCH_ERRORS, 404: {"model": ErrorDetail}},
+)
 def dataset_compounds(
     dataset_id: str,
     state: Annotated[ViewerState, Depends(get_state)],
@@ -133,6 +136,7 @@ def dataset_compounds(
     Raises:
         HTTPException: 404 if the corpus holds no such dataset, 422 or 504 if the
             search fails.
+        SlotsBusyError: If every search slot stays busy for the configured wait.
     """
     _find(state.corpus, dataset_id)
     request = SearchQuery.model_validate(

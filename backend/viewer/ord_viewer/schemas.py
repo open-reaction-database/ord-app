@@ -14,10 +14,11 @@
 
 """The bodies the routes accept and return."""
 
+import base64
 from typing import Annotated, Any, Literal
 
 from ord_schema.search.query import Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 
 
 class DatasetSummary(BaseModel):
@@ -102,12 +103,35 @@ class ReactionsResult(BaseModel):
 
 
 class TableResult(BaseModel):
-    """An aggregate's answer: its group and measure columns."""
+    """An aggregate's answer: its group and measure columns; bytes cells are base64."""
 
     kind: Literal["table"] = "table"
     columns: list[str]
     rows: list[list[Any]]
     truncated: bool
 
+    @field_serializer("rows")
+    def _encode_bytes(self, rows: list[list[Any]]) -> list[list[Any]]:
+        """Encode bytes cells as standard base64, which JSON has no type for."""
+        return [
+            [
+                base64.b64encode(cell).decode() if isinstance(cell, bytes) else cell
+                for cell in row
+            ]
+            for row in rows
+        ]
+
 
 SearchResult = Annotated[ReactionsResult | TableResult, Field(discriminator="kind")]
+
+
+class ErrorDetail(BaseModel):
+    """The body of an error a route raises itself: a message."""
+
+    detail: str
+
+
+class ValidationErrors(BaseModel):
+    """The body FastAPI answers 422 with when the request fails validation."""
+
+    detail: list[dict[str, Any]]
