@@ -15,7 +15,9 @@
 """Settings for the viewer's backend, read from ORD_VIEWER_* environment variables."""
 
 from pathlib import Path
+from typing import Literal
 
+from ord_schema.search import nl
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -33,10 +35,14 @@ class Settings(BaseSettings):
     corpus_dir: Path | None = None
     # DuckDB's memory_limit, such as "6500MiB"; DuckDB's default when unset.
     memory_limit: str | None = None
-    # The most searches and dataset charts' aggregates in flight at once, a cap the
-    # search slots enforce; each search gets cores / max_concurrent RDKit threads.
+    # The most searches, asks, and dataset charts' aggregates in flight at once, a cap
+    # the search slots enforce; each search gets cores / max_concurrent RDKit threads.
     max_concurrent: int = Field(default=4, ge=1)
     # The bound on one search, passed to Corpus.search; a search past it answers 504.
     search_timeout_seconds: float = Field(default=30.0, gt=0)
     # How long a request waits for a free search slot before answering 503.
     slot_wait_seconds: float = Field(default=10.0, gt=0)
+    # The model /api/ask translates questions with.
+    ask_model: str = nl.DEFAULT_MODEL
+    # Where /api/ask records each question: nowhere, or one JSON line on stdout.
+    ask_log: Literal["none", "stdout"] = "none"

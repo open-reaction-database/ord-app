@@ -25,7 +25,7 @@ The viewer's backend: search and browse over one published corpus with `ord_sche
 - Postgres required, configured via `PG_DSN` / `PG_ALEMBIC_DSN` / `PG_TEST_DSN`. Migrate (from `backend/editor`): `uv run alembic upgrade head`.
 - Run dev server (from `backend/editor`): `APP_ENV=localhost uv run uvicorn ord_editor.service_api.main:app --reload` → http://localhost:8000 (`/service_api/docs`).
 - Tests (from `backend/editor`): `uv run pytest` (pytest-asyncio). Parallel runs are supported — `uv run pytest -n auto` — because the conftest gives each xdist worker its own isolated test database (DSN suffixed with `PYTEST_XDIST_WORKER`). Note: at the current suite size, per-worker DB setup makes `-n auto` roughly break-even with serial; the win grows as the suite does.
-- Viewer: `cd backend/viewer && uv sync --frozen`; tests `uv run pytest -n auto`; serve with `ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001` (opening a full corpus takes about 40 s and 7 GiB); the API docs are at `/api/docs`; the other `ORD_VIEWER_*` settings are listed in `README.md`'s "Viewer backend" section.
+- Viewer: `cd backend/viewer && uv sync --frozen`; tests `uv run pytest -n auto`; serve with `ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001` (opening a full corpus takes about 40 s and 7 GiB); the API docs are at `/api/docs`; the other `ORD_VIEWER_*` settings are listed in `README.md`'s "Viewer backend" section; `/api/ask` needs `ORD_ANTHROPIC_API_KEY` (or `ANTHROPIC_API_KEY`) and answers 503 without one.
 - Lint/type: `ruff` + `ruff format` (config in the root `ruff.toml`), `ty` (Astral's type checker; `uv run ty check ord_editor`).
 
 ## Frontend (`frontend/`)

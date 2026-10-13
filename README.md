@@ -43,9 +43,12 @@ The service reads these environment variables:
 | --- | --- | --- |
 | `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/` |
 | `ORD_VIEWER_MEMORY_LIMIT` | DuckDB's default | DuckDB's `memory_limit`, such as `6500MiB` |
-| `ORD_VIEWER_MAX_CONCURRENT` | 4 | The most searches and dataset charts' aggregates in flight at once; each search gets cores / this many RDKit threads |
+| `ORD_VIEWER_MAX_CONCURRENT` | 4 | The most searches, asks, and dataset charts' aggregates in flight at once; each search gets cores / this many RDKit threads |
 | `ORD_VIEWER_SEARCH_TIMEOUT_SECONDS` | 30 | The bound on one search; a search past it answers 504 |
 | `ORD_VIEWER_SLOT_WAIT_SECONDS` | 10 | How long a request waits for a free search slot before answering 503 |
+| `ORD_VIEWER_ASK_MODEL` | ord-schema's `nl.DEFAULT_MODEL` | The model `/api/ask` translates questions with |
+| `ORD_VIEWER_ASK_LOG` | `none` | Where `/api/ask` records each question: `none`, or `stdout` for one JSON line per question |
+| `ORD_ANTHROPIC_API_KEY` | unset | The key `/api/ask` calls the model with, falling back to `ANTHROPIC_API_KEY`; without either, `/api/ask` answers 503 and the other routes work |
 
 ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `derive_structures`, `derive_pivots`, and `derive_occurrences`) produce a corpus's trees from source Parquet. For a local smoke run, `ord_viewer.testing.derive_corpus(path)` writes the five-reaction test corpus:
 
