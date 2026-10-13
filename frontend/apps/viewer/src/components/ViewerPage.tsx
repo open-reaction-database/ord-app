@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Anchor, Group } from '@mantine/core';
+import { Anchor, Burger, Group, Menu } from '@mantine/core';
 import { PageContainer, type Breadcrumbs } from '@open-reaction-database/ui/shell';
-import type { PropsWithChildren } from 'react';
+import { useState, type PropsWithChildren } from 'react';
 import { Link } from 'wouter';
 
 export const EDITOR_URL = 'https://app.open-reaction-database.org';
@@ -25,31 +25,85 @@ interface ViewerPageProps extends PropsWithChildren {
   breadcrumbs: Breadcrumbs;
 }
 
+/** The header's links: the viewer's own pages route in the app, the rest leave it. */
+const LINKS: ReadonlyArray<{ label: string; href: string; external?: boolean }> = [
+  { label: 'Browse', href: '/' },
+  { label: 'Search', href: '/search' },
+  { label: 'Contribute', href: EDITOR_URL, external: true },
+  { label: 'Docs', href: DOCS_URL, external: true },
+  { label: 'About', href: '/about' },
+];
+
+/** The links in a menu behind a button, for screens too narrow to show them in a row. */
+function NavigationMenu() {
+  const [opened, setOpened] = useState(false);
+  return (
+    <Menu
+      opened={opened}
+      onChange={setOpened}
+      position="bottom-end"
+    >
+      <Menu.Target>
+        <Burger
+          opened={opened}
+          size="sm"
+          hiddenFrom="sm"
+          aria-label="Navigation menu"
+        />
+      </Menu.Target>
+      <Menu.Dropdown>
+        {LINKS.map(({ label, href, external }) =>
+          external ? (
+            <Menu.Item
+              key={label}
+              component="a"
+              href={href}
+            >
+              {label}
+            </Menu.Item>
+          ) : (
+            <Menu.Item
+              key={label}
+              component={Link}
+              href={href}
+            >
+              {label}
+            </Menu.Item>
+          ),
+        )}
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
 function Navigation() {
   return (
     <nav aria-label="Main">
-      <Group gap="lg">
-        <Anchor
-          component={Link}
-          href="/"
-        >
-          Browse
-        </Anchor>
-        <Anchor
-          component={Link}
-          href="/search"
-        >
-          Search
-        </Anchor>
-        <Anchor href={EDITOR_URL}>Contribute</Anchor>
-        <Anchor href={DOCS_URL}>Docs</Anchor>
-        <Anchor
-          component={Link}
-          href="/about"
-        >
-          About
-        </Anchor>
+      <Group
+        gap="lg"
+        wrap="nowrap"
+        visibleFrom="sm"
+      >
+        {LINKS.map(({ label, href, external }) =>
+          external ? (
+            <Anchor
+              key={label}
+              href={href}
+            >
+              {label}
+            </Anchor>
+          ) : (
+            <Anchor
+              key={label}
+              component={Link}
+              href={href}
+            >
+              {label}
+            </Anchor>
+          ),
+        )}
       </Group>
+      <NavigationMenu />
     </nav>
   );
 }
