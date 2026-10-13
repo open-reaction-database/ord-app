@@ -45,7 +45,9 @@ def test_returns_reactions_in_the_order_asked(client):
 def test_a_compound_without_a_structure_has_a_null_molblock(client):
     response = client.get("/api/reactions/ord-viewer0202")
     assert response.status_code == 200
-    assert response.json()["molblocks"]["inputs"]["catalysts"] == [None]
+    inputs = response.json()["molblocks"]["inputs"]
+    assert inputs["catalysts"] == [None]
+    assert all("M  END" in molblock for molblock in inputs["reactants"])
 
 
 def test_repeated_and_unknown_ids(client):
@@ -60,7 +62,10 @@ def test_one_reaction(client):
     assert client.get("/api/reactions/ord-unknown").status_code == 404
 
 
-def test_bounds_the_batch(client):
+def test_asks_for_at_least_one_reaction(client):
     assert client.get("/api/reactions").status_code == 422
+
+
+def test_bounds_the_batch(client):
     too_many = _get(client, *[f"ord-{index}" for index in range(101)])
     assert too_many.status_code == 422

@@ -18,18 +18,20 @@ import base64
 from collections.abc import Sequence
 from typing import Annotated
 
-import pyarrow as pa
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from ord_schema.proto import reaction_pb2
 from ord_schema.search import execute
 
+from ord_viewer.corpus import read_reactions
 from ord_viewer.molblocks import reaction_molblocks
 from ord_viewer.schemas import ReactionRecord
 from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api/reactions")
 
-# One page of result cards. 100 IDs are about 4 KiB of query string.
+# One page of result cards. 100 IDs are about 4 KiB of query string. The corpus is
+# always opened with execute.DEFAULT_MAX_ROWS (1000), so this cap is the tighter bound
+# and the ValueError for too many IDs never reaches the route.
 _MAX_IDS = 100
 
 
@@ -48,14 +50,8 @@ def fetch_records(
     Raises:
         ValueError: If more IDs are asked for than the corpus returns in one call.
     """
-    try:
-        table = corpus.reactions(reaction_ids)
-    except pa.ArrowNotImplementedError:
-        # Corpus.reactions fails to reorder a result with no rows, which is what
-        # IDs the corpus does not hold produce.
-        return []
     records = []
-    for row in table.to_pylist():
+    for row in read_reactions(corpus, reaction_ids).to_pylist():
         blob = row["reaction"]
         records.append(
             ReactionRecord(

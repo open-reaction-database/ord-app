@@ -16,8 +16,9 @@
 
 import glob
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
+import pyarrow as pa
 from ord_schema import resolvers
 from ord_schema.search import execute
 
@@ -93,3 +94,29 @@ def open_corpus(
         corpus.close()
         raise
     return corpus
+
+
+def read_reactions(corpus: execute.Corpus, reaction_ids: Sequence[str]) -> pa.Table:
+    """Read the source records of the reactions the corpus holds.
+
+    Corpus.reactions reorders its rows with an untyped index list, which pyarrow
+    rejects when none of the asked IDs is held; that request is an empty table.
+
+    Args:
+        corpus: The open corpus.
+        reaction_ids: The reactions wanted; unknown IDs have no row.
+
+    Returns:
+        Columns reaction_id, dataset_id, and reaction, one row per known ID in the
+        order first asked.
+
+    Raises:
+        ValueError: If more distinct IDs are asked for than the corpus returns at once.
+        pa.ArrowNotImplementedError: For any Arrow failure other than that empty take.
+    """
+    try:
+        return corpus.reactions(reaction_ids)
+    except pa.ArrowNotImplementedError as error:
+        if "array_take" not in str(error):
+            raise
+        return corpus.reactions([])
