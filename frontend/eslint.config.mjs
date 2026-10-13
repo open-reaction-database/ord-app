@@ -33,7 +33,7 @@ const PACKAGE_IMPORT_PATTERNS = [
     message: 'Import package files through #… instead.',
   },
   {
-    regex: String.raw`^#(reaction(/[^/]+)?|testing|theme|display|shell)/index\.ts$`,
+    regex: String.raw`^#(reaction(/[^/]+)?|testing|theme|display|shell|ketcher)/index\.ts$`,
     message:
       'Import the module itself: an app test that mocks a barrel must not reach package code.',
   },
@@ -41,6 +41,14 @@ const PACKAGE_IMPORT_PATTERNS = [
 
 // App state and transport, which the shared package leaves to its hosts.
 const APP_STATE_IMPORTS = ['react-redux', '@reduxjs/toolkit', 'axios', '@auth0/*'];
+
+// Ketcher, which only the structure dialog's lazily loaded module may import: any other
+// import would put Ketcher in an app's first download.
+const KETCHER_PATTERN = {
+  group: ['ketcher-*'],
+  message:
+    'Only src/ketcher/KetcherDialog.tsx imports Ketcher, which StructureDialog loads lazily.',
+};
 
 export default tseslint.config(
   { ignores: ['**/dist', '**/coverage', '**/playwright-report', '**/test-results'] },
@@ -159,6 +167,7 @@ export default tseslint.config(
               message:
                 'The shared package stays free of app state, transport, and routing.',
             },
+            KETCHER_PATTERN,
           ],
         },
       ],
@@ -176,6 +185,26 @@ export default tseslint.config(
             {
               group: APP_STATE_IMPORTS,
               message: 'The page shell stays free of app state and transport.',
+            },
+            KETCHER_PATTERN,
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The one module that may import Ketcher.
+    files: ['packages/ui/src/ketcher/KetcherDialog.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            ...PACKAGE_IMPORT_PATTERNS,
+            {
+              group: [...APP_STATE_IMPORTS, 'wouter'],
+              message:
+                'The shared package stays free of app state, transport, and routing.',
             },
           ],
         },
