@@ -30,6 +30,9 @@ from ord_viewer.state import ViewerState
 async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NOSONAR
     """Answer 503 when every search slot stayed busy.
 
+    It is async so Starlette runs it on the event loop, and the 503 needs no worker
+    thread when the threadpool may be full of requests waiting for a slot.
+
     Args:
         request: The request that waited for a slot.
         error: The SlotsBusyError that ended the wait.
