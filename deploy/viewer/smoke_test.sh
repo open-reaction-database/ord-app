@@ -100,8 +100,10 @@ if ((limited == 0)); then
 fi
 
 # A body past 128 KiB never reaches the backend.
-head -c 200000 /dev/zero | tr '\0' 'a' >"${TMPDIR:-/tmp}/viewer-large-body"
+large=$(mktemp)
+head -c 200000 /dev/zero | tr '\0' 'a' >"$large"
 expect_status 413 -X POST -H 'Content-Type: application/json' \
-  --data-binary "@${TMPDIR:-/tmp}/viewer-large-body" "$base/api/download"
+  --data-binary "@$large" "$base/api/download"
+rm -f "$large"
 
 echo "the viewer's image passed its smoke test"

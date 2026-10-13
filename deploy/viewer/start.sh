@@ -16,6 +16,9 @@
 # The container's command: runs supervisord, and exits 1 when a program's exit stopped it
 # (exit_on_failure.sh leaves the marker), so the exit code tells a failure from a stop the
 # container was asked for. As PID 1 it passes that request, SIGTERM, on to supervisord.
+
+# A restarted container keeps its files, and with them a marker an earlier run left.
+rm -f /tmp/viewer-program-exited
 supervisord -c /etc/supervisor/viewer.conf &
 supervisord=$!
 trap 'kill -TERM "$supervisord"' TERM INT
