@@ -48,18 +48,12 @@ async def test_waits_then_refuses_when_full():
                 pass
 
 
-async def _raise_in_a_slot(slots: SearchSlots, error: Exception) -> None:
-    async with slots.hold():
-        raise error
-
-
 @pytest.mark.anyio
 async def test_frees_a_slot_when_the_body_raises():
     slots = SearchSlots(capacity=1, wait_seconds=0.01)
-    # Built before pytest.raises, so only awaiting it can raise there.
-    attempt = _raise_in_a_slot(slots, RuntimeError("search failed"))
-    with pytest.raises(RuntimeError):
-        await attempt
+    with pytest.raises(RuntimeError, match="search failed"):
+        async with slots.hold():
+            raise RuntimeError("search failed")
     async with slots.hold():
         pass
 
@@ -67,8 +61,8 @@ async def test_frees_a_slot_when_the_body_raises():
 @pytest.mark.anyio
 async def test_a_timeout_in_the_body_is_not_a_busy_slot():
     slots = SearchSlots(capacity=1, wait_seconds=5)
-    attempt = _raise_in_a_slot(slots, TimeoutError("the search ran long"))
     with pytest.raises(TimeoutError, match="the search ran long"):
-        await attempt
+        async with slots.hold():
+            raise TimeoutError("the search ran long")
     async with slots.hold():
         pass
