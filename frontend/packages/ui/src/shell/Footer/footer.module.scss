@@ -26,3 +26,12 @@
   display: flex;
   gap: 12px;
 }
+
+/* Below Mantine's sm breakpoint the items wrap onto the lines they need; the page shell lets the
+   footer grow to hold them. */
+@media (width < 48em) {
+  .root {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+}

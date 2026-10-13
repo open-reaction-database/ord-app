@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { within } from '@testing-library/react';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
+import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import { PageContainer } from './PageContainer.tsx';
 
 // Stub the router-aware Breadcrumbs and the Footer so this test focuses on PageContainer's own
@@ -89,5 +90,35 @@ describe('PageContainer', () => {
     expect(queryByRole('contentinfo')).toBeNull();
     expect(queryByTestId('footer')).toBeNull();
     expect(getByRole('main').className).toMatch(/mainWithoutFooter/);
+  });
+});
+
+describe('PageContainer at different widths', () => {
+  afterEach(() => {
+    setViewportWidth(DEFAULT_VIEWPORT_WIDTH);
+  });
+
+  function renderPage() {
+    const { getByRole } = renderWithMantine(<PageContainer breadcrumbs={[]} />);
+    return {
+      footer: getComputedStyle(getByRole('contentinfo')),
+      main: getComputedStyle(getByRole('main')),
+    };
+  }
+
+  it('keeps a 48px footer, and padding clear of it, from the sm breakpoint up', () => {
+    setViewportWidth(768);
+    const { footer, main } = renderPage();
+    expect(footer.height).toBe('48px');
+    expect(footer.position).not.toBe('sticky');
+    expect(main.paddingBottom).toBe('48px');
+  });
+
+  it('lets the footer grow with its content in the page flow below the sm breakpoint', () => {
+    setViewportWidth(767);
+    const { footer, main } = renderPage();
+    expect(footer.height).toBe('auto');
+    expect(footer.position).toBe('sticky');
+    expect(main.paddingBottom).toBe('0px');
   });
 });

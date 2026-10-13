@@ -25,6 +25,9 @@ export default defineConfig({
     setupFiles: ['./src/testing/setup.ts'],
     mockReset: true,
     include: ['src/**/*.test.{ts,tsx}'],
+    // Load the components' CSS modules into the document, so their media queries answer to
+    // happy-dom's viewport width (see `#testing/setViewportWidth.ts`).
+    css: { include: [/\.module\.scss$/] },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],

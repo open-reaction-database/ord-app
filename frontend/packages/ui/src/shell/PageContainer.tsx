@@ -41,6 +41,7 @@ export function PageContainer({
   return (
     <AppShell
       classNames={{
+        root: classes.root,
         header: classes.header,
         main: hasFooter ? classes.main : `${classes.main} ${classes.mainWithoutFooter}`,
         footer: classes.footer,
