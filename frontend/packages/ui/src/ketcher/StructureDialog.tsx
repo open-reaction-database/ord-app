@@ -37,8 +37,8 @@ const KetcherDialog = lazy(loadKetcherDialog);
 /**
  * Draws a structure in Ketcher, saving it as `format`.
  *
- * Ketcher loads the first time the dialog opens, in a chunk of its own, and stays mounted
- * after the dialog closes, so later openings are immediate.
+ * Ketcher's chunk loads the first time the dialog opens and is reused by later openings,
+ * each of which initializes a new Ketcher in the modal.
  */
 export function StructureDialog(props: Readonly<StructureDialogProps>) {
   const [hasOpened, setHasOpened] = useState(props.opened);

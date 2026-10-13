@@ -44,18 +44,19 @@ export function KetcherDialog({
 }: Readonly<StructureDialogProps>) {
   const [ketcher, setKetcher] = useState<Ketcher | null>(null);
 
-  // The canvas is cleared on close, so each opening loads the initial structure again.
+  // The modal unmounts Ketcher while closed, and each opening initializes a new one, so
+  // the instance is forgotten on close and the next one loads the initial structure.
   useEffect(() => {
-    if (ketcher && opened) {
-      void ketcher.setMolecule(initial);
+    if (!opened) {
+      setKetcher(null);
     }
-  }, [ketcher, opened, initial]);
+  }, [opened]);
 
   useEffect(() => {
-    if (ketcher && !opened) {
-      void ketcher.setMolecule('');
+    if (ketcher) {
+      void ketcher.setMolecule(initial);
     }
-  }, [ketcher, opened]);
+  }, [ketcher, initial]);
 
   const handleSave = () => {
     if (ketcher) {
