@@ -43,6 +43,6 @@ def test_caches_names_that_resolve_and_retries_names_that_do_not(
     assert resolve_compound_name("pyridine") == "c1ccncc1"
     assert resolve_compound_name("pyridine") == "c1ccncc1"
     for _ in range(2):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Could not resolve name unobtainium"):
             resolve_compound_name("unobtainium")
     assert asked == ["pyridine", "unobtainium", "unobtainium"]

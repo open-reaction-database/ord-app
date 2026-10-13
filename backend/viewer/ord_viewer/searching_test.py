@@ -30,7 +30,7 @@ from ord_viewer.searching import search_errors, to_result
 @pytest.mark.parametrize("error_type", [ValueError, QueryError])
 def test_a_value_error_is_unprocessable(error_type):
     error = error_type("bad query")
-    with pytest.raises(HTTPException) as raised, search_errors():
+    with pytest.raises(HTTPException, match="bad query") as raised, search_errors():
         raise error
     assert raised.value.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert raised.value.detail == "bad query"
@@ -38,7 +38,7 @@ def test_a_value_error_is_unprocessable(error_type):
 
 def test_a_timeout_is_a_gateway_timeout():
     error = TimeoutError("too slow")
-    with pytest.raises(HTTPException) as raised, search_errors():
+    with pytest.raises(HTTPException, match="too slow") as raised, search_errors():
         raise error
     assert raised.value.status_code == status.HTTP_504_GATEWAY_TIMEOUT
     assert raised.value.detail == "too slow"
@@ -46,7 +46,7 @@ def test_a_timeout_is_a_gateway_timeout():
 
 def test_a_pairing_error_propagates():
     error = execute.PairingError("stale")
-    with pytest.raises(execute.PairingError) as raised, search_errors():
+    with pytest.raises(execute.PairingError, match="stale") as raised, search_errors():
         raise error
     assert raised.value is error
 

@@ -43,7 +43,7 @@ async def test_waits_then_refuses_when_full():
     slots = SearchSlots(capacity=1, wait_seconds=0.01)
     async with slots.hold():
         # Only the inner hold sits inside pytest.raises, so only it can raise.
-        with pytest.raises(SlotsBusyError):
+        with pytest.raises(SlotsBusyError, match="every search slot stayed busy"):
             async with slots.hold():
                 pass
 
