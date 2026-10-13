@@ -86,9 +86,7 @@ export function ComponentsKetcherEditor({
     }
     // The drawing goes back in the type it was opened in; a new one is a molblock.
     const type = identifier?.type ?? DEFAULT_STRUCTURE_IDENTIFIER_TYPE;
-    // An async function, so that getSmiles throwing synchronously and getMolfile
-    // rejecting reach the same catch.
-    const serialize = async () => {
+    const serialize = (): Promise<string> => {
       switch (type) {
         case 'MOLBLOCK':
           return ketcherInstance.getMolfile();
@@ -113,19 +111,25 @@ export function ComponentsKetcherEditor({
         }
       }
     };
-    serialize().then(
-      value => {
-        onSave({ type, value, details: getValue() });
-        onClose();
-      },
-      (error: unknown) => {
-        showNotification({
-          variant: NotificationVariant.ERROR,
-          message:
-            error instanceof Error ? error.message : 'The drawing could not be saved.',
-        });
-      },
-    );
+    // Called inside then(), so that getSmiles throwing synchronously and getMolfile
+    // rejecting reach the same handler.
+    Promise.resolve()
+      .then(serialize)
+      .then(
+        value => {
+          onSave({ type, value, details: getValue() });
+          onClose();
+        },
+        (error: unknown) => {
+          showNotification({
+            variant: NotificationVariant.ERROR,
+            message:
+              error instanceof Error
+                ? error.message
+                : 'The drawing could not be saved.',
+          });
+        },
+      );
   };
 
   return (
