@@ -33,7 +33,9 @@
   --font-size-lg: 16px;
   --font-size-md: 14px;
   --font-size-sm: 12px;
-  --sidebar-width: 928px;
+
+  /* A drawer's width, capped at the window's so a drawer never starts off-screen. */
+  --sidebar-width: min(928px, 100vw);
 }
 
 body {
