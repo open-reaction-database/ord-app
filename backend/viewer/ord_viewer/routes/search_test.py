@@ -200,6 +200,27 @@ def test_a_query_nested_past_the_recursion_limit_is_unprocessable(client):
     assert "recursion_loop" in {error["type"] for error in response.json()["detail"]}
 
 
+def _nested(depth):
+    value = {}
+    for _ in range(depth):
+        value = {"a": value}
+    return value
+
+
+@pytest.mark.parametrize(
+    ("body", "error_type"),
+    [
+        ({"query": {}, "extra": _nested(2000)}, "extra_forbidden"),
+        ({"query": {"limit": _nested(2000)}}, "int_type"),
+    ],
+)
+def test_a_deep_value_in_an_invalid_field_is_unprocessable(client, body, error_type):
+    # Pydantic echoes the offending value as the error's input, however deep it is.
+    response = client.post("/api/search", json=body)
+    assert response.status_code == 422
+    assert error_type in {error["type"] for error in response.json()["detail"]}
+
+
 def test_repeated_measure_names_keep_every_row_aligned(client):
     measure = {"fn": "count", "name": "n"}
     query = {"aggregate": {"group_by": ["dataset_id"], "measures": [measure, measure]}}

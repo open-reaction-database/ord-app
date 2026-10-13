@@ -49,12 +49,14 @@ async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NO
 async def _request_invalid(  # NOSONAR
     request: Request, error: Exception
 ) -> JSONResponse:
-    """Answer 422 with FastAPI's usual body, less the input a recursion loop echoes.
+    """Answer 422 with FastAPI's usual body, less the input each error echoes.
 
-    A query nested past pydantic's recursion limit fails as recursion_loop, and that
-    error echoes the query's whole remaining depth as its input, deeper than
-    jsonable_encoder can recurse. It is async, as FastAPI's own handler is, so
-    Starlette runs it on the event loop rather than in a worker thread.
+    Pydantic echoes the value that failed as each error's input, however deeply it
+    nests, and a value nested past the recursion limit (a deep query, or a deep value
+    under an unknown key) is deeper than jsonable_encoder can recurse. The caller sent
+    that value, so the error's type, location, and message identify it. It is async, as
+    FastAPI's own handler is, so Starlette runs it on the event loop rather than in a
+    worker thread.
 
     Args:
         request: The request that failed validation.
@@ -65,8 +67,6 @@ async def _request_invalid(  # NOSONAR
     """
     errors = [
         {key: value for key, value in item.items() if key != "input"}
-        if item["type"] == "recursion_loop"
-        else item
         for item in cast(RequestValidationError, error).errors()
     ]
     return JSONResponse(
