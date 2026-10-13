@@ -13,16 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The container's command: runs supervisord, and exits 1 when a program's exit stopped it
-# (exit_on_failure.sh leaves the marker), so the exit code tells a failure from a stop the
-# container was asked for. As PID 1 it passes that request, SIGTERM, on to supervisord.
+# The container's command: runs supervisord, and exits 0 only when the container was
+# asked to stop (SIGTERM, which it passes on to supervisord) and supervisord stopped
+# cleanly. Any other end is a failure: a program's exit (exit_on_failure.sh leaves the
+# marker), or supervisord failing or stopping on its own, which keeps supervisord's code
+# when it is not 0 and is 1 otherwise.
 
 # A restarted container keeps its files, and with them a marker an earlier run left.
 rm -f /tmp/viewer-program-exited
+requested=
 supervisord -c /etc/supervisor/viewer.conf &
 supervisord=$!
-trap 'kill -TERM "$supervisord"' TERM INT
+trap 'requested=1; kill -TERM "$supervisord"' TERM INT
 wait "$supervisord"
-# A trapped signal ends the first wait early; this one waits for supervisord to finish.
-wait "$supervisord"
-[ ! -e /tmp/viewer-program-exited ]
+status=$?
+if [ -n "$requested" ] && [ "$status" -gt 128 ]; then
+  # The trap ended that wait early; this one waits for supervisord to finish.
+  wait "$supervisord"
+  status=$?
+fi
+if [ -n "$requested" ] && [ "$status" -eq 0 ] && [ ! -e /tmp/viewer-program-exited ]; then
+  exit 0
+fi
+if [ "$status" -ne 0 ]; then
+  exit "$status"
+fi
+exit 1

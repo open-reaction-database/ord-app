@@ -22,9 +22,14 @@ set -euo pipefail
 base=${1:?usage: smoke_test.sh <base URL> <reaction ID>}
 reaction=${2:?usage: smoke_test.sh <base URL> <reaction ID>}
 
+# Every request gives up rather than hang: 5 s to connect, 30 s in all.
+request() {
+  curl --connect-timeout 5 --max-time 30 "$@"
+}
+
 # The response's status, or 000 when nothing answers.
 status() {
-  curl -s -o /dev/null -w '%{http_code}' "$@" || true
+  request -s -o /dev/null -w '%{http_code}' "$@" || true
 }
 
 expect_status() {
@@ -42,7 +47,7 @@ expect_status() {
 # stops at its first match can cut curl off mid-response and fail the pipeline.
 expect_body() {
   local url=$1 pattern=$2 body
-  body=$(curl -sf "$url") || {
+  body=$(request -sf "$url") || {
     echo "could not fetch $url" >&2
     exit 1
   }
@@ -54,7 +59,7 @@ expect_body() {
 
 expect_header() {
   local url=$1 pattern=$2 headers
-  headers=$(curl -sfI "$url") || {
+  headers=$(request -sfI "$url") || {
     echo "could not fetch $url's headers" >&2
     exit 1
   }
@@ -64,9 +69,10 @@ expect_header() {
   fi
 }
 
-# The backend opens its corpus before it accepts connections; nginx answers 502 until then.
-for _ in $(seq 1 90); do
-  [[ $(status "$base/api/health") == 200 ]] && break
+# The backend opens its corpus before it accepts connections; nginx answers 502 until
+# then. Wait up to three minutes.
+deadline=$((SECONDS + 180))
+until [[ $(status "$base/api/health") == 200 ]] || ((SECONDS >= deadline)); do
   sleep 2
 done
 expect_status 200 "$base/api/health"
@@ -75,7 +81,7 @@ expect_status 200 "$base/api/health"
 expect_body "$base/" '<div id="root">'
 expect_body "$base/reactions/$reaction" '<div id="root">'
 expect_header "$base/" '^cache-control: no-cache'
-index=$(curl -sf "$base/")
+index=$(request -sf "$base/")
 asset=$(grep -m1 -oE '/assets/[^"]+\.js' <<<"$index") || {
   echo "no script under /assets/ in $base/" >&2
   exit 1

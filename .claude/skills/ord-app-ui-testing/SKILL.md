@@ -109,8 +109,8 @@ function makeStore() {
 Boot the full stack with the dev/test Auth0 bypass, then drive Chromium. The **critical, easy-to-miss** env var is `VITE_API_ENDPOINT` — without it the UI calls the *production* API and hangs on "Loading…".
 
 ```bash
-# 1) Postgres (docker-compose maps it to host :5400; user/db = ord, empty password)
-docker compose up -d db   # wait for healthy
+# 1) Postgres (backend/editor/docker-compose.yml maps it to host :5400; user/db = ord, empty password)
+(cd backend/editor && docker compose up -d db)   # wait for healthy
 
 # 2) migrations + backend (host), under /service_api
 export PG_DSN="postgresql+psycopg://ord@localhost:5400/ord"
@@ -128,7 +128,7 @@ cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0
 npx playwright install chromium   # first time only
 npx playwright test e2e/<spec>
 ```
-Teardown: kill the :5173/:8000 listeners, then `docker compose down`.
+Teardown: kill the :5173/:8000 listeners, then `docker compose down` in `backend/editor`.
 
 E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 - Grant clipboard for copy/paste flows: `test.use({ permissions: ['clipboard-read', 'clipboard-write'] })`; `127.0.0.1` is a secure context so the clipboard API works.
