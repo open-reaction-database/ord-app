@@ -17,5 +17,11 @@ import { createRoot } from 'react-dom/client';
 import './index.scss';
 import '@open-reaction-database/ui/theme/global.scss';
 import { AppRoot } from './core/AppRoot.tsx';
+import { Buffer } from 'buffer'; // NOSONAR: the npm polyfill, for browser code; node:buffer is a Node builtin
+
+// Node's Buffer and global, which some dependencies read as they load: csv-parse reads
+// Buffer, so it must be set before any module imports it.
+globalThis.global ||= globalThis;
+globalThis.Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(<AppRoot />);

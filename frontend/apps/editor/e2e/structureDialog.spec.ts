@@ -35,6 +35,12 @@ test('draws a molblock identifier in Ketcher and saves it', async ({
   });
 
   await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+  // The input's drawer lists its components; a component's own form holds its identifiers.
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Edit', exact: true })
+    .first()
+    .click();
   await page.getByText('Add Molblock Identifier').click();
   await page.waitForFunction(
     () => Boolean((globalThis as KetcherWindow).ketcher),
@@ -44,7 +50,12 @@ test('draws a molblock identifier in Ketcher and saves it', async ({
     },
   );
   await page.evaluate(() => (globalThis as KetcherWindow).ketcher?.setMolecule('CCO'));
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  // The drawer's form has a Save of its own; this one is the dialog holding Ketcher.
+  await page
+    .getByRole('dialog')
+    .filter({ has: page.locator('.Ketcher-root') })
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
 
   await expect(page.getByText('Drawn with Ketcher')).toBeVisible();
 });
