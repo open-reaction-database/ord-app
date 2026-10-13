@@ -246,4 +246,35 @@ describe('ComponentsKetcherEditor', () => {
 
     await waitFor(() => expect(ketcher.setMolecule).toHaveBeenCalledWith(''));
   });
+
+  it('refuses to save over a CXSMILES whose coordinate bonds Ketcher cannot read', async () => {
+    // Ketcher reads |C:...| bonds as single bonds, so cisplatin would come back with NH2.
+    const { onSave, onClose } = await openAndSave({
+      type: 'CXSMILES',
+      value: '[NH3][Pt]([NH3])([Cl])[Cl] |C:0.0,2.1|',
+      details: 'cisplatin',
+    });
+
+    await waitFor(() =>
+      expect(showNotification).toHaveBeenCalledWith({
+        variant: NotificationVariant.ERROR,
+        message:
+          'Ketcher cannot read the coordinate bonds in this CXSMILES, so saving it would change the structure.',
+      }),
+    );
+    expect(ketcher.getSmiles).not.toHaveBeenCalled();
+    expect(onSave).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('saves a CXSMILES whose extension has no coordinate bonds', async () => {
+    // "C:" inside an atom label is not the coordinate-bond field.
+    const { onSave } = await openAndSave({
+      type: 'CXSMILES',
+      value: 'CC(N)C(=O)O |$C:1;;;;;$|',
+      details: 'labeled',
+    });
+
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+  });
 });

@@ -34,6 +34,13 @@ const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 
+/** Returns whether a CXSMILES's extension block records coordinate bonds (`C:`). */
+function hasCoordinateBonds(cxsmiles: string) {
+  const extension = /\s(\|.*\|)\s*$/.exec(cxsmiles)?.[1] ?? '';
+  // Atom labels sit between $ signs and may hold any text, "C:" included.
+  return /[|,]C:\d/.test(extension.replaceAll(/\$[^$]*\$/g, ''));
+}
+
 export function ComponentsKetcherEditor({
   opened,
   onClose,
@@ -74,6 +81,13 @@ export function ComponentsKetcherEditor({
     const serialize = async () => {
       if (type !== 'CXSMILES') {
         return ketcherInstance.getMolfile();
+      }
+      // Ketcher loads coordinate bonds as single bonds, so a dative N->Pt would save as
+      // an N-Pt single bond with one hydrogen fewer on the N.
+      if (hasCoordinateBonds(identifier?.value ?? '')) {
+        throw new Error(
+          'Ketcher cannot read the coordinate bonds in this CXSMILES, so saving it would change the structure.',
+        );
       }
       // getSmiles would write a reaction SMILES into a compound identifier.
       if (ketcherInstance.containsReaction()) {
