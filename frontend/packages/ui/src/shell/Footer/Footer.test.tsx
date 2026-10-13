@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
+import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import { Footer } from './Footer.tsx';
+
+function itemsWrap() {
+  const items = screen.getByText(/© Copyright/).parentElement as HTMLElement;
+  return getComputedStyle(items).flexWrap === 'wrap';
+}
 
 describe('Footer', () => {
   it('renders the dated copyright line and external links', () => {
@@ -31,5 +37,23 @@ describe('Footer', () => {
     renderWithMantine(<Footer />);
     const link = screen.getByRole('link', { name: 'help@open-reaction-database.org' });
     expect(link).toHaveAttribute('href', 'mailto:help@open-reaction-database.org');
+  });
+
+  describe('at different widths', () => {
+    afterEach(() => {
+      setViewportWidth(DEFAULT_VIEWPORT_WIDTH);
+    });
+
+    it('keeps its items on one line from the sm breakpoint up', () => {
+      setViewportWidth(768);
+      renderWithMantine(<Footer />);
+      expect(itemsWrap()).toBe(false);
+    });
+
+    it('wraps its items onto more lines below the sm breakpoint', () => {
+      setViewportWidth(767);
+      renderWithMantine(<Footer />);
+      expect(itemsWrap()).toBe(true);
+    });
   });
 });

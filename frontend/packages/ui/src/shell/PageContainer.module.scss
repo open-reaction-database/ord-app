@@ -58,3 +58,28 @@
   width: 54px;
   height: 24px;
 }
+
+/* Below Mantine's sm breakpoint (48em) the footer's items wrap past a 48px bar, so the footer takes
+   its content's height and joins the page's flow, sticking to the viewport's bottom edge. The main
+   area fills the screen above it in place of padding clear of it. The footer spans the full width,
+   so no page text shows beside it. */
+@media (width < 48em) {
+  .root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  .main {
+    flex-grow: 1;
+    min-height: auto;
+    padding-bottom: 0;
+  }
+
+  .footer {
+    position: sticky;
+    height: auto;
+    margin: 0;
+    padding: 8px 20px calc(8px + env(safe-area-inset-bottom));
+  }
+}
