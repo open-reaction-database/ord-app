@@ -14,6 +14,7 @@
 
 """A small corpus built and derived the way ord-schema derives a published one."""
 
+import glob
 import pathlib
 from collections.abc import Sequence
 from typing import Any
@@ -144,18 +145,18 @@ def derive_corpus(root: pathlib.Path) -> None:
     """Write DATASETS as sources under root and derive every artifact to read.
 
     Args:
-        root: The directory to build the corpus in. Its path must hold no glob
-            metacharacter: the derive scripts place their outputs relative to the
-            input pattern's wildcard-free leading directories.
+        root: The directory to build the corpus in.
     """
     for dataset in DATASETS:
         source = root / "sources" / "aa" / f"{dataset.dataset_id}.parquet"
         source.parent.mkdir(parents=True, exist_ok=True)
         parquet.save_dataset(dataset, source)
+    # The input patterns are globs, so a metacharacter in root's own name is escaped.
+    pattern_root = glob.escape(str(root))
     derive_projection.main(
         derive_projection.parse_args(
             [
-                f"--input_pattern={root}/sources/*/*.parquet",
+                f"--input_pattern={pattern_root}/sources/*/*.parquet",
                 f"--output_dir={root}/projections",
             ]
         )
@@ -163,7 +164,7 @@ def derive_corpus(root: pathlib.Path) -> None:
     derive_structures.main(
         derive_structures.parse_args(
             [
-                f"--input_pattern={root}/projections/*/*.parquet",
+                f"--input_pattern={pattern_root}/projections/*/*.parquet",
                 f"--output_dir={root}/structures",
             ]
         )
@@ -171,7 +172,7 @@ def derive_corpus(root: pathlib.Path) -> None:
     derive_pivots.main(
         derive_pivots.parse_args(
             [
-                f"--input_pattern={root}/projections/*/*.parquet",
+                f"--input_pattern={pattern_root}/projections/*/*.parquet",
                 f"--output_dir={root}/pivots",
             ]
         )

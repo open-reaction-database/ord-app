@@ -361,7 +361,7 @@ wheels = [
 
 [[package]]
 name = "ord-schema"
-version = "0.9.1"
+version = "0.9.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "joblib" },
@@ -374,9 +374,9 @@ dependencies = [
     { name = "rdkit" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8e/82/508a263c3f39696551fb9b52bdf2c5e4a7f160dbd13630f1c94c384bf038/ord_schema-0.9.1.tar.gz", hash = "sha256:1ef03efc5677da938ca17c61b7878c024eb9b117f7961867c79dfd0fec4ea49c", size = 565177, upload-time = "2026-10-11T23:56:59.85Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/55/45f8889c5e330e039b9ff10ae9b5fb62ed258c5d4e321d666bc8fa33ee0a/ord_schema-0.9.2.tar.gz", hash = "sha256:470b34ca8050450a214aeb69f29d6c559d5f2f4c64237b8f0dd7cb0d59963de0", size = 568389, upload-time = "2026-10-13T01:02:10.047Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/e4/fd4f44aaaf5a9cedde1c097a33e5e5dc892656ca3b16e1d9c721ed782f02/ord_schema-0.9.1-py3-none-any.whl", hash = "sha256:2a14b4712f92729b61a506977f0fd8fc68c076f64f051cbc0179cd01f8dffdee", size = 620285, upload-time = "2026-10-11T23:56:58.262Z" },
+    { url = "https://files.pythonhosted.org/packages/b1/b1/8a801a3b73a5e20f5d4dadedd788951b2c24c5267f62fe993d236ca05860/ord_schema-0.9.2-py3-none-any.whl", hash = "sha256:2fa4893f8f5cb2ff56613d233e8da84f25df411d1cf35ad57e3a01428bd31c77", size = 623085, upload-time = "2026-10-13T01:02:08.203Z" },
 ]
 
 [package.optional-dependencies]
@@ -419,7 +419,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.138.0,<0.200" },
-    { name = "ord-schema", extras = ["search", "nl"], specifier = "==0.9.1" },
+    { name = "ord-schema", extras = ["search", "nl"], specifier = "==0.9.2" },
     { name = "pyarrow", specifier = ">=24,<25" },
     { name = "pydantic", specifier = ">=2.13,<3" },
     { name = "pydantic-settings", specifier = ">=2.14,<3" },

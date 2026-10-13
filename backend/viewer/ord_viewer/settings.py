@@ -36,3 +36,5 @@ class Settings(BaseSettings):
     # The searches expected in flight at once; each gets cores / max_concurrent RDKit
     # threads.
     max_concurrent: int = Field(default=4, ge=1)
+    # The bound on one search, passed to Corpus.search; a search past it answers 504.
+    search_timeout_seconds: float = Field(default=30.0, gt=0)
