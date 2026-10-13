@@ -1,0 +1,64 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""The viewer's FastAPI app: one corpus, opened at startup and held until shutdown."""
+
+import contextlib
+from collections.abc import AsyncGenerator, Callable
+
+from fastapi import FastAPI
+
+from ord_viewer.corpus import open_corpus, resolve_compound_name
+from ord_viewer.routes import health
+from ord_viewer.settings import Settings
+from ord_viewer.state import ViewerState
+
+
+def create_app(
+    settings_factory: Callable[[], Settings] = Settings,
+    *,
+    resolver: Callable[[str], str] = resolve_compound_name,
+) -> FastAPI:
+    """Build the app; its lifespan reads the settings and opens the corpus.
+
+    Uvicorn accepts no connection until the lifespan has opened the corpus, and exits
+    non-zero if opening it raises.
+
+    Args:
+        settings_factory: Called once at startup; the default reads the environment.
+        resolver: Resolves compound names in queries to SMILES.
+
+    Returns:
+        The app, with every route registered.
+    """
+
+    @contextlib.asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+        settings = settings_factory()
+        with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
+            app.state.viewer = ViewerState(settings=settings, corpus=corpus)
+            yield
+
+    app = FastAPI(
+        title="Open Reaction Database viewer",
+        lifespan=lifespan,
+        openapi_url="/api/openapi.json",
+        docs_url="/api/docs",
+        redoc_url=None,
+    )
+    app.include_router(health.router)
+    return app
+
+
+app = create_app()

@@ -67,10 +67,26 @@ jobs:
         working-directory: backend/editor
         run: uv run --frozen --no-build ty check ord_editor
 
+      - name: Install dependencies (viewer)
+        working-directory: backend/viewer
+        run: uv sync --frozen --no-build
+
+      - name: ruff (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ruff check ord_viewer/
+
+      - name: ruff format (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ruff format --check ord_viewer/
+
+      - name: ty (viewer)
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build ty check ord_viewer
+
   # Cross-language copy-paste detection (replaces SonarCloud's duplication metric).
   # jscpd is pinned as a frontend/ devDependency; run from the repo root so it scans
-  # backend/editor/ord_editor (Python) and the frontend workspaces' src/ trees (TS/TSX)
-  # per .jscpd.json.
+  # backend/editor/ord_editor and backend/viewer/ord_viewer (Python) and the frontend
+  # workspaces' src/ trees (TS/TSX) per .jscpd.json.
   # Runs on every PR (not path-filtered) so Python-only changes are covered too.
   check_duplication:
     runs-on: ubuntu-latest

@@ -21,10 +21,14 @@ duplication:
 
 check-ruff:
 	uv run --directory backend/editor --frozen --no-build ruff check ord_editor/
+	uv run --directory backend/viewer --frozen --no-build ruff check ord_viewer/
 
 python-formatting:
 	uv run --directory backend/editor --frozen --no-build ruff format ord_editor/
 	uv run --directory backend/editor --frozen --no-build ruff check ord_editor/ --fix
+	uv run --directory backend/viewer --frozen --no-build ruff format ord_viewer/
+	uv run --directory backend/viewer --frozen --no-build ruff check ord_viewer/ --fix
 
 python-checking: check-ruff
 	uv run --directory backend/editor --frozen --no-build ty check ord_editor
+	uv run --directory backend/viewer --frozen --no-build ty check ord_viewer
