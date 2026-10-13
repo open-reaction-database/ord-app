@@ -182,11 +182,17 @@ jobs:
           nohup uv run --directory backend/editor --frozen --no-build uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
           nohup npm --prefix frontend -w apps/editor run dev -- --host 127.0.0.1 --port 5173 > /tmp/ui.log 2>&1 &
           for _ in $(seq 1 60); do
-            curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null && break || sleep 2
+            if curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null; then
+              break
+            fi
+            sleep 2
           done
           curl -sf http://127.0.0.1:8000/service_api/docs > /dev/null || { echo "backend failed"; cat /tmp/backend.log; exit 1; }
           for _ in $(seq 1 30); do
-            curl -sf http://127.0.0.1:5173 > /dev/null && break || sleep 2
+            if curl -sf http://127.0.0.1:5173 > /dev/null; then
+              break
+            fi
+            sleep 2
           done
           curl -sf http://127.0.0.1:5173 > /dev/null || { echo "ui failed"; cat /tmp/ui.log; exit 1; }
           npm --prefix frontend -w apps/editor run test:e2e
