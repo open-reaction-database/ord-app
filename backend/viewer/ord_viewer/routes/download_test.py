@@ -36,9 +36,13 @@ def test_downloads_a_gzipped_dataset(client):
     ]
 
 
+_NOT_FOUND = {"detail": "none of these reactions are in the corpus"}
+
+
 def test_nothing_known_is_not_found(client):
     response = client.post("/api/download", json={"reaction_ids": ["ord-unknown"]})
     assert response.status_code == 404
+    assert response.json() == _NOT_FOUND
 
 
 def test_bounds_the_request(client):
@@ -46,3 +50,10 @@ def test_bounds_the_request(client):
     too_many = [f"ord-{index}" for index in range(1001)]
     response = client.post("/api/download", json={"reaction_ids": too_many})
     assert response.status_code == 422
+
+
+def test_accepts_the_largest_request(client):
+    largest = [f"ord-{index}" for index in range(1000)]
+    response = client.post("/api/download", json={"reaction_ids": largest})
+    assert response.status_code == 404
+    assert response.json() == _NOT_FOUND
