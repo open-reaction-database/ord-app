@@ -1,0 +1,2816 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Open Reaction Database viewer",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "description": "Return the open corpus's fingerprint.\n\nThe fingerprint is a precomputed string, so the handler never blocks the event\nloop and does not queue behind blocking handlers on the threadpool.\n\nArgs:\n    state: The settings and open corpus the lifespan stored on the app.\n\nReturns:\n    The fingerprint of the corpus the process serves.",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets": {
+      "get": {
+        "summary": "List Datasets",
+        "description": "Return every dataset, sorted by name.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The datasets, sorted by name.",
+        "operationId": "list_datasets_api_datasets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DatasetSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Datasets Api Datasets Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}": {
+      "get": {
+        "summary": "Get Dataset",
+        "description": "Return one dataset.\n\nArgs:\n    dataset_id: The dataset to return.\n    state: The settings and open corpus.\n\nReturns:\n    The dataset's summary.\n\nRaises:\n    HTTPException: 404, if the corpus holds no such dataset.",
+        "operationId": "get_dataset_api_datasets__dataset_id__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSummary"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/compounds": {
+      "get": {
+        "summary": "Dataset Compounds",
+        "description": "Return the compounds a dataset's inputs or products use most, most first.\n\nIt is async so a request waits for its search slot on the event loop; the dataset\nlookup, the search, and the molblocks run in worker threads.\n\nArgs:\n    dataset_id: The dataset to count in.\n    state: The settings and open corpus.\n    side: Whether to count the reactions' inputs or their products.\n    limit: The most compounds to return.\n\nReturns:\n    The compounds with a SMILES, by descending count and then by SMILES.\n\nRaises:\n    HTTPException: 404 if the corpus holds no such dataset, 422 or 504 if the\n        search fails.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
+        "operationId": "dataset_compounds_api_datasets__dataset_id__compounds_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "inputs",
+                "products"
+              ],
+              "type": "string",
+              "default": "inputs",
+              "title": "Side"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompoundCount"
+                  },
+                  "title": "Response Dataset Compounds Api Datasets  Dataset Id  Compounds Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The request fails validation (a list of errors), or the query does not compile or names an unknown compound (a message)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorDetail"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrors"
+                    }
+                  ],
+                  "title": "Response 422 Dataset Compounds Api Datasets  Dataset Id  Compounds Get"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Every search slot stayed busy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The search ran past its timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/reactions": {
+      "get": {
+        "summary": "List Reactions",
+        "description": "Return up to 100 reactions, named by repeated id parameters.\n\nArgs:\n    state: The settings and open corpus.\n    reaction_ids: The reactions to return.\n\nReturns:\n    The known reactions, once each, in the order first asked.",
+        "operationId": "list_reactions_api_reactions_get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "maxItems": 100,
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReactionRecord"
+                  },
+                  "title": "Response List Reactions Api Reactions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reactions/{reaction_id}": {
+      "get": {
+        "summary": "Get Reaction",
+        "description": "Return one reaction.\n\nArgs:\n    reaction_id: The reaction to return.\n    state: The settings and open corpus.\n\nReturns:\n    The reaction with its molblocks.\n\nRaises:\n    HTTPException: 404, if the corpus holds no such reaction.",
+        "operationId": "get_reaction_api_reactions__reaction_id__get",
+        "parameters": [
+          {
+            "name": "reaction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reaction Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReactionRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/download": {
+      "post": {
+        "summary": "Download",
+        "description": "Return the known reactions among the IDs as one gzipped Dataset.\n\nArgs:\n    body: The reaction IDs to download.\n    state: The settings and open corpus.\n\nReturns:\n    A gzipped serialized Dataset holding each known reaction once, in the order\n    first asked.\n\nRaises:\n    HTTPException: 404, if the corpus holds none of the reactions.",
+        "operationId": "download_api_download_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownloadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "A gzipped serialized ord.Dataset",
+            "content": {
+              "application/gzip": {}
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search": {
+      "post": {
+        "summary": "Search",
+        "description": "Run one query: reaction IDs for a plain query, a table for an aggregate.\n\nIt is async so a request waits for its search slot on the event loop; the search\nand the shaping of its result run in worker threads.\n\nArgs:\n    body: The query to run.\n    state: The settings, open corpus, and search slots.\n\nReturns:\n    Reaction IDs for a plain query, or a table for an aggregate.\n\nRaises:\n    HTTPException: 422 if the query is invalid, 504 if it times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
+        "operationId": "search_api_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReactionsResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TableResult"
+                    }
+                  ],
+                  "title": "Response Search Api Search Post",
+                  "discriminator": {
+                    "propertyName": "kind",
+                    "mapping": {
+                      "reactions": "#/components/schemas/ReactionsResult",
+                      "table": "#/components/schemas/TableResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The request fails validation (a list of errors), or the query does not compile or names an unknown compound (a message)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorDetail"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrors"
+                    }
+                  ],
+                  "title": "Response 422 Search Api Search Post"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Every search slot stayed busy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The search ran past its timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ask": {
+      "post": {
+        "summary": "Ask",
+        "description": "Translate a question into a query, run it, and describe what it found.\n\nIt is async so a question waits for its search slot on the event loop; the model\ncalls, the search, and the shaping of its result run in worker threads.\n\nArgs:\n    body: The question.\n    state: The settings, open corpus, and search slots.\n    client: The model client.\n\nReturns:\n    The query the question became, a sentence about what it found, and the result.\n\nRaises:\n    HTTPException: 422 if the question cannot be put to the grammar, the model\n        declined it, or its query names an unknown compound; 429 if the model is\n        rate limiting; 502 if the model's query never compiles; 503 if the model\n        cannot be reached; 504 if the search times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
+        "operationId": "ask_api_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The request fails validation (a list of errors), or the question cannot be put to the grammar, the model declined it, or its query names an unknown compound (a message)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorDetail"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrors"
+                    }
+                  ],
+                  "title": "Response 422 Ask Api Ask Post"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Every search slot stayed busy, no API key is configured, or the model could not be reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The search ran past its timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The model is rate limiting the service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The model's query did not compile, and neither did its repair",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Aggregate-Input": {
+        "properties": {
+          "over": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Input",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Input",
+                    "forall": "#/components/schemas/Quantifier-Input",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Input",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Input",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          },
+          "group_by": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Group By"
+          },
+          "measures": {
+            "items": {
+              "$ref": "#/components/schemas/Measure-Input"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Measures"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "measures"
+        ],
+        "title": "Aggregate",
+        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
+      },
+      "Aggregate-Output": {
+        "properties": {
+          "over": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Output",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Output",
+                    "forall": "#/components/schemas/Quantifier-Output",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Output",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Output",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          },
+          "group_by": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Group By"
+          },
+          "measures": {
+            "items": {
+              "$ref": "#/components/schemas/Measure-Output"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Measures"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "measures"
+        ],
+        "title": "Aggregate",
+        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
+      },
+      "And-Input": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "and",
+            "title": "Op"
+          },
+          "clauses": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/And-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Or-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Not-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Quantifier-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Comparison"
+                },
+                {
+                  "$ref": "#/components/schemas/NullCheck"
+                },
+                {
+                  "$ref": "#/components/schemas/Substructure"
+                },
+                {
+                  "$ref": "#/components/schemas/Similarity"
+                },
+                {
+                  "$ref": "#/components/schemas/SameCompound"
+                },
+                {
+                  "$ref": "#/components/schemas/SameParent"
+                },
+                {
+                  "$ref": "#/components/schemas/ReactionSmarts"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "op",
+                "mapping": {
+                  "and": "#/components/schemas/And-Input",
+                  "contains": "#/components/schemas/Comparison",
+                  "ends_with": "#/components/schemas/Comparison",
+                  "eq": "#/components/schemas/Comparison",
+                  "exists": "#/components/schemas/Quantifier-Input",
+                  "forall": "#/components/schemas/Quantifier-Input",
+                  "ge": "#/components/schemas/Comparison",
+                  "gt": "#/components/schemas/Comparison",
+                  "is_null": "#/components/schemas/NullCheck",
+                  "le": "#/components/schemas/Comparison",
+                  "lt": "#/components/schemas/Comparison",
+                  "ne": "#/components/schemas/Comparison",
+                  "not": "#/components/schemas/Not-Input",
+                  "not_null": "#/components/schemas/NullCheck",
+                  "or": "#/components/schemas/Or-Input",
+                  "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                  "same_compound": "#/components/schemas/SameCompound",
+                  "same_parent": "#/components/schemas/SameParent",
+                  "similarity": "#/components/schemas/Similarity",
+                  "starts_with": "#/components/schemas/Comparison",
+                  "substructure": "#/components/schemas/Substructure"
+                }
+              }
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Clauses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clauses"
+        ],
+        "title": "And",
+        "description": "Every clause holds."
+      },
+      "And-Output": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "and",
+            "title": "Op"
+          },
+          "clauses": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/And-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Or-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Not-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Quantifier-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Comparison"
+                },
+                {
+                  "$ref": "#/components/schemas/NullCheck"
+                },
+                {
+                  "$ref": "#/components/schemas/Substructure"
+                },
+                {
+                  "$ref": "#/components/schemas/Similarity"
+                },
+                {
+                  "$ref": "#/components/schemas/SameCompound"
+                },
+                {
+                  "$ref": "#/components/schemas/SameParent"
+                },
+                {
+                  "$ref": "#/components/schemas/ReactionSmarts"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "op",
+                "mapping": {
+                  "and": "#/components/schemas/And-Output",
+                  "contains": "#/components/schemas/Comparison",
+                  "ends_with": "#/components/schemas/Comparison",
+                  "eq": "#/components/schemas/Comparison",
+                  "exists": "#/components/schemas/Quantifier-Output",
+                  "forall": "#/components/schemas/Quantifier-Output",
+                  "ge": "#/components/schemas/Comparison",
+                  "gt": "#/components/schemas/Comparison",
+                  "is_null": "#/components/schemas/NullCheck",
+                  "le": "#/components/schemas/Comparison",
+                  "lt": "#/components/schemas/Comparison",
+                  "ne": "#/components/schemas/Comparison",
+                  "not": "#/components/schemas/Not-Output",
+                  "not_null": "#/components/schemas/NullCheck",
+                  "or": "#/components/schemas/Or-Output",
+                  "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                  "same_compound": "#/components/schemas/SameCompound",
+                  "same_parent": "#/components/schemas/SameParent",
+                  "similarity": "#/components/schemas/Similarity",
+                  "starts_with": "#/components/schemas/Comparison",
+                  "substructure": "#/components/schemas/Substructure"
+                }
+              }
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Clauses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clauses"
+        ],
+        "title": "And",
+        "description": "Every clause holds."
+      },
+      "AskRequest": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AskRequest",
+        "description": "A question in English."
+      },
+      "AskResponse": {
+        "properties": {
+          "query": {
+            "$ref": "#/components/schemas/Query-Output"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReactionsResult"
+              },
+              {
+                "$ref": "#/components/schemas/TableResult"
+              }
+            ],
+            "title": "Result",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "reactions": "#/components/schemas/ReactionsResult",
+                "table": "#/components/schemas/TableResult"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "text",
+          "result"
+        ],
+        "title": "AskResponse",
+        "description": "The query a question became, a sentence about what it found, and the result."
+      },
+      "AuthenticStandardMolblock": {
+        "properties": {
+          "molblock": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Molblock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "molblock"
+        ],
+        "title": "AuthenticStandardMolblock",
+        "description": "A measurement's authentic standard."
+      },
+      "Comparison": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "ne",
+              "lt",
+              "le",
+              "gt",
+              "ge",
+              "contains",
+              "starts_with",
+              "ends_with"
+            ],
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path",
+          "value"
+        ],
+        "title": "Comparison",
+        "description": "A leaf compared against a literal or a resolved compound."
+      },
+      "CompoundCount": {
+        "properties": {
+          "smiles": {
+            "type": "string",
+            "title": "Smiles"
+          },
+          "molblock": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Molblock"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "smiles",
+          "molblock",
+          "count"
+        ],
+        "title": "CompoundCount",
+        "description": "How often one compound appears in a dataset, with a molblock to draw it."
+      },
+      "DatasetSummary": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "reactions": {
+            "type": "integer",
+            "title": "Reactions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "name",
+          "description",
+          "reactions"
+        ],
+        "title": "DatasetSummary",
+        "description": "One dataset in the corpus, from its source file's footer."
+      },
+      "DownloadRequest": {
+        "properties": {
+          "reaction_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Reaction Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reaction_ids"
+        ],
+        "title": "DownloadRequest",
+        "description": "The reactions to download: at most one search's worth."
+      },
+      "ErrorDetail": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorDetail",
+        "description": "The body of an error a route raises itself: a message."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "fingerprint": {
+            "type": "string",
+            "title": "Fingerprint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fingerprint"
+        ],
+        "title": "Health",
+        "description": "The corpus the process serves."
+      },
+      "Measure-Input": {
+        "properties": {
+          "fn": {
+            "type": "string",
+            "enum": [
+              "count",
+              "count_distinct",
+              "sum",
+              "avg",
+              "min",
+              "max"
+            ],
+            "title": "Fn"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/Reduction-Input"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fn",
+          "name"
+        ],
+        "title": "Measure",
+        "description": "One aggregate over the matching rows."
+      },
+      "Measure-Output": {
+        "properties": {
+          "fn": {
+            "type": "string",
+            "enum": [
+              "count",
+              "count_distinct",
+              "sum",
+              "avg",
+              "min",
+              "max"
+            ],
+            "title": "Fn"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/Reduction-Output"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fn",
+          "name"
+        ],
+        "title": "Measure",
+        "description": "One aggregate over the matching rows."
+      },
+      "MeasurementMolblocks": {
+        "properties": {
+          "authentic_standard": {
+            "$ref": "#/components/schemas/AuthenticStandardMolblock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "authentic_standard"
+        ],
+        "title": "MeasurementMolblocks",
+        "description": "The structures one product measurement names."
+      },
+      "Not-Input": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "not",
+            "title": "Op"
+          },
+          "clause": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/And-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Or-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Not-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Quantifier-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Comparison"
+              },
+              {
+                "$ref": "#/components/schemas/NullCheck"
+              },
+              {
+                "$ref": "#/components/schemas/Substructure"
+              },
+              {
+                "$ref": "#/components/schemas/Similarity"
+              },
+              {
+                "$ref": "#/components/schemas/SameCompound"
+              },
+              {
+                "$ref": "#/components/schemas/SameParent"
+              },
+              {
+                "$ref": "#/components/schemas/ReactionSmarts"
+              }
+            ],
+            "title": "Clause",
+            "discriminator": {
+              "propertyName": "op",
+              "mapping": {
+                "and": "#/components/schemas/And-Input",
+                "contains": "#/components/schemas/Comparison",
+                "ends_with": "#/components/schemas/Comparison",
+                "eq": "#/components/schemas/Comparison",
+                "exists": "#/components/schemas/Quantifier-Input",
+                "forall": "#/components/schemas/Quantifier-Input",
+                "ge": "#/components/schemas/Comparison",
+                "gt": "#/components/schemas/Comparison",
+                "is_null": "#/components/schemas/NullCheck",
+                "le": "#/components/schemas/Comparison",
+                "lt": "#/components/schemas/Comparison",
+                "ne": "#/components/schemas/Comparison",
+                "not": "#/components/schemas/Not-Input",
+                "not_null": "#/components/schemas/NullCheck",
+                "or": "#/components/schemas/Or-Input",
+                "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                "same_compound": "#/components/schemas/SameCompound",
+                "same_parent": "#/components/schemas/SameParent",
+                "similarity": "#/components/schemas/Similarity",
+                "starts_with": "#/components/schemas/Comparison",
+                "substructure": "#/components/schemas/Substructure"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clause"
+        ],
+        "title": "Not",
+        "description": "The clause does not hold."
+      },
+      "Not-Output": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "not",
+            "title": "Op"
+          },
+          "clause": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/And-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Or-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Not-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Quantifier-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Comparison"
+              },
+              {
+                "$ref": "#/components/schemas/NullCheck"
+              },
+              {
+                "$ref": "#/components/schemas/Substructure"
+              },
+              {
+                "$ref": "#/components/schemas/Similarity"
+              },
+              {
+                "$ref": "#/components/schemas/SameCompound"
+              },
+              {
+                "$ref": "#/components/schemas/SameParent"
+              },
+              {
+                "$ref": "#/components/schemas/ReactionSmarts"
+              }
+            ],
+            "title": "Clause",
+            "discriminator": {
+              "propertyName": "op",
+              "mapping": {
+                "and": "#/components/schemas/And-Output",
+                "contains": "#/components/schemas/Comparison",
+                "ends_with": "#/components/schemas/Comparison",
+                "eq": "#/components/schemas/Comparison",
+                "exists": "#/components/schemas/Quantifier-Output",
+                "forall": "#/components/schemas/Quantifier-Output",
+                "ge": "#/components/schemas/Comparison",
+                "gt": "#/components/schemas/Comparison",
+                "is_null": "#/components/schemas/NullCheck",
+                "le": "#/components/schemas/Comparison",
+                "lt": "#/components/schemas/Comparison",
+                "ne": "#/components/schemas/Comparison",
+                "not": "#/components/schemas/Not-Output",
+                "not_null": "#/components/schemas/NullCheck",
+                "or": "#/components/schemas/Or-Output",
+                "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                "same_compound": "#/components/schemas/SameCompound",
+                "same_parent": "#/components/schemas/SameParent",
+                "similarity": "#/components/schemas/Similarity",
+                "starts_with": "#/components/schemas/Comparison",
+                "substructure": "#/components/schemas/Substructure"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clause"
+        ],
+        "title": "Not",
+        "description": "The clause does not hold."
+      },
+      "NullCheck": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "is_null",
+              "not_null"
+            ],
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path"
+        ],
+        "title": "NullCheck",
+        "description": "Whether the source recorded the leaf at all."
+      },
+      "Or-Input": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "or",
+            "title": "Op"
+          },
+          "clauses": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/And-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Or-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Not-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Quantifier-Input"
+                },
+                {
+                  "$ref": "#/components/schemas/Comparison"
+                },
+                {
+                  "$ref": "#/components/schemas/NullCheck"
+                },
+                {
+                  "$ref": "#/components/schemas/Substructure"
+                },
+                {
+                  "$ref": "#/components/schemas/Similarity"
+                },
+                {
+                  "$ref": "#/components/schemas/SameCompound"
+                },
+                {
+                  "$ref": "#/components/schemas/SameParent"
+                },
+                {
+                  "$ref": "#/components/schemas/ReactionSmarts"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "op",
+                "mapping": {
+                  "and": "#/components/schemas/And-Input",
+                  "contains": "#/components/schemas/Comparison",
+                  "ends_with": "#/components/schemas/Comparison",
+                  "eq": "#/components/schemas/Comparison",
+                  "exists": "#/components/schemas/Quantifier-Input",
+                  "forall": "#/components/schemas/Quantifier-Input",
+                  "ge": "#/components/schemas/Comparison",
+                  "gt": "#/components/schemas/Comparison",
+                  "is_null": "#/components/schemas/NullCheck",
+                  "le": "#/components/schemas/Comparison",
+                  "lt": "#/components/schemas/Comparison",
+                  "ne": "#/components/schemas/Comparison",
+                  "not": "#/components/schemas/Not-Input",
+                  "not_null": "#/components/schemas/NullCheck",
+                  "or": "#/components/schemas/Or-Input",
+                  "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                  "same_compound": "#/components/schemas/SameCompound",
+                  "same_parent": "#/components/schemas/SameParent",
+                  "similarity": "#/components/schemas/Similarity",
+                  "starts_with": "#/components/schemas/Comparison",
+                  "substructure": "#/components/schemas/Substructure"
+                }
+              }
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Clauses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clauses"
+        ],
+        "title": "Or",
+        "description": "At least one clause holds."
+      },
+      "Or-Output": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "or",
+            "title": "Op"
+          },
+          "clauses": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/And-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Or-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Not-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Quantifier-Output"
+                },
+                {
+                  "$ref": "#/components/schemas/Comparison"
+                },
+                {
+                  "$ref": "#/components/schemas/NullCheck"
+                },
+                {
+                  "$ref": "#/components/schemas/Substructure"
+                },
+                {
+                  "$ref": "#/components/schemas/Similarity"
+                },
+                {
+                  "$ref": "#/components/schemas/SameCompound"
+                },
+                {
+                  "$ref": "#/components/schemas/SameParent"
+                },
+                {
+                  "$ref": "#/components/schemas/ReactionSmarts"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "op",
+                "mapping": {
+                  "and": "#/components/schemas/And-Output",
+                  "contains": "#/components/schemas/Comparison",
+                  "ends_with": "#/components/schemas/Comparison",
+                  "eq": "#/components/schemas/Comparison",
+                  "exists": "#/components/schemas/Quantifier-Output",
+                  "forall": "#/components/schemas/Quantifier-Output",
+                  "ge": "#/components/schemas/Comparison",
+                  "gt": "#/components/schemas/Comparison",
+                  "is_null": "#/components/schemas/NullCheck",
+                  "le": "#/components/schemas/Comparison",
+                  "lt": "#/components/schemas/Comparison",
+                  "ne": "#/components/schemas/Comparison",
+                  "not": "#/components/schemas/Not-Output",
+                  "not_null": "#/components/schemas/NullCheck",
+                  "or": "#/components/schemas/Or-Output",
+                  "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                  "same_compound": "#/components/schemas/SameCompound",
+                  "same_parent": "#/components/schemas/SameParent",
+                  "similarity": "#/components/schemas/Similarity",
+                  "starts_with": "#/components/schemas/Comparison",
+                  "substructure": "#/components/schemas/Substructure"
+                }
+              }
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Clauses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "clauses"
+        ],
+        "title": "Or",
+        "description": "At least one clause holds."
+      },
+      "Order-Input": {
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/Reduction-Input"
+              }
+            ],
+            "title": "Key"
+          },
+          "descending": {
+            "type": "boolean",
+            "title": "Descending",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Order",
+        "description": "How to sort the result."
+      },
+      "Order-Output": {
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/Reduction-Output"
+              }
+            ],
+            "title": "Key"
+          },
+          "descending": {
+            "type": "boolean",
+            "title": "Descending",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Order",
+        "description": "How to sort the result."
+      },
+      "OutcomeMolblocks": {
+        "properties": {
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ProductMolblocks"
+            },
+            "type": "array",
+            "title": "Products"
+          }
+        },
+        "type": "object",
+        "required": [
+          "products"
+        ],
+        "title": "OutcomeMolblocks",
+        "description": "One outcome's products."
+      },
+      "ProductMolblocks": {
+        "properties": {
+          "molblock": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Molblock"
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/MeasurementMolblocks"
+            },
+            "type": "array",
+            "title": "Measurements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "molblock",
+          "measurements"
+        ],
+        "title": "ProductMolblocks",
+        "description": "One product and its measurements' standards."
+      },
+      "Quantifier-Input": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "exists",
+              "forall"
+            ],
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "where": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/And-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Or-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Not-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Quantifier-Input"
+              },
+              {
+                "$ref": "#/components/schemas/Comparison"
+              },
+              {
+                "$ref": "#/components/schemas/NullCheck"
+              },
+              {
+                "$ref": "#/components/schemas/Substructure"
+              },
+              {
+                "$ref": "#/components/schemas/Similarity"
+              },
+              {
+                "$ref": "#/components/schemas/SameCompound"
+              },
+              {
+                "$ref": "#/components/schemas/SameParent"
+              },
+              {
+                "$ref": "#/components/schemas/ReactionSmarts"
+              }
+            ],
+            "title": "Where",
+            "discriminator": {
+              "propertyName": "op",
+              "mapping": {
+                "and": "#/components/schemas/And-Input",
+                "contains": "#/components/schemas/Comparison",
+                "ends_with": "#/components/schemas/Comparison",
+                "eq": "#/components/schemas/Comparison",
+                "exists": "#/components/schemas/Quantifier-Input",
+                "forall": "#/components/schemas/Quantifier-Input",
+                "ge": "#/components/schemas/Comparison",
+                "gt": "#/components/schemas/Comparison",
+                "is_null": "#/components/schemas/NullCheck",
+                "le": "#/components/schemas/Comparison",
+                "lt": "#/components/schemas/Comparison",
+                "ne": "#/components/schemas/Comparison",
+                "not": "#/components/schemas/Not-Input",
+                "not_null": "#/components/schemas/NullCheck",
+                "or": "#/components/schemas/Or-Input",
+                "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                "same_compound": "#/components/schemas/SameCompound",
+                "same_parent": "#/components/schemas/SameParent",
+                "similarity": "#/components/schemas/Similarity",
+                "starts_with": "#/components/schemas/Comparison",
+                "substructure": "#/components/schemas/Substructure"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path",
+          "where"
+        ],
+        "title": "Quantifier",
+        "description": "Some, or every, element at a repeated level satisfies ``where``.\n\nPaths inside ``where`` are relative to the element bound here, which is what lets a\nsingle component be required to satisfy several conditions at once."
+      },
+      "Quantifier-Output": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "exists",
+              "forall"
+            ],
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "where": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/And-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Or-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Not-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Quantifier-Output"
+              },
+              {
+                "$ref": "#/components/schemas/Comparison"
+              },
+              {
+                "$ref": "#/components/schemas/NullCheck"
+              },
+              {
+                "$ref": "#/components/schemas/Substructure"
+              },
+              {
+                "$ref": "#/components/schemas/Similarity"
+              },
+              {
+                "$ref": "#/components/schemas/SameCompound"
+              },
+              {
+                "$ref": "#/components/schemas/SameParent"
+              },
+              {
+                "$ref": "#/components/schemas/ReactionSmarts"
+              }
+            ],
+            "title": "Where",
+            "discriminator": {
+              "propertyName": "op",
+              "mapping": {
+                "and": "#/components/schemas/And-Output",
+                "contains": "#/components/schemas/Comparison",
+                "ends_with": "#/components/schemas/Comparison",
+                "eq": "#/components/schemas/Comparison",
+                "exists": "#/components/schemas/Quantifier-Output",
+                "forall": "#/components/schemas/Quantifier-Output",
+                "ge": "#/components/schemas/Comparison",
+                "gt": "#/components/schemas/Comparison",
+                "is_null": "#/components/schemas/NullCheck",
+                "le": "#/components/schemas/Comparison",
+                "lt": "#/components/schemas/Comparison",
+                "ne": "#/components/schemas/Comparison",
+                "not": "#/components/schemas/Not-Output",
+                "not_null": "#/components/schemas/NullCheck",
+                "or": "#/components/schemas/Or-Output",
+                "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                "same_compound": "#/components/schemas/SameCompound",
+                "same_parent": "#/components/schemas/SameParent",
+                "similarity": "#/components/schemas/Similarity",
+                "starts_with": "#/components/schemas/Comparison",
+                "substructure": "#/components/schemas/Substructure"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path",
+          "where"
+        ],
+        "title": "Quantifier",
+        "description": "Some, or every, element at a repeated level satisfies ``where``.\n\nPaths inside ``where`` are relative to the element bound here, which is what lets a\nsingle component be required to satisfy several conditions at once."
+      },
+      "Query-Input": {
+        "properties": {
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Input",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Input",
+                    "forall": "#/components/schemas/Quantifier-Input",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Input",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Input",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          },
+          "aggregate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Aggregate-Input"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "order_by": {
+            "items": {
+              "$ref": "#/components/schemas/Order-Input"
+            },
+            "type": "array",
+            "title": "Order By"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Query",
+        "description": "A whole query: which reactions, optionally grouped and measured."
+      },
+      "Query-Output": {
+        "properties": {
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Output",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Output",
+                    "forall": "#/components/schemas/Quantifier-Output",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Output",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Output",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          },
+          "aggregate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Aggregate-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "order_by": {
+            "items": {
+              "$ref": "#/components/schemas/Order-Output"
+            },
+            "type": "array",
+            "title": "Order By"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Query",
+        "description": "A whole query: which reactions, optionally grouped and measured."
+      },
+      "ReactionMolblocks": {
+        "properties": {
+          "inputs": {
+            "additionalProperties": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Inputs"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/OutcomeMolblocks"
+            },
+            "type": "array",
+            "title": "Outcomes"
+          },
+          "workups": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Workups"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs",
+          "outcomes",
+          "workups"
+        ],
+        "title": "ReactionMolblocks",
+        "description": "A molblock for each compound slot of a reaction; None where none reads."
+      },
+      "ReactionRecord": {
+        "properties": {
+          "reaction_id": {
+            "type": "string",
+            "title": "Reaction Id"
+          },
+          "dataset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Id"
+          },
+          "binpb": {
+            "type": "string",
+            "title": "Binpb"
+          },
+          "molblocks": {
+            "$ref": "#/components/schemas/ReactionMolblocks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reaction_id",
+          "dataset_id",
+          "binpb",
+          "molblocks"
+        ],
+        "title": "ReactionRecord",
+        "description": "One reaction as the editor returns it: the serialized proto and molblocks."
+      },
+      "ReactionSmarts": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "reaction_smarts",
+            "title": "Op"
+          },
+          "smarts": {
+            "type": "string",
+            "title": "Smarts"
+          },
+          "chirality": {
+            "type": "boolean",
+            "title": "Chirality",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "smarts"
+        ],
+        "title": "ReactionSmarts",
+        "description": "The reaction matches a reaction SMARTS, each template on a molecule of its own.\n\nEach reactant template has to match an input component whose role is ``REACTANT``,\neach product template a product, and each agent template an input component in any\nother role. Every template has to match, and two templates on one side have to\nmatch two different molecules: ``C(=O)O.N`` names an acid and an amine, and a\nBoc-protected amine holding both groups is not that, even recorded twice. Grouping\nwith parentheses, ``(C(=O)O.N)``, makes one template of both pieces, matched within\none molecule. The RDKit cartridge's ``@>`` accepts any one template per side, which\nfor a two-template query returns several times the reactions the query describes.\nAtom maps are ignored, as ``@>`` ignores them, so this says which molecules took\npart and not which atoms changed. ``chirality`` applies to every template, as it\ndoes to a ``substructure``."
+      },
+      "ReactionsResult": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "reactions",
+            "title": "Kind",
+            "default": "reactions"
+          },
+          "reaction_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Reaction Ids",
+            "description": "The IDs of the matching reactions, at most 1,000"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated",
+            "description": "True when the corpus's bound of 1,000 rows may have cut the answer short"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "reaction_ids",
+          "truncated"
+        ],
+        "title": "ReactionsResult",
+        "description": "A plain query's answer: reaction IDs to fetch a page at a time."
+      },
+      "Reduction-Input": {
+        "properties": {
+          "reduce": {
+            "type": "string",
+            "enum": [
+              "min",
+              "max",
+              "avg",
+              "sum",
+              "count"
+            ],
+            "title": "Reduce"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Input"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Input",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Input",
+                    "forall": "#/components/schemas/Quantifier-Input",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Input",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Input",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reduce",
+          "path"
+        ],
+        "title": "Reduction",
+        "description": "One value per reaction, reduced from a path that crosses a repeated level.\n\nAn ordering key and an aggregate's argument both have to be scalar, which leaves\n\"the highest-yielding reactions\" unwritable: a yield lives under outcomes, products,\nand measurements, so the path resolves to a list rather than a number. This reduces\nthat list to the one value the reaction is judged by, leaving the aggregate to\ncombine those across reactions.\n\n``where`` selects which elements are reduced, and is what separates \"the highest\nyield\" from \"the highest percentage anything was measured at\": a percentage is\nrecorded for selectivity and purity too, so a reduction over the bare path answers\na broader question than the one asked. Its paths are relative to the element, as\nthey are inside a quantifier, and the element is the deepest repeated level the\npath crosses -- for\n``outcomes.products.measurements.percentage.value`` that is a measurement, so\n``type`` there means the measurement's own.\n\nAttributes:\n    reduce: How to reduce the list. ``count`` counts the values that are present.\n    path: A dotted path crossing at least one repeated level.\n    where: Selects the elements to reduce; all of them when absent."
+      },
+      "Reduction-Output": {
+        "properties": {
+          "reduce": {
+            "type": "string",
+            "enum": [
+              "min",
+              "max",
+              "avg",
+              "sum",
+              "count"
+            ],
+            "title": "Reduce"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/And-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Or-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Not-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Quantifier-Output"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Comparison"
+                  },
+                  {
+                    "$ref": "#/components/schemas/NullCheck"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Substructure"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Similarity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameCompound"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SameParent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReactionSmarts"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "op",
+                  "mapping": {
+                    "and": "#/components/schemas/And-Output",
+                    "contains": "#/components/schemas/Comparison",
+                    "ends_with": "#/components/schemas/Comparison",
+                    "eq": "#/components/schemas/Comparison",
+                    "exists": "#/components/schemas/Quantifier-Output",
+                    "forall": "#/components/schemas/Quantifier-Output",
+                    "ge": "#/components/schemas/Comparison",
+                    "gt": "#/components/schemas/Comparison",
+                    "is_null": "#/components/schemas/NullCheck",
+                    "le": "#/components/schemas/Comparison",
+                    "lt": "#/components/schemas/Comparison",
+                    "ne": "#/components/schemas/Comparison",
+                    "not": "#/components/schemas/Not-Output",
+                    "not_null": "#/components/schemas/NullCheck",
+                    "or": "#/components/schemas/Or-Output",
+                    "reaction_smarts": "#/components/schemas/ReactionSmarts",
+                    "same_compound": "#/components/schemas/SameCompound",
+                    "same_parent": "#/components/schemas/SameParent",
+                    "similarity": "#/components/schemas/Similarity",
+                    "starts_with": "#/components/schemas/Comparison",
+                    "substructure": "#/components/schemas/Substructure"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reduce",
+          "path"
+        ],
+        "title": "Reduction",
+        "description": "One value per reaction, reduced from a path that crosses a repeated level.\n\nAn ordering key and an aggregate's argument both have to be scalar, which leaves\n\"the highest-yielding reactions\" unwritable: a yield lives under outcomes, products,\nand measurements, so the path resolves to a list rather than a number. This reduces\nthat list to the one value the reaction is judged by, leaving the aggregate to\ncombine those across reactions.\n\n``where`` selects which elements are reduced, and is what separates \"the highest\nyield\" from \"the highest percentage anything was measured at\": a percentage is\nrecorded for selectivity and purity too, so a reduction over the bare path answers\na broader question than the one asked. Its paths are relative to the element, as\nthey are inside a quantifier, and the element is the deepest repeated level the\npath crosses -- for\n``outcomes.products.measurements.percentage.value`` that is a measurement, so\n``type`` there means the measurement's own.\n\nAttributes:\n    reduce: How to reduce the list. ``count`` counts the values that are present.\n    path: A dotted path crossing at least one repeated level.\n    where: Selects the elements to reduce; all of them when absent."
+      },
+      "SameCompound": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "same_compound",
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "smiles": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smiles"
+          },
+          "compound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compound"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path"
+        ],
+        "title": "SameCompound",
+        "description": "The element's structure is the same compound, however either was drawn.\n\nAn ``eq`` on a ``smiles`` compares spellings, and two drawings of one reagent are\nunequal: acetic acid and acetate, an amine and its ammonium, a 2-pyridone and its\n2-hydroxypyridine tautomer. This compares the ``mol_hash`` the structures artifact\nderives, which ignores protonation state, tautomer, and atom-map labels, so those\nmatch. Fragments and stereochemistry are not ignored: sodium acetate stays distinct\nfrom acetic acid, and enantiomers from each other.\n\n``path`` names a compound's ``smiles``. The query is a SMILES, or a compound name\nresolved at execution; exactly one is given."
+      },
+      "SameParent": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "same_parent",
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "smiles": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smiles"
+          },
+          "compound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compound"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path"
+        ],
+        "title": "SameParent",
+        "description": "The element's structure is the same compound once counterions are set aside.\n\nWhat ``same_compound`` ignores, this ignores too, and the salt a reagent was sold\nas besides: sodium acetate matches acetic acid, and triethylamine hydrochloride\nmatches triethylamine. Reagents whose parents differ still differ, so sodium\ncarbonate does not match sodium acetate; reagents that *are* the salt are left\nwhole, so sodium hydride does not match hydrogen and palladium acetate does not\nmatch acetic acid.\n\nIt is the looser question of the two, and the looseness is the point: sodium and\npotassium carbonate share a parent and match here, which is right for \"which\nreactions used carbonate\" and wrong for a question about the sodium. Ask\n``same_compound`` for that one.\n\nOnly the counterions RDKit recognizes are set aside -- the halides, lithium,\nsodium, potassium, calcium, magnesium, and the usual acid counterions. A salt of\nsomething else, cesium carbonate among them, is left whole and matches only itself.\n\n``path`` names a compound's ``smiles``. The query is a SMILES, or a compound name\nresolved at execution; exactly one is given."
+      },
+      "SearchRequest": {
+        "properties": {
+          "query": {
+            "$ref": "#/components/schemas/Query-Input"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "SearchRequest",
+        "description": "One query in the search grammar, as the form and /ask both produce."
+      },
+      "Similarity": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "similarity",
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "smiles": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smiles"
+          },
+          "compound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compound"
+          },
+          "threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Threshold"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path",
+          "threshold"
+        ],
+        "title": "Similarity",
+        "description": "The element's structure is Tanimoto-similar to the query molecule.\n\nSimilarity is defined on the Morgan fingerprints in the structures artifact, so\nthe screen is the whole answer and no verification step exists. ``path`` names a\ncompound's ``smiles``. The query is a SMILES, or a compound name resolved at\nexecution; exactly one is given."
+      },
+      "Substructure": {
+        "properties": {
+          "op": {
+            "type": "string",
+            "const": "substructure",
+            "title": "Op"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "smarts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smarts"
+          },
+          "compound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compound"
+          },
+          "chirality": {
+            "type": "boolean",
+            "title": "Chirality",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op",
+          "path"
+        ],
+        "title": "Substructure",
+        "description": "The element's structure contains the query as a subgraph.\n\n``path`` names a compound's ``smiles``. The query is a SMARTS pattern, or a\ncompound name resolved to a molecule at execution; exactly one is given.\n\nA stereocenter drawn in the query is respected, as RDKit respects it: a pattern\ndrawn as one enantiomer matches that enantiomer, not its mirror image or the same\nmolecule recorded without stereo. ``chirality`` false ignores stereocenters, for a\nquestion about the molecule whatever its configuration. A query with no\nstereocenters matches the same structures either way."
+      },
+      "TableResult": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "table",
+            "title": "Kind",
+            "default": "table"
+          },
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "items": {},
+              "type": "array"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Rows",
+            "description": "One row per group, with a cell for each column in order; at most 1,000"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated",
+            "description": "True when the corpus's bound of 1,000 rows may have cut the answer short"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "columns",
+          "rows",
+          "truncated"
+        ],
+        "title": "TableResult",
+        "description": "An aggregate's answer: its group and measure columns; bytes cells are base64."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ValidationErrorItem": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationErrorItem",
+        "description": "One way a request fails validation, as in FastAPI's own ValidationError."
+      },
+      "ValidationErrors": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationErrorItem"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ValidationErrors",
+        "description": "The body FastAPI answers 422 with when the request fails validation."
+      },
+      "Value": {
+        "properties": {
+          "literal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Literal"
+          },
+          "compound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compound"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Value",
+        "description": "A comparison operand: a literal, or a compound to resolve and bind."
+      }
+    }
+  }
+}
