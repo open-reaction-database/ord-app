@@ -19,8 +19,8 @@ import '@open-reaction-database/ui/theme/global.scss';
 import { AppRoot } from './core/AppRoot.tsx';
 import { Buffer } from 'buffer'; // NOSONAR: the npm polyfill, for browser code; node:buffer is a Node builtin
 
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
+// Node's Buffer and global, which some dependencies read as they load, csv-parse's Buffer
+// among them. Set here, before the lazily loaded routes import those dependencies.
 globalThis.global ||= globalThis;
 globalThis.Buffer = Buffer;
 

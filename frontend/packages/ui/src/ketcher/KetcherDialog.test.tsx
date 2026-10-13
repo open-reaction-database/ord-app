@@ -1,0 +1,143 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import type * as ReactNS from 'react';
+import { renderWithMantine } from '#testing/renderWithMantine.tsx';
+import { KetcherDialog } from './KetcherDialog.tsx';
+import type { StructureDialogProps } from './structure.types.ts';
+
+// Ketcher's editor needs a WASM struct service and a canvas, which happy-dom lacks. The
+// stub keeps the API the dialog relies on (onInit, setMolecule, and the getters), which a
+// Ketcher upgrade could break, and hands each mount an instance of its own, as Ketcher does.
+function createInstance() {
+  return {
+    setMolecule: vi.fn((_structure: string) => Promise.resolve()),
+    getMolfile: vi.fn(() => Promise.resolve('MOLFILE')),
+    getSmiles: vi.fn(() => Promise.resolve('SMILES')),
+    getSmarts: vi.fn(() => Promise.resolve('SMARTS')),
+  };
+}
+
+type Instance = ReturnType<typeof createInstance>;
+
+const instances = vi.hoisted((): Array<Instance> => []);
+
+function latest(): Instance {
+  return instances[instances.length - 1];
+}
+
+vi.mock('ketcher-standalone', () => ({
+  StandaloneStructServiceProvider: class {},
+}));
+
+vi.mock('ketcher-react', async () => {
+  const React = (await vi.importActual('react')) as typeof ReactNS;
+  return {
+    // Calls the host's onInit once per mount, as Ketcher does when it is ready.
+    Editor: (props: Readonly<{ onInit?: (instance: Instance) => void }>) => {
+      React.useEffect(() => {
+        const instance = createInstance();
+        instances.push(instance);
+        props.onInit?.(instance);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- once per mount, as Ketcher does
+      }, []);
+      return React.createElement('div', { 'data-testid': 'ketcher-editor' });
+    },
+  };
+});
+
+vi.mock('ketcher-react/dist/index.css', () => ({}));
+
+function props(overrides: Partial<StructureDialogProps> = {}): StructureDialogProps {
+  return {
+    opened: true,
+    onClose: vi.fn(),
+    onSave: vi.fn(),
+    initial: 'CCO',
+    format: 'molfile',
+    ...overrides,
+  };
+}
+
+describe('KetcherDialog', () => {
+  beforeEach(() => {
+    instances.length = 0;
+  });
+
+  it('loads the initial structure once Ketcher initializes', async () => {
+    renderWithMantine(<KetcherDialog {...props()} />);
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCO'));
+  });
+
+  it('loads the initial structure into each opening’s Ketcher, and only into it', async () => {
+    const { rerender, queryByTestId } = renderWithMantine(
+      <KetcherDialog {...props()} />,
+    );
+    const close = async () => {
+      rerender(<KetcherDialog {...props({ opened: false })} />);
+      await waitFor(() =>
+        expect(queryByTestId('ketcher-editor')).not.toBeInTheDocument(),
+      );
+    };
+    await waitFor(() => expect(instances[0].setMolecule).toHaveBeenCalledWith('CCO'));
+    await close();
+    rerender(<KetcherDialog {...props()} />);
+    await waitFor(() => expect(instances[1].setMolecule).toHaveBeenCalledWith('CCO'));
+    await close();
+    rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+    await waitFor(() => expect(instances[2].setMolecule).toHaveBeenCalledWith('CCN'));
+    // The modal unmounts Ketcher while closed, so an earlier instance is never used again.
+    expect(instances[0].setMolecule).toHaveBeenCalledTimes(1);
+    expect(instances[1].setMolecule).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads a new initial structure while open', async () => {
+    const { rerender } = renderWithMantine(<KetcherDialog {...props()} />);
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCO'));
+    rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenLastCalledWith('CCN'));
+  });
+
+  it.each([
+    ['molfile', 'MOLFILE', 'getMolfile'],
+    ['smiles', 'SMILES', 'getSmiles'],
+    ['smarts', 'SMARTS', 'getSmarts'],
+  ] as const)('saves the drawing as %s and closes', async (format, saved, getter) => {
+    const onSave = vi.fn();
+    const onClose = vi.fn();
+    const { getByRole } = renderWithMantine(
+      <KetcherDialog {...props({ format, onSave, onClose })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() => {
+      expect(latest()[getter]).toHaveBeenCalled();
+      expect(onSave).toHaveBeenCalledWith(saved);
+      expect(onClose).toHaveBeenCalled();
+    });
+  });
+
+  it('shows the host’s fields beside the buttons', () => {
+    const { getByText } = renderWithMantine(
+      <KetcherDialog {...props()}>
+        <span>Details field</span>
+      </KetcherDialog>,
+    );
+    expect(getByText('Details field')).toBeInTheDocument();
+  });
+});

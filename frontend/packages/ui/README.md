@@ -2,9 +2,9 @@
 
 The theme and components that the Open Reaction Database web apps share: the Mantine theme, the global
 stylesheet, icons, display primitives and form controls, the reaction model, the reaction view with its
-drawer, and the page shell. Apps import it only through the subpaths in its `package.json` `exports`
+drawer, the page shell, and a Ketcher structure dialog. Apps import it only through the subpaths in its `package.json` `exports`
 (`@open-reaction-database/ui/theme`, `…/display`, `…/reaction`, `…/reaction/model`, `…/reaction/previews`,
-`…/shell`, `…/testing`), never by a path into `src/`. Each app's Vite build compiles it from TypeScript
+`…/shell`, `…/ketcher`, `…/testing`), never by a path into `src/`. Each app's Vite build compiles it from TypeScript
 source; it has no build step of its own and is not published.
 
 ## What a host provides
@@ -21,3 +21,6 @@ source; it has no build step of its own and is not published.
 - A `<ReactionDetailsSidebar />` inside that provider, which shows the drawer forms the view's buttons
   open; without it, those buttons open nothing.
 - `wouter`, for the page shell's breadcrumbs, which link through the host's router.
+- For `@open-reaction-database/ui/ketcher`: `define: { 'process.env': {} }` in its Vite config, since
+  Ketcher reads `process.env`. `StructureDialog` installs the `global` and `Buffer` Ketcher's modules
+  expect, and loads Ketcher the first time it opens.

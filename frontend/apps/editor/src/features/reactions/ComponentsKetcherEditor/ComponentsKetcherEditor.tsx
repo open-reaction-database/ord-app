@@ -13,106 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Grid, Modal, TextInput } from '@mantine/core';
-import { Editor } from 'ketcher-react';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { StandaloneStructServiceProvider } from 'ketcher-standalone';
-import 'ketcher-react/dist/index.css';
-import classes from './componentsKetcherEditor.module.scss';
-import type { Ketcher } from 'ketcher-core';
-import { useEffect, useState } from 'react';
+import { TextInput } from '@mantine/core';
 import { useField } from '@mantine/form';
+import { useEffect } from 'react';
+import { StructureDialog } from '@open-reaction-database/ui/ketcher';
 import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
 
-const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
-
-const structServiceProvider = new StandaloneStructServiceProvider();
-
+/** The editor's molecule editor: Ketcher, saving a molfile with the drawing's details. */
 export function ComponentsKetcherEditor({
   opened,
   onClose,
   identifier,
   onSave,
 }: Readonly<MoleculeEditorProps>) {
-  const [ketcherInstance, setKetcherInstance] = useState<Ketcher | null>(null);
-  const initialValue = identifier?.details || 'Drawn with Ketcher';
+  const initialDetails = identifier?.details || 'Drawn with Ketcher';
   const { getInputProps, getValue, setValue } = useField({
     mode: 'controlled',
-    initialValue: initialValue,
+    initialValue: initialDetails,
   });
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [setValue, initialValue]);
-
-  useEffect(() => {
-    if (ketcherInstance && identifier) {
-      ketcherInstance.setMolecule(identifier.value ?? '');
-    }
-  }, [identifier, ketcherInstance]);
-
-  useEffect(() => {
-    if (ketcherInstance && !opened) {
-      ketcherInstance.setMolecule('');
-    }
-  }, [ketcherInstance, opened]);
-
-  const handleSave = () => {
-    if (ketcherInstance) {
-      ketcherInstance.getMolfile().then(molfile => {
-        const details = getValue();
-        onSave({ value: molfile, details });
-        onClose();
-      });
-    }
-  };
+    setValue(initialDetails);
+  }, [setValue, initialDetails]);
 
   return (
-    <Modal
+    <StructureDialog
       opened={opened}
       onClose={onClose}
-      classNames={{ content: classes.wrapper, body: classes.body }}
-      withCloseButton={false}
+      initial={identifier?.value ?? ''}
+      format="molfile"
+      onSave={value => onSave({ value, details: getValue() })}
     >
-      <div className={classes.editorWrapper}>
-        <Editor
-          structServiceProvider={structServiceProvider}
-          staticResourcesUrl={import.meta.env.BASE_URL as string}
-          onInit={ketcher => {
-            setKetcherInstance(ketcher);
-            // Ketcher EXPECTS global object to have ketcher variable, otherwise it won't work
-            appWindow.ketcher = ketcher;
-          }}
-          errorHandler={console.error}
-        />
-      </div>
-      <Grid
-        className={classes.actions}
-        align="flex-end"
-      >
-        <Grid.Col span={6}>
-          <TextInput
-            placeholder="Details"
-            label="Details"
-            {...getInputProps()}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <Flex
-            gap="sm"
-            justify="flex-end"
-          >
-            <Button
-              variant="default"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save</Button>
-          </Flex>
-        </Grid.Col>
-      </Grid>
-    </Modal>
+      <TextInput
+        placeholder="Details"
+        label="Details"
+        {...getInputProps()}
+      />
+    </StructureDialog>
   );
 }
