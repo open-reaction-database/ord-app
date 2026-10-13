@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { fromBinary } from '@bufbuild/protobuf';
+import { base64Decode } from '@bufbuild/protobuf/wire';
+import {
+  type Reaction,
+  ReactionSchema,
+} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb.js';
 import type { APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -38,9 +44,16 @@ async function call<T>(
   return (await response.json()) as T;
 }
 
-/** Creates a group, a dataset in it, and the fixture reaction, as the e2e dev user. */
+/**
+ * Creates a group, a dataset in it, and a fixture reaction, as the e2e dev user.
+ *
+ * Args:
+ *   request: The Playwright request context.
+ *   fixture: The fixture's file name under `fixtures/`.
+ */
 export async function seedReaction(
   request: APIRequestContext,
+  fixture = 'reaction.pbtxt',
 ): Promise<{ groupId: number; datasetId: number; reactionId: number }> {
   await call(request, 'post', '/auth/jit-provisioning', {
     data: { access_token: TOKEN, id_token: TOKEN },
@@ -63,16 +76,27 @@ export async function seedReaction(
     {
       multipart: {
         file: {
-          name: 'reaction.pbtxt',
+          name: fixture,
           mimeType: 'text/plain',
-          buffer: readFileSync(
-            path.join(import.meta.dirname, 'fixtures', 'reaction.pbtxt'),
-          ),
+          buffer: readFileSync(path.join(import.meta.dirname, 'fixtures', fixture)),
         },
       },
     },
   );
   return { groupId: group.id, datasetId: dataset.id, reactionId: reaction.id };
+}
+
+/** Reads a reaction as the backend stores it. */
+export async function readReaction(
+  request: APIRequestContext,
+  { datasetId, reactionId }: { datasetId: number; reactionId: number },
+): Promise<Reaction> {
+  const { binpb } = await call<{ binpb: string }>(
+    request,
+    'get',
+    `/datasets/${datasetId}/reactions/${reactionId}`,
+  );
+  return fromBinary(ReactionSchema, base64Decode(binpb));
 }
 
 /** Saves a seeded reaction as a template, with `variables` if given, as the e2e dev user. */
