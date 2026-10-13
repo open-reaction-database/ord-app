@@ -32,6 +32,7 @@ updates:
     directories:
       - /backend/editor
       - /deploy/editor
+      - /deploy/viewer
     schedule:
       interval: monthly
     groups:
