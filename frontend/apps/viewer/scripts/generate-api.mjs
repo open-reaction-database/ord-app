@@ -39,5 +39,7 @@ async function licenseHeader() {
 }
 
 const header = await licenseHeader();
-const generated = astToString(await openapiTS(DOCUMENT));
+// A field the backend defaults is optional unless the schema lists it as required, since a
+// request may leave it out.
+const generated = astToString(await openapiTS(DOCUMENT, { defaultNonNullable: false }));
 await writeFile(OUTPUT, header + generated);

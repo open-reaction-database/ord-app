@@ -718,7 +718,7 @@ export interface components {
        * Descending
        * @default false
        */
-      descending: boolean;
+      descending?: boolean;
     };
     /**
      * Order
@@ -731,7 +731,7 @@ export interface components {
        * Descending
        * @default false
        */
-      descending: boolean;
+      descending?: boolean;
     };
     /**
      * OutcomeMolblocks
@@ -918,7 +918,7 @@ export interface components {
        * Chirality
        * @default true
        */
-      chirality: boolean;
+      chirality?: boolean;
     };
     /**
      * ReactionsResult
@@ -1162,7 +1162,7 @@ export interface components {
        * Chirality
        * @default true
        */
-      chirality: boolean;
+      chirality?: boolean;
     };
     /**
      * TableResult
