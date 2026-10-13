@@ -56,6 +56,17 @@ ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `
 uv run python -c "import pathlib; from ord_viewer.testing import derive_corpus; derive_corpus(pathlib.Path('/tmp/corpus'))"
 ```
 
+### Viewer
+
+The viewer's frontend is a workspace in `frontend/`. Its dev server, on port 5174, sends `/api` to the viewer's backend on port 8001, or to `ORD_VIEWER_API` when set:
+
+```shell
+cd frontend && npm ci
+npm run dev -w apps/viewer
+```
+
+`npm test -w apps/viewer -- --run` runs its unit tests, and `npm run build -w apps/viewer` builds it into `frontend/apps/viewer/dist/`.
+
 ## Code style
 
 Formatting and linting run through [pre-commit](https://pre-commit.com): license headers via
