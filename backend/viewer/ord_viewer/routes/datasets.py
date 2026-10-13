@@ -44,7 +44,12 @@ def _summaries(corpus: execute.Corpus) -> list[DatasetSummary]:
         The datasets, sorted by name.
     """
     summaries = [
-        DatasetSummary(**row)
+        DatasetSummary(
+            dataset_id=row["dataset_id"],
+            name=row["name"],
+            description=row["description"],
+            reactions=row["reactions"],
+        )
         for row in corpus.datasets().to_pylist()
         if row["dataset_id"] is not None
     ]
@@ -145,11 +150,16 @@ def dataset_compounds(
         }
     )
     table = run_search(state, request)
+    # The query cannot order by the grouped SMILES, so ties within the returned rows
+    # are broken here; which tied compounds fall past the limit is left to the query.
+    rows = sorted(
+        table.to_pylist(), key=lambda row: (-row["occurrences"], row["smiles"])
+    )
     return [
         CompoundCount(
             smiles=row["smiles"],
             molblock=smiles_molblock(row["smiles"]),
             count=row["occurrences"],
         )
-        for row in table.to_pylist()
+        for row in rows
     ]

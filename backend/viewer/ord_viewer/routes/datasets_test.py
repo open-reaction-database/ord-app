@@ -43,8 +43,10 @@ def test_gets_one_dataset(client):
 
 
 def test_an_unknown_dataset_is_not_found(client):
-    assert client.get("/api/datasets/ord_dataset-nope").status_code == 404
-    assert client.get("/api/datasets/ord_dataset-nope/compounds").status_code == 404
+    for suffix in ("", "/compounds"):
+        response = client.get(f"/api/datasets/ord_dataset-nope{suffix}")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "no dataset ord_dataset-nope"}
 
 
 def test_counts_input_compounds_most_used_first(client):
@@ -74,3 +76,10 @@ def test_limits_the_compound_counts(client):
     assert len(client.get(url, params={"limit": 1}).json()) == 1
     for bad in ({"limit": 0}, {"limit": 101}, {"side": "solvents"}):
         assert client.get(url, params=bad).status_code == 422
+
+
+def test_orders_tied_counts_by_smiles(client):
+    rows = client.get("/api/datasets/ord_dataset-viewer02/compounds").json()
+    assert {row["count"] for row in rows} == {1}
+    smiles = [row["smiles"] for row in rows]
+    assert smiles == sorted(smiles)
