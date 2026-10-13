@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Anchor, List, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Grid, List, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { ViewerPage } from '#components/ViewerPage.tsx';
 
@@ -87,18 +87,14 @@ function Section({
   children,
 }: Readonly<{ title: string; children: ReactNode }>) {
   return (
-    <SimpleGrid
-      cols={{ base: 1, sm: 4 }}
-      spacing="lg"
-    >
-      <Title order={3}>{title}</Title>
-      <Stack
-        gap="sm"
-        style={{ gridColumn: 'span 3' }}
-      >
-        {children}
-      </Stack>
-    </SimpleGrid>
+    <Grid gutter="lg">
+      <Grid.Col span={{ base: 12, sm: 3 }}>
+        <Title order={3}>{title}</Title>
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 9 }}>
+        <Stack gap="sm">{children}</Stack>
+      </Grid.Col>
+    </Grid>
   );
 }
 
