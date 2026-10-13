@@ -15,7 +15,6 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import type { JSX, MouseEvent } from 'react';
-import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { renderWithProviders } from 'test/renderWithProviders.tsx';
 import { columns, handleMenu } from './datasetTable.columns.tsx';
 import type { Dataset } from 'store/entities/datasets/datasets.types.ts';
@@ -27,7 +26,7 @@ const renderCell = (columnId: string, original: Partial<Dataset>) => {
   const Cell = column.Cell as (props: {
     row: { original: Partial<Dataset> };
   }) => JSX.Element;
-  return renderWithMantine(<Cell row={{ original }} />);
+  return renderWithProviders(<Cell row={{ original }} />);
 };
 
 describe('datasetTable.columns', () => {
@@ -40,12 +39,18 @@ describe('datasetTable.columns', () => {
     ).toBeInTheDocument();
   });
 
-  it('names the row menu for assistive technology', () => {
-    const Cell = columns.find(c => c.id === 'menu')!.Cell as (props: {
-      row: { original: Partial<Dataset> };
-    }) => JSX.Element;
-    const { getByRole } = renderWithProviders(<Cell row={{ original: { id: 1 } }} />);
-    expect(getByRole('button', { name: 'Download dataset' })).toBeInTheDocument();
+  it('names each row’s menu after its dataset', () => {
+    // The title matches the name, so screen readers do not read it again as a description.
+    expect(
+      renderCell('menu', { name: 'My Dataset', id: 1 }).getByRole('button', {
+        name: 'Download dataset My Dataset',
+      }),
+    ).toHaveAttribute('title', 'Download dataset My Dataset');
+    expect(
+      renderCell('menu', { id: 7 }).getByRole('button', {
+        name: 'Download dataset Dataset 7',
+      }),
+    ).toBeInTheDocument();
   });
 });
 

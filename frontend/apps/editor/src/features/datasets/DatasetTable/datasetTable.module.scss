@@ -43,6 +43,19 @@
   }
 }
 
+/* One-line text takes its cell's width by default, which would make that width the column's
+   minimum; this text fills whatever width the column gets instead. The class is doubled to
+   outrank the one-line style whichever stylesheet loads last. */
+.fillsColumn.fillsColumn {
+  width: 0;
+  min-width: 100%;
+}
+
+/* The group's one-line name would take the wrapper's zero width; it fills the wrapper instead. */
+.groupsCell p {
+  width: auto;
+}
+
 .row:hover {
   cursor: pointer;
 }

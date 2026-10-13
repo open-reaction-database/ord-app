@@ -71,6 +71,8 @@ export function DatasetTable() {
         data={datasets}
         state={{ isLoading }}
         enableSorting={false}
+        // Its hidden filter inputs would hold each filterable column at least as wide as they are.
+        enableColumnFilters={false}
         mantineTableProps={{
           className: classes.table,
         }}

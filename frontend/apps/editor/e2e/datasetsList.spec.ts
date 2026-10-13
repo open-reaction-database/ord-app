@@ -29,6 +29,60 @@ test('shows each dataset’s download menu without scrolling the table', async (
   await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
   const menu = page.getByRole('button', { name: 'Download dataset' }).first();
   await expect(menu).toBeVisible({ timeout: 30_000 });
-  // The table scrolls in its own container, which clips what lies past its edge.
+  // Counts only the part inside the window and not clipped by the table's container.
   await expect(menu).toBeInViewport({ ratio: 1 });
+});
+
+test('fills each truncating column with its text', async ({ page }) => {
+  await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
+  // The first data row, rather than the loading skeleton the table shows before it.
+  await expect(
+    page.getByRole('button', { name: 'Download dataset' }).first(),
+  ).toBeVisible({
+    timeout: 30_000,
+  });
+  for (const header of ['Dataset Name', 'Group', 'Owner', 'Description']) {
+    // How much the first row's text differs in width from its cell's content box.
+    const gap = () =>
+      page.evaluate(name => {
+        const headers = Array.from(document.querySelectorAll('thead th'));
+        const column = headers.findIndex(th => th.textContent?.trim() === name);
+        const cell = document.querySelectorAll('tbody tr')[0].children[column];
+        const style = getComputedStyle(cell);
+        const content =
+          cell.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight);
+        // The group's name is a paragraph inside the cell's wrapper.
+        const box =
+          cell.querySelector(':scope > div > p') ?? cell.querySelector(':scope > div');
+        const text = box!.getBoundingClientRect().width;
+        return Math.abs(content - text);
+      }, header);
+    await expect
+      .poll(gap, { message: `${header} text misses its column` })
+      .toBeLessThanOrEqual(1);
+  }
+});
+
+test.describe('in a window too narrow for the table', () => {
+  test.use({ viewport: { width: 640, height: 900 } });
+
+  test('takes the description and owner to their minimums, and keeps the name and group at their sizes', async ({
+    page,
+  }) => {
+    await page.goto('/datasets', { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('button', { name: 'Download dataset' }).first(),
+    ).toBeVisible({
+      timeout: 30_000,
+    });
+    const width = async (name: string) =>
+      (await page.getByRole('columnheader', { name, exact: true }).boundingBox())!
+        .width;
+    await expect.poll(() => width('Description')).toBe(120);
+    await expect.poll(() => width('Owner')).toBe(100);
+    await expect.poll(() => width('Dataset Name')).toBe(230);
+    await expect.poll(() => width('Group')).toBe(145);
+  });
 });

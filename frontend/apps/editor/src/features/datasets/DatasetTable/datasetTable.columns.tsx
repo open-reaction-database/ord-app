@@ -36,16 +36,35 @@ export const handleMenu = (event: MouseEvent) => {
   event.preventDefault();
 };
 
+const datasetNameOf = (dataset: Dataset) => dataset.name ?? `Dataset ${dataset.id}`;
+
+/**
+ * Lets a column shrink from its size down to `minWidth` when the table is short of room; MRT
+ * otherwise makes each column's size its minimum width.
+ */
+function shrinksTo(minWidth: number) {
+  return {
+    mantineTableHeadCellProps: { style: { minWidth } },
+    mantineTableBodyCellProps: { style: { minWidth } },
+  };
+}
+
 export const columns: Array<MRT_ColumnDef<Dataset>> = [
   {
     id: 'datasetName',
     accessorKey: 'name',
     header: 'Dataset Name',
     Cell: ({ row }) => {
-      const datasetName = row.original.name ?? `Dataset ${row.original.id}`;
+      const datasetName = datasetNameOf(row.original);
       return (
         <Tooltip label={datasetName}>
-          <div className={clsx(typographyClasses.oneLineText, classes.datasetName)}>
+          <div
+            className={clsx(
+              typographyClasses.oneLineText,
+              classes.fillsColumn,
+              classes.datasetName,
+            )}
+          >
             {datasetName}
           </div>
         </Tooltip>
@@ -87,7 +106,11 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     accessorKey: 'group',
     header: 'Group',
     Cell: ({ row }) => {
-      return <GroupsListWithRoles data={row.original.groups} />;
+      return (
+        <div className={clsx(classes.fillsColumn, classes.groupsCell)}>
+          <GroupsListWithRoles data={row.original.groups} />
+        </div>
+      );
     },
     size: 145,
   },
@@ -99,13 +122,20 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
       const ownerName = row.original.owner.name;
       return (
         <Tooltip label={ownerName}>
-          <div className={clsx(typographyClasses.oneLineText, classes.ownerName)}>
+          <div
+            className={clsx(
+              typographyClasses.oneLineText,
+              classes.fillsColumn,
+              classes.ownerName,
+            )}
+          >
             <UserField username={ownerName} />
           </div>
         </Tooltip>
       );
     },
     size: 145,
+    ...shrinksTo(100),
   },
   {
     id: 'lastModified',
@@ -123,15 +153,15 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
     Cell: ({ row }) => {
       return (
         <Tooltip label={row.original.description}>
-          <div className={typographyClasses.oneLineText}>
+          <div className={clsx(typographyClasses.oneLineText, classes.fillsColumn)}>
             {row.original.description}
           </div>
         </Tooltip>
       );
     },
-    // The narrowest text column, since it truncates and shows the whole text on hover; a cell's
-    // size is also its minimum width, and these sizes keep the table inside its panel at 1280 px.
-    size: 120,
+    size: 280,
+    // Gives up the most room, as the column least needed to tell one dataset from another.
+    ...shrinksTo(120),
   },
   {
     id: 'menu',
@@ -142,7 +172,8 @@ export const columns: Array<MRT_ColumnDef<Dataset>> = [
           download={format => downloadDatasetThroughLink(row.original.id, format)}
           target={
             <ActionIcon
-              aria-label="Download dataset"
+              aria-label={`Download dataset ${datasetNameOf(row.original)}`}
+              title={`Download dataset ${datasetNameOf(row.original)}`}
               onClick={handleMenu}
               variant="transparent"
               color="default"
