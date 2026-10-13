@@ -234,3 +234,14 @@ for (const width of WIDTHS) {
     }
   });
 }
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+
+  test('a page lays out 1024 px wide without scrolling sideways', async ({ page }) => {
+    await openDatasetsList(page);
+    const layoutWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(layoutWidth).toBe(1024);
+    await expect.poll(() => sidewaysOverflow(page)).toBe(0);
+  });
+});
