@@ -38,7 +38,7 @@
 }
 
 .sidebar {
-  min-width: 680px;
+  min-width: var(--validation-sidebar-width);
 }
 
 .title {
