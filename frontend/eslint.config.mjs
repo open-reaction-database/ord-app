@@ -227,4 +227,31 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // The viewer, like the shared package, leaves Redux, axios, and Auth0 to the editor,
+    // and imports its own files through #… rather than ../. This repeats the deep-import
+    // pattern above, since this block's no-restricted-imports replaces that one's here.
+    files: ['apps/viewer/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@open-reaction-database/ui/src/*', '**/packages/ui/*'],
+              message: 'Import the shared package only through its exports.',
+            },
+            {
+              group: ['../*'],
+              message: 'Import the viewer’s files through #… instead.',
+            },
+            {
+              group: APP_STATE_IMPORTS,
+              message: 'The viewer keeps no app store and uses fetch, without sign-in.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

@@ -1,4 +1,8 @@
 {
   "files": [],
-  "references": [{ "path": "./apps/editor" }, { "path": "./packages/ui" }]
+  "references": [
+    { "path": "./apps/editor" },
+    { "path": "./apps/viewer" },
+    { "path": "./packages/ui" }
+  ]
 }
