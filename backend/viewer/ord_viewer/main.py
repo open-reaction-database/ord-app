@@ -102,12 +102,18 @@ def create_app(
     @contextlib.asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         settings = settings_factory()
-        with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
+        with contextlib.ExitStack() as stack:
+            corpus = stack.enter_context(
+                contextlib.closing(open_corpus(settings, resolver=resolver))
+            )
+            ask_client = ask_client_factory()
+            if ask_client is not None:
+                stack.callback(ask_client.close)
             app.state.viewer = ViewerState(
                 settings=settings,
                 corpus=corpus,
                 slots=SearchSlots(settings.max_concurrent, settings.slot_wait_seconds),
-                ask_client=ask_client_factory(),
+                ask_client=ask_client,
             )
             yield
 

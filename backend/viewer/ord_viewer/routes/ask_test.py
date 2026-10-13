@@ -53,6 +53,11 @@ class _StubClient:
         self._responses = list(responses)
         self.requests: list[dict[str, Any]] = []
         self.messages = self
+        self.closed = False
+
+    def close(self) -> None:
+        """Record that the app closed the client, as it does at shutdown."""
+        self.closed = True
 
     def create(self, **kwargs: Any) -> types.SimpleNamespace:
         """Record the request and answer with the next scripted response.
@@ -174,6 +179,40 @@ def test_a_query_that_never_compiles_is_a_bad_gateway(client, ask_with):
     response = client.post("/api/ask", json={"question": "anything"})
     assert response.status_code == 502
     assert "no_such_field" in response.json()["detail"]
+
+
+def test_an_unknown_compound_is_unprocessable(client, ask_with):
+    query = {
+        "where": {
+            **_PYRIDINE_QUERY["where"],
+            "where": {
+                "op": "substructure",
+                "path": "smiles",
+                "compound": "unobtainium",
+            },
+        }
+    }
+    stub = ask_with(query)
+    response = client.post("/api/ask", json={"question": "reactions with unobtainium"})
+    assert response.status_code == 422
+    assert "unobtainium" in response.json()["detail"]
+    assert len(stub.requests) == 1
+
+
+def test_a_search_past_its_timeout(corpus_dir):
+    stub = _StubClient(_PYRIDINE_QUERY)
+    with make_client(
+        corpus_dir, ask_client=stub, search_timeout_seconds=1e-9
+    ) as client:
+        response = client.post("/api/ask", json={"question": "anything"})
+    assert response.status_code == 504
+
+
+def test_shutdown_closes_the_model_client(corpus_dir):
+    stub = _StubClient()
+    with make_client(corpus_dir, ask_client=stub):
+        assert not stub.closed
+    assert stub.closed
 
 
 def test_no_key_means_no_answers(client):

@@ -30,11 +30,9 @@ from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api")
 
-# The bound on an ask's search, nl.ask's own default; the model calls are bounded by the
-# client's timeout below.
-_ASK_TIMEOUT_SECONDS = 60.0
-# The bound on one model call. An ask holds a search slot through its model calls, and
-# the SDK's default of ten minutes would let one stalled call hold it that long.
+# The bound on one model call; an ask's search has the service's search timeout. An ask
+# holds a search slot through its model calls, and the SDK's default of ten minutes
+# would let one stalled call hold it that long.
 _MODEL_TIMEOUT_SECONDS = 30.0
 
 _STATUS_BY_ERROR: dict[type[nl.NLQueryError], int] = {
@@ -162,7 +160,7 @@ async def ask(
                     state.corpus,
                     client=client,
                     model=state.settings.ask_model,
-                    timeout_seconds=_ASK_TIMEOUT_SECONDS,
+                    timeout_seconds=state.settings.search_timeout_seconds,
                     sink=sink,
                     source="ord-viewer",
                 )
