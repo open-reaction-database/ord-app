@@ -102,6 +102,25 @@ class ReactionsResult(BaseModel):
     truncated: bool
 
 
+def _base64_bytes(value: Any) -> Any:
+    """Encode the bytes in a cell as standard base64, however deeply nested.
+
+    Args:
+        value: A cell: bytes, a list or tuple, a dict, or any other value.
+
+    Returns:
+        The value with each bytes replaced by its base64 text; dict keys are left as
+        they are, and any other value is returned unchanged.
+    """
+    if isinstance(value, bytes):
+        return base64.b64encode(value).decode()
+    if isinstance(value, list | tuple):
+        return [_base64_bytes(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _base64_bytes(item) for key, item in value.items()}
+    return value
+
+
 class TableResult(BaseModel):
     """An aggregate's answer: its group and measure columns; bytes cells are base64."""
 
@@ -110,16 +129,10 @@ class TableResult(BaseModel):
     rows: list[list[Any]]
     truncated: bool
 
-    @field_serializer("rows")
+    @field_serializer("rows", when_used="json")
     def _encode_bytes(self, rows: list[list[Any]]) -> list[list[Any]]:
         """Encode bytes cells as standard base64, which JSON has no type for."""
-        return [
-            [
-                base64.b64encode(cell).decode() if isinstance(cell, bytes) else cell
-                for cell in row
-            ]
-            for row in rows
-        ]
+        return [[_base64_bytes(cell) for cell in row] for row in rows]
 
 
 SearchResult = Annotated[ReactionsResult | TableResult, Field(discriminator="kind")]

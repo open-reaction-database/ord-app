@@ -99,3 +99,15 @@ def test_a_bytes_cell_is_base64_in_json():
     result = TableResult(columns=["image"], rows=[[b"\xff"]], truncated=False)
     dumped = TypeAdapter(SearchResult).dump_python(result, mode="json")
     assert dumped["rows"] == [["/w=="]]
+
+
+def test_bytes_nested_in_a_cell_are_base64_in_json():
+    cells = [{"bytes_value": b"\xff"}, [b"\xff"]]
+    result = TableResult(columns=["image", "list"], rows=[cells], truncated=False)
+    dumped = TypeAdapter(SearchResult).dump_python(result, mode="json")
+    assert dumped["rows"] == [[{"bytes_value": "/w=="}, ["/w=="]]]
+
+
+def test_python_mode_keeps_the_bytes():
+    result = TableResult(columns=["image"], rows=[[b"\xff"]], truncated=False)
+    assert result.model_dump()["rows"] == [[b"\xff"]]
