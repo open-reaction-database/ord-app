@@ -30,10 +30,15 @@ from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api")
 
-# The bound on one model call; an ask's search has the service's search timeout. An ask
-# holds a search slot through its model calls, and the SDK's default of ten minutes
-# would let one stalled call hold it that long.
+# An ask holds a search slot through up to three model calls (its query, a repair when
+# the query does not compile, and the sentence about what the search found) and the
+# search, which has the service's search timeout. Each call is one attempt of at most
+# 30 s; the SDK's defaults would hold the slot for ten minutes an attempt and two
+# retries, each after waiting out any Retry-After the API sends. When the model is rate
+# limiting, overloaded, or unreachable, the ask answers 429 or 503, and the caller can
+# ask again without holding a slot meanwhile.
 _MODEL_TIMEOUT_SECONDS = 30.0
+_MODEL_MAX_RETRIES = 0
 
 _STATUS_BY_ERROR: dict[type[nl.NLQueryError], int] = {
     nl.ModelUnavailableError: status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -93,10 +98,13 @@ def ask_client_from_environment() -> anthropic.Anthropic | None:
     """Return a client when ord-schema's key variable or the SDK's is set, else None.
 
     Returns:
-        ord-schema's client, each call bounded by _MODEL_TIMEOUT_SECONDS, or None.
+        ord-schema's client, each call one attempt of at most _MODEL_TIMEOUT_SECONDS,
+        or None.
     """
     if os.environ.get(nl.API_KEY_VARIABLE) or os.environ.get("ANTHROPIC_API_KEY"):
-        return nl.get_client().with_options(timeout=_MODEL_TIMEOUT_SECONDS)
+        return nl.get_client().with_options(
+            timeout=_MODEL_TIMEOUT_SECONDS, max_retries=_MODEL_MAX_RETRIES
+        )
     return None
 
 
