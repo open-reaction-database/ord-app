@@ -24,6 +24,7 @@ import pytest
 from anthropic.types import TextBlock, ToolUseBlock
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from ord_schema.search import nl
 
 from ord_viewer.routes.ask import ask_client_from_environment, get_ask_client
 from ord_viewer.testing import hold_slot, make_client
@@ -38,6 +39,7 @@ _PYRIDINE_QUERY = {
 _PYRIDINE_ANSWER = "One reaction uses a pyridine."
 # A response the model's safety classifiers stopped.
 _DECLINED = "declined"
+_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 
 
 class _StubClient:
@@ -111,7 +113,7 @@ def ask_with(client: TestClient) -> Generator[Callable[..., _StubClient]]:
 
 
 def _api_error(error_type: type[anthropic.APIStatusError], code: int) -> Exception:
-    request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+    request = httpx2.Request("POST", _MESSAGES_URL)
     response = httpx2.Response(code, request=request, json={"error": {}})
     return error_type("the model said no", response=response, body=None)
 
@@ -166,6 +168,7 @@ def test_an_unanswerable_question(client, ask_with):
     [
         (_api_error(anthropic.RateLimitError, 429), 429),
         (_api_error(anthropic.InternalServerError, 500), 503),
+        (anthropic.APITimeoutError(httpx2.Request("POST", _MESSAGES_URL)), 503),
     ],
 )
 def test_a_model_failure_has_its_own_status(client, ask_with, error, code):
@@ -243,6 +246,30 @@ def test_a_key_in_the_environment_builds_a_bounded_client(monkeypatch, variable)
     client = ask_client_from_environment()
     assert client is not None
     assert client.timeout == 30.0
+    assert client.max_retries == 0
+
+
+def test_an_overloaded_model_is_asked_once(monkeypatch, corpus_dir):
+    requests: list[httpx2.Request] = []
+
+    def overloaded(request: httpx2.Request) -> httpx2.Response:
+        requests.append(request)
+        error = {"type": "overloaded_error", "message": "overloaded"}
+        return httpx2.Response(
+            529, headers={"retry-after": "1"}, json={"type": "error", "error": error}
+        )
+
+    http_client = httpx2.Client(transport=httpx2.MockTransport(overloaded))
+    monkeypatch.setenv("ORD_ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.setattr(
+        nl,
+        "get_client",
+        lambda: anthropic.Anthropic(api_key="test-key", http_client=http_client),
+    )
+    with make_client(corpus_dir, ask_client=ask_client_from_environment()) as client:
+        response = client.post("/api/ask", json={"question": "anything"})
+    assert response.status_code == 503
+    assert len(requests) == 1
 
 
 def test_no_key_in_the_environment_builds_no_client(monkeypatch):

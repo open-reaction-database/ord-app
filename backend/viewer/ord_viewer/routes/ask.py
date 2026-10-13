@@ -30,10 +30,15 @@ from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api")
 
-# The bound on one model call; an ask's search has the service's search timeout. An ask
-# holds a search slot through its model calls, and the SDK's default of ten minutes
-# would let one stalled call hold it that long.
+# An ask holds a search slot through up to three model calls (its query, a repair when
+# the query does not compile, and the sentence about what the search found) and the
+# search, which has the service's search timeout. Each call makes one attempt, which
+# gives up after 30 s waiting on the API; the SDK's defaults would wait ten minutes and
+# retry twice, each time after waiting out any Retry-After the API sends. A failed call
+# ends the ask with 429 or 503, and the caller can ask again without holding a slot
+# meanwhile.
 _MODEL_TIMEOUT_SECONDS = 30.0
+_MODEL_MAX_RETRIES = 0
 
 _STATUS_BY_ERROR: dict[type[nl.NLQueryError], int] = {
     nl.ModelUnavailableError: status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -64,8 +69,8 @@ ASK_ERRORS: dict[int | str, dict[str, Any]] = {
     503: {
         "model": ErrorDetail,
         "description": (
-            "Every search slot stayed busy, no API key is configured, or the model "
-            "could not be reached"
+            "Every search slot stayed busy, no API key is configured, or a call to "
+            "the model failed"
         ),
     },
 }
@@ -93,10 +98,13 @@ def ask_client_from_environment() -> anthropic.Anthropic | None:
     """Return a client when ord-schema's key variable or the SDK's is set, else None.
 
     Returns:
-        ord-schema's client, each call bounded by _MODEL_TIMEOUT_SECONDS, or None.
+        ord-schema's client, making one attempt per call with a timeout of
+        _MODEL_TIMEOUT_SECONDS, or None.
     """
     if os.environ.get(nl.API_KEY_VARIABLE) or os.environ.get("ANTHROPIC_API_KEY"):
-        return nl.get_client().with_options(timeout=_MODEL_TIMEOUT_SECONDS)
+        return nl.get_client().with_options(
+            timeout=_MODEL_TIMEOUT_SECONDS, max_retries=_MODEL_MAX_RETRIES
+        )
     return None
 
 
@@ -145,8 +153,8 @@ async def ask(
     Raises:
         HTTPException: 422 if the question cannot be put to the grammar, the model
             declined it, or its query names an unknown compound; 429 if the model is
-            rate limiting; 502 if the model's query never compiles; 503 if the model
-            cannot be reached; 504 if the search times out.
+            rate limiting; 502 if the model's query never compiles; 503 if a call to
+            the model fails for any other reason; 504 if the search times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
         execute.PairingError: If the corpus is inconsistent; a 500.
     """

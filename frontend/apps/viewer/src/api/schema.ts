@@ -288,8 +288,8 @@ export interface paths {
      *     Raises:
      *         HTTPException: 422 if the question cannot be put to the grammar, the model
      *             declined it, or its query names an unknown compound; 429 if the model is
-     *             rate limiting; 502 if the model's query never compiles; 503 if the model
-     *             cannot be reached; 504 if the search times out.
+     *             rate limiting; 502 if the model's query never compiles; 503 if a call to
+     *             the model fails for any other reason; 504 if the search times out.
      *         SlotsBusyError: If every search slot stays busy for the configured wait.
      *         execute.PairingError: If the corpus is inconsistent; a 500.
      */
@@ -1607,7 +1607,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorDetail'];
         };
       };
-      /** @description Every search slot stayed busy, no API key is configured, or the model could not be reached */
+      /** @description Every search slot stayed busy, no API key is configured, or a call to the model failed */
       503: {
         headers: {
           [name: string]: unknown;
