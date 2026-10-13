@@ -19,16 +19,31 @@ import pytest
 from ord_viewer.slots import SearchSlots, SlotsBusyError
 
 
-def test_waits_then_refuses_when_full():
+@pytest.mark.anyio
+async def test_waits_then_refuses_when_full():
     slots = SearchSlots(capacity=1, wait_seconds=0.01)
-    # The outer hold is entered before pytest.raises, so only the inner one can raise.
-    with slots.hold(), pytest.raises(SlotsBusyError), slots.hold():
+    async with slots.hold():
+        # Only the inner hold sits inside pytest.raises, so only it can raise.
+        with pytest.raises(SlotsBusyError):
+            async with slots.hold():
+                pass
+
+
+@pytest.mark.anyio
+async def test_frees_a_slot_when_the_body_raises():
+    slots = SearchSlots(capacity=1, wait_seconds=0.01)
+    with pytest.raises(RuntimeError):
+        async with slots.hold():
+            raise RuntimeError("search failed")
+    async with slots.hold():
         pass
 
 
-def test_frees_a_slot_when_the_body_raises():
-    slots = SearchSlots(capacity=1, wait_seconds=0.01)
-    with pytest.raises(RuntimeError), slots.hold():
-        raise RuntimeError("search failed")
-    with slots.hold():
+@pytest.mark.anyio
+async def test_a_timeout_in_the_body_is_not_a_busy_slot():
+    slots = SearchSlots(capacity=1, wait_seconds=5)
+    with pytest.raises(TimeoutError, match="the search ran long"):
+        async with slots.hold():
+            raise TimeoutError("the search ran long")
+    async with slots.hold():
         pass

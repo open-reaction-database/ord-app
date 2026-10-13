@@ -31,7 +31,7 @@ async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NO
     """Answer 503 when every search slot stayed busy.
 
     It is async so Starlette runs it on the event loop, and the 503 needs no worker
-    thread when the threadpool may be full of requests waiting for a slot.
+    thread however busy the threadpool is.
 
     Args:
         request: The request that waited for a slot.

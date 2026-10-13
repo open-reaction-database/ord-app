@@ -15,8 +15,9 @@
 """A cap on searches in flight, since each one can hold the corpus's CPUs."""
 
 import contextlib
-import threading
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
+
+import anyio
 
 
 class SlotsBusyError(Exception):
@@ -26,26 +27,31 @@ class SlotsBusyError(Exception):
 class SearchSlots:
     """A bounded number of concurrent searches; a request waits a while for one.
 
+    A request waits on the event loop, so a waiting request holds no worker thread.
+
     Args:
         capacity: The most searches that may hold a slot at once.
         wait_seconds: How long a request waits for a slot before giving up.
     """
 
     def __init__(self, capacity: int, wait_seconds: float) -> None:
-        self._semaphore = threading.BoundedSemaphore(capacity)
+        self._semaphore = anyio.Semaphore(capacity, max_value=capacity)
         self._wait_seconds = wait_seconds
 
-    @contextlib.contextmanager
-    def hold(self) -> Generator[None]:
-        """Hold one slot for the body of the with statement.
+    @contextlib.asynccontextmanager
+    async def hold(self) -> AsyncGenerator[None]:
+        """Hold one slot for the body of the async with statement.
 
         Raises:
             SlotsBusyError: If no slot frees within the wait.
         """
-        if not self._semaphore.acquire(timeout=self._wait_seconds):
+        try:
+            with anyio.fail_after(self._wait_seconds):
+                await self._semaphore.acquire()
+        except TimeoutError:
             raise SlotsBusyError(
                 f"every search slot stayed busy for {self._wait_seconds} s; try again"
-            )
+            ) from None
         try:
             yield
         finally:

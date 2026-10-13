@@ -14,12 +14,14 @@
 
 """The /api/search route."""
 
-from typing import cast
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
-from fastapi import FastAPI
+from anyio import to_thread
+from fastapi.testclient import TestClient
 
-from ord_viewer.testing import make_client
+from ord_viewer.testing import hold_slot, make_client, portal
 
 _PYRIDINE_INPUT = {
     "op": "exists",
@@ -188,6 +190,50 @@ def test_a_failed_search_frees_its_slot(corpus_dir):
         assert client.post("/api/search", json={"query": bad}).status_code == 422
         ok = {"query": {"where": _PYRIDINE_INPUT}}
         assert client.post("/api/search", json=ok).status_code == 200
-        with cast(FastAPI, client.app).state.viewer.slots.hold():
+        with hold_slot(client):
             busy = client.post("/api/search", json=ok)
         assert busy.status_code == 503
+
+
+def _set_thread_tokens(client: TestClient, total: float) -> float:
+    """Set the worker threads the app's event loop may run at once.
+
+    Args:
+        client: An entered client.
+        total: The new number of threads.
+
+    Returns:
+        The number it replaced.
+    """
+
+    async def swap() -> float:
+        limiter = to_thread.current_default_thread_limiter()
+        previous = limiter.total_tokens
+        limiter.total_tokens = total
+        return previous
+
+    return portal(client).call(swap)
+
+
+def test_a_request_waiting_for_a_slot_holds_no_worker_thread(corpus_dir):
+    search = {"query": {"where": _PYRIDINE_INPUT}}
+    with make_client(corpus_dir, max_concurrent=1, slot_wait_seconds=3) as client:
+        tokens = _set_thread_tokens(client, 2)
+        try:
+            # The slot is released before the executor joins, so the searches finish.
+            with ThreadPoolExecutor(max_workers=3) as executor, hold_slot(client):
+                waiting = [
+                    executor.submit(client.post, "/api/search", json=search)
+                    for _ in range(3)
+                ]
+                time.sleep(0.5)  # for the searches to reach the slot
+                started = time.monotonic()
+                response = client.get("/api/datasets")
+                elapsed = time.monotonic() - started
+                overlapped = not any(future.done() for future in waiting)
+            assert response.status_code == 200
+            assert elapsed < 1
+            assert overlapped
+            assert [future.result().status_code for future in waiting] == [200] * 3
+        finally:
+            _set_thread_tokens(client, tokens)

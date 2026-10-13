@@ -16,7 +16,9 @@
 
 from typing import Annotated, Literal
 
+import pyarrow as pa
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.concurrency import run_in_threadpool
 from ord_schema.search import execute
 from ord_schema.search.query import Query as SearchQuery
 
@@ -112,17 +114,39 @@ def get_dataset(
     return _find(state.corpus, dataset_id)
 
 
+def _compound_counts(table: pa.Table) -> list[CompoundCount]:
+    """Read each compound's count from an aggregate's rows, with a molblock to draw it.
+
+    Args:
+        table: The rows of the compound-counting aggregate: smiles and occurrences.
+
+    Returns:
+        One count per row, in the table's order.
+    """
+    return [
+        CompoundCount(
+            smiles=row["smiles"],
+            molblock=smiles_molblock(row["smiles"]),
+            count=row["occurrences"],
+        )
+        for row in table.to_pylist()
+    ]
+
+
 @router.get(
     "/{dataset_id}/compounds",
     responses={**SEARCH_ERRORS, 404: {"model": ErrorDetail}},
 )
-def dataset_compounds(
+async def dataset_compounds(
     dataset_id: str,
     state: Annotated[ViewerState, Depends(get_state)],
     side: Literal["inputs", "products"] = "inputs",
     limit: Annotated[int, Query(ge=1, le=100)] = 30,
 ) -> list[CompoundCount]:
     """Return the compounds a dataset's inputs or products use most, most first.
+
+    It is async so a request waits for its search slot on the event loop; the dataset
+    lookup, the search, and the molblocks run in worker threads.
 
     Args:
         dataset_id: The dataset to count in.
@@ -138,7 +162,7 @@ def dataset_compounds(
             search fails.
         SlotsBusyError: If every search slot stays busy for the configured wait.
     """
-    _find(state.corpus, dataset_id)
+    await run_in_threadpool(_find, state.corpus, dataset_id)
     request = SearchQuery.model_validate(
         {
             "where": {
@@ -160,12 +184,5 @@ def dataset_compounds(
             "limit": limit,
         }
     )
-    table = run_search(state, request)
-    return [
-        CompoundCount(
-            smiles=row["smiles"],
-            molblock=smiles_molblock(row["smiles"]),
-            count=row["occurrences"],
-        )
-        for row in table.to_pylist()
-    ]
+    table = await run_search(state, request)
+    return await run_in_threadpool(_compound_counts, table)

@@ -17,6 +17,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from fastapi.concurrency import run_in_threadpool
 
 from ord_viewer.schemas import SearchRequest, SearchResult
 from ord_viewer.searching import SEARCH_ERRORS, run_search, to_result
@@ -26,10 +27,13 @@ router = APIRouter(prefix="/api")
 
 
 @router.post("/search", responses=SEARCH_ERRORS)
-def search(
+async def search(
     body: SearchRequest, state: Annotated[ViewerState, Depends(get_state)]
 ) -> SearchResult:
     """Run one query: reaction IDs for a plain query, a table for an aggregate.
+
+    It is async so a request waits for its search slot on the event loop; the search
+    and the shaping of its result run in worker threads.
 
     Args:
         body: The query to run.
@@ -42,4 +46,5 @@ def search(
         HTTPException: 422 if the query is invalid, 504 if it times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
     """
-    return to_result(body.query, run_search(state, body.query))
+    table = await run_search(state, body.query)
+    return await run_in_threadpool(to_result, body.query, table)

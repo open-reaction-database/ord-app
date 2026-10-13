@@ -20,6 +20,7 @@ from typing import Any
 
 import pyarrow as pa
 from fastapi import HTTPException, status
+from fastapi.concurrency import run_in_threadpool
 from ord_schema.search import execute
 from ord_schema.search.query import Query
 
@@ -68,8 +69,11 @@ def search_errors() -> Generator[None]:
         raise HTTPException(status.HTTP_504_GATEWAY_TIMEOUT, str(error)) from error
 
 
-def run_search(state: ViewerState, request: Query) -> pa.Table:
+async def run_search(state: ViewerState, request: Query) -> pa.Table:
     """Run one query in a search slot, under the service's timeout.
+
+    The request waits for its slot on the event loop, and only the search itself
+    takes a worker thread.
 
     Args:
         state: The settings, open corpus, and search slots.
@@ -82,10 +86,15 @@ def run_search(state: ViewerState, request: Query) -> pa.Table:
         HTTPException: 422 if the query is invalid, 504 if it times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
     """
-    with state.slots.hold(), search_errors():
-        return state.corpus.search(
-            request, timeout_seconds=state.settings.search_timeout_seconds
-        )
+    async with state.slots.hold():
+        with search_errors():
+            # A cancelled request still waits for its thread to finish, so the slot
+            # stays held for as long as DuckDB works on the search.
+            return await run_in_threadpool(
+                state.corpus.search,
+                request,
+                timeout_seconds=state.settings.search_timeout_seconds,
+            )
 
 
 def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:

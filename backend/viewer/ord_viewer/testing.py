@@ -14,11 +14,14 @@
 
 """A small corpus built and derived the way ord-schema derives a published one."""
 
+import contextlib
 import glob
 import pathlib
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, cast
 
+from anyio.from_thread import BlockingPortal
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import parquet
 from ord_schema.artifacts.scripts import (
@@ -182,6 +185,36 @@ def derive_corpus(root: pathlib.Path) -> None:
             [f"--pivots_dir={root}/pivots", f"--output_dir={root}/occurrences"]
         )
     )
+
+
+def portal(client: TestClient) -> BlockingPortal:
+    """Return the blocking portal to the event loop an entered client's app runs on.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The portal, for running coroutines on the app's event loop from the test thread.
+
+    Raises:
+        RuntimeError: If the client has not been entered.
+    """
+    if client.portal is None:
+        raise RuntimeError("enter the client before reaching its event loop")
+    return client.portal
+
+
+def hold_slot(client: TestClient) -> contextlib.AbstractContextManager[None]:
+    """Hold one of the app's search slots from the test thread.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        A context manager holding the slot, on the app's event loop, for its body.
+    """
+    slots = cast(FastAPI, client.app).state.viewer.slots
+    return portal(client).wrap_async_context_manager(slots.hold())
 
 
 def make_client(corpus_dir: pathlib.Path, **settings: Any) -> TestClient:
