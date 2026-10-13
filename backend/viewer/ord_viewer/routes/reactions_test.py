@@ -86,4 +86,5 @@ def test_documents_the_batch_bound(client):
     (reaction_ids,) = [
         parameter for parameter in parameters if parameter["name"] == "id"
     ]
+    assert reaction_ids["schema"]["minItems"] == 1
     assert reaction_ids["schema"]["maxItems"] == 100

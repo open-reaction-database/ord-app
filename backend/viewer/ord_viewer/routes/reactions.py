@@ -68,7 +68,9 @@ def fetch_records(
 @router.get("")
 def list_reactions(
     state: Annotated[ViewerState, Depends(get_state)],
-    reaction_ids: Annotated[list[str], Query(alias="id", max_length=_MAX_IDS)],
+    reaction_ids: Annotated[
+        list[str], Query(alias="id", min_length=1, max_length=_MAX_IDS)
+    ],
 ) -> list[ReactionRecord]:
     """Return up to 100 reactions, named by repeated id parameters.
 
