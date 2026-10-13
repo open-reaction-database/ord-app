@@ -17,42 +17,40 @@ import { describe, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type * as ReactNS from 'react';
+import type { StructureDialogProps } from '@open-reaction-database/ui/ketcher';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { ComponentsKetcherEditor } from './ComponentsKetcherEditor.tsx';
 
-// The real Ketcher editor pulls in a WASM struct-service and a canvas renderer that cannot run
-// under happy-dom. We stub `ketcher-react`/`ketcher-standalone` and assert the integration
-// contract our component relies on — the exact API surface (`onInit`, `setMolecule`,
-// `getMolfile`) that a Ketcher major upgrade could silently break.
-const ketcher = {
-  setMolecule: vi.fn((_molecule: string) => undefined),
-  getMolfile: vi.fn(() => Promise.resolve('MOLFILE')),
-};
-
-vi.mock('ketcher-standalone', () => ({
-  StandaloneStructServiceProvider: class {},
-}));
-
-vi.mock('ketcher-react', async () => {
+// The dialog itself is tested in the shared package; this stub shows what the editor
+// passes it and saves a fixed molfile.
+vi.mock('@open-reaction-database/ui/ketcher', async () => {
   const React = (await vi.importActual('react')) as typeof ReactNS;
   return {
-    // Drive the host's `onInit` once on mount, mimicking Ketcher signalling readiness.
-    Editor: (props: Readonly<{ onInit?: (instance: typeof ketcher) => void }>) => {
-      React.useEffect(() => {
-        props.onInit?.(ketcher);
-      }, [props]);
-      return React.createElement('div', { 'data-testid': 'ketcher-editor' });
-    },
+    StructureDialog: (props: Readonly<StructureDialogProps>) =>
+      props.opened
+        ? React.createElement(
+            'div',
+            {
+              'data-testid': 'structure-dialog',
+              'data-initial': props.initial,
+              'data-format': props.format,
+            },
+            props.children,
+            React.createElement(
+              'button',
+              { type: 'button', onClick: () => props.onSave('MOLFILE') },
+              'Save',
+            ),
+          )
+        : null,
   };
 });
-
-vi.mock('ketcher-react/dist/index.css', () => ({}));
 
 const identifier = { value: 'CCO', details: 'ethanol' };
 
 describe('ComponentsKetcherEditor', () => {
-  it('loads the identifier structure into Ketcher once the editor initializes', async () => {
-    renderWithMantine(
+  it('opens the identifier’s structure and asks for a molfile', () => {
+    const { getByTestId } = renderWithMantine(
       <ComponentsKetcherEditor
         opened
         onClose={vi.fn()}
@@ -60,56 +58,40 @@ describe('ComponentsKetcherEditor', () => {
         identifier={identifier}
       />,
     );
-
-    await waitFor(() => expect(ketcher.setMolecule).toHaveBeenCalledWith('CCO'));
+    const dialog = getByTestId('structure-dialog');
+    expect(dialog).toHaveAttribute('data-initial', 'CCO');
+    expect(dialog).toHaveAttribute('data-format', 'molfile');
   });
 
-  it('serializes the drawing via getMolfile and reports it through onSave on save', async () => {
+  it('saves the drawing with the Details field’s value', async () => {
     const onSave = vi.fn();
-    const onClose = vi.fn();
-    const { getByRole } = renderWithMantine(
+    const { getByLabelText, getByRole } = renderWithMantine(
       <ComponentsKetcherEditor
         opened
-        onClose={onClose}
+        onClose={vi.fn()}
         onSave={onSave}
         identifier={identifier}
       />,
     );
-
-    await waitFor(() => expect(ketcher.setMolecule).toHaveBeenCalled());
+    const details = getByLabelText('Details');
+    await userEvent.clear(details);
+    await userEvent.type(details, 'drawn again');
     await userEvent.click(getByRole('button', { name: 'Save' }));
-
-    await waitFor(() => {
-      expect(ketcher.getMolfile).toHaveBeenCalled();
-      expect(onSave).toHaveBeenCalledWith({
-        value: 'MOLFILE',
-        details: 'ethanol',
-      });
-      expect(onClose).toHaveBeenCalled();
-    });
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({ value: 'MOLFILE', details: 'drawn again' }),
+    );
   });
 
-  it('clears the canvas when the editor is closed', async () => {
-    const { rerender } = renderWithMantine(
+  it('starts a new drawing blank, with the default details', () => {
+    const { getByTestId, getByLabelText } = renderWithMantine(
       <ComponentsKetcherEditor
         opened
         onClose={vi.fn()}
         onSave={vi.fn()}
-        identifier={identifier}
+        identifier={null}
       />,
     );
-
-    await waitFor(() => expect(ketcher.setMolecule).toHaveBeenCalledWith('CCO'));
-
-    rerender(
-      <ComponentsKetcherEditor
-        opened={false}
-        onClose={vi.fn()}
-        onSave={vi.fn()}
-        identifier={identifier}
-      />,
-    );
-
-    await waitFor(() => expect(ketcher.setMolecule).toHaveBeenCalledWith(''));
+    expect(getByTestId('structure-dialog')).toHaveAttribute('data-initial', '');
+    expect(getByLabelText('Details')).toHaveValue('Drawn with Ketcher');
   });
 });

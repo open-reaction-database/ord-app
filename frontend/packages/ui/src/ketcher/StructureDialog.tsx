@@ -25,7 +25,7 @@ import type { StructureDialogProps } from './structure.types.ts';
  * may drop such an import.
  */
 async function loadKetcherDialog() {
-  const { Buffer } = await import('buffer');
+  const { Buffer } = await import('buffer'); // NOSONAR: the npm polyfill, for browser code; node:buffer is a Node builtin
   globalThis.global ??= globalThis;
   globalThis.Buffer ??= Buffer;
   const { KetcherDialog } = await import('./KetcherDialog.tsx');

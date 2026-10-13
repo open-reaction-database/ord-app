@@ -17,11 +17,5 @@ import { createRoot } from 'react-dom/client';
 import './index.scss';
 import '@open-reaction-database/ui/theme/global.scss';
 import { AppRoot } from './core/AppRoot.tsx';
-import { Buffer } from 'buffer'; // NOSONAR: the npm polyfill, for browser code; node:buffer is a Node builtin
-
-// Because ketcher depends on draft-js which requires setImmediate package
-// https://github.com/yuzujs/setImmediate
-globalThis.global ||= globalThis;
-globalThis.Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(<AppRoot />);
