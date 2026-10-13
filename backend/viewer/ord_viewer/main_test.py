@@ -18,7 +18,9 @@ import asyncio
 import re
 import shutil
 
+import httpx
 import pytest
+from anyio import to_thread
 from fastapi.testclient import TestClient
 from ord_schema.search import execute
 
@@ -33,6 +35,31 @@ def test_health_returns_the_corpus_fingerprint(client):
     fingerprint = response.json()["fingerprint"]
     assert re.fullmatch(r"[0-9a-f]{16}", fingerprint)
     assert fingerprint == client.app.state.viewer.corpus.fingerprint
+
+
+def test_health_answers_with_every_worker_thread_taken(corpus_dir):
+    app = create_app(lambda: Settings(corpus_dir=corpus_dir), resolver=offline_resolver)
+
+    async def probe_with_no_free_thread() -> int:
+        limiter = to_thread.current_default_thread_limiter()
+        limiter.total_tokens = 1
+        await limiter.acquire_on_behalf_of(object())
+        transport = httpx.ASGITransport(app=app)
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(transport=transport, base_url="http://viewer") as client,
+        ):
+            response = await asyncio.wait_for(client.get("/api/health"), timeout=2)
+        return response.status_code
+
+    assert asyncio.run(probe_with_no_free_thread()) == 200
+
+
+def test_opens_a_corpus_whose_path_holds_a_glob_metacharacter(corpus_dir, tmp_path):
+    copied = tmp_path / "corpus[1]"
+    shutil.copytree(corpus_dir, copied)
+    with make_client(copied) as client:
+        assert client.get("/api/health").status_code == 200
 
 
 def test_startup_fails_without_a_corpus_directory():
@@ -111,6 +138,8 @@ def test_api_docs_are_served_under_api(client):
     assert openapi.status_code == 200
     assert "/api/health" in openapi.json()["paths"]
     assert client.get("/api/docs").status_code == 200
+    assert client.get("/openapi.json").status_code == 404
+    assert client.get("/docs").status_code == 404
 
 
 def test_settings_come_from_the_environment(monkeypatch, corpus_dir):

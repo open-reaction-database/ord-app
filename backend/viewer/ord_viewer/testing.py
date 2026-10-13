@@ -64,8 +64,8 @@ def _reaction(
     """Build a reaction with an optional yield and an optional named catalyst.
 
     Args:
-        reaction_id: The reaction's ID.
-        reactants: SMILES of the reactants.
+        reaction_id: The ID the reaction gets, such as ``ord-viewer0101``.
+        reactants: Reactant SMILES, one component each.
         product: SMILES of the one product.
         yield_percent: The product's percent yield, if any.
         catalyst_name: The name of a catalyst input, if any.
@@ -144,7 +144,9 @@ def derive_corpus(root: pathlib.Path) -> None:
     """Write DATASETS as sources under root and derive every artifact to read.
 
     Args:
-        root: The directory to build the corpus in.
+        root: The directory to build the corpus in. Its path must hold no glob
+            metacharacter: the derive scripts place their outputs relative to the
+            input pattern's wildcard-free leading directories.
     """
     for dataset in DATASETS:
         source = root / "sources" / "aa" / f"{dataset.dataset_id}.parquet"

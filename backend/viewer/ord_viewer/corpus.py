@@ -14,6 +14,7 @@
 
 """Opening the corpus a deployment serves, and resolving the names queries use."""
 
+import glob
 import os
 from collections.abc import Callable
 
@@ -68,9 +69,12 @@ def open_corpus(
     for tree in _TREES:
         if not (root / tree).is_dir():
             raise FileNotFoundError(f"{root} has no {tree}/ directory")
+    # The file patterns are globs, so a metacharacter in root's own name is escaped;
+    # the pivot and occurrence trees are passed as directories.
+    pattern_root = glob.escape(str(root))
     corpus = execute.Corpus(
-        str(root / "projections" / "*" / "*.parquet"),
-        str(root / "structures" / "*" / "*.parquet"),
+        f"{pattern_root}/projections/*/*.parquet",
+        f"{pattern_root}/structures/*/*.parquet",
         resolver=resolver,
         threads=max(1, (os.cpu_count() or 1) // settings.max_concurrent),
         require_current=True,
@@ -81,7 +85,7 @@ def open_corpus(
         memory_limit=settings.memory_limit,
         warm=True,
         max_rows=execute.DEFAULT_MAX_ROWS,
-        sources_pattern=str(root / "sources" / "*" / "*.parquet"),
+        sources_pattern=f"{pattern_root}/sources/*/*.parquet",
     )
     try:
         corpus.check_pivots()
