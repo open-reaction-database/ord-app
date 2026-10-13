@@ -30,7 +30,7 @@ class ViewerState:
     corpus: execute.Corpus
 
 
-async def get_state(request: Request) -> ViewerState:
+async def get_state(request: Request) -> ViewerState:  # NOSONAR
     """Return the state the lifespan stored on the app.
 
     It is async so FastAPI resolves it on the event loop, not in a worker thread, and a

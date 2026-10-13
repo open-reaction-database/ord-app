@@ -64,7 +64,8 @@ def test_opens_a_corpus_whose_path_holds_a_glob_metacharacter(corpus_dir, tmp_pa
 
 def test_startup_fails_without_a_corpus_directory():
     app = create_app(lambda: Settings(corpus_dir=None), resolver=offline_resolver)
-    with pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"), TestClient(app):
+    client = TestClient(app)
+    with pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"), client:
         pass
 
 
@@ -154,8 +155,6 @@ def test_settings_come_from_the_environment(monkeypatch, corpus_dir):
 
 def test_an_empty_corpus_directory_variable_counts_as_unset(monkeypatch):
     monkeypatch.setenv("ORD_VIEWER_CORPUS_DIR", "")
-    with (
-        pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"),
-        TestClient(create_app(resolver=offline_resolver)),
-    ):
+    client = TestClient(create_app(resolver=offline_resolver))
+    with pytest.raises(ValueError, match="ORD_VIEWER_CORPUS_DIR"), client:
         pass
