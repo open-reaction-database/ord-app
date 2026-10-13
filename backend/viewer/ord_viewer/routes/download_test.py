@@ -71,6 +71,15 @@ def test_bounds_the_request(client):
     assert response.status_code == 422
 
 
+def test_an_unknown_key_is_unprocessable(client):
+    body = {"reaction_ids": ["ord-viewer0101"], "format": "zip"}
+    response = client.post("/api/download", json=body)
+    assert response.status_code == 422
+    (error,) = response.json()["detail"]
+    assert error["type"] == "extra_forbidden"
+    assert error["loc"] == ["body", "format"]
+
+
 def test_accepts_the_largest_request(client):
     largest = [f"ord-{index}" for index in range(1000)]
     response = client.post("/api/download", json={"reaction_ids": largest})

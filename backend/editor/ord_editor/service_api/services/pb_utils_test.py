@@ -82,12 +82,14 @@ def test_write_message_round_trips_non_ascii_text(kind):
 
 
 def test_load_malformed_parquet_raises():
-    with pytest.raises((ValueError, pyarrow.ArrowException)):
+    with pytest.raises(
+        (ValueError, pyarrow.ArrowException), match="Parquet magic bytes not found"
+    ):
         load_dataset_message(b"this is not a parquet file", "parquet")
 
 
 def test_write_parquet_requires_reactions_and_description():
     # ord-schema's Parquet writer requires a non-empty description and at least one reaction.
     no_reactions = Dataset(name="n", description="d")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Dataset has no reactions"):
         write_dataset_message(no_reactions, "parquet")

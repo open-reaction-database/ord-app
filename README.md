@@ -37,6 +37,16 @@ ORD_VIEWER_CORPUS_DIR=<corpus> uv run uvicorn ord_viewer.main:app --port 8001
 
 Opening a full corpus takes about 40 s and 7 GiB. The API docs are at http://localhost:8001/api/docs.
 
+The service reads these environment variables:
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/` |
+| `ORD_VIEWER_MEMORY_LIMIT` | DuckDB's default | DuckDB's `memory_limit`, such as `6500MiB` |
+| `ORD_VIEWER_MAX_CONCURRENT` | 4 | The most searches and dataset charts' aggregates in flight at once; each search gets cores / this many RDKit threads |
+| `ORD_VIEWER_SEARCH_TIMEOUT_SECONDS` | 30 | The bound on one search; a search past it answers 504 |
+| `ORD_VIEWER_SLOT_WAIT_SECONDS` | 10 | How long a request waits for a free search slot before answering 503 |
+
 ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `derive_structures`, `derive_pivots`, and `derive_occurrences`) produce a corpus's trees from source Parquet. For a local smoke run, `ord_viewer.testing.derive_corpus(path)` writes the five-reaction test corpus:
 
 ```shell

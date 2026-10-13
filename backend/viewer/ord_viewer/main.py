@@ -16,13 +16,63 @@
 
 import contextlib
 from collections.abc import AsyncGenerator, Callable
+from typing import cast
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
-from ord_viewer.routes import datasets, download, health, reactions
+from ord_viewer.routes import datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
+from ord_viewer.slots import SearchSlots, SlotsBusyError
 from ord_viewer.state import ViewerState
+
+
+async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NOSONAR
+    """Answer 503 when every search slot stayed busy.
+
+    It is async so Starlette runs it on the event loop, and the 503 needs no worker
+    thread however busy the threadpool is.
+
+    Args:
+        request: The request that waited for a slot.
+        error: The SlotsBusyError that ended the wait.
+
+    Returns:
+        A 503 response carrying the error's message.
+    """
+    return JSONResponse(status_code=503, content={"detail": str(error)})
+
+
+async def _request_invalid(  # NOSONAR
+    request: Request, error: Exception
+) -> JSONResponse:
+    """Answer 422 with FastAPI's usual body, less the input each error echoes.
+
+    Pydantic echoes the value that failed as each error's input, however deeply it
+    nests, and a value nested past the recursion limit (a deep query, or a deep value
+    under an unknown key) is deeper than jsonable_encoder can recurse. The caller sent
+    that value, so the error's type, location, and message identify it. It is async, as
+    FastAPI's own handler is, so Starlette runs it on the event loop rather than in a
+    worker thread.
+
+    Args:
+        request: The request that failed validation.
+        error: The RequestValidationError listing what pydantic found.
+
+    Returns:
+        A 422 response listing the errors.
+    """
+    errors = [
+        {key: value for key, value in item.items() if key != "input"}
+        for item in cast(RequestValidationError, error).errors()
+    ]
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        content={"detail": jsonable_encoder(errors)},
+    )
 
 
 def create_app(
@@ -47,7 +97,11 @@ def create_app(
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         settings = settings_factory()
         with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
-            app.state.viewer = ViewerState(settings=settings, corpus=corpus)
+            app.state.viewer = ViewerState(
+                settings=settings,
+                corpus=corpus,
+                slots=SearchSlots(settings.max_concurrent, settings.slot_wait_seconds),
+            )
             yield
 
     app = FastAPI(
@@ -61,6 +115,9 @@ def create_app(
     app.include_router(datasets.router)
     app.include_router(reactions.router)
     app.include_router(download.router)
+    app.include_router(search.router)
+    app.add_exception_handler(SlotsBusyError, _slots_busy)
+    app.add_exception_handler(RequestValidationError, _request_invalid)
     return app
 
 

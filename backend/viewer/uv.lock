@@ -397,6 +397,7 @@ name = "ord-viewer"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "anyio" },
     { name = "fastapi" },
     { name = "ord-schema", extra = ["nl", "search"] },
     { name = "pyarrow" },
@@ -418,6 +419,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "anyio", specifier = ">=4.15,<5" },
     { name = "fastapi", specifier = ">=0.138.0,<0.200" },
     { name = "ord-schema", extras = ["search", "nl"], specifier = "==0.9.2" },
     { name = "pyarrow", specifier = ">=24,<25" },

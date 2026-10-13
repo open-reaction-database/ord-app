@@ -18,6 +18,8 @@ import pyarrow as pa
 from ord_schema.search import execute
 from rdkit import Chem
 
+from ord_viewer.testing import hold_slot, make_client
+
 
 def test_lists_datasets_by_name(client):
     response = client.get("/api/datasets")
@@ -113,3 +115,12 @@ def test_a_limit_keeps_the_first_tied_compounds_in_smiles_order(client):
     for _ in range(5):
         kept = client.get(url, params={"limit": 2}).json()
         assert [row["smiles"] for row in kept] == every[:2]
+
+
+def test_the_compound_counts_wait_for_a_search_slot(corpus_dir):
+    url = "/api/datasets/ord_dataset-viewer01/compounds"
+    with make_client(corpus_dir, max_concurrent=1, slot_wait_seconds=0.05) as client:
+        with hold_slot(client):
+            response = client.get(url)
+        assert response.status_code == 503
+        assert client.get(url).status_code == 200

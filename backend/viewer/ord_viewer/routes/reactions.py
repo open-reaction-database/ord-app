@@ -23,7 +23,7 @@ from ord_schema.proto import reaction_pb2
 from ord_schema.search import execute
 
 from ord_viewer.molblocks import reaction_molblocks
-from ord_viewer.schemas import ReactionRecord
+from ord_viewer.schemas import ErrorDetail, ReactionRecord
 from ord_viewer.state import ViewerState, get_state
 
 router = APIRouter(prefix="/api/reactions")
@@ -83,7 +83,7 @@ def list_reactions(
     return fetch_records(state.corpus, reaction_ids)
 
 
-@router.get("/{reaction_id}")
+@router.get("/{reaction_id}", responses={404: {"model": ErrorDetail}})
 def get_reaction(
     reaction_id: str, state: Annotated[ViewerState, Depends(get_state)]
 ) -> ReactionRecord:
