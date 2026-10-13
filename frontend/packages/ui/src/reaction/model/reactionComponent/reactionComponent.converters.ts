@@ -75,6 +75,7 @@ import type {
   OrdOptional,
   ReactionCompoundIdentifier,
 } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
+import { isStructureIdentifierType } from '#reaction/model/reactionEntity/structureIdentifiers.ts';
 import { measurementTransform } from '#reaction/model/reactionsMeasurement/reactionMeasurements.transform.ts';
 
 type OrdComponentBaseField = 'identifiers' | 'reactionRole' | 'texture' | 'features';
@@ -277,13 +278,13 @@ function ordComponentBaseToReaction({
 
   const { nonMolBlockIdentifiers, molBlockIdentifiers } = reactionIdentifiers.reduce(
     ({ nonMolBlockIdentifiers, molBlockIdentifiers }, item) => {
-      const isMolblock = item.type === 'MOLBLOCK';
+      const isStructure = isStructureIdentifierType(item.type);
 
       return {
-        nonMolBlockIdentifiers: isMolblock
+        nonMolBlockIdentifiers: isStructure
           ? nonMolBlockIdentifiers
           : nonMolBlockIdentifiers.concat(item),
-        molBlockIdentifiers: isMolblock
+        molBlockIdentifiers: isStructure
           ? molBlockIdentifiers.concat(item)
           : molBlockIdentifiers,
       };

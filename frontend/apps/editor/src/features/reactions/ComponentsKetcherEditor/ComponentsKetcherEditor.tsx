@@ -23,7 +23,12 @@ import classes from './componentsKetcherEditor.module.scss';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import { useField } from '@mantine/form';
+import {
+  NotificationVariant,
+  showNotification,
+} from '@open-reaction-database/ui/display';
 import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
+import { DEFAULT_STRUCTURE_IDENTIFIER_TYPE } from '@open-reaction-database/ui/reaction/model';
 
 const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 
@@ -59,13 +64,38 @@ export function ComponentsKetcherEditor({
   }, [ketcherInstance, opened]);
 
   const handleSave = () => {
-    if (ketcherInstance) {
-      ketcherInstance.getMolfile().then(molfile => {
-        const details = getValue();
-        onSave({ value: molfile, details });
-        onClose();
-      });
+    if (!ketcherInstance) {
+      return;
     }
+    // The drawing goes back in the type it was opened in; a new one is a molblock.
+    const type = identifier?.type ?? DEFAULT_STRUCTURE_IDENTIFIER_TYPE;
+    // An async function, so that getSmiles throwing synchronously and getMolfile
+    // rejecting reach the same catch.
+    const serialize = async () => {
+      if (type !== 'CXSMILES') {
+        return ketcherInstance.getMolfile();
+      }
+      // getSmiles would write a reaction SMILES into a compound identifier.
+      if (ketcherInstance.containsReaction()) {
+        throw new Error(
+          'The structure cannot be saved as CXSMILES due to reaction arrows.',
+        );
+      }
+      return ketcherInstance.getSmiles(true);
+    };
+    serialize().then(
+      value => {
+        onSave({ type, value, details: getValue() });
+        onClose();
+      },
+      (error: unknown) => {
+        showNotification({
+          variant: NotificationVariant.ERROR,
+          message:
+            error instanceof Error ? error.message : 'The drawing could not be saved.',
+        });
+      },
+    );
   };
 
   return (

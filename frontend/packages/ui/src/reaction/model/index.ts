@@ -26,6 +26,7 @@ export * from './reactionData/reactionData.converters.ts';
 export * from './reactionData/reactionData.types.ts';
 export * from './reactionEntity/reactionEntity.converters.ts';
 export * from './reactionEntity/reactionEntity.types.ts';
+export * from './reactionEntity/structureIdentifiers.ts';
 export * from './reactionEntityTypes/reactionEntityTypes.converters.ts';
 export * from './reactionEntityTypes/reactionEntityTypes.models.ts';
 export * from './reactionEntityTypes/reactionEntityTypes.types.ts';

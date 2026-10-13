@@ -30,14 +30,7 @@ export default defineConfig({
       reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: [
-        'src/**/*.test.{ts,tsx}',
-        'src/**/*.d.ts',
-        'src/testing/**',
-        // Indigo is a WASM build that cannot load under Vitest, so only renderSvg's two
-        // guards can run here; the worker's tests stub this module.
-        'src/reaction/previews/indigo.ts',
-      ],
+      exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.d.ts', 'src/testing/**'],
       // Floors at the measured coverage, rounded down.
       thresholds: {
         lines: 84,

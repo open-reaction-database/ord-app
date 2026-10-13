@@ -19,16 +19,24 @@ import {
 } from '#reaction/view/ReactionEntities/reactionEntities.types.ts';
 import { compoundIdentifierTypeOptions } from '#reaction/model/reactionEntityTypes/reactionEntityTypes.models.ts';
 import { type SelectOptions } from '#reaction/model/selectOptions.ts';
+import {
+  isStructureIdentifierType,
+  STRUCTURE_IDENTIFIER_TYPES,
+} from '#reaction/model/reactionEntity/structureIdentifiers.ts';
 
-const typeOptionsWithoutMolBlock: SelectOptions = compoundIdentifierTypeOptions.filter(
-  item => item !== 'MOLBLOCK',
+const textEntryTypeOptions: SelectOptions = compoundIdentifierTypeOptions.filter(
+  item => !isStructureIdentifierType(item),
 );
 
-const typeOptions = typeOptionsWithoutMolBlock.concat({
-  label: 'MOLBLOCK',
-  value: 'MOLBLOCK',
-  disabled: true,
-});
+// Structure identifiers are drawn in the molecule editor, so their types label existing
+// values but are never a choice.
+const typeOptions = textEntryTypeOptions.concat(
+  STRUCTURE_IDENTIFIER_TYPES.map(type => ({
+    label: type,
+    value: type,
+    disabled: true,
+  })),
+);
 
 export const reactionComponentIdentifiers: Array<ReactionFormNode> = [
   {
