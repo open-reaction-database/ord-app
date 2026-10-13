@@ -26,7 +26,7 @@ from ord_schema.search import execute
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
-from ord_viewer.testing import make_client, offline_resolver
+from ord_viewer.testing import derive_corpus, make_client, offline_resolver
 
 
 def test_health_returns_the_corpus_fingerprint(client):
@@ -55,10 +55,11 @@ def test_health_answers_with_every_worker_thread_taken(corpus_dir):
     assert asyncio.run(probe_with_no_free_thread()) == 200
 
 
-def test_opens_a_corpus_whose_path_holds_a_glob_metacharacter(corpus_dir, tmp_path):
-    copied = tmp_path / "corpus[1]"
-    shutil.copytree(corpus_dir, copied)
-    with make_client(copied) as client:
+def test_derives_and_opens_a_corpus_whose_path_holds_a_glob_metacharacter(tmp_path):
+    root = tmp_path / "corpus[1]"
+    root.mkdir()
+    derive_corpus(root)
+    with make_client(root) as client:
         assert client.get("/api/health").status_code == 200
 
 

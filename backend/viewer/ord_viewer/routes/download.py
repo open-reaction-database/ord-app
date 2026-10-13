@@ -20,7 +20,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from ord_schema.proto import dataset_pb2, reaction_pb2
 
-from ord_viewer.corpus import read_reactions
 from ord_viewer.schemas import DownloadRequest
 from ord_viewer.state import ViewerState, get_state
 
@@ -53,7 +52,7 @@ def download(
     Raises:
         HTTPException: 404, if the corpus holds none of the reactions.
     """
-    table = read_reactions(state.corpus, body.reaction_ids)
+    table = state.corpus.reactions(body.reaction_ids)
     if table.num_rows == 0:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "none of these reactions are in the corpus"

@@ -22,7 +22,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from ord_schema.proto import reaction_pb2
 from ord_schema.search import execute
 
-from ord_viewer.corpus import read_reactions
 from ord_viewer.molblocks import reaction_molblocks
 from ord_viewer.schemas import ReactionRecord
 from ord_viewer.state import ViewerState, get_state
@@ -52,7 +51,7 @@ def fetch_records(
         execute.PairingError: If a reaction is stated in more than one source.
     """
     records = []
-    for row in read_reactions(corpus, reaction_ids).to_pylist():
+    for row in corpus.reactions(reaction_ids).to_pylist():
         blob = row["reaction"]
         records.append(
             ReactionRecord(

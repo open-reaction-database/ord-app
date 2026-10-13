@@ -105,3 +105,11 @@ def test_orders_tied_counts_by_smiles(client):
     assert {row["count"] for row in rows} == {1}
     smiles = [row["smiles"] for row in rows]
     assert smiles == sorted(smiles)
+
+
+def test_a_limit_keeps_the_first_tied_compounds_in_smiles_order(client):
+    url = "/api/datasets/ord_dataset-viewer02/compounds"
+    every = [row["smiles"] for row in client.get(url).json()]
+    for _ in range(5):
+        kept = client.get(url, params={"limit": 2}).json()
+        assert [row["smiles"] for row in kept] == every[:2]

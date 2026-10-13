@@ -148,22 +148,20 @@ def dataset_compounds(
                 "group_by": ["smiles"],
                 "measures": [{"fn": "count", "name": "occurrences"}],
             },
-            "order_by": [{"key": "occurrences", "descending": True}],
+            # SMILES breaks ties, so a limit keeps the same compounds every time.
+            "order_by": [
+                {"key": "occurrences", "descending": True},
+                {"key": "smiles"},
+            ],
             "limit": limit,
         }
     )
     table = run_search(state, request)
-    # ord-schema 0.9.1 cannot order an element aggregate by its group key
-    # (ord-schema#1106), so ties within the returned rows are put in SMILES order
-    # here; which tied compounds a limit keeps can vary between requests.
-    rows = sorted(
-        table.to_pylist(), key=lambda row: (-row["occurrences"], row["smiles"])
-    )
     return [
         CompoundCount(
             smiles=row["smiles"],
             molblock=smiles_molblock(row["smiles"]),
             count=row["occurrences"],
         )
-        for row in rows
+        for row in table.to_pylist()
     ]
