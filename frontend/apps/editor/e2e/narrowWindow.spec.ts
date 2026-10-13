@@ -185,6 +185,11 @@ const DRAWERS: Array<{ name: string; open: (page: Page) => Promise<void> }> = [
   },
 ];
 
+/** The width the page lays out at, in CSS pixels. */
+function layoutWidth(page: Page) {
+  return page.evaluate(() => document.documentElement.clientWidth);
+}
+
 /** How far the page scrolls sideways, in pixels. */
 function sidewaysOverflow(page: Page) {
   return page.evaluate(
@@ -217,6 +222,8 @@ for (const width of WIDTHS) {
       }) => {
         await open(page);
         await expect(page.locator(LOADER)).toHaveCount(0, { timeout: 30_000 });
+        // A desktop window ignores the 1024 px viewport that phones apply.
+        expect(await layoutWidth(page)).toBe(width);
         await expect.poll(() => sidewaysOverflow(page)).toBe(0);
         for (const locator of whole(page)) {
           await expectWhole(locator);
@@ -234,3 +241,13 @@ for (const width of WIDTHS) {
     }
   });
 }
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+
+  test('a page lays out 1024 px wide without scrolling sideways', async ({ page }) => {
+    await openDatasetsList(page);
+    expect(await layoutWidth(page)).toBe(1024);
+    await expect.poll(() => sidewaysOverflow(page)).toBe(0);
+  });
+});
