@@ -34,8 +34,9 @@
   --font-size-md: 14px;
   --font-size-sm: 12px;
 
-  /* A drawer's width, capped at the window's so a drawer never starts off-screen. */
+  /* The drawers' widths, at most the window's, so a drawer's left edge stays on screen. */
   --sidebar-width: min(928px, 100vw);
+  --validation-sidebar-width: min(680px, 100vw);
 }
 
 body {

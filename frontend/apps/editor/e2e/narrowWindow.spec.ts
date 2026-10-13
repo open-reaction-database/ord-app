@@ -153,6 +153,13 @@ const DRAWERS: Array<{ name: string; open: (page: Page) => Promise<void> }> = [
     },
   },
   {
+    name: 'a reaction’s validation messages',
+    open: async page => {
+      await openReaction(page);
+      await page.getByRole('button', { name: /error/ }).click();
+    },
+  },
+  {
     name: 'sharing a dataset',
     open: async page => {
       await openDataset(page);
