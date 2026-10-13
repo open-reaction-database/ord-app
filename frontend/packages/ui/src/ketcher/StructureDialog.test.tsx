@@ -15,6 +15,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type * as ReactNS from 'react';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { StructureDialog } from './StructureDialog.tsx';
@@ -22,17 +23,23 @@ import type { StructureDialogProps } from './structure.types.ts';
 
 // Counts how often the dialog's module is evaluated, which happens when it is imported.
 const evaluations = vi.hoisted(() => ({ count: 0 }));
+// Makes the dialog throw as it renders, which reaches the same boundary a failed import does.
+const failure = vi.hoisted(() => ({ throwing: false }));
 
 vi.mock('./KetcherDialog.tsx', async () => {
   evaluations.count += 1;
   const React = (await vi.importActual('react')) as typeof ReactNS;
   return {
-    KetcherDialog: (props: Readonly<StructureDialogProps>) =>
-      React.createElement(
+    KetcherDialog: (props: Readonly<StructureDialogProps>) => {
+      if (failure.throwing) {
+        throw new Error('Failed to fetch dynamically imported module');
+      }
+      return React.createElement(
         'div',
         { 'data-testid': 'ketcher-dialog', 'data-opened': String(props.opened) },
         props.initial,
-      ),
+      );
+    },
   };
 });
 
@@ -62,5 +69,18 @@ describe('StructureDialog', () => {
     rerender(<StructureDialog {...props(true, 'CCN')} />);
     expect(getByTestId('ketcher-dialog')).toHaveTextContent('CCN');
     expect(evaluations.count).toBe(1);
+  });
+
+  it('tries loading Ketcher again when asked', async () => {
+    failure.throwing = true;
+    // React logs the error the boundary catches; the test expects it.
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { findByText, findByTestId, getByRole } = renderWithMantine(
+      <StructureDialog {...props(true)} />,
+    );
+    expect(await findByText('Ketcher could not be loaded.')).toBeInTheDocument();
+    failure.throwing = false;
+    await userEvent.click(getByRole('button', { name: 'Try again' }));
+    expect(await findByTestId('ketcher-dialog')).toHaveAttribute('data-opened', 'true');
   });
 });

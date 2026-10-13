@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Center, Loader, Modal } from '@mantine/core';
-import { lazy, Suspense, useState } from 'react';
+import { Button, Center, Group, Loader, Modal, Text } from '@mantine/core';
+import { Component, lazy, Suspense, useState, type ReactNode } from 'react';
 import type { StructureDialogProps } from './structure.types.ts';
 
 /**
@@ -32,37 +32,96 @@ async function loadKetcherDialog() {
   return { default: KetcherDialog };
 }
 
-const KetcherDialog = lazy(loadKetcherDialog);
+/** A lazy dialog for one attempt to load Ketcher: one that failed keeps its failure. */
+function lazyKetcherDialog() {
+  return lazy(loadKetcherDialog);
+}
+
+interface LoadBoundaryProps {
+  fallback: ReactNode;
+  children: ReactNode;
+}
+
+/** Keeps a failure to load Ketcher, such as a chunk that did not download, in the dialog. */
+class LoadBoundary extends Component<Readonly<LoadBoundaryProps>, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
 
 /**
  * Draws a structure in Ketcher, saving it as `format`.
  *
  * Ketcher's chunk loads the first time the dialog opens and is reused by later openings,
- * each of which initializes a new Ketcher in the modal.
+ * each of which initializes a new Ketcher in the modal. If the chunk cannot load, the
+ * dialog says so and offers to try again, and its host is left as it was.
  */
 export function StructureDialog(props: Readonly<StructureDialogProps>) {
   const [hasOpened, setHasOpened] = useState(props.opened);
+  const [attempt, setAttempt] = useState(0);
+  const [KetcherDialog, setKetcherDialog] = useState(lazyKetcherDialog);
   if (props.opened && !hasOpened) {
     setHasOpened(true);
   }
   if (!hasOpened) {
     return null;
   }
+  const tryAgain = () => {
+    setKetcherDialog(() => lazyKetcherDialog());
+    setAttempt(previous => previous + 1);
+  };
   return (
-    <Suspense
+    <LoadBoundary
+      key={attempt}
       fallback={
         <Modal
           opened={props.opened}
           onClose={props.onClose}
-          withCloseButton={false}
+          title="Draw a structure"
         >
-          <Center p="xl">
-            <Loader />
-          </Center>
+          <Text>Ketcher could not be loaded.</Text>
+          <Text
+            size="sm"
+            c="dimmed"
+          >
+            Check the connection, then try again.
+          </Text>
+          <Group
+            justify="flex-end"
+            mt="md"
+          >
+            <Button
+              variant="default"
+              onClick={props.onClose}
+            >
+              Close
+            </Button>
+            <Button onClick={tryAgain}>Try again</Button>
+          </Group>
         </Modal>
       }
     >
-      <KetcherDialog {...props} />
-    </Suspense>
+      <Suspense
+        fallback={
+          <Modal
+            opened={props.opened}
+            onClose={props.onClose}
+            withCloseButton={false}
+          >
+            <Center p="xl">
+              <Loader />
+            </Center>
+          </Modal>
+        }
+      >
+        <KetcherDialog {...props} />
+      </Suspense>
+    </LoadBoundary>
   );
 }

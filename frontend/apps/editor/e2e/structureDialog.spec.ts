@@ -13,15 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { seedReaction } from './seed.ts';
 
-// Ketcher sets this global once its canvas is ready.
+// Ketcher sets this global to each instance it initializes.
 interface KetcherWindow {
-  ketcher?: { setMolecule(structure: string): Promise<void> } | null;
+  ketcher?: {
+    setMolecule(structure: string): Promise<void>;
+    getSmiles(): Promise<string>;
+  } | null;
 }
 
-test('draws a molblock identifier in Ketcher and saves it', async ({
+/** Waits for a Ketcher initialized after the global was last cleared. */
+async function waitForKetcher(page: Page) {
+  await page.waitForFunction(
+    () => Boolean((globalThis as KetcherWindow).ketcher),
+    undefined,
+    {
+      timeout: 60_000,
+    },
+  );
+}
+
+function drawnSmiles(page: Page): Promise<string | undefined> {
+  return page.evaluate(() => (globalThis as KetcherWindow).ketcher?.getSmiles());
+}
+
+test('draws a molblock identifier in Ketcher and saves the drawing', async ({
   page,
   request,
 }) => {
@@ -42,20 +60,33 @@ test('draws a molblock identifier in Ketcher and saves it', async ({
     .first()
     .click();
   await page.getByText('Add Molblock Identifier').click();
-  await page.waitForFunction(
-    () => Boolean((globalThis as KetcherWindow).ketcher),
-    undefined,
-    {
-      timeout: 60_000,
-    },
-  );
-  await page.evaluate(() => (globalThis as KetcherWindow).ketcher?.setMolecule('CCO'));
+  await waitForKetcher(page);
+  // The dialog loads its initial structure into the canvas as Ketcher starts, so the
+  // drawing is set until Ketcher reports it.
+  await expect(async () => {
+    await page.evaluate(() =>
+      (globalThis as KetcherWindow).ketcher?.setMolecule('CCO'),
+    );
+    expect(await drawnSmiles(page)).toBe('CCO');
+  }).toPass();
   // The drawer's form has a Save of its own; this one is the dialog holding Ketcher.
-  await page
+  const ketcherDialog = page
     .getByRole('dialog')
-    .filter({ has: page.locator('.Ketcher-root') })
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
+    .filter({ has: page.locator('.Ketcher-root') });
+  await ketcherDialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(ketcherDialog).toBeHidden();
 
-  await expect(page.getByText('Drawn with Ketcher')).toBeVisible();
+  // Reopen the saved identifier in a new Ketcher, which loads the stored molfile.
+  await page.evaluate(() => {
+    (globalThis as KetcherWindow).ketcher = null;
+  });
+  await page
+    .locator('div')
+    .filter({ hasText: 'Drawn with Ketcher' })
+    .filter({ has: page.getByRole('button', { name: 'Edit', exact: true }) })
+    .last()
+    .getByRole('button', { name: 'Edit', exact: true })
+    .click();
+  await waitForKetcher(page);
+  await expect.poll(() => drawnSmiles(page)).toBe('CCO');
 });
