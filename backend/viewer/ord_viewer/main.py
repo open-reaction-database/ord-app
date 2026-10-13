@@ -18,13 +18,14 @@ import contextlib
 from collections.abc import AsyncGenerator, Callable
 from typing import cast
 
+import anthropic
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
-from ord_viewer.routes import datasets, download, health, reactions, search
+from ord_viewer.routes import ask, datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots, SlotsBusyError
 from ord_viewer.state import ViewerState
@@ -79,6 +80,9 @@ def create_app(
     settings_factory: Callable[[], Settings] = Settings,
     *,
     resolver: Callable[[str], str] = resolve_compound_name,
+    ask_client_factory: Callable[
+        [], anthropic.Anthropic | None
+    ] = ask.ask_client_from_environment,
 ) -> FastAPI:
     """Build the app; its lifespan reads the settings and opens the corpus.
 
@@ -88,6 +92,8 @@ def create_app(
     Args:
         settings_factory: Called once at startup; the default reads the environment.
         resolver: Resolves compound names in queries to SMILES.
+        ask_client_factory: Called once at startup for /api/ask's model client; None
+            leaves /api/ask answering 503. The default reads the API key variables.
 
     Returns:
         The app, with every route registered.
@@ -96,11 +102,18 @@ def create_app(
     @contextlib.asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         settings = settings_factory()
-        with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
+        with contextlib.ExitStack() as stack:
+            corpus = stack.enter_context(
+                contextlib.closing(open_corpus(settings, resolver=resolver))
+            )
+            ask_client = ask_client_factory()
+            if ask_client is not None:
+                stack.callback(ask_client.close)
             app.state.viewer = ViewerState(
                 settings=settings,
                 corpus=corpus,
                 slots=SearchSlots(settings.max_concurrent, settings.slot_wait_seconds),
+                ask_client=ask_client,
             )
             yield
 
@@ -116,6 +129,7 @@ def create_app(
     app.include_router(reactions.router)
     app.include_router(download.router)
     app.include_router(search.router)
+    app.include_router(ask.router)
     app.add_exception_handler(SlotsBusyError, _slots_busy)
     app.add_exception_handler(RequestValidationError, _request_invalid)
     return app

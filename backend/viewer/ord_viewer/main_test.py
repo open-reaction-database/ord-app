@@ -170,6 +170,7 @@ _SEARCH_ERRORS = {"422", "503", "504"}
     ("method", "path", "statuses"),
     [
         ("post", "/api/search", _SEARCH_ERRORS),
+        ("post", "/api/ask", _SEARCH_ERRORS | {"429", "502"}),
         ("get", "/api/datasets/{dataset_id}/compounds", _SEARCH_ERRORS | {"404"}),
         ("get", "/api/datasets/{dataset_id}", {"404", "422"}),
         ("get", "/api/reactions/{reaction_id}", {"404", "422"}),

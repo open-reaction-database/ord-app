@@ -397,6 +397,7 @@ name = "ord-viewer"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "anthropic" },
     { name = "anyio" },
     { name = "fastapi" },
     { name = "ord-schema", extra = ["nl", "search"] },
@@ -410,6 +411,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "httpx" },
+    { name = "httpx2" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-xdist" },
@@ -419,6 +421,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "anthropic", specifier = ">=1.13,<2" },
     { name = "anyio", specifier = ">=4.15,<5" },
     { name = "fastapi", specifier = ">=0.138.0,<0.200" },
     { name = "ord-schema", extras = ["search", "nl"], specifier = "==0.9.2" },
@@ -432,6 +435,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "httpx", specifier = ">=0.28.1,<0.29" },
+    { name = "httpx2", specifier = ">=2.13,<3" },
     { name = "pytest", specifier = ">=9.0.3,<10" },
     { name = "pytest-cov", specifier = ">=6.0.0,<7" },
     { name = "pytest-xdist", specifier = ">=3.6,<4" },

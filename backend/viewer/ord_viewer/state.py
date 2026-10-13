@@ -16,6 +16,7 @@
 
 import dataclasses
 
+import anthropic
 from fastapi import Request
 from ord_schema.search import execute
 
@@ -25,11 +26,13 @@ from ord_viewer.slots import SearchSlots
 
 @dataclasses.dataclass(frozen=True)
 class ViewerState:
-    """The settings, the open corpus, and the search slots every route reads."""
+    """The settings, the open corpus, the search slots, and the model client /ask uses."""
 
     settings: Settings
     corpus: execute.Corpus
     slots: SearchSlots
+    # None when no API key is configured; /api/ask then answers 503.
+    ask_client: anthropic.Anthropic | None = None
 
 
 async def get_state(request: Request) -> ViewerState:  # NOSONAR
@@ -42,6 +45,6 @@ async def get_state(request: Request) -> ViewerState:  # NOSONAR
         request: The request being served.
 
     Returns:
-        The settings, open corpus, and search slots.
+        The settings, open corpus, search slots, and model client.
     """
     return request.app.state.viewer

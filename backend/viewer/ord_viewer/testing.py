@@ -241,17 +241,23 @@ def slot_waiters(client: TestClient) -> int:
     return portal(client).call(_search_slots(client).waiting)
 
 
-def make_client(corpus_dir: pathlib.Path, **settings: Any) -> TestClient:
+def make_client(
+    corpus_dir: pathlib.Path, *, ask_client: Any = None, **settings: Any
+) -> TestClient:
     """Return an unentered client over corpus_dir, with any settings overridden.
 
     Args:
         corpus_dir: The corpus the app serves.
+        ask_client: What /api/ask calls messages.create on: an anthropic.Anthropic, or a
+            stub that scripts its responses. None answers 503, as with no key.
         **settings: Settings fields to set beyond corpus_dir.
 
     Returns:
         A client whose app opens the corpus when the client is entered.
     """
     app = create_app(
-        lambda: Settings(corpus_dir=corpus_dir, **settings), resolver=offline_resolver
+        lambda: Settings(corpus_dir=corpus_dir, **settings),
+        resolver=offline_resolver,
+        ask_client_factory=lambda: ask_client,
     )
     return TestClient(app)
