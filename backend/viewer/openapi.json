@@ -434,7 +434,7 @@
     "/api/ask": {
       "post": {
         "summary": "Ask",
-        "description": "Translate a question into a query, run it, and describe what it found.\n\nIt is async so a question waits for its search slot on the event loop; the model\ncalls, the search, and the shaping of its result run in worker threads.\n\nArgs:\n    body: The question.\n    state: The settings, open corpus, and search slots.\n    client: The model client.\n\nReturns:\n    The query the question became, a sentence about what it found, and the result.\n\nRaises:\n    HTTPException: 422 if the question cannot be put to the grammar, the model\n        declined it, or its query names an unknown compound; 429 if the model is\n        rate limiting; 502 if the model's query never compiles; 503 if the model\n        cannot be reached; 504 if the search times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
+        "description": "Translate a question into a query, run it, and describe what it found.\n\nIt is async so a question waits for its search slot on the event loop; the model\ncalls, the search, and the shaping of its result run in worker threads.\n\nArgs:\n    body: The question.\n    state: The settings, open corpus, and search slots.\n    client: The model client.\n\nReturns:\n    The query the question became, a sentence about what it found, and the result.\n\nRaises:\n    HTTPException: 422 if the question cannot be put to the grammar, the model\n        declined it, or its query names an unknown compound; 429 if the model is\n        rate limiting; 502 if the model's query never compiles; 503 if a call to\n        the model fails for any other reason; 504 if the search times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
         "operationId": "ask_api_ask_post",
         "requestBody": {
           "content": {
@@ -476,7 +476,7 @@
             }
           },
           "503": {
-            "description": "Every search slot stayed busy, no API key is configured, or the model could not be reached",
+            "description": "Every search slot stayed busy, no API key is configured, or a call to the model failed",
             "content": {
               "application/json": {
                 "schema": {

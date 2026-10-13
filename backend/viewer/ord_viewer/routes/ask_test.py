@@ -39,6 +39,7 @@ _PYRIDINE_QUERY = {
 _PYRIDINE_ANSWER = "One reaction uses a pyridine."
 # A response the model's safety classifiers stopped.
 _DECLINED = "declined"
+_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 
 
 class _StubClient:
@@ -112,7 +113,7 @@ def ask_with(client: TestClient) -> Generator[Callable[..., _StubClient]]:
 
 
 def _api_error(error_type: type[anthropic.APIStatusError], code: int) -> Exception:
-    request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+    request = httpx2.Request("POST", _MESSAGES_URL)
     response = httpx2.Response(code, request=request, json={"error": {}})
     return error_type("the model said no", response=response, body=None)
 
@@ -167,6 +168,7 @@ def test_an_unanswerable_question(client, ask_with):
     [
         (_api_error(anthropic.RateLimitError, 429), 429),
         (_api_error(anthropic.InternalServerError, 500), 503),
+        (anthropic.APITimeoutError(httpx2.Request("POST", _MESSAGES_URL)), 503),
     ],
 )
 def test_a_model_failure_has_its_own_status(client, ask_with, error, code):
