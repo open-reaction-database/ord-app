@@ -18,6 +18,7 @@ version = "0.1.0"
 description = "The Open Reaction Database viewer's backend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "anyio>=4.15,<5",
     "fastapi>=0.138.0,<0.200",
     # Corpus opens only artifacts stamped with its own RDKit version and artifact
     # lineage, so RDKit follows the corpus ord-schema publishes and ord-schema stays on

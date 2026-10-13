@@ -21,7 +21,7 @@ import pytest
 from anyio import to_thread
 from fastapi.testclient import TestClient
 
-from ord_viewer.testing import hold_slot, make_client, portal
+from ord_viewer.testing import hold_slot, make_client, portal, slot_waiters
 
 _PYRIDINE_INPUT = {
     "op": "exists",
@@ -248,9 +248,24 @@ def _set_thread_tokens(client: TestClient, total: float) -> float:
     return portal(client).call(swap)
 
 
+def _wait_for_slot_waiters(client: TestClient, count: int) -> None:
+    """Wait until count requests are waiting for a search slot; fail after 3 s.
+
+    Args:
+        client: An entered client.
+        count: How many waiting requests to wait for.
+    """
+    deadline = time.monotonic() + 3
+    while (waiters := slot_waiters(client)) < count:
+        if time.monotonic() > deadline:
+            pytest.fail(f"only {waiters} of {count} searches reached the slot in 3 s")
+        time.sleep(0.01)
+
+
 def test_a_request_waiting_for_a_slot_holds_no_worker_thread(corpus_dir):
     search = {"query": {"where": _PYRIDINE_INPUT}}
-    with make_client(corpus_dir, max_concurrent=1, slot_wait_seconds=3) as client:
+    # The slot wait outlasts the 3 s poll and the 1 s probe, so no search gives up.
+    with make_client(corpus_dir, max_concurrent=1, slot_wait_seconds=5) as client:
         tokens = _set_thread_tokens(client, 2)
         try:
             # The slot is released before the executor joins, so the searches finish.
@@ -259,7 +274,7 @@ def test_a_request_waiting_for_a_slot_holds_no_worker_thread(corpus_dir):
                     executor.submit(client.post, "/api/search", json=search)
                     for _ in range(3)
                 ]
-                time.sleep(0.5)  # for the searches to reach the slot
+                _wait_for_slot_waiters(client, len(waiting))
                 started = time.monotonic()
                 response = client.get("/api/datasets")
                 elapsed = time.monotonic() - started

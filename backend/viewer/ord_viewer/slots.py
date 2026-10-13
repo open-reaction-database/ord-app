@@ -38,6 +38,10 @@ class SearchSlots:
         self._semaphore = anyio.Semaphore(capacity, max_value=capacity)
         self._wait_seconds = wait_seconds
 
+    def waiting(self) -> int:
+        """Return how many requests are waiting for a slot; call it on the event loop."""
+        return self._semaphore.statistics().tasks_waiting
+
     @contextlib.asynccontextmanager
     async def hold(self) -> AsyncGenerator[None]:
         """Hold one slot for the body of the async with statement.

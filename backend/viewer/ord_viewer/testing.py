@@ -34,6 +34,7 @@ from ord_schema.proto import dataset_pb2, reaction_pb2
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
+from ord_viewer.slots import SearchSlots
 
 # Names offline_resolver knows; any other name raises, as ord-schema's resolvers do.
 COMPOUND_NAMES = {"pyridine": "c1ccncc1"}
@@ -204,6 +205,18 @@ def portal(client: TestClient) -> BlockingPortal:
     return client.portal
 
 
+def _search_slots(client: TestClient) -> SearchSlots:
+    """Return the search slots an entered client's app holds.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The app's search slots.
+    """
+    return cast(FastAPI, client.app).state.viewer.slots
+
+
 def hold_slot(client: TestClient) -> contextlib.AbstractContextManager[None]:
     """Hold one of the app's search slots from the test thread.
 
@@ -213,8 +226,19 @@ def hold_slot(client: TestClient) -> contextlib.AbstractContextManager[None]:
     Returns:
         A context manager holding the slot, on the app's event loop, for its body.
     """
-    slots = cast(FastAPI, client.app).state.viewer.slots
-    return portal(client).wrap_async_context_manager(slots.hold())
+    return portal(client).wrap_async_context_manager(_search_slots(client).hold())
+
+
+def slot_waiters(client: TestClient) -> int:
+    """Count the requests waiting for one of the app's search slots.
+
+    Args:
+        client: A client inside its with statement.
+
+    Returns:
+        The number waiting, read on the app's event loop.
+    """
+    return portal(client).call(_search_slots(client).waiting)
 
 
 def make_client(corpus_dir: pathlib.Path, **settings: Any) -> TestClient:
