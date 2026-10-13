@@ -14,7 +14,17 @@
 
 """Molblocks for the browser, which draws molecules with Indigo rather than SVG."""
 
+from ord_schema import message_helpers
+from ord_schema.proto import reaction_pb2
 from rdkit import Chem
+
+from ord_viewer.schemas import (
+    AuthenticStandardMolblock,
+    MeasurementMolblocks,
+    OutcomeMolblocks,
+    ProductMolblocks,
+    ReactionMolblocks,
+)
 
 
 def smiles_molblock(smiles: str) -> str | None:
@@ -28,3 +38,64 @@ def smiles_molblock(smiles: str) -> str | None:
     """
     molecule = Chem.MolFromSmiles(smiles)
     return None if molecule is None else Chem.MolToMolBlock(molecule)
+
+
+def _compound_molblock(
+    compound: reaction_pb2.Compound | reaction_pb2.ProductCompound,
+) -> str | None:
+    """Return a compound's molblock, or None if no identifier is a structure.
+
+    Args:
+        compound: A reaction input, workup, product, or standard compound.
+
+    Returns:
+        The molblock, or None if none of the compound's identifiers reads.
+    """
+    try:
+        return message_helpers.molblock_from_compound(compound)
+    except ValueError:
+        return None
+
+
+def reaction_molblocks(reaction: reaction_pb2.Reaction) -> ReactionMolblocks:
+    """Return a molblock for each input, product, standard, and workup compound.
+
+    Args:
+        reaction: The reaction to draw.
+
+    Returns:
+        The molblocks, in the shape the editor's previews read.
+    """
+    return ReactionMolblocks(
+        inputs={
+            key: [
+                _compound_molblock(component) for component in reaction_input.components
+            ]
+            for key, reaction_input in reaction.inputs.items()
+        },
+        outcomes=[
+            OutcomeMolblocks(
+                products=[
+                    ProductMolblocks(
+                        molblock=_compound_molblock(product),
+                        measurements=[
+                            MeasurementMolblocks(
+                                authentic_standard=AuthenticStandardMolblock(
+                                    molblock=_compound_molblock(
+                                        measurement.authentic_standard
+                                    )
+                                )
+                            )
+                            for measurement in product.measurements
+                        ],
+                    )
+                    for product in outcome.products
+                ]
+            )
+            for outcome in reaction.outcomes
+        ],
+        workups=[
+            [_compound_molblock(component) for component in workup.input.components]
+            for workup in reaction.workups
+        ],
+    )

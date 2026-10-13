@@ -20,7 +20,7 @@ from collections.abc import AsyncGenerator, Callable
 from fastapi import FastAPI
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
-from ord_viewer.routes import datasets, health
+from ord_viewer.routes import datasets, health, reactions
 from ord_viewer.settings import Settings
 from ord_viewer.state import ViewerState
 
@@ -59,6 +59,7 @@ def create_app(
     )
     app.include_router(health.router)
     app.include_router(datasets.router)
+    app.include_router(reactions.router)
     return app
 
 

@@ -32,3 +32,46 @@ class CompoundCount(BaseModel):
     smiles: str
     molblock: str | None
     count: int
+
+
+class AuthenticStandardMolblock(BaseModel):
+    """A measurement's authentic standard."""
+
+    molblock: str | None
+
+
+class MeasurementMolblocks(BaseModel):
+    """The structures one product measurement names."""
+
+    authentic_standard: AuthenticStandardMolblock
+
+
+class ProductMolblocks(BaseModel):
+    """One product and its measurements' standards."""
+
+    molblock: str | None
+    measurements: list[MeasurementMolblocks]
+
+
+class OutcomeMolblocks(BaseModel):
+    """One outcome's products."""
+
+    products: list[ProductMolblocks]
+
+
+class ReactionMolblocks(BaseModel):
+    """A molblock for each compound slot of a reaction; None where none reads."""
+
+    inputs: dict[str, list[str | None]]
+    outcomes: list[OutcomeMolblocks]
+    workups: list[list[str | None]]
+
+
+class ReactionRecord(BaseModel):
+    """One reaction as the editor returns it: the serialized proto and molblocks."""
+
+    reaction_id: str
+    dataset_id: str | None
+    # The base64 serialized Reaction, as the source file stores it.
+    binpb: str
+    molblocks: ReactionMolblocks
