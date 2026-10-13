@@ -150,6 +150,22 @@ def test_an_aggregate_is_a_table(client):
     ]
 
 
+def test_a_sum_of_integers_is_a_json_integer(client):
+    components = {"reduce": "count", "path": "inputs.components"}
+    query = {
+        "aggregate": {
+            "group_by": ["dataset_id"],
+            "measures": [{"fn": "sum", "path": components, "name": "components"}],
+        }
+    }
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 200, response.text
+    assert sorted(response.json()["rows"]) == [
+        ["ord_dataset-viewer01", 6],
+        ["ord_dataset-viewer02", 5],
+    ]
+
+
 def test_an_unknown_path_is_unprocessable_with_a_message(client):
     query = {"where": {"op": "eq", "path": "no_such_field", "value": {"literal": 1}}}
     response = client.post("/api/search", json={"query": query})

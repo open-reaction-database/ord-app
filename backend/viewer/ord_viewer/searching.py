@@ -97,6 +97,24 @@ async def run_search(state: ViewerState, request: Query) -> pa.Table:
             )
 
 
+def _json_numbers(column: pa.ChunkedArray) -> pa.ChunkedArray:
+    """Cast a decimal column to the JSON number it holds; leave any other as it is.
+
+    DuckDB's sum over integers is a HUGEINT, which Arrow carries as a decimal, and
+    pydantic writes a Decimal as a string.
+
+    Args:
+        column: One column of a search's table.
+
+    Returns:
+        An int64 column for a decimal of scale 0, a float64 column for any other
+        decimal, or the column unchanged.
+    """
+    if not pa.types.is_decimal(column.type):
+        return column
+    return column.cast(pa.int64() if column.type.scale == 0 else pa.float64())
+
+
 def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
     """Shape a search's table as the result the viewer reads.
 
@@ -107,7 +125,8 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
     Returns:
         Reaction IDs for a plain query, or the columns and rows of an aggregate, each
         saying whether the corpus's row bound may have cut it. Rows are built by
-        position, so repeated column names stay aligned.
+        position, so repeated column names stay aligned, and decimal cells become
+        integers or floats.
     """
     truncated = (table.schema.metadata or {}).get(execute.TRUNCATED.encode()) == b"true"
     if request.aggregate is None:
@@ -119,7 +138,8 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
         rows=[
             list(row)
             for row in zip(
-                *(column.to_pylist() for column in table.columns), strict=False
+                *(_json_numbers(column).to_pylist() for column in table.columns),
+                strict=False,
             )
         ],
         truncated=truncated,

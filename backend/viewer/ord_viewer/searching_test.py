@@ -14,6 +14,8 @@
 
 """Mapping a query's failures to HTTP statuses."""
 
+from decimal import Decimal
+
 import pyarrow as pa
 import pytest
 from fastapi import HTTPException, status
@@ -93,6 +95,33 @@ def test_repeated_column_names_keep_every_row_aligned():
     assert isinstance(result, TableResult)
     assert result.columns == ["dataset_id", "n", "n"]
     assert result.rows == [["a", 3, 4], ["b", 2, 1]]
+
+
+def test_a_fractional_decimal_column_gives_floats():
+    request = Query.model_validate(
+        {
+            "aggregate": {
+                "group_by": ["dataset_id"],
+                "measures": [
+                    {
+                        "fn": "sum",
+                        "path": "conditions.temperature.setpoint.value",
+                        "name": "total",
+                    }
+                ],
+            }
+        }
+    )
+    table = pa.table(
+        {
+            "dataset_id": ["a", "b"],
+            "total": pa.array([Decimal("1.25"), None], type=pa.decimal128(10, 2)),
+        }
+    )
+    result = to_result(request, table)
+    assert isinstance(result, TableResult)
+    assert result.rows == [["a", 1.25], ["b", None]]
+    assert type(result.rows[0][1]) is float
 
 
 def test_a_bytes_cell_is_base64_in_json():
