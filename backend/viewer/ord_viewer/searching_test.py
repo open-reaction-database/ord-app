@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Mapping a query's failures to HTTP statuses."""
+"""Mapping a query's failures to HTTP statuses, and shaping its table as a result."""
 
 from decimal import Decimal
 
@@ -76,6 +76,25 @@ def test_an_aggregate_gives_a_table():
     assert result.columns == ["dataset_id", "reactions"]
     assert result.rows == [["ord_dataset-x", 3]]
     assert not result.truncated
+
+
+def test_an_aggregate_reads_the_truncation_flag():
+    request = Query.model_validate(
+        {
+            "aggregate": {
+                "over": "inputs.components",
+                "group_by": ["smiles"],
+                "measures": [{"fn": "count", "name": "occurrences"}],
+            }
+        }
+    )
+    table = pa.table({"smiles": ["CCO"], "occurrences": [2]}).replace_schema_metadata(
+        {execute.TRUNCATED: b"true"}
+    )
+    result = to_result(request, table)
+    assert isinstance(result, TableResult)
+    assert result.rows == [["CCO", 2]]
+    assert result.truncated
 
 
 def test_repeated_column_names_keep_every_row_aligned():

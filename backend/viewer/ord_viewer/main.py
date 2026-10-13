@@ -16,8 +16,11 @@
 
 import contextlib
 from collections.abc import AsyncGenerator, Callable
+from typing import cast
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
@@ -41,6 +44,35 @@ async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NO
         A 503 response carrying the error's message.
     """
     return JSONResponse(status_code=503, content={"detail": str(error)})
+
+
+async def _request_invalid(  # NOSONAR
+    request: Request, error: Exception
+) -> JSONResponse:
+    """Answer 422 with FastAPI's usual body, less the input a recursion loop echoes.
+
+    A query nested past pydantic's recursion limit fails as recursion_loop, and that
+    error echoes the query's whole remaining depth as its input, deeper than
+    jsonable_encoder can recurse. It is async, as FastAPI's own handler is, so
+    Starlette runs it on the event loop rather than in a worker thread.
+
+    Args:
+        request: The request that failed validation.
+        error: The RequestValidationError listing what pydantic found.
+
+    Returns:
+        A 422 response listing the errors.
+    """
+    errors = [
+        {key: value for key, value in item.items() if key != "input"}
+        if item["type"] == "recursion_loop"
+        else item
+        for item in cast(RequestValidationError, error).errors()
+    ]
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        content={"detail": jsonable_encoder(errors)},
+    )
 
 
 def create_app(
@@ -85,6 +117,7 @@ def create_app(
     app.include_router(download.router)
     app.include_router(search.router)
     app.add_exception_handler(SlotsBusyError, _slots_busy)
+    app.add_exception_handler(RequestValidationError, _request_invalid)
     return app
 
 

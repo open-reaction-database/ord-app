@@ -41,7 +41,7 @@ The service reads these environment variables:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `ORD_VIEWER_CORPUS_DIR` | unset | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/` |
+| `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/` |
 | `ORD_VIEWER_MEMORY_LIMIT` | DuckDB's default | DuckDB's `memory_limit`, such as `6500MiB` |
 | `ORD_VIEWER_MAX_CONCURRENT` | 4 | The searches that run at once; each gets cores / this many RDKit threads |
 | `ORD_VIEWER_SEARCH_TIMEOUT_SECONDS` | 30 | The bound on one search; a search past it answers 504 |

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Running a query against the corpus, with its failures mapped to HTTP statuses."""
+"""Running a query, mapping its failures to HTTP statuses, and shaping its result."""
 
 import contextlib
 from collections.abc import Generator
@@ -85,6 +85,7 @@ async def run_search(state: ViewerState, request: Query) -> pa.Table:
     Raises:
         HTTPException: 422 if the query is invalid, 504 if it times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
+        execute.PairingError: If the corpus is inconsistent; a 500.
     """
     async with state.slots.hold():
         with search_errors():

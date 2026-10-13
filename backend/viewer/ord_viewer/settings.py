@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     corpus_dir: Path | None = None
     # DuckDB's memory_limit, such as "6500MiB"; DuckDB's default when unset.
     memory_limit: str | None = None
-    # The searches expected in flight at once; each gets cores / max_concurrent RDKit
-    # threads.
+    # The most searches, asks, and dataset charts' aggregates in flight at once, a cap
+    # the search slots enforce; each search gets cores / max_concurrent RDKit threads.
     max_concurrent: int = Field(default=4, ge=1)
     # The bound on one search, passed to Corpus.search; a search past it answers 504.
     search_timeout_seconds: float = Field(default=30.0, gt=0)

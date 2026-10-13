@@ -183,6 +183,23 @@ def test_an_extra_key_is_unprocessable_with_a_list(client):
     assert error["loc"] == ["body", "query", "page"]
 
 
+def test_an_unknown_top_level_key_is_unprocessable(client):
+    response = client.post("/api/search", json={"query": {}, "limit": 1})
+    assert response.status_code == 422
+    (error,) = response.json()["detail"]
+    assert error["type"] == "extra_forbidden"
+    assert error["loc"] == ["body", "limit"]
+
+
+def test_a_query_nested_past_the_recursion_limit_is_unprocessable(client):
+    where = {"op": "not_null", "path": "reaction_id"}
+    for _ in range(2000):
+        where = {"op": "not", "clause": where}
+    response = client.post("/api/search", json={"query": {"where": where}})
+    assert response.status_code == 422
+    assert "recursion_loop" in {error["type"] for error in response.json()["detail"]}
+
+
 def test_repeated_measure_names_keep_every_row_aligned(client):
     measure = {"fn": "count", "name": "n"}
     query = {"aggregate": {"group_by": ["dataset_id"], "measures": [measure, measure]}}

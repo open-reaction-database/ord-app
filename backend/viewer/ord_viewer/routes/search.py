@@ -45,6 +45,7 @@ async def search(
     Raises:
         HTTPException: 422 if the query is invalid, 504 if it times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
+        execute.PairingError: If the corpus is inconsistent; a 500.
     """
     table = await run_search(state, body.query)
     return await run_in_threadpool(to_result, body.query, table)

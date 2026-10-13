@@ -17,8 +17,9 @@
 import base64
 from typing import Annotated, Any, Literal
 
+from ord_schema.search import execute
 from ord_schema.search.query import Query
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 
 class DatasetSummary(BaseModel):
@@ -84,22 +85,39 @@ class ReactionRecord(BaseModel):
 class DownloadRequest(BaseModel):
     """The reactions to download: at most one search's worth."""
 
-    reaction_ids: list[str] = Field(min_length=1, max_length=1000)
+    model_config = ConfigDict(extra="forbid")
+
+    reaction_ids: list[str] = Field(min_length=1, max_length=execute.DEFAULT_MAX_ROWS)
 
 
 class SearchRequest(BaseModel):
     """One query in the search grammar, as the form and /ask both produce."""
 
+    model_config = ConfigDict(extra="forbid")
+
     query: Query
+
+
+_TRUNCATED = (
+    f"True when the corpus's bound of {execute.DEFAULT_MAX_ROWS:,} rows may have cut "
+    "the answer short"
+)
 
 
 class ReactionsResult(BaseModel):
     """A plain query's answer: reaction IDs to fetch a page at a time."""
 
+    # The published schema lists kind as required, since every answer carries it.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     kind: Literal["reactions"] = "reactions"
-    reaction_ids: list[str]
-    # True when the corpus's 1,000-row bound may have cut the answer.
-    truncated: bool
+    reaction_ids: list[str] = Field(
+        max_length=execute.DEFAULT_MAX_ROWS,
+        description=(
+            f"The IDs of the matching reactions, at most {execute.DEFAULT_MAX_ROWS:,}"
+        ),
+    )
+    truncated: bool = Field(description=_TRUNCATED)
 
 
 def _base64_bytes(value: Any) -> Any:
@@ -121,17 +139,38 @@ def _base64_bytes(value: Any) -> Any:
     return value
 
 
+# An aggregate's rows, as many as the corpus returns at most. The JSON serializer below
+# returns this type too, so the published schema keeps the bound.
+_Rows = Annotated[list[list[Any]], Field(max_length=execute.DEFAULT_MAX_ROWS)]
+
+
 class TableResult(BaseModel):
     """An aggregate's answer: its group and measure columns; bytes cells are base64."""
 
+    # The published schema lists kind as required, since every answer carries it.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     kind: Literal["table"] = "table"
     columns: list[str]
-    rows: list[list[Any]]
-    truncated: bool
+    rows: _Rows = Field(
+        description=(
+            "One row per group, with a cell for each column in order; at most "
+            f"{execute.DEFAULT_MAX_ROWS:,}"
+        ),
+    )
+    truncated: bool = Field(description=_TRUNCATED)
 
     @field_serializer("rows", when_used="json")
-    def _encode_bytes(self, rows: list[list[Any]]) -> list[list[Any]]:
-        """Encode bytes cells as standard base64, which JSON has no type for."""
+    def _encode_bytes(self, rows: list[list[Any]]) -> _Rows:
+        """Encode bytes cells as standard base64, which JSON has no type for.
+
+        Args:
+            rows: The table's rows, as the model holds them.
+
+        Returns:
+            The rows with every bytes value, however deeply nested in a cell, replaced
+            by its base64 text.
+        """
         return [[_base64_bytes(cell) for cell in row] for row in rows]
 
 
@@ -144,7 +183,17 @@ class ErrorDetail(BaseModel):
     detail: str
 
 
+class ValidationErrorItem(BaseModel):
+    """One way a request fails validation, as in FastAPI's own ValidationError."""
+
+    loc: list[str | int] = Field(title="Location")
+    msg: str = Field(title="Message")
+    type: str = Field(title="Error Type")
+    input: Any = Field(default=None, title="Input")
+    ctx: dict[str, Any] | None = Field(default=None, title="Context")
+
+
 class ValidationErrors(BaseModel):
     """The body FastAPI answers 422 with when the request fails validation."""
 
-    detail: list[dict[str, Any]]
+    detail: list[ValidationErrorItem]

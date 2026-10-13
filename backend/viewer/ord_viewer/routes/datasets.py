@@ -161,6 +161,7 @@ async def dataset_compounds(
         HTTPException: 404 if the corpus holds no such dataset, 422 or 504 if the
             search fails.
         SlotsBusyError: If every search slot stays busy for the configured wait.
+        execute.PairingError: If the corpus is inconsistent; a 500.
     """
     await run_in_threadpool(_find, state.corpus, dataset_id)
     request = SearchQuery.model_validate(

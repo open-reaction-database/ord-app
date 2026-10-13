@@ -30,8 +30,9 @@ from ord_viewer.settings import Settings
 _TREES = ("projections", "structures", "pivots", "occurrences", "sources")
 
 
-# Resolutions reach PubChem, CACTUS, and OPSIN; a name that resolved once is kept for
-# the life of the process. A name that failed raises again, so it is retried.
+# Resolutions reach PubChem, CACTUS, and OPSIN; a name that resolved is kept until
+# 4,096 more recently used names push it out. A name that failed raises again, so it
+# is retried.
 @functools.lru_cache(maxsize=4096)
 def resolve_compound_name(name: str) -> str:
     """Resolve a compound name to SMILES through ord-schema's resolvers.
