@@ -15,6 +15,8 @@
  */
 import { afterEach, describe, it, expect, vi } from 'vitest';
 import { within } from '@testing-library/react';
+import { DEFAULT_THEME, mergeMantineTheme } from '@mantine/core';
+import { theme } from '#theme/theme.ts';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import { PageContainer } from './PageContainer.tsx';
@@ -100,25 +102,41 @@ describe('PageContainer at different widths', () => {
 
   function renderPage() {
     const { getByRole } = renderWithMantine(<PageContainer breadcrumbs={[]} />);
+    const main = getByRole('main');
     return {
+      root: getComputedStyle(main.parentElement as HTMLElement),
+      main: getComputedStyle(main),
       footer: getComputedStyle(getByRole('contentinfo')),
-      main: getComputedStyle(getByRole('main')),
     };
   }
 
+  it('names the theme’s sm breakpoint in its stylesheets', () => {
+    expect(mergeMantineTheme(DEFAULT_THEME, theme).breakpoints.sm).toBe('48em');
+  });
+
   it('keeps a 48px footer, and padding clear of it, from the sm breakpoint up', () => {
     setViewportWidth(768);
-    const { footer, main } = renderPage();
+    const { root, main, footer } = renderPage();
     expect(footer.height).toBe('48px');
     expect(footer.position).not.toBe('sticky');
     expect(main.paddingBottom).toBe('48px');
+    expect(root.display).not.toBe('flex');
   });
 
-  it('lets the footer grow with its content in the page flow below the sm breakpoint', () => {
+  it('puts the footer in the page flow below the sm breakpoint, at its content’s height', () => {
     setViewportWidth(767);
     const { footer, main } = renderPage();
     expect(footer.height).toBe('auto');
     expect(footer.position).toBe('sticky');
     expect(main.paddingBottom).toBe('0px');
+  });
+
+  it('fills the screen above the footer with the main area below the sm breakpoint', () => {
+    setViewportWidth(767);
+    const { root, main } = renderPage();
+    expect(root.display).toBe('flex');
+    expect(root.flexDirection).toBe('column');
+    expect(root.minHeight).toBe('100dvh');
+    expect(main.flexGrow).toBe('1');
   });
 });

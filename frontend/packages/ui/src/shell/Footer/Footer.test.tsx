@@ -51,7 +51,7 @@ describe('Footer', () => {
     });
 
     it('wraps its items onto more lines below the sm breakpoint', () => {
-      setViewportWidth(375);
+      setViewportWidth(767);
       renderWithMantine(<Footer />);
       expect(itemsWrap()).toBe(true);
     });
