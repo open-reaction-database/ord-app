@@ -129,8 +129,9 @@ def test_serving_exception_still_closes_the_corpus(monkeypatch, corpus_dir):
         async with app.router.lifespan_context(app):
             raise RuntimeError("serving failed")
 
+    serving = serve_and_fail()
     with pytest.raises(RuntimeError, match="serving failed"):
-        asyncio.run(serve_and_fail())
+        asyncio.run(serving)
     assert len(closes) == 1
 
 
