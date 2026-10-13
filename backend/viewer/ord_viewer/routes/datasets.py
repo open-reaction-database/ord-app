@@ -128,7 +128,7 @@ def dataset_compounds(
         limit: The most compounds to return.
 
     Returns:
-        The compounds with a SMILES, by descending count.
+        The compounds with a SMILES, by descending count and then by SMILES.
 
     Raises:
         HTTPException: 404 if the corpus holds no such dataset, 422 or 504 if the
