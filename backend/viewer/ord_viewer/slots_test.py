@@ -14,9 +14,28 @@
 
 """The cap on searches in flight."""
 
+import anyio
 import pytest
+from anyio.abc import TaskStatus
 
 from ord_viewer.slots import SearchSlots, SlotsBusyError
+
+
+@pytest.mark.anyio
+async def test_waits_for_a_slot_to_free():
+    slots = SearchSlots(capacity=1, wait_seconds=5)
+    released = anyio.Event()
+
+    async def hold_briefly(*, task_status: TaskStatus[None]) -> None:
+        async with slots.hold():
+            task_status.started()
+            await anyio.sleep(0.1)
+        released.set()
+
+    async with anyio.create_task_group() as group:
+        await group.start(hold_briefly)
+        async with slots.hold():
+            assert released.is_set()
 
 
 @pytest.mark.anyio
