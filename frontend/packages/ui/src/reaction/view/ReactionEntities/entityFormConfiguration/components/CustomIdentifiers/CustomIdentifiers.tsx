@@ -17,7 +17,7 @@ import { Divider, Grid, Title } from '@mantine/core';
 import { PaperButton } from '#display/interactions/PaperButton/PaperButton.tsx';
 import { SearchIcon, StylusNoteIcon } from '#theme/icons/index.ts';
 import { buildUseSelectItems } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { create } from '@bufbuild/protobuf';
 import { CompoundIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { useDisclosure } from '@mantine/hooks';
@@ -108,11 +108,15 @@ export function CustomIdentifiers() {
   };
 
   const edited = editedMolblock !== null ? identifiers[editedMolblock] : undefined;
-  // The component converters route only structure types to this list.
-  const selectedMolblockIdentifier: MoleculeIdentifier | null =
-    edited && isStructureIdentifierType(edited.type)
-      ? { type: edited.type, value: edited.value, details: edited.details }
-      : null;
+  // Memoized because the editor reloads its canvas whenever this object changes.
+  const selectedMolblockIdentifier = useMemo<MoleculeIdentifier | null>(
+    () =>
+      // The component converters route only structure types to this list.
+      edited && isStructureIdentifierType(edited.type)
+        ? { type: edited.type, value: edited.value, details: edited.details }
+        : null,
+    [edited],
+  );
 
   return (
     <>

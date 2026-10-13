@@ -34,11 +34,21 @@ const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 
-/** Returns whether a CXSMILES's extension block records coordinate bonds (`C:`). */
-function hasCoordinateBonds(cxsmiles: string) {
+// CXSMILES fields carrying bonding that Ketcher loads as plain single bonds or drops:
+// either way, saving the drawing back would record a different molecule.
+const UNREADABLE_FIELDS = [
+  { pattern: /[|,]C:\d/, name: 'coordinate bonds' },
+  { pattern: /[|,]m:\d/, name: 'multicenter attachments' },
+];
+
+/** Returns the names of the fields in a CXSMILES's extension block that Ketcher drops. */
+function unreadableFields(cxsmiles: string) {
   const extension = /\s(\|.*\|)\s*$/.exec(cxsmiles)?.[1] ?? '';
   // Atom labels sit between $ signs and may hold any text, "C:" included.
-  return /[|,]C:\d/.test(extension.replaceAll(/\$[^$]*\$/g, ''));
+  const fields = extension.replaceAll(/\$[^$]*\$/g, '');
+  return UNREADABLE_FIELDS.filter(({ pattern }) => pattern.test(fields)).map(
+    ({ name }) => name,
+  );
 }
 
 export function ComponentsKetcherEditor({
@@ -79,23 +89,29 @@ export function ComponentsKetcherEditor({
     // An async function, so that getSmiles throwing synchronously and getMolfile
     // rejecting reach the same catch.
     const serialize = async () => {
-      if (type !== 'CXSMILES') {
-        return ketcherInstance.getMolfile();
+      switch (type) {
+        case 'MOLBLOCK':
+          return ketcherInstance.getMolfile();
+        case 'CXSMILES': {
+          const unreadable = unreadableFields(identifier?.value ?? '');
+          if (unreadable.length > 0) {
+            throw new Error(
+              `Ketcher cannot read the ${unreadable.join(' or ')} in this CXSMILES, so saving it would change the structure.`,
+            );
+          }
+          // getSmiles would write a reaction SMILES into a compound identifier.
+          if (ketcherInstance.containsReaction()) {
+            throw new Error(
+              'The structure cannot be saved as CXSMILES due to reaction arrows.',
+            );
+          }
+          return ketcherInstance.getSmiles(true);
+        }
+        default: {
+          const unhandled: never = type;
+          throw new Error(`Ketcher cannot save a ${String(unhandled)} identifier.`);
+        }
       }
-      // Ketcher loads coordinate bonds as single bonds, so a dative N->Pt would save as
-      // an N-Pt single bond with one hydrogen fewer on the N.
-      if (hasCoordinateBonds(identifier?.value ?? '')) {
-        throw new Error(
-          'Ketcher cannot read the coordinate bonds in this CXSMILES, so saving it would change the structure.',
-        );
-      }
-      // getSmiles would write a reaction SMILES into a compound identifier.
-      if (ketcherInstance.containsReaction()) {
-        throw new Error(
-          'The structure cannot be saved as CXSMILES due to reaction arrows.',
-        );
-      }
-      return ketcherInstance.getSmiles(true);
     };
     serialize().then(
       value => {

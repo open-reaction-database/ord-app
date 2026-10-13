@@ -222,4 +222,26 @@ describe('CustomIdentifiers', () => {
     expect(getByText('Structure Identifiers')).toBeInTheDocument();
     expect(getByText('CXSMILES')).toBeInTheDocument();
   });
+  it('hands the editor the same identifier object across renders', () => {
+    // The editor reloads its canvas when the identifier changes, wiping a drawing.
+    const seen: Array<MoleculeEditorProps['identifier']> = [];
+    function RecordingEditor({ identifier }: Readonly<MoleculeEditorProps>) {
+      seen.push(identifier);
+      return null;
+    }
+    const { getByRole, rerender } = renderWithReaction(<CustomIdentifiers />, {
+      editable: true,
+      reaction: withCxsmiles,
+      pathComponents: componentPath,
+      slots: {
+        ViewDeleteButtons: EditButton,
+        MoleculeEditor: { name: 'Recording', Editor: RecordingEditor },
+      },
+    });
+    fireEvent.click(getByRole('button', { name: 'Edit' }));
+    rerender(<CustomIdentifiers />);
+    const opened = seen.filter(identifier => identifier !== null);
+    expect(opened.length).toBeGreaterThan(1);
+    expect(new Set(opened).size).toBe(1);
+  });
 });

@@ -16,9 +16,9 @@
 // @vitest-environment node
 //
 // Real Indigo, which loads under Node but not under happy-dom. The editor's Ketcher bundles
-// this Indigo release and, standalone, reaches it through the same calls: a structure loads
-// onto the canvas through `layout` (a CXSMILES without coordinates has none to keep) and
-// saves through `convert`.
+// its own copy of Indigo and makes the same calls: a structure loads onto the canvas through
+// `layout` (a CXSMILES without coordinates has none to keep) and saves through `convert`.
+// The editor's e2e suite checks Ketcher's copy in a browser; this is the fast check.
 import { beforeAll, describe, expect, it } from 'vitest';
 // indigo-ketcher ships no types.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

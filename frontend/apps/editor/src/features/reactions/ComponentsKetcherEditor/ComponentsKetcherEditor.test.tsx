@@ -267,11 +267,29 @@ describe('ComponentsKetcherEditor', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it('refuses to save over a CXSMILES whose multicenter attachments Ketcher cannot read', async () => {
+    // Ketcher drops the m: field, cutting the haptic bond to the ring.
+    const { onSave } = await openAndSave({
+      type: 'CXSMILES',
+      value: 'c1ccccc1.[Fe].* |m:7:0.1.2.3.4.5|',
+      details: 'haptic',
+    });
+
+    await waitFor(() =>
+      expect(showNotification).toHaveBeenCalledWith({
+        variant: NotificationVariant.ERROR,
+        message:
+          'Ketcher cannot read the multicenter attachments in this CXSMILES, so saving it would change the structure.',
+      }),
+    );
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
   it('saves a CXSMILES whose extension has no coordinate bonds', async () => {
     // "C:" inside an atom label is not the coordinate-bond field.
     const { onSave } = await openAndSave({
       type: 'CXSMILES',
-      value: 'CC(N)C(=O)O |$C:1;;;;;$|',
+      value: 'CC(N)C(=O)O |$a,C:1;;;;;$|',
       details: 'labeled',
     });
 
