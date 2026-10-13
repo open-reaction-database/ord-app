@@ -38,3 +38,5 @@ class Settings(BaseSettings):
     max_concurrent: int = Field(default=4, ge=1)
     # The bound on one search, passed to Corpus.search; a search past it answers 504.
     search_timeout_seconds: float = Field(default=30.0, gt=0)
+    # How long a request waits for a free search slot before answering 503.
+    slot_wait_seconds: float = Field(default=10.0, gt=0)

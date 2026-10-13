@@ -49,10 +49,10 @@ def search_errors() -> Generator[None]:
 
 
 def run_search(state: ViewerState, request: Query) -> pa.Table:
-    """Run one query under the service's timeout.
+    """Run one query in a search slot, under the service's timeout.
 
     Args:
-        state: The settings and open corpus.
+        state: The settings, open corpus, and search slots.
         request: The query to run.
 
     Returns:
@@ -60,8 +60,9 @@ def run_search(state: ViewerState, request: Query) -> pa.Table:
 
     Raises:
         HTTPException: 422 if the query is invalid, 504 if it times out.
+        SlotsBusyError: If every search slot stays busy for the configured wait.
     """
-    with search_errors():
+    with state.slots.hold(), search_errors():
         return state.corpus.search(
             request, timeout_seconds=state.settings.search_timeout_seconds
         )

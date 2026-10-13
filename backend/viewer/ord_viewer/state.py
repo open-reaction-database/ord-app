@@ -20,14 +20,16 @@ from fastapi import Request
 from ord_schema.search import execute
 
 from ord_viewer.settings import Settings
+from ord_viewer.slots import SearchSlots
 
 
 @dataclasses.dataclass(frozen=True)
 class ViewerState:
-    """The settings and the open corpus every route reads."""
+    """The settings, the open corpus, and the search slots every route reads."""
 
     settings: Settings
     corpus: execute.Corpus
+    slots: SearchSlots
 
 
 async def get_state(request: Request) -> ViewerState:  # NOSONAR
@@ -40,6 +42,6 @@ async def get_state(request: Request) -> ViewerState:  # NOSONAR
         request: The request being served.
 
     Returns:
-        The settings and open corpus.
+        The settings, open corpus, and search slots.
     """
     return request.app.state.viewer

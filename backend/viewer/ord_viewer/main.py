@@ -17,12 +17,27 @@
 import contextlib
 from collections.abc import AsyncGenerator, Callable
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from ord_viewer.corpus import open_corpus, resolve_compound_name
 from ord_viewer.routes import datasets, download, health, reactions
 from ord_viewer.settings import Settings
+from ord_viewer.slots import SearchSlots, SlotsBusyError
 from ord_viewer.state import ViewerState
+
+
+async def _slots_busy(request: Request, error: Exception) -> JSONResponse:  # NOSONAR
+    """Answer 503 when every search slot stayed busy.
+
+    Args:
+        request: The request that waited for a slot.
+        error: The SlotsBusyError that ended the wait.
+
+    Returns:
+        A 503 response carrying the error's message.
+    """
+    return JSONResponse(status_code=503, content={"detail": str(error)})
 
 
 def create_app(
@@ -47,7 +62,11 @@ def create_app(
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         settings = settings_factory()
         with contextlib.closing(open_corpus(settings, resolver=resolver)) as corpus:
-            app.state.viewer = ViewerState(settings=settings, corpus=corpus)
+            app.state.viewer = ViewerState(
+                settings=settings,
+                corpus=corpus,
+                slots=SearchSlots(settings.max_concurrent, settings.slot_wait_seconds),
+            )
             yield
 
     app = FastAPI(
@@ -61,6 +80,7 @@ def create_app(
     app.include_router(datasets.router)
     app.include_router(reactions.router)
     app.include_router(download.router)
+    app.add_exception_handler(SlotsBusyError, _slots_busy)
     return app
 
 
