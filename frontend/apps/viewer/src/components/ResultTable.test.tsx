@@ -70,6 +70,28 @@ describe('ResultTable', () => {
     expect(within(table).getByText('—')).toBeInTheDocument();
   });
 
+  it('shows each of two rows with the same values', () => {
+    const error = vi.spyOn(console, 'error');
+    const { getAllByRole } = renderAt(
+      '/',
+      <ResultTable
+        result={{ kind: 'table', columns: ['n'], rows: [[1], [1]], truncated: false }}
+      />,
+    );
+    expect(getAllByRole('cell', { name: '1' })).toHaveLength(2);
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it('shows a true or false value as written', () => {
+    const { getByText } = renderAt(
+      '/',
+      <ResultTable
+        result={{ kind: 'table', columns: ['flag'], rows: [[true]], truncated: false }}
+      />,
+    );
+    expect(getByText('true')).toBeInTheDocument();
+  });
+
   it('shows a structured value as JSON', () => {
     const { getByText } = renderAt(
       '/',

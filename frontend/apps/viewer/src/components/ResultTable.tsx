@@ -18,6 +18,34 @@ import { Link } from 'wouter';
 import type { TableResult } from '#api/types.ts';
 import { MAX_LIMIT } from '#search/form.ts';
 
+/** A cell's value as text: strings, numbers, and booleans as written, the rest as JSON. */
+function cellText(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+
+/**
+ * Each item with a key from its content, numbered among the items that share it, since a
+ * table may repeat a column's name or a row's values.
+ */
+function keyed<T>(
+  items: ReadonlyArray<T>,
+  identify: (item: T) => string,
+): Array<{ key: string; item: T }> {
+  const seen = new Map<string, number>();
+  return items.map(item => {
+    const identity = identify(item);
+    const count = seen.get(identity) ?? 0;
+    seen.set(identity, count + 1);
+    return { key: `${count}:${identity}`, item };
+  });
+}
+
 function Cell({ column, value }: Readonly<{ column: string; value: unknown }>) {
   if (value === null || value === undefined) {
     return <>—</>;
@@ -32,11 +60,13 @@ function Cell({ column, value }: Readonly<{ column: string; value: unknown }>) {
       </Anchor>
     );
   }
-  return <>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</>;
+  return <>{cellText(value)}</>;
 }
 
 /** A table result's columns and rows as they come, with reaction IDs linked. */
 export function ResultTable({ result }: Readonly<{ result: TableResult }>) {
+  const columns = keyed(result.columns, column => column);
+  const rows = keyed(result.rows, row => JSON.stringify(row));
   return (
     <Stack gap="sm">
       {result.truncated && (
@@ -52,18 +82,16 @@ export function ResultTable({ result }: Readonly<{ result: TableResult }>) {
         <Table striped>
           <Table.Thead>
             <Table.Tr>
-              {result.columns.map((column, columnIndex) => (
-                // A table's rows and columns are fixed, and a name may repeat, so each is
-                // keyed by its place.
-                <Table.Th key={columnIndex}>{column}</Table.Th>
+              {columns.map(({ key, item: column }) => (
+                <Table.Th key={key}>{column}</Table.Th>
               ))}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {result.rows.map((row, rowIndex) => (
-              <Table.Tr key={rowIndex}>
-                {result.columns.map((column, columnIndex) => (
-                  <Table.Td key={columnIndex}>
+            {rows.map(({ key: rowKey, item: row }) => (
+              <Table.Tr key={rowKey}>
+                {columns.map(({ key, item: column }, columnIndex) => (
+                  <Table.Td key={key}>
                     <Cell
                       column={column}
                       value={row[columnIndex]}
