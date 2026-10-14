@@ -88,6 +88,41 @@ jobs:
   # backend/editor/ord_editor and backend/viewer/ord_viewer (Python) and the frontend
   # workspaces' src/ trees (TS/TSX) per .jscpd.json.
   # Runs on every PR (not path-filtered) so Python-only changes are covered too.
+  check_ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: npm run lint:check
+      - run: npm run typecheck
+      # The viewer's API types are generated from backend/viewer/openapi.json, which
+      # test_python_viewer pins to the backend's routes.
+      - name: The viewer's API types match the backend's document
+        run: |
+          npm run generate:api -w apps/viewer
+          git diff --exit-code -- apps/viewer/src/api/schema.ts
+      # deploy/editor/Dockerfile builds with ORD_APP_REQUIRE_AUTH0, which fails the build
+      # when an Auth0 setting is missing (vite.config.ts). The check runs as the config
+      # loads, so this step is fast; the build below passes it with placeholder values.
+      - name: Image builds fail without the Auth0 settings
+        run: |
+          (cd apps/editor && ORD_APP_REQUIRE_AUTH0=true ../../node_modules/.bin/vite build) > "$RUNNER_TEMP/auth0.log" 2>&1 || true
+          grep 'Missing VITE_AUTH0_DOMAIN' "$RUNNER_TEMP/auth0.log"
+      - run: npm run build
+        env:
+          ORD_APP_REQUIRE_AUTH0: 'true'
+          VITE_AUTH0_DOMAIN: auth0.example.com
+          VITE_AUTH0_CLIENT_ID: placeholder
+          VITE_AUTH0_AUDIENCE: https://auth0.example.com/api/v2/
+          VITE_AUTH0_ISSUER: https://auth0.example.com/
+          VITE_AUTH0_SCOPE: openid
+
   check_duplication:
     runs-on: ubuntu-latest
     steps:
