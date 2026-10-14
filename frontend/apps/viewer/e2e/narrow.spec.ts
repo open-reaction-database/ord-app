@@ -177,6 +177,19 @@ test("shows a reaction's header on a phone", async ({ page }) => {
   await expectNoSidewaysScroll(page);
 });
 
+test('shows a reaction with a long ID on a phone', async ({ page }) => {
+  await page.route(`**/api/reactions/${REACTION_ID}`, async route => {
+    const url = route.request().url().replace(REACTION_ID, 'ord-viewer0101');
+    const record = await (await route.fetch({ url })).json();
+    await route.fulfill({ json: { ...record, reaction_id: REACTION_ID } });
+  });
+  await page.goto(`/reactions/${REACTION_ID}`);
+  // Wider than the header's row, the ID breaks onto a second line, whole.
+  await expectWhole(page.getByRole('heading', { name: REACTION_ID }));
+  await expectWhole(page.getByText('Copy reaction image', { exact: true }));
+  await expectNoSidewaysScroll(page);
+});
+
 test("scrolls a reaction's tabs within their list on a phone", async ({ page }) => {
   await page.goto('/reactions/ord-viewer0101');
   const list = page.getByRole('tablist');
@@ -193,33 +206,59 @@ test("scrolls a reaction's tabs within their list on a phone", async ({ page }) 
   await expectNoSidewaysScroll(page);
 });
 
-const TABLES = [
+/** Opens a tab of the reaction view and returns its panel. */
+function openTab(name: string) {
+  return async (page: Page) => {
+    await page.getByRole('tab', { name }).click();
+    return page.getByRole('tabpanel');
+  };
+}
+
+interface Table {
+  name: string;
+  /** Opens the table from the reaction page and returns what holds it. */
+  open: (page: Page) => Promise<Locator>;
+  headers: Array<string>;
+  /** Cells whose words a squeezed column would break. */
+  cells: Array<string>;
+}
+
+const TABLES: Array<Table> = [
   {
-    tab: 'inputs',
+    name: 'inputs table',
+    open: openTab('inputs'),
     headers: ['Input', 'Identifiers', 'Preview', 'Role', 'Amount'],
     cells: ['REACTANT', 'UNSPECIFIED'],
   },
   {
-    tab: 'outcomes',
+    name: 'outcomes table',
+    open: openTab('outcomes'),
     headers: ['Identifiers', 'Preview', 'Role', 'Measurements'],
     cells: ['UNSPECIFIED', 'YIELD'],
   },
+  {
+    name: "input drawer's components table",
+    open: async page => {
+      // The first is the input's own, before its components'.
+      await page.getByRole('button', { name: 'View', exact: true }).first().click();
+      return page.getByRole('dialog');
+    },
+    headers: ['Identifiers', 'Preview', 'Role', 'Amount'],
+    cells: ['REACTANT', 'UNSPECIFIED'],
+  },
 ];
 
-for (const { tab, headers, cells } of TABLES) {
-  test(`scrolls a reaction's ${tab} table within itself on a phone`, async ({
-    page,
-  }) => {
+for (const { name, open, headers, cells } of TABLES) {
+  test(`scrolls a reaction's ${name} within itself on a phone`, async ({ page }) => {
     await page.goto('/reactions/ord-viewer0101');
-    await page.getByRole('tab', { name: tab }).click();
-    const panel = page.getByRole('tabpanel');
+    const holder = await open(page);
     for (const header of headers) {
-      const text = panel.getByText(header, { exact: true });
+      const text = holder.getByText(header, { exact: true });
       expect(await revealSideways(text)).toBe(true);
       await expectWhole(text);
     }
     for (const cell of cells) {
-      const text = panel.getByText(cell, { exact: true }).first();
+      const text = holder.getByText(cell, { exact: true }).first();
       await revealSideways(text);
       await expectWhole(text);
       expect(await lineCount(text), `${cell} keeps to one line`).toBe(1);

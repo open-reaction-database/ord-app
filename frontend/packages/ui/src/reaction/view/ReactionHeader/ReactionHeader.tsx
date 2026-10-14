@@ -70,8 +70,8 @@ export function ReactionHeader({
           direction="column"
           gap="sm"
         >
-          {/* The copy button wraps below an ID too long to share its line, instead of
-              squeezing it into breaking. */}
+          {/* The copy button wraps below an ID too long to share its line, so the ID
+              breaks only when it is wider than the whole row. */}
           <Flex
             justify="space-between"
             align="center"
