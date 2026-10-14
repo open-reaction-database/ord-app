@@ -36,7 +36,10 @@ import {
   useReactionPart,
   useReactionSlots,
 } from '#reaction/provider/reactionProvider.hooks.ts';
-import { ComponentsListHeader } from '#reaction/view/ReactionView/ComponentsList/index.ts';
+import {
+  ComponentsListHeader,
+  componentsListClasses,
+} from '#reaction/view/ReactionView/ComponentsList/index.ts';
 import { ComponentsListOrEmpty } from '#display/ComponentsListOrEmpty/ComponentsListOrEmpty.tsx';
 import { renderValuePrecisionUnit } from '#reaction/view/ReactionView/renderValuePrecisionUnit.ts';
 
@@ -100,25 +103,31 @@ export function WorkupInput({ name }: Readonly<ReactionFormCustomProps>) {
     >
       {input && (
         <ComponentsListOrEmpty componentsAmount={input.components.length}>
-          <ComponentsListHeader detailsHeader="Amount" />
           <Flex
             direction="column"
             gap="sm"
+            className={componentsListClasses.table}
           >
-            {input.components.map((item, index) => (
-              <ComponentDisplayRowCustomActions
-                key={item.id}
-                component={item}
-                renderDetails={renderDetails}
-                actions={
-                  <ViewDeleteButtons
-                    entityName="Component"
-                    pathComponents={currentPath.concat([COMPONENTS_FIELD, index])}
-                    onEdit={() => onWorkupComponentEdit(index)}
-                  />
-                }
-              />
-            ))}
+            <ComponentsListHeader detailsHeader="Amount" />
+            <Flex
+              direction="column"
+              gap="sm"
+            >
+              {input.components.map((item, index) => (
+                <ComponentDisplayRowCustomActions
+                  key={item.id}
+                  component={item}
+                  renderDetails={renderDetails}
+                  actions={
+                    <ViewDeleteButtons
+                      entityName="Component"
+                      pathComponents={currentPath.concat([COMPONENTS_FIELD, index])}
+                      onEdit={() => onWorkupComponentEdit(index)}
+                    />
+                  }
+                />
+              ))}
+            </Flex>
           </Flex>
         </ComponentsListOrEmpty>
       )}

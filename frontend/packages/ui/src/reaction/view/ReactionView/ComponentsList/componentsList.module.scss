@@ -19,6 +19,18 @@
   grid-template-columns: repeat(4, 1fr) 120px;
 }
 
+/* Below Mantine's sm breakpoint a table of components keeps a width its columns' words fit in and
+   scrolls sideways within its own box. */
+@media (width < 48em) {
+  .table {
+    overflow-x: auto;
+
+    & > * {
+      min-width: 45rem;
+    }
+  }
+}
+
 .identifiers {
   grid-area: identifiers;
   overflow: hidden;

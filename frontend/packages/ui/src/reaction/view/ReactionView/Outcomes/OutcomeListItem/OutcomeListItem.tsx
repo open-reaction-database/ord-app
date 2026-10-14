@@ -88,25 +88,27 @@ export function OutcomeListItem({
             </Flex>
           ))}
         </div>
-        <div className={componentsListClasses.grid}>
-          {headers.map(({ label, className }) => (
-            <Text
-              className={clsx(classes.text, className)}
-              key={label}
-            >
-              {label}
-            </Text>
+        <div className={componentsListClasses.table}>
+          <div className={componentsListClasses.grid}>
+            {headers.map(({ label, className }) => (
+              <Text
+                className={clsx(classes.text, className)}
+                key={label}
+              >
+                {label}
+              </Text>
+            ))}
+          </div>
+          {outcome.products.map((product, productIndex) => (
+            <ComponentDisplayRow
+              key={product.id}
+              component={product}
+              renderDetails={renderDetails}
+              componentPath={outcomePathComponents.concat(['products', productIndex])}
+              historyPathComponents={[outcomePathComponents]}
+            />
           ))}
         </div>
-        {outcome.products.map((product, productIndex) => (
-          <ComponentDisplayRow
-            key={product.id}
-            component={product}
-            renderDetails={renderDetails}
-            componentPath={outcomePathComponents.concat(['products', productIndex])}
-            historyPathComponents={[outcomePathComponents]}
-          />
-        ))}
       </Accordion.Panel>
     </Accordion.Item>
   );
