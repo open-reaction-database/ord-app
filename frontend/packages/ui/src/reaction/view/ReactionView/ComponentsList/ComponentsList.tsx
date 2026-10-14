@@ -18,7 +18,7 @@ import type { ReactionPathComponents } from '#reaction/model/reactionPathCompone
 import { ComponentDisplayRow } from './ComponentDisplayRow.tsx';
 import classes from './componentsList.module.scss';
 import clsx from 'clsx';
-import { Text } from '@mantine/core';
+import { Flex, Text } from '@mantine/core';
 import type { ReactNode } from 'react';
 
 interface ComponentsListHeaderProps {
@@ -77,8 +77,13 @@ export function ComponentsList<T extends ReactionComponentBase>({
   entityName,
   onlyOpenOneSidebar,
 }: Readonly<ComponentsListProps<T>>) {
+  // The rows keep the spacing of the entity block that holds the list.
   return (
-    <>
+    <Flex
+      direction="column"
+      gap="sm"
+      className={classes.table}
+    >
       <ComponentsListHeader detailsHeader={detailsHeader} />
       {components.map((component, index) => (
         <ComponentDisplayRow
@@ -89,6 +94,6 @@ export function ComponentsList<T extends ReactionComponentBase>({
           component={component}
         />
       ))}
-    </>
+    </Flex>
   );
 }

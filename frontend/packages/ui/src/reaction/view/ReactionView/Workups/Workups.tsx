@@ -27,6 +27,7 @@ import { create } from '@bufbuild/protobuf';
 import { ReactionWorkupSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { renderValuePrecisionUnit } from '#reaction/view/ReactionView/renderValuePrecisionUnit.ts';
 import { InputComponentsListItem } from '#reaction/view/ReactionView/Inputs/InputsComponentsList/InputComponentsListItem/InputComponentsListItem.tsx';
+import { componentsListClasses } from '#reaction/view/ReactionView/ComponentsList/index.ts';
 import { ReactionNodeValidationResult } from '#reaction/view/ReactionInteractions/ReactionNodeValidationResult/ReactionNodeValidationResult.tsx';
 import {
   useDrawer,
@@ -204,19 +205,21 @@ export function Workups() {
             />
             {WorkupConstants.inputCompatibleTypes.includes(workup.type) &&
               workup.input && (
-                <Accordion
-                  variant="separated"
-                  chevronPosition="left"
-                  multiple={true}
-                  defaultValue={[workup.input.id]}
-                >
-                  <InputComponentsListItem
-                    input={workup.input}
-                    name="Input"
-                    pathComponents={[ENTITY_FIELD, index, 'input']}
-                    historyPathComponents={[[ENTITY_FIELD, index]]}
-                  />
-                </Accordion>
+                <div className={componentsListClasses.table}>
+                  <Accordion
+                    variant="separated"
+                    chevronPosition="left"
+                    multiple={true}
+                    defaultValue={[workup.input.id]}
+                  >
+                    <InputComponentsListItem
+                      input={workup.input}
+                      name="Input"
+                      pathComponents={[ENTITY_FIELD, index, 'input']}
+                      historyPathComponents={[[ENTITY_FIELD, index]]}
+                    />
+                  </Accordion>
+                </div>
               )}
           </Flex>
         ))}

@@ -49,7 +49,7 @@ export function ReactionTabs() {
   return (
     <Tabs
       defaultValue={tabs[0].name}
-      classNames={{ tab: classes.tabTitle, panel: classes.panel }}
+      classNames={{ list: classes.list, tab: classes.tabTitle, panel: classes.panel }}
     >
       <Tabs.List>
         {tabs.map(({ name, required }) => (
