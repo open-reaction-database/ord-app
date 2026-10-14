@@ -181,27 +181,22 @@ async function redraw(page: Page, pattern: string, mode: string) {
 }
 
 test.describe('a drawn Kekulé ring is saved aromatized', () => {
-  test('as SMILES, and finds the benzene ring', async ({ page }) => {
-    await redraw(page, 'C1=CC=CC=C1', 'substructure');
-    await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
-      'c1ccccc1',
-    );
-    await page.getByRole('button', { name: 'Search' }).click();
-    await expect(page.getByRole('link', { name: REACTION_LINK })).toHaveText([
-      'ord-viewer0101',
-    ]);
-  });
-
-  test('as SMARTS, and finds the pyridine ring', async ({ page }) => {
-    await redraw(page, 'C1=CC=NC=C1', 'smarts');
-    await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
-      '[#6]1:[#6]:[#6]:[#7]:[#6]:[#6]:1',
-    );
-    await page.getByRole('button', { name: 'Search' }).click();
-    await expect(page.getByRole('link', { name: REACTION_LINK })).toHaveText([
-      'ord-viewer0101',
-    ]);
-  });
+  // ord-viewer0101 holds the only aromatic rings in the corpus, a benzene and a pyridine.
+  for (const [notation, ring, pattern, mode, saved] of [
+    ['SMILES', 'benzene', 'C1=CC=CC=C1', 'substructure', 'c1ccccc1'],
+    ['SMARTS', 'pyridine', 'C1=CC=NC=C1', 'smarts', '[#6]1:[#6]:[#6]:[#7]:[#6]:[#6]:1'],
+  ] as const) {
+    test(`as ${notation}, and finds the ${ring} ring`, async ({ page }) => {
+      await redraw(page, pattern, mode);
+      await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
+        saved,
+      );
+      await page.getByRole('button', { name: 'Search' }).click();
+      await expect(page.getByRole('link', { name: REACTION_LINK })).toHaveText([
+        'ord-viewer0101',
+      ]);
+    });
+  }
 
   test('by the model that aromatizes a 2-pyridone, as RDKit does', async ({ page }) => {
     await redraw(page, 'O=C1C=CC=CN1', 'smarts');
