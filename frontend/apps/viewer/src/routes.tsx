@@ -15,7 +15,11 @@
  */
 import { Redirect, Route, Switch, useSearchParams } from 'wouter';
 import { AboutPage } from '#pages/AboutPage.tsx';
+import { DatasetPage } from '#pages/DatasetPage.tsx';
+import { DatasetsPage } from '#pages/DatasetsPage.tsx';
 import { NotFoundPage } from '#pages/NotFoundPage.tsx';
+import { ReactionPage } from '#pages/ReactionPage.tsx';
+import { ReactionSetPage } from '#pages/ReactionSetPage.tsx';
 import { routeParam } from '#routeParams.ts';
 
 /** ord-interface's /selected-set?reaction_id=…, as the viewer's /reactions?id=…. */
@@ -36,6 +40,20 @@ function SelectedSetRedirect() {
 export function ViewerRoutes() {
   return (
     <Switch>
+      <Route
+        path="/"
+        component={DatasetsPage}
+      />
+      <Route path="/datasets/:datasetId">
+        {({ datasetId }) => <DatasetPage datasetId={routeParam(datasetId)} />}
+      </Route>
+      <Route path="/reactions/:reactionId">
+        {({ reactionId }) => <ReactionPage reactionId={routeParam(reactionId)} />}
+      </Route>
+      <Route
+        path="/reactions"
+        component={ReactionSetPage}
+      />
       <Route
         path="/about"
         component={AboutPage}
