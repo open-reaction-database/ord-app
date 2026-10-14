@@ -134,17 +134,20 @@ def _fetch_sources(
     """Fetch from the ord-data mirror the source dataset each projection restates.
 
     A Corpus refuses a source that no projection restates, so a Parquet file under
-    local_dir's data/ that was not fetched, such as one an earlier build named, is
-    deleted.
+    local_dir that was not fetched, such as one an earlier build named, is deleted.
+    One in a directory reached through a link is refused instead, since deleting it
+    would reach storage local_dir does not own.
 
     Args:
         projections: The fetched projections, whose stamps name their sources.
-        local_dir: Directory to download beneath, laid out as the mirror is.
+        local_dir: Directory to download beneath, laid out as the mirror is, and
+            resolved only as far as the directory its caller chose.
         revision: The mirror's branch, tag, or commit.
 
     Raises:
-        ValueError: If a projection names no source dataset, or the mirror holds a
-            source only in a format other than Parquet.
+        ValueError: If a projection names no source dataset, the mirror holds a
+            source only in a format other than Parquet, or a file to delete sits in
+            a directory reached through a link.
     """
     dataset_ids = set()
     for path in huggingface.parquet_files(projections):
@@ -155,9 +158,19 @@ def _fetch_sources(
     fetch = functools.partial(_fetch_source, local_dir=local_dir, revision=revision)
     with concurrent.futures.ThreadPoolExecutor(_SOURCE_DOWNLOADS) as executor:
         fetched = set(executor.map(fetch, sorted(dataset_ids)))
-    for path in huggingface.parquet_files(local_dir / "data"):
-        if path.resolve() not in fetched:
+    foreign = []
+    for path in huggingface.parquet_files(local_dir):
+        if path.resolve() in fetched:
+            continue
+        if path.parent.resolve().is_relative_to(local_dir):
             path.unlink()
+        else:
+            foreign.append(str(path))
+    if foreign:
+        raise ValueError(
+            "no projection restates these sources, which sit in directories linked "
+            f"from outside {local_dir} and were left in place: {foreign}"
+        )
 
 
 def _fetched_trees(
@@ -180,21 +193,24 @@ def _fetched_trees(
     Raises:
         LookupError: If the artifacts revision holds no build for this ord-schema
             and RDKit.
-        ValueError: If a projection names no source dataset, or the mirror holds a
-            source only in a format other than Parquet.
+        ValueError: If a projection names no source dataset, the mirror holds a
+            source only in a format other than Parquet, or a stale source sits in a
+            directory reached through a link.
         RuntimeError: If the mirror holds no file for a source.
     """
     artifacts = huggingface.fetch_artifacts(
         root / _FETCHED_ARTIFACTS, revision=artifacts_revision
     )
-    sources = root / _FETCHED_SOURCES
+    # Resolved only as far as root, which the deployment chose: a link below it leads
+    # to storage this directory does not own.
+    sources = root.resolve() / _FETCHED_SOURCES
     _fetch_sources(artifacts.projections, sources, revision=sources_revision)
     return _Trees(
         projections=artifacts.projection_pattern,
         structures=artifacts.structures_pattern,
         pivots=str(artifacts.pivots),
         occurrences=str(artifacts.occurrences),
-        sources=huggingface.parquet_pattern(sources / "data"),
+        sources=huggingface.parquet_pattern(sources),
     )
 
 
@@ -212,8 +228,8 @@ def open_corpus(
         The open corpus, warmed, with its pivots checked.
 
     Raises:
-        ValueError: If ORD_VIEWER_CORPUS_DIR is not set, or a fetch finds a source it
-            cannot serve.
+        ValueError: If ORD_VIEWER_CORPUS_DIR is not set, a fetched source cannot be
+            served, or a stale one sits behind a link and cannot be deleted.
         FileNotFoundError: If a local corpus directory lacks one of its trees.
         LookupError: If the artifacts revision holds no build this library reads.
         RuntimeError: If the ord-data mirror holds no file for a source.

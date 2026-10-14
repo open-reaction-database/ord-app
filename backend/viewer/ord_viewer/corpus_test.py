@@ -86,7 +86,8 @@ def hub(monkeypatch, corpus_dir) -> list[tuple[str, str]]:
 
 
 def test_serves_a_fetched_corpus_as_the_local_one_it_matches(hub, client, tmp_path):
-    with fetching_client(tmp_path) as fetched:
+    # A glob metacharacter in the directory's name, which every pattern must escape.
+    with fetching_client(tmp_path / "corpus[1]") as fetched:
         for path in ("/api/health", "/api/datasets"):
             assert fetched.get(path).json() == client.get(path).json()
     assert (
@@ -104,6 +105,20 @@ def test_deletes_a_source_the_fetched_build_does_not_restate(hub, corpus_dir, tm
     with fetching_client(tmp_path) as fetched:
         assert fetched.get("/api/health").status_code == 200
     assert not stale.exists()
+
+
+def test_leaves_a_stale_source_in_a_linked_directory_in_place(
+    hub, corpus_dir, tmp_path
+):
+    outside = tmp_path / "outside" / "ord_dataset-zz.parquet"
+    outside.parent.mkdir()
+    shutil.copy(corpus_dir / "sources" / "aa" / "ord_dataset-viewer01.parquet", outside)
+    root = tmp_path / "corpus"
+    (root / "ord-data" / "data").mkdir(parents=True)
+    (root / "ord-data" / "data" / "zz").symlink_to(outside.parent)
+    with pytest.raises(ValueError, match="linked from outside .* left in place"):
+        open_corpus(fetching_settings(root), resolver=offline_resolver)
+    assert outside.exists()
 
 
 def test_refuses_a_source_the_mirror_holds_only_as_a_binary_proto(
