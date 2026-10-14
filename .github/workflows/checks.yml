@@ -15,6 +15,8 @@
 name: Checks
 
 on:
+  # Every pull request runs these jobs, whatever it changes: the main branch's ruleset
+  # requires them, and a required check that never reports leaves the PR blocked.
   pull_request:
     branches:
       - '*'
