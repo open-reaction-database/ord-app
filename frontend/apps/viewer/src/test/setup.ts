@@ -15,3 +15,10 @@
  */
 // Registers jest-dom's matchers (toBeInTheDocument, etc.).
 import '@testing-library/jest-dom/vitest';
+import { notifications } from '@mantine/notifications';
+import { afterEach } from 'vitest';
+
+// Notifications live in a module-level store that outlives each test's render.
+afterEach(() => {
+  notifications.clean();
+});
