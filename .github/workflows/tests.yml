@@ -220,3 +220,80 @@ jobs:
             frontend/apps/editor/test-results/
             frontend/apps/editor/e2e/*-snapshots/
           retention-days: 7
+
+  test_e2e_viewer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the backend
+        working-directory: backend/viewer
+        run: uv sync --frozen --no-build
+
+      - name: Derive the test corpus
+        working-directory: backend/viewer
+        run: uv run --frozen --no-build python -m ord_viewer.testing "$RUNNER_TEMP/corpus"
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install the frontend
+        working-directory: frontend
+        run: npm ci --ignore-scripts
+
+      - name: Install Playwright's browser
+        working-directory: frontend
+        run: node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Build the viewer
+        working-directory: frontend
+        run: npm run build -w apps/viewer
+
+      # Background processes do not outlive their step on GitHub's runners, so the
+      # servers and the tests share one.
+      - name: Serve the viewer and run its end-to-end tests
+        env:
+          ORD_VIEWER_CORPUS_DIR: ${{ runner.temp }}/corpus
+        run: |
+          nohup uv run --directory backend/viewer --frozen --no-build \
+            uvicorn --factory ord_viewer.testing:e2e_app --host 127.0.0.1 --port 8001 \
+            > "$RUNNER_TEMP/backend.log" 2>&1 &
+          nohup npm --prefix frontend -w apps/viewer run preview -- --host 127.0.0.1 \
+            > "$RUNNER_TEMP/preview.log" 2>&1 &
+          wait_for() {
+            for _ in $(seq 1 60); do
+              if curl -sf --max-time 5 "$1" > /dev/null; then
+                return 0
+              fi
+              sleep 2
+            done
+            echo "$1 did not answer:"
+            cat "$2"
+            return 1
+          }
+          wait_for http://127.0.0.1:8001/api/health "$RUNNER_TEMP/backend.log"
+          wait_for http://127.0.0.1:4174/ "$RUNNER_TEMP/preview.log"
+          npm --prefix frontend -w apps/viewer run test:e2e
+
+      - name: Server logs (on failure)
+        if: failure()
+        run: cat "$RUNNER_TEMP/backend.log" "$RUNNER_TEMP/preview.log" || true
+
+      - name: Upload the Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report-viewer
+          path: |
+            frontend/apps/viewer/playwright-report/
+            frontend/apps/viewer/test-results/
+            frontend/apps/viewer/e2e/*-snapshots/
+          retention-days: 7
