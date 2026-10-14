@@ -17,6 +17,7 @@
   "dependencies": {
     "@buf/open-reaction-database_ord-schema.bufbuild_es": "2.16.0-00000000000000-2a4e5a8d72a2.1",
     "@bufbuild/protobuf": "^2.16.0",
+    "@mantine/charts": "^7.17.8",
     "@mantine/core": "^7.15.3",
     "@mantine/dates": "^7.15.3",
     "@mantine/form": "^7.15.3",
@@ -26,6 +27,7 @@
     "@tanstack/react-query": "^5.90.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "^2.15.4",
     "wouter": "^3.3.5"
   },
   "devDependencies": {
