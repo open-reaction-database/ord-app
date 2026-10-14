@@ -108,3 +108,16 @@ test('shows a selected set with long IDs on a phone', async ({ page }) => {
   });
   await expectNoSidewaysScroll(page);
 });
+
+test('shows search results with long IDs on a phone', async ({ page }) => {
+  await withLongIds(page);
+  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  // On a phone the form comes first and the results below it.
+  const link = page.getByRole('link', { name: REACTION_ID });
+  await link.scrollIntoViewIfNeeded();
+  await expect(link).toBeInViewport({ ratio: 1 });
+  await expect(
+    page.getByRole('checkbox', { name: `Select ${REACTION_ID}` }),
+  ).toBeInViewport();
+  await expectNoSidewaysScroll(page);
+});

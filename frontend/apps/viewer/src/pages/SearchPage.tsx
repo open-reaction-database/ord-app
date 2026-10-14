@@ -100,7 +100,8 @@ export function SearchPage() {
         <Flex
           direction={{ base: 'column', md: 'row' }}
           gap="lg"
-          align="flex-start"
+          // Stacked, the form and results take the page's width rather than their own.
+          align={{ base: 'stretch', md: 'flex-start' }}
         >
           {showForm && (
             <Paper
