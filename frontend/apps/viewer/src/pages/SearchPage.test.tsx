@@ -27,6 +27,13 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** The POST /api/search requests fetch was asked for. */
+function searchRequests(fetch: ReturnType<typeof mockApi>) {
+  return fetch.mock.calls.filter(
+    ([input, init]) => String(input) === '/api/search' && init?.method === 'POST',
+  );
+}
+
 describe('SearchPage', () => {
   it('asks for criteria before searching', () => {
     const fetch = mockApi({});
@@ -119,6 +126,54 @@ describe('SearchPage', () => {
       target: 'input',
       mode: 'exact',
     });
+  });
+
+  // The second URL holds the same search as the form writes it, in another order.
+  it.each([
+    'reaction_id=ord-viewer0103&limit=100',
+    'limit=100&reaction_id=ord-viewer0103',
+  ])('sends a failed search again when it is resubmitted from %s', async search => {
+    const user = userEvent.setup();
+    const answers = [
+      () => new Response(JSON.stringify({ detail: 'busy' }), { status: 503 }),
+      () =>
+        new Response(
+          JSON.stringify({
+            kind: 'reactions',
+            reaction_ids: ['ord-viewer0103'],
+            truncated: false,
+          }),
+        ),
+    ];
+    const fetch = mockApi({
+      'POST /api/search': () => answers.shift()!(),
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByRole, getByRole } = renderAt(`/search?${search}`, <SearchPage />);
+    expect(await findByRole('alert')).toHaveTextContent('try again shortly');
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    expect(searchRequests(fetch)).toHaveLength(2);
+  });
+
+  it('runs a search that succeeded only once', async () => {
+    const user = userEvent.setup();
+    const fetch = mockApi({
+      'POST /api/search': {
+        kind: 'reactions',
+        reaction_ids: ['ord-viewer0103'],
+        truncated: false,
+      },
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByRole, getByRole } = renderAt(
+      '/search?reaction_id=ord-viewer0103&limit=100',
+      <SearchPage />,
+    );
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    expect(searchRequests(fetch)).toHaveLength(1);
   });
 
   it("shows the server's reason for a search it refused", async () => {

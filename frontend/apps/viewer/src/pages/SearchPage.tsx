@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Button, Flex, Loader, Paper, Stack, Text, Title } from '@mantine/core';
+import { hashKey } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'wouter';
 import { useSearch } from '#api/hooks.ts';
@@ -22,7 +23,7 @@ import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
 import { compileQuery } from '#search/compile.ts';
-import { formFromParams, paramsFromForm } from '#search/form.ts';
+import { formFromParams, paramsFromForm, type SearchForm } from '#search/form.ts';
 import { SearchFormPanel } from '#search/SearchFormPanel.tsx';
 
 function HelpNote() {
@@ -53,6 +54,14 @@ export function SearchPage() {
   const form = useMemo(() => formFromParams(new URLSearchParams(search)), [search]);
   const query = useMemo(() => compileQuery(form), [form]);
   const results = useSearch(query);
+  // The search shown is sent again only after a failure; its results are kept. Queries,
+  // not URLs, are compared, since more than one URL can hold the same search.
+  const runSearch = (next: SearchForm) => {
+    navigate(`/search?${paramsFromForm(next)}`);
+    if (results.isError && hashKey([compileQuery(next)]) === hashKey([query])) {
+      void results.refetch();
+    }
+  };
   const [showForm, setShowForm] = useState(true);
   let body;
   if (query === null) {
@@ -115,7 +124,7 @@ export function SearchPage() {
                 // A new URL, such as Back to an earlier search, starts the form afresh.
                 key={search}
                 initial={form}
-                onSearch={next => navigate(`/search?${paramsFromForm(next)}`)}
+                onSearch={runSearch}
               />
               <HelpNote />
             </Stack>
