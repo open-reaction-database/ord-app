@@ -35,7 +35,7 @@ import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
 
-/** The backend's bound on a question's length, after trimming. */
+/** The backend's bound on a question's length in characters, after trimming. */
 export const MAX_QUESTION = 2000;
 
 /** ord-interface's examples. */
@@ -72,7 +72,8 @@ interface AskFormProps {
 function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
   const [draft, setDraft] = useState(question);
   const trimmed = draft.trim();
-  const tooLong = trimmed.length > MAX_QUESTION;
+  // By code point, as the backend counts, not by UTF-16 unit as length does.
+  const tooLong = [...trimmed].length > MAX_QUESTION;
   return (
     <>
       <Textarea
@@ -134,6 +135,8 @@ function Answer({
         <ReactionResults
           result={answer.result}
           selectionKey={selectionKey}
+          limit={answer.query.limit ?? undefined}
+          moreHint="ask for more reactions to see the rest"
         />
       ) : (
         <ResultTable result={answer.result} />

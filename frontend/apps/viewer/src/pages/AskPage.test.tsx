@@ -71,6 +71,22 @@ describe('AskPage', () => {
     );
   });
 
+  it("says when the answer stopped at its query's limit", async () => {
+    mockApi({
+      'POST /api/ask': { ...ANSWER, query: { ...ANSWER.query, limit: 1 } },
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByText } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    expect(
+      await findByText(
+        /stopped at its limit of 1; ask for more reactions to see the rest/,
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('shows a table answer as a table', async () => {
     mockApi({
       'POST /api/ask': {
@@ -177,6 +193,14 @@ describe('AskPage', () => {
     const { getByRole } = renderAt('/ask', <AskPage />);
     await user.click(getByRole('textbox', { name: 'Question' }));
     await user.paste(`${'x'.repeat(2000)}   `);
+    expect(getByRole('button', { name: 'Ask' })).toBeEnabled();
+  });
+
+  it('counts characters as the backend does, not UTF-16 units', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = renderAt('/ask', <AskPage />);
+    await user.click(getByRole('textbox', { name: 'Question' }));
+    await user.paste('\u{1F600}'.repeat(2000));
     expect(getByRole('button', { name: 'Ask' })).toBeEnabled();
   });
 
