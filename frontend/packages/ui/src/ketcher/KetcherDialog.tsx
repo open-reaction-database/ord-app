@@ -19,7 +19,7 @@ import { Editor } from 'ketcher-react';
 // @ts-ignore
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import 'ketcher-react/dist/index.css';
-import type { Ketcher } from 'ketcher-core';
+import { ChemicalMimeType, type Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import classes from './structureDialog.module.scss';
 import type { StructureDialogProps, StructureFormat } from './structure.types.ts';
@@ -27,10 +27,25 @@ import type { StructureDialogProps, StructureFormat } from './structure.types.ts
 const appWindow = globalThis as unknown as { ketcher: Ketcher | null };
 const structServiceProvider = new StandaloneStructServiceProvider();
 
+/**
+ * The drawing in a line notation, aromatized as Ketcher's Aromatize button would.
+ *
+ * Ketcher writes a ring as drawn, and a Kekulé ring read as SMARTS has single and double
+ * bonds that no aromatic ring matches. Indigo's generic model aromatizes 2-pyridones,
+ * purines, and coumarins as RDKit does; its default model leaves them Kekulé.
+ */
+async function aromatized(ketcher: Ketcher, notation: ChemicalMimeType) {
+  const { struct } = await ketcher.structService.aromatize(
+    { struct: await ketcher.getKet(), output_format: notation },
+    { ...ketcher.editor.serverSettings, 'aromaticity-model': 'generic' },
+  );
+  return struct;
+}
+
 const READERS: Record<StructureFormat, (ketcher: Ketcher) => Promise<string>> = {
   molfile: ketcher => ketcher.getMolfile(),
-  smiles: ketcher => ketcher.getSmiles(),
-  smarts: ketcher => ketcher.getSmarts(),
+  smiles: ketcher => aromatized(ketcher, ChemicalMimeType.DaylightSmiles),
+  smarts: ketcher => aromatized(ketcher, ChemicalMimeType.DaylightSmarts),
 };
 
 /** Ketcher's canvas in a modal; StructureDialog loads it the first time it opens. */

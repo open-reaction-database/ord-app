@@ -22,14 +22,21 @@ import { KetcherDialog } from './KetcherDialog.tsx';
 import type { StructureDialogProps } from './structure.types.ts';
 
 // Ketcher's editor needs a WASM struct service and a canvas, which happy-dom lacks. The
-// stub keeps the API the dialog relies on (onInit, setMolecule, and the getters), which a
-// Ketcher upgrade could break, and hands each mount an instance of its own, as Ketcher does.
+// stub keeps the API the dialog relies on (onInit, setMolecule, the getters, and the struct
+// service), which a Ketcher upgrade could break, and hands each mount an instance of its
+// own, as Ketcher does. Aromatizing answers with the notation it was asked for.
 function createInstance() {
   return {
     setMolecule: vi.fn((_structure: string) => Promise.resolve()),
     getMolfile: vi.fn(() => Promise.resolve('MOLFILE')),
-    getSmiles: vi.fn(() => Promise.resolve('SMILES')),
-    getSmarts: vi.fn(() => Promise.resolve('SMARTS')),
+    getKet: vi.fn(() => Promise.resolve('KET')),
+    editor: { serverSettings: { 'smart-layout': true } },
+    structService: {
+      aromatize: vi.fn(
+        (data: { struct: string; output_format: string }, _options?: object) =>
+          Promise.resolve({ struct: `aromatic ${data.output_format}` }),
+      ),
+    },
   };
 }
 
@@ -43,6 +50,14 @@ function latest(): Instance {
 
 vi.mock('ketcher-standalone', () => ({
   StandaloneStructServiceProvider: class {},
+}));
+
+// Ketcher's core draws on a canvas as it loads; the dialog reads only these values.
+vi.mock('ketcher-core', () => ({
+  ChemicalMimeType: {
+    DaylightSmiles: 'chemical/x-daylight-smiles',
+    DaylightSmarts: 'chemical/x-daylight-smarts',
+  },
 }));
 
 vi.mock('ketcher-react', async () => {
@@ -113,11 +128,7 @@ describe('KetcherDialog', () => {
     await waitFor(() => expect(latest().setMolecule).toHaveBeenLastCalledWith('CCN'));
   });
 
-  it.each([
-    ['molfile', 'MOLFILE', 'getMolfile'],
-    ['smiles', 'SMILES', 'getSmiles'],
-    ['smarts', 'SMARTS', 'getSmarts'],
-  ] as const)('saves the drawing as %s and closes', async (format, saved, getter) => {
+  async function save(format: StructureDialogProps['format']) {
     const onSave = vi.fn();
     const onClose = vi.fn();
     const { getByRole } = renderWithMantine(
@@ -125,11 +136,27 @@ describe('KetcherDialog', () => {
     );
     await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
     await userEvent.click(getByRole('button', { name: 'Save' }));
-    await waitFor(() => {
-      expect(latest()[getter]).toHaveBeenCalled();
-      expect(onSave).toHaveBeenCalledWith(saved);
-      expect(onClose).toHaveBeenCalled();
-    });
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    return onSave;
+  }
+
+  it('saves the drawing as a molfile and closes', async () => {
+    const onSave = await save('molfile');
+    expect(onSave).toHaveBeenCalledWith('MOLFILE');
+    expect(latest().structService.aromatize).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['smiles', 'chemical/x-daylight-smiles'],
+    ['smarts', 'chemical/x-daylight-smarts'],
+  ] as const)('saves the drawing as aromatized %s and closes', async (format, mime) => {
+    const onSave = await save(format);
+    // The editor's own settings, with the model that aromatizes pyridones and purines.
+    expect(latest().structService.aromatize).toHaveBeenCalledWith(
+      { struct: 'KET', output_format: mime },
+      { 'smart-layout': true, 'aromaticity-model': 'generic' },
+    );
+    expect(onSave).toHaveBeenCalledWith(`aromatic ${mime}`);
   });
 
   it('shows the host’s fields beside the buttons', () => {
