@@ -36,7 +36,7 @@ export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListPr
   const ids = inputs.map(input => input.id);
 
   return (
-    <>
+    <div className={componentsListClasses.table}>
       <div className={classes.grid}>
         {headers.map(({ label, className }) => (
           <Text
@@ -64,6 +64,6 @@ export function InputsComponentsList({ inputs }: Readonly<InputsComponentsListPr
           />
         ))}
       </Accordion>
-    </>
+    </div>
   );
 }

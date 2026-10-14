@@ -25,6 +25,7 @@ import { AddCircleIcon } from '#theme/icons/index.ts';
 import { renderValuePrecisionUnit } from '#reaction/view/ReactionView/renderValuePrecisionUnit.ts';
 import classes from './authenticStandard.module.scss';
 import { ComponentDisplayRowCustomActions } from '#reaction/view/ReactionView/ComponentsList/ComponentDisplayRowCustomActions.tsx';
+import componentsListClasses from '#reaction/view/ReactionView/ComponentsList/componentsList.module.scss';
 import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
@@ -81,7 +82,7 @@ export function AuthenticStandard({ name }: Readonly<ReactionFormCustomProps>) {
         />
       }
     >
-      <Flex>
+      <Flex className={componentsListClasses.table}>
         {authenticStandard && (
           <ComponentDisplayRowCustomActions
             component={authenticStandard}
