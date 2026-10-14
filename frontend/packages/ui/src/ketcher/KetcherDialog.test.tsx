@@ -52,7 +52,8 @@ vi.mock('ketcher-standalone', () => ({
   StandaloneStructServiceProvider: class {},
 }));
 
-// Ketcher's core draws on a canvas as it loads; the dialog reads only these values.
+// Importing Ketcher's core asks for a canvas context, which happy-dom lacks; the dialog
+// reads only these values from it.
 vi.mock('ketcher-core', () => ({
   ChemicalMimeType: {
     DaylightSmiles: 'chemical/x-daylight-smiles',
@@ -157,6 +158,61 @@ describe('KetcherDialog', () => {
       { 'smart-layout': true, 'aromaticity-model': 'generic' },
     );
     expect(onSave).toHaveBeenCalledWith(`aromatic ${mime}`);
+  });
+
+  it('says why a drawing could not be saved, and saves it on a later try', async () => {
+    const onSave = vi.fn();
+    const onClose = vi.fn();
+    const { getByRole, queryByRole } = renderWithMantine(
+      <KetcherDialog {...props({ format: 'smiles', onSave, onClose })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    latest().structService.aromatize.mockRejectedValueOnce(
+      new Error('SMILES saver: atom list can be used only with smarts_mode'),
+    );
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(getByRole('alert')).toHaveTextContent(
+        'The drawing could not be saved: SMILES saver: atom list can be used only with smarts_mode',
+      ),
+    );
+    expect(onSave).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith('aromatic chemical/x-daylight-smiles'),
+    );
+    await waitFor(() => expect(queryByRole('alert')).not.toBeInTheDocument());
+  });
+
+  it('puts a failed save aside when the canvas is clicked', async () => {
+    const { getByRole, getByTestId, queryByRole } = renderWithMantine(
+      <KetcherDialog {...props({ format: 'smiles' })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    latest().structService.aromatize.mockRejectedValueOnce(new Error('unreadable'));
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+    await userEvent.click(getByTestId('ketcher-editor'));
+    await waitFor(() => expect(queryByRole('alert')).not.toBeInTheDocument());
+  });
+
+  it('forgets a failed save once closed', async () => {
+    const { getByRole, queryByRole, queryByTestId, rerender } = renderWithMantine(
+      <KetcherDialog {...props({ format: 'smiles' })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    latest().structService.aromatize.mockRejectedValueOnce(new Error('unreadable'));
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+    rerender(<KetcherDialog {...props({ format: 'smiles', opened: false })} />);
+    await waitFor(() =>
+      expect(queryByTestId('ketcher-editor')).not.toBeInTheDocument(),
+    );
+    rerender(<KetcherDialog {...props({ format: 'smiles' })} />);
+    await waitFor(() => expect(instances).toHaveLength(2));
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await waitFor(() => expect(queryByRole('alert')).not.toBeInTheDocument());
   });
 
   it('shows the host’s fields beside the buttons', () => {

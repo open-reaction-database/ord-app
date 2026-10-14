@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Grid, Modal } from '@mantine/core';
+import { Button, Flex, Grid, Modal, Popover, Text } from '@mantine/core';
 import { Editor } from 'ketcher-react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -58,12 +58,16 @@ export function KetcherDialog({
   children,
 }: Readonly<StructureDialogProps>) {
   const [ketcher, setKetcher] = useState<Ketcher | null>(null);
+  // Why the last Save could not write the drawing, such as an atom list asked for as SMILES.
+  const [failure, setFailure] = useState<string | null>(null);
 
   // The modal unmounts Ketcher while closed, and each opening initializes a new one, so
-  // the instance is forgotten on close and the next one loads the initial structure.
+  // the instance and any failed save are forgotten on close, and the next one loads the
+  // initial structure.
   useEffect(() => {
     if (!opened) {
       setKetcher(null);
+      setFailure(null);
     }
   }, [opened]);
 
@@ -75,10 +79,16 @@ export function KetcherDialog({
 
   const handleSave = () => {
     if (ketcher) {
-      void READERS[format](ketcher).then(structure => {
-        onSave(structure);
-        onClose();
-      });
+      setFailure(null);
+      void READERS[format](ketcher).then(
+        structure => {
+          onSave(structure);
+          onClose();
+        },
+        (reason: unknown) => {
+          setFailure(reason instanceof Error ? reason.message : String(reason));
+        },
+      );
     }
   };
 
@@ -117,7 +127,27 @@ export function KetcherDialog({
             >
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            {/* A popover, since the canvas leaves the buttons no room for a message. */}
+            <Popover
+              opened={failure !== null}
+              onDismiss={() => setFailure(null)}
+              position="top-end"
+              width="min(24rem, calc(100vw - 2rem))"
+              withArrow
+            >
+              <Popover.Target>
+                <Button onClick={handleSave}>Save</Button>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Text
+                  role="alert"
+                  size="sm"
+                  c="red"
+                >
+                  The drawing could not be saved: {failure}
+                </Text>
+              </Popover.Dropdown>
+            </Popover>
           </Flex>
         </Grid.Col>
       </Grid>
