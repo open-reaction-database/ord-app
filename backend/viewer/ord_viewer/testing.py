@@ -18,9 +18,12 @@ import argparse
 import contextlib
 import glob
 import pathlib
-from collections.abc import Sequence
+import types
+from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
+import anthropic
+from anthropic.types import TextBlock, ToolUseBlock
 from anyio.from_thread import BlockingPortal
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -275,17 +278,174 @@ def make_client(
     return TestClient(app)
 
 
+# A response the model's safety classifiers stopped.
+DECLINED = "declined"
+
+
+def _message(payload: Any) -> types.SimpleNamespace:
+    """Build a Messages API response from a scripted payload.
+
+    Args:
+        payload: A dict holding "reason" for a cannot_answer call, any other dict for a
+            build_query call, DECLINED for a classifier's stop, or another string for
+            the answer's prose.
+
+    Returns:
+        A message with that content and nominal usage.
+    """
+    usage = types.SimpleNamespace(
+        input_tokens=1,
+        output_tokens=1,
+        cache_creation_input_tokens=0,
+        cache_read_input_tokens=0,
+    )
+    if payload == DECLINED:
+        details = types.SimpleNamespace(category="cyber")
+        return types.SimpleNamespace(
+            content=[], usage=usage, stop_reason="refusal", stop_details=details
+        )
+    if isinstance(payload, str):
+        content: list[Any] = [TextBlock(type="text", text=payload)]
+    else:
+        tool = "cannot_answer" if "reason" in payload else "build_query"
+        content = [
+            ToolUseBlock(type="tool_use", id="toolu_stub", name=tool, input=payload)
+        ]
+    stop = "end_turn" if isinstance(payload, str) else "tool_use"
+    return types.SimpleNamespace(content=content, usage=usage, stop_reason=stop)
+
+
+class StubAskClient:
+    """Answers messages.create from a script, in order: a query, prose, or a refusal.
+
+    Args:
+        *responses: One per call, in order, as _message reads them; an exception is
+            raised instead.
+    """
+
+    def __init__(self, *responses: Any) -> None:
+        self._responses = list(responses)
+        self.requests: list[dict[str, Any]] = []
+        self.messages = self
+        self.closed = False
+
+    def close(self) -> None:
+        """Record that the app closed the client, as it does at shutdown."""
+        self.closed = True
+
+    def create(self, **kwargs: Any) -> types.SimpleNamespace:
+        """Record the request and answer with the next scripted response.
+
+        Args:
+            **kwargs: The request nl.ask sends.
+
+        Returns:
+            The next scripted message.
+
+        Raises:
+            Exception: The next scripted response, when it is one.
+        """
+        self.requests.append(kwargs)
+        payload = self._responses.pop(0)
+        if isinstance(payload, Exception):
+            raise payload
+        return _message(payload)
+
+
+def _text_of(message: Mapping[str, Any]) -> str:
+    """Return a message's text, whether its content is a string or blocks."""
+    content = message["content"]
+    if isinstance(content, str):
+        return content
+    return "".join(block.get("text", "") for block in content)
+
+
+class ScriptedAskClient:
+    """Answers each question it has a script for, and cannot answer any other.
+
+    nl.ask makes two calls a question. The query call carries tools, and its first
+    message is the question; the answer call carries none, and its message starts
+    "Question: <question>" before the result.
+
+    Args:
+        scripts: For each question, the query it compiles to and the sentence that
+            answers it.
+    """
+
+    def __init__(self, scripts: Mapping[str, tuple[dict[str, Any], str]]) -> None:
+        self._scripts = scripts
+        self.messages = self
+
+    def close(self) -> None:
+        """Nothing to release; the app closes its client at shutdown."""
+
+    def create(self, **kwargs: Any) -> types.SimpleNamespace:
+        """Answer the question in the request from its script.
+
+        Args:
+            **kwargs: The request nl.ask sends.
+
+        Returns:
+            The scripted query, the scripted sentence, or a cannot_answer call.
+        """
+        text = _text_of(kwargs["messages"][0])
+        if "tools" in kwargs:
+            script = self._scripts.get(text)
+            if script is None:
+                return _message({"reason": "the scripted client has no script for it"})
+            return _message(script[0])
+        question = text.removeprefix("Question: ").split("\n\nResult:", 1)[0]
+        return _message(self._scripts[question][1])
+
+
+# The questions the viewer's end-to-end tests ask, over the fixture corpus. Each query
+# orders its rows, so a test can compare them as a list.
+ASK_SCRIPTS: dict[str, tuple[dict[str, Any], str]] = {
+    "reactions that use acetyl chloride": (
+        {
+            "where": {
+                "op": "exists",
+                "path": "inputs.components",
+                "where": {
+                    "op": "same_compound",
+                    "path": "smiles",
+                    "smiles": "CC(=O)Cl",
+                },
+            },
+            "order_by": [{"key": "reaction_id"}],
+        },
+        "Three reactions use acetyl chloride.",
+    ),
+    "how many reactions are in each dataset": (
+        {
+            "aggregate": {
+                "group_by": ["dataset_id"],
+                "measures": [{"fn": "count", "name": "reactions"}],
+            },
+            "order_by": [{"key": "dataset_id"}],
+        },
+        "The first dataset holds three reactions, and the second two.",
+    ),
+}
+
+
 def e2e_app() -> FastAPI:
     """Build the app the viewer's end-to-end tests run against.
 
     Reads ORD_VIEWER_CORPUS_DIR and the other settings from the environment, as the
-    image does, and resolves compound names from COMPOUND_NAMES, without the network.
-    It has no model client, so /api/ask answers 503.
+    image does, resolves compound names from COMPOUND_NAMES without the network, and
+    answers /api/ask from ASK_SCRIPTS.
 
     Returns:
         The app, for ``uvicorn --factory ord_viewer.testing:e2e_app``.
     """
-    return create_app(resolver=offline_resolver, ask_client_factory=lambda: None)
+    return create_app(
+        resolver=offline_resolver,
+        # The scripted client answers messages.create, the one method the route calls.
+        ask_client_factory=lambda: cast(
+            anthropic.Anthropic, ScriptedAskClient(ASK_SCRIPTS)
+        ),
+    )
 
 
 def main(argv: Sequence[str] | None = None) -> None:
