@@ -25,10 +25,12 @@ vi.mock('@open-reaction-database/ui/ketcher', () => ({
   StructureDialog: ({
     opened,
     format,
+    onClose,
     onSave,
   }: Readonly<{
     opened: boolean;
     format: string;
+    onClose: () => void;
     onSave: (structure: string) => void;
   }>) =>
     opened ? (
@@ -38,6 +40,12 @@ vi.mock('@open-reaction-database/ui/ketcher', () => ({
           onClick={() => onSave(format === 'smarts' ? 'c1ccccc1' : 'C1=CC=CC=C1')}
         >
           Save drawing
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+        >
+          Cancel drawing
         </button>
       </div>
     ) : null,
@@ -85,6 +93,17 @@ describe('SearchFormPanel', () => {
     expect(getByRole('textbox', { name: 'Structure 1' })).toHaveValue('C1=CC=CC=C1');
   });
 
+  it('closes the drawing without changing the structure', async () => {
+    const { getByRole, queryByRole, user } = setUp({
+      ...EMPTY_FORM,
+      structures: [{ pattern: 'CCN', target: 'input', mode: 'exact' }],
+    });
+    await user.click(getByRole('button', { name: 'Draw structure 1' }));
+    await user.click(getByRole('button', { name: 'Cancel drawing' }));
+    expect(queryByRole('dialog')).not.toBeInTheDocument();
+    expect(getByRole('textbox', { name: 'Structure 1' })).toHaveValue('CCN');
+  });
+
   it('draws a SMARTS in SMARTS mode', async () => {
     const { getByRole, user } = setUp();
     await user.click(getByRole('button', { name: 'Add a structure' }));
@@ -115,6 +134,23 @@ describe('SearchFormPanel', () => {
     await user.click(getByRole('button', { name: 'Add a structure' }));
     await user.click(getByRole('button', { name: 'Remove structure 1' }));
     expect(queryByRole('textbox', { name: 'Structure 1' })).not.toBeInTheDocument();
+  });
+
+  it('edits only the structure typed into', async () => {
+    const { getByRole, onSearch, user } = setUp({
+      ...EMPTY_FORM,
+      structures: [
+        { pattern: 'CCN', target: 'input', mode: 'exact' },
+        { pattern: 'CCO', target: 'input', mode: 'exact' },
+      ],
+    });
+    await user.type(getByRole('textbox', { name: 'Structure 2' }), 'C');
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(
+      onSearch.mock.calls[0][0].structures.map(
+        ({ pattern }: { pattern: string }) => pattern,
+      ),
+    ).toEqual(['CCN', 'CCOC']);
   });
 
   it('keeps a drawing with its structure when one before it is removed', async () => {
@@ -192,6 +228,32 @@ describe('SearchFormPanel', () => {
     await user.type(threshold, '0.8');
     await user.click(getByRole('button', { name: 'Search' }));
     expect(onSearch.mock.calls[0][0].similarity).toBeCloseTo(0.8);
+  });
+
+  it('matches stereochemistry when asked', async () => {
+    const { getByRole, onSearch, user } = setUp();
+    await user.click(getByRole('checkbox', { name: 'Match stereochemistry' }));
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(onSearch.mock.calls[0][0].useStereochemistry).toBe(true);
+  });
+
+  it('moves a conversion bound with the keyboard', async () => {
+    const { getAllByRole, getByRole, onSearch, user } = setUp();
+    const conversionLow = getAllByRole('slider')[2];
+    fireEvent.keyDown(conversionLow, { key: 'ArrowRight' });
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(onSearch.mock.calls[0][0].conversionRange).toEqual([1, 100]);
+  });
+
+  it.each([
+    ['Dataset IDs', 'datasetIds', 'ord_dataset-1'],
+    ['DOIs', 'dois', '10.1021/x'],
+    ['Reaction IDs', 'reactionIds', 'ord-1'],
+  ])('takes %s as tags', async (label, field, value) => {
+    const { getByRole, onSearch, user } = setUp();
+    await user.type(getByRole('textbox', { name: label }), `${value}{Enter}`);
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(onSearch.mock.calls[0][0][field]).toEqual([value]);
   });
 
   it('clears the form', async () => {

@@ -20,6 +20,7 @@ import { DatasetsPage } from '#pages/DatasetsPage.tsx';
 import { NotFoundPage } from '#pages/NotFoundPage.tsx';
 import { ReactionPage } from '#pages/ReactionPage.tsx';
 import { ReactionSetPage } from '#pages/ReactionSetPage.tsx';
+import { SearchPage } from '#pages/SearchPage.tsx';
 import { routeParam } from '#routeParams.ts';
 
 /** ord-interface's /selected-set?reaction_id=…, as the viewer's /reactions?id=…. */
@@ -53,6 +54,10 @@ export function ViewerRoutes() {
       <Route
         path="/reactions"
         component={ReactionSetPage}
+      />
+      <Route
+        path="/search"
+        component={SearchPage}
       />
       <Route
         path="/about"

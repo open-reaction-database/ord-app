@@ -70,3 +70,30 @@ export const VIEWER0102: ReactionRecord = {
     workups: [],
   },
 };
+
+export const VIEWER0103: ReactionRecord = {
+  reaction_id: 'ord-viewer0103',
+  dataset_id: 'ord_dataset-viewer01',
+  binpb:
+    'EiwKCXJlYWN0YW50cxIfCgsKBwgCGgNDQ04YAQoQCgwIAhoIQ0MoPU8pQ2wYAUIcGhoKDQgCGglDQ05DKEMpPU8aCRADQgUNAACWQlIOb3JkLXZpZXdlcjAxMDM=',
+  molblocks: {
+    inputs: {
+      reactants: [
+        '\n     RDKit          2D\n\n  3  2  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990    0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.5981   -0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0\n  2  3  1  0\nM  END\n',
+        '\n     RDKit          2D\n\n  4  3  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990    0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.5981   -0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990    2.2500    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0\n  2  3  2  0\n  2  4  1  0\nM  END\n',
+      ],
+    },
+    outcomes: [
+      {
+        products: [
+          {
+            molblock:
+              '\n     RDKit          2D\n\n  6  5  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990    0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.5981   -0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8971    0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    5.1962   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8971    2.2500    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0\n  2  3  1  0\n  3  4  1  0\n  4  5  1  0\n  4  6  2  0\nM  END\n',
+            measurements: [{ authentic_standard: { molblock: null } }],
+          },
+        ],
+      },
+    ],
+    workups: [],
+  },
+};

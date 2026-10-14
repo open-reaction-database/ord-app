@@ -80,6 +80,21 @@ describe('useSelection', () => {
     expect(result.current.selected).toEqual(['a']);
   });
 
+  it.each([['{not json'], ['{"a": 1}']])(
+    'reads the stored %j as no selection',
+    stored => {
+      sessionStorage.setItem('viewer-selection:k', stored);
+      const { result } = renderHook(() => useSelection('k'));
+      expect(result.current.selected).toEqual([]);
+    },
+  );
+
+  it('keeps only the IDs of a stored list', () => {
+    sessionStorage.setItem('viewer-selection:k', '["a", 2]');
+    const { result } = renderHook(() => useSelection('k'));
+    expect(result.current.selected).toEqual(['a']);
+  });
+
   it('clears', () => {
     const { result } = renderHook(() => useSelection('k'));
     act(() => result.current.toggle('a'));
