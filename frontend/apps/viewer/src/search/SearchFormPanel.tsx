@@ -51,7 +51,9 @@ const TARGET_OPTIONS = [
   { label: 'Product', value: 'output' },
 ];
 
-const MIN_SIMILARITY = 0.05;
+// The number fields' bounds, which both the input and the search enforce.
+const SIMILARITY_BOUNDS = { min: 0.05, max: 1 };
+const LIMIT_BOUNDS = { min: 1, max: MAX_LIMIT };
 
 interface StructureRowProps {
   index: number;
@@ -201,13 +203,12 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
   const matchesPatterns =
     rows.some(({ structure }) => ['substructure', 'smarts'].includes(structure.mode)) ||
     lines(smartsText).length > 0;
-  // A number field holds to its bounds only once it loses focus, and Enter searches
-  // from within one, so the search holds the numbers to the same bounds.
+  // A number field clamps itself on blur, which Enter skips, so the search clamps too.
   const search = () =>
     onSearch({
       ...form,
-      similarity: clamp(form.similarity, MIN_SIMILARITY, 1),
-      limit: clamp(form.limit, 1, MAX_LIMIT),
+      similarity: clamp(form.similarity, SIMILARITY_BOUNDS.min, SIMILARITY_BOUNDS.max),
+      limit: clamp(form.limit, LIMIT_BOUNDS.min, LIMIT_BOUNDS.max),
       structures: rows.map(({ structure }) => structure),
       reactionSmarts: lines(smartsText),
     });
@@ -251,8 +252,7 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
         {rows.some(({ structure }) => structure.mode === 'similar') && (
           <NumberInput
             label="Similarity threshold"
-            min={MIN_SIMILARITY}
-            max={1}
+            {...SIMILARITY_BOUNDS}
             step={0.05}
             decimalScale={2}
             value={form.similarity}
@@ -297,8 +297,7 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
         />
         <NumberInput
           label="Limit"
-          min={1}
-          max={MAX_LIMIT}
+          {...LIMIT_BOUNDS}
           allowDecimal={false}
           value={form.limit}
           onChange={value => update({ limit: Number(value) || form.limit })}

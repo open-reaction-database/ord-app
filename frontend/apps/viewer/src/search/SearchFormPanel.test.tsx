@@ -233,15 +233,18 @@ describe('SearchFormPanel', () => {
     expect(onSearch.mock.calls[0][0].limit).toBe(1000);
   });
 
-  it('holds a threshold entered with Enter to at most 1', async () => {
+  it.each([
+    ['5', 1],
+    ['0.01', 0.05],
+  ])('holds a threshold of %s entered with Enter to %s', async (typed, searched) => {
     const { getByRole, onSearch, user } = setUp({
       ...EMPTY_FORM,
       structures: [{ pattern: 'CCN', target: 'input', mode: 'similar' }],
     });
     const threshold = getByRole('textbox', { name: 'Similarity threshold' });
     await user.clear(threshold);
-    await user.type(threshold, '5{Enter}');
-    expect(onSearch.mock.calls[0][0].similarity).toBe(1);
+    await user.type(threshold, `${typed}{Enter}`);
+    expect(onSearch.mock.calls[0][0].similarity).toBe(searched);
   });
 
   it('takes a threshold typed over the old one', async () => {
