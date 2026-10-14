@@ -24,7 +24,7 @@ dependencies = [
     # Corpus opens only artifacts stamped with its own RDKit version and artifact
     # lineage, so RDKit follows the corpus ord-schema publishes and ord-schema stays on
     # a release whose artifact definitions match it.
-    "ord-schema[search,nl]==0.9.3",
+    "ord-schema[huggingface,nl,search]==0.9.3",
     "rdkit==2026.3.5",
     "pyarrow>=24,<25",
     "pydantic>=2.13,<3",

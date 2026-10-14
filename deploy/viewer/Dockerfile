@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The viewer: its SPA and API behind nginx, under supervisord. The corpus is mounted at
-# run time and named by ORD_VIEWER_CORPUS_DIR. Built from the repository's root:
+# The viewer: its SPA and API behind nginx, under supervisord. The corpus is named by
+# ORD_VIEWER_CORPUS_DIR: a directory mounted at run time, or, with the revisions set, one
+# the API fetches into at startup, such as /app/corpus. Built from the repository's root:
 #   docker build -f deploy/viewer/Dockerfile .
 
 FROM ghcr.io/astral-sh/uv:0.13.0@sha256:cdc6093146eb3ff6a40107b38f008b789e050e77ad87865e381d9917da55a168 AS uv
