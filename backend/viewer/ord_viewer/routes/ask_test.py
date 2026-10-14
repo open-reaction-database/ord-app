@@ -14,20 +14,18 @@
 
 """Questions in English, answered through a scripted stand-in for the model."""
 
-import types
 from collections.abc import Callable, Generator
 from typing import Any, cast
 
 import anthropic
 import httpx2
 import pytest
-from anthropic.types import TextBlock, ToolUseBlock
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema.search import nl
 
 from ord_viewer.routes.ask import ask_client_from_environment, get_ask_client
-from ord_viewer.testing import hold_slot, make_client
+from ord_viewer.testing import DECLINED, StubAskClient, hold_slot, make_client
 
 _PYRIDINE_QUERY = {
     "where": {
@@ -37,74 +35,15 @@ _PYRIDINE_QUERY = {
     }
 }
 _PYRIDINE_ANSWER = "One reaction uses a pyridine."
-# A response the model's safety classifiers stopped.
-_DECLINED = "declined"
 _MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 
 
-class _StubClient:
-    """Answers messages.create from a script: a query, prose, a refusal, or an error.
-
-    Args:
-        *responses: One per call, in order. A dict holding "reason" is a refusal, any
-            other dict a query, _DECLINED a classifier's stop, another string the
-            answer's prose, and an exception is raised.
-    """
-
-    def __init__(self, *responses: Any) -> None:
-        self._responses = list(responses)
-        self.requests: list[dict[str, Any]] = []
-        self.messages = self
-        self.closed = False
-
-    def close(self) -> None:
-        """Record that the app closed the client, as it does at shutdown."""
-        self.closed = True
-
-    def create(self, **kwargs: Any) -> types.SimpleNamespace:
-        """Record the request and answer with the next scripted response.
-
-        Args:
-            **kwargs: The request nl.ask sends.
-
-        Returns:
-            A message with the scripted content and nominal usage.
-
-        Raises:
-            Exception: The next scripted response, when it is one.
-        """
-        self.requests.append(kwargs)
-        payload = self._responses.pop(0)
-        if isinstance(payload, Exception):
-            raise payload
-        usage = types.SimpleNamespace(
-            input_tokens=1,
-            output_tokens=1,
-            cache_creation_input_tokens=0,
-            cache_read_input_tokens=0,
-        )
-        if payload == _DECLINED:
-            details = types.SimpleNamespace(category="cyber")
-            return types.SimpleNamespace(
-                content=[], usage=usage, stop_reason="refusal", stop_details=details
-            )
-        if isinstance(payload, str):
-            content: list[Any] = [TextBlock(type="text", text=payload)]
-        else:
-            tool = "cannot_answer" if "reason" in payload else "build_query"
-            content = [
-                ToolUseBlock(type="tool_use", id="toolu_stub", name=tool, input=payload)
-            ]
-        stop = "end_turn" if isinstance(payload, str) else "tool_use"
-        return types.SimpleNamespace(content=content, usage=usage, stop_reason=stop)
-
-
 @pytest.fixture
-def ask_with(client: TestClient) -> Generator[Callable[..., _StubClient]]:
+def ask_with(client: TestClient) -> Generator[Callable[..., StubAskClient]]:
     app = cast(FastAPI, client.app)
 
-    def install(*responses: Any) -> _StubClient:
-        stub = _StubClient(*responses)
+    def install(*responses: Any) -> StubAskClient:
+        stub = StubAskClient(*responses)
         app.dependency_overrides[get_ask_client] = lambda: stub
         return stub
 
@@ -150,7 +89,7 @@ def test_refuses_an_unknown_key_before_asking(client, ask_with):
 
 
 def test_a_declined_request_is_unprocessable(client, ask_with):
-    ask_with(_DECLINED)
+    ask_with(DECLINED)
     response = client.post("/api/ask", json={"question": "anything"})
     assert response.status_code == 422
     assert "cyber" in response.json()["detail"]
@@ -203,7 +142,7 @@ def test_an_unknown_compound_is_unprocessable(client, ask_with):
 
 
 def test_a_search_past_its_timeout(corpus_dir):
-    stub = _StubClient(_PYRIDINE_QUERY)
+    stub = StubAskClient(_PYRIDINE_QUERY)
     with make_client(
         corpus_dir, ask_client=stub, search_timeout_seconds=1e-9
     ) as client:
@@ -212,7 +151,7 @@ def test_a_search_past_its_timeout(corpus_dir):
 
 
 def test_shutdown_closes_the_model_client(corpus_dir):
-    stub = _StubClient()
+    stub = StubAskClient()
     with make_client(corpus_dir, ask_client=stub):
         assert not stub.closed
     assert stub.closed
@@ -225,7 +164,7 @@ def test_no_key_means_no_answers(client):
 
 
 def test_an_ask_waits_for_a_search_slot(corpus_dir):
-    stub = _StubClient(_PYRIDINE_QUERY, _PYRIDINE_ANSWER)
+    stub = StubAskClient(_PYRIDINE_QUERY, _PYRIDINE_ANSWER)
     with (
         make_client(
             corpus_dir, ask_client=stub, max_concurrent=1, slot_wait_seconds=0.05
@@ -279,7 +218,7 @@ def test_no_key_in_the_environment_builds_no_client(monkeypatch):
 
 
 def test_logs_questions_to_stdout(corpus_dir, capfd):
-    stub = _StubClient(_PYRIDINE_QUERY, _PYRIDINE_ANSWER)
+    stub = StubAskClient(_PYRIDINE_QUERY, _PYRIDINE_ANSWER)
     with make_client(corpus_dir, ask_client=stub, ask_log="stdout") as client:
         question = {"question": "reactions with a pyridine"}
         assert client.post("/api/ask", json=question).status_code == 200

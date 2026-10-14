@@ -15,6 +15,7 @@
  */
 import { Redirect, Route, Switch, useSearchParams } from 'wouter';
 import { AboutPage } from '#pages/AboutPage.tsx';
+import { AskPage } from '#pages/AskPage.tsx';
 import { DatasetPage } from '#pages/DatasetPage.tsx';
 import { DatasetsPage } from '#pages/DatasetsPage.tsx';
 import { NotFoundPage } from '#pages/NotFoundPage.tsx';
@@ -58,6 +59,10 @@ export function ViewerRoutes() {
       <Route
         path="/search"
         component={SearchPage}
+      />
+      <Route
+        path="/ask"
+        component={AskPage}
       />
       <Route
         path="/about"

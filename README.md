@@ -67,7 +67,7 @@ npm run dev -w apps/viewer
 
 `npm test -w apps/viewer -- --run` runs its unit tests, and `npm run build -w apps/viewer` builds it into `frontend/apps/viewer/dist/`.
 
-Its end-to-end tests run Playwright against the production build, served by `vite preview` on port 4174, and a backend over the five-reaction test corpus whose compound names resolve offline. From the repository's root, start the backend and the viewer, then run the tests:
+Its end-to-end tests run Playwright against the production build, served by `vite preview` on port 4174, and a backend over the five-reaction test corpus whose compound names resolve offline and whose `/api/ask` answers the questions in `ord_viewer.testing.ASK_SCRIPTS` without a model. From the repository's root, start the backend and the viewer, then run the tests:
 
 ```shell
 (cd backend/viewer && uv run python -m ord_viewer.testing /tmp/viewer-corpus)

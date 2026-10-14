@@ -299,3 +299,19 @@ test('shows a wide table on a phone, scrolling inside it', async ({ page }) => {
   ).toBeInViewport();
   await expectNoSidewaysScroll(page);
 });
+
+test('asks a question on a phone', async ({ page }) => {
+  await withLongIds(page);
+  await page.goto(
+    `/ask?${new URLSearchParams({ q: 'reactions that use acetyl chloride' })}`,
+  );
+  await expect(page.getByRole('link', { name: REACTION_ID }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'The query it ran' }).click();
+  await expect(page.getByText('"same_compound"', { exact: false })).toBeVisible();
+  const examples = page.getByRole('button', { name: /^reactions / });
+  await expect(examples).toHaveCount(3);
+  for (const example of await examples.all()) {
+    await expectWhole(example);
+  }
+  await expectNoSidewaysScroll(page);
+});
