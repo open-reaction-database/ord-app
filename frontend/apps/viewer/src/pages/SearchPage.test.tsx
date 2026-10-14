@@ -28,6 +28,24 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+const SEARCH_URL = '/search?reaction_id=ord-viewer0103&limit=100';
+
+/** What the search at SEARCH_URL finds. */
+const FOUND = { kind: 'reactions', reaction_ids: ['ord-viewer0103'], truncated: false };
+
+/** An answer the service sends while it is busy. */
+function busy() {
+  return new Response(JSON.stringify({ detail: 'busy' }), { status: 503 });
+}
+
+/** The fetch calls with this method and path, whatever their query string. */
+function requests(fetch: ReturnType<typeof mockApi>, method: string, path: string) {
+  return fetch.mock.calls.filter(
+    ([input, init]) =>
+      String(input).split('?')[0] === path && (init?.method ?? 'GET') === method,
+  );
+}
+
 describe('SearchPage', () => {
   it('asks for criteria before searching', () => {
     const fetch = mockApi({});
@@ -148,6 +166,62 @@ describe('SearchPage', () => {
     expect(smarts).toHaveValue('A>>B\n');
     expect(history).toEqual(['/search']);
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  // The second URL holds the same search as the form writes it, in another order.
+  it.each([
+    'reaction_id=ord-viewer0103&limit=100',
+    'limit=100&reaction_id=ord-viewer0103',
+  ])('sends a failed search again when it is resubmitted from %s', async search => {
+    const user = userEvent.setup();
+    const answers = [busy, () => new Response(JSON.stringify(FOUND))];
+    const fetch = mockApi({
+      'POST /api/search': () => answers.shift()!(),
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByRole, getByRole } = renderAt(`/search?${search}`, <SearchPage />);
+    expect(await findByRole('alert')).toHaveTextContent('try again shortly');
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    expect(requests(fetch, 'POST', '/api/search')).toHaveLength(2);
+  });
+
+  it('sends a failed page of reactions again when the search is resubmitted', async () => {
+    const user = userEvent.setup();
+    const answers = [busy, () => new Response(JSON.stringify([VIEWER0103]))];
+    const fetch = mockApi({
+      'POST /api/search': FOUND,
+      'GET /api/reactions': () => answers.shift()!(),
+    });
+    const { findByRole, getByRole } = renderAt(SEARCH_URL, <SearchPage />);
+    expect(await findByRole('alert')).toHaveTextContent('try again shortly');
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    expect(requests(fetch, 'GET', '/api/reactions')).toHaveLength(2);
+    expect(requests(fetch, 'POST', '/api/search')).toHaveLength(1);
+  });
+
+  it('runs a search that succeeded only once', async () => {
+    const user = userEvent.setup();
+    const fetch = mockApi({
+      'POST /api/search': FOUND,
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByRole, getByRole } = renderAt(SEARCH_URL, <SearchPage />);
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    expect(requests(fetch, 'POST', '/api/search')).toHaveLength(1);
+    expect(requests(fetch, 'GET', '/api/reactions')).toHaveLength(1);
+  });
+
+  it('adds no history entry when the search shown is submitted again', async () => {
+    const user = userEvent.setup();
+    mockApi({ 'POST /api/search': FOUND, 'GET /api/reactions': [VIEWER0103] });
+    const { findByRole, getByRole, history } = renderAt(SEARCH_URL, <SearchPage />);
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(history).toEqual([SEARCH_URL]);
   });
 
   it("shows the server's reason for a search it refused", async () => {
