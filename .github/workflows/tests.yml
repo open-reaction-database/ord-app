@@ -24,7 +24,7 @@ on:
 
 jobs:
 
-  test_python:
+  test_python_editor:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
