@@ -46,7 +46,7 @@ Run hooks via [pre-commit](https://pre-commit.com): `uvx pre-commit install` onc
 
 ## CI gates (a PR is not mergeable until these are green)
 
-- **Tests**: `test_python` and `test_python_viewer` (each ubuntu + macos), `test_ui` (the editor's and the shared package's tests), `test_ui_viewer`, `test_e2e` (boots the full no-auth stack), `test_e2e_viewer` (the viewer's build and backend over the test corpus).
+- **Tests**: `test_python` and `test_python_viewer` (each ubuntu + macos), `test_ui` (the editor's and the shared package's tests), `test_ui_viewer`, `test_e2e_editor` (boots the editor's full no-auth stack), `test_e2e_viewer` (the viewer's build and backend over the test corpus).
 - **Images**: `build_editor_image`, and `build_viewer_image` with its smoke test through nginx (each on an arm64 runner, with its layers cached).
 - **Checks**: `check_python` (ruff / ruff-format / ty), `check_duplication` (jscpd copy-paste detection, root `.jscpd.json`; also `uvx pre-commit run jscpd --all-files`), `lint_and_build_ui` (`lint:check` + `typecheck` + `npm run build`), `check_license_headers`.
 - **SonarCloud quality gate** and **Greptile review** also gate merges — never merge over a red Sonar check; address Greptile findings (and read its PR-body summary for sub-threshold notes) before merging.
