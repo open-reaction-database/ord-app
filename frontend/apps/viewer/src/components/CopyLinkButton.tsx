@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, CopyButton } from '@mantine/core';
+import { Button } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 
 /** Copies the page's address, which holds everything needed to show it again. */
 export function CopyLinkButton() {
+  const clipboard = useClipboard();
   return (
-    <CopyButton value={globalThis.location.href}>
-      {({ copied, copy }) => (
-        <Button
-          variant="default"
-          onClick={copy}
-        >
-          {copied ? 'Link copied' : 'Copy link'}
-        </Button>
-      )}
-    </CopyButton>
+    <Button
+      variant="default"
+      // Read when clicked, so the link is the page as it is then.
+      onClick={() => clipboard.copy(globalThis.location.href)}
+    >
+      {clipboard.copied ? 'Link copied' : 'Copy link'}
+    </Button>
   );
 }

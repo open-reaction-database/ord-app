@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The test corpus's command, for the image's smoke test, and the end-to-end app."""
+"""The command that derives the test corpus, and the end-to-end tests' app."""
 
 import pytest
 from fastapi.testclient import TestClient

@@ -31,4 +31,14 @@ describe('CopyLinkButton', () => {
     expect(writeText).toHaveBeenCalledWith(globalThis.location.href);
     expect(await findByRole('button', { name: 'Link copied' })).toBeInTheDocument();
   });
+  it('copies the address as it is when clicked', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+    const { getByRole } = renderAt('/', <CopyLinkButton />);
+    globalThis.history.pushState(null, '', '/reactions?id=ord-later');
+    await user.click(getByRole('button', { name: 'Copy link' }));
+    expect(writeText).toHaveBeenCalledWith(
+      `${globalThis.location.origin}/reactions?id=ord-later`,
+    );
+  });
 });

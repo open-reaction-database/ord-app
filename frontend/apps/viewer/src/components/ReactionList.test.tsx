@@ -54,6 +54,28 @@ describe('ReactionList', () => {
     expect(asked).toEqual([ids.slice(0, 10), ids.slice(10)]);
   });
 
+  it('names the reactions the corpus does not hold', async () => {
+    mockApi({ 'GET /api/reactions': [VIEWER0101] });
+    const { findByRole, getByRole } = renderAt(
+      '/',
+      <ReactionList reactionIds={['ord-viewer0101', 'ord-nowhere', 'ord-gone']} />,
+    );
+    await findByRole('link', { name: 'ord-viewer0101' });
+    expect(getByRole('alert')).toHaveTextContent(
+      'Not in the corpus: ord-nowhere, ord-gone.',
+    );
+  });
+
+  it('names none when the corpus holds them all', async () => {
+    mockApi({ 'GET /api/reactions': [VIEWER0101] });
+    const { findByRole, queryByRole } = renderAt(
+      '/',
+      <ReactionList reactionIds={['ord-viewer0101']} />,
+    );
+    await findByRole('link', { name: 'ord-viewer0101' });
+    expect(queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('says so when there is nothing to list', () => {
     const { getByText } = renderAt('/', <ReactionList reactionIds={[]} />);
     expect(getByText('No reactions.')).toBeInTheDocument();

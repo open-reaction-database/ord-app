@@ -23,6 +23,14 @@ test('shows a selected set in the order given', async ({ page }) => {
   await expect(links).toHaveText(['ord-viewer0103', 'ord-viewer0101']);
 });
 
+test('names the IDs the corpus does not hold', async ({ page }) => {
+  await page.goto('/reactions?id=ord-viewer0101&id=ord-nowhere');
+  await expect(
+    page.getByRole('link', { name: 'ord-viewer0101', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('Not in the corpus: ord-nowhere.')).toBeVisible();
+});
+
 test("redirects ord-interface's paths", async ({ page }) => {
   await page.goto('/selected-set?reaction_id=ord-viewer0102');
   await expect(page).toHaveURL('/reactions?id=ord-viewer0102');

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Anchor, Flex, Loader, Stack, Text } from '@mantine/core';
+import { Alert, Anchor, Flex, Loader, Stack, Text } from '@mantine/core';
 import { ReactionCard } from '@open-reaction-database/ui/reaction';
 import { Link } from 'wouter';
 import { useReactions } from '#api/hooks.ts';
@@ -47,6 +47,28 @@ function CardTitle({ record }: Readonly<{ record: ReactionRecord }>) {
   );
 }
 
+interface MissingProps {
+  asked: ReadonlyArray<string>;
+  records: ReadonlyArray<ReactionRecord>;
+}
+
+/** The IDs asked for that the corpus does not hold, which the backend skips. */
+function Missing({ asked, records }: Readonly<MissingProps>) {
+  const found = new Set(records.map(record => record.reaction_id));
+  const missing = asked.filter(reactionId => !found.has(reactionId));
+  if (missing.length === 0) {
+    return null;
+  }
+  return (
+    <Alert
+      color="yellow"
+      variant="light"
+    >
+      Not in the corpus: {missing.join(', ')}.
+    </Alert>
+  );
+}
+
 interface ReactionListProps {
   /** The reactions, in order; the same array between renders, at most 1,000. */
   reactionIds: ReadonlyArray<string>;
@@ -72,17 +94,23 @@ export function ReactionList({ reactionIds }: Readonly<ReactionListProps>) {
           <Loader />
         </Flex>
       ) : (
-        records.data.map(record => (
-          <ViewerReactionProvider
-            key={record.reaction_id}
-            record={record}
-          >
-            <ReactionCard
-              title={<CardTitle record={record} />}
-              actions={null}
-            />
-          </ViewerReactionProvider>
-        ))
+        <>
+          <Missing
+            asked={pageItems}
+            records={records.data}
+          />
+          {records.data.map(record => (
+            <ViewerReactionProvider
+              key={record.reaction_id}
+              record={record}
+            >
+              <ReactionCard
+                title={<CardTitle record={record} />}
+                actions={null}
+              />
+            </ViewerReactionProvider>
+          ))}
+        </>
       )}
     </Stack>
   );
