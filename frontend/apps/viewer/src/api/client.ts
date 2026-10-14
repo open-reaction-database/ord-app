@@ -129,3 +129,8 @@ export function errorMessage(error: unknown): string {
     MESSAGES[error.status] ?? `The server answered ${error.status}: ${error.detail}`
   );
 }
+
+/** Whether the server said the thing asked for does not exist. */
+export function isNotFound(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 404;
+}

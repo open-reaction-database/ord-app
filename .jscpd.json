@@ -8,7 +8,8 @@
     "**/*.test.tsx",
     "**/testdata/**",
     "**/__pycache__/**",
-    "**/api/schema.ts"
+    "**/api/schema.ts",
+    "**/test/fixtures/records.ts"
   ],
   "gitignore": true,
   "threshold": 2,

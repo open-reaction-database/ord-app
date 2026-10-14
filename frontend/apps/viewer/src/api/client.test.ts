@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, errorMessage, getJson, postJson } from '#api/client.ts';
+import { ApiError, errorMessage, getJson, isNotFound, postJson } from '#api/client.ts';
 
 function respond(status: number, body: unknown, statusText = 'Status') {
   const text = typeof body === 'string' ? body : JSON.stringify(body);
@@ -155,5 +155,16 @@ describe('errorMessage', () => {
     expect(errorMessage(new TypeError('Failed to fetch'))).toBe(
       'The viewer could not reach its server.',
     );
+  });
+});
+
+describe('isNotFound', () => {
+  it.each([
+    [new ApiError(404, 'Not Found'), true],
+    [new ApiError(422, 'x'), false],
+    [new TypeError('Failed to fetch'), false],
+    [null, false],
+  ])('says whether %o is a 404', (error, expected) => {
+    expect(isNotFound(error)).toBe(expected);
   });
 });

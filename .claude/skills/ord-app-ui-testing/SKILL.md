@@ -24,7 +24,7 @@ npx vitest run <path-or-substring>     # subset
 cd frontend/packages/ui                # the shared package: theme, display, the reaction model and view
 npx vitest run                         # its own suite and coverage floors
 ```
-Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (the theme and icons, the display primitives and form controls, the reaction model and converters, `ReactionProvider`, the reaction view and its drawer forms, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The license header for new test files is Apache 2.0 with the current year.
+Each workspace's Vitest is scoped to its own `src/**`, so code that lives in `packages/ui` (the theme and icons, the display primitives and form controls, the reaction model and converters, `ReactionProvider`, the reaction view and its drawer forms, the preview renderer) is tested there, not in the editor's suite. `cd frontend && npm run test:coverage` runs both, as CI does. Playwright specs live in `apps/editor/e2e/` and run via `npm run test:e2e` (not vitest). The viewer's live in `apps/viewer/e2e/` and run against its production build under `vite preview` on 4174, with `uvicorn --factory ord_viewer.testing:e2e_app` on 8001 over the five-reaction test corpus; the README's Viewer section has the commands, and its screenshots follow the same CI-only baseline rules as the editor's below. The license header for new test files is Apache 2.0 with the current year.
 
 ## Render helpers
 

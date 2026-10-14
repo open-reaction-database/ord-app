@@ -13,11 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderAt } from '#test/render.tsx';
+import { mockApi } from '#test/fetch.ts';
+import { VIEWER0101 } from '#test/fixtures/records.ts';
 import { ViewerRoutes } from '#routes.tsx';
 
 describe('ViewerRoutes', () => {
+  // The pages behind the redirects fetch as they render; an empty corpus answers them.
+  beforeEach(() => {
+    mockApi({
+      'GET /api/datasets': [],
+      'GET /api/reactions': [],
+      'GET /api/reactions/ord-viewer0101': VIEWER0101,
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('shows the datasets at /', async () => {
+    const { findByRole } = renderAt('/', <ViewerRoutes />);
+    expect(await findByRole('heading', { name: 'Datasets' })).toBeInTheDocument();
+  });
+
+  it('shows a reaction at /reactions/:id', async () => {
+    const { findByRole } = renderAt('/reactions/ord-viewer0101', <ViewerRoutes />);
+    expect(await findByRole('heading', { name: 'ord-viewer0101' })).toBeInTheDocument();
+  });
+
+  it('shows the selected set at /reactions', () => {
+    const { getByRole } = renderAt('/reactions?id=ord-viewer0101', <ViewerRoutes />);
+    expect(getByRole('heading', { name: 'Selected reactions' })).toBeInTheDocument();
+  });
+
+  it('asks for a dataset whose ID holds an escaped character by its whole ID', async () => {
+    const fetch = vi.mocked(globalThis.fetch);
+    renderAt('/datasets/a%2Fb', <ViewerRoutes />);
+    await vi.waitFor(() =>
+      expect(fetch.mock.calls.map(([input]) => String(input))).toContain(
+        '/api/datasets/a%2Fb',
+      ),
+    );
+  });
+
   it('shows About', () => {
     const { getByRole } = renderAt('/about', <ViewerRoutes />);
     expect(getByRole('heading', { name: 'About' })).toBeInTheDocument();

@@ -264,6 +264,19 @@ def make_client(
     return TestClient(app)
 
 
+def e2e_app() -> FastAPI:
+    """Build the app the viewer's end-to-end tests run against.
+
+    Reads ORD_VIEWER_CORPUS_DIR and the other settings from the environment, as the
+    image does, and resolves compound names from COMPOUND_NAMES, without the network.
+    It has no model client, so /api/ask answers 503.
+
+    Returns:
+        The app, for ``uvicorn --factory ord_viewer.testing:e2e_app``.
+    """
+    return create_app(resolver=offline_resolver, ask_client_factory=lambda: None)
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     """Derive the test corpus into a directory, for the image's smoke test.
 
