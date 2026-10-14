@@ -91,7 +91,7 @@ function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
               key={example}
               variant="light"
               size="xs"
-              // A button keeps its label on one line, wider than a phone; these wrap.
+              // Mantine keeps a button's label on one line, which runs past a phone's edge.
               h="auto"
               py={6}
               styles={{ label: { whiteSpace: 'normal', textAlign: 'left' } }}

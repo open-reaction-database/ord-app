@@ -352,20 +352,12 @@ class StubAskClient:
         return _message(payload)
 
 
-def _text_of(message: Mapping[str, Any]) -> str:
-    """Return a message's text, whether its content is a string or blocks."""
-    content = message["content"]
-    if isinstance(content, str):
-        return content
-    return "".join(block.get("text", "") for block in content)
-
-
 class ScriptedAskClient:
     """Answers each question it has a script for, and cannot answer any other.
 
-    nl.ask makes two calls a question. The query call carries tools, and its first
-    message is the question; the answer call carries none, and its message starts
-    "Question: <question>" before the result.
+    nl.ask's query calls carry tools, and their first message is the question; its
+    answer call carries none, and its one message starts "Question: <question>" before
+    the result. Both send each message's content as a string.
 
     Args:
         scripts: For each question, the query it compiles to and the sentence that
@@ -388,7 +380,7 @@ class ScriptedAskClient:
         Returns:
             The scripted query, the scripted sentence, or a cannot_answer call.
         """
-        text = _text_of(kwargs["messages"][0])
+        text = kwargs["messages"][0]["content"]
         if "tools" in kwargs:
             script = self._scripts.get(text)
             if script is None:
@@ -441,7 +433,7 @@ def e2e_app() -> FastAPI:
     """
     return create_app(
         resolver=offline_resolver,
-        # The scripted client answers messages.create, the one method the route calls.
+        # The scripted client has what the app calls: messages.create, and close.
         ask_client_factory=lambda: cast(
             anthropic.Anthropic, ScriptedAskClient(ASK_SCRIPTS)
         ),

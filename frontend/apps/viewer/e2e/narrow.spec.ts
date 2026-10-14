@@ -150,7 +150,9 @@ test('asks a question on a phone', async ({ page }) => {
   await expect(page.getByRole('link', { name: REACTION_ID }).first()).toBeVisible();
   await page.getByRole('button', { name: 'The query it ran' }).click();
   await expect(page.getByText('"same_compound"', { exact: false })).toBeVisible();
-  for (const example of await page.getByRole('button', { name: /^reactions / }).all()) {
+  const examples = page.getByRole('button', { name: /^reactions / });
+  await expect(examples).toHaveCount(3);
+  for (const example of await examples.all()) {
     await expect(example).toBeInViewport({ ratio: 1 });
   }
   await expectNoSidewaysScroll(page);
