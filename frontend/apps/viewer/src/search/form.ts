@@ -192,7 +192,8 @@ export function paramsFromForm(form: SearchForm): URLSearchParams {
   if (form.structures.length > 0) {
     params.set('similarity', String(form.similarity));
   }
-  // Substructures, SMARTS, and reaction SMARTS each match stereochemistry when asked.
+  // Written with any structure, as ord-interface's URLs were, and with a reaction SMARTS,
+  // which also matches stereochemistry when asked.
   if (form.structures.length > 0 || form.reactionSmarts.length > 0) {
     params.set('use_stereochemistry', String(form.useStereochemistry));
   }
