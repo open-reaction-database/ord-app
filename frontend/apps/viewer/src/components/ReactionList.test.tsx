@@ -25,6 +25,22 @@ afterEach(() => {
 });
 
 describe('ReactionList', () => {
+  it("puts each card's actions on it", async () => {
+    mockApi({ 'GET /api/reactions': [VIEWER0101] });
+    const { findByRole } = renderAt(
+      '/',
+      <ReactionList
+        reactionIds={['ord-viewer0101']}
+        renderActions={record => (
+          <button type="button">{`Pick ${record.reaction_id}`}</button>
+        )}
+      />,
+    );
+    expect(
+      await findByRole('button', { name: 'Pick ord-viewer0101' }),
+    ).toBeInTheDocument();
+  });
+
   it('shows a card for each reaction, linking it and its dataset', async () => {
     mockApi({ 'GET /api/reactions': [VIEWER0101, VIEWER0102] });
     const { findByRole, getAllByRole, getByRole } = renderAt(

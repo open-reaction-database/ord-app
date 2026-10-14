@@ -19,6 +19,8 @@ import { mockApi } from '#test/fetch.ts';
 import { VIEWER0101 } from '#test/fixtures/records.ts';
 import { ViewerRoutes } from '#routes.tsx';
 
+vi.mock('@open-reaction-database/ui/ketcher', () => ({ StructureDialog: () => null }));
+
 describe('ViewerRoutes', () => {
   // The pages behind the redirects fetch as they render; an empty corpus answers them.
   beforeEach(() => {
@@ -56,6 +58,11 @@ describe('ViewerRoutes', () => {
         '/api/datasets/a%2Fb',
       ),
     );
+  });
+
+  it('shows the search at /search', () => {
+    const { getByRole } = renderAt('/search', <ViewerRoutes />);
+    expect(getByRole('button', { name: 'Search' })).toBeInTheDocument();
   });
 
   it('shows About', () => {

@@ -66,8 +66,10 @@ def _reaction(
     product: str,
     yield_percent: float | None = None,
     catalyst_name: str | None = None,
+    conversion_percent: float | None = None,
+    doi: str | None = None,
 ) -> reaction_pb2.Reaction:
-    """Build a reaction with an optional yield and an optional named catalyst.
+    """Build a reaction with an optional yield, catalyst, conversion, and DOI.
 
     Args:
         reaction_id: The ID the reaction gets, such as ``ord-viewer0101``.
@@ -75,6 +77,8 @@ def _reaction(
         product: SMILES of the one product.
         yield_percent: The product's percent yield, if any.
         catalyst_name: The name of a catalyst input, if any.
+        conversion_percent: The outcome's percent conversion, if any.
+        doi: The DOI of the reaction's publication, if any.
 
     Returns:
         The reaction.
@@ -90,7 +94,12 @@ def _reaction(
             reaction_role=reaction_pb2.ReactionRole.CATALYST
         )
         catalyst.identifiers.add(type="NAME", value=catalyst_name)
-    outcome_product = reaction.outcomes.add().products.add()
+    if doi is not None:
+        reaction.provenance.doi = doi
+    outcome = reaction.outcomes.add()
+    if conversion_percent is not None:
+        outcome.conversion.value = conversion_percent
+    outcome_product = outcome.products.add()
     outcome_product.identifiers.add(type="SMILES", value=product)
     if yield_percent is not None:
         measurement = outcome_product.measurements.add(type="YIELD")
@@ -140,6 +149,8 @@ DATASETS = (
                 reactants=["CCO", "CC(=O)O"],
                 product="CCOC(C)=O",
                 catalyst_name="mystery catalyst",
+                conversion_percent=30,
+                doi="10.1021/viewer0202",
             ),
         ],
     ),
