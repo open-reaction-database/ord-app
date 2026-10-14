@@ -30,8 +30,8 @@ function cellText(value: unknown): string {
 }
 
 /**
- * Each item with a key from its content, numbered among the items that share it, since a
- * table may repeat a column's name or a row's values.
+ * Each item with a key from its content, numbered among the items that share it, so no
+ * two keys collide whatever the table holds.
  */
 function keyed<T>(
   items: ReadonlyArray<T>,

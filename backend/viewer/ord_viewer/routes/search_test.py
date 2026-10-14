@@ -221,13 +221,26 @@ def test_a_deep_value_in_an_invalid_field_is_unprocessable(client, body, error_t
     assert error_type in {error["type"] for error in response.json()["detail"]}
 
 
-def test_repeated_measure_names_keep_every_row_aligned(client):
-    measure = {"fn": "count", "name": "n"}
-    query = {"aggregate": {"group_by": ["dataset_id"], "measures": [measure, measure]}}
-    body = client.post("/api/search", json={"query": query}).json()
-    assert body["columns"] == ["dataset_id", "n", "n"]
-    assert body["rows"]
-    assert all(len(row) == len(body["columns"]) for row in body["rows"])
+@pytest.mark.parametrize(
+    "measures",
+    [
+        [{"fn": "count", "name": "n"}, {"fn": "count", "name": "n"}],
+        [{"fn": "count", "name": "dataset_id"}],
+        [{"fn": "count", "name": "n"}, {"fn": "count", "name": "N"}],
+        [{"fn": "count", "name": "DATASET_ID"}],
+    ],
+    ids=[
+        "two measures",
+        "a measure and a group",
+        "two measures in other cases",
+        "a measure and a group in other cases",
+    ],
+)
+def test_a_repeated_output_name_is_unprocessable(client, measures):
+    query = {"aggregate": {"group_by": ["dataset_id"], "measures": measures}}
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 422
+    assert "repeats" in response.json()["detail"][0]["msg"]
 
 
 def test_a_search_past_its_timeout(corpus_dir):

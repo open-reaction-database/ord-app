@@ -45,18 +45,23 @@ interface ReactionResultsProps {
   selectionKey: string;
   /** The most reactions the search asked for, when it set a limit of its own. */
   limit?: number;
+  /** How to see more once the search stops at its limit, ending that note. */
+  moreHint?: string;
 }
+
+const RAISE_THE_LIMIT = 'raise the limit to see more';
 
 /** Why there may be more reactions than these: the corpus's bound, or the search's limit. */
 function StoppedNote({
   result,
   limit,
-}: Readonly<{ result: ReactionsResult; limit?: number }>) {
+  moreHint,
+}: Readonly<{ result: ReactionsResult; limit?: number; moreHint: string }>) {
   let note;
   if (result.truncated) {
     note = `The search stopped at ${MAX_LIMIT.toLocaleString()} reactions; narrow it to see the rest.`;
   } else if (limit !== undefined && result.reaction_ids.length >= limit) {
-    note = `The search stopped at its limit of ${limit.toLocaleString()}; raise the limit to see more.`;
+    note = `The search stopped at its limit of ${limit.toLocaleString()}; ${moreHint}.`;
   } else {
     return null;
   }
@@ -75,6 +80,7 @@ export function ReactionResults({
   result,
   selectionKey,
   limit,
+  moreHint = RAISE_THE_LIMIT,
 }: Readonly<ReactionResultsProps>) {
   const selection = useSelection(selectionKey);
   const count = result.reaction_ids.length;
@@ -105,6 +111,7 @@ export function ReactionResults({
       <StoppedNote
         result={result}
         limit={limit}
+        moreHint={moreHint}
       />
       <ReactionList
         reactionIds={result.reaction_ids}

@@ -627,7 +627,7 @@
           "measures"
         ],
         "title": "Aggregate",
-        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
+        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\nEach ``group_by`` path is one column of the result, named by the whole path as\nwritten, and each measure is one named by its ``name``. No two may share a name,\nwhatever their case.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
       },
       "Aggregate-Output": {
         "properties": {
@@ -735,7 +735,7 @@
           "measures"
         ],
         "title": "Aggregate",
-        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
+        "description": "Group the matching rows and measure each group.\n\n``group_by`` paths must be scalar, so the number of groups is bounded by the values\na column holds rather than by an explosion over a repeated level.\n\nEach ``group_by`` path is one column of the result, named by the whole path as\nwritten, and each measure is one named by its ``name``. No two may share a name,\nwhatever their case.\n\n``over`` changes what a row is. Without it the rows are reactions, and \"how many\nreactions are automated\" is a count of them. With it the rows are the elements of\none repeated level, which is what \"the most common solvent\" asks for: solvents are\nnot a column of a reaction, and no grouping of reactions can name one. Paths inside\nare then relative to the element, as they are inside a quantifier.\n\nTwo filters, because there are two things to filter. This ``where`` selects the\nelements grouped -- the components that are solvents. The *query's* ``where``\nselects reactions, and says which reactions' elements are counted at all. \"The most\ncommon solvents in reactions run above 350 K\" needs both, and neither can say what\nthe other says.\n\nOne level, never nested, so the rows are that level's own cardinality rather than a\nproduct: the query stays one pass and a sort, over the pivot instead of over the\nprojection. ``reaction_id`` is reachable as a measure path and is how a question\nabout reactions is answered from a relation of elements -- a reaction using THF\ntwice is one reaction and two rows."
       },
       "And-Input": {
         "properties": {
@@ -1015,7 +1015,7 @@
           "value"
         ],
         "title": "Comparison",
-        "description": "A leaf compared against a literal or a resolved compound."
+        "description": "A leaf compared against a literal.\n\nA compound is never a comparison's value. What a resolved name could be compared\nagainst is a ``smiles``, and equal spellings are not what makes two compounds the\nsame; ``same_compound`` is that question."
       },
       "CompoundCount": {
         "properties": {
@@ -2452,7 +2452,10 @@
           "compound": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1,
+                "description": "A compound's name, resolved to a structure when the query runs. Any printable text with no whitespace around it."
               },
               {
                 "type": "null"
@@ -2495,7 +2498,10 @@
           "compound": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1,
+                "description": "A compound's name, resolved to a structure when the query runs. Any printable text with no whitespace around it."
               },
               {
                 "type": "null"
@@ -2552,7 +2558,10 @@
           "compound": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1,
+                "description": "A compound's name, resolved to a structure when the query runs. Any printable text with no whitespace around it."
               },
               {
                 "type": "null"
@@ -2602,7 +2611,10 @@
           "compound": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1,
+                "description": "A compound's name, resolved to a structure when the query runs. Any printable text with no whitespace around it."
               },
               {
                 "type": "null"
@@ -2623,7 +2635,7 @@
           "path"
         ],
         "title": "Substructure",
-        "description": "The element's structure contains the query as a subgraph.\n\n``path`` names a compound's ``smiles``. The query is a SMARTS pattern, or a\ncompound name resolved to a molecule at execution; exactly one is given.\n\nA stereocenter drawn in the query is respected, as RDKit respects it: a pattern\ndrawn as one enantiomer matches that enantiomer, not its mirror image or the same\nmolecule recorded without stereo. ``chirality`` false ignores stereocenters, for a\nquestion about the molecule whatever its configuration. A query with no\nstereocenters matches the same structures either way."
+        "description": "The element's structure contains the query as a subgraph.\n\n``path`` names a compound's ``smiles``. The query is a SMARTS pattern, or a\ncompound name resolved to a molecule at execution; exactly one is given.\n\nA stereocenter drawn in the query is respected, as RDKit respects it: a pattern\ndrawn as one enantiomer matches that enantiomer, not its mirror image or the same\nmolecule recorded without stereo. ``chirality`` false ignores stereocenters, for a\nquestion about the molecule whatever its configuration. A query with no\nstereocenters matches the same structures either way.\n\nCXSMILES stereo groups count too. A structure recorded as a racemate (``&``) or as\nan unknown single enantiomer (``o``) matches a pattern drawn as either enantiomer,\nand a pattern drawn as a racemate matches only racemates."
       },
       "TableResult": {
         "properties": {
@@ -2787,29 +2799,18 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ],
             "title": "Literal"
-          },
-          "compound": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Compound"
           }
         },
         "additionalProperties": false,
         "type": "object",
+        "required": [
+          "literal"
+        ],
         "title": "Value",
-        "description": "A comparison operand: a literal, or a compound to resolve and bind."
+        "description": "A comparison operand: a literal, bound as a parameter of its own type."
       }
     }
   }

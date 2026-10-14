@@ -105,7 +105,9 @@ describe('ReactionResults', () => {
         limit={2}
       />,
     );
-    expect(getByText(/stopped at its limit of 2;/)).toBeInTheDocument();
+    expect(
+      getByText(/stopped at its limit of 2; raise the limit to see more/),
+    ).toBeInTheDocument();
   });
 
   it('says nothing of a limit the search did not reach', () => {

@@ -65,6 +65,12 @@ describe('ViewerRoutes', () => {
     expect(getByRole('button', { name: 'Search' })).toBeInTheDocument();
   });
 
+  it('shows /ask without listing it in the navigation', () => {
+    const { getByRole, queryByRole } = renderAt('/ask', <ViewerRoutes />);
+    expect(getByRole('heading', { name: 'Ask about reactions' })).toBeInTheDocument();
+    expect(queryByRole('link', { name: /ask/i })).not.toBeInTheDocument();
+  });
+
   it('shows About', () => {
     const { getByRole } = renderAt('/about', <ViewerRoutes />);
     expect(getByRole('heading', { name: 'About' })).toBeInTheDocument();
