@@ -311,7 +311,7 @@ test('asks a question on a phone', async ({ page }) => {
   const examples = page.getByRole('button', { name: /^reactions / });
   await expect(examples).toHaveCount(3);
   for (const example of await examples.all()) {
-    await expect(example).toBeInViewport({ ratio: 1 });
+    await expectWhole(example);
   }
   await expectNoSidewaysScroll(page);
 });
