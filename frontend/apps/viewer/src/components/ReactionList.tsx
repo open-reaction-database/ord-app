@@ -15,6 +15,7 @@
  */
 import { Alert, Anchor, Flex, Loader, Stack, Text } from '@mantine/core';
 import { ReactionCard } from '@open-reaction-database/ui/reaction';
+import type { ReactNode } from 'react';
 import { Link } from 'wouter';
 import { useReactions } from '#api/hooks.ts';
 import type { ReactionRecord } from '#api/types.ts';
@@ -72,13 +73,18 @@ function Missing({ asked, records }: Readonly<MissingProps>) {
 interface ReactionListProps {
   /** The reactions, in order; the same array between renders, at most 1,000. */
   reactionIds: ReadonlyArray<string>;
+  /** Controls for each card, such as a checkbox that selects it. */
+  renderActions?: (record: ReactionRecord) => ReactNode;
 }
 
 /**
  * The reactions as cards, a page at a time; each page is one request, since a page
  * holds at most 100, the backend's bound for one.
  */
-export function ReactionList({ reactionIds }: Readonly<ReactionListProps>) {
+export function ReactionList({
+  reactionIds,
+  renderActions,
+}: Readonly<ReactionListProps>) {
   const { pageItems, controls } = usePaging(reactionIds, 'reactions');
   const records = useReactions(pageItems);
   if (reactionIds.length === 0) {
@@ -107,7 +113,7 @@ export function ReactionList({ reactionIds }: Readonly<ReactionListProps>) {
           >
             <ReactionCard
               title={<CardTitle record={record} />}
-              actions={null}
+              actions={renderActions?.(record) ?? null}
             />
           </ViewerReactionProvider>
         ))}

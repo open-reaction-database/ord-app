@@ -29,7 +29,7 @@ import tempfile
 
 from ord_viewer.testing import derive_corpus, make_client
 
-REACTION_IDS = ("ord-viewer0101", "ord-viewer0102")
+REACTION_IDS = ("ord-viewer0101", "ord-viewer0102", "ord-viewer0103")
 
 
 def main() -> None:

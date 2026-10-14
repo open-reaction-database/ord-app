@@ -108,3 +108,36 @@ test('shows a selected set with long IDs on a phone', async ({ page }) => {
   });
   await expectNoSidewaysScroll(page);
 });
+
+test('shows search results with long IDs on a phone', async ({ page }) => {
+  await withLongIds(page);
+  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  // On a phone the form comes first and the results below it.
+  const link = page.getByRole('link', { name: REACTION_ID });
+  await link.scrollIntoViewIfNeeded();
+  await expect(link).toBeInViewport({ ratio: 1 });
+  await expect(
+    page.getByRole('checkbox', { name: `Select ${REACTION_ID}` }),
+  ).toBeInViewport();
+  await expectNoSidewaysScroll(page);
+});
+
+test('shows a wide table on a phone, scrolling inside it', async ({ page }) => {
+  await page.route('**/api/search', route =>
+    route.fulfill({
+      json: {
+        kind: 'table',
+        columns: ['reaction_id', 'dataset_id', 'description'],
+        rows: [[REACTION_ID, DATASET_ID, DESCRIPTION]],
+        truncated: false,
+      },
+    }),
+  );
+  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  const table = page.getByRole('table');
+  await table.scrollIntoViewIfNeeded();
+  await expect(
+    table.getByRole('columnheader', { name: 'reaction_id' }),
+  ).toBeInViewport();
+  await expectNoSidewaysScroll(page);
+});
