@@ -9,7 +9,7 @@ Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Manti
 
 ## Pre-flight: match CI or get a false green
 
-- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
+- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `check_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
 - **Lint/format** exactly as CI, from `frontend/`: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint .` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
 - **zsh word-splitting**: a `$VAR` holding a space-separated file list does NOT split. Use `${=FILES}` (e.g. `npx eslint ${=FILES}`).
 - ESLint rules that bite tests: `no-duplicate-imports`; use `Array<string>` not `string[]`; `react-refresh/only-export-components` fires on files that export both a component and helpers (add a file-level `/* eslint-disable react-refresh/only-export-components */` to test-only render helpers); forbids inline `import()` type annotations (`@typescript-eslint/consistent-type-imports`) — see the partial-mock note below.
@@ -145,7 +145,7 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 `e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. The reaction page spec masks what changes between runs (the footer's year; the card spec's capture does not reach the footer). Neither retries, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
 
 When a change alters the page's look on purpose, refresh the baselines from CI. The spec's snapshot directory is `e2e/<spec>.spec.ts-snapshots/`: `reactionPage.spec.ts-snapshots/` or `datasetPage.spec.ts-snapshots/`.
-1. Push the change. `test_e2e` fails on the altered screenshot; download the run's artifact (`gh run download <run-id> -n playwright-report`).
+1. Push the change. `test_e2e_editor` fails on the altered screenshot; download the run's artifact (`gh run download <run-id> -n playwright-report`).
 2. The artifact's `test-results/<spec>-<test>/` holds `<name>-actual.png`, `-expected.png`, and `-diff.png`. Look at the diff to confirm only the intended part changed, and the actual for anything half-loaded or run-specific.
 3. Copy the actual over `frontend/apps/editor/e2e/<spec>.spec.ts-snapshots/<name>-chromium-linux.png`, commit, and push; the next run should pass.
 

@@ -18,7 +18,7 @@
 # testing or to run the Playwright E2E suite against. Requires a Postgres reachable
 # via the PG_*_DSN env vars (e.g. `docker compose up -d` in backend/editor to start
 # the bundled database). Reproducible: no machine-specific setup beyond uv and a
-# provisioned Postgres — identical to the test_e2e CI job.
+# provisioned Postgres — identical to the test_e2e_editor CI job.
 #
 # Usage:
 #   PG_DSN=... PG_ALEMBIC_DSN=... PG_TEST_DSN=... ./scripts/dev-e2e.sh
