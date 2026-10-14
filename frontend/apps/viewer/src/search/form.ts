@@ -148,7 +148,8 @@ export function formFromParams(params: URLSearchParams): SearchForm {
   };
 }
 
-function isFullRange([low, high]: NumberRange): boolean {
+/** Whether a range is 0 to 100, which filters nothing. */
+export function isFullRange([low, high]: NumberRange): boolean {
   return low === FULL_RANGE[0] && high === FULL_RANGE[1];
 }
 
