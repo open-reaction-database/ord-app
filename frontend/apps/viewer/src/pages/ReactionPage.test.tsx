@@ -58,6 +58,32 @@ describe('ReactionPage', () => {
     expect(getByRole('radio', { name: 'Tabs' })).toBeChecked();
   });
 
+  it('switches between tabs and a list', async () => {
+    const user = userEvent.setup();
+    const { findByRole, getByRole, queryAllByRole } = show();
+    await findByRole('heading', { name: 'ord-viewer0101' });
+    expect(getByRole('tab', { name: /inputs/i })).toBeInTheDocument();
+    await user.click(getByRole('radio', { name: 'List' }));
+    expect(getByRole('radio', { name: 'List' })).toBeChecked();
+    await vi.waitFor(() => expect(queryAllByRole('tab')).toHaveLength(0));
+  });
+
+  it('leaves the dataset out of the breadcrumbs when the record names none', async () => {
+    mockApi({
+      'GET /api/reactions/ord-viewer0101': { ...VIEWER0101, dataset_id: null },
+      'GET /api/datasets': DATASETS,
+    });
+    const { findByRole, getAllByRole } = renderAt(
+      '/reactions/ord-viewer0101',
+      <ReactionPage reactionId="ord-viewer0101" />,
+    );
+    await findByRole('heading', { name: 'ord-viewer0101' });
+    expect(getAllByRole('link').map(link => link.textContent)).not.toContain(
+      'ord_dataset-viewer01',
+    );
+    expect(getAllByRole('link', { name: 'Datasets' })).not.toHaveLength(0);
+  });
+
   it('offers no way to edit it', async () => {
     const { findByRole, queryByRole } = show();
     await findByRole('heading', { name: 'ord-viewer0101' });

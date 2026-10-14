@@ -75,6 +75,19 @@ describe('DatasetsPage', () => {
     );
   });
 
+  it('closes the description', async () => {
+    mockApi({ 'GET /api/datasets': DATASETS });
+    const user = userEvent.setup();
+    const { findByRole, getAllByRole, queryByRole } = renderAt('/', <DatasetsPage />);
+    await findByRole('table');
+    await user.click(
+      getAllByRole('button', { name: 'Show all of the description' })[0],
+    );
+    await findByRole('dialog', { name: 'dataset 0' });
+    await user.keyboard('{Escape}');
+    await vi.waitFor(() => expect(queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('says why the datasets could not load', async () => {
     mockApi({
       'GET /api/datasets': () =>

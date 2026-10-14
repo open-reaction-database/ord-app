@@ -98,6 +98,34 @@ describe('DatasetPage', () => {
     expect(await findByRole('heading', { name: title })).toBeInTheDocument();
   });
 
+  it('says why the sample could not load, under the dataset', async () => {
+    mockApi({
+      'GET /api/datasets/ord_dataset-viewer01': DATASET,
+      'GET /api/datasets/ord_dataset-viewer01/compounds': [],
+      'POST /api/search': () =>
+        new Response(JSON.stringify({ detail: 'busy' }), { status: 504 }),
+    });
+    const { findByRole, getByRole } = renderAt(
+      '/datasets/ord_dataset-viewer01',
+      <DatasetPage datasetId="ord_dataset-viewer01" />,
+    );
+    expect(await findByRole('alert')).toHaveTextContent('took too long');
+    expect(getByRole('heading', { name: 'viewer one' })).toBeInTheDocument();
+  });
+
+  it('lists nothing when the search answers with a table', async () => {
+    mockApi({
+      'GET /api/datasets/ord_dataset-viewer01': DATASET,
+      'GET /api/datasets/ord_dataset-viewer01/compounds': [],
+      'POST /api/search': { kind: 'table', columns: [], rows: [], truncated: false },
+    });
+    const { findByText } = renderAt(
+      '/datasets/ord_dataset-viewer01',
+      <DatasetPage datasetId="ord_dataset-viewer01" />,
+    );
+    expect(await findByText('No reactions.')).toBeInTheDocument();
+  });
+
   it('shows NotFound for a dataset the corpus does not hold', async () => {
     mockApi({});
     const { findByRole } = renderAt(

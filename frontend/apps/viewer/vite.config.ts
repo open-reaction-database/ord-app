@@ -64,10 +64,10 @@ export default defineConfig({
       ],
       // Floors at the measured coverage, rounded down.
       thresholds: {
-        lines: 97,
-        statements: 97,
+        lines: 99,
+        statements: 99,
         branches: 100,
-        functions: 97,
+        functions: 99,
       },
     },
   },

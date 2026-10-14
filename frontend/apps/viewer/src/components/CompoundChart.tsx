@@ -24,6 +24,9 @@ import { ErrorNotice } from '#components/ErrorNotice.tsx';
 
 const IMAGE_SIZE = 160;
 
+// One array for every render before the counts arrive.
+const NO_COMPOUNDS: ReadonlyArray<CompoundCount> = [];
+
 interface CompoundTooltipProps {
   smiles: string;
   count: number;
@@ -69,21 +72,18 @@ export function CompoundTooltip({
 function useImages(
   datasetId: string,
   side: CompoundSide,
-  compounds: ReadonlyArray<CompoundCount> | undefined,
+  compounds: ReadonlyArray<CompoundCount>,
 ) {
   return useQuery({
     queryKey: ['compound-images', datasetId, side],
     queryFn: () =>
       renderPreviews(
         Object.fromEntries(
-          (compounds ?? []).map((compound, index) => [
-            String(index),
-            compound.molblock,
-          ]),
+          compounds.map((compound, index) => [String(index), compound.molblock]),
         ),
         { size: IMAGE_SIZE },
       ),
-    enabled: compounds !== undefined && compounds.length > 0,
+    enabled: compounds.length > 0,
   });
 }
 
@@ -103,10 +103,10 @@ export function CompoundChart({
   title,
 }: Readonly<CompoundChartProps>) {
   const compounds = useCompounds(datasetId, side);
-  const images = useImages(datasetId, side, compounds.data);
+  const images = useImages(datasetId, side, compounds.data ?? NO_COMPOUNDS);
   const data = useMemo(
     () =>
-      (compounds.data ?? []).map((compound, index) => ({
+      (compounds.data ?? NO_COMPOUNDS).map((compound, index) => ({
         key: String(index),
         smiles: compound.smiles,
         count: compound.count,

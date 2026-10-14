@@ -19,7 +19,14 @@ const PREVIEW = 'img[src^="data:image/svg+xml"]';
 const LOADER = '.mantine-Loader-root';
 
 test.describe.configure({ retries: 0 });
+// The footer is fixed to the viewport's bottom, so a full-page capture would draw it over
+// the content; these capture the viewport, tall enough to show what each test checks.
 test.use({ viewport: { width: 1280, height: 1080 } });
+
+// What differs between runs: the footer's year.
+function changingContent(page: Page) {
+  return [page.getByText(/Copyright \d{4}/)];
+}
 
 async function settle(page: Page, previews: number) {
   await expect(page.locator(LOADER)).toHaveCount(0);
@@ -39,12 +46,16 @@ test('the reaction page looks the same', async ({ page }) => {
   await page.goto('/reactions/ord-viewer0101');
   // Three molecules in the header's preview, and two reactants in the inputs.
   await settle(page, 5);
-  await expect(page).toHaveScreenshot('reaction-page.png', { fullPage: true });
+  await expect(page).toHaveScreenshot('reaction-page.png', {
+    mask: changingContent(page),
+  });
 });
 
 test('a dataset page looks the same', async ({ page }) => {
   await page.goto('/datasets/ord_dataset-viewer01');
   // Three reactions' previews of three molecules each.
   await settle(page, 9);
-  await expect(page).toHaveScreenshot('dataset-page.png', { fullPage: true });
+  await expect(page).toHaveScreenshot('dataset-page.png', {
+    mask: changingContent(page),
+  });
 });

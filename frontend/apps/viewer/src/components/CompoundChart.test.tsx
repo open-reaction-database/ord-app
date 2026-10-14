@@ -15,24 +15,42 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
+import { within } from '@testing-library/react';
 import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { CompoundChart, CompoundTooltip } from '#components/CompoundChart.tsx';
 
 // recharts measures its container, which happy-dom gives no size; the test reads what
-// the chart is given instead.
+// the chart is given instead, and draws the tooltip as recharts would with the first bar
+// hovered and with none.
+interface Point {
+  smiles: string;
+  count: number;
+}
 vi.mock('@mantine/charts', () => ({
   BarChart: ({
     data,
+    tooltipProps,
   }: {
-    readonly data: Array<{ smiles: string; count: number }>;
+    readonly data: Array<Point>;
+    readonly tooltipProps: {
+      content: (props: { payload?: Array<{ payload: Point }> }) => ReactNode;
+    };
   }): ReactNode => (
-    <ol aria-label="bars">
-      {data.map(point => (
-        <li key={point.smiles}>{`${point.smiles} ${point.count}`}</li>
-      ))}
-    </ol>
+    <>
+      <ol aria-label="bars">
+        {data.map(point => (
+          <li key={point.smiles}>{`${point.smiles} ${point.count}`}</li>
+        ))}
+      </ol>
+      <section aria-label="hovered">
+        {tooltipProps.content({ payload: [{ payload: data[0] }] })}
+      </section>
+      <section aria-label="not hovered">
+        {tooltipProps.content({ payload: [] })}
+      </section>
+    </>
   ),
 }));
 vi.mock('@open-reaction-database/ui/reaction/previews', () => ({
@@ -88,6 +106,28 @@ describe('CompoundChart', () => {
       { 0: 'acetyl chloride molblock', 1: null },
       { size: 160 },
     );
+  });
+
+  it("shows a hovered bar's molecule from the chart's rendered images", async () => {
+    vi.mocked(renderPreviews).mockResolvedValue({ 0: 'c3Zn' });
+    mockApi({ 'GET /api/datasets/ord_dataset-1/compounds': COMPOUNDS });
+    const { findByRole, getByRole } = renderAt(
+      '/',
+      <CompoundChart
+        datasetId="ord_dataset-1"
+        side="inputs"
+        title="Most frequent inputs"
+      />,
+    );
+    const hovered = await findByRole('region', { name: 'hovered' });
+    await vi.waitFor(() =>
+      expect(within(hovered).getByRole('img', { name: 'CC(=O)Cl' })).toHaveAttribute(
+        'src',
+        'data:image/svg+xml;base64,c3Zn',
+      ),
+    );
+    expect(within(hovered).getByText('2 occurrences')).toBeInTheDocument();
+    expect(getByRole('region', { name: 'not hovered' })).toBeEmptyDOMElement();
   });
 
   it('says so when the dataset has no compounds on that side', async () => {

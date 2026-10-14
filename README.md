@@ -67,6 +67,17 @@ npm run dev -w apps/viewer
 
 `npm test -w apps/viewer -- --run` runs its unit tests, and `npm run build -w apps/viewer` builds it into `frontend/apps/viewer/dist/`.
 
+Its end-to-end tests run Playwright against the production build, served by `vite preview` on port 4174, and a backend over the five-reaction test corpus whose compound names resolve offline. From the repository's root, start the backend and the viewer, then run the tests:
+
+```shell
+(cd backend/viewer && uv run python -m ord_viewer.testing /tmp/viewer-corpus)
+(cd backend/viewer && ORD_VIEWER_CORPUS_DIR=/tmp/viewer-corpus uv run uvicorn --factory ord_viewer.testing:e2e_app --host 127.0.0.1 --port 8001) &
+(cd frontend && npm run build -w apps/viewer && npm run preview -w apps/viewer -- --host 127.0.0.1) &
+cd frontend && npx -w apps/viewer playwright install chromium && npm run test:e2e -w apps/viewer
+```
+
+The screenshot tests run only in CI, where their baselines were made.
+
 ## Code style
 
 Formatting and linting run through [pre-commit](https://pre-commit.com): license headers via
