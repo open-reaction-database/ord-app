@@ -1,0 +1,35 @@
+/*
+ * Copyright 2026 Open Reaction Database Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* A column, like the input wrapper around it, so that the control stretches across it. */
+.scroller {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Below Mantine's sm breakpoint segments wider than their box scroll sideways within it. Inline-size
+   containment keeps their width out of the box's own minimum, so a grid column holding the control
+   shrinks to its share instead of widening the form; the control keeps the width its labels fit. */
+@media (width < 48em) {
+  .scroller {
+    contain: inline-size;
+    overflow-x: auto;
+
+    & > * {
+      min-width: max-content;
+    }
+  }
+}
