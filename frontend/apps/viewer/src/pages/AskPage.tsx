@@ -91,6 +91,10 @@ function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
               key={example}
               variant="light"
               size="xs"
+              // A button keeps its label on one line, wider than a phone; these wrap.
+              h="auto"
+              py={6}
+              styles={{ label: { whiteSpace: 'normal', textAlign: 'left' } }}
               onClick={() => {
                 setDraft(example);
                 onAsk(example);
