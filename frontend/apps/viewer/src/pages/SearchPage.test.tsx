@@ -15,6 +15,7 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { waitFor } from '@testing-library/react';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0103 } from '#test/fixtures/records.ts';
@@ -137,6 +138,34 @@ describe('SearchPage', () => {
       target: 'input',
       mode: 'exact',
     });
+  });
+
+  it('searches when Enter is pressed in a field', async () => {
+    const fetch = mockApi({
+      'POST /api/search': { kind: 'reactions', reaction_ids: [], truncated: false },
+    });
+    const user = userEvent.setup();
+    const { getByRole } = renderAt('/search', <SearchPage />);
+    await user.click(getByRole('button', { name: 'Add a structure' }));
+    await user.type(getByRole('textbox', { name: 'Structure 1' }), 'CCN{Enter}');
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/search',
+        expect.objectContaining({ method: 'POST' }),
+      ),
+    );
+    expect(String(fetch.mock.calls[0][1]?.body)).toContain('"smiles":"CCN"');
+  });
+
+  it('starts a new line on Enter in the reaction SMARTS rather than searching', async () => {
+    const fetch = mockApi({});
+    const user = userEvent.setup();
+    const { getByRole, history } = renderAt('/search', <SearchPage />);
+    const smarts = getByRole('textbox', { name: 'Reaction SMARTS' });
+    await user.type(smarts, 'A>>B{Enter}');
+    expect(smarts).toHaveValue('A>>B\n');
+    expect(history).toEqual(['/search']);
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   // The second URL holds the same search as the form writes it, in another order.

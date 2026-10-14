@@ -51,6 +51,13 @@ vi.mock('@open-reaction-database/ui/ketcher', () => ({
     ) : null,
 }));
 
+/** Each tags field: its label, its key in the form, and a value to type. */
+const TAG_FIELDS = [
+  ['Dataset IDs', 'datasetIds', 'ord_dataset-1'],
+  ['DOIs', 'dois', '10.1021/x'],
+  ['Reaction IDs', 'reactionIds', 'ord-1'],
+];
+
 function setUp(initial = EMPTY_FORM) {
   const onSearch = vi.fn();
   const user = userEvent.setup();
@@ -218,6 +225,28 @@ describe('SearchFormPanel', () => {
     expect(onSearch.mock.calls[0][0].limit).toBe(1000);
   });
 
+  it('holds a limit entered with Enter to the most the backend returns', async () => {
+    const { getByRole, onSearch, user } = setUp();
+    const limit = getByRole('textbox', { name: 'Limit' });
+    await user.clear(limit);
+    await user.type(limit, '5000{Enter}');
+    expect(onSearch.mock.calls[0][0].limit).toBe(1000);
+  });
+
+  it.each([
+    ['5', 1],
+    ['0.01', 0.05],
+  ])('holds a threshold of %s entered with Enter to %s', async (typed, searched) => {
+    const { getByRole, onSearch, user } = setUp({
+      ...EMPTY_FORM,
+      structures: [{ pattern: 'CCN', target: 'input', mode: 'similar' }],
+    });
+    const threshold = getByRole('textbox', { name: 'Similarity threshold' });
+    await user.clear(threshold);
+    await user.type(threshold, `${typed}{Enter}`);
+    expect(onSearch.mock.calls[0][0].similarity).toBe(searched);
+  });
+
   it('takes a threshold typed over the old one', async () => {
     const { getByRole, onSearch, user } = setUp({
       ...EMPTY_FORM,
@@ -269,16 +298,25 @@ describe('SearchFormPanel', () => {
     expect(onSearch.mock.calls[0][0].conversionRange).toEqual([1, 100]);
   });
 
-  it.each([
-    ['Dataset IDs', 'datasetIds', 'ord_dataset-1'],
-    ['DOIs', 'dois', '10.1021/x'],
-    ['Reaction IDs', 'reactionIds', 'ord-1'],
-  ])('takes %s as tags', async (label, field, value) => {
+  it.each(TAG_FIELDS)('takes %s as tags', async (label, field, value) => {
     const { getByRole, onSearch, user } = setUp();
     await user.type(getByRole('textbox', { name: label }), `${value}{Enter}`);
     await user.click(getByRole('button', { name: 'Search' }));
     expect(onSearch.mock.calls[0][0][field]).toEqual([value]);
   });
+
+  it.each(TAG_FIELDS)(
+    'adds a tag to %s on Enter, and searches on the next',
+    async (label, field, value) => {
+      const { getByRole, onSearch, user } = setUp();
+      const tags = getByRole('textbox', { name: label });
+      await user.type(tags, `${value}{Enter}`);
+      expect(onSearch).not.toHaveBeenCalled();
+      await user.type(tags, '{Enter}');
+      expect(onSearch).toHaveBeenCalledOnce();
+      expect(onSearch.mock.calls[0][0][field]).toEqual([value]);
+    },
+  );
 
   it('clears the form', async () => {
     const { getByRole, queryByRole, user } = setUp({
