@@ -61,7 +61,7 @@ repos:
   # UI lint, format, and type check. Delegated to the tools installed under
   # frontend/ via their npm scripts (run `npm ci` in frontend/ first). The type
   # check is `tsc -b` over every project, test files included, as in CI's
-  # lint_and_build_ui; it is incremental, so a run after a small change is quick.
+  # check_ui; it is incremental, so a run after a small change is quick.
   - repo: local
     hooks:
       - id: prettier

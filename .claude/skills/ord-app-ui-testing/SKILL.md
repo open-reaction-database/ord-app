@@ -9,7 +9,7 @@ Stack: React 19 / Vite 6 / Vitest 3 / happy-dom / @testing-library/react / Manti
 
 ## Pre-flight: match CI or get a false green
 
-- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `lint_and_build_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
+- **Type-check with `tsc -b`, never bare `tsc --noEmit`.** CI's `npm run build` = `tsc -b && vite build`, and `tsc -b` type-checks the **test files**. Bare `tsc --noEmit` against the root config skips them → false green, then `check_ui` fails in CI. Always: `cd frontend && npx tsc -b --force`.
 - **Lint/format** exactly as CI, from `frontend/`: `npm run lint:check` = `prettier --check . && npm run lint && npm run lint:css` (where `lint` is `eslint .` and `lint:css` is `stylelint '**/*.[s]css'`). Run `npx prettier --write <files>` and `npx eslint <files>` before committing. Pre-commit also runs these.
 - **zsh word-splitting**: a `$VAR` holding a space-separated file list does NOT split. Use `${=FILES}` (e.g. `npx eslint ${=FILES}`).
 - ESLint rules that bite tests: `no-duplicate-imports`; use `Array<string>` not `string[]`; `react-refresh/only-export-components` fires on files that export both a component and helpers (add a file-level `/* eslint-disable react-refresh/only-export-components */` to test-only render helpers); forbids inline `import()` type annotations (`@typescript-eslint/consistent-type-imports`) — see the partial-mock note below.
