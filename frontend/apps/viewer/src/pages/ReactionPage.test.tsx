@@ -78,9 +78,11 @@ describe('ReactionPage', () => {
       <ReactionPage reactionId="ord-viewer0101" />,
     );
     await findByRole('heading', { name: 'ord-viewer0101' });
-    expect(getAllByRole('link').map(link => link.textContent)).not.toContain(
-      'ord_dataset-viewer01',
-    );
+    // The dataset's breadcrumb is the only link on a reaction page into a dataset.
+    const datasetLinks = getAllByRole('link')
+      .map(link => link.getAttribute('href'))
+      .filter(href => href?.startsWith('/datasets/'));
+    expect(datasetLinks).toEqual([]);
     expect(getAllByRole('link', { name: 'Datasets' })).not.toHaveLength(0);
   });
 
