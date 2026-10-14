@@ -116,7 +116,7 @@ describe('paramsFromForm', () => {
     expect(paramsFromForm(EMPTY_FORM).toString()).toBe('limit=100');
   });
 
-  it('writes the stereochemistry and similarity only with a structure', () => {
+  it('writes the stereochemistry and similarity with a structure', () => {
     const params = paramsFromForm({
       ...EMPTY_FORM,
       structures: [{ pattern: 'CCN', target: 'input', mode: 'similar' }],
@@ -126,6 +126,15 @@ describe('paramsFromForm', () => {
     ]);
     expect(params.get('use_stereochemistry')).toBe('false');
     expect(params.get('similarity')).toBe('0.5');
+  });
+
+  it('writes the stereochemistry with a reaction SMARTS', () => {
+    const form = {
+      ...EMPTY_FORM,
+      reactionSmarts: ['[N:1]>>[N:1]'],
+      useStereochemistry: true,
+    };
+    expect(formFromParams(paramsFromForm(form))).toEqual(form);
   });
 
   it('writes a range only when it is narrower than 0 to 100', () => {

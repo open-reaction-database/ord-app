@@ -96,6 +96,16 @@ describe('SearchPage', () => {
     expect(getByRole('button', { name: 'Search' })).toBeInTheDocument();
   });
 
+  it('keeps unsent edits while the form is hidden', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = renderAt('/search', <SearchPage />);
+    await user.click(getByRole('button', { name: 'Add a structure' }));
+    await user.type(getByRole('textbox', { name: 'Structure 1' }), 'CCN');
+    await user.click(getByRole('button', { name: 'Hide the form' }));
+    await user.click(getByRole('button', { name: 'Show the form' }));
+    expect(getByRole('textbox', { name: 'Structure 1' })).toHaveValue('CCN');
+  });
+
   it('puts a new search in the URL', async () => {
     mockApi({});
     const user = userEvent.setup();

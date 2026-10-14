@@ -15,10 +15,12 @@
  */
 import { Alert, Button, Checkbox, Group, Stack, Title } from '@mantine/core';
 import { Link } from 'wouter';
+import { REACTIONS_PER_REQUEST } from '#api/hooks.ts';
 import type { ReactionsResult } from '#api/types.ts';
 import { CopyLinkButton } from '#components/CopyLinkButton.tsx';
 import { DownloadButton } from '#components/DownloadButton.tsx';
 import { ReactionList } from '#components/ReactionList.tsx';
+import { MAX_LIMIT } from '#search/form.ts';
 import { useSelection } from '#search/selection.ts';
 
 /** A link to the selected reactions as a set, or a disabled button while there are none. */
@@ -52,7 +54,7 @@ function StoppedNote({
 }: Readonly<{ result: ReactionsResult; limit?: number }>) {
   let note;
   if (result.truncated) {
-    note = 'The search stopped at 1,000 reactions; narrow it to see the rest.';
+    note = `The search stopped at ${MAX_LIMIT.toLocaleString()} reactions; narrow it to see the rest.`;
   } else if (limit !== undefined && result.reaction_ids.length >= limit) {
     note = `The search stopped at its limit of ${limit.toLocaleString()}; raise the limit to see more.`;
   } else {
@@ -112,7 +114,11 @@ export function ReactionResults({
           return (
             <Checkbox
               aria-label={`Select ${id}`}
-              title={blocked ? 'A set holds at most 100 reactions.' : undefined}
+              title={
+                blocked
+                  ? `A set holds at most ${REACTIONS_PER_REQUEST} reactions.`
+                  : undefined
+              }
               checked={selection.isSelected(id)}
               disabled={blocked}
               onChange={() => selection.toggle(id)}

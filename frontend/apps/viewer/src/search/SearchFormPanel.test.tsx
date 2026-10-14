@@ -230,8 +230,32 @@ describe('SearchFormPanel', () => {
     expect(onSearch.mock.calls[0][0].similarity).toBeCloseTo(0.8);
   });
 
-  it('matches stereochemistry when asked', async () => {
+  it('offers stereochemistry only for a pattern it applies to', async () => {
+    const { getByRole, user } = setUp();
+    const stereochemistry = getByRole('checkbox', { name: 'Match stereochemistry' });
+    expect(stereochemistry).toBeDisabled();
+    await user.click(getByRole('button', { name: 'Add a structure' }));
+    expect(stereochemistry).toBeDisabled();
+    await user.selectOptions(
+      getByRole('combobox', { name: 'Match for structure 1' }),
+      'substructure',
+    );
+    expect(stereochemistry).toBeEnabled();
+    await user.selectOptions(
+      getByRole('combobox', { name: 'Match for structure 1' }),
+      'smarts',
+    );
+    expect(stereochemistry).toBeEnabled();
+    await user.selectOptions(
+      getByRole('combobox', { name: 'Match for structure 1' }),
+      'similar',
+    );
+    expect(stereochemistry).toBeDisabled();
+  });
+
+  it('matches stereochemistry for a reaction SMARTS', async () => {
     const { getByRole, onSearch, user } = setUp();
+    await user.type(getByRole('textbox', { name: 'Reaction SMARTS' }), 'A>>B');
     await user.click(getByRole('checkbox', { name: 'Match stereochemistry' }));
     await user.click(getByRole('button', { name: 'Search' }));
     expect(onSearch.mock.calls[0][0].useStereochemistry).toBe(true);

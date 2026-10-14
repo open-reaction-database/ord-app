@@ -115,7 +115,11 @@ function percent(value: string | null, fallback: number): number {
   return Number.isFinite(number) ? Math.min(100, Math.max(0, number)) : fallback;
 }
 
-function rangeOf(params: URLSearchParams, low: string, high: string): NumberRange {
+/** The URL parameters holding a range's bounds. */
+const YIELD_BOUNDS: [string, string] = ['min_yield', 'max_yield'];
+const CONVERSION_BOUNDS: [string, string] = ['min_conversion', 'max_conversion'];
+
+function rangeOf(params: URLSearchParams, [low, high]: [string, string]): NumberRange {
   return [percent(params.get(low), 0), percent(params.get(high), 100)];
 }
 
@@ -139,8 +143,8 @@ export function formFromParams(params: URLSearchParams): SearchForm {
     useStereochemistry: params.get('use_stereochemistry') === 'true',
     similarity: similarityOf(params.get('similarity')),
     reactionSmarts: params.getAll('reaction_smarts'),
-    yieldRange: rangeOf(params, 'min_yield', 'max_yield'),
-    conversionRange: rangeOf(params, 'min_conversion', 'max_conversion'),
+    yieldRange: rangeOf(params, YIELD_BOUNDS),
+    conversionRange: rangeOf(params, CONVERSION_BOUNDS),
     datasetIds: params.getAll('dataset_id'),
     dois: params.getAll('doi'),
     reactionIds: params.getAll('reaction_id'),
@@ -153,36 +157,51 @@ export function isFullRange([low, high]: NumberRange): boolean {
   return low === FULL_RANGE[0] && high === FULL_RANGE[1];
 }
 
+function appendAll(
+  params: URLSearchParams,
+  name: string,
+  values: ReadonlyArray<string>,
+): void {
+  for (const value of values) {
+    params.append(name, value);
+  }
+}
+
+/** Writes a range's bounds, unless it is 0 to 100. */
+function setRange(
+  params: URLSearchParams,
+  [low, high]: [string, string],
+  range: NumberRange,
+): void {
+  if (!isFullRange(range)) {
+    params.set(low, String(range[0]));
+    params.set(high, String(range[1]));
+  }
+}
+
 /** The URL's parameters for a form, as ord-interface's search page wrote them. */
 export function paramsFromForm(form: SearchForm): URLSearchParams {
   const params = new URLSearchParams();
-  for (const { pattern, target, mode } of form.structures) {
-    params.append('component', JSON.stringify({ pattern, target, mode }));
-  }
+  appendAll(
+    params,
+    'component',
+    form.structures.map(({ pattern, target, mode }) =>
+      JSON.stringify({ pattern, target, mode }),
+    ),
+  );
   if (form.structures.length > 0) {
-    params.set('use_stereochemistry', String(form.useStereochemistry));
     params.set('similarity', String(form.similarity));
   }
-  for (const smarts of form.reactionSmarts) {
-    params.append('reaction_smarts', smarts);
+  // Substructures, SMARTS, and reaction SMARTS each match stereochemistry when asked.
+  if (form.structures.length > 0 || form.reactionSmarts.length > 0) {
+    params.set('use_stereochemistry', String(form.useStereochemistry));
   }
-  if (!isFullRange(form.yieldRange)) {
-    params.set('min_yield', String(form.yieldRange[0]));
-    params.set('max_yield', String(form.yieldRange[1]));
-  }
-  if (!isFullRange(form.conversionRange)) {
-    params.set('min_conversion', String(form.conversionRange[0]));
-    params.set('max_conversion', String(form.conversionRange[1]));
-  }
-  for (const datasetId of form.datasetIds) {
-    params.append('dataset_id', datasetId);
-  }
-  for (const doi of form.dois) {
-    params.append('doi', doi);
-  }
-  for (const reactionId of form.reactionIds) {
-    params.append('reaction_id', reactionId);
-  }
+  appendAll(params, 'reaction_smarts', form.reactionSmarts);
+  setRange(params, YIELD_BOUNDS, form.yieldRange);
+  setRange(params, CONVERSION_BOUNDS, form.conversionRange);
+  appendAll(params, 'dataset_id', form.datasetIds);
+  appendAll(params, 'doi', form.dois);
+  appendAll(params, 'reaction_id', form.reactionIds);
   params.set('limit', String(form.limit));
   return params;
 }

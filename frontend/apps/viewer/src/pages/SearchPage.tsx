@@ -103,23 +103,23 @@ export function SearchPage() {
           // Stacked, the form and results take the page's width rather than their own.
           align={{ base: 'stretch', md: 'flex-start' }}
         >
-          {showForm && (
-            <Paper
-              p="md"
-              withBorder
-              w={{ base: '100%', md: 360 }}
-            >
-              <Stack gap="md">
-                <SearchFormPanel
-                  // A new URL, such as Back to an earlier search, starts the form afresh.
-                  key={search}
-                  initial={form}
-                  onSearch={next => navigate(`/search?${paramsFromForm(next)}`)}
-                />
-                <HelpNote />
-              </Stack>
-            </Paper>
-          )}
+          {/* Hidden rather than removed, so the form keeps edits not yet searched. */}
+          <Paper
+            p="md"
+            withBorder
+            w={{ base: '100%', md: 360 }}
+            display={showForm ? undefined : 'none'}
+          >
+            <Stack gap="md">
+              <SearchFormPanel
+                // A new URL, such as Back to an earlier search, starts the form afresh.
+                key={search}
+                initial={form}
+                onSearch={next => navigate(`/search?${paramsFromForm(next)}`)}
+              />
+              <HelpNote />
+            </Stack>
+          </Paper>
           <Stack
             gap="md"
             style={{ flex: 1, minWidth: 0 }}

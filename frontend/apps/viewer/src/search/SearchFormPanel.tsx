@@ -194,6 +194,10 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
     );
   const removeStructure = (key: number) =>
     setRows(current => current.filter(row => row.key !== key));
+  // Stereochemistry is matched only by a pattern: a substructure, SMARTS, or reaction SMARTS.
+  const matchesPatterns =
+    rows.some(({ structure }) => ['substructure', 'smarts'].includes(structure.mode)) ||
+    lines(smartsText).length > 0;
   return (
     <Stack gap="md">
       {rows.map(({ key, structure }, index) => (
@@ -218,6 +222,8 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
       </Button>
       <Checkbox
         label="Match stereochemistry"
+        description="For substructures, SMARTS, and reaction SMARTS"
+        disabled={!matchesPatterns}
         checked={form.useStereochemistry}
         onChange={event => update({ useStereochemistry: event.currentTarget.checked })}
       />

@@ -13,12 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { within } from '@testing-library/react';
 import { renderAt } from '#test/render.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('ResultTable', () => {
+  it('shows each of two columns with the same name', () => {
+    const error = vi.spyOn(console, 'error');
+    const { getAllByRole, getByText } = renderAt(
+      '/',
+      <ResultTable
+        result={{
+          kind: 'table',
+          columns: ['n', 'n'],
+          rows: [[1, 2]],
+          truncated: false,
+        }}
+      />,
+    );
+    expect(getAllByRole('columnheader')).toHaveLength(2);
+    expect(getByText('2')).toBeInTheDocument();
+    expect(error).not.toHaveBeenCalled();
+  });
+
   it('shows the columns and rows as they come, linking reaction IDs', () => {
     const { getByRole } = renderAt(
       '/',

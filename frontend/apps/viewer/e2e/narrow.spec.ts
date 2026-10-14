@@ -121,3 +121,23 @@ test('shows search results with long IDs on a phone', async ({ page }) => {
   ).toBeInViewport();
   await expectNoSidewaysScroll(page);
 });
+
+test('shows a wide table on a phone, scrolling inside it', async ({ page }) => {
+  await page.route('**/api/search', route =>
+    route.fulfill({
+      json: {
+        kind: 'table',
+        columns: ['reaction_id', 'dataset_id', 'description'],
+        rows: [[REACTION_ID, DATASET_ID, DESCRIPTION]],
+        truncated: false,
+      },
+    }),
+  );
+  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  const table = page.getByRole('table');
+  await table.scrollIntoViewIfNeeded();
+  await expect(
+    table.getByRole('columnheader', { name: 'reaction_id' }),
+  ).toBeInViewport();
+  await expectNoSidewaysScroll(page);
+});

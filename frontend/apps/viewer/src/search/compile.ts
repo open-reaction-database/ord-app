@@ -40,8 +40,8 @@ function structurePredicate(
         smiles: pattern,
         threshold: form.similarity,
       };
-    // A substructure's SMILES is read as SMARTS, as the cartridge's SMILES query read it
-    // for most patterns.
+    // A substructure's SMILES is read as SMARTS, which matches the same molecules for
+    // most patterns.
     case 'substructure':
     case 'smarts':
       return {

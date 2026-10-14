@@ -16,6 +16,7 @@
 import { Alert, Anchor, ScrollArea, Stack, Table } from '@mantine/core';
 import { Link } from 'wouter';
 import type { TableResult } from '#api/types.ts';
+import { MAX_LIMIT } from '#search/form.ts';
 
 function Cell({ column, value }: Readonly<{ column: string; value: unknown }>) {
   if (value === null || value === undefined) {
@@ -43,24 +44,26 @@ export function ResultTable({ result }: Readonly<{ result: TableResult }>) {
           color="yellow"
           variant="light"
         >
-          The answer stopped at 1,000 rows; narrow the question to see the rest.
+          The answer stopped at {MAX_LIMIT.toLocaleString()} rows; narrow the question
+          to see the rest.
         </Alert>
       )}
       <ScrollArea>
         <Table striped>
           <Table.Thead>
             <Table.Tr>
-              {result.columns.map(column => (
-                <Table.Th key={column}>{column}</Table.Th>
+              {result.columns.map((column, columnIndex) => (
+                // A table's rows and columns are fixed, and a name may repeat, so each is
+                // keyed by its place.
+                <Table.Th key={columnIndex}>{column}</Table.Th>
               ))}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {result.rows.map((row, rowIndex) => (
-              // Rows have no identity of their own; their place is stable for a result.
               <Table.Tr key={rowIndex}>
                 {result.columns.map((column, columnIndex) => (
-                  <Table.Td key={column}>
+                  <Table.Td key={columnIndex}>
                     <Cell
                       column={column}
                       value={row[columnIndex]}

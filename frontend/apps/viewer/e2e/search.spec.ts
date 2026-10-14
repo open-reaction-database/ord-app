@@ -99,6 +99,14 @@ test.describe('each field searches the corpus', () => {
         ['min_conversion', '0'],
         ['max_conversion', '50'],
       ],
+      ['ord-viewer0202'],
+    );
+    await expectResults(
+      page,
+      [
+        ['min_conversion', '50'],
+        ['max_conversion', '100'],
+      ],
       [],
     );
   });
@@ -112,7 +120,7 @@ test.describe('each field searches the corpus', () => {
   });
 
   test('a DOI', async ({ page }) => {
-    await expectResults(page, [['doi', '10.1/x']], []);
+    await expectResults(page, [['doi', '10.1021/viewer0202']], ['ord-viewer0202']);
   });
 
   test('a reaction ID', async ({ page }) => {
