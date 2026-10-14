@@ -116,8 +116,9 @@ def test_leaves_a_stale_source_in_a_linked_directory_in_place(
     root = tmp_path / "corpus"
     (root / "ord-data" / "data").mkdir(parents=True)
     (root / "ord-data" / "data" / "zz").symlink_to(outside.parent)
+    settings = fetching_settings(root)
     with pytest.raises(ValueError, match="linked from outside .* left in place"):
-        open_corpus(fetching_settings(root), resolver=offline_resolver)
+        open_corpus(settings, resolver=offline_resolver)
     assert outside.exists()
 
 
@@ -129,10 +130,11 @@ def test_refuses_a_source_the_mirror_holds_only_as_a_binary_proto(
         "fetch_dataset",
         lambda dataset_id, **_: str(tmp_path / f"{dataset_id}.pb.gz"),
     )
+    settings = fetching_settings(tmp_path)
     with pytest.raises(
         ValueError, match=r"mirror at data-commit holds ord_dataset-viewer0\d only as"
     ):
-        open_corpus(fetching_settings(tmp_path), resolver=offline_resolver)
+        open_corpus(settings, resolver=offline_resolver)
 
 
 def test_refuses_a_projection_that_names_no_source(hub, monkeypatch, tmp_path):
@@ -142,8 +144,9 @@ def test_refuses_a_projection_that_names_no_source(hub, monkeypatch, tmp_path):
         "load_stamps",
         lambda path: dataclasses.replace(load_stamps(path), source_dataset_id=None),
     )
+    settings = fetching_settings(tmp_path)
     with pytest.raises(ValueError, match="names no source dataset to fetch"):
-        open_corpus(fetching_settings(tmp_path), resolver=offline_resolver)
+        open_corpus(settings, resolver=offline_resolver)
 
 
 @pytest.fixture
