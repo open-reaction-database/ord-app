@@ -267,6 +267,64 @@ for (const { name, open, headers, cells } of TABLES) {
   });
 }
 
+/** Scrolls a drawer's fields, and no other container, to bring an element near their top. */
+function scrollFieldsTo(locator: Locator) {
+  return locator.evaluate(element => {
+    const fields = element.closest('form')?.firstElementChild;
+    if (fields) {
+      const offset =
+        element.getBoundingClientRect().top - fields.getBoundingClientRect().top;
+      fields.scrollTop += offset - 100;
+    }
+  });
+}
+
+/** Opens the nth View button's drawer from a tab, then the nth of each nested drawer's. */
+function openDrawer(tab: string, ...path: Array<number>) {
+  return async (page: Page) => {
+    await page.getByRole('tab', { name: tab }).click();
+    let scope: Page | Locator = page;
+    for (const index of path) {
+      await scope.getByRole('button', { name: 'View', exact: true }).nth(index).click();
+      scope = page.getByRole('dialog');
+    }
+  };
+}
+
+const DRAWERS = [
+  // Units of time and temperature.
+  { name: 'an input', open: openDrawer('inputs', 0) },
+  // Units beside choices of Unspecified, True, or False in three columns.
+  { name: 'the conditions', open: openDrawer('conditions', 0) },
+  // The tab's second View opens the outcome's product, and the product's second a measurement.
+  { name: 'a measurement', open: openDrawer('outcomes', 1, 1) },
+];
+
+for (const { name, open } of DRAWERS) {
+  test(`scrolls ${name} drawer's choices within themselves on a phone`, async ({
+    page,
+  }) => {
+    await page.goto('/reactions/ord-viewer0101');
+    await open(page);
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('radiogroup').first()).toBeVisible();
+    const labels = await dialog.getByRole('radiogroup').locator('label').all();
+    const revealed = [];
+    for (const label of labels) {
+      revealed.push(await revealSideways(label));
+      await scrollFieldsTo(label);
+      await expectWhole(label);
+    }
+    expect(revealed, 'some choices scroll sideways').toContain(true);
+    // A drawer's form holds its fields in its first child.
+    const overflow = await dialog
+      .locator('form > :first-child')
+      .evaluate(fields => fields.scrollWidth - fields.clientWidth);
+    expect(overflow, 'the fields keep to the drawer').toBe(0);
+    await expectNoSidewaysScroll(page);
+  });
+}
+
 test('shows search results with long IDs on a phone', async ({ page }) => {
   await withLongIds(page);
   await page.goto('/search?reaction_id=ord-viewer0101&limit=100');

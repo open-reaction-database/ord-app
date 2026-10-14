@@ -20,6 +20,7 @@ import type {
 import { Input, SegmentedControl, type SegmentedControlProps } from '@mantine/core';
 import { useMemo, type ReactNode } from 'react';
 import { inputWrapperClasses } from '#display/InputWrapper/index.ts';
+import classes from './appSegmentedControl.module.scss';
 
 interface AppSegmentedControlProps extends Omit<SegmentedControlProps, 'data'> {
   options: SelectOptions;
@@ -48,13 +49,15 @@ export function AppSegmentedControl({
       label={label}
       className={inputWrapperClasses.inputWrapper}
     >
-      <SegmentedControl
-        value={value}
-        defaultValue={defaultValue}
-        onChange={onChange}
-        data={data}
-        {...rest}
-      />
+      <div className={classes.scroller}>
+        <SegmentedControl
+          value={value}
+          defaultValue={defaultValue}
+          onChange={onChange}
+          data={data}
+          {...rest}
+        />
+      </div>
     </Input.Wrapper>
   );
 }
