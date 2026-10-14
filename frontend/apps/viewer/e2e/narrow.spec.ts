@@ -309,11 +309,13 @@ for (const { name, open } of DRAWERS) {
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByRole('radiogroup').first()).toBeVisible();
     const labels = await dialog.getByRole('radiogroup').locator('label').all();
+    const revealed = [];
     for (const label of labels) {
-      await revealSideways(label);
+      revealed.push(await revealSideways(label));
       await scrollFieldsTo(label);
       await expectWhole(label);
     }
+    expect(revealed, 'some choices scroll sideways').toContain(true);
     // A drawer's form holds its fields in its first child.
     const overflow = await dialog
       .locator('form > :first-child')

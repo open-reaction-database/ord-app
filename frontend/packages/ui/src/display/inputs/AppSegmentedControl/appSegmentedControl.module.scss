@@ -22,7 +22,8 @@
 
 /* Below Mantine's sm breakpoint segments wider than their box scroll sideways within it. Inline-size
    containment keeps their width out of the box's own minimum, so a grid column holding the control
-   shrinks to its share instead of widening the form; the control keeps the width its labels fit. */
+   shrinks to its share instead of widening the form, and the control stays wide enough for its
+   labels. */
 @media (width < 48em) {
   .scroller {
     contain: inline-size;

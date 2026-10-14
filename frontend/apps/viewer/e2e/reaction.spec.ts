@@ -34,6 +34,28 @@ test('shows a reaction read-only, with its drawer', async ({ page }) => {
   );
 });
 
+test("stretches a drawer's choices across their fields", async ({ page }) => {
+  await page.goto('/reactions/ord-viewer0101');
+  // The tab's second View opens the outcome's product, and the product's second a measurement,
+  // whose value type is a group of segments that is not full width.
+  await page.getByRole('tab', { name: 'outcomes' }).click();
+  await page.getByRole('button', { name: 'View', exact: true }).nth(1).click();
+  const drawer = page.getByRole('dialog');
+  await drawer.getByRole('button', { name: 'View', exact: true }).nth(1).click();
+  await expect(drawer.getByRole('radiogroup').first()).toBeVisible();
+  const gaps = await drawer.getByRole('radiogroup').evaluateAll(groups =>
+    groups.map(group => {
+      const field = group.closest('.mantine-InputWrapper-root');
+      const fieldWidth = field?.getBoundingClientRect().width ?? 0;
+      return fieldWidth - group.getBoundingClientRect().width;
+    }),
+  );
+  expect(gaps).toHaveLength(4);
+  for (const gap of gaps) {
+    expect(gap).toBeCloseTo(0);
+  }
+});
+
 test('shows the full record', async ({ page }) => {
   await page.goto('/reactions/ord-viewer0101');
   await page.getByRole('button', { name: 'Full record' }).click();
