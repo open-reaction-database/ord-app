@@ -117,7 +117,8 @@ export const theme = createTheme({
     },
     Textarea: {
       // An autosize Textarea renders through react-textarea-autosize, which sizes itself
-      // from minRows and throws on a minHeight style in development builds.
+      // from minRows and throws on a minHeight style in development builds. The resolver
+      // sees InputBase's props, whose component is 'textarea' only when not autosizing.
       styles: (_theme: unknown, props: { component?: unknown }) =>
         props.component === 'textarea' ? { input: { minHeight: '92px' } } : {},
     },
