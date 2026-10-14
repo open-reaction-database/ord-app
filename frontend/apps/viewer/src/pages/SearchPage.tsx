@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Button, Flex, Loader, Paper, Stack, Text, Title } from '@mantine/core';
-import { hashKey } from '@tanstack/react-query';
+import { hashKey, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'wouter';
 import { useSearch } from '#api/hooks.ts';
@@ -54,12 +54,20 @@ export function SearchPage() {
   const form = useMemo(() => formFromParams(new URLSearchParams(search)), [search]);
   const query = useMemo(() => compileQuery(form), [form]);
   const results = useSearch(query);
-  // The search shown is sent again only after a failure; its results are kept. Queries,
-  // not URLs, are compared, since more than one URL can hold the same search.
+  const queryClient = useQueryClient();
+  // Submitting the search shown sends again each request on the page that failed, the
+  // search or a page of its reactions; what succeeded stays cached. Queries, not URLs,
+  // are compared, since more than one URL can hold the same search.
   const runSearch = (next: SearchForm) => {
-    navigate(`/search?${paramsFromForm(next)}`);
-    if (results.isError && hashKey([compileQuery(next)]) === hashKey([query])) {
-      void results.refetch();
+    const params = paramsFromForm(next).toString();
+    if (params !== search) {
+      navigate(`/search?${params}`);
+    }
+    if (hashKey([compileQuery(next)]) === hashKey([query])) {
+      void queryClient.refetchQueries({
+        type: 'active',
+        predicate: cached => cached.state.status === 'error',
+      });
     }
   };
   const [showForm, setShowForm] = useState(true);
