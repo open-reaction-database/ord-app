@@ -148,7 +148,14 @@ export function AskPage() {
   const [, navigate] = useLocation();
   const question = (searchParams.get('q') ?? '').trim();
   const answer = useAsk(question === '' ? null : question);
-  const ask = (text: string) => navigate(`/ask?${new URLSearchParams({ q: text })}`);
+  // The question already asked is asked again only after a failure; an answer is kept.
+  const ask = (text: string) => {
+    if (text !== question) {
+      navigate(`/ask?${new URLSearchParams({ q: text })}`);
+    } else if (answer.isError) {
+      void answer.refetch();
+    }
+  };
   let body = null;
   if (question !== '') {
     if (answer.isError) {

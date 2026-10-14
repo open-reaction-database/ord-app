@@ -123,6 +123,46 @@ describe('AskPage', () => {
     expect(getByRole('textbox', { name: 'Question' })).toHaveValue(ASK_EXAMPLES[1]);
   });
 
+  it('asks the same question again after a failure', async () => {
+    const user = userEvent.setup();
+    let release = (_: Response) => {};
+    const answers = [
+      () => new Response(JSON.stringify({ detail: 'busy' }), { status: 503 }),
+      () => new Promise<Response>(resolve => (release = resolve)),
+    ];
+    mockApi({
+      'POST /api/ask': () => answers.shift()!(),
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByRole, findByText, getByRole, queryByRole } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    expect(await findByRole('alert')).toHaveTextContent('try again shortly');
+    await user.click(getByRole('button', { name: 'Ask' }));
+    await vi.waitFor(() => expect(queryByRole('alert')).not.toBeInTheDocument());
+    release(new Response(JSON.stringify(ANSWER)));
+    expect(await findByText('One reaction uses ethylamine.')).toBeInTheDocument();
+  });
+
+  it('asks an answered question only once', async () => {
+    const user = userEvent.setup();
+    const fetch = mockApi({
+      'POST /api/ask': ANSWER,
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByText, getByRole } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    await findByText('One reaction uses ethylamine.');
+    await user.click(getByRole('button', { name: 'Ask' }));
+    const asks = fetch.mock.calls.filter(([input]) =>
+      String(input).endsWith('/api/ask'),
+    );
+    expect(asks).toHaveLength(1);
+  });
+
   it('refuses an empty or overlong question', async () => {
     const user = userEvent.setup();
     const { getByRole } = renderAt('/ask', <AskPage />);
