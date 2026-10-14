@@ -15,10 +15,10 @@
 """Settings for the viewer's backend, read from ORD_VIEWER_* environment variables."""
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
 from ord_schema.search import nl
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,8 +31,14 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
     )
 
-    # A root holding projections/, structures/, pivots/, occurrences/, and sources/.
+    # A root holding projections/, structures/, pivots/, occurrences/, and sources/;
+    # with the revisions below set, the directory the corpus is fetched into instead.
     corpus_dir: Path | None = None
+    # The ord-artifacts revision to fetch the derived artifacts from, and the ord-data
+    # mirror's revision to fetch their sources from. Set both, as commits so a restart
+    # fetches the same corpus, or neither to serve corpus_dir as it stands.
+    artifacts_revision: str | None = None
+    sources_revision: str | None = None
     # DuckDB's memory_limit, such as "6500MiB"; DuckDB's default when unset.
     memory_limit: str | None = None
     # The most searches, asks, and dataset charts' aggregates in flight at once, a cap
@@ -46,3 +52,13 @@ class Settings(BaseSettings):
     ask_model: str = nl.DEFAULT_MODEL
     # Where /api/ask records each question: nowhere, or one JSON line on stdout.
     ask_log: Literal["none", "stdout"] = "none"
+
+    @model_validator(mode="after")
+    def _revisions_together(self) -> Self:
+        """Refuse one revision without the other, which names half a corpus."""
+        if (self.artifacts_revision is None) != (self.sources_revision is None):
+            raise ValueError(
+                "ORD_VIEWER_ARTIFACTS_REVISION and ORD_VIEWER_SOURCES_REVISION are set "
+                "together or not at all"
+            )
+        return self

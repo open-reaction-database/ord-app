@@ -41,7 +41,9 @@ The service reads these environment variables:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/` |
+| `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/`; with the two revisions below set, the writable directory the corpus is fetched into |
+| `ORD_VIEWER_ARTIFACTS_REVISION` | unset | The [ord-artifacts](https://huggingface.co/datasets/open-reaction-database/ord-artifacts) commit to fetch the derived artifacts from at startup; the build fetched is the one this ord-schema and RDKit read. Set with `ORD_VIEWER_SOURCES_REVISION` |
+| `ORD_VIEWER_SOURCES_REVISION` | unset | The [ord-data mirror](https://huggingface.co/datasets/open-reaction-database/ord-data) commit to fetch the artifacts' source datasets from at startup. Set with `ORD_VIEWER_ARTIFACTS_REVISION` |
 | `ORD_VIEWER_MEMORY_LIMIT` | DuckDB's default | DuckDB's `memory_limit`, such as `6500MiB` |
 | `ORD_VIEWER_MAX_CONCURRENT` | 4 | The most searches, asks, and dataset charts' aggregates in flight at once; each search gets cores / this many RDKit threads |
 | `ORD_VIEWER_SEARCH_TIMEOUT_SECONDS` | 30 | The bound on one search, including an ask's; a search past it answers 504 |
@@ -50,7 +52,7 @@ The service reads these environment variables:
 | `ORD_VIEWER_ASK_LOG` | `none` | Where `/api/ask` records each question: `none`, or `stdout` for one JSON line per question |
 | `ORD_ANTHROPIC_API_KEY` | unset | The key `/api/ask` calls the model with, falling back to `ANTHROPIC_API_KEY`; without either, `/api/ask` answers 503 and the other routes work |
 
-ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `derive_structures`, `derive_pivots`, and `derive_occurrences`) produce a corpus's trees from source Parquet. For a local smoke run, `ord_viewer.testing.derive_corpus(path)` writes the five-reaction test corpus:
+The service serves a corpus one of two ways. A local corpus is a directory laid out as above: ord-schema's derive scripts (`ord_schema.artifacts.scripts.derive_projection`, `derive_structures`, `derive_pivots`, and `derive_occurrences`) produce its trees from source Parquet, and `sources/` holds that Parquet. A fetched corpus is downloaded at startup, before the service accepts connections: the artifacts from ord-artifacts into `ord-artifacts/` and their sources from the ord-data mirror into `ord-data/`, both under `ORD_VIEWER_CORPUS_DIR`. A restart over the same directory downloads only what changed. For a local smoke run, `ord_viewer.testing.derive_corpus(path)` writes the five-reaction test corpus:
 
 ```shell
 uv run python -c "import pathlib; from ord_viewer.testing import derive_corpus; derive_corpus(pathlib.Path('/tmp/corpus'))"
@@ -165,14 +167,18 @@ Envs for backend:
 
 
 ### The viewer's image
-The viewer's image serves its bundle and API behind nginx on port 8080, over a corpus mounted at run time. To build it and check it over the five-reaction test corpus:
+The viewer's image serves its bundle and API behind nginx on port 8080, over a corpus mounted or fetched at run time. To build it and check it over the five-reaction test corpus:
 ```shell
 docker build -f deploy/viewer/Dockerfile -t ord-viewer .
 (cd backend/viewer && uv run python -m ord_viewer.testing /tmp/viewer-corpus)
 docker run --rm -p 8080:8080 -v /tmp/viewer-corpus:/corpus:ro -e ORD_VIEWER_CORPUS_DIR=/corpus ord-viewer
 deploy/viewer/smoke_test.sh http://127.0.0.1:8080 ord-viewer0101
 ```
-Mount a full corpus instead to serve it; the other `ORD_VIEWER_*` settings are listed under "Viewer backend" above.
+Mount a full corpus instead to serve it, or fetch one into a writable directory in the container:
+```shell
+docker run --rm -p 8080:8080 -e ORD_VIEWER_CORPUS_DIR=/app/corpus -e ORD_VIEWER_ARTIFACTS_REVISION=<commit> -e ORD_VIEWER_SOURCES_REVISION=<commit> ord-viewer
+```
+The other `ORD_VIEWER_*` settings are listed under "Viewer backend" above.
 
 ## Testing
 
