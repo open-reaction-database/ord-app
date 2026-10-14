@@ -25,18 +25,20 @@ import { vi } from 'vitest';
  * 404 with FastAPI's body.
  */
 export function mockApi(routes: Record<string, unknown>) {
-  return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+  return vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
     const url = new URL(String(input), 'http://viewer.test');
     const method = init?.method ?? 'GET';
     const exact = `${method} ${url.pathname}${url.search}`;
     const loose = `${method} ${url.pathname}`;
     const answer = exact in routes ? routes[exact] : routes[loose];
     if (answer === undefined) {
-      return new Response(JSON.stringify({ detail: 'Not Found' }), { status: 404 });
+      return Promise.resolve(
+        new Response(JSON.stringify({ detail: 'Not Found' }), { status: 404 }),
+      );
     }
     if (typeof answer === 'function') {
-      return (answer as () => Response)();
+      return Promise.resolve((answer as () => Response)());
     }
-    return new Response(JSON.stringify(answer));
+    return Promise.resolve(new Response(JSON.stringify(answer)));
   });
 }

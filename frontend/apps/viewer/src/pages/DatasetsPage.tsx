@@ -133,19 +133,23 @@ function DatasetTable({
 /** Every dataset in the corpus, filtered and paged in the browser. */
 export function DatasetsPage() {
   const datasets = useDatasets();
+  let body;
+  if (datasets.isError) {
+    body = <ErrorNotice error={datasets.error} />;
+  } else if (datasets.isPending) {
+    body = (
+      <Flex justify="center">
+        <Loader />
+      </Flex>
+    );
+  } else {
+    body = <DatasetTable datasets={datasets.data} />;
+  }
   return (
     <ViewerPage breadcrumbs={[{ title: 'Datasets', path: '/' }]}>
       <Stack gap="md">
         <Title order={2}>Datasets</Title>
-        {datasets.isError ? (
-          <ErrorNotice error={datasets.error} />
-        ) : datasets.isPending ? (
-          <Flex justify="center">
-            <Loader />
-          </Flex>
-        ) : (
-          <DatasetTable datasets={datasets.data} />
-        )}
+        {body}
       </Stack>
     </ViewerPage>
   );

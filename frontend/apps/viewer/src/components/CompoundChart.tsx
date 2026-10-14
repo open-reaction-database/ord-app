@@ -15,7 +15,10 @@
  */
 import { BarChart } from '@mantine/charts';
 import { Flex, Loader, Paper, Stack, Text, Title } from '@mantine/core';
-import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
+import {
+  renderPreviews,
+  type PreviewsById,
+} from '@open-reaction-database/ui/reaction/previews';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useCompounds } from '#api/hooks.ts';
@@ -87,6 +90,31 @@ function useImages(
   });
 }
 
+/** A bar's data: the compound's place in the counts, its SMILES, and its count. */
+interface Bar {
+  key: string;
+  smiles: string;
+  count: number;
+}
+
+interface BarTooltipProps {
+  images: PreviewsById | undefined;
+  /** What recharts gives its tooltip: the hovered bar, or nothing. */
+  payload?: ReadonlyArray<{ payload?: Bar }>;
+}
+
+/** The hovered bar's tooltip, which recharts draws with the bar as its payload. */
+function BarTooltip({ images, payload }: Readonly<BarTooltipProps>) {
+  const bar = payload?.[0]?.payload;
+  return bar ? (
+    <CompoundTooltip
+      smiles={bar.smiles}
+      count={bar.count}
+      image={images?.[bar.key]}
+    />
+  ) : null;
+}
+
 interface CompoundChartProps {
   datasetId: string;
   side: CompoundSide;
@@ -105,7 +133,7 @@ export function CompoundChart({
   const compounds = useCompounds(datasetId, side);
   const images = useImages(datasetId, side, compounds.data ?? NO_COMPOUNDS);
   const data = useMemo(
-    () =>
+    (): Array<Bar> =>
       (compounds.data ?? NO_COMPOUNDS).map((compound, index) => ({
         key: String(index),
         smiles: compound.smiles,
@@ -132,18 +160,7 @@ export function CompoundChart({
         dataKey="smiles"
         series={[{ name: 'count', label: 'Occurrences', color: 'blue.6' }]}
         xAxisProps={{ tick: false }}
-        tooltipProps={{
-          content: ({ payload }) => {
-            const point = payload?.[0]?.payload as (typeof data)[number] | undefined;
-            return point ? (
-              <CompoundTooltip
-                smiles={point.smiles}
-                count={point.count}
-                image={images.data?.[point.key]}
-              />
-            ) : null;
-          },
-        }}
+        tooltipProps={{ content: <BarTooltip images={images.data} /> }}
       />
     );
   }

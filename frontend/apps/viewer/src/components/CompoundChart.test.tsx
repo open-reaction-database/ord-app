@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ReactNode } from 'react';
+import { cloneElement, type ReactElement, type ReactNode } from 'react';
 import { within } from '@testing-library/react';
 import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
 import { renderAt } from '#test/render.tsx';
@@ -35,7 +35,7 @@ vi.mock('@mantine/charts', () => ({
   }: {
     readonly data: Array<Point>;
     readonly tooltipProps: {
-      content: (props: { payload?: Array<{ payload: Point }> }) => ReactNode;
+      content: ReactElement<{ payload: Array<{ payload: Point }> }>;
     };
   }): ReactNode => (
     <>
@@ -45,10 +45,10 @@ vi.mock('@mantine/charts', () => ({
         ))}
       </ol>
       <section aria-label="hovered">
-        {tooltipProps.content({ payload: [{ payload: data[0] }] })}
+        {cloneElement(tooltipProps.content, { payload: [{ payload: data[0] }] })}
       </section>
       <section aria-label="not hovered">
-        {tooltipProps.content({ payload: [] })}
+        {cloneElement(tooltipProps.content, { payload: [] })}
       </section>
     </>
   ),

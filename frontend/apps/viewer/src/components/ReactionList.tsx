@@ -84,34 +84,40 @@ export function ReactionList({ reactionIds }: Readonly<ReactionListProps>) {
   if (reactionIds.length === 0) {
     return <Text>No reactions.</Text>;
   }
+  let body;
+  if (records.isError) {
+    body = <ErrorNotice error={records.error} />;
+  } else if (records.isPending) {
+    body = (
+      <Flex justify="center">
+        <Loader />
+      </Flex>
+    );
+  } else {
+    body = (
+      <>
+        <Missing
+          asked={pageItems}
+          records={records.data}
+        />
+        {records.data.map(record => (
+          <ViewerReactionProvider
+            key={record.reaction_id}
+            record={record}
+          >
+            <ReactionCard
+              title={<CardTitle record={record} />}
+              actions={null}
+            />
+          </ViewerReactionProvider>
+        ))}
+      </>
+    );
+  }
   return (
     <Stack gap="md">
       {controls}
-      {records.isError ? (
-        <ErrorNotice error={records.error} />
-      ) : records.isPending ? (
-        <Flex justify="center">
-          <Loader />
-        </Flex>
-      ) : (
-        <>
-          <Missing
-            asked={pageItems}
-            records={records.data}
-          />
-          {records.data.map(record => (
-            <ViewerReactionProvider
-              key={record.reaction_id}
-              record={record}
-            >
-              <ReactionCard
-                title={<CardTitle record={record} />}
-                actions={null}
-              />
-            </ViewerReactionProvider>
-          ))}
-        </>
-      )}
+      {body}
     </Stack>
   );
 }
