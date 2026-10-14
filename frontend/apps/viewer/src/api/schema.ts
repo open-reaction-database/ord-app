@@ -311,6 +311,10 @@ export interface components {
      *     ``group_by`` paths must be scalar, so the number of groups is bounded by the values
      *     a column holds rather than by an explosion over a repeated level.
      *
+     *     Each ``group_by`` path is one column of the result, named by the whole path as
+     *     written, and each measure is one named by its ``name``. No two may share a name,
+     *     whatever their case.
+     *
      *     ``over`` changes what a row is. Without it the rows are reactions, and "how many
      *     reactions are automated" is a count of them. With it the rows are the elements of
      *     one repeated level, which is what "the most common solvent" asks for: solvents are
@@ -359,6 +363,10 @@ export interface components {
      *
      *     ``group_by`` paths must be scalar, so the number of groups is bounded by the values
      *     a column holds rather than by an explosion over a repeated level.
+     *
+     *     Each ``group_by`` path is one column of the result, named by the whole path as
+     *     written, and each measure is one named by its ``name``. No two may share a name,
+     *     whatever their case.
      *
      *     ``over`` changes what a row is. Without it the rows are reactions, and "how many
      *     reactions are automated" is a count of them. With it the rows are the elements of
@@ -483,7 +491,11 @@ export interface components {
     };
     /**
      * Comparison
-     * @description A leaf compared against a literal or a resolved compound.
+     * @description A leaf compared against a literal.
+     *
+     *     A compound is never a comparison's value. What a resolved name could be compared
+     *     against is a ``smiles``, and equal spellings are not what makes two compounds the
+     *     same; ``same_compound`` is that question.
      */
     Comparison: {
       /**
@@ -1145,6 +1157,10 @@ export interface components {
      *     molecule recorded without stereo. ``chirality`` false ignores stereocenters, for a
      *     question about the molecule whatever its configuration. A query with no
      *     stereocenters matches the same structures either way.
+     *
+     *     CXSMILES stereo groups count too. A structure recorded as a racemate (``&``) or as
+     *     an unknown single enantiomer (``o``) matches a pattern drawn as either enantiomer,
+     *     and a pattern drawn as a racemate matches only racemates.
      */
     Substructure: {
       /**
@@ -1228,13 +1244,11 @@ export interface components {
     };
     /**
      * Value
-     * @description A comparison operand: a literal, or a compound to resolve and bind.
+     * @description A comparison operand: a literal, bound as a parameter of its own type.
      */
     Value: {
       /** Literal */
-      literal?: boolean | number | string | null;
-      /** Compound */
-      compound?: string | null;
+      literal: boolean | number | string;
     };
   };
   responses: never;
