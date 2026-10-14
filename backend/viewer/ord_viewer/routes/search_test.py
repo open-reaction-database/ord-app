@@ -226,8 +226,15 @@ def test_a_deep_value_in_an_invalid_field_is_unprocessable(client, body, error_t
     [
         [{"fn": "count", "name": "n"}, {"fn": "count", "name": "n"}],
         [{"fn": "count", "name": "dataset_id"}],
+        [{"fn": "count", "name": "n"}, {"fn": "count", "name": "N"}],
+        [{"fn": "count", "name": "DATASET_ID"}],
     ],
-    ids=["two measures", "a measure and a group"],
+    ids=[
+        "two measures",
+        "a measure and a group",
+        "two measures in other cases",
+        "a measure and a group in other cases",
+    ],
 )
 def test_a_repeated_output_name_is_unprocessable(client, measures):
     query = {"aggregate": {"group_by": ["dataset_id"], "measures": measures}}
