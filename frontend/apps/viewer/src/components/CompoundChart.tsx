@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { BarChart } from '@mantine/charts';
-import { Flex, Loader, Paper, Stack, Text, Title } from '@mantine/core';
+import { Button, Flex, Group, Loader, Paper, Stack, Text, Title } from '@mantine/core';
 import {
   renderPreviews,
   type PreviewsById,
@@ -168,6 +168,18 @@ export function CompoundChart({
     <Stack gap="xs">
       <Title order={3}>{title}</Title>
       {body}
+      {images.isError && (
+        <Group gap="xs">
+          <Text size="sm">The molecules could not be drawn.</Text>
+          <Button
+            variant="subtle"
+            size="compact-sm"
+            onClick={() => void images.refetch()}
+          >
+            Retry
+          </Button>
+        </Group>
+      )}
     </Stack>
   );
 }

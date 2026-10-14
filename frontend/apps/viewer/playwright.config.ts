@@ -24,7 +24,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: true,
   retries: 1,
-  reporter: 'list',
+  // The HTML report is what CI uploads when a run fails.
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: BASE_URL,
     trace: 'on-first-retry',

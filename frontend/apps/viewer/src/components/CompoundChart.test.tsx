@@ -16,6 +16,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cloneElement, type ReactElement, type ReactNode } from 'react';
 import { within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
@@ -128,6 +129,33 @@ describe('CompoundChart', () => {
     );
     expect(within(hovered).getByText('2 occurrences')).toBeInTheDocument();
     expect(getByRole('region', { name: 'not hovered' })).toBeEmptyDOMElement();
+  });
+
+  it('says when the molecules could not be drawn, and draws them on retry', async () => {
+    vi.mocked(renderPreviews)
+      .mockRejectedValueOnce(new Error('the worker failed'))
+      .mockResolvedValueOnce({ 0: 'c3Zn' });
+    mockApi({ 'GET /api/datasets/ord_dataset-1/compounds': COMPOUNDS });
+    const user = userEvent.setup();
+    const { findByText, findByRole, getAllByRole, queryByText } = renderAt(
+      '/',
+      <CompoundChart
+        datasetId="ord_dataset-1"
+        side="inputs"
+        title="Most frequent inputs"
+      />,
+    );
+    expect(await findByText('The molecules could not be drawn.')).toBeInTheDocument();
+    // The counts still show.
+    expect(getAllByRole('listitem')).toHaveLength(2);
+    await user.click(await findByRole('button', { name: 'Retry' }));
+    const hovered = await findByRole('region', { name: 'hovered' });
+    await vi.waitFor(() =>
+      expect(
+        within(hovered).getByRole('img', { name: 'CC(=O)Cl' }),
+      ).toBeInTheDocument(),
+    );
+    expect(queryByText('The molecules could not be drawn.')).not.toBeInTheDocument();
   });
 
   it('says so when the dataset has no compounds on that side', async () => {

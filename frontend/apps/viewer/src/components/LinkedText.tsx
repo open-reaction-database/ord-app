@@ -73,6 +73,8 @@ export function LinkedText({ text }: Readonly<{ text: string }>) {
         href={hrefOf(link)}
         target="_blank"
         rel="noopener noreferrer"
+        // An address has no spaces to wrap at, and would widen a narrow page.
+        style={{ overflowWrap: 'anywhere' }}
       >
         {link}
       </Anchor>,

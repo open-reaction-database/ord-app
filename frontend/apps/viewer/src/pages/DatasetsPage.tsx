@@ -95,37 +95,40 @@ function DatasetTable({
         onChange={event => setFilter(event.currentTarget.value)}
       />
       {controls}
-      <Table striped>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Description</Table.Th>
-            <Table.Th>Reactions</Table.Th>
-            <Table.Th>ID</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {pageItems.map(dataset => (
-            <Table.Tr key={dataset.dataset_id}>
-              <Table.Td>
-                <Anchor
-                  component={Link}
-                  href={datasetPath(dataset.dataset_id)}
-                >
-                  {dataset.name}
-                </Anchor>
-              </Table.Td>
-              <Table.Td>
-                <Description dataset={dataset} />
-              </Table.Td>
-              <Table.Td>{dataset.reactions.toLocaleString()}</Table.Td>
-              <Table.Td>
-                <Code>{dataset.dataset_id}</Code>
-              </Table.Td>
+      {/* On a phone the columns keep a readable width and scroll within the table. */}
+      <Table.ScrollContainer minWidth={640}>
+        <Table striped>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th>Reactions</Table.Th>
+              <Table.Th>ID</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+          </Table.Thead>
+          <Table.Tbody>
+            {pageItems.map(dataset => (
+              <Table.Tr key={dataset.dataset_id}>
+                <Table.Td>
+                  <Anchor
+                    component={Link}
+                    href={datasetPath(dataset.dataset_id)}
+                  >
+                    {dataset.name}
+                  </Anchor>
+                </Table.Td>
+                <Table.Td>
+                  <Description dataset={dataset} />
+                </Table.Td>
+                <Table.Td>{dataset.reactions.toLocaleString()}</Table.Td>
+                <Table.Td>
+                  <Code>{dataset.dataset_id}</Code>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
     </Stack>
   );
 }

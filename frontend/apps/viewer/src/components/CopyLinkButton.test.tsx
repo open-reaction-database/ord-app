@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderAt } from '#test/render.tsx';
 import { CopyLinkButton } from '#components/CopyLinkButton.tsx';
@@ -40,5 +41,30 @@ describe('CopyLinkButton', () => {
     expect(writeText).toHaveBeenCalledWith(
       `${globalThis.location.origin}/reactions?id=ord-later`,
     );
+  });
+  it('shows the address to copy by hand when the browser refuses', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('denied'));
+    const { getByRole, findByText } = renderAt('/', <CopyLinkButton />);
+    await user.click(getByRole('button', { name: 'Copy link' }));
+    expect(await findByText('The link could not be copied')).toBeInTheDocument();
+    expect(await findByText(globalThis.location.href)).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+  });
+  it('says so for two seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+      const { getByRole, findByRole } = renderAt('/', <CopyLinkButton />);
+      await user.click(getByRole('button', { name: 'Copy link' }));
+      await findByRole('button', { name: 'Link copied' });
+      await act(() => vi.advanceTimersByTimeAsync(1900));
+      expect(getByRole('button', { name: 'Link copied' })).toBeInTheDocument();
+      await act(() => vi.advanceTimersByTimeAsync(200));
+      expect(getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
