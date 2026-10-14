@@ -53,7 +53,8 @@ describe('DatasetPage', () => {
       <DatasetPage datasetId="ord_dataset-viewer01" />,
     );
     expect(await findByRole('heading', { name: 'viewer one' })).toBeInTheDocument();
-    expect(getByText('ord_dataset-viewer01')).toBeInTheDocument();
+    // Each reaction card also names its dataset, once the reactions have loaded.
+    expect(getByText('ord_dataset-viewer01', { selector: 'code' })).toBeInTheDocument();
     expect(getByText('A Suzuki coupling and two acylations')).toBeInTheDocument();
     expect(getByRole('heading', { name: 'Most frequent inputs' })).toBeInTheDocument();
     expect(
