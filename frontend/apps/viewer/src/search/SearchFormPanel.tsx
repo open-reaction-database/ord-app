@@ -26,6 +26,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
+import { clamp } from '@mantine/hooks';
 import { StructureDialog } from '@open-reaction-database/ui/ketcher';
 import { useState } from 'react';
 import {
@@ -49,6 +50,10 @@ const TARGET_OPTIONS = [
   { label: 'Input', value: 'input' },
   { label: 'Product', value: 'output' },
 ];
+
+// The number fields' bounds, which both the input and the search enforce.
+const SIMILARITY_BOUNDS = { min: 0.05, max: 1 };
+const LIMIT_BOUNDS = { min: 1, max: MAX_LIMIT };
 
 interface StructureRowProps {
   index: number;
@@ -198,113 +203,119 @@ export function SearchFormPanel({ initial, onSearch }: Readonly<SearchFormPanelP
   const matchesPatterns =
     rows.some(({ structure }) => ['substructure', 'smarts'].includes(structure.mode)) ||
     lines(smartsText).length > 0;
+  // A number field clamps itself on blur, which Enter skips, so the search clamps too.
+  const search = () =>
+    onSearch({
+      ...form,
+      similarity: clamp(form.similarity, SIMILARITY_BOUNDS.min, SIMILARITY_BOUNDS.max),
+      limit: clamp(form.limit, LIMIT_BOUNDS.min, LIMIT_BOUNDS.max),
+      structures: rows.map(({ structure }) => structure),
+      reactionSmarts: lines(smartsText),
+    });
   return (
-    <Stack gap="md">
-      {rows.map(({ key, structure }, index) => (
-        <StructureRow
-          key={key}
-          index={index}
-          structure={structure}
-          onChange={changed => setStructure(key, changed)}
-          onRemove={() => removeStructure(key)}
-        />
-      ))}
-      <Button
-        variant="default"
-        onClick={() =>
-          setRows(current => [
-            ...current,
-            newRow({ pattern: '', target: 'input', mode: 'exact' }),
-          ])
-        }
-      >
-        Add a structure
-      </Button>
-      <Checkbox
-        label="Match stereochemistry"
-        description="For substructures, SMARTS, and reaction SMARTS"
-        disabled={!matchesPatterns}
-        checked={form.useStereochemistry}
-        onChange={event => update({ useStereochemistry: event.currentTarget.checked })}
-      />
-      {rows.some(({ structure }) => structure.mode === 'similar') && (
-        <NumberInput
-          label="Similarity threshold"
-          min={0.05}
-          max={1}
-          step={0.05}
-          decimalScale={2}
-          value={form.similarity}
-          onChange={value => update({ similarity: Number(value) || form.similarity })}
-        />
-      )}
-      <Textarea
-        label="Reaction SMARTS"
-        description="One per line"
-        autosize
-        minRows={2}
-        value={smartsText}
-        onChange={event => setSmartsText(event.currentTarget.value)}
-      />
-      <RangeField
-        label="Yield"
-        value={form.yieldRange}
-        onChange={yieldRange => update({ yieldRange })}
-      />
-      <RangeField
-        label="Conversion"
-        value={form.conversionRange}
-        onChange={conversionRange => update({ conversionRange })}
-      />
-      <TagsInput
-        label="Dataset IDs"
-        value={form.datasetIds}
-        onChange={datasetIds => update({ datasetIds })}
-        splitChars={[',', ' ']}
-      />
-      <TagsInput
-        label="DOIs"
-        value={form.dois}
-        onChange={dois => update({ dois })}
-        splitChars={[',', ' ']}
-      />
-      <TagsInput
-        label="Reaction IDs"
-        value={form.reactionIds}
-        onChange={reactionIds => update({ reactionIds })}
-        splitChars={[',', ' ']}
-      />
-      <NumberInput
-        label="Limit"
-        min={1}
-        max={MAX_LIMIT}
-        allowDecimal={false}
-        value={form.limit}
-        onChange={value => update({ limit: Number(value) || form.limit })}
-      />
-      <Group justify="space-between">
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+        search();
+      }}
+    >
+      <Stack gap="md">
+        {rows.map(({ key, structure }, index) => (
+          <StructureRow
+            key={key}
+            index={index}
+            structure={structure}
+            onChange={changed => setStructure(key, changed)}
+            onRemove={() => removeStructure(key)}
+          />
+        ))}
         <Button
-          variant="subtle"
-          onClick={() => {
-            setForm(EMPTY_FORM);
-            setRows([]);
-            setSmartsText('');
-          }}
-        >
-          Clear
-        </Button>
-        <Button
+          variant="default"
           onClick={() =>
-            onSearch({
-              ...form,
-              structures: rows.map(({ structure }) => structure),
-              reactionSmarts: lines(smartsText),
-            })
+            setRows(current => [
+              ...current,
+              newRow({ pattern: '', target: 'input', mode: 'exact' }),
+            ])
           }
         >
-          Search
+          Add a structure
         </Button>
-      </Group>
-    </Stack>
+        <Checkbox
+          label="Match stereochemistry"
+          description="For substructures, SMARTS, and reaction SMARTS"
+          disabled={!matchesPatterns}
+          checked={form.useStereochemistry}
+          onChange={event =>
+            update({ useStereochemistry: event.currentTarget.checked })
+          }
+        />
+        {rows.some(({ structure }) => structure.mode === 'similar') && (
+          <NumberInput
+            label="Similarity threshold"
+            {...SIMILARITY_BOUNDS}
+            step={0.05}
+            decimalScale={2}
+            value={form.similarity}
+            onChange={value => update({ similarity: Number(value) || form.similarity })}
+          />
+        )}
+        <Textarea
+          label="Reaction SMARTS"
+          description="One per line"
+          autosize
+          minRows={2}
+          value={smartsText}
+          onChange={event => setSmartsText(event.currentTarget.value)}
+        />
+        <RangeField
+          label="Yield"
+          value={form.yieldRange}
+          onChange={yieldRange => update({ yieldRange })}
+        />
+        <RangeField
+          label="Conversion"
+          value={form.conversionRange}
+          onChange={conversionRange => update({ conversionRange })}
+        />
+        <TagsInput
+          label="Dataset IDs"
+          value={form.datasetIds}
+          onChange={datasetIds => update({ datasetIds })}
+          splitChars={[',', ' ']}
+        />
+        <TagsInput
+          label="DOIs"
+          value={form.dois}
+          onChange={dois => update({ dois })}
+          splitChars={[',', ' ']}
+        />
+        <TagsInput
+          label="Reaction IDs"
+          value={form.reactionIds}
+          onChange={reactionIds => update({ reactionIds })}
+          splitChars={[',', ' ']}
+        />
+        <NumberInput
+          label="Limit"
+          {...LIMIT_BOUNDS}
+          allowDecimal={false}
+          value={form.limit}
+          onChange={value => update({ limit: Number(value) || form.limit })}
+        />
+        <Group justify="space-between">
+          <Button
+            variant="subtle"
+            onClick={() => {
+              setForm(EMPTY_FORM);
+              setRows([]);
+              setSmartsText('');
+            }}
+          >
+            Clear
+          </Button>
+          <Button type="submit">Search</Button>
+        </Group>
+      </Stack>
+    </form>
   );
 }
