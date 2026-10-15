@@ -16,6 +16,10 @@
 import { createRoot } from 'react-dom/client';
 import './index.scss';
 import '@open-reaction-database/ui/theme/global.scss';
+import { loadAnalytics } from '@open-reaction-database/ui/shell';
 import { App } from '#App.tsx';
+
+// The Google tag ord-interface's pages carry.
+loadAnalytics('G-REEDLYB0ZJ');
 
 createRoot(document.getElementById('root')!).render(<App />);
