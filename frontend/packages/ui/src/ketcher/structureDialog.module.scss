@@ -30,7 +30,10 @@
   height: calc(80dvh - 106px);
 }
 
-/* Centered over the blank canvas, which takes taps around it. */
+/*
+ * Centered over the blank canvas, which takes taps around it. The inline padding keeps it
+ * between Ketcher's side toolbars, which run the canvas's height on a phone.
+ */
 .unreadable {
   position: absolute;
   inset: 0;
@@ -38,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--mantine-spacing-md);
+  padding: var(--mantine-spacing-md) 3rem;
   pointer-events: none;
 
   > * {
