@@ -64,8 +64,12 @@ export function KetcherDialog({
   const [ketcher, setKetcher] = useState<Ketcher | null>(null);
   // Why the last Save could not write the drawing, such as an atom list asked for as SMILES.
   const [failure, setFailure] = useState<string | null>(null);
-  // Why Ketcher could not read the initial structure; Save waits for a drawing to replace it.
+  // Why Ketcher could not read the initial structure.
   const [unreadable, setUnreadable] = useState<string | null>(null);
+  // Whether the canvas holds what Save should write: the initial structure, once loaded, or
+  // a drawing that replaces one Ketcher could not read. Before then Save would write a blank
+  // canvas over the host's structure.
+  const [ready, setReady] = useState(false);
 
   // The modal unmounts Ketcher while closed, and each opening initializes a new one, so
   // the instance and any failure are forgotten on close, and the next one loads the
@@ -75,6 +79,7 @@ export function KetcherDialog({
       setKetcher(null);
       setFailure(null);
       setUnreadable(null);
+      setReady(false);
     }
   }, [opened]);
 
@@ -84,26 +89,32 @@ export function KetcherDialog({
     }
     let current = true;
     setUnreadable(null);
-    // setMolecule leaves the canvas blank when it cannot read a structure and only logs why,
-    // so the structure is parsed first, as setMolecule parses it, to keep the reason.
-    parseStruct(initial, ketcher.structService, ketcher).then(
-      () => {
-        if (current) {
-          void ketcher.setMolecule(initial);
-        }
-      },
-      (reason: unknown) => {
+    setReady(false);
+    const load = async () => {
+      // setMolecule leaves the canvas blank when it cannot read a structure and only logs
+      // why, so the structure is parsed first, as setMolecule parses it, to keep the reason.
+      try {
+        await parseStruct(initial, ketcher.structService, ketcher);
+      } catch (reason) {
         if (current) {
           setUnreadable(messageOf(reason));
         }
-      },
-    );
+        return;
+      }
+      if (!current) {
+        return;
+      }
+      await ketcher.setMolecule(initial);
+      if (current) {
+        setReady(true);
+      }
+    };
+    void load();
     return () => {
       current = false;
     };
   }, [ketcher, initial]);
 
-  // A drawing on the blank canvas is what Save replaces the unreadable structure with.
   useEffect(() => {
     if (!ketcher || unreadable === null) {
       return;
@@ -111,6 +122,7 @@ export function KetcherDialog({
     const subscriber: unknown = ketcher.editor.subscribe('change', () => {
       if (!ketcher.editor.struct().isBlank()) {
         setUnreadable(null);
+        setReady(true);
       }
     });
     return () => ketcher.editor.unsubscribe('change', subscriber);
@@ -199,7 +211,7 @@ export function KetcherDialog({
             <Popover.Target>
               <Button
                 onClick={handleSave}
-                disabled={unreadable !== null}
+                disabled={!ready}
               >
                 Save
               </Button>
