@@ -17,12 +17,9 @@ import { Divider, Grid, Title } from '@mantine/core';
 import { PaperButton } from '#display/interactions/PaperButton/PaperButton.tsx';
 import { SearchIcon, StylusNoteIcon } from '#theme/icons/index.ts';
 import { buildUseSelectItems } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseSelectItems.ts';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { create } from '@bufbuild/protobuf';
-import {
-  CompoundIdentifier_CompoundIdentifierType,
-  CompoundIdentifierSchema,
-} from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
+import { CompoundIdentifierSchema } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import { useDisclosure } from '@mantine/hooks';
 import { buildUseCreate } from '#reaction/view/ReactionEntities/entityFormConfiguration/buildUseCreate.ts';
 import { reactionEntityContext } from '#reaction/view/ReactionEntities/reactionEntity.context.ts';
@@ -38,6 +35,11 @@ import { colorToCssVariable } from '#theme/colors.ts';
 import { ordCompoundIdentifierToReaction } from '#reaction/model/reactionEntity/reactionEntity.converters.ts';
 import { type ReactionCompoundIdentifier } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
 import {
+  DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+  isStructureIdentifierType,
+} from '#reaction/model/reactionEntity/structureIdentifiers.ts';
+import { reactionCompoundIdentifierTypeToOrd } from '#reaction/model/reactionEntityTypes/reactionEntityTypes.converters.ts';
+import {
   ReactionEntityBlock,
   ReactionEntityBlockTitle,
 } from '#reaction/view/ReactionEntities/reactionEntityNode/ReactionEntityBlock/ReactionEntityBlock.tsx';
@@ -50,10 +52,14 @@ const useSelectIdentifiers =
 const useCreateNewMolblockIdentifier = buildUseCreate(
   ENTITY_FIELD,
   (newIndex, _, value?: unknown) => {
-    const { value: identifierValue, details } = (value as MoleculeIdentifier) || {};
+    const {
+      type = DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+      value: identifierValue,
+      details,
+    } = (value as MoleculeIdentifier | undefined) ?? {};
     const newIdentifier = ordCompoundIdentifierToReaction(
       create(CompoundIdentifierSchema, {
-        type: CompoundIdentifier_CompoundIdentifierType.MOLBLOCK,
+        type: reactionCompoundIdentifierTypeToOrd(type),
         value: identifierValue ?? undefined,
         details: details ?? undefined,
       }),
@@ -101,8 +107,16 @@ export function CustomIdentifiers() {
     }
   };
 
-  const selectedMolblockIdentifier =
-    editedMolblock !== null ? identifiers[editedMolblock] : null;
+  const edited = editedMolblock !== null ? identifiers[editedMolblock] : undefined;
+  // Memoized because the editor reloads its canvas whenever this object changes.
+  const selectedMolblockIdentifier = useMemo<MoleculeIdentifier | null>(
+    () =>
+      // The component converters route only structure types to this list.
+      edited && isStructureIdentifierType(edited.type)
+        ? { type: edited.type, value: edited.value, details: edited.details }
+        : null,
+    [edited],
+  );
 
   return (
     <>
@@ -137,7 +151,7 @@ export function CustomIdentifiers() {
       <ReactionEntityBlock
         renderedTitle={
           <ReactionEntityBlockTitle
-            leftSection={<Title order={3}>Molblock Identifiers</Title>}
+            leftSection={<Title order={3}>Structure Identifiers</Title>}
           />
         }
       >

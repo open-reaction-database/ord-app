@@ -1,0 +1,17 @@
+reaction_id: "e2e-cxsmiles"
+inputs {
+  key: "alanine"
+  value {
+    components {
+      identifiers { type: CXSMILES value: "C[C@H](N)C(=O)O |&1:1|" details: "racemic alanine" }
+      amount { moles { value: 1 units: MILLIMOLE } }
+      reaction_role: REACTANT
+    }
+  }
+}
+outcomes {
+  products {
+    identifiers { type: SMILES value: "CC(N)C(=O)OC" }
+    reaction_role: PRODUCT
+  }
+}

@@ -18,9 +18,14 @@ import type { ReactionViewDeleteButtonsProps } from '#reaction/provider/reaction
 import { fireEvent, waitFor } from '@testing-library/react';
 import type { MoleculeEditorProps } from '#reaction/provider/reactionProvider.types.ts';
 import type { AppReaction } from '#reaction/model/reactions.types.ts';
-import { renderWithReaction } from '#testing/renderWithReaction.tsx';
+import {
+  renderWithReaction,
+  stubReactionActions,
+} from '#testing/renderWithReaction.tsx';
 import { emptyReactionData } from '#testing/emptyReactionData.ts';
 import { CustomIdentifiers } from './CustomIdentifiers.tsx';
+
+const RACEMIC_ALANINE = 'C[C@H](N)C(=O)O |&1:1|';
 
 const reaction = {
   ...emptyReactionData(),
@@ -52,6 +57,25 @@ const withMolblock = {
   },
 } as unknown as AppReaction;
 
+const withCxsmiles = {
+  ...emptyReactionData(),
+  inputs: {
+    in1: {
+      id: 'in1',
+      name: 'in1',
+      components: [
+        {
+          id: 'c1',
+          identifiers: [],
+          molBlockIdentifiers: [
+            { id: 'x1', type: 'CXSMILES', value: RACEMIC_ALANINE, details: 'racemate' },
+          ],
+        },
+      ],
+    },
+  },
+} as unknown as AppReaction;
+
 function EditButton({ onEdit }: Readonly<ReactionViewDeleteButtonsProps>) {
   return onEdit ? (
     <button
@@ -68,6 +92,30 @@ function FakeMoleculeEditor({ opened }: Readonly<MoleculeEditorProps>) {
 }
 
 const fakeMoleculeEditor = { name: 'Fake Draw', Editor: FakeMoleculeEditor };
+
+/** An editor that saves the structure it opened in its own type, a new one as CXSMILES. */
+function SavingMoleculeEditor({
+  opened,
+  identifier,
+  onSave,
+}: Readonly<MoleculeEditorProps>) {
+  return opened ? (
+    <button
+      type="button"
+      onClick={() =>
+        onSave({
+          type: identifier?.type ?? 'CXSMILES',
+          value: identifier ? 'REDRAWN' : RACEMIC_ALANINE,
+          details: 'drawn',
+        })
+      }
+    >
+      Save drawing
+    </button>
+  ) : null;
+}
+
+const savingMoleculeEditor = { name: 'Fake Draw', Editor: SavingMoleculeEditor };
 
 describe('CustomIdentifiers', () => {
   it('opens the name lookup from Add Identifier and closes it on Cancel', async () => {
@@ -129,5 +177,71 @@ describe('CustomIdentifiers', () => {
       slots: { ViewDeleteButtons: EditButton, MoleculeEditor: fakeMoleculeEditor },
     });
     expect(withEditor.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+  });
+  it('creates a drawn structure as the type the editor saved it in', () => {
+    const actions = stubReactionActions();
+    const { getByText, getByRole } = renderWithReaction(<CustomIdentifiers />, {
+      actions,
+      reaction,
+      pathComponents: componentPath,
+      slots: { MoleculeEditor: savingMoleculeEditor },
+    });
+    fireEvent.click(getByText('Add Molblock Identifier'));
+    fireEvent.click(getByRole('button', { name: 'Save drawing' }));
+    expect(actions.update).toHaveBeenCalledWith(
+      [...componentPath, 'molBlockIdentifiers', 0],
+      expect.objectContaining({
+        type: 'CXSMILES',
+        value: RACEMIC_ALANINE,
+        details: 'drawn',
+      }),
+    );
+  });
+
+  it('keeps an edited CXSMILES identifier a CXSMILES', () => {
+    const actions = stubReactionActions();
+    const { getByRole } = renderWithReaction(<CustomIdentifiers />, {
+      actions,
+      reaction: withCxsmiles,
+      pathComponents: componentPath,
+      slots: { ViewDeleteButtons: EditButton, MoleculeEditor: savingMoleculeEditor },
+    });
+    fireEvent.click(getByRole('button', { name: 'Edit' }));
+    fireEvent.click(getByRole('button', { name: 'Save drawing' }));
+    expect(actions.update).toHaveBeenCalledWith(
+      [...componentPath, 'molBlockIdentifiers', 0],
+      expect.objectContaining({ id: 'x1', type: 'CXSMILES', value: 'REDRAWN' }),
+    );
+  });
+
+  it('lists a CXSMILES identifier as a structure, labeled with its type', () => {
+    const { getByText } = renderWithReaction(<CustomIdentifiers />, {
+      reaction: withCxsmiles,
+      pathComponents: componentPath,
+    });
+    expect(getByText('Structure Identifiers')).toBeInTheDocument();
+    expect(getByText('CXSMILES')).toBeInTheDocument();
+  });
+  it('hands the editor the same identifier object across renders', () => {
+    // The editor reloads its canvas when the identifier changes, wiping a drawing.
+    const seen: Array<MoleculeEditorProps['identifier']> = [];
+    function RecordingEditor({ identifier }: Readonly<MoleculeEditorProps>) {
+      seen.push(identifier);
+      return null;
+    }
+    const { getByRole, rerender } = renderWithReaction(<CustomIdentifiers />, {
+      editable: true,
+      reaction: withCxsmiles,
+      pathComponents: componentPath,
+      slots: {
+        ViewDeleteButtons: EditButton,
+        MoleculeEditor: { name: 'Recording', Editor: RecordingEditor },
+      },
+    });
+    fireEvent.click(getByRole('button', { name: 'Edit' }));
+    rerender(<CustomIdentifiers />);
+    const opened = seen.filter(identifier => identifier !== null);
+    expect(opened.length).toBeGreaterThan(1);
+    expect(new Set(opened).size).toBe(1);
   });
 });

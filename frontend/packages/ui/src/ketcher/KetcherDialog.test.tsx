@@ -17,19 +17,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type * as ReactNS from 'react';
+import { NotificationVariant } from '#display/types/notification.ts';
+import { showNotification } from '#display/utils/showNotification.tsx';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { KetcherDialog } from './KetcherDialog.tsx';
 import type { StructureDialogProps } from './structure.types.ts';
 
+// Notifications render into a portal renderWithMantine does not mount.
+vi.mock('#display/utils/showNotification.tsx', () => ({ showNotification: vi.fn() }));
+
 // Ketcher's editor needs a WASM struct service and a canvas, which happy-dom lacks. The
-// stub keeps the API the dialog relies on (onInit, setMolecule, and the getters), which a
-// Ketcher upgrade could break, and hands each mount an instance of its own, as Ketcher does.
+// stub keeps the API the dialog relies on (onInit, setMolecule, the getters, and
+// containsReaction), which a Ketcher upgrade could break, and hands each mount an instance
+// of its own, as Ketcher does.
 function createInstance() {
   return {
     setMolecule: vi.fn((_structure: string) => Promise.resolve()),
     getMolfile: vi.fn(() => Promise.resolve('MOLFILE')),
-    getSmiles: vi.fn(() => Promise.resolve('SMILES')),
+    getSmiles: vi.fn((_isExtended?: boolean) => Promise.resolve('SMILES')),
     getSmarts: vi.fn(() => Promise.resolve('SMARTS')),
+    containsReaction: vi.fn(() => false),
   };
 }
 
@@ -130,6 +137,101 @@ describe('KetcherDialog', () => {
       expect(onSave).toHaveBeenCalledWith(saved);
       expect(onClose).toHaveBeenCalled();
     });
+  });
+
+  it('saves the drawing as CXSMILES through extended SMILES', async () => {
+    const onSave = vi.fn();
+    const { getByRole } = renderWithMantine(
+      <KetcherDialog {...props({ format: 'cxsmiles', onSave })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith('SMILES'));
+    expect(latest().getSmiles).toHaveBeenCalledWith(true);
+  });
+
+  /**
+   * Opens the dialog, readies Ketcher with `prepare`, clicks Save, and expects `message`
+   * reported with nothing saved and the dialog left open.
+   */
+  async function expectSaveRefused(
+    overrides: Partial<StructureDialogProps>,
+    message: string,
+    prepare: (instance: Instance) => void = () => undefined,
+  ) {
+    const onSave = vi.fn();
+    const onClose = vi.fn();
+    const { getByRole } = renderWithMantine(
+      <KetcherDialog {...props({ onSave, onClose, ...overrides })} />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    prepare(latest());
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(showNotification).toHaveBeenCalledWith({
+        variant: NotificationVariant.ERROR,
+        message,
+      }),
+    );
+    expect(onSave).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  }
+
+  it('reports a drawing Ketcher will not write and stays open', async () => {
+    // getMolfile refuses this way when the canvas holds a reaction arrow.
+    const message = 'The structure cannot be saved as *.MOL due to reaction arrows.';
+    await expectSaveRefused({ format: 'molfile' }, message, instance =>
+      instance.getMolfile.mockRejectedValueOnce(new Error(message)),
+    );
+  });
+
+  it('reports a getter that throws rather than rejects', async () => {
+    // getSmiles throws synchronously, in macro mode for one.
+    const message = 'SMILES format is not available in macro mode';
+    await expectSaveRefused({ format: 'cxsmiles' }, message, instance =>
+      instance.getSmiles.mockImplementationOnce(() => {
+        throw new Error(message);
+      }),
+    );
+  });
+
+  it('refuses to write a reaction arrow as CXSMILES', async () => {
+    // getSmiles would write reaction SMILES where its host expects a molecule.
+    await expectSaveRefused(
+      { format: 'cxsmiles' },
+      'The structure cannot be saved as CXSMILES due to reaction arrows.',
+      instance => instance.containsReaction.mockReturnValue(true),
+    );
+    expect(latest().getSmiles).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    // Ketcher reads |C:...| as single bonds: cisplatin would come back with NH2.
+    ['coordinate bonds', '[NH3][Pt]([NH3])([Cl])[Cl] |C:0.0,2.1|'],
+    // Ketcher drops |m:...|, cutting a haptic bond to the ring.
+    ['multicenter attachments', 'c1ccccc1.[Fe].* |m:7:0.1.2.3.4.5|'],
+  ])('refuses to save over the %s Ketcher cannot read', async (fields, initial) => {
+    await expectSaveRefused(
+      { initial, format: 'cxsmiles' },
+      `Ketcher cannot read the ${fields} in this structure, so saving it would change it.`,
+    );
+    expect(latest().getSmiles).not.toHaveBeenCalled();
+  });
+
+  it('saves over a CXSMILES whose atom labels only look like those fields', async () => {
+    const onSave = vi.fn();
+    const { getByRole } = renderWithMantine(
+      <KetcherDialog
+        {...props({
+          initial: 'CC(N)C(=O)O |$a,C:1;;;;;$|',
+          format: 'cxsmiles',
+          onSave,
+        })}
+      />,
+    );
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await userEvent.click(getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
   });
 
   it('shows the host’s fields beside the buttons', () => {

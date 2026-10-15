@@ -21,6 +21,8 @@ import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import 'ketcher-react/dist/index.css';
 import type { Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
+import { NotificationVariant } from '#display/types/notification.ts';
+import { showNotification } from '#display/utils/showNotification.tsx';
 import classes from './structureDialog.module.scss';
 import type { StructureDialogProps, StructureFormat } from './structure.types.ts';
 
@@ -30,8 +32,45 @@ const structServiceProvider = new StandaloneStructServiceProvider();
 const READERS: Record<StructureFormat, (ketcher: Ketcher) => Promise<string>> = {
   molfile: ketcher => ketcher.getMolfile(),
   smiles: ketcher => ketcher.getSmiles(),
+  cxsmiles: ketcher => {
+    // getMolfile refuses a reaction itself; getSmiles would write reaction SMILES.
+    if (ketcher.containsReaction()) {
+      throw new Error(
+        'The structure cannot be saved as CXSMILES due to reaction arrows.',
+      );
+    }
+    return ketcher.getSmiles(true);
+  },
   smarts: ketcher => ketcher.getSmarts(),
 };
+
+// CXSMILES fields carrying bonding that Ketcher loads as plain single bonds or drops:
+// either way, saving the drawing back would record a different molecule.
+const UNREADABLE_FIELDS = [
+  { pattern: /[|,]C:\d/, name: 'coordinate bonds' },
+  { pattern: /[|,]m:\d/, name: 'multicenter attachments' },
+];
+
+/** Returns the names of the fields in a CXSMILES's extension block that Ketcher drops. */
+function unreadableFields(structure: string) {
+  const extension = /\s(\|.*\|)\s*$/.exec(structure)?.[1] ?? '';
+  // Atom labels sit between $ signs and may hold any text, "C:" included.
+  const fields = extension.replaceAll(/\$[^$]*\$/g, '');
+  return UNREADABLE_FIELDS.filter(({ pattern }) => pattern.test(fields)).map(
+    ({ name }) => name,
+  );
+}
+
+/** Reads the drawing as `format`, refusing one that lost what `initial` held. */
+function readDrawing(ketcher: Ketcher, initial: string, format: StructureFormat) {
+  const unreadable = unreadableFields(initial);
+  if (unreadable.length > 0) {
+    throw new Error(
+      `Ketcher cannot read the ${unreadable.join(' or ')} in this structure, so saving it would change it.`,
+    );
+  }
+  return READERS[format](ketcher);
+}
 
 /** Ketcher's canvas in a modal; StructureDialog loads it the first time it opens. */
 export function KetcherDialog({
@@ -59,12 +98,28 @@ export function KetcherDialog({
   }, [ketcher, initial]);
 
   const handleSave = () => {
-    if (ketcher) {
-      void READERS[format](ketcher).then(structure => {
-        onSave(structure);
-        onClose();
-      });
+    if (!ketcher) {
+      return;
     }
+    // Read inside then(), so that a getter or guard throwing synchronously and a getter
+    // rejecting reach the same handler.
+    Promise.resolve()
+      .then(() => readDrawing(ketcher, initial, format))
+      .then(
+        structure => {
+          onSave(structure);
+          onClose();
+        },
+        (error: unknown) => {
+          showNotification({
+            variant: NotificationVariant.ERROR,
+            message:
+              error instanceof Error
+                ? error.message
+                : 'The drawing could not be saved.',
+          });
+        },
+      );
   };
 
   return (

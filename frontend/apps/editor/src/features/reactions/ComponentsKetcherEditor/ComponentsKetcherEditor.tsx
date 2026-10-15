@@ -16,10 +16,25 @@
 import { TextInput } from '@mantine/core';
 import { useField } from '@mantine/form';
 import { useEffect } from 'react';
-import { StructureDialog } from '@open-reaction-database/ui/ketcher';
+import {
+  StructureDialog,
+  type StructureFormat,
+} from '@open-reaction-database/ui/ketcher';
 import type { MoleculeEditorProps } from '@open-reaction-database/ui/reaction';
+import {
+  DEFAULT_STRUCTURE_IDENTIFIER_TYPE,
+  type StructureIdentifierType,
+} from '@open-reaction-database/ui/reaction/model';
 
-/** The editor's molecule editor: Ketcher, saving a molfile with the drawing's details. */
+const FORMATS: Record<StructureIdentifierType, StructureFormat> = {
+  MOLBLOCK: 'molfile',
+  CXSMILES: 'cxsmiles',
+};
+
+/**
+ * The editor's molecule editor: Ketcher, saving the drawing with its details in the type it
+ * was opened in, or a new drawing as a molblock.
+ */
 export function ComponentsKetcherEditor({
   opened,
   onClose,
@@ -36,13 +51,14 @@ export function ComponentsKetcherEditor({
     setValue(initialDetails);
   }, [setValue, initialDetails]);
 
+  const type = identifier?.type ?? DEFAULT_STRUCTURE_IDENTIFIER_TYPE;
   return (
     <StructureDialog
       opened={opened}
       onClose={onClose}
       initial={identifier?.value ?? ''}
-      format="molfile"
-      onSave={value => onSave({ value, details: getValue() })}
+      format={FORMATS[type]}
+      onSave={value => onSave({ type, value, details: getValue() })}
     >
       <TextInput
         placeholder="Details"

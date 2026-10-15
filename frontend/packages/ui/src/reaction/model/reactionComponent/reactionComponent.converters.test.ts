@@ -16,12 +16,16 @@
 import { describe, it, expect } from 'vitest';
 import { create } from '@bufbuild/protobuf';
 import {
+  CompoundIdentifier_CompoundIdentifierType as IdentifierType,
   CompoundPreparationSchema,
+  CompoundSchema,
   ProductMeasurementSchema,
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import {
+  ordInputComponentToReaction,
   ordMeasurementToReaction,
   ordPreparationToReaction,
+  reactionInputComponentToOrd,
   reactionMeasurementToOrd,
   reactionPreparationToOrd,
 } from './reactionComponent.converters.ts';
@@ -149,5 +153,38 @@ describe('measurement value oneof', () => {
     expect(ordMeasurement.details).toBe('isolated');
     expect(ordMeasurement.value.case).toBe('percentage');
     expect(ordMeasurement.value.value).toMatchObject({ value: 85, precision: 2 });
+  });
+});
+
+describe('structure identifier routing', () => {
+  const racemicAlanine = 'C[C@H](N)C(=O)O |&1:1|';
+
+  it('routes MOLBLOCK and CXSMILES to the drawn structures, the rest to identifiers', () => {
+    const component = ordInputComponentToReaction(
+      create(CompoundSchema, {
+        identifiers: [
+          { type: IdentifierType.SMILES, value: 'CCO' },
+          { type: IdentifierType.CXSMILES, value: racemicAlanine },
+          { type: IdentifierType.NAME, value: 'ethanol' },
+          { type: IdentifierType.MOLBLOCK, value: 'MOLFILE' },
+        ],
+      }),
+    );
+    expect(component.molBlockIdentifiers.map(item => item.type)).toEqual([
+      'CXSMILES',
+      'MOLBLOCK',
+    ]);
+    expect(component.identifiers.map(item => item.type)).toEqual(['SMILES', 'NAME']);
+  });
+
+  it('round-trips a CXSMILES identifier through ord', () => {
+    const component = ordInputComponentToReaction(
+      create(CompoundSchema, {
+        identifiers: [{ type: IdentifierType.CXSMILES, value: racemicAlanine }],
+      }),
+    );
+    expect(reactionInputComponentToOrd(component).identifiers).toEqual([
+      expect.objectContaining({ type: IdentifierType.CXSMILES, value: racemicAlanine }),
+    ]);
   });
 });

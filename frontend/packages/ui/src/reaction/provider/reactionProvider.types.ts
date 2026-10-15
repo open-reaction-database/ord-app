@@ -21,6 +21,7 @@ import type {
   ReactionId,
 } from '#reaction/model/reactions.types.ts';
 import type { ReactionCompoundIdentifier } from '#reaction/model/reactionEntity/reactionEntity.types.ts';
+import type { StructureIdentifierType } from '#reaction/model/reactionEntity/structureIdentifiers.ts';
 import type { ReactionPerson } from '#reaction/model/reactionProvenance/reactionProvenance.types.ts';
 import type { ReactionValueLabelProps } from './reactionValueLabel.types.ts';
 import type { ReactionViewDeleteButtonsProps } from './reactionViewDeleteButtons.types.ts';
@@ -72,12 +73,18 @@ export interface ReactionActions {
   currentPerson?(): ReactionPerson | undefined;
 }
 
-/** A compound identifier's value and details, as a molecule editor reads and saves them. */
-export type MoleculeIdentifier = Pick<ReactionCompoundIdentifier, 'value' | 'details'>;
+/** A compound identifier's type, value, and details, as a molecule editor reads and saves them. */
+export type MoleculeIdentifier = Pick<
+  ReactionCompoundIdentifier,
+  'value' | 'details'
+> & {
+  type: StructureIdentifierType;
+};
 
 export interface MoleculeEditorProps {
   opened: boolean;
   onClose: () => void;
+  /** Receives the drawing in the type it was opened in, or a new drawing's default type. */
   onSave: (identifier: MoleculeIdentifier) => void;
   /** The identifier to edit, or null to draw a new one. */
   identifier: MoleculeIdentifier | null;
