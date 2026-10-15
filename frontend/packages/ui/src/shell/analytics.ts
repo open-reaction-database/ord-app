@@ -19,10 +19,8 @@
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$|\.localhost$/;
 
 /**
- * Loads Google Analytics for a measurement ID, unless the page is served locally.
- *
- * @param measurementId - The Google tag ID, such as `G-REEDLYB0ZJ`.
- * @param hostname - The host the page is served from; the page's own by default.
+ * Loads the Google tag for a measurement ID, such as `G-REEDLYB0ZJ`, unless the page is
+ * served locally: from `hostname`, the page's own host unless a caller names another.
  */
 export function loadAnalytics(
   measurementId: string,
