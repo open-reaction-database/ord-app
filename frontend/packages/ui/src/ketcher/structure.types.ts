@@ -15,7 +15,7 @@
  */
 import type { PropsWithChildren } from 'react';
 
-/** What a drawing is saved as: a molfile, SMILES, or SMARTS. */
+/** What a drawing is saved as: a molfile as drawn, or SMILES or SMARTS aromatized. */
 export type StructureFormat = 'molfile' | 'smiles' | 'smarts';
 
 /** `children` are fields shown beside the buttons, such as the editor's Details. */

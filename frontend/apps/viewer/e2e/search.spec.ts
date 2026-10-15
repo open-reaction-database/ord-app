@@ -157,3 +157,68 @@ test('opens the drawing dialog', async ({ page }) => {
   await page.getByRole('button', { name: 'Draw structure 1' }).click();
   await expect(page.locator('.Ketcher-root')).toBeVisible({ timeout: 30_000 });
 });
+
+// Ketcher sets this global to each instance it initializes.
+interface KetcherWindow {
+  ketcher?: { editor: { struct(): { atoms: { size: number } } } } | null;
+}
+
+/** Types a pattern, opens it in Ketcher, which draws it as written, and saves the drawing. */
+async function redraw(page: Page, pattern: string, mode: string) {
+  await page.goto('/search');
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  await page.getByRole('textbox', { name: 'Structure 1' }).fill(pattern);
+  await page
+    .getByRole('combobox', { name: 'Match for structure 1' })
+    .selectOption(mode);
+  await page.getByRole('button', { name: 'Draw structure 1' }).click();
+  await page.waitForFunction(
+    () => ((globalThis as KetcherWindow).ketcher?.editor.struct().atoms.size ?? 0) > 0,
+    undefined,
+    { timeout: 60_000 },
+  );
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+}
+
+test.describe('a drawn Kekulé ring is saved aromatized', () => {
+  // ord-viewer0101 holds the only aromatic rings in the corpus, a benzene and a pyridine.
+  for (const [notation, ring, pattern, mode, saved] of [
+    ['SMILES', 'benzene', 'C1=CC=CC=C1', 'substructure', 'c1ccccc1'],
+    ['SMARTS', 'pyridine', 'C1=CC=NC=C1', 'smarts', '[#6]1:[#6]:[#6]:[#7]:[#6]:[#6]:1'],
+  ] as const) {
+    test(`as ${notation}, and finds the ${ring} ring`, async ({ page }) => {
+      await redraw(page, pattern, mode);
+      await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
+        saved,
+      );
+      await page.getByRole('button', { name: 'Search' }).click();
+      await expect(page.getByRole('link', { name: REACTION_LINK })).toHaveText([
+        'ord-viewer0101',
+      ]);
+    });
+  }
+
+  test('by the model that aromatizes a 2-pyridone, as RDKit does', async ({ page }) => {
+    await redraw(page, 'O=C1C=CC=CN1', 'smarts');
+    await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
+      '[#8]=[#6]1:[#7;H]:[#6]:[#6]:[#6]:[#6]:1',
+    );
+  });
+});
+
+test('says why a drawing has no SMILES, on a phone with Save still in view', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  // An atom list is SMARTS only, so a substructure, which asks for SMILES, cannot hold it.
+  await redraw(page, '[#6]1-[#6]=[#6]-[#6]=[#6]-[#6,#7]=1', 'substructure');
+  const alert = page.getByRole('alert');
+  await expect(alert).toHaveText(/^The drawing could not be saved: .*atom list/);
+  await expect(alert).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeInViewport({
+    ratio: 1,
+  });
+  await expect(page.getByRole('textbox', { name: 'Structure 1' })).toHaveValue(
+    '[#6]1-[#6]=[#6]-[#6]=[#6]-[#6,#7]=1',
+  );
+});

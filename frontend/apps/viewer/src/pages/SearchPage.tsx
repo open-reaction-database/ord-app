@@ -39,8 +39,9 @@ function HelpNote() {
         A reaction SMARTS with several templates on one side returns fewer reactions
         than the old site, since each template has to match a molecule of its own. A
         substructure typed as SMILES is read as SMARTS, which matches the same molecules
-        for most patterns but not, for example, a charged or explicit-hydrogen atom. The
-        dataset charts count the SMILES the corpus records.
+        for most patterns but not, for example, a ring typed in Kekulé form or a charged
+        or explicit-hydrogen atom; a drawn structure is aromatized first. The dataset
+        charts count the SMILES the corpus records.
       </Text>
     </Stack>
   );
