@@ -13,5 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export { loadAnalytics } from './analytics.ts';
 export { PageContainer, type PageContainerProps } from './PageContainer.tsx';
 export type { Breadcrumb, Breadcrumbs } from './breadcrumbs.ts';
