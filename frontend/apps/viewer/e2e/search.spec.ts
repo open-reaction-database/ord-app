@@ -222,3 +222,58 @@ test('says why a drawing has no SMILES, on a phone with Save still in view', asy
     '[#6]1-[#6]=[#6]-[#6]=[#6]-[#6,#7]=1',
   );
 });
+
+test('keeps Cancel and Save whole inside the drawing dialog on a phone', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/search');
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  await page.getByRole('button', { name: 'Draw structure 1' }).click();
+  await expect(page.locator('.Ketcher-root')).toBeVisible({ timeout: 30_000 });
+  const dialog = (await page.getByRole('dialog').boundingBox())!;
+  for (const name of ['Cancel', 'Save']) {
+    const button = page.getByRole('button', { name, exact: true });
+    const box = (await button.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(dialog.x);
+    expect(box.y).toBeGreaterThanOrEqual(dialog.y);
+    expect(box.x + box.width).toBeLessThanOrEqual(dialog.x + dialog.width);
+    expect(box.y + box.height).toBeLessThanOrEqual(dialog.y + dialog.height);
+    // A squeezed button keeps its box and cuts its label short.
+    const clipped = await button.evaluate(element =>
+      [element, ...element.querySelectorAll('*')].some(
+        inner => inner.scrollWidth > inner.clientWidth,
+      ),
+    );
+    expect(clipped, `${name}'s label is cut short`).toBe(false);
+  }
+});
+
+test('says why a pattern cannot be drawn, and keeps it until a drawing replaces it', async ({
+  page,
+}) => {
+  await page.goto('/search');
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  const pattern = page.getByRole('textbox', { name: 'Structure 1' });
+  await pattern.fill('not a smiles');
+  const draw = page.getByRole('button', { name: 'Draw structure 1' });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
+  await draw.click();
+  const alert = page.getByRole('alert');
+  await expect(alert).toContainText('The structure could not be loaded.', {
+    timeout: 60_000,
+  });
+  await expect(alert).toContainText('SMILES loader: invalid character');
+  await expect(save).toBeDisabled();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(pattern).toHaveValue('not a smiles');
+
+  await draw.click();
+  await expect(alert).toBeVisible({ timeout: 60_000 });
+  // A benzene ring, placed beside the message rather than under it.
+  await page.getByTestId('template-0').click();
+  await page.getByTestId('canvas').click({ position: { x: 100, y: 300 } });
+  await expect(alert).toBeHidden();
+  await save.click();
+  await expect(pattern).toHaveValue('c1ccccc1');
+});
