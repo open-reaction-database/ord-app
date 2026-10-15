@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type * as ReactNS from 'react';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
@@ -22,21 +22,42 @@ import { KetcherDialog } from './KetcherDialog.tsx';
 import type { StructureDialogProps } from './structure.types.ts';
 
 // Ketcher's editor needs a WASM struct service and a canvas, which happy-dom lacks. The
-// stub keeps the API the dialog relies on (onInit, setMolecule, the getters, and the struct
-// service), which a Ketcher upgrade could break, and hands each mount an instance of its
-// own, as Ketcher does. Aromatizing answers with the notation it was asked for.
+// stub keeps the API the dialog relies on (onInit, setMolecule, the getters, the editor's
+// change events, and the struct service), which a Ketcher upgrade could break, and hands
+// each mount an instance of its own, as Ketcher does. Aromatizing answers with the
+// notation it was asked for.
 function createInstance() {
+  const changeHandlers = new Set<() => void>();
+  let blank = true;
   return {
     setMolecule: vi.fn((_structure: string) => Promise.resolve()),
     getMolfile: vi.fn(() => Promise.resolve('MOLFILE')),
     getKet: vi.fn(() => Promise.resolve('KET')),
-    editor: { serverSettings: { 'smart-layout': true } },
+    editor: {
+      serverSettings: { 'smart-layout': true },
+      struct: () => ({ isBlank: () => blank }),
+      subscribe: (event: string, handler: () => void) => {
+        if (event === 'change') {
+          changeHandlers.add(handler);
+        }
+        return handler;
+      },
+      unsubscribe: (_event: string, handler: () => void) => {
+        changeHandlers.delete(handler);
+      },
+    },
     structService: {
       aromatize: vi.fn(
         (data: { struct: string; output_format: string }, _options?: object) =>
           Promise.resolve({ struct: `aromatic ${data.output_format}` }),
       ),
     },
+    /** Changes the canvas, as a drawing or an erasure does, and tells the subscribers. */
+    change(drawn: boolean) {
+      blank = !drawn;
+      act(() => changeHandlers.forEach(handler => handler()));
+    },
+    listeners: () => changeHandlers.size,
   };
 }
 
@@ -47,6 +68,17 @@ const instances = vi.hoisted((): Array<Instance> => []);
 function latest(): Instance {
   return instances[instances.length - 1];
 }
+
+// Ketcher takes a while to initialize; a test holds the editors that mount meanwhile here.
+const initializing = vi.hoisted(() => ({
+  held: false,
+  pending: [] as Array<() => void>,
+}));
+
+// Reads a structure as setMolecule would; a test rejects it to make the structure unreadable.
+const parseStruct = vi.hoisted(() =>
+  vi.fn((_structure: string) => Promise.resolve({})),
+);
 
 vi.mock('ketcher-standalone', () => ({
   StandaloneStructServiceProvider: class {},
@@ -59,17 +91,26 @@ vi.mock('ketcher-core', () => ({
     DaylightSmiles: 'chemical/x-daylight-smiles',
     DaylightSmarts: 'chemical/x-daylight-smarts',
   },
+  parseStruct,
 }));
 
 vi.mock('ketcher-react', async () => {
   const React = (await vi.importActual('react')) as typeof ReactNS;
   return {
-    // Calls the host's onInit once per mount, as Ketcher does when it is ready.
+    // Calls the host's onInit once per mount, as Ketcher does when it is ready, unless a
+    // test holds it.
     Editor: (props: Readonly<{ onInit?: (instance: Instance) => void }>) => {
       React.useEffect(() => {
-        const instance = createInstance();
-        instances.push(instance);
-        props.onInit?.(instance);
+        const initialize = () => {
+          const instance = createInstance();
+          instances.push(instance);
+          props.onInit?.(instance);
+        };
+        if (initializing.held) {
+          initializing.pending.push(initialize);
+        } else {
+          initialize();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- once per mount, as Ketcher does
       }, []);
       return React.createElement('div', { 'data-testid': 'ketcher-editor' });
@@ -93,11 +134,14 @@ function props(overrides: Partial<StructureDialogProps> = {}): StructureDialogPr
 describe('KetcherDialog', () => {
   beforeEach(() => {
     instances.length = 0;
+    initializing.held = false;
+    initializing.pending.length = 0;
   });
 
   it('loads the initial structure once Ketcher initializes', async () => {
     renderWithMantine(<KetcherDialog {...props()} />);
     await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCO'));
+    expect(parseStruct).toHaveBeenCalledWith('CCO', latest().structService, latest());
   });
 
   it('loads the initial structure into each opening’s Ketcher, and only into it', async () => {
@@ -129,13 +173,99 @@ describe('KetcherDialog', () => {
     await waitFor(() => expect(latest().setMolecule).toHaveBeenLastCalledWith('CCN'));
   });
 
+  it('keeps Save off until the initial structure is on the canvas', async () => {
+    initializing.held = true;
+    let read = (): void => {};
+    parseStruct.mockReturnValueOnce(
+      new Promise(resolve => {
+        read = () => resolve({});
+      }),
+    );
+    const { getByRole } = renderWithMantine(<KetcherDialog {...props()} />);
+    const save = getByRole('button', { name: 'Save' });
+    expect(save).toBeDisabled();
+    act(() => initializing.pending.forEach(initialize => initialize()));
+    await waitFor(() => expect(parseStruct).toHaveBeenCalled());
+    expect(save).toBeDisabled();
+    let draw = (): void => {};
+    latest().setMolecule.mockReturnValueOnce(
+      new Promise(resolve => {
+        draw = () => resolve();
+      }),
+    );
+    await act(async () => read());
+    expect(latest().setMolecule).toHaveBeenCalledWith('CCO');
+    expect(save).toBeDisabled();
+    await act(async () => draw());
+    expect(save).toBeEnabled();
+  });
+
+  it('keeps Save off while a new initial structure loads', async () => {
+    let read = (): void => {};
+    const { getByRole, rerender } = renderWithMantine(<KetcherDialog {...props()} />);
+    const save = getByRole('button', { name: 'Save' });
+    await waitFor(() => expect(save).toBeEnabled());
+    parseStruct.mockReturnValueOnce(
+      new Promise(resolve => {
+        read = () => resolve({});
+      }),
+    );
+    rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+    expect(save).toBeDisabled();
+    await act(async () => read());
+    await waitFor(() => expect(save).toBeEnabled());
+  });
+
+  it('keeps Save off on reopening until the next Ketcher loads', async () => {
+    const { getByRole, queryByTestId, rerender } = renderWithMantine(
+      <KetcherDialog {...props()} />,
+    );
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
+    rerender(<KetcherDialog {...props({ opened: false })} />);
+    await waitFor(() =>
+      expect(queryByTestId('ketcher-editor')).not.toBeInTheDocument(),
+    );
+    initializing.held = true;
+    rerender(<KetcherDialog {...props()} />);
+    await waitFor(() => expect(queryByTestId('ketcher-editor')).toBeInTheDocument());
+    expect(getByRole('button', { name: 'Save' })).toBeDisabled();
+    act(() => initializing.pending.forEach(initialize => initialize()));
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
+  });
+
+  it('keeps Save off when an earlier structure finishes loading late', async () => {
+    const reads = new Map<string, () => void>();
+    parseStruct.mockImplementation(
+      structure =>
+        new Promise(resolve => {
+          reads.set(structure, () => resolve({}));
+        }),
+    );
+    const { getByRole, rerender } = renderWithMantine(<KetcherDialog {...props()} />);
+    await waitFor(() => expect(reads.has('CCO')).toBe(true));
+    let drawEarlier = (): void => {};
+    latest().setMolecule.mockReturnValueOnce(
+      new Promise(resolve => {
+        drawEarlier = () => resolve();
+      }),
+    );
+    await act(async () => reads.get('CCO')!());
+    expect(latest().setMolecule).toHaveBeenCalledWith('CCO');
+    rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+    await act(async () => drawEarlier());
+    expect(getByRole('button', { name: 'Save' })).toBeDisabled();
+    await act(async () => reads.get('CCN')!());
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
+    expect(latest().setMolecule).toHaveBeenLastCalledWith('CCN');
+  });
+
   async function save(format: StructureDialogProps['format']) {
     const onSave = vi.fn();
     const onClose = vi.fn();
     const { getByRole } = renderWithMantine(
       <KetcherDialog {...props({ format, onSave, onClose })} />,
     );
-    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
     await userEvent.click(getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     return onSave;
@@ -166,7 +296,7 @@ describe('KetcherDialog', () => {
     const { getByRole, queryByRole } = renderWithMantine(
       <KetcherDialog {...props({ format: 'smiles', onSave, onClose })} />,
     );
-    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
     latest().structService.aromatize.mockRejectedValueOnce(
       new Error('SMILES saver: atom list can be used only with smarts_mode'),
     );
@@ -189,7 +319,7 @@ describe('KetcherDialog', () => {
     const { getByRole, getByTestId, queryByRole } = renderWithMantine(
       <KetcherDialog {...props({ format: 'smiles' })} />,
     );
-    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
     latest().structService.aromatize.mockRejectedValueOnce(new Error('unreadable'));
     await userEvent.click(getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
@@ -201,7 +331,7 @@ describe('KetcherDialog', () => {
     const { getByRole, queryByRole, queryByTestId, rerender } = renderWithMantine(
       <KetcherDialog {...props({ format: 'smiles' })} />,
     );
-    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalled());
+    await waitFor(() => expect(getByRole('button', { name: 'Save' })).toBeEnabled());
     latest().structService.aromatize.mockRejectedValueOnce(new Error('unreadable'));
     await userEvent.click(getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
@@ -222,5 +352,127 @@ describe('KetcherDialog', () => {
       </KetcherDialog>,
     );
     expect(getByText('Details field')).toBeInTheDocument();
+  });
+
+  it('keeps the buttons at their own width, and gives the host’s fields the rest', () => {
+    const { getByRole, getByText } = renderWithMantine(
+      <KetcherDialog {...props()}>
+        <span>Details field</span>
+      </KetcherDialog>,
+    );
+    const buttons = getByRole('button', { name: 'Cancel' }).parentElement!;
+    expect(getByRole('button', { name: 'Save' }).parentElement).toBe(buttons);
+    // A narrow modal, such as one on a phone, would otherwise squeeze the buttons' labels.
+    expect(getComputedStyle(buttons).flexShrink).toBe('0');
+    const fields = getByText('Details field').parentElement!;
+    expect(getComputedStyle(fields).flexGrow).toBe('1');
+    expect(getComputedStyle(fields).minWidth).toBe('0');
+  });
+
+  describe('with an initial structure Ketcher cannot read', () => {
+    const REASON = 'SMILES loader: invalid character within atom description';
+
+    beforeEach(() => {
+      parseStruct.mockImplementation(structure =>
+        structure === 'not a smiles'
+          ? Promise.reject(new Error(REASON))
+          : Promise.resolve({}),
+      );
+    });
+
+    function renderUnreadable(overrides: Partial<StructureDialogProps> = {}) {
+      return renderWithMantine(
+        <KetcherDialog
+          {...props({ initial: 'not a smiles', format: 'smiles', ...overrides })}
+        />,
+      );
+    }
+
+    it('says why, and keeps Save from writing the blank canvas over it', async () => {
+      const onSave = vi.fn();
+      const { getByRole } = renderUnreadable({ onSave });
+      await waitFor(() =>
+        expect(getByRole('alert')).toHaveTextContent(
+          `The structure could not be loaded.${REASON}`,
+        ),
+      );
+      expect(latest().setMolecule).not.toHaveBeenCalled();
+      const save = getByRole('button', { name: 'Save' });
+      expect(save).toBeDisabled();
+      await userEvent.click(save);
+      expect(latest().structService.aromatize).not.toHaveBeenCalled();
+      expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('saves a drawing that replaces it', async () => {
+      const onSave = vi.fn();
+      const { getByRole, queryByRole } = renderUnreadable({ onSave });
+      await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+      latest().change(true);
+      expect(queryByRole('alert')).not.toBeInTheDocument();
+      expect(latest().listeners()).toBe(0);
+      await userEvent.click(getByRole('button', { name: 'Save' }));
+      await waitFor(() =>
+        expect(onSave).toHaveBeenCalledWith('aromatic chemical/x-daylight-smiles'),
+      );
+    });
+
+    it('keeps Save off while a change leaves the canvas blank', async () => {
+      const { getByRole } = renderUnreadable();
+      await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+      latest().change(false);
+      expect(getByRole('alert')).toBeInTheDocument();
+      expect(getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
+    it('loads a readable structure given while open', async () => {
+      const { getByRole, queryByRole, rerender } = renderUnreadable();
+      await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+      rerender(<KetcherDialog {...props({ initial: 'CCN', format: 'smiles' })} />);
+      await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCN'));
+      expect(queryByRole('alert')).not.toBeInTheDocument();
+      expect(getByRole('button', { name: 'Save' })).toBeEnabled();
+    });
+
+    it('forgets it once closed', async () => {
+      const { getByRole, queryByRole, queryByTestId, rerender } = renderUnreadable();
+      await waitFor(() => expect(getByRole('alert')).toBeInTheDocument());
+      rerender(
+        <KetcherDialog {...props({ initial: 'not a smiles', opened: false })} />,
+      );
+      await waitFor(() =>
+        expect(queryByTestId('ketcher-editor')).not.toBeInTheDocument(),
+      );
+      initializing.held = true;
+      rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+      await waitFor(() => expect(queryByTestId('ketcher-editor')).toBeInTheDocument());
+      // The next Ketcher is still initializing, without the last one's failure over it.
+      expect(queryByRole('alert')).not.toBeInTheDocument();
+      act(() => initializing.pending.forEach(initialize => initialize()));
+      await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCN'));
+      expect(queryByRole('alert')).not.toBeInTheDocument();
+      expect(getByRole('button', { name: 'Save' })).toBeEnabled();
+    });
+  });
+
+  it.each([
+    ['is read', true],
+    ['cannot be read', false],
+  ])('ignores an earlier structure that %s late', async (_outcome, readable) => {
+    let readEarlier = (): void => {};
+    parseStruct.mockReturnValueOnce(
+      new Promise((resolve, reject) => {
+        readEarlier = () => (readable ? resolve({}) : reject(new Error('unreadable')));
+      }),
+    );
+    const { queryByRole, rerender } = renderWithMantine(<KetcherDialog {...props()} />);
+    await waitFor(() =>
+      expect(parseStruct).toHaveBeenCalledWith('CCO', latest().structService, latest()),
+    );
+    rerender(<KetcherDialog {...props({ initial: 'CCN' })} />);
+    await waitFor(() => expect(latest().setMolecule).toHaveBeenCalledWith('CCN'));
+    await act(async () => readEarlier());
+    expect(latest().setMolecule).toHaveBeenCalledTimes(1);
+    expect(queryByRole('alert')).not.toBeInTheDocument();
   });
 });

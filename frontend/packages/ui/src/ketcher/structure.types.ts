@@ -22,7 +22,11 @@ export type StructureFormat = 'molfile' | 'smiles' | 'smarts';
 export interface StructureDialogProps extends PropsWithChildren {
   opened: boolean;
   onClose: () => void;
-  /** The structure the canvas opens with, in any notation Ketcher reads; '' for none. */
+  /**
+   * The structure the canvas opens with, in any notation Ketcher reads; '' for none.
+   *
+   * One Ketcher cannot read opens a blank canvas that says why, and Save waits for a drawing.
+   */
   initial: string;
   /** The notation onSave receives the drawing in. */
   format: StructureFormat;

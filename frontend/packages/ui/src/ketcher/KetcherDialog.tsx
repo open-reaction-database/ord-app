@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Flex, Grid, Modal, Popover, Text } from '@mantine/core';
+import { Button, Flex, Modal, Paper, Popover, Text } from '@mantine/core';
 import { Editor } from 'ketcher-react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import 'ketcher-react/dist/index.css';
-import { ChemicalMimeType, type Ketcher } from 'ketcher-core';
+import { ChemicalMimeType, parseStruct, type Ketcher } from 'ketcher-core';
 import { useEffect, useState } from 'react';
 import classes from './structureDialog.module.scss';
 import type { StructureDialogProps, StructureFormat } from './structure.types.ts';
@@ -48,6 +48,10 @@ const READERS: Record<StructureFormat, (ketcher: Ketcher) => Promise<string>> = 
   smarts: ketcher => aromatized(ketcher, ChemicalMimeType.DaylightSmarts),
 };
 
+function messageOf(reason: unknown) {
+  return reason instanceof Error ? reason.message : String(reason);
+}
+
 /** Ketcher's canvas in a modal; StructureDialog loads it the first time it opens. */
 export function KetcherDialog({
   opened,
@@ -60,22 +64,69 @@ export function KetcherDialog({
   const [ketcher, setKetcher] = useState<Ketcher | null>(null);
   // Why the last Save could not write the drawing, such as an atom list asked for as SMILES.
   const [failure, setFailure] = useState<string | null>(null);
+  // Why Ketcher could not read the initial structure.
+  const [unreadable, setUnreadable] = useState<string | null>(null);
+  // Whether the canvas holds what Save should write: the initial structure, once loaded, or
+  // a drawing that replaces one Ketcher could not read. Before then Save would write a blank
+  // canvas over the host's structure.
+  const [ready, setReady] = useState(false);
 
   // The modal unmounts Ketcher while closed, and each opening initializes a new one, so
-  // the instance and any failed save are forgotten on close, and the next one loads the
+  // the instance and any failure are forgotten on close, and the next one loads the
   // initial structure.
   useEffect(() => {
     if (!opened) {
       setKetcher(null);
       setFailure(null);
+      setUnreadable(null);
+      setReady(false);
     }
   }, [opened]);
 
   useEffect(() => {
-    if (ketcher) {
-      void ketcher.setMolecule(initial);
+    if (!ketcher) {
+      return;
     }
+    let current = true;
+    setUnreadable(null);
+    setReady(false);
+    const load = async () => {
+      // setMolecule leaves the canvas blank when it cannot read a structure and only logs
+      // why, so the structure is parsed first, as setMolecule parses it, to keep the reason.
+      try {
+        await parseStruct(initial, ketcher.structService, ketcher);
+      } catch (reason) {
+        if (current) {
+          setUnreadable(messageOf(reason));
+        }
+        return;
+      }
+      if (!current) {
+        return;
+      }
+      await ketcher.setMolecule(initial);
+      if (current) {
+        setReady(true);
+      }
+    };
+    void load();
+    return () => {
+      current = false;
+    };
   }, [ketcher, initial]);
+
+  useEffect(() => {
+    if (!ketcher || unreadable === null) {
+      return;
+    }
+    const subscriber: unknown = ketcher.editor.subscribe('change', () => {
+      if (!ketcher.editor.struct().isBlank()) {
+        setUnreadable(null);
+        setReady(true);
+      }
+    });
+    return () => ketcher.editor.unsubscribe('change', subscriber);
+  }, [ketcher, unreadable]);
 
   const handleSave = () => {
     if (ketcher) {
@@ -86,7 +137,7 @@ export function KetcherDialog({
           onClose();
         },
         (reason: unknown) => {
-          setFailure(reason instanceof Error ? reason.message : String(reason));
+          setFailure(messageOf(reason));
         },
       );
     }
@@ -110,47 +161,73 @@ export function KetcherDialog({
           }}
           errorHandler={console.error}
         />
+        {unreadable !== null && (
+          <div className={classes.unreadable}>
+            <Paper
+              role="alert"
+              withBorder
+              shadow="sm"
+              p="sm"
+            >
+              <Text
+                size="sm"
+                c="red"
+              >
+                The structure could not be loaded.
+              </Text>
+              {/* Indigo's reason can list each notation it tried, so it scrolls. */}
+              <Text
+                className={classes.reason}
+                size="xs"
+                c="dimmed"
+              >
+                {unreadable}
+              </Text>
+              <Text size="sm">Draw one to replace it, or cancel to keep it.</Text>
+            </Paper>
+          </div>
+        )}
       </div>
-      <Grid
-        className={classes.actions}
-        align="flex-end"
-      >
-        <Grid.Col span={6}>{children}</Grid.Col>
-        <Grid.Col span={6}>
-          <Flex
-            gap="sm"
-            justify="flex-end"
+      <div className={classes.actions}>
+        <div className={classes.fields}>{children}</div>
+        <Flex
+          className={classes.buttons}
+          gap="sm"
+        >
+          <Button
+            variant="default"
+            onClick={onClose}
           >
-            <Button
-              variant="default"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            {/* A popover, since the canvas leaves the buttons no room for a message. */}
-            <Popover
-              opened={failure !== null}
-              onDismiss={() => setFailure(null)}
-              position="top-end"
-              width="min(24rem, calc(100vw - 2rem))"
-              withArrow
-            >
-              <Popover.Target>
-                <Button onClick={handleSave}>Save</Button>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <Text
-                  role="alert"
-                  size="sm"
-                  c="red"
-                >
-                  The drawing could not be saved: {failure}
-                </Text>
-              </Popover.Dropdown>
-            </Popover>
-          </Flex>
-        </Grid.Col>
-      </Grid>
+            Cancel
+          </Button>
+          {/* A popover, since the canvas leaves the buttons no room for a message. */}
+          <Popover
+            opened={failure !== null}
+            onDismiss={() => setFailure(null)}
+            position="top-end"
+            width="min(24rem, calc(100vw - 2rem))"
+            withArrow
+          >
+            <Popover.Target>
+              <Button
+                onClick={handleSave}
+                disabled={!ready}
+              >
+                Save
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text
+                role="alert"
+                size="sm"
+                c="red"
+              >
+                The drawing could not be saved: {failure}
+              </Text>
+            </Popover.Dropdown>
+          </Popover>
+        </Flex>
+      </div>
     </Modal>
   );
 }

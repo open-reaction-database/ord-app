@@ -25,12 +25,55 @@
 }
 
 .editorWrapper {
+  position: relative;
   width: calc(80dvw - 2rem);
   height: calc(80dvh - 106px);
 }
 
+/*
+ * Centered over the blank canvas, which takes taps around it. The inline padding keeps it
+ * between Ketcher's side toolbars, which run the canvas's height on a phone.
+ */
+.unreadable {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mantine-spacing-md) 3rem;
+  pointer-events: none;
+
+  > * {
+    max-width: 22rem;
+    pointer-events: auto;
+  }
+}
+
+.reason {
+  max-height: 6rem;
+  margin-block: var(--mantine-spacing-xs);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
 .actions {
+  display: flex;
+  gap: var(--mantine-spacing-md);
+  align-items: flex-end;
   border-top: 1px solid #e8ebed;
   padding: var(--mantine-spacing-sm);
   margin-top: var(--mantine-spacing-sm);
+}
+
+/* The host's fields take the width the buttons leave. */
+.fields {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The buttons keep their own width, so a phone-wide modal does not clip them. */
+.buttons {
+  flex: none;
 }
