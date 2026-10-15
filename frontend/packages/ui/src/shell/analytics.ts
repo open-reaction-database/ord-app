@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-// The hosts a page is served from on this machine: a dev server, a preview, an
-// end-to-end run, a local container.
-const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$|\.localhost$/;
+// The hosts a page is served from on this machine or its network: a dev server, a
+// preview, an end-to-end run, a local container, the same server opened from a phone. A
+// URL's hostname writes an IPv4 address as four decimal octets, which these patterns
+// read.
+const LOCAL_HOSTS = [
+  /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/,
+  /\.(localhost|local)$/,
+  /^10(\.\d{1,3}){3}$/,
+  /^172\.(1[6-9]|2\d|3[01])(\.\d{1,3}){2}$/,
+  /^192\.168(\.\d{1,3}){2}$/,
+];
 
 /**
  * Loads the Google tag for a measurement ID, such as `G-REEDLYB0ZJ`, unless the page is
@@ -26,7 +34,7 @@ export function loadAnalytics(
   measurementId: string,
   hostname: string = globalThis.location.hostname,
 ): void {
-  if (LOCAL_HOST.test(hostname)) {
+  if (LOCAL_HOSTS.some(pattern => pattern.test(hostname))) {
     return;
   }
   const tag = document.createElement('script');

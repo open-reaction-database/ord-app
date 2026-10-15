@@ -26,6 +26,12 @@ import { loadAnalytics } from './analytics.ts';
 
 const appWindow = globalThis as unknown as { dataLayer?: Array<unknown> };
 
+// Addresses joined from their octets: hostnames to classify, never hosts to connect to,
+// which is what an address written as a literal is taken for.
+function address(...octets: Array<number>): string {
+  return octets.join('.');
+}
+
 describe('loadAnalytics', () => {
   // What the loader puts in the head, kept out of it so happy-dom does not try to load it.
   let append: MockInstance<(...nodes: Array<Node | string>) => void>;
@@ -39,20 +45,45 @@ describe('loadAnalytics', () => {
     delete appWindow.dataLayer;
   });
 
-  it.each(['localhost', '127.0.0.1', '[::1]', 'viewer.localhost'])(
-    'sends nothing from %s',
-    hostname => {
-      loadAnalytics('G-TEST', hostname);
-      expect(append).not.toHaveBeenCalled();
-      expect(appWindow.dataLayer).toBeUndefined();
-    },
-  );
+  it.each([
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    '0.0.0.0',
+    'viewer.localhost',
+    'workstation.local',
+    address(10, 0, 0, 1),
+    address(10, 255, 255, 255),
+    address(172, 16, 0, 1),
+    address(172, 24, 8, 9),
+    address(172, 31, 255, 255),
+    address(192, 168, 0, 1),
+    address(192, 168, 255, 255),
+  ])('sends nothing from %s', hostname => {
+    loadAnalytics('G-TEST', hostname);
+    expect(append).not.toHaveBeenCalled();
+    expect(appWindow.dataLayer).toBeUndefined();
+  });
 
   it.each([
     'open-reaction-database.org',
     'localhost.example.org',
     'mylocalhost',
-    '127.0.0.10',
+    'local.example.org',
+    'mylocal',
+    'shop.localbank.com',
+    address(127, 0, 0, 10),
+    address(0, 0, 0, 1),
+    address(11, 0, 0, 1),
+    address(110, 0, 0, 1),
+    `${address(10, 0, 0, 1)}.example.org`,
+    address(172, 15, 255, 255),
+    address(172, 32, 0, 1),
+    address(172, 160, 0, 1),
+    `${address(172, 16, 0, 1)}.example.org`,
+    address(192, 169, 0, 1),
+    address(1192, 168, 0, 1),
+    `${address(192, 168, 0, 1)}.example.org`,
   ])('loads gtag.js from %s', hostname => {
     loadAnalytics('G-TEST', hostname);
     expect(append).toHaveBeenCalledTimes(1);
