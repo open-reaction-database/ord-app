@@ -39,18 +39,26 @@ afterEach(() => {
 });
 
 describe('ViewerPage', () => {
-  it('links the viewer’s pages, the editor, and the docs in a row, but not /ask', () => {
+  it('links the viewer’s pages, the editor, and the docs in a row', () => {
     setViewportWidth(WIDE);
     const { getByRole, queryByRole } = renderPage();
     const navigation = within(getByRole('navigation', { name: 'Main' }));
     const link = (name: string) => navigation.getByRole('link', { name });
-    expect(link('Browse')).toHaveAttribute('href', '/');
+    expect(link('Browse')).toHaveAttribute('href', '/datasets');
     expect(link('Search')).toHaveAttribute('href', '/search');
+    expect(link('Ask')).toHaveAttribute('href', '/ask');
     expect(link('Contribute')).toHaveAttribute('href', EDITOR_URL);
     expect(link('Docs')).toHaveAttribute('href', DOCS_URL);
     expect(link('About')).toHaveAttribute('href', '/about');
-    expect(queryByRole('link', { name: /ask/i })).not.toBeInTheDocument();
     expect(queryByRole('button', { name: 'Navigation menu' })).not.toBeInTheDocument();
+  });
+
+  it('links the logo to the front page', () => {
+    const { getByRole } = renderPage();
+    expect(getByRole('link', { name: 'Open Reaction Database logo' })).toHaveAttribute(
+      'href',
+      '/',
+    );
   });
 
   it('lists the same links in a menu on a narrow screen, instead of in a row', async () => {
@@ -60,8 +68,9 @@ describe('ViewerPage', () => {
     expect(queryByRole('link', { name: 'Browse' })).not.toBeInTheDocument();
     await user.click(getByRole('button', { name: 'Navigation menu' }));
     const item = (name: string) => getByRole('menuitem', { name });
-    expect(item('Browse')).toHaveAttribute('href', '/');
+    expect(item('Browse')).toHaveAttribute('href', '/datasets');
     expect(item('Search')).toHaveAttribute('href', '/search');
+    expect(item('Ask')).toHaveAttribute('href', '/ask');
     expect(item('Contribute')).toHaveAttribute('href', EDITOR_URL);
     expect(item('Docs')).toHaveAttribute('href', DOCS_URL);
     expect(item('About')).toHaveAttribute('href', '/about');

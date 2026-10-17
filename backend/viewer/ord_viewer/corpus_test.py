@@ -13,16 +13,26 @@
 # limitations under the License.
 
 import dataclasses
+import datetime
 import pathlib
 import shutil
 from collections.abc import Generator
+from typing import cast
 
+import pyarrow as pa
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import huggingface, message_helpers, resolvers
 from ord_schema.artifacts import base
+from ord_schema.search import execute
 
-from ord_viewer.corpus import open_corpus, resolve_compound_name
+from ord_viewer.corpus import (
+    Submission,
+    newest_submission,
+    open_corpus,
+    resolve_compound_name,
+)
 from ord_viewer.settings import Settings
 from ord_viewer.testing import make_client, offline_resolver
 
@@ -175,3 +185,28 @@ def test_caches_names_that_resolve_and_retries_names_that_do_not(
         with pytest.raises(ValueError, match="Could not resolve name unobtainium"):
             resolve_compound_name("unobtainium")
     assert asked == ["pyridine", "unobtainium", "unobtainium"]
+
+
+def _corpus(client: TestClient) -> execute.Corpus:
+    """Return the corpus an entered client's app holds."""
+    return cast(FastAPI, client.app).state.viewer.corpus
+
+
+def test_finds_the_newest_submission_by_each_dataset_s_first_change(client):
+    # viewer one's records changed, and one was first submitted, after viewer two was
+    # submitted; viewer one's earliest change still leaves it the older submission.
+    assert newest_submission(_corpus(client)) == Submission(
+        dataset_id="ord_dataset-viewer02",
+        submitted=datetime.datetime(2025, 6, 15, 10, 0),
+    )
+
+
+def test_finds_no_submission_when_no_record_holds_a_change(client, monkeypatch):
+    unmatched = pa.table(
+        {
+            "dataset_id": pa.array([], type=pa.string()),
+            "submitted": pa.array([], type=pa.timestamp("us")),
+        }
+    )
+    monkeypatch.setattr(execute.Corpus, "search", lambda self, request: unmatched)
+    assert newest_submission(_corpus(client)) is None

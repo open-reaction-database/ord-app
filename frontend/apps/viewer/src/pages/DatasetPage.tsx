@@ -97,7 +97,7 @@ export function DatasetPage({ datasetId }: Readonly<{ datasetId: string }>) {
     return <NotFoundPage />;
   }
   const breadcrumbs = [
-    { title: 'Datasets', path: '/' },
+    { title: 'Datasets', path: '/datasets' },
     {
       title: dataset.data?.name ?? datasetId,
       path: `/datasets/${encodeURIComponent(datasetId)}`,

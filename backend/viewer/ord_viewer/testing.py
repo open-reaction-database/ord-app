@@ -71,8 +71,9 @@ def _reaction(
     catalyst_name: str | None = None,
     conversion_percent: float | None = None,
     doi: str | None = None,
+    modified: Sequence[str] = (),
 ) -> reaction_pb2.Reaction:
-    """Build a reaction with an optional yield, catalyst, conversion, and DOI.
+    """Build a reaction with an optional yield, catalyst, conversion, DOI, and history.
 
     Args:
         reaction_id: The ID the reaction gets, such as ``ord-viewer0101``.
@@ -82,6 +83,8 @@ def _reaction(
         catalyst_name: The name of a catalyst input, if any.
         conversion_percent: The outcome's percent conversion, if any.
         doi: The DOI of the reaction's publication, if any.
+        modified: When the record was modified, in order, as ord-data's submission
+            pipeline records each change.
 
     Returns:
         The reaction.
@@ -99,6 +102,8 @@ def _reaction(
         catalyst.identifiers.add(type="NAME", value=catalyst_name)
     if doi is not None:
         reaction.provenance.doi = doi
+    for time in modified:
+        reaction.provenance.record_modified.add().time.value = time
     outcome = reaction.outcomes.add()
     if conversion_percent is not None:
         outcome.conversion.value = conversion_percent
@@ -110,6 +115,10 @@ def _reaction(
     return reaction
 
 
+# A record's first modification is its submission, and a dataset's earliest is the
+# dataset's. viewer one was submitted before viewer two; after viewer two, one of its
+# records was modified again and another first submitted. The first reaction of each
+# records no history.
 DATASETS = (
     dataset_pb2.Dataset(
         dataset_id="ord_dataset-viewer01",
@@ -127,12 +136,14 @@ DATASETS = (
                 reactants=["C[C@@H](N)C(=O)O", "CC(=O)Cl"],
                 product="C[C@@H](NC(C)=O)C(=O)O",
                 yield_percent=90,
+                modified=["2024-03-01T09:30:00", "2025-09-01T08:00:00"],
             ),
             _reaction(
                 "ord-viewer0103",
                 reactants=["CCN", "CC(=O)Cl"],
                 product="CCNC(C)=O",
                 yield_percent=75,
+                modified=["2025-08-01T12:00:00"],
             ),
         ],
     ),
@@ -154,6 +165,7 @@ DATASETS = (
                 catalyst_name="mystery catalyst",
                 conversion_percent=30,
                 doi="10.1021/viewer0202",
+                modified=["2025-06-15T10:00:00"],
             ),
         ],
     ),

@@ -15,6 +15,7 @@
 """The bodies the routes accept and return."""
 
 import base64
+import datetime
 from typing import Annotated, Any, Literal
 
 from ord_schema.search import execute
@@ -29,6 +30,13 @@ class DatasetSummary(BaseModel):
     name: str
     description: str
     reactions: int
+
+
+class NewestDataset(DatasetSummary):
+    """The corpus's most recently submitted dataset."""
+
+    # When ord-data's submission pipeline took it in.
+    submitted: datetime.datetime
 
 
 class CompoundCount(BaseModel):

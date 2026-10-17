@@ -83,7 +83,11 @@ describe('ReactionPage', () => {
       .map(link => link.getAttribute('href'))
       .filter(href => href?.startsWith('/datasets/'));
     expect(datasetLinks).toEqual([]);
-    expect(getAllByRole('link', { name: 'Datasets' })).not.toHaveLength(0);
+    const crumbs = getAllByRole('link', { name: 'Datasets' });
+    expect(crumbs).not.toHaveLength(0);
+    for (const crumb of crumbs) {
+      expect(crumb).toHaveAttribute('href', '/datasets');
+    }
   });
 
   it('offers no way to edit it', async () => {

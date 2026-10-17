@@ -23,7 +23,12 @@ from ord_schema.search import execute
 from ord_schema.search.query import Query as SearchQuery
 
 from ord_viewer.molblocks import smiles_molblock
-from ord_viewer.schemas import CompoundCount, DatasetSummary, ErrorDetail
+from ord_viewer.schemas import (
+    CompoundCount,
+    DatasetSummary,
+    ErrorDetail,
+    NewestDataset,
+)
 from ord_viewer.searching import SEARCH_ERRORS, run_search
 from ord_viewer.state import ViewerState, get_state
 
@@ -93,6 +98,27 @@ def list_datasets(
         The datasets, sorted by name.
     """
     return _summaries(state.corpus)
+
+
+# Registered before /{dataset_id}, which would otherwise take "newest" as an ID.
+@router.get("/newest")
+def newest_dataset(
+    state: Annotated[ViewerState, Depends(get_state)],
+) -> NewestDataset | None:
+    """Return the most recently submitted dataset.
+
+    Args:
+        state: The settings and open corpus.
+
+    Returns:
+        The dataset, with when it was submitted, or None when no record in the corpus
+        holds a change.
+    """
+    newest = state.newest_submission
+    if newest is None:
+        return None
+    summary = _find(state.corpus, newest.dataset_id)
+    return NewestDataset(**summary.model_dump(), submitted=newest.submitted)
 
 
 @router.get("/{dataset_id}", responses={404: {"model": ErrorDetail}})

@@ -19,7 +19,8 @@ import { Link } from 'wouter';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0103 } from '#test/fixtures/records.ts';
-import { ASK_EXAMPLES, AskPage } from '#pages/AskPage.tsx';
+import { ASK_EXAMPLES } from '#ask/questions.ts';
+import { AskPage } from '#pages/AskPage.tsx';
 
 const QUESTION = 'reactions that use ethylamine';
 const ANSWER = {
@@ -36,11 +37,6 @@ afterEach(() => {
 });
 
 describe('AskPage', () => {
-  it('says the feature is in development', () => {
-    const { getByText } = renderAt('/ask', <AskPage />);
-    expect(getByText(/in development/)).toBeInTheDocument();
-  });
-
   it("asks the URL's question and shows the answer", async () => {
     const fetch = mockApi({
       'POST /api/ask': ANSWER,

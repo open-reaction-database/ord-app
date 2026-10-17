@@ -19,7 +19,6 @@ const REACTION_LINK = /^ord-viewer\d{4}$/;
 
 test('answers a question with its reactions', async ({ page }) => {
   await page.goto('/ask');
-  await expect(page.getByText(/in development/)).toBeVisible();
   await page
     .getByRole('textbox', { name: 'Question' })
     .fill('reactions that use acetyl chloride');

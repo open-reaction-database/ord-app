@@ -16,6 +16,7 @@
 
 import concurrent.futures
 import dataclasses
+import datetime
 import functools
 import glob
 import os
@@ -25,6 +26,7 @@ from collections.abc import Callable
 from ord_schema import huggingface, resolvers
 from ord_schema.artifacts import base
 from ord_schema.search import execute
+from ord_schema.search.query import Query
 
 from ord_viewer.settings import Settings
 
@@ -41,6 +43,10 @@ _FETCHED_SOURCES = "ord-data"
 # How many source datasets download at once.
 _SOURCE_DOWNLOADS = 8
 
+# When a record was changed, as the projection parses it. ord-data's submission pipeline
+# stamps the first change, so a record's earliest is when it was submitted.
+_MODIFIED = "provenance.record_modified.time.timestamp"
+
 
 @dataclasses.dataclass(frozen=True)
 class _Trees:
@@ -51,6 +57,14 @@ class _Trees:
     pivots: str
     occurrences: str
     sources: str
+
+
+@dataclasses.dataclass(frozen=True)
+class Submission:
+    """A dataset, and when ord-data's submission pipeline took it in."""
+
+    dataset_id: str
+    submitted: datetime.datetime
 
 
 # Resolutions reach PubChem, CACTUS, and OPSIN; a name that resolved is kept until
@@ -266,3 +280,46 @@ def open_corpus(
         corpus.close()
         raise
     return corpus
+
+
+def newest_submission(corpus: execute.Corpus) -> Submission | None:
+    """Find the most recently submitted dataset.
+
+    A dataset was submitted at the earliest change any of its records holds; a change a
+    later run of the pipeline made does not move it. A tie goes to the first dataset ID.
+
+    Args:
+        corpus: The open corpus.
+
+    Returns:
+        The dataset and when it was submitted, or None when no record in the corpus
+        holds a change.
+    """
+    request = Query.model_validate(
+        {
+            "where": {
+                "op": "exists",
+                "path": "provenance.record_modified",
+                "where": {"op": "not_null", "path": "time.timestamp"},
+            },
+            "aggregate": {
+                "group_by": ["dataset_id"],
+                "measures": [
+                    {
+                        "fn": "min",
+                        "path": {"reduce": "min", "path": _MODIFIED},
+                        "name": "submitted",
+                    }
+                ],
+            },
+            "order_by": [
+                {"key": "submitted", "descending": True},
+                {"key": "dataset_id"},
+            ],
+            "limit": 1,
+        }
+    )
+    rows = corpus.search(request).to_pylist()
+    if not rows:
+        return None
+    return Submission(dataset_id=rows[0]["dataset_id"], submitted=rows[0]["submitted"])

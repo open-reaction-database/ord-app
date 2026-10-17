@@ -18,6 +18,7 @@ import { AboutPage } from '#pages/AboutPage.tsx';
 import { AskPage } from '#pages/AskPage.tsx';
 import { DatasetPage } from '#pages/DatasetPage.tsx';
 import { DatasetsPage } from '#pages/DatasetsPage.tsx';
+import { HomePage } from '#pages/HomePage.tsx';
 import { NotFoundPage } from '#pages/NotFoundPage.tsx';
 import { ReactionPage } from '#pages/ReactionPage.tsx';
 import { ReactionSetPage } from '#pages/ReactionSetPage.tsx';
@@ -44,6 +45,10 @@ export function ViewerRoutes() {
     <Switch>
       <Route
         path="/"
+        component={HomePage}
+      />
+      <Route
+        path="/datasets"
         component={DatasetsPage}
       />
       <Route path="/datasets/:datasetId">
@@ -70,7 +75,7 @@ export function ViewerRoutes() {
       />
       <Route path="/browse">
         <Redirect
-          to="/"
+          to="/datasets"
           replace
         />
       </Route>

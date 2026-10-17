@@ -52,7 +52,7 @@ function reactionPath(reactionId: string): string {
 /** Datasets, then the reaction's dataset by name once the list has loaded, then it. */
 function useBreadcrumbs(reactionId: string, datasetId: string | null): Breadcrumbs {
   const datasets = useDatasets();
-  const crumbs: Breadcrumbs = [{ title: 'Datasets', path: '/' }];
+  const crumbs: Breadcrumbs = [{ title: 'Datasets', path: '/datasets' }];
   if (datasetId !== null) {
     const name = datasets.data?.find(dataset => dataset.dataset_id === datasetId)?.name;
     crumbs.push({
@@ -109,7 +109,7 @@ export function ReactionPage({ reactionId }: Readonly<{ reactionId: string }>) {
     return <ReactionView record={reaction.data} />;
   }
   const breadcrumbs = [
-    { title: 'Datasets', path: '/' },
+    { title: 'Datasets', path: '/datasets' },
     { title: reactionId, path: reactionPath(reactionId) },
   ];
   return (

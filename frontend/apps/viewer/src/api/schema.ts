@@ -70,6 +70,33 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/datasets/newest': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Newest Dataset
+     * @description Return the most recently submitted dataset.
+     *
+     *     Args:
+     *         state: The settings and open corpus.
+     *
+     *     Returns:
+     *         The dataset, with when it was submitted, or None when no record in the corpus
+     *         holds a change.
+     */
+    get: operations['newest_dataset_api_datasets_newest_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/datasets/{dataset_id}': {
     parameters: {
       query?: never;
@@ -607,6 +634,25 @@ export interface components {
      */
     MeasurementMolblocks: {
       authentic_standard: components['schemas']['AuthenticStandardMolblock'];
+    };
+    /**
+     * NewestDataset
+     * @description The corpus's most recently submitted dataset.
+     */
+    NewestDataset: {
+      /** Dataset Id */
+      dataset_id: string;
+      /** Name */
+      name: string;
+      /** Description */
+      description: string;
+      /** Reactions */
+      reactions: number;
+      /**
+       * Submitted
+       * Format: date-time
+       */
+      submitted: string;
     };
     /**
      * Not
@@ -1295,6 +1341,26 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['DatasetSummary'][];
+        };
+      };
+    };
+  };
+  newest_dataset_api_datasets_newest_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NewestDataset'] | null;
         };
       };
     };

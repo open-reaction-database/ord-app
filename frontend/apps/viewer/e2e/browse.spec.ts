@@ -17,7 +17,7 @@ import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
 test('browses from the datasets to a dataset and its reactions', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/datasets');
   const filter = page.getByRole('textbox', { name: 'Filter' });
   await expect(page.getByRole('link', { name: 'viewer one' })).toBeVisible();
   await filter.fill('ord_dataset-viewer02');
