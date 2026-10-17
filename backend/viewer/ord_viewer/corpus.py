@@ -53,10 +53,8 @@ class _Trees:
     sources: str
 
 
-# Resolutions reach PubChem, CACTUS, and OPSIN; a name that resolved is kept until
-# 4,096 more recently used names push it out. A name that failed raises again, so it
-# is retried.
-@functools.lru_cache(maxsize=4096)
+# Resolutions reach PubChem, CACTUS, and OPSIN. The Corpus keeps each name that
+# resolved and calls this only for a name it has not kept.
 def resolve_compound_name(name: str) -> str:
     """Resolve a compound name to SMILES through ord-schema's resolvers.
 
