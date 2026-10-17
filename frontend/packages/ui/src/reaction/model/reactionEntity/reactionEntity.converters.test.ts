@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { create } from '@bufbuild/protobuf';
 import {
   CompoundIdentifierSchema,
@@ -89,10 +89,28 @@ describe('DateTime converters', () => {
     });
   });
 
-  it('writes a time the user entered in UTC with its Z', () => {
-    expect(reactionDateTimeToOrd('2024-06-01T12:00:00')?.value).toMatch(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
-    );
+  it('writes a time the user entered as the UTC instant it names', () => {
+    // The Date constructor reads its fields in the local zone, independently of dayjs.
+    const expected = new Date(2024, 5, 1, 12).toISOString().replace('.000Z', 'Z');
+    expect(reactionDateTimeToOrd('2024-06-01T12:00:00')).toEqual({ value: expected });
+  });
+
+  // The suite may run in UTC, where converting from the user's zone changes nothing.
+  it('converts an entered time out of a zone other than UTC', async () => {
+    vi.stubEnv('TZ', 'Asia/Tokyo');
+    vi.resetModules();
+    try {
+      const converters = await import('./reactionEntity.converters.ts');
+      expect(converters.reactionDateTimeToOrd('2024-06-01T12:00:00')).toEqual({
+        value: '2024-06-01T03:00:00Z',
+      });
+      expect(converters.reactionDateTimeToOrd('2024-06-01')).toEqual({
+        value: '2024-06-01',
+      });
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
   });
 
   it('leaves an empty value unset', () => {
