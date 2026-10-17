@@ -16,7 +16,10 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { DATE_TIME_HUMAN_FORMAT } from '#reaction/model/reactionFormats.ts';
+import {
+  DATE_HUMAN_FORMAT,
+  DATE_TIME_HUMAN_FORMAT,
+} from '#reaction/model/reactionFormats.ts';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -43,5 +46,9 @@ export function formatUtcDateToDisplay(inputDate: string) {
 }
 
 export function formatDateToDisplay(inputDate: string | Date) {
+  // A date alone carries no time of day, so none is shown.
+  if (typeof inputDate === 'string' && isDateOnly(inputDate)) {
+    return dayjs(inputDate).format(DATE_HUMAN_FORMAT);
+  }
   return dayjs(inputDate).format(DATE_TIME_HUMAN_FORMAT);
 }

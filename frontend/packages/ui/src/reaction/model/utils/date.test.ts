@@ -63,4 +63,8 @@ describe('display formatting', () => {
     expect(formatDateToDisplay('2024-06-01T12:00:00')).toMatch(humanFormat);
     expect(formatDateToDisplay(new Date('2024-06-01T12:00:00'))).toMatch(humanFormat);
   });
+
+  it('shows a date alone without a time of day', () => {
+    expect(formatDateToDisplay('2024-06-01')).toBe('01.06.2024');
+  });
 });

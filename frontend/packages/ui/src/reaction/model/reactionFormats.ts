@@ -23,6 +23,8 @@ export const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 // DateTime only as a date alone or a time with its offset.
 export const ORD_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
+export const DATE_HUMAN_FORMAT = 'DD.MM.YYYY';
+
 export const DATE_TIME_HUMAN_FORMAT = 'DD.MM.YYYY hh:mm a';
 
 // 1 MB
