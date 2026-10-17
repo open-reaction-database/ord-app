@@ -26,6 +26,7 @@ export type Query = Schemas['Query-Input'];
 export type CompiledQuery = Schemas['Query-Output'];
 export type ReactionsResult = Schemas['ReactionsResult'];
 export type TableResult = Schemas['TableResult'];
+export type ResolvedCompound = Schemas['ResolvedCompound'];
 export type SearchResult = ReactionsResult | TableResult;
 export type AskResponse = Schemas['AskResponse'];
 export type SearchRequest = Schemas['SearchRequest'];

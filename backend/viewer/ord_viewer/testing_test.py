@@ -95,6 +95,9 @@ def test_e2e_app_answers_its_scripted_questions(tmp_path, monkeypatch):
             "ord-viewer0103",
             "ord-viewer0201",
         ]
+        assert [
+            (each["name"], each["smiles"]) for each in body["result"]["resolved"]
+        ] == [("acetyl chloride", "CC(=O)Cl")]
         table = client.post(
             "/api/ask", json={"question": "how many reactions are in each dataset"}
         )
@@ -103,6 +106,7 @@ def test_e2e_app_answers_its_scripted_questions(tmp_path, monkeypatch):
             "columns": ["dataset_id", "reactions"],
             "rows": [["ord_dataset-viewer01", 3], ["ord_dataset-viewer02", 2]],
             "truncated": False,
+            "resolved": [],
         }
 
 

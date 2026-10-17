@@ -24,9 +24,11 @@ from fastapi.concurrency import run_in_threadpool
 from ord_schema.search import execute
 from ord_schema.search.query import Query
 
+from ord_viewer.molblocks import smiles_molblock
 from ord_viewer.schemas import (
     ErrorDetail,
     ReactionsResult,
+    ResolvedCompound,
     TableResult,
     ValidationErrors,
 )
@@ -125,14 +127,20 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
 
     Returns:
         Reaction IDs for a plain query, or the columns and rows of an aggregate, each
-        saying whether the corpus's row bound may have cut it. Rows are built by
-        position, so repeated column names stay aligned, and decimal cells become
-        integers or floats.
+        saying whether the corpus's row bound may have cut it and what each compound
+        name in the query was searched as. Rows are built by position, so repeated
+        column names stay aligned, and decimal cells become integers or floats.
     """
     truncated = (table.schema.metadata or {}).get(execute.TRUNCATED.encode()) == b"true"
+    resolved = [
+        ResolvedCompound(name=name, smiles=smiles, molblock=smiles_molblock(smiles))
+        for name, smiles in execute.resolutions(table).items()
+    ]
     if request.aggregate is None:
         return ReactionsResult(
-            reaction_ids=table.column("reaction_id").to_pylist(), truncated=truncated
+            reaction_ids=table.column("reaction_id").to_pylist(),
+            truncated=truncated,
+            resolved=resolved,
         )
     return TableResult(
         columns=table.column_names,
@@ -144,4 +152,5 @@ def to_result(request: Query, table: pa.Table) -> ReactionsResult | TableResult:
             )
         ],
         truncated=truncated,
+        resolved=resolved,
     )

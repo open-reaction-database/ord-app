@@ -2220,13 +2220,22 @@
             "type": "boolean",
             "title": "Truncated",
             "description": "True when the corpus's bound of 1,000 rows may have cut the answer short"
+          },
+          "resolved": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedCompound"
+            },
+            "type": "array",
+            "title": "Resolved",
+            "description": "Each compound name the query gives, with the structure the search matched it as; empty for a query that names none"
           }
         },
         "type": "object",
         "required": [
           "kind",
           "reaction_ids",
-          "truncated"
+          "truncated",
+          "resolved"
         ],
         "title": "ReactionsResult",
         "description": "A plain query's answer: reaction IDs to fetch a page at a time."
@@ -2426,6 +2435,38 @@
         ],
         "title": "Reduction",
         "description": "One value per reaction, reduced from a path that crosses a repeated level.\n\nAn ordering key and an aggregate's argument both have to be scalar, which leaves\n\"the highest-yielding reactions\" unwritable: a yield lives under outcomes, products,\nand measurements, so the path resolves to a list rather than a number. This reduces\nthat list to the one value the reaction is judged by, leaving the aggregate to\ncombine those across reactions.\n\n``where`` selects which elements are reduced, and is what separates \"the highest\nyield\" from \"the highest percentage anything was measured at\": a percentage is\nrecorded for selectivity and purity too, so a reduction over the bare path answers\na broader question than the one asked. Its paths are relative to the element, as\nthey are inside a quantifier, and the element is the deepest repeated level the\npath crosses -- for\n``outcomes.products.measurements.percentage.value`` that is a measurement, so\n``type`` there means the measurement's own.\n\nAttributes:\n    reduce: How to reduce the list. ``count`` counts the values that are present.\n    path: A dotted path crossing at least one repeated level.\n    where: Selects the elements to reduce; all of them when absent."
+      },
+      "ResolvedCompound": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "smiles": {
+            "type": "string",
+            "title": "Smiles",
+            "description": "The canonical SMILES the name resolved to"
+          },
+          "molblock": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Molblock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "smiles",
+          "molblock"
+        ],
+        "title": "ResolvedCompound",
+        "description": "A compound name from a query, with the structure the search matched it as."
       },
       "SameCompound": {
         "properties": {
@@ -2666,6 +2707,14 @@
             "type": "boolean",
             "title": "Truncated",
             "description": "True when the corpus's bound of 1,000 rows may have cut the answer short"
+          },
+          "resolved": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedCompound"
+            },
+            "type": "array",
+            "title": "Resolved",
+            "description": "Each compound name the query gives, with the structure the search matched it as; empty for a query that names none"
           }
         },
         "type": "object",
@@ -2673,7 +2722,8 @@
           "kind",
           "columns",
           "rows",
-          "truncated"
+          "truncated",
+          "resolved"
         ],
         "title": "TableResult",
         "description": "An aggregate's answer: its group and measure columns; bytes cells are base64."

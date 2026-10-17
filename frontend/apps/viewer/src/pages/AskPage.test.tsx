@@ -15,6 +15,8 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { within } from '@testing-library/react';
+import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
 import { Link } from 'wouter';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
@@ -27,8 +29,43 @@ const ANSWER = {
     where: { op: 'eq', path: 'reaction_id', value: { literal: 'ord-viewer0103' } },
   },
   text: 'One reaction uses ethylamine.',
-  result: { kind: 'reactions', reaction_ids: ['ord-viewer0103'], truncated: false },
+  result: {
+    kind: 'reactions',
+    reaction_ids: ['ord-viewer0103'],
+    truncated: false,
+    resolved: [],
+  },
 };
+
+// The query a model writes for a named compound, as the backend returns it: every unset
+// field written out as null or [].
+const NAMED_ANSWER = {
+  ...ANSWER,
+  query: {
+    where: {
+      op: 'exists',
+      path: 'inputs.components',
+      where: {
+        op: 'same_compound',
+        path: 'smiles',
+        smiles: null,
+        compound: 'ethylamine',
+      },
+    },
+    aggregate: null,
+    order_by: [],
+    limit: null,
+  },
+  result: {
+    ...ANSWER.result,
+    resolved: [{ name: 'ethylamine', smiles: 'CCN', molblock: 'ETHYLAMINE MOL' }],
+  },
+};
+
+// The preview worker does not run under happy-dom.
+vi.mock('@open-reaction-database/ui/reaction/previews', () => ({
+  renderPreviews: vi.fn(async () => ({})),
+}));
 
 afterEach(() => {
   sessionStorage.clear();
@@ -71,6 +108,63 @@ describe('AskPage', () => {
     );
   });
 
+  it('leaves out the fields the query does not set', async () => {
+    const user = userEvent.setup();
+    mockApi({ 'POST /api/ask': NAMED_ANSWER, 'GET /api/reactions': [VIEWER0103] });
+    const { findByRole } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    await user.click(await findByRole('button', { name: 'The query it ran' }));
+    const code = (
+      await findByRole('region', { name: 'The query it ran' })
+    ).querySelector('pre');
+    expect(JSON.parse(code!.textContent!)).toEqual({
+      where: {
+        op: 'exists',
+        path: 'inputs.components',
+        where: { op: 'same_compound', path: 'smiles', compound: 'ethylamine' },
+      },
+    });
+  });
+
+  it('shows the structure each compound name was searched as', async () => {
+    const user = userEvent.setup();
+    vi.mocked(renderPreviews).mockResolvedValue({ ethylamine: 'c3Zn' });
+    mockApi({ 'POST /api/ask': NAMED_ANSWER, 'GET /api/reactions': [VIEWER0103] });
+    const { findByRole } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    await user.click(await findByRole('button', { name: 'The query it ran' }));
+    const panel = await findByRole('region', { name: 'The query it ran' });
+    const compounds = within(panel).getByRole('list', { name: 'Compounds it named' });
+    const [compound] = within(compounds).getAllByRole('listitem');
+    expect(compound).toHaveTextContent('ethylamine');
+    expect(compound).toHaveTextContent('CCN');
+    expect(await within(compound).findByRole('img', { name: 'CCN' })).toHaveAttribute(
+      'src',
+      'data:image/svg+xml;base64,c3Zn',
+    );
+    expect(renderPreviews).toHaveBeenCalledWith(
+      { ethylamine: 'ETHYLAMINE MOL' },
+      { size: 120 },
+    );
+  });
+
+  it('lists no compounds for a query that names none', async () => {
+    const user = userEvent.setup();
+    mockApi({ 'POST /api/ask': ANSWER, 'GET /api/reactions': [VIEWER0103] });
+    const { findByRole } = renderAt(
+      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      <AskPage />,
+    );
+    await user.click(await findByRole('button', { name: 'The query it ran' }));
+    const panel = await findByRole('region', { name: 'The query it ran' });
+    expect(within(panel).queryByRole('list')).not.toBeInTheDocument();
+    expect(renderPreviews).not.toHaveBeenCalled();
+  });
+
   it("says when the answer stopped at its query's limit", async () => {
     mockApi({
       'POST /api/ask': { ...ANSWER, query: { ...ANSWER.query, limit: 1 } },
@@ -91,7 +185,13 @@ describe('AskPage', () => {
     mockApi({
       'POST /api/ask': {
         ...ANSWER,
-        result: { kind: 'table', columns: ['n'], rows: [[5]], truncated: false },
+        result: {
+          kind: 'table',
+          columns: ['n'],
+          rows: [[5]],
+          truncated: false,
+          resolved: [],
+        },
       },
     });
     const { findByRole } = renderAt(

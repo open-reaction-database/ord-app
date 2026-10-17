@@ -26,10 +26,12 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
-import { useState } from 'react';
+import { renderPreviews } from '@open-reaction-database/ui/reaction/previews';
+import { useQuery } from '@tanstack/react-query';
+import { useId, useState } from 'react';
 import { useLocation, useSearchParams } from 'wouter';
 import { useAsk } from '#api/hooks.ts';
-import type { AskResponse } from '#api/types.ts';
+import type { AskResponse, ResolvedCompound } from '#api/types.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
@@ -116,6 +118,88 @@ function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
   );
 }
 
+const STRUCTURE_SIZE = 120;
+
+/** Leaves out what the backend writes for a field the query does not set: null or []. */
+function unsetField(_key: string, value: unknown) {
+  return value === null || (Array.isArray(value) && value.length === 0)
+    ? undefined
+    : value;
+}
+
+/** Each compound name in the query, drawn as the structure the search matched it as. */
+function ResolvedCompounds({
+  compounds,
+}: Readonly<{ compounds: ReadonlyArray<ResolvedCompound> }>) {
+  const labelId = useId();
+  const images = useQuery({
+    queryKey: [
+      'resolved-structures',
+      compounds.map(({ name, smiles }) => [name, smiles]),
+    ],
+    queryFn: () =>
+      renderPreviews(
+        Object.fromEntries(compounds.map(({ name, molblock }) => [name, molblock])),
+        { size: STRUCTURE_SIZE },
+      ),
+  });
+  return (
+    <Stack gap="xs">
+      <Text
+        id={labelId}
+        size="sm"
+        fw={500}
+      >
+        Compounds it named
+      </Text>
+      <Group
+        component="ul"
+        aria-labelledby={labelId}
+        gap="sm"
+        align="flex-start"
+        p={0}
+        m={0}
+        style={{ listStyle: 'none' }}
+      >
+        {compounds.map(({ name, smiles }) => {
+          const image = images.data?.[name];
+          return (
+            <Paper
+              key={name}
+              component="li"
+              p="xs"
+              withBorder
+              maw={STRUCTURE_SIZE + 40}
+            >
+              {image && (
+                <img
+                  src={`data:image/svg+xml;base64,${image}`}
+                  alt={smiles}
+                  width={STRUCTURE_SIZE}
+                  height={STRUCTURE_SIZE}
+                />
+              )}
+              <Text
+                size="sm"
+                fw={500}
+                style={{ overflowWrap: 'anywhere' }}
+              >
+                {name}
+              </Text>
+              <Text
+                size="xs"
+                style={{ wordBreak: 'break-all' }}
+              >
+                {smiles}
+              </Text>
+            </Paper>
+          );
+        })}
+      </Group>
+    </Stack>
+  );
+}
+
 function Answer({
   answer,
   selectionKey,
@@ -127,7 +211,12 @@ function Answer({
         <Accordion.Item value="query">
           <Accordion.Control>The query it ran</Accordion.Control>
           <Accordion.Panel>
-            <Code block>{JSON.stringify(answer.query, null, 2)}</Code>
+            <Stack gap="sm">
+              <Code block>{JSON.stringify(answer.query, unsetField, 2)}</Code>
+              {answer.result.resolved.length > 0 && (
+                <ResolvedCompounds compounds={answer.result.resolved} />
+              )}
+            </Stack>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

@@ -33,6 +33,7 @@ describe('ResultTable', () => {
           columns: ['n', 'n'],
           rows: [[1, 2]],
           truncated: false,
+          resolved: [],
         }}
       />,
     );
@@ -53,6 +54,7 @@ describe('ResultTable', () => {
             ['ord-viewer0102', 90.5, 'x'],
           ],
           truncated: false,
+          resolved: [],
         }}
       />,
     );
@@ -75,7 +77,13 @@ describe('ResultTable', () => {
     const { getAllByRole } = renderAt(
       '/',
       <ResultTable
-        result={{ kind: 'table', columns: ['n'], rows: [[1], [1]], truncated: false }}
+        result={{
+          kind: 'table',
+          columns: ['n'],
+          rows: [[1], [1]],
+          truncated: false,
+          resolved: [],
+        }}
       />,
     );
     expect(getAllByRole('cell', { name: '1' })).toHaveLength(2);
@@ -86,7 +94,13 @@ describe('ResultTable', () => {
     const { getByText } = renderAt(
       '/',
       <ResultTable
-        result={{ kind: 'table', columns: ['flag'], rows: [[true]], truncated: false }}
+        result={{
+          kind: 'table',
+          columns: ['flag'],
+          rows: [[true]],
+          truncated: false,
+          resolved: [],
+        }}
       />,
     );
     expect(getByText('true')).toBeInTheDocument();
@@ -101,6 +115,7 @@ describe('ResultTable', () => {
           columns: ['range'],
           rows: [[{ low: 1 }]],
           truncated: false,
+          resolved: [],
         }}
       />,
     );
@@ -111,7 +126,13 @@ describe('ResultTable', () => {
     const { getByText } = renderAt(
       '/',
       <ResultTable
-        result={{ kind: 'table', columns: ['n'], rows: [[1]], truncated: true }}
+        result={{
+          kind: 'table',
+          columns: ['n'],
+          rows: [[1]],
+          truncated: true,
+          resolved: [],
+        }}
       />,
     );
     expect(getByText(/stopped at 1,000 rows/)).toBeInTheDocument();

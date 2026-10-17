@@ -24,6 +24,7 @@ const RESULT = {
   kind: 'reactions' as const,
   reaction_ids: ['ord-viewer0101', 'ord-viewer0102'],
   truncated: false,
+  resolved: [],
 };
 
 afterEach(() => {

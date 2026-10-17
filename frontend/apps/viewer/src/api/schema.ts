@@ -952,6 +952,11 @@ export interface components {
        * @description True when the corpus's bound of 1,000 rows may have cut the answer short
        */
       truncated: boolean;
+      /**
+       * Resolved
+       * @description Each compound name the query gives, with the structure the search matched it as; empty for a query that names none
+       */
+      resolved: components['schemas']['ResolvedCompound'][];
     };
     /**
      * Reduction
@@ -1050,6 +1055,21 @@ export interface components {
             | components['schemas']['ReactionSmarts']
           )
         | null;
+    };
+    /**
+     * ResolvedCompound
+     * @description A compound name from a query, with the structure the search matched it as.
+     */
+    ResolvedCompound: {
+      /** Name */
+      name: string;
+      /**
+       * Smiles
+       * @description The canonical SMILES the name resolved to
+       */
+      smiles: string;
+      /** Molblock */
+      molblock: string | null;
     };
     /**
      * SameCompound
@@ -1202,6 +1222,11 @@ export interface components {
        * @description True when the corpus's bound of 1,000 rows may have cut the answer short
        */
       truncated: boolean;
+      /**
+       * Resolved
+       * @description Each compound name the query gives, with the structure the search matched it as; empty for a query that names none
+       */
+      resolved: components['schemas']['ResolvedCompound'][];
     };
     /** ValidationError */
     ValidationError: {

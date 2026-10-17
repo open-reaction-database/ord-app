@@ -24,6 +24,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema.search import nl
 
+from ord_viewer.molblocks import smiles_molblock
 from ord_viewer.routes.ask import ask_client_from_environment, get_ask_client
 from ord_viewer.testing import DECLINED, StubAskClient, hold_slot, make_client
 
@@ -67,9 +68,27 @@ def test_answers_a_question(client, ask_with):
         "kind": "reactions",
         "reaction_ids": ["ord-viewer0101"],
         "truncated": False,
+        "resolved": [],
     }
     assert body["query"]["where"]["path"] == "inputs.components"
     assert len(stub.requests) == 2
+
+
+def test_an_answer_says_what_a_compound_name_was_searched_as(client, ask_with):
+    where = {"op": "substructure", "path": "smiles", "compound": "pyridine"}
+    ask_with({"where": {**_PYRIDINE_QUERY["where"], "where": where}}, _PYRIDINE_ANSWER)
+    response = client.post("/api/ask", json={"question": "reactions with a pyridine"})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["query"]["where"]["where"]["compound"] == "pyridine"
+    assert body["result"]["reaction_ids"] == ["ord-viewer0101"]
+    assert body["result"]["resolved"] == [
+        {
+            "name": "pyridine",
+            "smiles": "c1ccncc1",
+            "molblock": smiles_molblock("c1ccncc1"),
+        }
+    ]
 
 
 @pytest.mark.parametrize("question", ["   ", "x" * 2001])

@@ -103,6 +103,19 @@ _TRUNCATED = (
     "the answer short"
 )
 
+_RESOLVED = (
+    "Each compound name the query gives, with the structure the search matched it as; "
+    "empty for a query that names none"
+)
+
+
+class ResolvedCompound(BaseModel):
+    """A compound name from a query, with the structure the search matched it as."""
+
+    name: str
+    smiles: str = Field(description="The canonical SMILES the name resolved to")
+    molblock: str | None
+
 
 class ReactionsResult(BaseModel):
     """A plain query's answer: reaction IDs to fetch a page at a time."""
@@ -118,6 +131,7 @@ class ReactionsResult(BaseModel):
         ),
     )
     truncated: bool = Field(description=_TRUNCATED)
+    resolved: list[ResolvedCompound] = Field(description=_RESOLVED)
 
 
 def _base64_bytes(value: Any) -> Any:
@@ -159,6 +173,7 @@ class TableResult(BaseModel):
         ),
     )
     truncated: bool = Field(description=_TRUNCATED)
+    resolved: list[ResolvedCompound] = Field(description=_RESOLVED)
 
     @field_serializer("rows", when_used="json")
     def _encode_bytes(self, rows: list[list[Any]]) -> _Rows:

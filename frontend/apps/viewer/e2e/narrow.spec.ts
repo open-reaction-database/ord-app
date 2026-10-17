@@ -366,6 +366,12 @@ test('asks a question on a phone', async ({ page }) => {
   await expect(page.getByRole('link', { name: REACTION_ID }).first()).toBeVisible();
   await page.getByRole('button', { name: 'The query it ran' }).click();
   await expect(page.getByText('"same_compound"', { exact: false })).toBeVisible();
+  const compound = page
+    .getByRole('list', { name: 'Compounds it named' })
+    .getByRole('listitem');
+  await expect(compound.locator(PREVIEW)).toBeVisible();
+  await expectWhole(compound.getByText('acetyl chloride', { exact: true }));
+  await expectWhole(compound.getByText('CC(=O)Cl', { exact: true }));
   const examples = page.getByRole('button', { name: /^reactions / });
   await expect(examples).toHaveCount(3);
   for (const example of await examples.all()) {

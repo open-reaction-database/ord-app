@@ -41,7 +41,7 @@ from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots
 
 # Names offline_resolver knows; any other name raises, as ord-schema's resolvers do.
-COMPOUND_NAMES = {"pyridine": "c1ccncc1"}
+COMPOUND_NAMES = {"acetyl chloride": "CC(=O)Cl", "pyridine": "c1ccncc1"}
 
 
 def offline_resolver(name: str) -> str:
@@ -398,10 +398,12 @@ ASK_SCRIPTS: dict[str, tuple[dict[str, Any], str]] = {
             "where": {
                 "op": "exists",
                 "path": "inputs.components",
+                # Named, as the model names a well-known compound, so the answer
+                # says what the name was searched as.
                 "where": {
                     "op": "same_compound",
                     "path": "smiles",
-                    "smiles": "CC(=O)Cl",
+                    "compound": "acetyl chloride",
                 },
             },
             "order_by": [{"key": "reaction_id"}],

@@ -21,6 +21,7 @@ import pytest
 from anyio import to_thread
 from fastapi.testclient import TestClient
 
+from ord_viewer.molblocks import smiles_molblock
 from ord_viewer.testing import hold_slot, make_client, portal, slot_waiters
 
 _PYRIDINE_INPUT = {
@@ -45,7 +46,14 @@ def test_substructure(client):
 def test_a_compound_by_name(client):
     where = {"op": "substructure", "path": "smiles", "compound": "pyridine"}
     query = {"where": {**_PYRIDINE_INPUT, "where": where}}
-    assert _ids(client, query) == {"ord-viewer0101"}
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["reaction_ids"] == ["ord-viewer0101"]
+    assert [(each["name"], each["smiles"]) for each in body["resolved"]] == [
+        ("pyridine", "c1ccncc1")
+    ]
+    assert body["resolved"][0]["molblock"] == smiles_molblock("c1ccncc1")
 
 
 def test_an_unknown_name_is_unprocessable(client):
@@ -131,6 +139,7 @@ def test_no_match_is_an_empty_answer(client):
         "kind": "reactions",
         "reaction_ids": [],
         "truncated": False,
+        "resolved": [],
     }
 
 

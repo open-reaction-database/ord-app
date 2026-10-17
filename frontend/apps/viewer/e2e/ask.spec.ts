@@ -31,7 +31,19 @@ test('answers a question with its reactions', async ({ page }) => {
     'ord-viewer0201',
   ]);
   await page.getByRole('button', { name: 'The query it ran' }).click();
-  await expect(page.getByText('"same_compound"', { exact: false })).toBeVisible();
+  const panel = page.getByRole('region', { name: 'The query it ran' });
+  await expect(panel.getByText('"same_compound"', { exact: false })).toBeVisible();
+  await expect(panel.getByText('"compound": "acetyl chloride"')).toBeVisible();
+  // The query's unset fields, written out as null and [], are left out.
+  await expect(panel.locator('pre')).not.toContainText('null');
+  await expect(panel.locator('pre')).not.toContainText('[]');
+  const compound = panel
+    .getByRole('list', { name: 'Compounds it named' })
+    .getByRole('listitem');
+  await expect(compound).toHaveCount(1);
+  await expect(compound).toContainText('acetyl chloride');
+  await expect(compound).toContainText('CC(=O)Cl');
+  await expect(compound.getByRole('img', { name: 'CC(=O)Cl' })).toBeVisible();
 });
 
 test('answers a question with a table', async ({ page }) => {

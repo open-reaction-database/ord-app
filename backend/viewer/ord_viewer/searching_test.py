@@ -14,6 +14,7 @@
 
 """Mapping a query's failures to HTTP statuses, and shaping its table as a result."""
 
+import json
 from decimal import Decimal
 
 import pyarrow as pa
@@ -23,6 +24,7 @@ from ord_schema.search import execute
 from ord_schema.search.query import Query, QueryError
 from pydantic import TypeAdapter
 
+from ord_viewer.molblocks import smiles_molblock
 from ord_viewer.schemas import SearchResult, TableResult
 from ord_viewer.searching import search_errors, to_result
 
@@ -59,6 +61,20 @@ def test_a_plain_query_gives_reaction_ids_and_reads_the_truncation_flag():
     assert result.kind == "reactions"
     assert result.reaction_ids == ["ord-a", "ord-b"]
     assert result.truncated
+    assert result.resolved == []
+
+
+def test_a_result_says_what_each_name_was_searched_as():
+    stamp = json.dumps({"pyridine": "c1ccncc1", "ethanol": "CCO"}).encode()
+    table = pa.table({"reaction_id": ["ord-a"]}).replace_schema_metadata(
+        {execute.RESOLVED: stamp}
+    )
+    result = to_result(Query(), table)
+    assert [(each.name, each.smiles, each.molblock) for each in result.resolved] == [
+        ("pyridine", "c1ccncc1", smiles_molblock("c1ccncc1")),
+        ("ethanol", "CCO", smiles_molblock("CCO")),
+    ]
+    assert not result.truncated
 
 
 def test_an_aggregate_gives_a_table():
@@ -144,18 +160,24 @@ def test_a_fractional_decimal_column_gives_floats():
 
 
 def test_a_bytes_cell_is_base64_in_json():
-    result = TableResult(columns=["image"], rows=[[b"\xff"]], truncated=False)
+    result = TableResult(
+        columns=["image"], rows=[[b"\xff"]], truncated=False, resolved=[]
+    )
     dumped = TypeAdapter(SearchResult).dump_python(result, mode="json")
     assert dumped["rows"] == [["/w=="]]
 
 
 def test_bytes_nested_in_a_cell_are_base64_in_json():
     cells = [{"bytes_value": b"\xff"}, [b"\xff"]]
-    result = TableResult(columns=["image", "list"], rows=[cells], truncated=False)
+    result = TableResult(
+        columns=["image", "list"], rows=[cells], truncated=False, resolved=[]
+    )
     dumped = TypeAdapter(SearchResult).dump_python(result, mode="json")
     assert dumped["rows"] == [[{"bytes_value": "/w=="}, ["/w=="]]]
 
 
 def test_python_mode_keeps_the_bytes():
-    result = TableResult(columns=["image"], rows=[[b"\xff"]], truncated=False)
+    result = TableResult(
+        columns=["image"], rows=[[b"\xff"]], truncated=False, resolved=[]
+    )
     assert result.model_dump()["rows"] == [[b"\xff"]]
