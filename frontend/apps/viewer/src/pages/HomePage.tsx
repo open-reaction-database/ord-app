@@ -174,7 +174,7 @@ function AskBox() {
       p="lg"
       bg="var(--mantine-primary-color-light)"
     >
-      {/* Enter submits only while the Ask button is enabled, so the question is one to ask. */}
+      {/* Enter submits only while Ask is enabled, so a submitted question is never empty or too long. */}
       <form
         onSubmit={event => {
           event.preventDefault();

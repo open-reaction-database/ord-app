@@ -193,8 +193,8 @@ def _corpus(client: TestClient) -> execute.Corpus:
 
 
 def test_finds_the_newest_submission_by_each_dataset_s_first_change(client):
-    # viewer one was changed again after viewer two was submitted, which leaves it the
-    # older submission.
+    # viewer one's records changed, and one was first submitted, after viewer two was
+    # submitted; viewer one's earliest change still leaves it the older submission.
     assert newest_submission(_corpus(client)) == Submission(
         dataset_id="ord_dataset-viewer02",
         submitted=datetime.datetime(2025, 6, 15, 10, 0),

@@ -115,9 +115,10 @@ def _reaction(
     return reaction
 
 
-# A record's first modification is its submission. viewer one was submitted first and
-# modified again after viewer two was submitted; the first reaction of each records no
-# history.
+# A record's first modification is its submission, and a dataset's earliest is the
+# dataset's. viewer one was submitted before viewer two; after viewer two, one of its
+# records was modified again and another first submitted. The first reaction of each
+# records no history.
 DATASETS = (
     dataset_pb2.Dataset(
         dataset_id="ord_dataset-viewer01",
@@ -142,7 +143,7 @@ DATASETS = (
                 reactants=["CCN", "CC(=O)Cl"],
                 product="CCNC(C)=O",
                 yield_percent=75,
-                modified=["2024-03-01T09:30:00", "2025-09-01T08:00:00"],
+                modified=["2025-08-01T12:00:00"],
             ),
         ],
     ),

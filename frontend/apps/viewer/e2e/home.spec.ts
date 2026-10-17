@@ -17,10 +17,17 @@ import { expect, test } from '@playwright/test';
 
 test('opens the newest submission from the front page', async ({ page }) => {
   await page.goto('/');
-  // viewer one was changed after viewer two was submitted, and is still the older one.
+  // viewer one changed after viewer two was submitted, and is still the older one.
   await expect(page.getByText('Recently added · Jun 15, 2025')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'viewer two' })).toBeVisible();
-  await page.getByRole('link', { name: 'View dataset →' }).click();
+  // On a desktop the card sits beside the description, above the question box.
+  const view = page.getByRole('link', { name: 'View dataset →' });
+  const cardBottom = await view.evaluate(link => link.getBoundingClientRect().bottom);
+  const questionTop = await page
+    .getByRole('textbox', { name: 'Question' })
+    .evaluate(box => box.getBoundingClientRect().top);
+  expect(cardBottom).toBeLessThan(questionTop);
+  await view.click();
   await expect(page).toHaveURL('/datasets/ord_dataset-viewer02');
   await expect(page.getByRole('heading', { name: 'viewer two' })).toBeVisible();
 });
