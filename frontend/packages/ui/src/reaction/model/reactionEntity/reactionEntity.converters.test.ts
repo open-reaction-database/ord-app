@@ -17,6 +17,7 @@ import { describe, it, expect } from 'vitest';
 import { create } from '@bufbuild/protobuf';
 import {
   CompoundIdentifierSchema,
+  DateTimeSchema,
   ReactionIdentifierSchema,
   StirringConditions_StirringRateSchema,
   TextureSchema,
@@ -24,12 +25,14 @@ import {
 import {
   ordBooleanToReaction,
   ordCompoundIdentifierToReaction,
+  ordDateTimeToReaction,
   ordReactionIdentifierToReaction,
   ordScalarToReaction,
   ordStirringRateToReaction,
   ordTextureToReaction,
   ordValuePrecisionToReaction,
   reactionBooleanToOrd,
+  reactionDateTimeToOrd,
   reactionValuePrecisionToOrd,
   withId,
   withIdName,
@@ -61,6 +64,40 @@ describe('withIdName / withoutIdName', () => {
 
   it('strips id and name', () => {
     expect(withoutIdName({ id: 'abc', name: 'label', value: 1 })).toEqual({ value: 1 });
+  });
+});
+
+// The form holds times in the user's zone, so these assert what reaches ord, which does not
+// depend on the zone the tests run in.
+describe('DateTime converters', () => {
+  const roundTrip = (value: string) =>
+    reactionDateTimeToOrd(ordDateTimeToReaction(create(DateTimeSchema, { value })));
+
+  it('keeps a date as a date', () => {
+    expect(ordDateTimeToReaction(create(DateTimeSchema, { value: '2024-05-08' }))).toBe(
+      '2024-05-08',
+    );
+    expect(reactionDateTimeToOrd('2024-05-08')).toEqual({ value: '2024-05-08' });
+  });
+
+  it('writes a time in UTC with its Z', () => {
+    expect(roundTrip('2024-06-01T12:00:00Z')).toEqual({
+      value: '2024-06-01T12:00:00Z',
+    });
+    expect(roundTrip('2024-06-01T21:00:00+09:00')).toEqual({
+      value: '2024-06-01T12:00:00Z',
+    });
+  });
+
+  it('writes a time the user entered in UTC with its Z', () => {
+    expect(reactionDateTimeToOrd('2024-06-01T12:00:00')?.value).toMatch(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
+    );
+  });
+
+  it('leaves an empty value unset', () => {
+    expect(ordDateTimeToReaction(create(DateTimeSchema, { value: '' }))).toBeNull();
+    expect(reactionDateTimeToOrd(null)).toBeUndefined();
   });
 });
 

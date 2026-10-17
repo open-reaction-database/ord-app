@@ -19,7 +19,21 @@ import {
   convertUserTZDateToUtc,
   formatUtcDateToDisplay,
   formatDateToDisplay,
+  isDateOnly,
 } from './date.ts';
+
+describe('isDateOnly', () => {
+  it('accepts a date with no time', () => {
+    expect(isDateOnly('2024-05-08')).toBe(true);
+  });
+
+  it('rejects anything with a time or in another shape', () => {
+    expect(isDateOnly('2024-05-08T00:00:00Z')).toBe(false);
+    expect(isDateOnly('2024-05-08T00:00:00')).toBe(false);
+    expect(isDateOnly('05/08/2024')).toBe(false);
+    expect(isDateOnly(' 2024-05-08')).toBe(false);
+  });
+});
 
 // DATE_TIME_HUMAN_FORMAT renders as e.g. "01.06.2024 02:00 pm" (DD.MM.YYYY hh:mm a).
 const humanFormat = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)$/;

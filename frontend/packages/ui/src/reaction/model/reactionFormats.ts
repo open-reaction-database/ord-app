@@ -19,6 +19,10 @@ export const DATE_FORMAT = 'YYYY-MM-DD';
 
 export const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
+// A time as it is written to ord: in UTC, with the Z that says so. ord-schema accepts a
+// DateTime only as a date alone or a time with its offset.
+export const ORD_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
 export const DATE_TIME_HUMAN_FORMAT = 'DD.MM.YYYY hh:mm a';
 
 // 1 MB
