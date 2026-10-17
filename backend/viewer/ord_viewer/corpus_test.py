@@ -60,7 +60,7 @@ def hub(monkeypatch, corpus_dir) -> list[tuple[str, str]]:
         root = pathlib.Path(local_dir)
         fetched = {}
         for artifact, directory in huggingface.ARTIFACT_DIRECTORIES.items():
-            fetched[artifact] = root / huggingface.current_prefix(artifact)
+            fetched[artifact] = root / directory
             shutil.copytree(
                 corpus_dir / directory, fetched[artifact], dirs_exist_ok=True
             )

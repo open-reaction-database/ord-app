@@ -183,16 +183,16 @@ def _fetched_trees(
 
     Args:
         root: The directory to fetch beneath.
-        artifacts_revision: The ord-artifacts revision to fetch the artifacts from;
-            the build fetched is the one this ord-schema and RDKit read as current.
+        artifacts_revision: The ord-artifacts revision to fetch the artifacts from,
+            which must hold a build of this ord-schema's artifact schema and RDKit.
         sources_revision: The ord-data mirror's revision to fetch their sources from.
 
     Returns:
         Where a Corpus reads each tree.
 
     Raises:
-        LookupError: If the artifacts revision holds no build for this ord-schema
-            and RDKit.
+        LookupError: If the artifacts revision holds a build of another artifact
+            schema or RDKit, or lacks an artifact.
         ValueError: If a projection names no source dataset, the mirror holds a
             source only in a format other than Parquet, or a stale source sits in a
             directory reached through a link.
@@ -231,7 +231,7 @@ def open_corpus(
         ValueError: If ORD_VIEWER_CORPUS_DIR is not set, a fetched source cannot be
             served, or a stale one sits behind a link and cannot be deleted.
         FileNotFoundError: If a local corpus directory lacks one of its trees.
-        LookupError: If the artifacts revision holds no build this library reads.
+        LookupError: If the artifacts revision holds a build this library cannot read.
         RuntimeError: If the ord-data mirror holds no file for a source.
         execute.PairingError: If the artifacts are stale or do not form one corpus.
     """

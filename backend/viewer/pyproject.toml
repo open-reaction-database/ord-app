@@ -22,9 +22,9 @@ dependencies = [
     "anyio>=4.15,<5",
     "fastapi>=0.138.0,<0.200",
     # Corpus opens only artifacts stamped with its own RDKit version and artifact
-    # lineage, so RDKit follows the corpus ord-schema publishes and ord-schema stays on
-    # a release whose artifact definitions match it.
-    "ord-schema[huggingface,nl,search]==0.9.3",
+    # schema version, so RDKit follows the corpus ord-schema publishes and ord-schema
+    # stays on a release whose artifact schema matches it.
+    "ord-schema[huggingface,nl,search]==0.9.5",
     "rdkit==2026.3.5",
     "pyarrow>=24,<25",
     "pydantic>=2.13,<3",

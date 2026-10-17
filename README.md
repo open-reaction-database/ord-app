@@ -42,8 +42,8 @@ The service reads these environment variables:
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `ORD_VIEWER_CORPUS_DIR` | required | The corpus root, holding `projections/`, `structures/`, `pivots/`, `occurrences/`, and `sources/`; with the two revisions below set, the writable directory the corpus is fetched into |
-| `ORD_VIEWER_ARTIFACTS_REVISION` | unset | The [ord-artifacts](https://huggingface.co/datasets/open-reaction-database/ord-artifacts) commit to fetch the derived artifacts from at startup; the build fetched is the one this ord-schema and RDKit read. Set with `ORD_VIEWER_SOURCES_REVISION` |
-| `ORD_VIEWER_SOURCES_REVISION` | unset | The [ord-data mirror](https://huggingface.co/datasets/open-reaction-database/ord-data) commit to fetch the artifacts' source datasets from at startup. Set with `ORD_VIEWER_ARTIFACTS_REVISION` |
+| `ORD_VIEWER_ARTIFACTS_REVISION` | unset | The [ord-artifacts](https://huggingface.co/datasets/open-reaction-database/ord-artifacts) commit to fetch the derived artifacts from at startup. Its build must carry the artifact schema version and RDKit the viewer pins, or the fetch fails. Set with `ORD_VIEWER_SOURCES_REVISION` |
+| `ORD_VIEWER_SOURCES_REVISION` | unset | The [ord-data mirror](https://huggingface.co/datasets/open-reaction-database/ord-data) commit to fetch the artifacts' source datasets from at startup: the mirror of the ord-data commit the artifacts' commit message names, or the corpus refuses the sources at open. Set with `ORD_VIEWER_ARTIFACTS_REVISION` |
 | `ORD_VIEWER_MEMORY_LIMIT` | DuckDB's default | DuckDB's `memory_limit`, such as `6500MiB` |
 | `ORD_VIEWER_MAX_CONCURRENT` | 4 | The most searches, asks, and dataset charts' aggregates in flight at once; each search gets cores / this many RDKit threads |
 | `ORD_VIEWER_SEARCH_TIMEOUT_SECONDS` | 30 | The bound on one search, including an ask's; a search past it answers 504 |
