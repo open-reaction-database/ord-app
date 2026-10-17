@@ -18,6 +18,7 @@ import pyarrow as pa
 from ord_schema.search import execute
 from rdkit import Chem
 
+from ord_viewer import main
 from ord_viewer.testing import hold_slot, make_client
 
 
@@ -63,6 +64,26 @@ def test_gets_one_dataset(client):
     response = client.get("/api/datasets/ord_dataset-viewer02")
     assert response.status_code == 200
     assert response.json()["reactions"] == 2
+
+
+def test_gets_the_newest_submitted_dataset(client):
+    response = client.get("/api/datasets/newest")
+    assert response.status_code == 200
+    assert response.json() == {
+        "dataset_id": "ord_dataset-viewer02",
+        "name": "viewer two",
+        "description": "A mirror-image acylation and a named catalyst",
+        "reactions": 2,
+        "submitted": "2025-06-15T10:00:00",
+    }
+
+
+def test_no_dataset_is_newest_when_no_record_holds_a_change(corpus_dir, monkeypatch):
+    monkeypatch.setattr(main, "newest_submission", lambda corpus: None)
+    with make_client(corpus_dir) as undated:
+        response = undated.get("/api/datasets/newest")
+    assert response.status_code == 200
+    assert response.json() is None
 
 
 def test_an_unknown_dataset_is_not_found(client):

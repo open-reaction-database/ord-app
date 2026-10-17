@@ -32,6 +32,12 @@ async function withLongIds(page: Page) {
       json: [{ ...datasets[0], dataset_id: DATASET_ID, description: DESCRIPTION }],
     });
   });
+  await page.route('**/api/datasets/newest', async route => {
+    const newest = await (await route.fetch()).json();
+    await route.fulfill({
+      json: { ...newest, dataset_id: DATASET_ID, description: DESCRIPTION },
+    });
+  });
   await page.route(`**/api/datasets/${DATASET_ID}`, route =>
     route.fulfill({
       json: {
@@ -120,9 +126,34 @@ function lineCount(locator: Locator) {
   });
 }
 
-test('lists datasets with long IDs and links on a phone', async ({ page }) => {
+test('shows the front page on a phone, with the question box before the card', async ({
+  page,
+}) => {
   await withLongIds(page);
   await page.goto('/');
+  const question = page.getByRole('textbox', { name: 'Question' });
+  const view = page.getByRole('link', { name: 'View dataset →' });
+  await expect(view).toHaveAttribute('href', `/datasets/${DATASET_ID}`);
+  const questionBottom = await question.evaluate(
+    box => box.getBoundingClientRect().bottom,
+  );
+  const cardTop = await view.evaluate(link => link.getBoundingClientRect().top);
+  expect(questionBottom).toBeLessThan(cardTop);
+  const examples = page.getByRole('button', { name: /^reactions / });
+  await expect(examples).toHaveCount(3);
+  for (const example of await examples.all()) {
+    await expectWhole(example);
+  }
+  await expectWhole(
+    page.getByRole('link', { name: 'Or search by structure and conditions →' }),
+  );
+  await expectWhole(view);
+  await expectNoSidewaysScroll(page);
+});
+
+test('lists datasets with long IDs and links on a phone', async ({ page }) => {
+  await withLongIds(page);
+  await page.goto('/datasets');
   await expect(
     page.getByRole('link', { name: 'https://example.com', exact: false }),
   ).toBeVisible();
@@ -131,7 +162,7 @@ test('lists datasets with long IDs and links on a phone', async ({ page }) => {
 
 test("shows a dataset's whole description on a phone", async ({ page }) => {
   await withLongIds(page);
-  await page.goto('/');
+  await page.goto('/datasets');
   await page.getByRole('button', { name: 'Show all of the description' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('link')).toBeInViewport({ ratio: 1 });

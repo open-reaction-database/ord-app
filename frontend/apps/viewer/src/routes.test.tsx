@@ -26,6 +26,7 @@ describe('ViewerRoutes', () => {
   beforeEach(() => {
     mockApi({
       'GET /api/datasets': [],
+      'GET /api/datasets/newest': null,
       'GET /api/reactions': [],
       'GET /api/reactions/ord-viewer0101': VIEWER0101,
     });
@@ -35,8 +36,15 @@ describe('ViewerRoutes', () => {
     vi.restoreAllMocks();
   });
 
-  it('shows the datasets at /', async () => {
-    const { findByRole } = renderAt('/', <ViewerRoutes />);
+  it('shows the front page at /', () => {
+    const { getByRole } = renderAt('/', <ViewerRoutes />);
+    expect(
+      getByRole('heading', { name: 'The Open Reaction Database' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the datasets at /datasets', async () => {
+    const { findByRole } = renderAt('/datasets', <ViewerRoutes />);
     expect(await findByRole('heading', { name: 'Datasets' })).toBeInTheDocument();
   });
 
@@ -65,10 +73,9 @@ describe('ViewerRoutes', () => {
     expect(getByRole('button', { name: 'Search' })).toBeInTheDocument();
   });
 
-  it('shows /ask without listing it in the navigation', () => {
-    const { getByRole, queryByRole } = renderAt('/ask', <ViewerRoutes />);
+  it('shows /ask', () => {
+    const { getByRole } = renderAt('/ask', <ViewerRoutes />);
     expect(getByRole('heading', { name: 'Ask about reactions' })).toBeInTheDocument();
-    expect(queryByRole('link', { name: /ask/i })).not.toBeInTheDocument();
   });
 
   it('shows About', () => {
@@ -83,7 +90,7 @@ describe('ViewerRoutes', () => {
 
   // Each redirect replaces the path it left, so history holds one entry.
   it.each([
-    ['/browse', '/'],
+    ['/browse', '/datasets'],
     ['/dataset/ord_dataset-01', '/datasets/ord_dataset-01'],
     ['/dataset/a%2Fb', '/datasets/a%2Fb'],
     ['/id/ord-0123', '/reactions/ord-0123'],

@@ -149,7 +149,7 @@ export function DatasetsPage() {
     body = <DatasetTable datasets={datasets.data} />;
   }
   return (
-    <ViewerPage breadcrumbs={[{ title: 'Datasets', path: '/' }]}>
+    <ViewerPage breadcrumbs={[{ title: 'Datasets', path: '/datasets' }]}>
       <Stack gap="md">
         <Title order={2}>Datasets</Title>
         {body}

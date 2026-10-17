@@ -21,6 +21,7 @@ import type {
   CompoundCount,
   CompoundSide,
   DatasetSummary,
+  NewestDataset,
   Query,
   ReactionRecord,
   SearchRequest,
@@ -39,6 +40,15 @@ export function useDatasets() {
     queryKey: ['datasets'],
     queryFn: ({ signal }) =>
       getJson<Array<DatasetSummary>>('/api/datasets', undefined, signal),
+  });
+}
+
+/** The most recently submitted dataset, or null when no record holds a change. */
+export function useNewestDataset() {
+  return useQuery({
+    queryKey: ['newest-dataset'],
+    queryFn: ({ signal }) =>
+      getJson<NewestDataset | null>('/api/datasets/newest', undefined, signal),
   });
 }
 

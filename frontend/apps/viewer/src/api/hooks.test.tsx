@@ -24,6 +24,7 @@ import {
   useCompounds,
   useDataset,
   useDatasets,
+  useNewestDataset,
   useReaction,
   useReactions,
   useSearch,
@@ -51,6 +52,14 @@ describe('hooks', () => {
     const { result } = renderHook(() => useDatasets(), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(fetch).toHaveBeenCalledWith('/api/datasets', expect.anything());
+  });
+
+  it('useNewestDataset reads /api/datasets/newest, which may be null', async () => {
+    const fetch = respond(null);
+    const { result } = renderHook(() => useNewestDataset(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBeNull();
+    expect(fetch).toHaveBeenCalledWith('/api/datasets/newest', expect.anything());
   });
 
   it('useCompounds encodes the dataset ID and names the side', async () => {

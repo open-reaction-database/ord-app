@@ -47,6 +47,33 @@
         }
       }
     },
+    "/api/datasets/newest": {
+      "get": {
+        "summary": "Newest Dataset",
+        "description": "Return the most recently submitted dataset.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with when it was submitted, or None when no record in the corpus\n    holds a change.",
+        "operationId": "newest_dataset_api_datasets_newest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/NewestDataset"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Newest Dataset Api Datasets Newest Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/datasets/{dataset_id}": {
       "get": {
         "summary": "Get Dataset",
@@ -1234,6 +1261,41 @@
         ],
         "title": "MeasurementMolblocks",
         "description": "The structures one product measurement names."
+      },
+      "NewestDataset": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "reactions": {
+            "type": "integer",
+            "title": "Reactions"
+          },
+          "submitted": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "name",
+          "description",
+          "reactions",
+          "submitted"
+        ],
+        "title": "NewestDataset",
+        "description": "The corpus's most recently submitted dataset."
       },
       "Not-Input": {
         "properties": {

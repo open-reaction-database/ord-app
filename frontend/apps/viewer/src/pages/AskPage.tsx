@@ -20,7 +20,6 @@ import {
   Flex,
   Group,
   Loader,
-  Paper,
   Stack,
   Text,
   Textarea,
@@ -30,38 +29,12 @@ import { useState } from 'react';
 import { useLocation, useSearchParams } from 'wouter';
 import { useAsk } from '#api/hooks.ts';
 import type { AskResponse } from '#api/types.ts';
+import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
+import { askPath, isTooLong, MAX_QUESTION } from '#ask/questions.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
-
-/** The backend's bound on a question's length in characters, after trimming. */
-export const MAX_QUESTION = 2000;
-
-/** ord-interface's examples. */
-export const ASK_EXAMPLES = [
-  'reactions for synthesizing ibuprofen',
-  'reactions using benzene as an input with yield greater than 70%',
-  'reactions that make an aryl boronic acid',
-];
-
-/** A standing note, not an alert, so it is not announced when the page loads. */
-function DevelopmentNote() {
-  return (
-    <Paper
-      p="sm"
-      radius="md"
-      bg="var(--mantine-color-yellow-light)"
-    >
-      <Text
-        size="sm"
-        c="var(--mantine-color-yellow-light-color)"
-      >
-        This feature is in development — results may be incomplete or change.
-      </Text>
-    </Paper>
-  );
-}
 
 interface AskFormProps {
   question: string;
@@ -72,8 +45,7 @@ interface AskFormProps {
 function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
   const [draft, setDraft] = useState(question);
   const trimmed = draft.trim();
-  // By code point, as the backend counts, not by UTF-16 unit as length does.
-  const tooLong = [...trimmed].length > MAX_QUESTION;
+  const tooLong = isTooLong(trimmed);
   return (
     <>
       <Textarea
@@ -86,25 +58,12 @@ function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
         onChange={event => setDraft(event.currentTarget.value)}
       />
       <Group justify="space-between">
-        <Group gap="xs">
-          {ASK_EXAMPLES.map(example => (
-            <Button
-              key={example}
-              variant="light"
-              size="xs"
-              // Mantine keeps a button's label on one line, which runs past a phone's edge.
-              h="auto"
-              py={6}
-              styles={{ label: { whiteSpace: 'normal', textAlign: 'left' } }}
-              onClick={() => {
-                setDraft(example);
-                onAsk(example);
-              }}
-            >
-              {example}
-            </Button>
-          ))}
-        </Group>
+        <ExampleQuestions
+          onAsk={example => {
+            setDraft(example);
+            onAsk(example);
+          }}
+        />
         <Button
           disabled={trimmed === '' || tooLong}
           onClick={() => onAsk(trimmed)}
@@ -154,7 +113,7 @@ export function AskPage() {
   // The question already asked is asked again only after a failure; an answer is kept.
   const ask = (text: string) => {
     if (text !== question) {
-      navigate(`/ask?${new URLSearchParams({ q: text })}`);
+      navigate(askPath(text));
     } else if (answer.isError) {
       void answer.refetch();
     }
@@ -181,7 +140,6 @@ export function AskPage() {
   return (
     <ViewerPage breadcrumbs={[{ title: 'Ask', path: '/ask' }]}>
       <Stack gap="md">
-        <DevelopmentNote />
         <Title order={2}>Ask about reactions</Title>
         <AskForm
           key={question}
