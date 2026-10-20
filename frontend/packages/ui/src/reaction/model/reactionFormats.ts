@@ -19,8 +19,11 @@ export const DATE_FORMAT = 'YYYY-MM-DD';
 
 export const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-// A time as it is written to ord: in UTC, with the Z that says so. ord-schema accepts a
-// DateTime only as a date alone or a time with its offset.
+// A time in a form, in the user's zone with the offset that says so; it is written to ord in
+// UTC. A time without an offset is kept as written.
+export const FORM_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ';
+
+// A time with an offset as it is written to ord: in UTC, with the Z that says so.
 export const ORD_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
 export const DATE_HUMAN_FORMAT = 'DD.MM.YYYY';

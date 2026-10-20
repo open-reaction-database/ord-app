@@ -27,18 +27,23 @@ dayjs.extend(timezone);
 const userTimezone = dayjs.tz.guess();
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+const WITH_OFFSET = /T[\d:.]+(Z|[+-]\d{2}:?\d{2})$/;
 
-// A date with no time names a day in no particular zone, so it is never shifted between zones.
 export function isDateOnly(value: string): boolean {
   return DATE_ONLY.test(value);
 }
 
-export function convertUtcDateToUserTZ(inputDate: string): dayjs.Dayjs {
-  return dayjs.utc(inputDate).tz(userTimezone);
+// A date, or a time without an offset, names no instant, so it is never shifted between zones.
+export function hasOffset(value: string): boolean {
+  return WITH_OFFSET.test(value);
 }
 
-export function convertUserTZDateToUtc(inputDate: string | Date): dayjs.Dayjs {
-  return dayjs.tz(inputDate, userTimezone).utc();
+export function convertOffsetDateToUtc(inputDate: string): dayjs.Dayjs {
+  return dayjs.utc(inputDate);
+}
+
+export function convertUtcDateToUserTZ(inputDate: string): dayjs.Dayjs {
+  return dayjs.utc(inputDate).tz(userTimezone);
 }
 
 export function formatUtcDateToDisplay(inputDate: string) {

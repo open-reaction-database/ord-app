@@ -67,8 +67,8 @@ describe('withIdName / withoutIdName', () => {
   });
 });
 
-// The form holds times in the user's zone, so these assert what reaches ord, which does not
-// depend on the zone the tests run in.
+// The form holds times with an offset in the user's zone, so these assert what reaches ord, which
+// does not depend on the zone the tests run in.
 describe('DateTime converters', () => {
   const roundTrip = (value: string) =>
     reactionDateTimeToOrd(ordDateTimeToReaction(create(DateTimeSchema, { value })));
@@ -80,32 +80,40 @@ describe('DateTime converters', () => {
     expect(reactionDateTimeToOrd('2024-05-08')).toEqual({ value: '2024-05-08' });
   });
 
-  it('writes a time in UTC with its Z', () => {
+  it('keeps a time without an offset as written', () => {
+    expect(
+      ordDateTimeToReaction(create(DateTimeSchema, { value: '2021-10-22T22:19:55' })),
+    ).toBe('2021-10-22T22:19:55');
+    expect(reactionDateTimeToOrd('2021-10-22T22:19:55.5')).toEqual({
+      value: '2021-10-22T22:19:55.5',
+    });
+  });
+
+  it('writes a time with an offset as the UTC instant it names, with its Z', () => {
     expect(roundTrip('2024-06-01T12:00:00Z')).toEqual({
       value: '2024-06-01T12:00:00Z',
     });
     expect(roundTrip('2024-06-01T21:00:00+09:00')).toEqual({
       value: '2024-06-01T12:00:00Z',
     });
+    expect(reactionDateTimeToOrd('2024-06-01T12:00:00-04:00')).toEqual({
+      value: '2024-06-01T16:00:00Z',
+    });
   });
 
-  it('writes a time the user entered as the UTC instant it names', () => {
-    // The Date constructor reads its fields in the local zone, independently of dayjs.
-    const expected = new Date(2024, 5, 1, 12).toISOString().replace('.000Z', 'Z');
-    expect(reactionDateTimeToOrd('2024-06-01T12:00:00')).toEqual({ value: expected });
-  });
-
-  // The suite may run in UTC, where converting from the user's zone changes nothing.
-  it('converts an entered time out of a zone other than UTC', async () => {
+  // The suite may run in UTC, where showing a time in the user's zone changes nothing.
+  it("shows a time with an offset in the user's zone, with that zone's offset", async () => {
     vi.stubEnv('TZ', 'Asia/Tokyo');
     vi.resetModules();
     try {
       const converters = await import('./reactionEntity.converters.ts');
-      expect(converters.reactionDateTimeToOrd('2024-06-01T12:00:00')).toEqual({
+      expect(
+        converters.ordDateTimeToReaction(
+          create(DateTimeSchema, { value: '2024-06-01T03:00:00Z' }),
+        ),
+      ).toBe('2024-06-01T12:00:00+09:00');
+      expect(converters.reactionDateTimeToOrd('2024-06-01T12:00:00+09:00')).toEqual({
         value: '2024-06-01T03:00:00Z',
-      });
-      expect(converters.reactionDateTimeToOrd('2024-06-01')).toEqual({
-        value: '2024-06-01',
       });
     } finally {
       vi.unstubAllEnvs();

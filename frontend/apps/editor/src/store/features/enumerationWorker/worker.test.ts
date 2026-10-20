@@ -182,6 +182,16 @@ describe('value coercion by VariableType', () => {
     expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00');
   });
 
+  it('keeps the instant and an offset for a DateTime variable written with one', () => {
+    run({
+      variables: [makeVariable(VariableType.DateTime)],
+      rows: [{ col1: '2024-01-15T08:30:00+05:30' }],
+    });
+    const value = lastMergedTemplate().valueField as string;
+    expect(value).toMatch(/[+-]\d{2}:\d{2}$/);
+    expect(Date.parse(value)).toBe(Date.parse('2024-01-15T03:00:00Z'));
+  });
+
   it('accepts a plain ISO date, single-digit European, and common human-authored formats', () => {
     for (const input of [
       '2025-04-01',

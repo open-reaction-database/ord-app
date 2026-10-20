@@ -15,12 +15,27 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
+  convertOffsetDateToUtc,
   convertUtcDateToUserTZ,
-  convertUserTZDateToUtc,
   formatUtcDateToDisplay,
   formatDateToDisplay,
+  hasOffset,
   isDateOnly,
 } from './date.ts';
+
+describe('hasOffset', () => {
+  it('accepts a time with Z or a numeric offset', () => {
+    expect(hasOffset('2024-05-08T00:00:00Z')).toBe(true);
+    expect(hasOffset('2024-05-08T00:00:00.5+09:00')).toBe(true);
+    expect(hasOffset('2024-05-08T00:00:00-0400')).toBe(true);
+  });
+
+  it('rejects a date, or a time without an offset', () => {
+    expect(hasOffset('2024-05-08')).toBe(false);
+    expect(hasOffset('2024-05-08T00:00:00')).toBe(false);
+    expect(hasOffset('2024-05-08T00:00:00.5')).toBe(false);
+  });
+});
 
 describe('isDateOnly', () => {
   it('accepts a date with no time', () => {
@@ -46,10 +61,9 @@ describe('timezone conversions', () => {
     expect(convertUtcDateToUserTZ(iso).valueOf()).toBe(Date.parse(iso));
   });
 
-  it('converts an absolute Date to a UTC-mode value at the same instant', () => {
-    const date = new Date('2024-06-01T12:00:00Z');
-    const utc = convertUserTZDateToUtc(date);
-    expect(utc.valueOf()).toBe(date.getTime());
+  it('reads a time with an offset as a UTC-mode value at the same instant', () => {
+    const utc = convertOffsetDateToUtc('2024-06-01T21:00:00+09:00');
+    expect(utc.valueOf()).toBe(Date.parse('2024-06-01T12:00:00Z'));
     expect(utc.utcOffset()).toBe(0);
   });
 });

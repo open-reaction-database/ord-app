@@ -29,6 +29,8 @@ import {
   ordBooleanToReaction,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
+  FORM_DATE_TIME_FORMAT,
+  hasOffset,
 } from '@open-reaction-database/ui/reaction/model';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 import dayjs from 'dayjs';
@@ -86,9 +88,11 @@ function getDateOrError(value: ValueType, variable: Variable): string {
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }
-  return variable.type === VariableType.Date
-    ? date.format(DATE_FORMAT)
-    : date.format(DATE_TIME_FORMAT);
+  if (variable.type === VariableType.Date) {
+    return date.format(DATE_FORMAT);
+  }
+  // A time keeps the offset it was written with, and gains none it was not.
+  return date.format(hasOffset(value) ? FORM_DATE_TIME_FORMAT : DATE_TIME_FORMAT);
 }
 
 function getSelectOrError(value: ValueType, variable: Variable): string {
