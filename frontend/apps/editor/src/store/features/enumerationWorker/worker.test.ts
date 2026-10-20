@@ -183,13 +183,16 @@ describe('value coercion by VariableType', () => {
   });
 
   it('keeps the instant and an offset for a DateTime variable written with one', () => {
-    run({
-      variables: [makeVariable(VariableType.DateTime)],
-      rows: [{ col1: '2024-01-15T08:30:00+05:30' }],
-    });
-    const value = lastMergedTemplate().valueField as string;
-    expect(value).toMatch(/[+-]\d{2}:\d{2}$/);
-    expect(Date.parse(value)).toBe(Date.parse('2024-01-15T03:00:00Z'));
+    // A space before the time is ISO 8601 the worker accepts, so it keeps its offset too.
+    for (const input of ['2024-01-15T08:30:00+05:30', '2024-01-15 08:30:00+05:30']) {
+      run({
+        variables: [makeVariable(VariableType.DateTime)],
+        rows: [{ col1: input }],
+      });
+      const value = lastMergedTemplate().valueField as string;
+      expect(value).toMatch(/[+-]\d{2}:\d{2}$/);
+      expect(Date.parse(value)).toBe(Date.parse('2024-01-15T03:00:00Z'));
+    }
   });
 
   it('accepts a plain ISO date, single-digit European, and common human-authored formats', () => {

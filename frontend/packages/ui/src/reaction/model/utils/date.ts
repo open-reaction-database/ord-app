@@ -27,7 +27,8 @@ dayjs.extend(timezone);
 const userTimezone = dayjs.tz.guess();
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
-const WITH_OFFSET = /T[\d:.]+(Z|[+-]\d{2}:?\d{2})$/;
+// The same separators the enumeration worker reads: a T or a space before the time.
+const WITH_OFFSET = /[T ][\d:.]+(Z|[+-]\d{2}:?\d{2})$/;
 
 export function isDateOnly(value: string): boolean {
   return DATE_ONLY.test(value);

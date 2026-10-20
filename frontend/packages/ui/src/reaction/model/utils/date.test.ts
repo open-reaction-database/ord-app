@@ -28,6 +28,7 @@ describe('hasOffset', () => {
     expect(hasOffset('2024-05-08T00:00:00Z')).toBe(true);
     expect(hasOffset('2024-05-08T00:00:00.5+09:00')).toBe(true);
     expect(hasOffset('2024-05-08T00:00:00-0400')).toBe(true);
+    expect(hasOffset('2024-05-08 00:00:00+05:30')).toBe(true);
   });
 
   it('rejects a date, or a time without an offset', () => {
