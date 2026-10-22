@@ -128,7 +128,7 @@ def test_a_first_commit_date(client):
     assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
 
 
-def test_the_latest_first_commit_is_a_date(client):
+def test_a_first_commit_measure_is_an_iso_date(client):
     query = {
         "aggregate": {
             "group_by": ["dataset_id"],
