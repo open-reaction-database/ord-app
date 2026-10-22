@@ -20,7 +20,7 @@ import glob
 import pathlib
 import tempfile
 import types
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
 from typing import Any, cast
 
@@ -304,12 +304,18 @@ def slot_waiters(client: TestClient) -> int:
 
 
 def make_client(
-    corpus_dir: pathlib.Path, *, ask_client: Any = None, **settings: Any
+    corpus_dir: pathlib.Path,
+    *,
+    resolver: Callable[[str], str] | None = offline_resolver,
+    ask_client: Any = None,
+    **settings: Any,
 ) -> TestClient:
     """Return an unentered client over corpus_dir, with any settings overridden.
 
     Args:
         corpus_dir: The corpus the app serves.
+        resolver: Resolves compound names in queries; None keeps the app's default,
+            ord-schema's resolvers.
         ask_client: What /api/ask calls messages.create on: an anthropic.Anthropic, or a
             stub that scripts its responses. None answers 503, as with no key.
         **settings: Settings fields to set beyond corpus_dir.
@@ -319,7 +325,7 @@ def make_client(
     """
     app = create_app(
         lambda: Settings(corpus_dir=corpus_dir, **settings),
-        resolver=offline_resolver,
+        resolver=resolver,
         ask_client_factory=lambda: ask_client,
     )
     return TestClient(app)
