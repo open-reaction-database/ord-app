@@ -72,7 +72,8 @@ def test_startup_fails_without_a_corpus_directory():
 
 
 @pytest.mark.parametrize(
-    "missing", ["projections", "structures", "pivots", "occurrences", "sources"]
+    "missing",
+    ["projections", "structures", "arrivals", "pivots", "occurrences", "sources"],
 )
 def test_startup_names_a_missing_tree(corpus_dir, tmp_path, missing):
     partial = tmp_path / "corpus"
