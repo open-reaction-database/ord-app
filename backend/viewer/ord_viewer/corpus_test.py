@@ -15,14 +15,13 @@
 import dataclasses
 import pathlib
 import shutil
-from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from ord_schema import huggingface, message_helpers, resolvers
+from ord_schema import huggingface, message_helpers
 from ord_schema.artifacts import base
 
-from ord_viewer.corpus import open_corpus, resolve_compound_name
+from ord_viewer.corpus import open_corpus
 from ord_viewer.settings import Settings
 from ord_viewer.testing import make_client, offline_resolver
 
@@ -68,6 +67,7 @@ def hub(monkeypatch, corpus_dir) -> list[tuple[str, str]]:
             revision=revision,
             projections=fetched["projection"],
             structures=fetched["structures"],
+            arrivals=fetched["arrivals"],
             pivots=fetched["pivot"],
             occurrences=fetched["occurrences"],
         )
@@ -147,31 +147,3 @@ def test_refuses_a_projection_that_names_no_source(hub, monkeypatch, tmp_path):
     settings = fetching_settings(tmp_path)
     with pytest.raises(ValueError, match="names no source dataset to fetch"):
         open_corpus(settings, resolver=offline_resolver)
-
-
-@pytest.fixture
-def fresh_resolver_cache() -> Generator[None]:
-    """Empty the resolver cache before and after the test."""
-    resolve_compound_name.cache_clear()
-    yield
-    resolve_compound_name.cache_clear()
-
-
-def test_caches_names_that_resolve_and_retries_names_that_do_not(
-    monkeypatch, fresh_resolver_cache
-):
-    asked = []
-
-    def resolve_name(value_type, value):
-        asked.append(value)
-        if value == "pyridine":
-            return "c1ccncc1", "test"
-        raise ValueError(f"Could not resolve {value_type} {value} to SMILES")
-
-    monkeypatch.setattr(resolvers, "resolve_name", resolve_name)
-    assert resolve_compound_name("pyridine") == "c1ccncc1"
-    assert resolve_compound_name("pyridine") == "c1ccncc1"
-    for _ in range(2):
-        with pytest.raises(ValueError, match="Could not resolve name unobtainium"):
-            resolve_compound_name("unobtainium")
-    assert asked == ["pyridine", "unobtainium", "unobtainium"]

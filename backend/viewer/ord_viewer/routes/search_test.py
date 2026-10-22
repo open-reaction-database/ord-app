@@ -117,6 +117,34 @@ def test_a_dataset(client):
     assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
 
 
+def test_a_first_commit_date(client):
+    query = {
+        "where": {
+            "op": "ge",
+            "path": "first_commit.timestamp",
+            "value": {"literal": "2022-01-01"},
+        }
+    }
+    assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
+
+
+def test_the_latest_first_commit_is_a_date(client):
+    query = {
+        "aggregate": {
+            "group_by": ["dataset_id"],
+            "measures": [
+                {"fn": "max", "path": "first_commit.timestamp", "name": "arrived"}
+            ],
+        }
+    }
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 200, response.text
+    assert sorted(response.json()["rows"]) == [
+        ["ord_dataset-viewer01", "2021-07-28"],
+        ["ord_dataset-viewer02", "2023-03-02"],
+    ]
+
+
 def test_a_reaction_smarts(client):
     query = {"where": {"op": "reaction_smarts", "smarts": "cB(O)O.c[Br,I]>>c-c"}}
     assert _ids(client, query) == {"ord-viewer0101"}

@@ -18,17 +18,22 @@ import argparse
 import contextlib
 import glob
 import pathlib
+import tempfile
 import types
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 from typing import Any, cast
 
 import anthropic
+import pyarrow as pa
 from anthropic.types import TextBlock, ToolUseBlock
 from anyio.from_thread import BlockingPortal
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import parquet
+from ord_schema.artifacts import history
 from ord_schema.artifacts.scripts import (
+    derive_arrivals,
     derive_occurrences,
     derive_pivots,
     derive_projection,
@@ -160,6 +165,36 @@ DATASETS = (
 )
 
 
+# The commit each dataset's reactions first reached ord-data in, and its time; the
+# second dataset arrived later, so a query on first_commit tells them apart.
+ARRIVALS = {
+    "ord_dataset-viewer01": ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
+    "ord_dataset-viewer02": ("2" * 40, datetime(2023, 3, 2, 9, 30)),
+}
+
+
+def _write_arrivals_index(path: pathlib.Path) -> None:
+    """Write an index of first commits placing each dataset's reactions at ARRIVALS.
+
+    Args:
+        path: Where to write the index.
+    """
+    rows = [
+        {
+            "reaction_id": reaction.reaction_id,
+            "sha": ARRIVALS[dataset.dataset_id][0],
+            "timestamp": ARRIVALS[dataset.dataset_id][1],
+            "utc_offset_minutes": 0,
+            "dataset_id": dataset.dataset_id,
+        }
+        for dataset in DATASETS
+        for reaction in dataset.reactions
+    ]
+    table = pa.Table.from_pylist(rows, schema=history.INDEX_SCHEMA)
+    chain = [sha for sha, _ in ARRIVALS.values()]
+    history.write_index(history.Index(table, chain), path)
+
+
 def derive_corpus(root: pathlib.Path) -> None:
     """Write DATASETS as sources under root and derive every artifact to read.
 
@@ -188,6 +223,18 @@ def derive_corpus(root: pathlib.Path) -> None:
             ]
         )
     )
+    with tempfile.TemporaryDirectory() as scratch:
+        index = pathlib.Path(scratch) / "arrivals_index.parquet"
+        _write_arrivals_index(index)
+        derive_arrivals.main(
+            derive_arrivals.parse_args(
+                [
+                    f"--input_pattern={pattern_root}/projections/*/*.parquet",
+                    f"--output_dir={root}/arrivals",
+                    f"--index={index}",
+                ]
+            )
+        )
     derive_pivots.main(
         derive_pivots.parse_args(
             [
