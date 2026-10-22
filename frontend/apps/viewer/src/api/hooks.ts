@@ -43,7 +43,7 @@ export function useDatasets() {
   });
 }
 
-/** The most recently submitted dataset, or null when no record holds a change. */
+/** The dataset that most recently reached ord-data, or null when none has a first commit. */
 export function useNewestDataset() {
   return useQuery({
     queryKey: ['newest-dataset'],

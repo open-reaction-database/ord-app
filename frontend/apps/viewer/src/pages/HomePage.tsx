@@ -136,7 +136,7 @@ function NewestDatasetCard({ dataset }: Readonly<{ dataset: NewestDataset }>) {
           tt="uppercase"
           c="dimmed"
         >
-          Recently added · {DAY.format(new Date(dataset.submitted))}
+          Recently added · {DAY.format(new Date(dataset.arrived))}
         </Text>
         <Title order={3}>{dataset.name}</Title>
         <Text

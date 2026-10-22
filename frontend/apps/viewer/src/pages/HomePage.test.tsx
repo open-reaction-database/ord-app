@@ -42,7 +42,7 @@ const NEWEST = {
   name: 'Ni-catalyzed couplings',
   description: 'A screen; see https://example.com for more.',
   reactions: 1536,
-  submitted: '2025-06-15',
+  arrived: '2023-03-02',
 };
 
 function failure(detail: string) {
@@ -84,7 +84,7 @@ describe('HomePage', () => {
 
   it('shows the newest dataset, linked to its page', async () => {
     const { findByText, getByRole, getByText } = show();
-    expect(await findByText('Recently added · Jun 15, 2025')).toBeInTheDocument();
+    expect(await findByText('Recently added · Mar 2, 2023')).toBeInTheDocument();
     expect(
       getByRole('heading', { name: 'Ni-catalyzed couplings' }),
     ).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('leaves the card out when no dataset has a submission date', async () => {
+  it('leaves the card out when no dataset has a first commit', async () => {
     const { container, queryByText } = show({ newest: null });
     // Each request shows a placeholder until it settles.
     await waitFor(() =>

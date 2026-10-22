@@ -66,7 +66,7 @@ def test_gets_one_dataset(client):
     assert response.json()["reactions"] == 2
 
 
-def test_gets_the_newest_submitted_dataset(client):
+def test_gets_the_dataset_that_arrived_last(client):
     response = client.get("/api/datasets/newest")
     assert response.status_code == 200
     assert response.json() == {
@@ -74,12 +74,14 @@ def test_gets_the_newest_submitted_dataset(client):
         "name": "viewer two",
         "description": "A mirror-image acylation and a named catalyst",
         "reactions": 2,
-        "submitted": "2025-06-15",
+        "arrived": "2023-03-02",
     }
 
 
-def test_no_dataset_is_newest_when_no_record_holds_a_change(corpus_dir, monkeypatch):
-    monkeypatch.setattr(main, "newest_submission", lambda corpus: None)
+def test_no_dataset_is_newest_when_no_reaction_has_a_first_commit(
+    corpus_dir, monkeypatch
+):
+    monkeypatch.setattr(main, "newest_arrival", lambda corpus: None)
     with make_client(corpus_dir) as undated:
         response = undated.get("/api/datasets/newest")
     assert response.status_code == 200

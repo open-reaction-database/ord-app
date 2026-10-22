@@ -79,14 +79,14 @@ export interface paths {
     };
     /**
      * Newest Dataset
-     * @description Return the most recently submitted dataset.
+     * @description Return the dataset that most recently reached ord-data.
      *
      *     Args:
      *         state: The settings and open corpus.
      *
      *     Returns:
-     *         The dataset, with the day it was submitted, or None when no record in the
-     *         corpus holds a change.
+     *         The dataset, with the day it arrived, or None when no reaction in the corpus
+     *         has a first commit.
      */
     get: operations['newest_dataset_api_datasets_newest_get'];
     put?: never;
@@ -637,7 +637,7 @@ export interface components {
     };
     /**
      * NewestDataset
-     * @description The corpus's most recently submitted dataset.
+     * @description The dataset that most recently reached ord-data.
      */
     NewestDataset: {
       /** Dataset Id */
@@ -649,10 +649,10 @@ export interface components {
       /** Reactions */
       reactions: number;
       /**
-       * Submitted
+       * Arrived
        * Format: date
        */
-      submitted: string;
+      arrived: string;
     };
     /**
      * Not

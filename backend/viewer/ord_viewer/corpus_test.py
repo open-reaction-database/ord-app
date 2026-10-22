@@ -26,7 +26,7 @@ from ord_schema import huggingface, message_helpers
 from ord_schema.artifacts import base
 from ord_schema.search import execute
 
-from ord_viewer.corpus import Submission, newest_submission, open_corpus
+from ord_viewer.corpus import Arrival, newest_arrival, open_corpus
 from ord_viewer.settings import Settings
 from ord_viewer.testing import make_client, offline_resolver
 
@@ -159,21 +159,21 @@ def _corpus(client: TestClient) -> execute.Corpus:
     return cast(FastAPI, client.app).state.viewer.corpus
 
 
-def test_finds_the_newest_submission_by_each_dataset_s_first_change(client):
-    # viewer one's records changed, and one was first submitted, after viewer two was
-    # submitted; viewer one's earliest change still leaves it the older submission.
-    assert newest_submission(_corpus(client)) == Submission(
+def test_finds_the_newest_arrival_by_each_dataset_s_first_commit(client):
+    # A reaction was added to viewer one after viewer two arrived; viewer one's first
+    # commit still leaves it the earlier arrival.
+    assert newest_arrival(_corpus(client)) == Arrival(
         dataset_id="ord_dataset-viewer02",
-        submitted=datetime.date(2025, 6, 15),
+        arrived=datetime.date(2023, 3, 2),
     )
 
 
-def test_finds_no_submission_when_no_record_holds_a_change(client, monkeypatch):
+def test_finds_no_arrival_when_no_reaction_has_a_first_commit(client, monkeypatch):
     unmatched = pa.table(
         {
             "dataset_id": pa.array([], type=pa.string()),
-            "submitted": pa.array([], type=pa.date32()),
+            "arrived": pa.array([], type=pa.date32()),
         }
     )
     monkeypatch.setattr(execute.Corpus, "search", lambda self, request: unmatched)
-    assert newest_submission(_corpus(client)) is None
+    assert newest_arrival(_corpus(client)) is None

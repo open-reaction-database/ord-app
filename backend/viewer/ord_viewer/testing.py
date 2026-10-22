@@ -76,9 +76,8 @@ def _reaction(
     catalyst_name: str | None = None,
     conversion_percent: float | None = None,
     doi: str | None = None,
-    modified: Sequence[str] = (),
 ) -> reaction_pb2.Reaction:
-    """Build a reaction with an optional yield, catalyst, conversion, DOI, and history.
+    """Build a reaction with an optional yield, catalyst, conversion, and DOI.
 
     Args:
         reaction_id: The ID the reaction gets, such as ``ord-viewer0101``.
@@ -88,8 +87,6 @@ def _reaction(
         catalyst_name: The name of a catalyst input, if any.
         conversion_percent: The outcome's percent conversion, if any.
         doi: The DOI of the reaction's publication, if any.
-        modified: When the record was modified, in order, as ord-data's submission
-            pipeline records each change.
 
     Returns:
         The reaction.
@@ -107,8 +104,6 @@ def _reaction(
         catalyst.identifiers.add(type="NAME", value=catalyst_name)
     if doi is not None:
         reaction.provenance.doi = doi
-    for time in modified:
-        reaction.provenance.record_modified.add().time.value = time
     outcome = reaction.outcomes.add()
     if conversion_percent is not None:
         outcome.conversion.value = conversion_percent
@@ -120,10 +115,6 @@ def _reaction(
     return reaction
 
 
-# A record's first modification is its submission, and a dataset's earliest is the
-# dataset's. viewer one was submitted before viewer two; after viewer two, one of its
-# records was modified again and another first submitted. The first reaction of each
-# records no history.
 DATASETS = (
     dataset_pb2.Dataset(
         dataset_id="ord_dataset-viewer01",
@@ -141,14 +132,12 @@ DATASETS = (
                 reactants=["C[C@@H](N)C(=O)O", "CC(=O)Cl"],
                 product="C[C@@H](NC(C)=O)C(=O)O",
                 yield_percent=90,
-                modified=["2024-03-01T09:30:00", "2025-09-01T08:00:00"],
             ),
             _reaction(
                 "ord-viewer0103",
                 reactants=["CCN", "CC(=O)Cl"],
                 product="CCNC(C)=O",
                 yield_percent=75,
-                modified=["2025-08-01T12:00:00"],
             ),
         ],
     ),
@@ -170,41 +159,62 @@ DATASETS = (
                 catalyst_name="mystery catalyst",
                 conversion_percent=30,
                 doi="10.1021/viewer0202",
-                modified=["2025-06-15T10:00:00"],
             ),
         ],
     ),
 )
 
 
-# The commit each dataset's reactions first reached ord-data in, and its time; the
-# second dataset arrived later, so a query on first_commit tells them apart.
-ARRIVALS = {
-    "ord_dataset-viewer01": ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
-    "ord_dataset-viewer02": ("2" * 40, datetime(2023, 3, 2, 9, 30)),
-}
+# The commits reactions first reached ord-data in, oldest first, with their times.
+COMMITS = (
+    ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
+    ("2" * 40, datetime(2023, 3, 2, 9, 30)),
+    ("3" * 40, datetime(2024, 1, 15, 11, 0)),
+)
+
+# The commit, in COMMITS, each dataset's reactions first reached ord-data in. The second
+# dataset arrived later, so a query on first_commit tells them apart.
+ARRIVALS = {"ord_dataset-viewer01": 0, "ord_dataset-viewer02": 1}
+
+# Reactions added to their dataset in a later commit than the rest of it: one added to
+# viewer one after viewer two arrived.
+LATER_ARRIVALS = {"ord-viewer0103": 2}
+
+
+def _first_commit(dataset_id: str, reaction_id: str) -> tuple[str, datetime]:
+    """Return the commit a reaction first reached ord-data in, and its time.
+
+    Args:
+        dataset_id: The reaction's dataset.
+        reaction_id: The reaction.
+
+    Returns:
+        The commit's SHA and time.
+    """
+    return COMMITS[LATER_ARRIVALS.get(reaction_id, ARRIVALS[dataset_id])]
 
 
 def _write_arrivals_index(path: pathlib.Path) -> None:
-    """Write an index of first commits placing each dataset's reactions at ARRIVALS.
+    """Write an index of first commits placing each reaction at its _first_commit.
 
     Args:
         path: Where to write the index.
     """
-    rows = [
-        {
-            "reaction_id": reaction.reaction_id,
-            "sha": ARRIVALS[dataset.dataset_id][0],
-            "timestamp": ARRIVALS[dataset.dataset_id][1],
-            "utc_offset_minutes": 0,
-            "dataset_id": dataset.dataset_id,
-        }
-        for dataset in DATASETS
-        for reaction in dataset.reactions
-    ]
+    rows = []
+    for dataset in DATASETS:
+        for reaction in dataset.reactions:
+            sha, timestamp = _first_commit(dataset.dataset_id, reaction.reaction_id)
+            rows.append(
+                {
+                    "reaction_id": reaction.reaction_id,
+                    "sha": sha,
+                    "timestamp": timestamp,
+                    "utc_offset_minutes": 0,
+                    "dataset_id": dataset.dataset_id,
+                }
+            )
     table = pa.Table.from_pylist(rows, schema=history.INDEX_SCHEMA)
-    chain = [sha for sha, _ in ARRIVALS.values()]
-    history.write_index(history.Index(table, chain), path)
+    history.write_index(history.Index(table, [sha for sha, _ in COMMITS]), path)
 
 
 def derive_corpus(root: pathlib.Path) -> None:

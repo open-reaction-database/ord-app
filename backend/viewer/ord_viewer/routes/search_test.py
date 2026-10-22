@@ -164,7 +164,7 @@ def test_a_first_commit_date(client):
             "value": {"literal": "2022-01-01"},
         }
     }
-    assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
+    assert _ids(client, query) == {"ord-viewer0103", "ord-viewer0201", "ord-viewer0202"}
 
 
 def test_a_first_commit_measure_is_an_iso_date(client):
@@ -179,7 +179,7 @@ def test_a_first_commit_measure_is_an_iso_date(client):
     response = client.post("/api/search", json={"query": query})
     assert response.status_code == 200, response.text
     assert sorted(response.json()["rows"]) == [
-        ["ord_dataset-viewer01", "2021-07-28"],
+        ["ord_dataset-viewer01", "2024-01-15"],
         ["ord_dataset-viewer02", "2023-03-02"],
     ]
 

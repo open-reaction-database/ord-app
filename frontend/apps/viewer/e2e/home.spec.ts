@@ -18,10 +18,11 @@ import { expect, test } from '@playwright/test';
 // West of Greenwich, where a day read as local time would show as the day before.
 test.use({ timezoneId: 'America/Los_Angeles' });
 
-test('opens the newest submission from the front page', async ({ page }) => {
+test('opens the newest arrival from the front page', async ({ page }) => {
   await page.goto('/');
-  // viewer one changed after viewer two was submitted, and is still the older one.
-  await expect(page.getByText('Recently added · Jun 15, 2025')).toBeVisible();
+  // A reaction was added to viewer one after viewer two arrived, and viewer one is
+  // still the earlier arrival.
+  await expect(page.getByText('Recently added · Mar 2, 2023')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'viewer two' })).toBeVisible();
   // On a desktop the card sits beside the description, above the question box.
   const view = page.getByRole('link', { name: 'View dataset →' });

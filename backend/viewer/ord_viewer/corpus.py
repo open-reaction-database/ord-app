@@ -43,9 +43,8 @@ _FETCHED_SOURCES = "ord-data"
 # How many source datasets download at once.
 _SOURCE_DOWNLOADS = 8
 
-# When a record was changed, as the projection parses it. ord-data's submission pipeline
-# stamps the first change, so a record's earliest is when it was submitted.
-_MODIFIED = "provenance.record_modified.time.timestamp"
+# When a reaction first reached ord-data, from the arrivals artifact.
+_FIRST_COMMIT = "first_commit.timestamp"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -61,11 +60,11 @@ class _Trees:
 
 
 @dataclasses.dataclass(frozen=True)
-class Submission:
-    """A dataset, and the day ord-data's submission pipeline took it in."""
+class Arrival:
+    """A dataset, and the day it first reached ord-data."""
 
     dataset_id: str
-    submitted: datetime.date
+    arrived: datetime.date
 
 
 def _local_trees(root: pathlib.Path) -> _Trees:
@@ -266,39 +265,29 @@ def open_corpus(
     return corpus
 
 
-def newest_submission(corpus: execute.Corpus) -> Submission | None:
-    """Find the most recently submitted dataset.
+def newest_arrival(corpus: execute.Corpus) -> Arrival | None:
+    """Find the dataset that most recently reached ord-data.
 
-    A dataset was submitted on the day of the earliest change any of its records holds; a
-    change a later run of the pipeline made does not move it. Search measures a timestamp
-    by its day, so two datasets submitted on one day tie, and the first dataset ID wins.
+    A dataset arrived on the day of the earliest first commit among its reactions, so a
+    reaction added to it later does not move it. Search measures a timestamp by its day,
+    so two datasets that arrived on one day tie, and the first dataset ID wins.
 
     Args:
         corpus: The open corpus.
 
     Returns:
-        The dataset and the day it was submitted, or None when no record in the
-        corpus holds a change.
+        The dataset and the day it arrived, or None when no reaction in the corpus has a
+        first commit.
     """
     request = Query.model_validate(
         {
-            "where": {
-                "op": "exists",
-                "path": "provenance.record_modified",
-                "where": {"op": "not_null", "path": "time.timestamp"},
-            },
+            "where": {"op": "not_null", "path": _FIRST_COMMIT},
             "aggregate": {
                 "group_by": ["dataset_id"],
-                "measures": [
-                    {
-                        "fn": "min",
-                        "path": {"reduce": "min", "path": _MODIFIED},
-                        "name": "submitted",
-                    }
-                ],
+                "measures": [{"fn": "min", "path": _FIRST_COMMIT, "name": "arrived"}],
             },
             "order_by": [
-                {"key": "submitted", "descending": True},
+                {"key": "arrived", "descending": True},
                 {"key": "dataset_id"},
             ],
             "limit": 1,
@@ -307,4 +296,4 @@ def newest_submission(corpus: execute.Corpus) -> Submission | None:
     rows = corpus.search(request).to_pylist()
     if not rows:
         return None
-    return Submission(dataset_id=rows[0]["dataset_id"], submitted=rows[0]["submitted"])
+    return Arrival(dataset_id=rows[0]["dataset_id"], arrived=rows[0]["arrived"])

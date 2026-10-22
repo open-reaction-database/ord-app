@@ -105,20 +105,20 @@ def list_datasets(
 def newest_dataset(
     state: Annotated[ViewerState, Depends(get_state)],
 ) -> NewestDataset | None:
-    """Return the most recently submitted dataset.
+    """Return the dataset that most recently reached ord-data.
 
     Args:
         state: The settings and open corpus.
 
     Returns:
-        The dataset, with the day it was submitted, or None when no record in the
-        corpus holds a change.
+        The dataset, with the day it arrived, or None when no reaction in the corpus
+        has a first commit.
     """
-    newest = state.newest_submission
+    newest = state.newest_arrival
     if newest is None:
         return None
     summary = _find(state.corpus, newest.dataset_id)
-    return NewestDataset(**summary.model_dump(), submitted=newest.submitted)
+    return NewestDataset(**summary.model_dump(), arrived=newest.arrived)
 
 
 @router.get("/{dataset_id}", responses={404: {"model": ErrorDetail}})
