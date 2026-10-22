@@ -25,7 +25,9 @@ dependencies = [
     "gunicorn>=23.0.0,<24",
     "ord-schema>=0.9.6,<0.10",
     "protobuf>=5.29.6,<6",
-    "rdkit>=2026.3.5,<2027",
+    # RDKit publishes Intel macOS wheels through 2025.9.3 and no source archive, so a
+    # later release cannot install there; ord-schema needs 2025.3.4 or later.
+    "rdkit>=2025.3.4,<2025.9.4",
     "uvicorn>=0.34.0,<0.35",
     "python-multipart>=0.0.31,<0.1",
     "alembic>=1.14.1,<2",

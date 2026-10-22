@@ -90,8 +90,9 @@ async def test_verifies_a_token_the_tenant_signed(tenant_key, verify):
 
 
 async def test_refuses_a_token_another_key_signed(tenant_key, verify):
+    token = _signed_by(_rsa_key())
     with pytest.raises(ForbiddenError, match="Signature verification failed"):
-        await verify(_signed_by(_rsa_key()))
+        await verify(token)
 
 
 async def test_refuses_the_public_key_as_an_hmac_secret(tenant_key, verify):
