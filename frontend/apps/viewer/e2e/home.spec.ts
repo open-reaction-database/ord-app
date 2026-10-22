@@ -15,6 +15,9 @@
  */
 import { expect, test } from '@playwright/test';
 
+// West of Greenwich, where a day read as local time would show as the day before.
+test.use({ timezoneId: 'America/Los_Angeles' });
+
 test('opens the newest submission from the front page', async ({ page }) => {
   await page.goto('/');
   // viewer one changed after viewer two was submitted, and is still the older one.

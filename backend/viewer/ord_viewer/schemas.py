@@ -35,8 +35,8 @@ class DatasetSummary(BaseModel):
 class NewestDataset(DatasetSummary):
     """The corpus's most recently submitted dataset."""
 
-    # When ord-data's submission pipeline took it in.
-    submitted: datetime.datetime
+    # The day ord-data's submission pipeline took it in.
+    submitted: datetime.date
 
 
 class CompoundCount(BaseModel):

@@ -50,7 +50,7 @@
     "/api/datasets/newest": {
       "get": {
         "summary": "Newest Dataset",
-        "description": "Return the most recently submitted dataset.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with when it was submitted, or None when no record in the corpus\n    holds a change.",
+        "description": "Return the most recently submitted dataset.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with the day it was submitted, or None when no record in the\n    corpus holds a change.",
         "operationId": "newest_dataset_api_datasets_newest_get",
         "responses": {
           "200": {
@@ -1282,7 +1282,7 @@
           },
           "submitted": {
             "type": "string",
-            "format": "date-time",
+            "format": "date",
             "title": "Submitted"
           }
         },

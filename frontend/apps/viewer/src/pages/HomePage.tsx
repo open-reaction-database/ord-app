@@ -40,7 +40,9 @@ const COMPACT = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
 });
 
-const DAY = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
+// A day such as 2025-06-15 parses as midnight UTC, so it is shown in UTC: the
+// viewer's own time zone would show the day before west of Greenwich.
+const DAY = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
 
 function Count({ value, label }: Readonly<{ value: number; label: string }>) {
   return (

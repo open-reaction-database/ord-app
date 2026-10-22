@@ -111,8 +111,8 @@ def newest_dataset(
         state: The settings and open corpus.
 
     Returns:
-        The dataset, with when it was submitted, or None when no record in the corpus
-        holds a change.
+        The dataset, with the day it was submitted, or None when no record in the
+        corpus holds a change.
     """
     newest = state.newest_submission
     if newest is None:

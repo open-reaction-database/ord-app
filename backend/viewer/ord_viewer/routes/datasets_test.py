@@ -74,7 +74,7 @@ def test_gets_the_newest_submitted_dataset(client):
         "name": "viewer two",
         "description": "A mirror-image acylation and a named catalyst",
         "reactions": 2,
-        "submitted": "2025-06-15T10:00:00",
+        "submitted": "2025-06-15",
     }
 
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Opening the corpus a deployment serves, and resolving the names queries use."""
+"""Opening the corpus a deployment serves."""
 
 import concurrent.futures
 import dataclasses
@@ -23,17 +23,17 @@ import os
 import pathlib
 from collections.abc import Callable
 
-from ord_schema import huggingface, resolvers
+from ord_schema import huggingface
 from ord_schema.artifacts import base
 from ord_schema.search import execute
 from ord_schema.search.query import Query
 
 from ord_viewer.settings import Settings
 
-# The trees under a local corpus directory. projections/, structures/, and sources/
-# each hold one shard level of files, as ord-data's data/<shard>/ does; pivots/ and
-# occurrences/ hold one subdirectory per level, each sharded the same way.
-_TREES = ("projections", "structures", "pivots", "occurrences", "sources")
+# The trees under a local corpus directory. projections/, structures/, arrivals/, and
+# sources/ each hold one shard level of files, as ord-data's data/<shard>/ does; pivots/
+# and occurrences/ hold one subdirectory per level, each sharded the same way.
+_TREES = ("projections", "structures", "arrivals", "pivots", "occurrences", "sources")
 
 # Where a fetched corpus is kept under the corpus directory, each laid out as the
 # repository it comes from: the derived artifacts, and the ord-data mirror's sources.
@@ -54,6 +54,7 @@ class _Trees:
 
     projections: str
     structures: str
+    arrivals: str
     pivots: str
     occurrences: str
     sources: str
@@ -61,30 +62,10 @@ class _Trees:
 
 @dataclasses.dataclass(frozen=True)
 class Submission:
-    """A dataset, and when ord-data's submission pipeline took it in."""
+    """A dataset, and the day ord-data's submission pipeline took it in."""
 
     dataset_id: str
-    submitted: datetime.datetime
-
-
-# Resolutions reach PubChem, CACTUS, and OPSIN; a name that resolved is kept until
-# 4,096 more recently used names push it out. A name that failed raises again, so it
-# is retried.
-@functools.lru_cache(maxsize=4096)
-def resolve_compound_name(name: str) -> str:
-    """Resolve a compound name to SMILES through ord-schema's resolvers.
-
-    Args:
-        name: A compound name from a query.
-
-    Returns:
-        The SMILES the first resolver to answer gives.
-
-    Raises:
-        ValueError: If no resolver knows the name.
-    """
-    smiles, _ = resolvers.resolve_name("name", name)
-    return smiles
+    submitted: datetime.date
 
 
 def _local_trees(root: pathlib.Path) -> _Trees:
@@ -107,6 +88,7 @@ def _local_trees(root: pathlib.Path) -> _Trees:
     return _Trees(
         projections=f"{pattern_root}/projections/*/*.parquet",
         structures=f"{pattern_root}/structures/*/*.parquet",
+        arrivals=f"{pattern_root}/arrivals/*/*.parquet",
         pivots=str(root / "pivots"),
         occurrences=str(root / "occurrences"),
         sources=f"{pattern_root}/sources/*/*.parquet",
@@ -222,6 +204,7 @@ def _fetched_trees(
     return _Trees(
         projections=artifacts.projection_pattern,
         structures=artifacts.structures_pattern,
+        arrivals=artifacts.arrivals_pattern,
         pivots=str(artifacts.pivots),
         occurrences=str(artifacts.occurrences),
         sources=huggingface.parquet_pattern(sources),
@@ -229,14 +212,14 @@ def _fetched_trees(
 
 
 def open_corpus(
-    settings: Settings, *, resolver: Callable[[str], str]
+    settings: Settings, *, resolver: Callable[[str], str] | None
 ) -> execute.Corpus:
     """Open the corpus under settings.corpus_dir, fetched first if revisions are set.
 
     Args:
         settings: The service's settings.
         resolver: Resolves compound names in queries to SMILES; raises ValueError for
-            a name it does not know.
+            a name it does not know. None uses ord-schema's resolvers.
 
     Returns:
         The open corpus, warmed, with its pivots checked.
@@ -269,6 +252,7 @@ def open_corpus(
         require_pivots=True,
         occurrences_dir=trees.occurrences,
         require_occurrences=True,
+        arrivals_pattern=trees.arrivals,
         memory_limit=settings.memory_limit,
         warm=True,
         max_rows=execute.DEFAULT_MAX_ROWS,
@@ -285,15 +269,16 @@ def open_corpus(
 def newest_submission(corpus: execute.Corpus) -> Submission | None:
     """Find the most recently submitted dataset.
 
-    A dataset was submitted at the earliest change any of its records holds; a change a
-    later run of the pipeline made does not move it. A tie goes to the first dataset ID.
+    A dataset was submitted on the day of the earliest change any of its records holds; a
+    change a later run of the pipeline made does not move it. Search measures a timestamp
+    by its day, so two datasets submitted on one day tie, and the first dataset ID wins.
 
     Args:
         corpus: The open corpus.
 
     Returns:
-        The dataset and when it was submitted, or None when no record in the corpus
-        holds a change.
+        The dataset and the day it was submitted, or None when no record in the
+        corpus holds a change.
     """
     request = Query.model_validate(
         {

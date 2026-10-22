@@ -18,17 +18,22 @@ import argparse
 import contextlib
 import glob
 import pathlib
+import tempfile
 import types
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
+from datetime import datetime
 from typing import Any, cast
 
 import anthropic
+import pyarrow as pa
 from anthropic.types import TextBlock, ToolUseBlock
 from anyio.from_thread import BlockingPortal
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import parquet
+from ord_schema.artifacts import history
 from ord_schema.artifacts.scripts import (
+    derive_arrivals,
     derive_occurrences,
     derive_pivots,
     derive_projection,
@@ -172,6 +177,36 @@ DATASETS = (
 )
 
 
+# The commit each dataset's reactions first reached ord-data in, and its time; the
+# second dataset arrived later, so a query on first_commit tells them apart.
+ARRIVALS = {
+    "ord_dataset-viewer01": ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
+    "ord_dataset-viewer02": ("2" * 40, datetime(2023, 3, 2, 9, 30)),
+}
+
+
+def _write_arrivals_index(path: pathlib.Path) -> None:
+    """Write an index of first commits placing each dataset's reactions at ARRIVALS.
+
+    Args:
+        path: Where to write the index.
+    """
+    rows = [
+        {
+            "reaction_id": reaction.reaction_id,
+            "sha": ARRIVALS[dataset.dataset_id][0],
+            "timestamp": ARRIVALS[dataset.dataset_id][1],
+            "utc_offset_minutes": 0,
+            "dataset_id": dataset.dataset_id,
+        }
+        for dataset in DATASETS
+        for reaction in dataset.reactions
+    ]
+    table = pa.Table.from_pylist(rows, schema=history.INDEX_SCHEMA)
+    chain = [sha for sha, _ in ARRIVALS.values()]
+    history.write_index(history.Index(table, chain), path)
+
+
 def derive_corpus(root: pathlib.Path) -> None:
     """Write DATASETS as sources under root and derive every artifact to read.
 
@@ -200,6 +235,18 @@ def derive_corpus(root: pathlib.Path) -> None:
             ]
         )
     )
+    with tempfile.TemporaryDirectory() as scratch:
+        index = pathlib.Path(scratch) / "arrivals_index.parquet"
+        _write_arrivals_index(index)
+        derive_arrivals.main(
+            derive_arrivals.parse_args(
+                [
+                    f"--input_pattern={pattern_root}/projections/*/*.parquet",
+                    f"--output_dir={root}/arrivals",
+                    f"--index={index}",
+                ]
+            )
+        )
     derive_pivots.main(
         derive_pivots.parse_args(
             [
@@ -269,12 +316,18 @@ def slot_waiters(client: TestClient) -> int:
 
 
 def make_client(
-    corpus_dir: pathlib.Path, *, ask_client: Any = None, **settings: Any
+    corpus_dir: pathlib.Path,
+    *,
+    resolver: Callable[[str], str] | None = offline_resolver,
+    ask_client: Any = None,
+    **settings: Any,
 ) -> TestClient:
     """Return an unentered client over corpus_dir, with any settings overridden.
 
     Args:
         corpus_dir: The corpus the app serves.
+        resolver: Resolves compound names in queries; None keeps the app's default,
+            ord-schema's resolvers.
         ask_client: What /api/ask calls messages.create on: an anthropic.Anthropic, or a
             stub that scripts its responses. None answers 503, as with no key.
         **settings: Settings fields to set beyond corpus_dir.
@@ -284,7 +337,7 @@ def make_client(
     """
     app = create_app(
         lambda: Settings(corpus_dir=corpus_dir, **settings),
-        resolver=offline_resolver,
+        resolver=resolver,
         ask_client_factory=lambda: ask_client,
     )
     return TestClient(app)

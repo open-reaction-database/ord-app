@@ -24,7 +24,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from ord_viewer.corpus import newest_submission, open_corpus, resolve_compound_name
+from ord_viewer.corpus import newest_submission, open_corpus
 from ord_viewer.routes import ask, datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots, SlotsBusyError
@@ -79,7 +79,7 @@ async def _request_invalid(  # NOSONAR
 def create_app(
     settings_factory: Callable[[], Settings] = Settings,
     *,
-    resolver: Callable[[str], str] = resolve_compound_name,
+    resolver: Callable[[str], str] | None = None,
     ask_client_factory: Callable[
         [], anthropic.Anthropic | None
     ] = ask.ask_client_from_environment,
@@ -91,7 +91,8 @@ def create_app(
 
     Args:
         settings_factory: Called once at startup; the default reads the environment.
-        resolver: Resolves compound names in queries to SMILES.
+        resolver: Resolves compound names in queries to SMILES; None uses ord-schema's
+            resolvers.
         ask_client_factory: Called once at startup for /api/ask's model client; None
             leaves /api/ask answering 503. The default reads the API key variables.
 

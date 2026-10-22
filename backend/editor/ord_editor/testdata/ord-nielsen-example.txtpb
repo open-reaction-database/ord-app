@@ -253,7 +253,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -264,7 +264,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.108138"
+        value: "2021-02-25T08:49:31.108138"
       }
       person {
         username: "skearnes"
@@ -502,7 +502,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -513,7 +513,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.112631"
+        value: "2021-02-25T08:49:31.112631"
       }
       person {
         username: "skearnes"
@@ -751,7 +751,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -762,7 +762,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.116890"
+        value: "2021-02-25T08:49:31.116890"
       }
       person {
         username: "skearnes"
@@ -1000,7 +1000,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -1011,7 +1011,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.121073"
+        value: "2021-02-25T08:49:31.121073"
       }
       person {
         username: "skearnes"
@@ -1253,7 +1253,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -1264,7 +1264,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.125435"
+        value: "2021-02-25T08:49:31.125435"
       }
       person {
         username: "skearnes"
@@ -1506,7 +1506,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -1517,7 +1517,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.129771"
+        value: "2021-02-25T08:49:31.129771"
       }
       person {
         username: "skearnes"
@@ -1759,7 +1759,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -1770,7 +1770,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.134287"
+        value: "2021-02-25T08:49:31.134287"
       }
       person {
         username: "skearnes"
@@ -2012,7 +2012,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -2023,7 +2023,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.139474"
+        value: "2021-02-25T08:49:31.139474"
       }
       person {
         username: "skearnes"
@@ -2261,7 +2261,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -2272,7 +2272,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.143899"
+        value: "2021-02-25T08:49:31.143899"
       }
       person {
         username: "skearnes"
@@ -2510,7 +2510,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -2521,7 +2521,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.147927"
+        value: "2021-02-25T08:49:31.147927"
       }
       person {
         username: "skearnes"
@@ -2759,7 +2759,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -2770,7 +2770,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.151938"
+        value: "2021-02-25T08:49:31.151938"
       }
       person {
         username: "skearnes"
@@ -3008,7 +3008,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -3019,7 +3019,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.156141"
+        value: "2021-02-25T08:49:31.156141"
       }
       person {
         username: "skearnes"
@@ -3257,7 +3257,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -3268,7 +3268,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.160325"
+        value: "2021-02-25T08:49:31.160325"
       }
       person {
         username: "skearnes"
@@ -3506,7 +3506,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -3517,7 +3517,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.164349"
+        value: "2021-02-25T08:49:31.164349"
       }
       person {
         username: "skearnes"
@@ -3755,7 +3755,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -3766,7 +3766,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.168717"
+        value: "2021-02-25T08:49:31.168717"
       }
       person {
         username: "skearnes"
@@ -4004,7 +4004,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -4015,7 +4015,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.172952"
+        value: "2021-02-25T08:49:31.172952"
       }
       person {
         username: "skearnes"
@@ -4256,7 +4256,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -4267,7 +4267,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.177534"
+        value: "2021-02-25T08:49:31.177534"
       }
       person {
         username: "skearnes"
@@ -4508,7 +4508,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -4519,7 +4519,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.181896"
+        value: "2021-02-25T08:49:31.181896"
       }
       person {
         username: "skearnes"
@@ -4760,7 +4760,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -4771,7 +4771,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.186285"
+        value: "2021-02-25T08:49:31.186285"
       }
       person {
         username: "skearnes"
@@ -5012,7 +5012,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -5023,7 +5023,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.190553"
+        value: "2021-02-25T08:49:31.190553"
       }
       person {
         username: "skearnes"
@@ -5261,7 +5261,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -5272,7 +5272,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.194963"
+        value: "2021-02-25T08:49:31.194963"
       }
       person {
         username: "skearnes"
@@ -5510,7 +5510,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -5521,7 +5521,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.199564"
+        value: "2021-02-25T08:49:31.199564"
       }
       person {
         username: "skearnes"
@@ -5759,7 +5759,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -5770,7 +5770,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.203776"
+        value: "2021-02-25T08:49:31.203776"
       }
       person {
         username: "skearnes"
@@ -6008,7 +6008,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -6019,7 +6019,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.208037"
+        value: "2021-02-25T08:49:31.208037"
       }
       person {
         username: "skearnes"
@@ -6261,7 +6261,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -6272,7 +6272,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.212324"
+        value: "2021-02-25T08:49:31.212324"
       }
       person {
         username: "skearnes"
@@ -6514,7 +6514,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -6525,7 +6525,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.216506"
+        value: "2021-02-25T08:49:31.216506"
       }
       person {
         username: "skearnes"
@@ -6767,7 +6767,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -6778,7 +6778,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.220877"
+        value: "2021-02-25T08:49:31.220877"
       }
       person {
         username: "skearnes"
@@ -7020,7 +7020,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -7031,7 +7031,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.225619"
+        value: "2021-02-25T08:49:31.225619"
       }
       person {
         username: "skearnes"
@@ -7269,7 +7269,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -7280,7 +7280,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.229773"
+        value: "2021-02-25T08:49:31.229773"
       }
       person {
         username: "skearnes"
@@ -7518,7 +7518,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -7529,7 +7529,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.234132"
+        value: "2021-02-25T08:49:31.234132"
       }
       person {
         username: "skearnes"
@@ -7767,7 +7767,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -7778,7 +7778,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.238292"
+        value: "2021-02-25T08:49:31.238292"
       }
       person {
         username: "skearnes"
@@ -8016,7 +8016,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -8027,7 +8027,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.242777"
+        value: "2021-02-25T08:49:31.242777"
       }
       person {
         username: "skearnes"
@@ -8265,7 +8265,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -8276,7 +8276,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.246928"
+        value: "2021-02-25T08:49:31.246928"
       }
       person {
         username: "skearnes"
@@ -8514,7 +8514,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -8525,7 +8525,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.251107"
+        value: "2021-02-25T08:49:31.251107"
       }
       person {
         username: "skearnes"
@@ -8763,7 +8763,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -8774,7 +8774,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.255941"
+        value: "2021-02-25T08:49:31.255941"
       }
       person {
         username: "skearnes"
@@ -9012,7 +9012,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -9023,7 +9023,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.260220"
+        value: "2021-02-25T08:49:31.260220"
       }
       person {
         username: "skearnes"
@@ -9264,7 +9264,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -9275,7 +9275,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.264488"
+        value: "2021-02-25T08:49:31.264488"
       }
       person {
         username: "skearnes"
@@ -9516,7 +9516,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -9527,7 +9527,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.269369"
+        value: "2021-02-25T08:49:31.269369"
       }
       person {
         username: "skearnes"
@@ -9768,7 +9768,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -9779,7 +9779,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.274497"
+        value: "2021-02-25T08:49:31.274497"
       }
       person {
         username: "skearnes"
@@ -10020,7 +10020,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -10031,7 +10031,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.278603"
+        value: "2021-02-25T08:49:31.278603"
       }
       person {
         username: "skearnes"
@@ -10269,7 +10269,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -10280,7 +10280,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.282744"
+        value: "2021-02-25T08:49:31.282744"
       }
       person {
         username: "skearnes"
@@ -10518,7 +10518,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -10529,7 +10529,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.286979"
+        value: "2021-02-25T08:49:31.286979"
       }
       person {
         username: "skearnes"
@@ -10767,7 +10767,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -10778,7 +10778,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.291356"
+        value: "2021-02-25T08:49:31.291356"
       }
       person {
         username: "skearnes"
@@ -11016,7 +11016,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -11027,7 +11027,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.296100"
+        value: "2021-02-25T08:49:31.296100"
       }
       person {
         username: "skearnes"
@@ -11269,7 +11269,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -11280,7 +11280,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.300315"
+        value: "2021-02-25T08:49:31.300315"
       }
       person {
         username: "skearnes"
@@ -11522,7 +11522,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -11533,7 +11533,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.304663"
+        value: "2021-02-25T08:49:31.304663"
       }
       person {
         username: "skearnes"
@@ -11775,7 +11775,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -11786,7 +11786,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.309009"
+        value: "2021-02-25T08:49:31.309009"
       }
       person {
         username: "skearnes"
@@ -12028,7 +12028,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -12039,7 +12039,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.313509"
+        value: "2021-02-25T08:49:31.313509"
       }
       person {
         username: "skearnes"
@@ -12277,7 +12277,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -12288,7 +12288,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.318283"
+        value: "2021-02-25T08:49:31.318283"
       }
       person {
         username: "skearnes"
@@ -12526,7 +12526,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -12537,7 +12537,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.322623"
+        value: "2021-02-25T08:49:31.322623"
       }
       person {
         username: "skearnes"
@@ -12775,7 +12775,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -12786,7 +12786,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.326882"
+        value: "2021-02-25T08:49:31.326882"
       }
       person {
         username: "skearnes"
@@ -13024,7 +13024,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -13035,7 +13035,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.331219"
+        value: "2021-02-25T08:49:31.331219"
       }
       person {
         username: "skearnes"
@@ -13273,7 +13273,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -13284,7 +13284,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.335489"
+        value: "2021-02-25T08:49:31.335489"
       }
       person {
         username: "skearnes"
@@ -13522,7 +13522,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -13533,7 +13533,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.340199"
+        value: "2021-02-25T08:49:31.340199"
       }
       person {
         username: "skearnes"
@@ -13771,7 +13771,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -13782,7 +13782,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.344275"
+        value: "2021-02-25T08:49:31.344275"
       }
       person {
         username: "skearnes"
@@ -14020,7 +14020,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -14031,7 +14031,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.348380"
+        value: "2021-02-25T08:49:31.348380"
       }
       person {
         username: "skearnes"
@@ -14272,7 +14272,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -14283,7 +14283,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.352499"
+        value: "2021-02-25T08:49:31.352499"
       }
       person {
         username: "skearnes"
@@ -14524,7 +14524,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -14535,7 +14535,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.356741"
+        value: "2021-02-25T08:49:31.356741"
       }
       person {
         username: "skearnes"
@@ -14776,7 +14776,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -14787,7 +14787,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.361493"
+        value: "2021-02-25T08:49:31.361493"
       }
       person {
         username: "skearnes"
@@ -15028,7 +15028,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -15039,7 +15039,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.366024"
+        value: "2021-02-25T08:49:31.366024"
       }
       person {
         username: "skearnes"
@@ -15277,7 +15277,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -15288,7 +15288,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.370675"
+        value: "2021-02-25T08:49:31.370675"
       }
       person {
         username: "skearnes"
@@ -15526,7 +15526,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -15537,7 +15537,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.374936"
+        value: "2021-02-25T08:49:31.374936"
       }
       person {
         username: "skearnes"
@@ -15775,7 +15775,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -15786,7 +15786,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.379638"
+        value: "2021-02-25T08:49:31.379638"
       }
       person {
         username: "skearnes"
@@ -16024,7 +16024,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -16035,7 +16035,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.384869"
+        value: "2021-02-25T08:49:31.384869"
       }
       person {
         username: "skearnes"
@@ -16277,7 +16277,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -16288,7 +16288,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.390575"
+        value: "2021-02-25T08:49:31.390575"
       }
       person {
         username: "skearnes"
@@ -16530,7 +16530,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -16541,7 +16541,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.396090"
+        value: "2021-02-25T08:49:31.396090"
       }
       person {
         username: "skearnes"
@@ -16783,7 +16783,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -16794,7 +16794,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.401657"
+        value: "2021-02-25T08:49:31.401657"
       }
       person {
         username: "skearnes"
@@ -17036,7 +17036,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -17047,7 +17047,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.407171"
+        value: "2021-02-25T08:49:31.407171"
       }
       person {
         username: "skearnes"
@@ -17285,7 +17285,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -17296,7 +17296,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.412616"
+        value: "2021-02-25T08:49:31.412616"
       }
       person {
         username: "skearnes"
@@ -17534,7 +17534,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -17545,7 +17545,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.418123"
+        value: "2021-02-25T08:49:31.418123"
       }
       person {
         username: "skearnes"
@@ -17783,7 +17783,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -17794,7 +17794,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.423494"
+        value: "2021-02-25T08:49:31.423494"
       }
       person {
         username: "skearnes"
@@ -18032,7 +18032,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -18043,7 +18043,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.428882"
+        value: "2021-02-25T08:49:31.428882"
       }
       person {
         username: "skearnes"
@@ -18281,7 +18281,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -18292,7 +18292,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.434432"
+        value: "2021-02-25T08:49:31.434432"
       }
       person {
         username: "skearnes"
@@ -18530,7 +18530,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -18541,7 +18541,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.439861"
+        value: "2021-02-25T08:49:31.439861"
       }
       person {
         username: "skearnes"
@@ -18779,7 +18779,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -18790,7 +18790,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.445302"
+        value: "2021-02-25T08:49:31.445302"
       }
       person {
         username: "skearnes"
@@ -19028,7 +19028,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -19039,7 +19039,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.450720"
+        value: "2021-02-25T08:49:31.450720"
       }
       person {
         username: "skearnes"
@@ -19280,7 +19280,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -19291,7 +19291,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.456411"
+        value: "2021-02-25T08:49:31.456411"
       }
       person {
         username: "skearnes"
@@ -19532,7 +19532,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -19543,7 +19543,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.462122"
+        value: "2021-02-25T08:49:31.462122"
       }
       person {
         username: "skearnes"
@@ -19784,7 +19784,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -19795,7 +19795,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.467522"
+        value: "2021-02-25T08:49:31.467522"
       }
       person {
         username: "skearnes"
@@ -20036,7 +20036,7 @@ reactions {
     publication_url: "https://pubs.acs.org/doi/10.1021/jacs.8b01523"
     record_created {
       time {
-        value: "11/28/2020, 12:02:10"
+        value: "2020-11-28T12:02:10"
       }
       person {
         name: "Connor W. Coley"
@@ -20047,7 +20047,7 @@ reactions {
     }
     record_modified {
       time {
-        value: "2021-02-25 08:49:31.472679"
+        value: "2021-02-25T08:49:31.472679"
       }
       person {
         username: "skearnes"

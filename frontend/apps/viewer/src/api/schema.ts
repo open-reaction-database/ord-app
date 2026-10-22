@@ -85,8 +85,8 @@ export interface paths {
      *         state: The settings and open corpus.
      *
      *     Returns:
-     *         The dataset, with when it was submitted, or None when no record in the corpus
-     *         holds a change.
+     *         The dataset, with the day it was submitted, or None when no record in the
+     *         corpus holds a change.
      */
     get: operations['newest_dataset_api_datasets_newest_get'];
     put?: never;
@@ -650,7 +650,7 @@ export interface components {
       reactions: number;
       /**
        * Submitted
-       * Format: date-time
+       * Format: date
        */
       submitted: string;
     };
