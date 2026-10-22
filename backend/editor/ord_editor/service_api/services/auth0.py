@@ -48,7 +48,7 @@ async def verify_access_token(
         return {"sub": E2E_USER_AUTH0_ID}
     return await _verify_token(
         token,
-        algorithms=RuntimeSettings.auth0_algorithms,
+        algorithms=[RuntimeSettings.auth0_algorithms],
         audience=RuntimeSettings.auth0_audience,
         issuer=RuntimeSettings.auth0_issuer,
     )
@@ -57,14 +57,17 @@ async def verify_access_token(
 async def verify_id_token(token: HTTPAuthorizationCredentials) -> dict:
     return await _verify_token(
         token,
-        algorithms=RuntimeSettings.auth0_algorithms,
+        algorithms=[RuntimeSettings.auth0_algorithms],
         audience=RuntimeSettings.auth0_client_id,
         issuer=RuntimeSettings.auth0_issuer,
     )
 
 
 async def _verify_token(
-    token: HTTPAuthorizationCredentials, algorithms: str, audience: str, issuer: str
+    token: HTTPAuthorizationCredentials,
+    algorithms: list[str],
+    audience: str,
+    issuer: str,
 ) -> dict:
     if token is None:
         logger.error("token is missing")
