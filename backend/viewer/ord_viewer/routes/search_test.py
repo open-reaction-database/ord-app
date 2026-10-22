@@ -20,6 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from anyio import to_thread
 from fastapi.testclient import TestClient
+from ord_schema import resolvers
 
 from ord_viewer.testing import hold_slot, make_client, portal, slot_waiters
 
@@ -28,6 +29,11 @@ _PYRIDINE_INPUT = {
     "path": "inputs.components",
     "where": {"op": "substructure", "path": "smiles", "smarts": "c1ccncc1"},
 }
+
+
+def _by_name(name):
+    where = {"op": "substructure", "path": "smiles", "compound": name}
+    return {"where": {**_PYRIDINE_INPUT, "where": where}}
 
 
 def _ids(client, query):
@@ -43,17 +49,50 @@ def test_substructure(client):
 
 
 def test_a_compound_by_name(client):
-    where = {"op": "substructure", "path": "smiles", "compound": "pyridine"}
-    query = {"where": {**_PYRIDINE_INPUT, "where": where}}
-    assert _ids(client, query) == {"ord-viewer0101"}
+    assert _ids(client, _by_name("pyridine")) == {"ord-viewer0101"}
 
 
 def test_an_unknown_name_is_unprocessable(client):
-    where = {"op": "substructure", "path": "smiles", "compound": "unobtainium"}
-    query = {"where": {**_PYRIDINE_INPUT, "where": where}}
-    response = client.post("/api/search", json={"query": query})
+    response = client.post("/api/search", json={"query": _by_name("unobtainium")})
     assert response.status_code == 422
     assert "unobtainium" in response.json()["detail"]
+
+
+@pytest.fixture
+def name_lookups(monkeypatch) -> list[str]:
+    """Answer ord-schema's name lookups for pyridine alone, offline.
+
+    Returns:
+        Each name looked up, in the order asked.
+    """
+    asked = []
+
+    def resolve_name(value_type, value):
+        asked.append(value)
+        if value == "pyridine":
+            return "c1ccncc1", "stub"
+        raise ValueError(f"Could not resolve {value_type} {value} to SMILES")
+
+    monkeypatch.setattr(resolvers, "resolve_name", resolve_name)
+    return asked
+
+
+def test_the_default_resolver_looks_up_a_resolved_name_once(corpus_dir, name_lookups):
+    with make_client(corpus_dir, resolver=None) as default:
+        for _ in range(2):
+            assert _ids(default, _by_name("pyridine")) == {"ord-viewer0101"}
+    assert name_lookups == ["pyridine"]
+
+
+def test_the_default_resolver_looks_up_an_unknown_name_again(corpus_dir, name_lookups):
+    with make_client(corpus_dir, resolver=None) as default:
+        for _ in range(2):
+            response = default.post(
+                "/api/search", json={"query": _by_name("unobtainium")}
+            )
+            assert response.status_code == 422
+            assert "unobtainium" in response.json()["detail"]
+    assert name_lookups == ["unobtainium", "unobtainium"]
 
 
 @pytest.mark.parametrize(
@@ -115,6 +154,34 @@ def test_a_dataset(client):
         }
     }
     assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
+
+
+def test_a_first_commit_date(client):
+    query = {
+        "where": {
+            "op": "ge",
+            "path": "first_commit.timestamp",
+            "value": {"literal": "2022-01-01"},
+        }
+    }
+    assert _ids(client, query) == {"ord-viewer0201", "ord-viewer0202"}
+
+
+def test_a_first_commit_measure_is_an_iso_date(client):
+    query = {
+        "aggregate": {
+            "group_by": ["dataset_id"],
+            "measures": [
+                {"fn": "max", "path": "first_commit.timestamp", "name": "arrived"}
+            ],
+        }
+    }
+    response = client.post("/api/search", json={"query": query})
+    assert response.status_code == 200, response.text
+    assert sorted(response.json()["rows"]) == [
+        ["ord_dataset-viewer01", "2021-07-28"],
+        ["ord_dataset-viewer02", "2023-03-02"],
+    ]
 
 
 def test_a_reaction_smarts(client):

@@ -31,8 +31,9 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
     )
 
-    # A root holding projections/, structures/, pivots/, occurrences/, and sources/;
-    # with the revisions below set, the directory the corpus is fetched into instead.
+    # A root holding projections/, structures/, arrivals/, pivots/, occurrences/, and
+    # sources/; with the revisions below set, the directory the corpus is fetched into
+    # instead.
     corpus_dir: Path | None = None
     # The ord-artifacts revision to fetch the derived artifacts from, and the ord-data
     # mirror's revision to fetch their sources from. Set both, as commits so a restart

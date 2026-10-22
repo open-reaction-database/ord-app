@@ -16,7 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@buf/open-reaction-database_ord-schema.bufbuild_es": "2.16.0-00000000000000-2a4e5a8d72a2.1",
+    "@buf/open-reaction-database_ord-schema.bufbuild_es": "2.16.0-20261022020229-33cb127c93fd.1",
     "@bufbuild/protobuf": "^2.16.0",
     "@mantine/charts": "^7.17.8",
     "@mantine/core": "^7.15.3",
