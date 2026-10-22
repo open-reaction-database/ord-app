@@ -59,7 +59,8 @@ async def test_verifies_a_token_the_tenant_signed(tenant_key):
 
 
 async def test_refuses_a_token_another_key_signed(tenant_key):
+    token = _signed_by(_rsa_key())
     with pytest.raises(ForbiddenError, match="Signature verification failed"):
         await auth0._verify_token(
-            _signed_by(_rsa_key()), algorithms="RS256", audience=AUDIENCE, issuer=ISSUER
+            token, algorithms="RS256", audience=AUDIENCE, issuer=ISSUER
         )
