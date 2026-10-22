@@ -46,7 +46,7 @@ def _signed_by(key: rsa.RSAPrivateKey) -> HTTPAuthorizationCredentials:
 
 
 def _forged(alg: str, sign: Callable[[bytes], bytes]) -> HTTPAuthorizationCredentials:
-    """Build a token whose header names ``alg`` and whose signature ``sign`` makes.
+    """Build a token whose header names ``alg``, signed by ``sign``.
 
     PyJWT refuses to sign with an unregistered algorithm, or with a PEM key as an HMAC
     secret, so the token is assembled by hand.
