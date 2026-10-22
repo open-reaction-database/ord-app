@@ -182,8 +182,27 @@ describe('value coercion by VariableType', () => {
     expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00');
   });
 
+  it('keeps the fraction of a second a DateTime variable was written with', () => {
+    run({
+      variables: [makeVariable(VariableType.DateTime)],
+      rows: [{ col1: '2024-01-15T08:30:00.123456' }],
+    });
+    expect(lastMergedTemplate().valueField).toBe('2024-01-15T08:30:00.123456');
+  });
+
+  it('keeps a date alone as a date for a DateTime variable', () => {
+    for (const input of ['2025-04-01', '04/01/2025', 'April 1, 2025']) {
+      const result = run({
+        variables: [makeVariable(VariableType.DateTime)],
+        rows: [{ col1: input }],
+      });
+      expect(result.errors).toEqual([]);
+      expect(lastMergedTemplate().valueField).toBe('2025-04-01');
+    }
+  });
+
   it('keeps the instant and an offset for a DateTime variable written with one', () => {
-    // A space before the time is ISO 8601 the worker accepts, so it keeps its offset too.
+    // The worker also reads a space before the time, so that spelling keeps its offset too.
     for (const input of ['2024-01-15T08:30:00+05:30', '2024-01-15 08:30:00+05:30']) {
       run({
         variables: [makeVariable(VariableType.DateTime)],

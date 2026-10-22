@@ -19,9 +19,30 @@ import {
   convertUtcDateToUserTZ,
   formatUtcDateToDisplay,
   formatDateToDisplay,
+  formatWithFraction,
   hasOffset,
   isDateOnly,
 } from './date.ts';
+import dayjs from 'dayjs';
+
+describe('formatWithFraction', () => {
+  const date = dayjs.utc('2024-05-08T03:00:00Z');
+
+  it('puts the fraction the source was written with after the seconds', () => {
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss[Z]', '2024-05-08T12:00:00.5+09:00'),
+    ).toBe('2024-05-08T03:00:00.5Z');
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss', '2024-05-08T03:00:00.123456'),
+    ).toBe('2024-05-08T03:00:00.123456');
+  });
+
+  it('adds no fraction to a source written without one', () => {
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss[Z]', '2024-05-08T12:00:00+09:00'),
+    ).toBe('2024-05-08T03:00:00Z');
+  });
+});
 
 describe('hasOffset', () => {
   it('accepts a time with Z or a numeric offset', () => {

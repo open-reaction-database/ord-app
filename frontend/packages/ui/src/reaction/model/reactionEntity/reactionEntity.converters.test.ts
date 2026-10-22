@@ -101,6 +101,12 @@ describe('DateTime converters', () => {
     });
   });
 
+  it('keeps the fraction of a second a time with an offset was written with', () => {
+    expect(roundTrip('2024-06-01T21:00:00.123456+09:00')).toEqual({
+      value: '2024-06-01T12:00:00.123456Z',
+    });
+  });
+
   // The suite may run in UTC, where showing a time in the user's zone changes nothing.
   it("shows a time with an offset in the user's zone, with that zone's offset", async () => {
     vi.stubEnv('TZ', 'Asia/Tokyo');

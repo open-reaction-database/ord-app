@@ -107,6 +107,7 @@ import type { ElectrochemistryType } from '#reaction/model/reactionEntityTypes/r
 import {
   convertOffsetDateToUtc,
   convertUtcDateToUserTZ,
+  formatWithFraction,
   hasOffset,
 } from '#reaction/model/utils/date.ts';
 import {
@@ -430,7 +431,9 @@ export const ordDateTimeToReaction = (
     return dateTime.value;
   }
   const date = convertUtcDateToUserTZ(dateTime.value);
-  return date.isValid() ? date.format(FORM_DATE_TIME_FORMAT) : dateTime.value;
+  return date.isValid()
+    ? formatWithFraction(date, FORM_DATE_TIME_FORMAT, dateTime.value)
+    : dateTime.value;
 };
 
 export const reactionDateTimeToOrd = (
@@ -443,7 +446,11 @@ export const reactionDateTimeToOrd = (
     return { value: dateTime };
   }
   const date = convertOffsetDateToUtc(dateTime);
-  return { value: date.isValid() ? date.format(ORD_DATE_TIME_FORMAT) : dateTime };
+  return {
+    value: date.isValid()
+      ? formatWithFraction(date, ORD_DATE_TIME_FORMAT, dateTime)
+      : dateTime,
+  };
 };
 
 export const ordTubingToReaction = (

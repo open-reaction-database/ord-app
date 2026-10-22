@@ -29,6 +29,19 @@ const userTimezone = dayjs.tz.guess();
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 // The same separators the enumeration worker reads: a T or a space before the time.
 const WITH_OFFSET = /[T ][\d:.]+(Z|[+-]\d{2}:?\d{2})$/;
+const FRACTION = /\.\d+(?=(Z|[+-]\d{2}:?\d{2})?$)/;
+
+// dayjs keeps a time only to the millisecond, so the fraction of a second is carried over from
+// `source` as written; a shift between zones moves whole minutes and leaves it unchanged.
+// `format` spells the seconds `ss`.
+export function formatWithFraction(
+  date: dayjs.Dayjs,
+  format: string,
+  source: string,
+): string {
+  const fraction = FRACTION.exec(source)?.[0];
+  return date.format(fraction ? format.replace('ss', `ss[${fraction}]`) : format);
+}
 
 export function isDateOnly(value: string): boolean {
   return DATE_ONLY.test(value);
