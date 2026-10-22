@@ -15,11 +15,62 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
+  convertOffsetDateToUtc,
   convertUtcDateToUserTZ,
-  convertUserTZDateToUtc,
   formatUtcDateToDisplay,
   formatDateToDisplay,
+  formatWithFraction,
+  hasOffset,
+  isDateOnly,
 } from './date.ts';
+import dayjs from 'dayjs';
+
+describe('formatWithFraction', () => {
+  const date = dayjs.utc('2024-05-08T03:00:00Z');
+
+  it('puts the fraction the source was written with after the seconds', () => {
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss[Z]', '2024-05-08T12:00:00.5+09:00'),
+    ).toBe('2024-05-08T03:00:00.5Z');
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss', '2024-05-08T03:00:00.123456'),
+    ).toBe('2024-05-08T03:00:00.123456');
+  });
+
+  it('adds no fraction to a source written without one', () => {
+    expect(
+      formatWithFraction(date, 'YYYY-MM-DDTHH:mm:ss[Z]', '2024-05-08T12:00:00+09:00'),
+    ).toBe('2024-05-08T03:00:00Z');
+  });
+});
+
+describe('hasOffset', () => {
+  it('accepts a time with Z or a numeric offset', () => {
+    expect(hasOffset('2024-05-08T00:00:00Z')).toBe(true);
+    expect(hasOffset('2024-05-08T00:00:00.5+09:00')).toBe(true);
+    expect(hasOffset('2024-05-08T00:00:00-0400')).toBe(true);
+    expect(hasOffset('2024-05-08 00:00:00+05:30')).toBe(true);
+  });
+
+  it('rejects a date, or a time without an offset', () => {
+    expect(hasOffset('2024-05-08')).toBe(false);
+    expect(hasOffset('2024-05-08T00:00:00')).toBe(false);
+    expect(hasOffset('2024-05-08T00:00:00.5')).toBe(false);
+  });
+});
+
+describe('isDateOnly', () => {
+  it('accepts a date with no time', () => {
+    expect(isDateOnly('2024-05-08')).toBe(true);
+  });
+
+  it('rejects anything with a time or in another shape', () => {
+    expect(isDateOnly('2024-05-08T00:00:00Z')).toBe(false);
+    expect(isDateOnly('2024-05-08T00:00:00')).toBe(false);
+    expect(isDateOnly('05/08/2024')).toBe(false);
+    expect(isDateOnly(' 2024-05-08')).toBe(false);
+  });
+});
 
 // DATE_TIME_HUMAN_FORMAT renders as e.g. "01.06.2024 02:00 pm" (DD.MM.YYYY hh:mm a).
 const humanFormat = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} (am|pm)$/;
@@ -32,10 +83,9 @@ describe('timezone conversions', () => {
     expect(convertUtcDateToUserTZ(iso).valueOf()).toBe(Date.parse(iso));
   });
 
-  it('converts an absolute Date to a UTC-mode value at the same instant', () => {
-    const date = new Date('2024-06-01T12:00:00Z');
-    const utc = convertUserTZDateToUtc(date);
-    expect(utc.valueOf()).toBe(date.getTime());
+  it('reads a time with an offset as a UTC-mode value at the same instant', () => {
+    const utc = convertOffsetDateToUtc('2024-06-01T21:00:00+09:00');
+    expect(utc.valueOf()).toBe(Date.parse('2024-06-01T12:00:00Z'));
     expect(utc.utcOffset()).toBe(0);
   });
 });
@@ -48,5 +98,9 @@ describe('display formatting', () => {
   it('formats a local date/Date with the human-readable format', () => {
     expect(formatDateToDisplay('2024-06-01T12:00:00')).toMatch(humanFormat);
     expect(formatDateToDisplay(new Date('2024-06-01T12:00:00'))).toMatch(humanFormat);
+  });
+
+  it('shows a date alone without a time of day', () => {
+    expect(formatDateToDisplay('2024-06-01')).toBe('01.06.2024');
   });
 });

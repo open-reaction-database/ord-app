@@ -29,6 +29,10 @@ import {
   ordBooleanToReaction,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
+  FORM_DATE_TIME_FORMAT,
+  formatWithFraction,
+  hasOffset,
+  isDateOnly,
 } from '@open-reaction-database/ui/reaction/model';
 import type { Variable } from 'store/entities/templates/templates.types.ts';
 import dayjs from 'dayjs';
@@ -86,9 +90,13 @@ function getDateOrError(value: ValueType, variable: Variable): string {
   if (!date.isValid()) {
     throw produceValueTypeError('date', variable);
   }
-  return variable.type === VariableType.Date
-    ? date.format(DATE_FORMAT)
-    : date.format(DATE_TIME_FORMAT);
+  // A date alone gains no time of day; the human formats are all dates alone.
+  if (variable.type === VariableType.Date || !isIso || isDateOnly(value)) {
+    return date.format(DATE_FORMAT);
+  }
+  // A time with an offset keeps the instant it names, and one without gains no offset.
+  const format = hasOffset(value) ? FORM_DATE_TIME_FORMAT : DATE_TIME_FORMAT;
+  return formatWithFraction(date, format, value);
 }
 
 function getSelectOrError(value: ValueType, variable: Variable): string {

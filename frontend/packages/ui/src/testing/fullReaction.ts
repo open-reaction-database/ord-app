@@ -298,16 +298,16 @@ export const fullReaction = create(ReactionSchema, {
   provenance: {
     experimenter: { name: 'Ada Lovelace', orcid: '0000-0000-0000-0000' },
     city: 'London',
-    experimentStart: { value: '2024-06-01T12:00:00' },
+    experimentStart: { value: '2024-06-01' },
     doi: '10.1000/xyz',
     publicationUrl: 'https://example.com/paper',
     recordCreated: {
-      time: { value: '2024-06-02T12:00:00' },
+      time: { value: '2024-06-02T12:00:00Z' },
       person: { username: 'ada', email: 'ada@example.com' },
       details: 'created',
     },
     recordModified: [
-      { time: { value: '2024-06-03T12:00:00' }, person: { name: 'Grace Hopper' } },
+      { time: { value: '2024-06-03T12:00:00Z' }, person: { name: 'Grace Hopper' } },
     ],
     reactionMetadata: {
       origin: { kind: { case: 'stringValue', value: 'notebook' } },

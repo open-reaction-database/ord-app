@@ -105,10 +105,15 @@ import type {
 } from '@buf/open-reaction-database_ord-schema.bufbuild_es/ord-schema/proto/reaction_pb';
 import type { ElectrochemistryType } from '#reaction/model/reactionEntityTypes/reactionEntityTypes.types.ts';
 import {
+  convertOffsetDateToUtc,
   convertUtcDateToUserTZ,
-  convertUserTZDateToUtc,
+  formatWithFraction,
+  hasOffset,
 } from '#reaction/model/utils/date.ts';
-import { DATE_TIME_FORMAT } from '#reaction/model/reactionFormats.ts';
+import {
+  FORM_DATE_TIME_FORMAT,
+  ORD_DATE_TIME_FORMAT,
+} from '#reaction/model/reactionFormats.ts';
 
 export function withId<T>(entity: T): WithId<T> {
   return {
@@ -422,8 +427,13 @@ export const ordDateTimeToReaction = (
   if (!dateTime?.value) {
     return null;
   }
+  if (!hasOffset(dateTime.value)) {
+    return dateTime.value;
+  }
   const date = convertUtcDateToUserTZ(dateTime.value);
-  return date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime.value;
+  return date.isValid()
+    ? formatWithFraction(date, FORM_DATE_TIME_FORMAT, dateTime.value)
+    : dateTime.value;
 };
 
 export const reactionDateTimeToOrd = (
@@ -432,8 +442,15 @@ export const reactionDateTimeToOrd = (
   if (!dateTime) {
     return undefined;
   }
-  const date = convertUserTZDateToUtc(dateTime);
-  return { value: date.isValid() ? date.format(DATE_TIME_FORMAT) : dateTime };
+  if (!hasOffset(dateTime)) {
+    return { value: dateTime };
+  }
+  const date = convertOffsetDateToUtc(dateTime);
+  return {
+    value: date.isValid()
+      ? formatWithFraction(date, ORD_DATE_TIME_FORMAT, dateTime)
+      : dateTime,
+  };
 };
 
 export const ordTubingToReaction = (

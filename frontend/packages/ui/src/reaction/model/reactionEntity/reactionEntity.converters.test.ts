@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { create } from '@bufbuild/protobuf';
 import {
   CompoundIdentifierSchema,
+  DateTimeSchema,
   ReactionIdentifierSchema,
   StirringConditions_StirringRateSchema,
   TextureSchema,
@@ -24,12 +25,14 @@ import {
 import {
   ordBooleanToReaction,
   ordCompoundIdentifierToReaction,
+  ordDateTimeToReaction,
   ordReactionIdentifierToReaction,
   ordScalarToReaction,
   ordStirringRateToReaction,
   ordTextureToReaction,
   ordValuePrecisionToReaction,
   reactionBooleanToOrd,
+  reactionDateTimeToOrd,
   reactionValuePrecisionToOrd,
   withId,
   withIdName,
@@ -61,6 +64,72 @@ describe('withIdName / withoutIdName', () => {
 
   it('strips id and name', () => {
     expect(withoutIdName({ id: 'abc', name: 'label', value: 1 })).toEqual({ value: 1 });
+  });
+});
+
+// The form holds times with an offset in the user's zone, so these assert what reaches ord, which
+// does not depend on the zone the tests run in.
+describe('DateTime converters', () => {
+  const roundTrip = (value: string) =>
+    reactionDateTimeToOrd(ordDateTimeToReaction(create(DateTimeSchema, { value })));
+
+  it('keeps a date as a date', () => {
+    expect(ordDateTimeToReaction(create(DateTimeSchema, { value: '2024-05-08' }))).toBe(
+      '2024-05-08',
+    );
+    expect(reactionDateTimeToOrd('2024-05-08')).toEqual({ value: '2024-05-08' });
+  });
+
+  it('keeps a time without an offset as written', () => {
+    expect(
+      ordDateTimeToReaction(create(DateTimeSchema, { value: '2021-10-22T22:19:55' })),
+    ).toBe('2021-10-22T22:19:55');
+    expect(reactionDateTimeToOrd('2021-10-22T22:19:55.5')).toEqual({
+      value: '2021-10-22T22:19:55.5',
+    });
+  });
+
+  it('writes a time with an offset as the UTC instant it names, with its Z', () => {
+    expect(roundTrip('2024-06-01T12:00:00Z')).toEqual({
+      value: '2024-06-01T12:00:00Z',
+    });
+    expect(roundTrip('2024-06-01T21:00:00+09:00')).toEqual({
+      value: '2024-06-01T12:00:00Z',
+    });
+    expect(reactionDateTimeToOrd('2024-06-01T12:00:00-04:00')).toEqual({
+      value: '2024-06-01T16:00:00Z',
+    });
+  });
+
+  it('keeps the fraction of a second a time with an offset was written with', () => {
+    expect(roundTrip('2024-06-01T21:00:00.123456+09:00')).toEqual({
+      value: '2024-06-01T12:00:00.123456Z',
+    });
+  });
+
+  // The suite may run in UTC, where showing a time in the user's zone changes nothing.
+  it("shows a time with an offset in the user's zone, with that zone's offset", async () => {
+    vi.stubEnv('TZ', 'Asia/Tokyo');
+    vi.resetModules();
+    try {
+      const converters = await import('./reactionEntity.converters.ts');
+      expect(
+        converters.ordDateTimeToReaction(
+          create(DateTimeSchema, { value: '2024-06-01T03:00:00Z' }),
+        ),
+      ).toBe('2024-06-01T12:00:00+09:00');
+      expect(converters.reactionDateTimeToOrd('2024-06-01T12:00:00+09:00')).toEqual({
+        value: '2024-06-01T03:00:00Z',
+      });
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
+  });
+
+  it('leaves an empty value unset', () => {
+    expect(ordDateTimeToReaction(create(DateTimeSchema, { value: '' }))).toBeNull();
+    expect(reactionDateTimeToOrd(null)).toBeUndefined();
   });
 });
 
