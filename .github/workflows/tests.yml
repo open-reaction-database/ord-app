@@ -301,8 +301,9 @@ jobs:
           VITE_E2E_NO_AUTH: "TRUE"
           VITE_API_ENDPOINT: "http://127.0.0.1:8000/service_api/api/v1"
           # A deployed image's footer shows the commit it was built from, and footer.spec.ts
-          # measures that footer.
-          VITE_GIT_COMMIT: ${{ github.sha }}
+          # measures that footer. A fixed one keeps the reaction page's screenshots the same
+          # from run to run.
+          VITE_GIT_COMMIT: "0123456789abcdef0123456789abcdef01234567"
           PG_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_ALEMBIC_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
