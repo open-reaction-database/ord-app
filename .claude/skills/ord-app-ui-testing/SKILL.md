@@ -120,9 +120,9 @@ export APP_ENV=localhost ORD_APP_E2E=true CORS_ORIGINS='["http://127.0.0.1:5173"
 uv run --directory backend/editor alembic upgrade head
 uv run --directory backend/editor uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
 
-# 3) UI — BOTH env vars are required
+# 3) UI — the first two env vars are required; footer.spec.ts also needs a commit, as a deployed image's footer shows one
 cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
-  npm run dev -- --host 127.0.0.1 --port 5173 &
+  VITE_GIT_COMMIT="$(git rev-parse HEAD)" npm run dev -- --host 127.0.0.1 --port 5173 &
 
 # 4) Playwright (config baseURL is http://127.0.0.1:5173)
 npx playwright install chromium   # first time only
