@@ -120,9 +120,9 @@ export APP_ENV=localhost ORD_APP_E2E=true CORS_ORIGINS='["http://127.0.0.1:5173"
 uv run --directory backend/editor alembic upgrade head
 uv run --directory backend/editor uvicorn ord_editor.service_api.main:app --host 127.0.0.1 --port 8000 &   # docs: /service_api/docs
 
-# 3) UI — BOTH env vars are required
+# 3) UI — the first two env vars are required; footer.spec.ts also needs a commit, as a deployed image's footer shows one
 cd frontend/apps/editor && VITE_E2E_NO_AUTH=TRUE VITE_API_ENDPOINT="http://127.0.0.1:8000/service_api/api/v1" \
-  npm run dev -- --host 127.0.0.1 --port 5173 &
+  VITE_GIT_COMMIT="$(git rev-parse HEAD)" npm run dev -- --host 127.0.0.1 --port 5173 &
 
 # 4) Playwright (config baseURL is http://127.0.0.1:5173)
 npx playwright install chromium   # first time only
@@ -142,7 +142,7 @@ E2E driving tips (the app is WASM/Ketcher-heavy and slow):
 
 ### Screenshot tests (`toHaveScreenshot`)
 
-`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. The reaction page spec masks what changes between runs (the footer's year; the card spec's capture does not reach the footer). Neither retries, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
+`e2e/reactionPage.spec.ts`'s "looks the same" compares the reaction page and its drawer against PNGs in `e2e/reactionPage.spec.ts-snapshots/` (`*-chromium-linux.png`), and `e2e/datasetPage.spec.ts` compares the first reaction card on a dataset page. Both use a 1280×1080 viewport: the footer is fixed to the viewport's bottom, and at the default 720 px it covers the content. The baselines are rendered on CI's Linux runner, so the test skips unless `CI` is set; fonts and antialiasing differ elsewhere. The reaction page spec masks what changes between runs (the footer's year; the card spec's capture does not reach the footer), and the footer's commit is the fixed `VITE_GIT_COMMIT` that `test_e2e_editor` builds with. Neither retries, so a missing baseline fails the run instead of being written and then matched by a retry. A mask hides an element but not its size: the fixture sets its own `reaction_id` because one the upload assigns changes the heading's width, and so the layout beside it, from run to run. Seed anything a screenshot shows with fixed values.
 
 When a change alters the page's look on purpose, refresh the baselines from CI. The spec's snapshot directory is `e2e/<spec>.spec.ts-snapshots/`: `reactionPage.spec.ts-snapshots/` or `datasetPage.spec.ts-snapshots/`.
 1. Push the change. `test_e2e_editor` fails on the altered screenshot; download the run's artifact (`gh run download <run-id> -n playwright-report`).

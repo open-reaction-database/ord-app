@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderAt } from '#test/render.tsx';
@@ -36,6 +36,7 @@ function renderPage() {
 
 afterEach(() => {
   setViewportWidth(WIDE);
+  vi.unstubAllEnvs();
 });
 
 describe('ViewerPage', () => {
@@ -74,6 +75,17 @@ describe('ViewerPage', () => {
     expect(item('Contribute')).toHaveAttribute('href', EDITOR_URL);
     expect(item('Docs')).toHaveAttribute('href', DOCS_URL);
     expect(item('About')).toHaveAttribute('href', '/about');
+  });
+
+  it('shows the commit it was built from in the footer', () => {
+    const sha = '0123456789abcdef0123456789abcdef01234567';
+    vi.stubEnv('VITE_GIT_COMMIT', sha);
+    const { getByRole } = renderPage();
+    const footer = within(getByRole('contentinfo'));
+    expect(footer.getByRole('link', { name: '0123456' })).toHaveAttribute(
+      'href',
+      `https://github.com/open-reaction-database/ord-app/commit/${sha}`,
+    );
   });
 
   it('renders its children', () => {

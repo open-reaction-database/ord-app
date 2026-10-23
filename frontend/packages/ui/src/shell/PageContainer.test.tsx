@@ -29,7 +29,9 @@ vi.mock('#shell/Breadcrumbs/Breadcrumbs.tsx', () => ({
   ),
 }));
 vi.mock('#shell/Footer/Footer.tsx', () => ({
-  Footer: () => <div data-testid="footer" />,
+  Footer: ({ commit }: Readonly<{ commit?: string }>) => (
+    <div data-testid="footer">{commit}</div>
+  ),
 }));
 
 describe('PageContainer', () => {
@@ -83,6 +85,16 @@ describe('PageContainer', () => {
     const controls = getByText('menu').parentElement;
     expect(getByText('help').parentElement).toBe(controls);
     expect(controls).not.toBe(getByRole('banner'));
+  });
+
+  it('gives the default footer the commit the host was built from', () => {
+    const { getByTestId } = renderWithMantine(
+      <PageContainer
+        breadcrumbs={[]}
+        commit="abc"
+      />,
+    );
+    expect(getByTestId('footer')).toHaveTextContent('abc');
   });
 
   it('shows the footer a host gives instead of the default one', () => {

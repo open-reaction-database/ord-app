@@ -109,13 +109,17 @@ function Navigation() {
   );
 }
 
-/** The page shell, with the viewer's navigation in its header. */
+/**
+ * The page shell, with the viewer's navigation in its header and the commit it was built
+ * from in its footer.
+ */
 export function ViewerPage({ breadcrumbs, children }: Readonly<ViewerPageProps>) {
   return (
     <PageContainer
       breadcrumbs={breadcrumbs}
       headerActions={<Navigation />}
       homePath="/"
+      commit={import.meta.env.VITE_GIT_COMMIT as string | undefined}
     >
       {children}
     </PageContainer>

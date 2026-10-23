@@ -33,6 +33,9 @@ export CORS_ORIGINS="${CORS_ORIGINS:-[\"http://127.0.0.1:5173\"]}"
 # Point the UI at this backend; otherwise it calls the production API.
 api_endpoint="http://127.0.0.1:8000/service_api/api/v1"
 export VITE_API_ENDPOINT="${VITE_API_ENDPOINT:-${api_endpoint}}"
+# A deployed image's footer shows the commit it was built from, and footer.spec.ts
+# measures that footer.
+export VITE_GIT_COMMIT="${VITE_GIT_COMMIT:-$(git rev-parse HEAD)}"
 
 echo "Applying database migrations..."
 uv run --directory backend/editor --frozen --no-build alembic upgrade head

@@ -29,6 +29,10 @@ async function openDataset(page: Page) {
     timeout: 30_000,
   });
   await expect(page.getByRole('contentinfo')).toContainText('© Copyright');
+  // The commit a deployed image shows; the e2e UI is built with one (VITE_GIT_COMMIT).
+  await expect(
+    page.getByRole('contentinfo').getByRole('link', { name: /^[0-9a-f]{7}$/ }),
+  ).toBeVisible();
 }
 
 interface Box {
@@ -66,7 +70,7 @@ function scrollToEndAndMeasure(page: Page) {
  */
 const WIDTHS = [
   { width: 375, belowSm: true, wraps: true },
-  { width: 640, belowSm: true, wraps: false },
+  { width: 640, belowSm: true, wraps: true },
   { width: 1024, belowSm: false, wraps: false },
 ];
 
@@ -84,7 +88,8 @@ for (const { width, belowSm, wraps } of WIDTHS) {
         expect(measured.contentHeight, 'the page fits the window').toBeGreaterThan(
           measured.windowHeight,
         );
-        expect(items).toHaveLength(3);
+        // The copyright, the support address, the commit, and the social links.
+        expect(items).toHaveLength(4);
         const lines = new Set(items.map(item => Math.round(item.top))).size;
         expect(lines > 1, 'whether the items wrap').toBe(wraps);
         for (const item of items) {

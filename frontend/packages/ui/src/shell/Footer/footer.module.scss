@@ -15,10 +15,11 @@
  */
 .root {
   width: 100%;
+  column-gap: 28px;
 }
 
-.copyright {
-  margin-right: 28px;
+.commit {
+  font-family: var(--mantine-font-family-monospace);
 }
 
 .footerLinks {

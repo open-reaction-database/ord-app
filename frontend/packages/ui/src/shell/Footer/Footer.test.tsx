@@ -19,6 +19,8 @@ import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import { Footer } from './Footer.tsx';
 
+const SHA = '0123456789abcdef0123456789abcdef01234567';
+
 function itemsWrap() {
   const items = screen.getByText(/© Copyright/).parentElement as HTMLElement;
   return getComputedStyle(items).flexWrap === 'wrap';
@@ -32,6 +34,33 @@ describe('Footer', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(2);
   });
+
+  it('links the commit it is given, abbreviated, to its page on GitHub', () => {
+    renderWithMantine(<Footer commit={SHA} />);
+    const link = screen.getByRole('link', { name: SHA.slice(0, 7) });
+    expect(link).toHaveAttribute(
+      'href',
+      `https://github.com/open-reaction-database/ord-app/commit/${SHA}`,
+    );
+    expect(link.parentElement).toHaveTextContent(`Commit ${SHA.slice(0, 7)}`);
+  });
+
+  it('marks a commit built with changes as dirty, and links the commit they were made on', () => {
+    renderWithMantine(<Footer commit={`${SHA}-dirty`} />);
+    const link = screen.getByRole('link', { name: `${SHA.slice(0, 7)}-dirty` });
+    expect(link).toHaveAttribute(
+      'href',
+      `https://github.com/open-reaction-database/ord-app/commit/${SHA}`,
+    );
+  });
+
+  it.each([undefined, '', 'unknown', SHA.slice(0, 7)])(
+    'shows no commit for %j',
+    commit => {
+      renderWithMantine(<Footer commit={commit} />);
+      expect(screen.queryByText(/Commit/)).not.toBeInTheDocument();
+    },
+  );
 
   it('links the support address', () => {
     renderWithMantine(<Footer />);

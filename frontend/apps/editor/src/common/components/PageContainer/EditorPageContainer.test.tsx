@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { within } from '@testing-library/react';
 import { renderWithMantine } from 'test/renderWithMantine.tsx';
 import { EditorPageContainer } from './EditorPageContainer.tsx';
@@ -24,6 +24,10 @@ vi.mock('./UserMenu/UserMenu', () => ({
 }));
 
 describe('EditorPageContainer', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('puts the user menu in the page header', () => {
     const { getByRole, getByText } = renderWithMantine(
       <EditorPageContainer breadcrumbs={[{ title: 'Datasets', path: '/datasets' }]}>
@@ -32,5 +36,16 @@ describe('EditorPageContainer', () => {
     );
     expect(within(getByRole('banner')).getByTestId('user-menu')).toBeInTheDocument();
     expect(getByText('page content')).toBeInTheDocument();
+  });
+
+  it('shows the commit it was built from in the footer', () => {
+    const sha = '0123456789abcdef0123456789abcdef01234567';
+    vi.stubEnv('VITE_GIT_COMMIT', sha);
+    const { getByRole } = renderWithMantine(<EditorPageContainer breadcrumbs={[]} />);
+    const footer = within(getByRole('contentinfo'));
+    expect(footer.getByRole('link', { name: '0123456' })).toHaveAttribute(
+      'href',
+      `https://github.com/open-reaction-database/ord-app/commit/${sha}`,
+    );
   });
 });

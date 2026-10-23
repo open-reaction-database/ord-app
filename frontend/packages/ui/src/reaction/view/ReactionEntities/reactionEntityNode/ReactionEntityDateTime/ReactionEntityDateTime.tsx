@@ -30,11 +30,11 @@ import dayjs from 'dayjs';
 import { useIsViewOnly } from '#reaction/provider/reactionProvider.hooks.ts';
 import { ReactionValueLabelWrapper } from '#reaction/view/ReactionValueLabelWrapper.tsx';
 import { VariableType } from '#reaction/model/variableType.ts';
-import { DATE_TIME_FORMAT } from '#reaction/model/reactionFormats.ts';
+import { FORM_DATE_TIME_FORMAT } from '#reaction/model/reactionFormats.ts';
 import classes from './reactionEntityDateTime.module.scss';
 
 function formatDate(inputDate: string | Date): string {
-  return dayjs(inputDate).format(DATE_TIME_FORMAT);
+  return dayjs(inputDate).format(FORM_DATE_TIME_FORMAT);
 }
 
 interface ReactionEntityDateTimeLabelProps extends Omit<
@@ -60,7 +60,7 @@ function ReactionEntityDateTimeLabel({
     (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
-      onChange(dayjs().format(DATE_TIME_FORMAT));
+      onChange(dayjs().format(FORM_DATE_TIME_FORMAT));
     },
     [onChange],
   );

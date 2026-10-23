@@ -17,17 +17,56 @@ import { Flex } from '@mantine/core';
 import { Github, Linkedin } from '#theme/icons/index.ts';
 import classes from './footer.module.scss';
 
-export function Footer() {
+const REPOSITORY = 'https://github.com/open-reaction-database/ord-app';
+
+// A build's commit as the image's GIT_COMMIT build argument gives it: the full SHA, with
+// -dirty when the tree had changes.
+const BUILT_COMMIT = /^([0-9a-f]{40})(-dirty)?$/;
+
+export interface FooterProps {
+  /**
+   * The ord-app commit the host's bundle was built from. Anything but a full SHA, such as
+   * `unknown` or nothing, shows no commit.
+   */
+  commit?: string;
+}
+
+/** The commit, abbreviated and linked to its page on GitHub. */
+function BuiltCommit({ commit }: Readonly<{ commit: string }>) {
+  const match = BUILT_COMMIT.exec(commit);
+  if (!match) {
+    return null;
+  }
+  const [, sha, dirty = ''] = match;
+  return (
+    <div>
+      Commit{' '}
+      <a
+        className={classes.commit}
+        href={`${REPOSITORY}/commit/${sha}`}
+        title={commit}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {sha.slice(0, 7)}
+        {dirty}
+      </a>
+    </div>
+  );
+}
+
+export function Footer({ commit = '' }: Readonly<FooterProps>) {
   const year = new Date().getFullYear();
 
   return (
     <Flex className={classes.root}>
-      <div className={classes.copyright}>© Copyright {year} Open Reaction Database</div>
+      <div>© Copyright {year} Open Reaction Database</div>
       <div>
         <a href="mailto:help@open-reaction-database.org">
           help@open-reaction-database.org
         </a>
       </div>
+      <BuiltCommit commit={commit} />
       <div className={classes.footerLinks}>
         <a
           href="https://github.com/open-reaction-database/"

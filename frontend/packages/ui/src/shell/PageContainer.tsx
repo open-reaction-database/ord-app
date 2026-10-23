@@ -27,6 +27,8 @@ export interface PageContainerProps extends PropsWithChildren {
   badge?: ReactNode;
   /** Controls at the right of the header, such as the signed-in user's menu. */
   headerActions?: ReactNode;
+  /** The ord-app commit the host's bundle was built from, which the default footer shows. */
+  commit?: string;
   /** The page's footer: the Open Reaction Database footer by default, and none for `null`. */
   footer?: ReactNode;
   /** Where the logo links, such as the host's home page; without it the logo links nowhere. */
@@ -38,7 +40,8 @@ export function PageContainer({
   breadcrumbs,
   badge,
   headerActions,
-  footer = <Footer />,
+  commit,
+  footer = <Footer commit={commit} />,
   homePath,
 }: Readonly<PageContainerProps>) {
   const hasFooter = footer !== null;
