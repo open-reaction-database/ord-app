@@ -19,14 +19,15 @@ import {
 } from '@open-reaction-database/ui/shell';
 import UserMenu from './UserMenu/UserMenu';
 
-/** The page shell with the editor's header controls. */
+/** The page shell with the editor's header controls, and the commit it was built from. */
 export function EditorPageContainer(
-  props: Readonly<Omit<PageContainerProps, 'headerActions'>>,
+  props: Readonly<Omit<PageContainerProps, 'headerActions' | 'commit'>>,
 ) {
   return (
     <PageContainer
       {...props}
       headerActions={<UserMenu />}
+      commit={import.meta.env.VITE_GIT_COMMIT as string | undefined}
     />
   );
 }
