@@ -29,7 +29,10 @@ COPY frontend/apps/viewer/package.json apps/viewer/
 COPY frontend/packages/ui/package.json packages/ui/
 RUN npm ci --ignore-scripts
 COPY frontend/ ./
-RUN npm run build -w apps/viewer
+# The commit the footer shows: the GIT_COMMIT the image is labeled with below. Unset, as
+# in local and CI builds, the footer shows none.
+ARG GIT_COMMIT
+RUN VITE_GIT_COMMIT="$GIT_COMMIT" npm run build -w apps/viewer
 
 FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
 RUN apt-get update && apt-get install -y --no-install-recommends nginx supervisor && \

@@ -45,8 +45,12 @@ ARG VITE_AUTH0_AUDIENCE
 ARG VITE_AUTH0_ISSUER
 ARG VITE_AUTH0_SCOPE
 
+# The commit the footer shows: the GIT_COMMIT the image is labeled with below. Unset, as
+# in local and CI builds, the footer shows none.
+ARG GIT_COMMIT
+
 # Build the React app
-RUN ORD_APP_REQUIRE_AUTH0=true npm run build -w apps/editor
+RUN VITE_GIT_COMMIT="$GIT_COMMIT" ORD_APP_REQUIRE_AUTH0=true npm run build -w apps/editor
 
 # Stage 2: Build the FastAPI backend
 FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 AS fastapi-build
@@ -119,8 +123,9 @@ EXPOSE 5173
 # Record the source commit so the deployed image is traceable to a commit. The infra
 # build (ord-infrastructure's sibling_head) passes the checkout's HEAD, suffixed
 # -dirty when the tree has changes or git cannot tell, or "unknown" when it cannot
-# read HEAD; local and manual builds default to "unknown". Declared last so only
-# this layer rebuilds per commit.
+# read HEAD; local and manual builds default to "unknown". The bundle compiles it in
+# for the footer, so a new commit rebuilds the bundle and the layers that copy it; the
+# Python dependencies stay cached.
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 
