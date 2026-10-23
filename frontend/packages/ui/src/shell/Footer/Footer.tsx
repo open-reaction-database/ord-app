@@ -42,6 +42,7 @@ function BuiltCommit({ commit }: Readonly<{ commit: string }>) {
     <div>
       Commit{' '}
       <a
+        className={classes.commit}
         href={`${REPOSITORY}/commit/${sha}`}
         title={commit}
         target="_blank"
