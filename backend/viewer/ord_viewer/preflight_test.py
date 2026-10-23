@@ -14,14 +14,19 @@
 
 import dataclasses
 import pathlib
+import shutil
 from typing import BinaryIO
 
 import pytest
 from ord_schema import huggingface, message_helpers
 from ord_schema.artifacts import base
+from ord_schema.search import execute
 from rdkit import rdBase
 
 from ord_viewer import preflight
+from ord_viewer.corpus import open_corpus
+from ord_viewer.settings import Settings
+from ord_viewer.testing import offline_resolver
 
 # The commit the fake Hub resolves every ord-artifacts revision to.
 COMMIT = "artifacts-commit"
@@ -42,9 +47,8 @@ class Hub:
     mirrored: list[str]
     downloads: list[dict[str, object]] = dataclasses.field(default_factory=list)
 
-    def drop(self, artifact: str) -> None:
-        """Remove one artifact's files from ord-artifacts."""
-        directory = huggingface.ARTIFACT_DIRECTORIES[artifact]
+    def drop(self, directory: str) -> None:
+        """Remove the files beneath one directory from ord-artifacts."""
         self.artifacts = [
             path for path in self.artifacts if not path.startswith(f"{directory}/")
         ]
@@ -110,7 +114,7 @@ def test_passes_the_artifacts_fetch_artifacts_downloads(hub, tmp_path):
 
 @pytest.mark.parametrize("artifact", list(huggingface.ARTIFACT_DIRECTORIES))
 def test_refuses_a_revision_that_lacks_an_artifact(hub, tmp_path, artifact):
-    hub.drop(artifact)
+    hub.drop(huggingface.ARTIFACT_DIRECTORIES[artifact])
     refusal = rf"ord-artifacts@main holds no {artifact} artifacts"
     with pytest.raises(LookupError, match=refusal):
         preflight.check_artifacts("main")
@@ -142,6 +146,31 @@ def test_refuses_a_build_this_viewer_cannot_read(
     with pytest.raises(LookupError, match=r"Install the ord-schema and RDKit"):
         huggingface.fetch_artifacts(tmp_path, revision="main")
     assert not hub.downloads
+
+
+# Each name is a prefix of another level's or path's, which stays.
+@pytest.mark.parametrize(
+    ("directory", "refusal"),
+    [
+        ("pivots/inputs", r"holds no pivot artifacts for \['inputs'\]"),
+        (
+            "occurrences/outcomes.products",
+            r"holds no occurrence artifacts for \['outcomes\.products'\]",
+        ),
+    ],
+)
+def test_refuses_a_build_the_viewer_cannot_open(
+    hub, corpus_dir, tmp_path, directory, refusal
+):
+    hub.drop(directory)
+    with pytest.raises(LookupError, match=refusal):
+        preflight.check_artifacts("main")
+    # The viewer refuses the same tree when it opens it.
+    local = tmp_path / "corpus"
+    shutil.copytree(corpus_dir, local)
+    shutil.rmtree(local / directory)
+    with pytest.raises(execute.PairingError, match="this corpus was opened requiring"):
+        open_corpus(Settings(corpus_dir=local), resolver=offline_resolver)
 
 
 def test_counts_the_sources_the_projections_name(hub):

@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Checking, without fetching it, that the viewer can fetch the corpus it is given.
+"""Checking, without fetching it, that the viewer can start on the corpus it is given.
 
 Run ``python -m ord_viewer.preflight`` from backend/viewer with the deployment's
 ORD_VIEWER_ARTIFACTS_REVISION and ORD_VIEWER_SOURCES_REVISION. It reads the two
-repositories' file listings and one footer per projection, and refuses what fetching
-the corpus at startup would: an artifacts revision that lacks an artifact or holds a
-build of another artifact schema or RDKit, a projection that names no source, and a
-source the mirror lacks or holds only as a binary proto. A source whose contents differ
-from what its projection was derived from passes; only opening the corpus checks that.
+repositories' file listings and one footer per projection, and refuses what the viewer
+would at startup: an artifacts revision that lacks an artifact, a pivot level, or an
+indexed path, or holds a build of another artifact schema or RDKit; a projection that
+names no source; and a source the mirror lacks or holds only as a binary proto. A
+source whose contents differ from what its projection was derived from passes; only
+opening the corpus checks that.
 """
 
 import concurrent.futures
@@ -29,7 +30,8 @@ import functools
 import pyarrow.parquet as pq
 from huggingface_hub import HfFileSystem, list_repo_files
 from ord_schema import huggingface, message_helpers
-from ord_schema.artifacts import base
+from ord_schema.artifacts import base, pivot
+from ord_schema.search import execute
 from rdkit import rdBase
 
 from ord_viewer.settings import Settings
@@ -51,11 +53,13 @@ def _parquet_beneath(paths: list[str], directory: str) -> list[str]:
 
 
 def check_artifacts(revision: str) -> tuple[str, list[str]]:
-    """Refuse an ord-artifacts revision that fetch_artifacts would refuse.
+    """Refuse an ord-artifacts revision the viewer would refuse at startup.
 
-    These are the checks fetch_artifacts makes before it downloads anything: every
-    artifact is present, and the build is stamped with this ord-schema's artifact
-    schema version and this RDKit.
+    These are the checks fetch_artifacts makes before it downloads anything, that every
+    artifact is present and the build is stamped with this ord-schema's artifact schema
+    version and this RDKit, and the ones the viewer's Corpus makes as it opens, since it
+    requires a pivot artifact for every level and an occurrence artifact for every
+    indexed path.
 
     Args:
         revision: Branch, tag, or commit of ord-artifacts.
@@ -64,8 +68,8 @@ def check_artifacts(revision: str) -> tuple[str, list[str]]:
         The commit the revision names, and the paths of the projections it holds.
 
     Raises:
-        LookupError: If the revision lacks an artifact, or holds a build of another
-            artifact schema version or RDKit.
+        LookupError: If the revision lacks an artifact, a pivot level, or an indexed
+            path, or holds a build of another artifact schema version or RDKit.
     """
     commit = huggingface.resolve_revision(revision)
     published = list_repo_files(
@@ -93,6 +97,22 @@ def check_artifacts(revision: str) -> tuple[str, list[str]]:
             f"{stamps.rdkit_version}, and this viewer reads schema version "
             f"{base.ARTIFACT_SCHEMA_VERSION} under RDKit {rdBase.rdkitVersion}"
         )
+    pivots = huggingface.ARTIFACT_DIRECTORIES["pivot"]
+    occurrences = huggingface.ARTIFACT_DIRECTORIES["occurrences"]
+    for kind, directory, required in (
+        ("pivot", pivots, pivot.LEVELS),
+        ("occurrence", occurrences, execute.INDEXED_PATHS),
+    ):
+        lacking = [
+            name
+            for name in sorted(required)
+            if not _parquet_beneath(published, f"{directory}/{name}")
+        ]
+        if lacking:
+            raise LookupError(
+                f"{huggingface.ORD_ARTIFACTS_HF_REPO}@{revision} holds no {kind} "
+                f"artifacts for {lacking}"
+            )
     projections = huggingface.ARTIFACT_DIRECTORIES["projection"]
     return commit, _parquet_beneath(published, projections)
 
