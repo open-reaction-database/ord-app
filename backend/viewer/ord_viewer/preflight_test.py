@@ -169,8 +169,9 @@ def test_refuses_a_build_the_viewer_cannot_open(
     local = tmp_path / "corpus"
     shutil.copytree(corpus_dir, local)
     shutil.rmtree(local / directory)
+    settings = Settings(corpus_dir=local)
     with pytest.raises(execute.PairingError, match="this corpus was opened requiring"):
-        open_corpus(Settings(corpus_dir=local), resolver=offline_resolver)
+        open_corpus(settings, resolver=offline_resolver)
 
 
 def test_counts_the_sources_the_projections_name(hub):
