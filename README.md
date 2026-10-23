@@ -58,6 +58,12 @@ The service serves a corpus one of two ways. A local corpus is a directory laid 
 uv run python -c "import pathlib; from ord_viewer.testing import derive_corpus; derive_corpus(pathlib.Path('/tmp/corpus'))"
 ```
 
+To check a pair of revisions before deploying them, without fetching the corpus, run the preflight with the same two variables. In seconds, it refuses what the fetch at startup would: an artifacts revision that lacks an artifact or holds a build of another artifact schema or RDKit, a projection that names no source, and a source the mirror lacks or holds only as a binary proto. A source whose contents differ from what its projection was derived from passes, since only opening the corpus checks that.
+
+```shell
+ORD_VIEWER_ARTIFACTS_REVISION=<commit> ORD_VIEWER_SOURCES_REVISION=<commit> uv run python -m ord_viewer.preflight
+```
+
 ### Viewer
 
 The viewer's frontend is a workspace in `frontend/`. Its dev server, on port 5174, sends `/api` to the viewer's backend on port 8001, or to `ORD_VIEWER_API` when set:
