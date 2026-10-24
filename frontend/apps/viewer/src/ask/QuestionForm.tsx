@@ -17,7 +17,9 @@ import { Button, Group, Stack, TextInput } from '@mantine/core';
 import { useState } from 'react';
 import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
 import {
+  askPath,
   isTooLong,
+  MAX_ADDRESS,
   MAX_QUESTION,
   nextPlaceholder,
   type Structures,
@@ -51,6 +53,13 @@ export function QuestionForm({
     Object.entries(structures).map(([name, structure]) => [name, structure.trim()]),
   );
   const unfinished = Object.values(drawn).includes('');
+  const unaddressable = askPath(trimmed, drawn).length > MAX_ADDRESS;
+  let error = null;
+  if (tooLong) {
+    error = `At most ${MAX_QUESTION} characters.`;
+  } else if (unaddressable) {
+    error = 'Too long to ask with its structures; shorten the question or a structure.';
+  }
   const next = nextPlaceholder(structures);
   const add = (name: string) => {
     setStructures({ ...structures, [name]: '' });
@@ -64,7 +73,8 @@ export function QuestionForm({
   };
   return (
     // Enter submits only while Ask is enabled, so a submitted question is never empty,
-    // too long, or naming a structure with nothing in its field.
+    // too long for the backend or an address, or naming a structure with nothing in its
+    // field.
     <form
       onSubmit={event => {
         event.preventDefault();
@@ -82,12 +92,12 @@ export function QuestionForm({
             placeholder="e.g. reactions that make an aryl boronic acid"
             flex={1}
             value={draft}
-            error={tooLong ? `At most ${MAX_QUESTION} characters.` : null}
+            error={error}
             onChange={event => setDraft(event.currentTarget.value)}
           />
           <Button
             type="submit"
-            disabled={trimmed === '' || tooLong || unfinished}
+            disabled={trimmed === '' || error !== null || unfinished}
           >
             Ask
           </Button>

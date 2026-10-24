@@ -19,6 +19,14 @@ export const MAX_QUESTION = 2000;
 /** The backend's bound on how many structures one question names. */
 export const MOST_STRUCTURES = 10;
 
+/**
+ * The longest ask address, which carries a question and its structures.
+ *
+ * The viewer's load balancer and nginx each take a request line of at most 16 KiB, so a
+ * reload or a shared link of a longer address would be refused.
+ */
+export const MAX_ADDRESS = 16_000;
+
 /** ord-interface's examples. */
 export const ASK_EXAMPLES = [
   'reactions for synthesizing ibuprofen',

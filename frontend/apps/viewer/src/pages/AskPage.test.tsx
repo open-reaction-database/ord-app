@@ -215,10 +215,12 @@ describe('AskPage', () => {
 
   it('counts characters as the backend does, not UTF-16 units', async () => {
     const user = userEvent.setup();
-    const { getByRole } = renderAt('/ask', <AskPage />);
+    const { getByRole, getByText, queryByText } = renderAt('/ask', <AskPage />);
     await user.click(getByRole('textbox', { name: 'Question' }));
     await user.paste('\u{1F600}'.repeat(2000));
-    expect(getByRole('button', { name: 'Ask' })).toBeEnabled();
+    expect(queryByText('At most 2000 characters.')).not.toBeInTheDocument();
+    await user.paste('\u{1F600}');
+    expect(getByText('At most 2000 characters.')).toBeInTheDocument();
   });
 
   it('asks nothing for a blank question in the URL', () => {
