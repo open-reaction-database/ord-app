@@ -88,6 +88,69 @@ def test_refuses_an_unknown_key_before_asking(client, ask_with):
     assert stub.requests == []
 
 
+def test_answers_a_question_about_a_drawn_structure(client, ask_with):
+    drawn = {
+        "where": {
+            "op": "exists",
+            "path": "inputs.components",
+            "where": {"op": "substructure", "path": "smiles", "smarts": "@A"},
+        }
+    }
+    stub = ask_with(drawn, _PYRIDINE_ANSWER)
+    body = {"question": "reactions with @A", "structures": {"@A": "c1ccncc1"}}
+    response = client.post("/api/ask", json=body)
+    assert response.status_code == 200, response.text
+    assert response.json()["query"]["where"]["where"]["smarts"] == "c1ccncc1"
+    assert response.json()["result"]["reaction_ids"] == ["ord-viewer0101"]
+    # The model is told each placeholder's format, never its text.
+    asked = stub.requests[0]["messages"][0]["content"]
+    assert "@A is a compound SMILES." in asked
+    assert "c1ccncc1" not in asked
+
+
+@pytest.mark.parametrize(
+    ("question", "structures", "message"),
+    [
+        ("reactions with ethanol", {"@A": "CCO"}, "@A has a structure but is not in"),
+        ("reactions with @A", {}, "@A is in the question but has no structure"),
+        ("reactions with @A", {"@A": "not a structure"}, "@A: 'not a structure' is"),
+        ("reactions like @A", {"@A": "C>>C>>C"}, "@A: reaction SMARTS does not parse"),
+    ],
+    ids=["unwritten", "unbound", "unreadable", "refused by the grammar"],
+)
+def test_refuses_placeholders_that_do_not_fit_before_asking(
+    client, ask_with, question, structures, message
+):
+    stub = ask_with()
+    body = {"question": question, "structures": structures}
+    response = client.post("/api/ask", json=body)
+    assert response.status_code == 422
+    assert response.json()["detail"].startswith(message)
+    assert stub.requests == []
+
+
+@pytest.mark.parametrize(
+    ("structures", "error"),
+    [
+        ({"A": "CCO"}, "string_pattern_mismatch"),
+        ({f"@{letter}": "CCO" for letter in "ABCDEFGHIJK"}, "too_long"),
+        ({"@A": "C" * 2001}, "string_too_long"),
+    ],
+    ids=["name", "count", "length"],
+)
+def test_refuses_structures_past_the_bounds_before_asking(
+    client, ask_with, structures, error
+):
+    stub = ask_with()
+    question = " ".join(["reactions with", *structures])
+    response = client.post(
+        "/api/ask", json={"question": question, "structures": structures}
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["type"] == error
+    assert stub.requests == []
+
+
 def test_a_declined_request_is_unprocessable(client, ask_with):
     ask_with(DECLINED)
     response = client.post("/api/ask", json={"question": "anything"})
@@ -175,6 +238,20 @@ def test_an_ask_waits_for_a_search_slot(corpus_dir):
     assert response.status_code == 503
     assert "slot" in response.json()["detail"]
     assert stub.requests == []
+
+
+def test_refuses_placeholders_that_do_not_fit_without_waiting_for_a_slot(corpus_dir):
+    stub = StubAskClient()
+    with (
+        make_client(
+            corpus_dir, ask_client=stub, max_concurrent=1, slot_wait_seconds=0.05
+        ) as client,
+        hold_slot(client),
+    ):
+        body = {"question": "reactions with ethanol", "structures": {"@A": "CCO"}}
+        response = client.post("/api/ask", json=body)
+    assert response.status_code == 422
+    assert response.json()["detail"].startswith("@A has a structure but is not in")
 
 
 @pytest.mark.parametrize("variable", ["ORD_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"])

@@ -40,6 +40,7 @@ from ord_schema.artifacts.scripts import (
     derive_structures,
 )
 from ord_schema.proto import dataset_pb2, reaction_pb2
+from ord_schema.search import placeholders
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
@@ -165,34 +166,56 @@ DATASETS = (
 )
 
 
-# The commit each dataset's reactions first reached ord-data in, and its time; the
-# second dataset arrived later, so a query on first_commit tells them apart.
-ARRIVALS = {
-    "ord_dataset-viewer01": ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
-    "ord_dataset-viewer02": ("2" * 40, datetime(2023, 3, 2, 9, 30)),
-}
+# The commits reactions first reached ord-data in, oldest first, with their times.
+COMMITS = (
+    ("1" * 40, datetime(2021, 7, 28, 14, 7, 53)),
+    ("2" * 40, datetime(2023, 3, 2, 9, 30)),
+    ("3" * 40, datetime(2024, 1, 15, 11, 0)),
+)
+
+# The commit, in COMMITS, each dataset's reactions first reached ord-data in. The second
+# dataset arrived later, so a query on first_commit tells them apart.
+ARRIVALS = {"ord_dataset-viewer01": 0, "ord_dataset-viewer02": 1}
+
+# Reactions added to their dataset in a later commit than the rest of it: one added to
+# viewer one after viewer two arrived.
+LATER_ARRIVALS = {"ord-viewer0103": 2}
+
+
+def _first_commit(dataset_id: str, reaction_id: str) -> tuple[str, datetime]:
+    """Return the commit a reaction first reached ord-data in, and its time.
+
+    Args:
+        dataset_id: The reaction's dataset.
+        reaction_id: The reaction.
+
+    Returns:
+        The commit's SHA and time.
+    """
+    return COMMITS[LATER_ARRIVALS.get(reaction_id, ARRIVALS[dataset_id])]
 
 
 def _write_arrivals_index(path: pathlib.Path) -> None:
-    """Write an index of first commits placing each dataset's reactions at ARRIVALS.
+    """Write an index of first commits placing each reaction at its _first_commit.
 
     Args:
         path: Where to write the index.
     """
-    rows = [
-        {
-            "reaction_id": reaction.reaction_id,
-            "sha": ARRIVALS[dataset.dataset_id][0],
-            "timestamp": ARRIVALS[dataset.dataset_id][1],
-            "utc_offset_minutes": 0,
-            "dataset_id": dataset.dataset_id,
-        }
-        for dataset in DATASETS
-        for reaction in dataset.reactions
-    ]
+    rows = []
+    for dataset in DATASETS:
+        for reaction in dataset.reactions:
+            sha, timestamp = _first_commit(dataset.dataset_id, reaction.reaction_id)
+            rows.append(
+                {
+                    "reaction_id": reaction.reaction_id,
+                    "sha": sha,
+                    "timestamp": timestamp,
+                    "utc_offset_minutes": 0,
+                    "dataset_id": dataset.dataset_id,
+                }
+            )
     table = pa.Table.from_pylist(rows, schema=history.INDEX_SCHEMA)
-    chain = [sha for sha, _ in ARRIVALS.values()]
-    history.write_index(history.Index(table, chain), path)
+    history.write_index(history.Index(table, [sha for sha, _ in COMMITS]), path)
 
 
 def derive_corpus(root: pathlib.Path) -> None:
@@ -201,8 +224,11 @@ def derive_corpus(root: pathlib.Path) -> None:
     Args:
         root: The directory to build the corpus in.
     """
-    for dataset in DATASETS:
-        source = root / "sources" / "aa" / f"{dataset.dataset_id}.parquet"
+    for index, dataset in enumerate(DATASETS):
+        # A source that records no dataset ID is named by its place, since ".parquet"
+        # would be hidden from the corpus's globs.
+        name = dataset.dataset_id or f"unnamed{index}"
+        source = root / "sources" / "aa" / f"{name}.parquet"
         source.parent.mkdir(parents=True, exist_ok=True)
         parquet.save_dataset(dataset, source)
     # The input patterns are globs, so a metacharacter in root's own name is escaped.
@@ -408,9 +434,10 @@ class StubAskClient:
 class ScriptedAskClient:
     """Answers each question it has a script for, and cannot answer any other.
 
-    nl.ask's query calls carry tools, and their first message is the question; its
-    answer call carries none, and its one message starts "Question: <question>" before
-    the result. Both send each message's content as a string.
+    nl.ask's query calls carry tools, and their first message is the question, followed
+    by its placeholders' formats when it has any; its answer call carries none, and its
+    one message starts "Question: <question>" before the result. Both send each
+    message's content as a string.
 
     Args:
         scripts: For each question, the query it compiles to and the sentence that
@@ -435,7 +462,8 @@ class ScriptedAskClient:
         """
         text = kwargs["messages"][0]["content"]
         if "tools" in kwargs:
-            script = self._scripts.get(text)
+            question = text.split(f"\n\n{placeholders.PLACEHOLDERS_HEADING}", 1)[0]
+            script = self._scripts.get(question)
             if script is None:
                 return _message({"reason": "the scripted client has no script for it"})
             return _message(script[0])
@@ -471,6 +499,22 @@ ASK_SCRIPTS: dict[str, tuple[dict[str, Any], str]] = {
         },
         "The first dataset holds three reactions, and the second two.",
     ),
+    "reactions that use @A": (
+        {
+            "where": {
+                "op": "exists",
+                "path": "inputs.components",
+                "where": {"op": "same_compound", "path": "smiles", "smiles": "@A"},
+            },
+            "order_by": [{"key": "reaction_id"}],
+        },
+        "Three reactions use the structure you drew.",
+    ),
+}
+
+# The structures the end-to-end tests give the questions in ASK_SCRIPTS that name them.
+ASK_STRUCTURES: dict[str, dict[str, str]] = {
+    "reactions that use @A": {"@A": "CC(=O)Cl"},
 }
 
 

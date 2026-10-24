@@ -53,6 +53,23 @@ describe('PageContainer', () => {
     expect(getByText('page content')).toBeInTheDocument();
   });
 
+  it('links the logo to the home path a host gives, and nowhere without one', () => {
+    const { getByRole, queryByRole, rerender } = renderWithMantine(
+      <PageContainer breadcrumbs={[]} />,
+    );
+    expect(queryByRole('link')).not.toBeInTheDocument();
+    rerender(
+      <PageContainer
+        breadcrumbs={[]}
+        homePath="/home"
+      />,
+    );
+    expect(getByRole('link', { name: 'Open Reaction Database logo' })).toHaveAttribute(
+      'href',
+      '/home',
+    );
+  });
+
   it('keeps several header controls together, apart from the logo', () => {
     const { getByText, getByRole } = renderWithMantine(
       <PageContainer

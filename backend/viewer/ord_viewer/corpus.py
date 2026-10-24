@@ -16,6 +16,7 @@
 
 import concurrent.futures
 import dataclasses
+import datetime
 import functools
 import glob
 import os
@@ -25,6 +26,7 @@ from collections.abc import Callable
 from ord_schema import huggingface
 from ord_schema.artifacts import base
 from ord_schema.search import execute
+from ord_schema.search.query import Query
 
 from ord_viewer.settings import Settings
 
@@ -41,6 +43,9 @@ _FETCHED_SOURCES = "ord-data"
 # How many source datasets download at once.
 _SOURCE_DOWNLOADS = 8
 
+# When a reaction first reached ord-data, from the arrivals artifact.
+_FIRST_COMMIT = "first_commit.timestamp"
+
 
 @dataclasses.dataclass(frozen=True)
 class _Trees:
@@ -52,6 +57,14 @@ class _Trees:
     pivots: str
     occurrences: str
     sources: str
+
+
+@dataclasses.dataclass(frozen=True)
+class Arrival:
+    """A dataset, and the day it first reached ord-data."""
+
+    dataset_id: str
+    arrived: datetime.date
 
 
 def _local_trees(root: pathlib.Path) -> _Trees:
@@ -250,3 +263,44 @@ def open_corpus(
         corpus.close()
         raise
     return corpus
+
+
+def newest_arrival(corpus: execute.Corpus) -> Arrival | None:
+    """Find the dataset that most recently reached ord-data.
+
+    A dataset arrived on the day of the earliest first commit among its reactions, so a
+    reaction added to it later does not move it. Search measures a timestamp by its day,
+    so two datasets that arrived on one day tie, and the first dataset ID wins. A source
+    that records no dataset ID is passed over, since no route can address it.
+
+    Args:
+        corpus: The open corpus.
+
+    Returns:
+        The dataset and the day it arrived, or None when no reaction of a dataset with an
+        ID has a first commit.
+    """
+    request = Query.model_validate(
+        {
+            "where": {
+                "op": "and",
+                "clauses": [
+                    {"op": "not_null", "path": "dataset_id"},
+                    {"op": "not_null", "path": _FIRST_COMMIT},
+                ],
+            },
+            "aggregate": {
+                "group_by": ["dataset_id"],
+                "measures": [{"fn": "min", "path": _FIRST_COMMIT, "name": "arrived"}],
+            },
+            "order_by": [
+                {"key": "arrived", "descending": True},
+                {"key": "dataset_id"},
+            ],
+            "limit": 1,
+        }
+    )
+    rows = corpus.search(request).to_pylist()
+    if not rows:
+        return None
+    return Arrival(dataset_id=rows[0]["dataset_id"], arrived=rows[0]["arrived"])

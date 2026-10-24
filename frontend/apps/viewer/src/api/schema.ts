@@ -70,6 +70,33 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/datasets/newest': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Newest Dataset
+     * @description Return the dataset that most recently reached ord-data.
+     *
+     *     Args:
+     *         state: The settings and open corpus.
+     *
+     *     Returns:
+     *         The dataset, with the day it arrived, or None when no reaction of a dataset
+     *         with an ID has a first commit.
+     */
+    get: operations['newest_dataset_api_datasets_newest_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/datasets/{dataset_id}': {
     parameters: {
       query?: never;
@@ -278,7 +305,7 @@ export interface paths {
      *     calls, the search, and the shaping of its result run in worker threads.
      *
      *     Args:
-     *         body: The question.
+     *         body: The question, with any structures it names by placeholder.
      *         state: The settings, open corpus, and search slots.
      *         client: The model client.
      *
@@ -286,8 +313,9 @@ export interface paths {
      *         The query the question became, a sentence about what it found, and the result.
      *
      *     Raises:
-     *         HTTPException: 422 if the question cannot be put to the grammar, the model
-     *             declined it, or its query names an unknown compound; 429 if the model is
+     *         HTTPException: 422 if a structure does not fit the question or the grammar,
+     *             the question cannot be put to the grammar, the model declined it, or its
+     *             query names an unknown compound; 429 if the model is
      *             rate limiting; 502 if the model's query never compiles; 503 if a call to
      *             the model fails for any other reason; 504 if the search times out.
      *         SlotsBusyError: If every search slot stays busy for the configured wait.
@@ -462,11 +490,15 @@ export interface components {
     };
     /**
      * AskRequest
-     * @description A question in English.
+     * @description A question in English, with any structures it names by placeholder.
      */
     AskRequest: {
       /** Question */
       question: string;
+      /** Structures */
+      structures?: {
+        [key: string]: string;
+      };
     };
     /**
      * AskResponse
@@ -607,6 +639,25 @@ export interface components {
      */
     MeasurementMolblocks: {
       authentic_standard: components['schemas']['AuthenticStandardMolblock'];
+    };
+    /**
+     * NewestDataset
+     * @description The dataset that most recently reached ord-data.
+     */
+    NewestDataset: {
+      /** Dataset Id */
+      dataset_id: string;
+      /** Name */
+      name: string;
+      /** Description */
+      description: string;
+      /** Reactions */
+      reactions: number;
+      /**
+       * Arrived
+       * Format: date
+       */
+      arrived: string;
     };
     /**
      * Not
@@ -1295,6 +1346,26 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['DatasetSummary'][];
+        };
+      };
+    };
+  };
+  newest_dataset_api_datasets_newest_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NewestDataset'] | null;
         };
       };
     };

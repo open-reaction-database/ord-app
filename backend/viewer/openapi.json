@@ -47,6 +47,33 @@
         }
       }
     },
+    "/api/datasets/newest": {
+      "get": {
+        "summary": "Newest Dataset",
+        "description": "Return the dataset that most recently reached ord-data.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with the day it arrived, or None when no reaction of a dataset\n    with an ID has a first commit.",
+        "operationId": "newest_dataset_api_datasets_newest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/NewestDataset"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Newest Dataset Api Datasets Newest Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/datasets/{dataset_id}": {
       "get": {
         "summary": "Get Dataset",
@@ -434,7 +461,7 @@
     "/api/ask": {
       "post": {
         "summary": "Ask",
-        "description": "Translate a question into a query, run it, and describe what it found.\n\nIt is async so a question waits for its search slot on the event loop; the model\ncalls, the search, and the shaping of its result run in worker threads.\n\nArgs:\n    body: The question.\n    state: The settings, open corpus, and search slots.\n    client: The model client.\n\nReturns:\n    The query the question became, a sentence about what it found, and the result.\n\nRaises:\n    HTTPException: 422 if the question cannot be put to the grammar, the model\n        declined it, or its query names an unknown compound; 429 if the model is\n        rate limiting; 502 if the model's query never compiles; 503 if a call to\n        the model fails for any other reason; 504 if the search times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
+        "description": "Translate a question into a query, run it, and describe what it found.\n\nIt is async so a question waits for its search slot on the event loop; the model\ncalls, the search, and the shaping of its result run in worker threads.\n\nArgs:\n    body: The question, with any structures it names by placeholder.\n    state: The settings, open corpus, and search slots.\n    client: The model client.\n\nReturns:\n    The query the question became, a sentence about what it found, and the result.\n\nRaises:\n    HTTPException: 422 if a structure does not fit the question or the grammar,\n        the question cannot be put to the grammar, the model declined it, or its\n        query names an unknown compound; 429 if the model is\n        rate limiting; 502 if the model's query never compiles; 503 if a call to\n        the model fails for any other reason; 504 if the search times out.\n    SlotsBusyError: If every search slot stays busy for the configured wait.\n    execute.PairingError: If the corpus is inconsistent; a 500.",
         "operationId": "ask_api_ask_post",
         "requestBody": {
           "content": {
@@ -914,6 +941,18 @@
             "maxLength": 2000,
             "minLength": 1,
             "title": "Question"
+          },
+          "structures": {
+            "patternProperties": {
+              "^@[A-Z]+$": {
+                "type": "string",
+                "maxLength": 2000,
+                "minLength": 1
+              }
+            },
+            "type": "object",
+            "maxProperties": 10,
+            "title": "Structures"
           }
         },
         "additionalProperties": false,
@@ -922,7 +961,7 @@
           "question"
         ],
         "title": "AskRequest",
-        "description": "A question in English."
+        "description": "A question in English, with any structures it names by placeholder."
       },
       "AskResponse": {
         "properties": {
@@ -1234,6 +1273,41 @@
         ],
         "title": "MeasurementMolblocks",
         "description": "The structures one product measurement names."
+      },
+      "NewestDataset": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "reactions": {
+            "type": "integer",
+            "title": "Reactions"
+          },
+          "arrived": {
+            "type": "string",
+            "format": "date",
+            "title": "Arrived"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "name",
+          "description",
+          "reactions",
+          "arrived"
+        ],
+        "title": "NewestDataset",
+        "description": "The dataset that most recently reached ord-data."
       },
       "Not-Input": {
         "properties": {

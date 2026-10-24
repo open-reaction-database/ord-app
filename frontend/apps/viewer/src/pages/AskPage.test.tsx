@@ -19,7 +19,8 @@ import { Link } from 'wouter';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0103 } from '#test/fixtures/records.ts';
-import { ASK_EXAMPLES, AskPage } from '#pages/AskPage.tsx';
+import { ASK_EXAMPLES, askPath } from '#ask/questions.ts';
+import { AskPage } from '#pages/AskPage.tsx';
 
 const QUESTION = 'reactions that use ethylamine';
 const ANSWER = {
@@ -36,11 +37,6 @@ afterEach(() => {
 });
 
 describe('AskPage', () => {
-  it('says the feature is in development', () => {
-    const { getByText } = renderAt('/ask', <AskPage />);
-    expect(getByText(/in development/)).toBeInTheDocument();
-  });
-
   it("asks the URL's question and shows the answer", async () => {
     const fetch = mockApi({
       'POST /api/ask': ANSWER,
@@ -54,7 +50,28 @@ describe('AskPage', () => {
     expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
     expect(JSON.parse(String(fetch.mock.calls[0][1]?.body))).toEqual({
       question: QUESTION,
+      structures: {},
     });
+  });
+
+  it('asks with the structures the URL names, and shows each in its field', async () => {
+    const fetch = mockApi({
+      'POST /api/ask': ANSWER,
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByText, getByRole } = renderAt(
+      askPath('reactions that use @A', { '@A': 'CCN' }),
+      <AskPage />,
+    );
+    expect(await findByText('One reaction uses ethylamine.')).toBeInTheDocument();
+    expect(JSON.parse(String(fetch.mock.calls[0][1]?.body))).toEqual({
+      question: 'reactions that use @A',
+      structures: { '@A': 'CCN' },
+    });
+    expect(getByRole('textbox', { name: 'Question' })).toHaveValue(
+      'reactions that use @A',
+    );
+    expect(getByRole('textbox', { name: 'Structure @A' })).toHaveValue('CCN');
   });
 
   it('shows the query the question compiled to, folded away', async () => {
@@ -198,10 +215,12 @@ describe('AskPage', () => {
 
   it('counts characters as the backend does, not UTF-16 units', async () => {
     const user = userEvent.setup();
-    const { getByRole } = renderAt('/ask', <AskPage />);
+    const { getByRole, getByText, queryByText } = renderAt('/ask', <AskPage />);
     await user.click(getByRole('textbox', { name: 'Question' }));
     await user.paste('\u{1F600}'.repeat(2000));
-    expect(getByRole('button', { name: 'Ask' })).toBeEnabled();
+    expect(queryByText('At most 2000 characters.')).not.toBeInTheDocument();
+    await user.paste('\u{1F600}');
+    expect(getByText('At most 2000 characters.')).toBeInTheDocument();
   });
 
   it('asks nothing for a blank question in the URL', () => {

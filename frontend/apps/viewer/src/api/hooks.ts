@@ -21,6 +21,7 @@ import type {
   CompoundCount,
   CompoundSide,
   DatasetSummary,
+  NewestDataset,
   Query,
   ReactionRecord,
   SearchRequest,
@@ -39,6 +40,15 @@ export function useDatasets() {
     queryKey: ['datasets'],
     queryFn: ({ signal }) =>
       getJson<Array<DatasetSummary>>('/api/datasets', undefined, signal),
+  });
+}
+
+/** The dataset that most recently reached ord-data, or null when none has a first commit. */
+export function useNewestDataset() {
+  return useQuery({
+    queryKey: ['newest-dataset'],
+    queryFn: ({ signal }) =>
+      getJson<NewestDataset | null>('/api/datasets/newest', undefined, signal),
   });
 }
 
@@ -104,12 +114,15 @@ export function useSearch(query: Query | null) {
   });
 }
 
-/** Asks the question, or nothing while it is null. */
-export function useAsk(question: string | null) {
+/** Asks the question, with the structures it names by placeholder, or nothing while it is null. */
+export function useAsk(
+  question: string | null,
+  structures: Readonly<Record<string, string>> = {},
+) {
   return useQuery({
-    queryKey: ['ask', question],
+    queryKey: ['ask', question, structures],
     queryFn: ({ signal }) =>
-      postJson<AskResponse>('/api/ask', { question } as AskRequest, signal),
+      postJson<AskResponse>('/api/ask', { question, structures } as AskRequest, signal),
     enabled: question !== null,
   });
 }

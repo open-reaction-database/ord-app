@@ -105,6 +105,12 @@ if ((limited == 0)); then
   exit 1
 fi
 
+# An ask address as long as the viewer makes one (MAX_ADDRESS, 16,000 characters) is
+# served, and one twice that is past nginx's request line.
+long="/ask?q=$(head -c 15993 /dev/zero | tr '\0' 'a')"
+expect_body "$base$long" '<div id="root">'
+expect_status 414 "$base$long$long"
+
 # A body past 128 KiB never reaches the backend.
 large=$(mktemp)
 head -c 200000 /dev/zero | tr '\0' 'a' >"$large"

@@ -13,15 +13,22 @@
 # limitations under the License.
 
 import dataclasses
+import datetime
 import pathlib
 import shutil
+from typing import cast
 
+import pyarrow as pa
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import huggingface, message_helpers
 from ord_schema.artifacts import base
+from ord_schema.proto import dataset_pb2, reaction_pb2
+from ord_schema.search import execute
 
-from ord_viewer.corpus import open_corpus
+from ord_viewer import testing
+from ord_viewer.corpus import Arrival, newest_arrival, open_corpus
 from ord_viewer.settings import Settings
 from ord_viewer.testing import make_client, offline_resolver
 
@@ -147,3 +154,49 @@ def test_refuses_a_projection_that_names_no_source(hub, monkeypatch, tmp_path):
     settings = fetching_settings(tmp_path)
     with pytest.raises(ValueError, match="names no source dataset to fetch"):
         open_corpus(settings, resolver=offline_resolver)
+
+
+def _corpus(client: TestClient) -> execute.Corpus:
+    """Return the corpus an entered client's app holds."""
+    return cast(FastAPI, client.app).state.viewer.corpus
+
+
+def test_finds_the_newest_arrival_by_each_dataset_s_first_commit(client):
+    # A reaction was added to viewer one after viewer two arrived; viewer one's first
+    # commit still leaves it the earlier arrival.
+    assert newest_arrival(_corpus(client)) == Arrival(
+        dataset_id="ord_dataset-viewer02",
+        arrived=datetime.date(2023, 3, 2),
+    )
+
+
+def test_finds_no_arrival_when_no_reaction_has_a_first_commit(client, monkeypatch):
+    unmatched = pa.table(
+        {
+            "dataset_id": pa.array([], type=pa.string()),
+            "arrived": pa.array([], type=pa.date32()),
+        }
+    )
+    monkeypatch.setattr(execute.Corpus, "search", lambda self, request: unmatched)
+    assert newest_arrival(_corpus(client)) is None
+
+
+def test_passes_over_a_source_with_no_dataset_id(monkeypatch, tmp_path):
+    # The unnamed source's reaction arrives last, but no route can address its dataset.
+    unnamed = dataset_pb2.Dataset(
+        name="unnamed",
+        description="A source that records no dataset ID",
+        reactions=[reaction_pb2.Reaction(reaction_id="ord-unnamed01")],
+    )
+    monkeypatch.setattr(testing, "DATASETS", (*testing.DATASETS, unnamed))
+    monkeypatch.setattr(testing, "ARRIVALS", {**testing.ARRIVALS, "": 2})
+    testing.derive_corpus(tmp_path)
+    corpus = open_corpus(Settings(corpus_dir=tmp_path), resolver=offline_resolver)
+    try:
+        assert None in corpus.datasets().column("dataset_id").to_pylist()
+        assert newest_arrival(corpus) == Arrival(
+            dataset_id="ord_dataset-viewer02",
+            arrived=datetime.date(2023, 3, 2),
+        )
+    finally:
+        corpus.close()

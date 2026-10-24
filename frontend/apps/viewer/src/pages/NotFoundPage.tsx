@@ -26,7 +26,7 @@ export function NotFoundPage() {
           Nothing is at this address.{' '}
           <Anchor
             component={Link}
-            href="/"
+            href="/datasets"
           >
             Browse the datasets
           </Anchor>{' '}

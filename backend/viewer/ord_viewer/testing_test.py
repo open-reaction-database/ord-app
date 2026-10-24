@@ -16,9 +16,11 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from ord_schema.search import placeholders
 
 from ord_viewer.testing import (
     ASK_SCRIPTS,
+    ASK_STRUCTURES,
     ScriptedAskClient,
     derive_corpus,
     e2e_app,
@@ -119,6 +121,11 @@ def test_scripted_client_answers_from_the_question_in_each_request():
     client = ScriptedAskClient({"q": ({"limit": 1}, "an answer")})
     query_call = client.create(tools=[], messages=[{"role": "user", "content": "q"}])
     assert query_call.content[0].input == {"limit": 1}
+    described = f"q\n\n{placeholders.PLACEHOLDERS_HEADING}\n@A is a compound SMILES."
+    placeholder_call = client.create(
+        tools=[], messages=[{"role": "user", "content": described}]
+    )
+    assert placeholder_call.content[0].input == {"limit": 1}
     answer_call = client.create(
         messages=[{"role": "user", "content": "Question: q\n\nResult:\nrows"}]
     )
@@ -128,6 +135,11 @@ def test_scripted_client_answers_from_the_question_in_each_request():
 def test_every_script_compiles(tmp_path):
     derive_corpus(tmp_path)
     with make_client(tmp_path) as client:
-        for query, _ in ASK_SCRIPTS.values():
+        for question, (query, _) in ASK_SCRIPTS.items():
+            structures = {
+                name: placeholders.classify(text)
+                for name, text in ASK_STRUCTURES.get(question, {}).items()
+            }
+            query = placeholders.substitute(query, structures)
             response = client.post("/api/search", json={"query": query})
             assert response.status_code == 200, (query, response.text)
