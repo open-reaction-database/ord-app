@@ -24,7 +24,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from ord_viewer.corpus import open_corpus
+from ord_viewer.corpus import newest_arrival, open_corpus
 from ord_viewer.routes import ask, datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots, SlotsBusyError
@@ -114,6 +114,7 @@ def create_app(
                 settings=settings,
                 corpus=corpus,
                 slots=SearchSlots(settings.max_concurrent, settings.slot_wait_seconds),
+                newest_arrival=newest_arrival(corpus),
                 ask_client=ask_client,
             )
             yield

@@ -25,7 +25,7 @@ test('sends nothing to Google from a page served locally', async ({ page }) => {
     return route.fulfill({ status: 204 });
   });
   await page.goto('/');
-  await expect(page.getByRole('link', { name: 'Search' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Search', exact: true })).toBeVisible();
   expect(sent).toEqual([]);
 });
 

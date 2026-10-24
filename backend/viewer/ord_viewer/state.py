@@ -20,17 +20,20 @@ import anthropic
 from fastapi import Request
 from ord_schema.search import execute
 
+from ord_viewer.corpus import Arrival
 from ord_viewer.settings import Settings
 from ord_viewer.slots import SearchSlots
 
 
 @dataclasses.dataclass(frozen=True)
 class ViewerState:
-    """The settings, the open corpus, the search slots, and the model client /ask uses."""
+    """The settings, the corpus and its newest arrival, the slots, and /ask's client."""
 
     settings: Settings
     corpus: execute.Corpus
     slots: SearchSlots
+    # Found once at startup, since the corpus does not change while it is open.
+    newest_arrival: Arrival | None
     # None when no API key is configured; /api/ask then answers 503.
     ask_client: anthropic.Anthropic | None = None
 

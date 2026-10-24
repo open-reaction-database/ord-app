@@ -20,9 +20,9 @@ from typing import Annotated, Any
 import anthropic
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.concurrency import run_in_threadpool
-from ord_schema.search import nl, nl_log
+from ord_schema.search import nl, nl_log, placeholders
 from ord_schema.search.query import Query
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 
 from ord_viewer.schemas import ErrorDetail, SearchResult
 from ord_viewer.searching import SEARCH_ERRORS, search_errors, to_result
@@ -76,14 +76,27 @@ ASK_ERRORS: dict[int | str, dict[str, Any]] = {
 }
 
 
+# A placeholder's name as a question writes it, such as @A, and the structure it names.
+_PlaceholderName = Annotated[str, StringConstraints(pattern=placeholders.NAME_PATTERN)]
+_Structure = Annotated[
+    str, StringConstraints(min_length=1, max_length=placeholders.MOST_CHARACTERS)
+]
+
+
 class AskRequest(BaseModel):
-    """A question in English."""
+    """A question in English, with any structures it names by placeholder."""
 
     model_config = ConfigDict(extra="forbid")
 
     question: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)
     ]
+    # Each placeholder the question writes, mapped to the SMILES, SMARTS, or reaction
+    # SMARTS it stands for; the model is told each one's format and never its text.
+    structures: Annotated[
+        dict[_PlaceholderName, _Structure],
+        Field(max_length=placeholders.MOST_PLACEHOLDERS),
+    ] = Field(default_factory=dict)
 
 
 class AskResponse(BaseModel):
@@ -131,6 +144,45 @@ async def get_ask_client(  # NOSONAR
     return state.ask_client
 
 
+def _placeholders(body: AskRequest) -> dict[str, placeholders.Placeholder]:
+    """Read each structure a question names, and check the question writes each name.
+
+    Args:
+        body: The question and its structures.
+
+    Returns:
+        Each placeholder's name, mapped to its structure in the format its text is in.
+
+    Raises:
+        HTTPException: 422, naming the placeholder, if a structure is not a SMILES,
+            SMARTS, or reaction SMARTS the grammar takes, or if the question writes a
+            name with no structure or a structure's name is not in the question.
+    """
+    structures = {}
+    for name, text in body.structures.items():
+        try:
+            structures[name] = placeholders.classify(text)
+        except ValidationError as error:
+            reasons = "; ".join(
+                str(detail["msg"]).removeprefix("Value error, ")
+                for detail in error.errors()
+            )
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT, f"{name}: {reasons}"
+            ) from error
+        except ValueError as error:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT, f"{name}: {error}"
+            ) from error
+    try:
+        placeholders.check(body.question, structures)
+    except placeholders.PlaceholderError as error:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)
+        ) from error
+    return structures
+
+
 @router.post("/ask", responses=ASK_ERRORS)
 async def ask(
     body: AskRequest,
@@ -143,7 +195,7 @@ async def ask(
     calls, the search, and the shaping of its result run in worker threads.
 
     Args:
-        body: The question.
+        body: The question, with any structures it names by placeholder.
         state: The settings, open corpus, and search slots.
         client: The model client.
 
@@ -151,13 +203,17 @@ async def ask(
         The query the question became, a sentence about what it found, and the result.
 
     Raises:
-        HTTPException: 422 if the question cannot be put to the grammar, the model
-            declined it, or its query names an unknown compound; 429 if the model is
+        HTTPException: 422 if a structure does not fit the question or the grammar,
+            the question cannot be put to the grammar, the model declined it, or its
+            query names an unknown compound; 429 if the model is
             rate limiting; 502 if the model's query never compiles; 503 if a call to
             the model fails for any other reason; 504 if the search times out.
         SlotsBusyError: If every search slot stays busy for the configured wait.
         execute.PairingError: If the corpus is inconsistent; a 500.
     """
+    # Checked before the question waits for a slot, which a structure that does not fit
+    # would hold for nothing.
+    structures = _placeholders(body)
     sink = nl_log.StdoutSink() if state.settings.ask_log == "stdout" else None
     async with state.slots.hold():
         with search_errors():
@@ -166,6 +222,7 @@ async def ask(
                     nl.ask,
                     body.question,
                     state.corpus,
+                    structures=structures,
                     client=client,
                     model=state.settings.ask_model,
                     timeout_seconds=state.settings.search_timeout_seconds,

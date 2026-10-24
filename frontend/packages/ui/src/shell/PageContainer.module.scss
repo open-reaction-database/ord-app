@@ -59,6 +59,11 @@
   height: 24px;
 }
 
+/* The link takes the logo's size, so the header lays out as it does without one. */
+.logoLink {
+  display: flex;
+}
+
 /* Below Mantine's sm breakpoint (48em) the footer's items wrap past a 48px bar, so the footer takes
    its content's height and joins the page's flow, sticking to the viewport's bottom edge. The main
    area fills the screen above it in place of padding clear of it. The footer spans the full width,

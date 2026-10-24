@@ -15,6 +15,7 @@
 """The bodies the routes accept and return."""
 
 import base64
+import datetime
 from typing import Annotated, Any, Literal
 
 from ord_schema.search import execute
@@ -29,6 +30,13 @@ class DatasetSummary(BaseModel):
     name: str
     description: str
     reactions: int
+
+
+class NewestDataset(DatasetSummary):
+    """The dataset that most recently reached ord-data."""
+
+    # The day its first reaction reached ord-data.
+    arrived: datetime.date
 
 
 class CompoundCount(BaseModel):

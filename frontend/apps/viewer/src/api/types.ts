@@ -18,6 +18,7 @@ import type { components, paths } from '#api/schema.ts';
 type Schemas = components['schemas'];
 
 export type DatasetSummary = Schemas['DatasetSummary'];
+export type NewestDataset = Schemas['NewestDataset'];
 export type CompoundCount = Schemas['CompoundCount'];
 export type ReactionRecord = Schemas['ReactionRecord'];
 /** A query as /api/search takes it. */

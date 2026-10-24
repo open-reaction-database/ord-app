@@ -15,6 +15,7 @@
  */
 import type { PropsWithChildren, ReactNode } from 'react';
 import { AppShell, Flex, Group } from '@mantine/core';
+import { Link } from 'wouter';
 import classes from './PageContainer.module.scss';
 import ORDLogo from './ORDLogo.png';
 import { Breadcrumbs } from '#shell/Breadcrumbs/Breadcrumbs.tsx';
@@ -30,6 +31,8 @@ export interface PageContainerProps extends PropsWithChildren {
   commit?: string;
   /** The page's footer: the Open Reaction Database footer by default, and none for `null`. */
   footer?: ReactNode;
+  /** Where the logo links, such as the host's home page; without it the logo links nowhere. */
+  homePath?: string;
 }
 
 export function PageContainer({
@@ -39,8 +42,16 @@ export function PageContainer({
   headerActions,
   commit,
   footer = <Footer commit={commit} />,
+  homePath,
 }: Readonly<PageContainerProps>) {
   const hasFooter = footer !== null;
+  const logo = (
+    <img
+      src={ORDLogo}
+      className={classes.logo}
+      alt="Open Reaction Database logo"
+    />
+  );
   return (
     <AppShell
       classNames={{
@@ -51,11 +62,16 @@ export function PageContainer({
       }}
     >
       <AppShell.Header>
-        <img
-          src={ORDLogo}
-          className={classes.logo}
-          alt="Open Reaction Database logo"
-        />
+        {homePath === undefined ? (
+          logo
+        ) : (
+          <Link
+            to={homePath}
+            className={classes.logoLink}
+          >
+            {logo}
+          </Link>
+        )}
 
         <Group
           gap="xs"
