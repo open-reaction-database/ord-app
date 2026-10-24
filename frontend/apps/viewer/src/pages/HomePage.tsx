@@ -163,7 +163,7 @@ function NewestDatasetCard({ dataset }: Readonly<{ dataset: NewestDataset }>) {
   );
 }
 
-/** A question box that asks on the ask page, with the examples and a way to search instead. */
+/** A question box that asks on the ask page, with the example questions. */
 function AskBox() {
   const [, navigate] = useLocation();
   const [draft, setDraft] = useState('');
@@ -206,13 +206,6 @@ function AskBox() {
             </Button>
           </Group>
           <ExampleQuestions onAsk={ask} />
-          <Anchor
-            component={Link}
-            href="/search"
-            size="sm"
-          >
-            Or search by structure and conditions →
-          </Anchor>
         </Stack>
       </form>
     </Paper>

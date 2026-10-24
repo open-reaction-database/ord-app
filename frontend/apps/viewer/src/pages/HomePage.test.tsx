@@ -139,11 +139,4 @@ describe('HomePage', () => {
     await user.type(box, '{Enter}');
     expect(history).toEqual(['/']);
   });
-
-  it('links to the structured search', () => {
-    const { getByRole } = show();
-    expect(
-      getByRole('link', { name: 'Or search by structure and conditions →' }),
-    ).toHaveAttribute('href', '/search');
-  });
 });

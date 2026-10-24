@@ -46,8 +46,8 @@ describe('ViewerPage', () => {
     const navigation = within(getByRole('navigation', { name: 'Main' }));
     const link = (name: string) => navigation.getByRole('link', { name });
     expect(link('Browse')).toHaveAttribute('href', '/datasets');
-    expect(link('Search')).toHaveAttribute('href', '/search');
-    expect(link('Ask')).toHaveAttribute('href', '/ask');
+    expect(link('Search')).toHaveAttribute('href', '/ask');
+    expect(navigation.queryByRole('link', { name: 'Ask' })).not.toBeInTheDocument();
     expect(link('Contribute')).toHaveAttribute('href', EDITOR_URL);
     expect(link('Docs')).toHaveAttribute('href', DOCS_URL);
     expect(link('About')).toHaveAttribute('href', '/about');
@@ -70,8 +70,7 @@ describe('ViewerPage', () => {
     await user.click(getByRole('button', { name: 'Navigation menu' }));
     const item = (name: string) => getByRole('menuitem', { name });
     expect(item('Browse')).toHaveAttribute('href', '/datasets');
-    expect(item('Search')).toHaveAttribute('href', '/search');
-    expect(item('Ask')).toHaveAttribute('href', '/ask');
+    expect(item('Search')).toHaveAttribute('href', '/ask');
     expect(item('Contribute')).toHaveAttribute('href', EDITOR_URL);
     expect(item('Docs')).toHaveAttribute('href', DOCS_URL);
     expect(item('About')).toHaveAttribute('href', '/about');
