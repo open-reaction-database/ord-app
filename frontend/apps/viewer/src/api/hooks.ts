@@ -114,12 +114,15 @@ export function useSearch(query: Query | null) {
   });
 }
 
-/** Asks the question, or nothing while it is null. */
-export function useAsk(question: string | null) {
+/** Asks the question, with the structures it names by placeholder, or nothing while it is null. */
+export function useAsk(
+  question: string | null,
+  structures: Readonly<Record<string, string>> = {},
+) {
   return useQuery({
-    queryKey: ['ask', question],
+    queryKey: ['ask', question, structures],
     queryFn: ({ signal }) =>
-      postJson<AskResponse>('/api/ask', { question } as AskRequest, signal),
+      postJson<AskResponse>('/api/ask', { question, structures } as AskRequest, signal),
     enabled: question !== null,
   });
 }

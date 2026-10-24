@@ -22,15 +22,13 @@ import {
   Skeleton,
   Stack,
   Text,
-  TextInput,
   Title,
 } from '@mantine/core';
-import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useDatasets, useNewestDataset } from '#api/hooks.ts';
 import type { NewestDataset } from '#api/types.ts';
-import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
-import { askPath, isTooLong, MAX_QUESTION } from '#ask/questions.ts';
+import { QuestionForm } from '#ask/QuestionForm.tsx';
+import { askPath } from '#ask/questions.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { LinkedText } from '#components/LinkedText.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
@@ -163,51 +161,23 @@ function NewestDatasetCard({ dataset }: Readonly<{ dataset: NewestDataset }>) {
   );
 }
 
-/** A question box that asks on the ask page, with the example questions. */
+/** A question box that asks on the ask page. */
 function AskBox() {
   const [, navigate] = useLocation();
-  const [draft, setDraft] = useState('');
-  const trimmed = draft.trim();
-  const tooLong = isTooLong(trimmed);
-  const ask = (question: string) => navigate(askPath(question));
   return (
     <Paper
       radius="md"
       p="lg"
       bg="var(--mantine-primary-color-light)"
     >
-      {/* Enter submits only while Ask is enabled, so a submitted question is never empty or too long. */}
-      <form
-        onSubmit={event => {
-          event.preventDefault();
-          ask(trimmed);
-        }}
-      >
-        <Stack gap="sm">
-          <Title order={3}>Ask about reactions</Title>
-          <Group
-            gap="xs"
-            align="flex-start"
-            wrap="nowrap"
-          >
-            <TextInput
-              aria-label="Question"
-              placeholder="e.g. reactions that make an aryl boronic acid"
-              flex={1}
-              value={draft}
-              error={tooLong ? `At most ${MAX_QUESTION} characters.` : null}
-              onChange={event => setDraft(event.currentTarget.value)}
-            />
-            <Button
-              type="submit"
-              disabled={trimmed === '' || tooLong}
-            >
-              Ask
-            </Button>
-          </Group>
-          <ExampleQuestions onAsk={ask} />
-        </Stack>
-      </form>
+      <Stack gap="sm">
+        <Title order={3}>Ask about reactions</Title>
+        <QuestionForm
+          question=""
+          structures={{}}
+          onAsk={(question, structures) => navigate(askPath(question, structures))}
+        />
+      </Stack>
     </Paper>
   );
 }

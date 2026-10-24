@@ -40,6 +40,7 @@ from ord_schema.artifacts.scripts import (
     derive_structures,
 )
 from ord_schema.proto import dataset_pb2, reaction_pb2
+from ord_schema.search import placeholders
 
 from ord_viewer.main import create_app
 from ord_viewer.settings import Settings
@@ -433,9 +434,10 @@ class StubAskClient:
 class ScriptedAskClient:
     """Answers each question it has a script for, and cannot answer any other.
 
-    nl.ask's query calls carry tools, and their first message is the question; its
-    answer call carries none, and its one message starts "Question: <question>" before
-    the result. Both send each message's content as a string.
+    nl.ask's query calls carry tools, and their first message is the question, followed
+    by its placeholders' formats when it has any; its answer call carries none, and its
+    one message starts "Question: <question>" before the result. Both send each
+    message's content as a string.
 
     Args:
         scripts: For each question, the query it compiles to and the sentence that
@@ -460,7 +462,8 @@ class ScriptedAskClient:
         """
         text = kwargs["messages"][0]["content"]
         if "tools" in kwargs:
-            script = self._scripts.get(text)
+            question = text.split(f"\n\n{placeholders.PLACEHOLDERS_HEADING}", 1)[0]
+            script = self._scripts.get(question)
             if script is None:
                 return _message({"reason": "the scripted client has no script for it"})
             return _message(script[0])
@@ -496,6 +499,22 @@ ASK_SCRIPTS: dict[str, tuple[dict[str, Any], str]] = {
         },
         "The first dataset holds three reactions, and the second two.",
     ),
+    "reactions that use @A": (
+        {
+            "where": {
+                "op": "exists",
+                "path": "inputs.components",
+                "where": {"op": "same_compound", "path": "smiles", "smiles": "@A"},
+            },
+            "order_by": [{"key": "reaction_id"}],
+        },
+        "Three reactions use the structure you drew.",
+    ),
+}
+
+# The structures the end-to-end tests give the questions in ASK_SCRIPTS that name them.
+ASK_STRUCTURES: dict[str, dict[str, str]] = {
+    "reactions that use @A": {"@A": "CC(=O)Cl"},
 }
 
 

@@ -305,7 +305,7 @@ export interface paths {
      *     calls, the search, and the shaping of its result run in worker threads.
      *
      *     Args:
-     *         body: The question.
+     *         body: The question, with any structures it names by placeholder.
      *         state: The settings, open corpus, and search slots.
      *         client: The model client.
      *
@@ -313,8 +313,9 @@ export interface paths {
      *         The query the question became, a sentence about what it found, and the result.
      *
      *     Raises:
-     *         HTTPException: 422 if the question cannot be put to the grammar, the model
-     *             declined it, or its query names an unknown compound; 429 if the model is
+     *         HTTPException: 422 if a structure does not fit the question or the grammar,
+     *             the question cannot be put to the grammar, the model declined it, or its
+     *             query names an unknown compound; 429 if the model is
      *             rate limiting; 502 if the model's query never compiles; 503 if a call to
      *             the model fails for any other reason; 504 if the search times out.
      *         SlotsBusyError: If every search slot stays busy for the configured wait.
@@ -489,11 +490,15 @@ export interface components {
     };
     /**
      * AskRequest
-     * @description A question in English.
+     * @description A question in English, with any structures it names by placeholder.
      */
     AskRequest: {
       /** Question */
       question: string;
+      /** Structures */
+      structures?: {
+        [key: string]: string;
+      };
     };
     /**
      * AskResponse

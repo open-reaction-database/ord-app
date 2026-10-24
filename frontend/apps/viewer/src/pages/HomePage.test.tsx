@@ -121,6 +121,15 @@ describe('HomePage', () => {
     expect(history.at(-1)).toBe(askPath('what uses THF'));
   });
 
+  it('asks with the structures the question names', async () => {
+    const user = userEvent.setup();
+    const { getByRole, history } = show();
+    await user.type(getByRole('textbox', { name: 'Question' }), 'reactions that use');
+    await user.click(getByRole('button', { name: 'Add a structure' }));
+    await user.type(getByRole('textbox', { name: 'Structure @A' }), 'CC(=O)Cl{Enter}');
+    expect(history.at(-1)).toBe(askPath('reactions that use @A', { '@A': 'CC(=O)Cl' }));
+  });
+
   it('asks an example question when it is clicked', async () => {
     const user = userEvent.setup();
     const { getByRole, history } = show();

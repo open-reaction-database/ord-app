@@ -130,6 +130,23 @@ describe('hooks', () => {
     );
   });
 
+  it('useAsk posts the structures a question names beside it', async () => {
+    const fetch = respond({
+      query: {},
+      text: 'None.',
+      result: { kind: 'reactions', reaction_ids: [], truncated: false },
+    });
+    const { result } = renderHook(
+      () => useAsk('reactions that make @A', { '@A': 'c1ccccc1' }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(JSON.parse(String(fetch.mock.calls[0][1]?.body))).toEqual({
+      question: 'reactions that make @A',
+      structures: { '@A': 'c1ccccc1' },
+    });
+  });
+
   it('useAsk posts the question, and waits for one', async () => {
     const fetch = respond({
       query: {},
@@ -145,7 +162,9 @@ describe('hooks', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(fetch).toHaveBeenCalledWith(
       '/api/ask',
-      expect.objectContaining({ body: '{"question":"pyridine as a solvent"}' }),
+      expect.objectContaining({
+        body: '{"question":"pyridine as a solvent","structures":{}}',
+      }),
     );
   });
 });

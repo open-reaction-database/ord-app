@@ -19,7 +19,7 @@ import { Link } from 'wouter';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0103 } from '#test/fixtures/records.ts';
-import { ASK_EXAMPLES } from '#ask/questions.ts';
+import { ASK_EXAMPLES, askPath } from '#ask/questions.ts';
 import { AskPage } from '#pages/AskPage.tsx';
 
 const QUESTION = 'reactions that use ethylamine';
@@ -50,7 +50,28 @@ describe('AskPage', () => {
     expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
     expect(JSON.parse(String(fetch.mock.calls[0][1]?.body))).toEqual({
       question: QUESTION,
+      structures: {},
     });
+  });
+
+  it('asks with the structures the URL names, and shows each in its field', async () => {
+    const fetch = mockApi({
+      'POST /api/ask': ANSWER,
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const { findByText, getByRole } = renderAt(
+      askPath('reactions that use @A', { '@A': 'CCN' }),
+      <AskPage />,
+    );
+    expect(await findByText('One reaction uses ethylamine.')).toBeInTheDocument();
+    expect(JSON.parse(String(fetch.mock.calls[0][1]?.body))).toEqual({
+      question: 'reactions that use @A',
+      structures: { '@A': 'CCN' },
+    });
+    expect(getByRole('textbox', { name: 'Question' })).toHaveValue(
+      'reactions that use @A',
+    );
+    expect(getByRole('textbox', { name: 'Structure @A' })).toHaveValue('CCN');
   });
 
   it('shows the query the question compiled to, folded away', async () => {

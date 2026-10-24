@@ -13,67 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  Accordion,
-  Button,
-  Code,
-  Flex,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  Textarea,
-  Title,
-} from '@mantine/core';
-import { useState } from 'react';
+import { Accordion, Code, Flex, Loader, Stack, Text, Title } from '@mantine/core';
 import { useLocation, useSearchParams } from 'wouter';
 import { useAsk } from '#api/hooks.ts';
 import type { AskResponse } from '#api/types.ts';
-import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
-import { askPath, isTooLong, MAX_QUESTION } from '#ask/questions.ts';
+import { QuestionForm } from '#ask/QuestionForm.tsx';
+import { askPath, readStructures, type Structures } from '#ask/questions.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
-
-interface AskFormProps {
-  question: string;
-  onAsk: (question: string) => void;
-}
-
-/** The question box, starting from the URL's question; its host keys it by that question. */
-function AskForm({ question, onAsk }: Readonly<AskFormProps>) {
-  const [draft, setDraft] = useState(question);
-  const trimmed = draft.trim();
-  const tooLong = isTooLong(trimmed);
-  return (
-    <>
-      <Textarea
-        label="Question"
-        placeholder="e.g. reactions using benzene as an input with yield greater than 70%"
-        autosize
-        minRows={2}
-        value={draft}
-        error={tooLong ? `At most ${MAX_QUESTION} characters.` : null}
-        onChange={event => setDraft(event.currentTarget.value)}
-      />
-      <Group justify="space-between">
-        <ExampleQuestions
-          onAsk={example => {
-            setDraft(example);
-            onAsk(example);
-          }}
-        />
-        <Button
-          disabled={trimmed === '' || tooLong}
-          onClick={() => onAsk(trimmed)}
-        >
-          Ask
-        </Button>
-      </Group>
-    </>
-  );
-}
 
 function Answer({
   answer,
@@ -109,11 +58,14 @@ export function AskPage() {
   const [searchParams] = useSearchParams();
   const [, navigate] = useLocation();
   const question = (searchParams.get('q') ?? '').trim();
-  const answer = useAsk(question === '' ? null : question);
+  const structures = readStructures(searchParams);
+  const asked = askPath(question, structures);
+  const answer = useAsk(question === '' ? null : question, structures);
   // The question already asked is asked again only after a failure; an answer is kept.
-  const ask = (text: string) => {
-    if (text !== question) {
-      navigate(askPath(text));
+  const ask = (text: string, drawn: Structures) => {
+    const path = askPath(text, drawn);
+    if (path !== asked) {
+      navigate(path);
     } else if (answer.isError) {
       void answer.refetch();
     }
@@ -132,7 +84,7 @@ export function AskPage() {
       body = (
         <Answer
           answer={answer.data}
-          selectionKey={`ask:${question}`}
+          selectionKey={`ask:${asked}`}
         />
       );
     }
@@ -141,9 +93,10 @@ export function AskPage() {
     <ViewerPage breadcrumbs={[{ title: 'Ask', path: '/ask' }]}>
       <Stack gap="md">
         <Title order={2}>Ask about reactions</Title>
-        <AskForm
-          key={question}
+        <QuestionForm
+          key={asked}
           question={question}
+          structures={structures}
           onAsk={ask}
         />
         {body}

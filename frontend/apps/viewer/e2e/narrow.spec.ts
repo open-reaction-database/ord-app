@@ -399,5 +399,10 @@ test('asks a question on a phone', async ({ page }) => {
   for (const example of await examples.all()) {
     await expectWhole(example);
   }
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  for (const name of ['Draw @A', 'Remove @A']) {
+    await expectWhole(page.getByRole('button', { name }));
+  }
+  await expectWhole(page.getByText('Write each name, such as @A,'));
   await expectNoSidewaysScroll(page);
 });
