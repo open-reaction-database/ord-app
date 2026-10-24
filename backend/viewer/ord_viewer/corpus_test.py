@@ -24,8 +24,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from ord_schema import huggingface, message_helpers
 from ord_schema.artifacts import base
+from ord_schema.proto import dataset_pb2, reaction_pb2
 from ord_schema.search import execute
 
+from ord_viewer import testing
 from ord_viewer.corpus import Arrival, newest_arrival, open_corpus
 from ord_viewer.settings import Settings
 from ord_viewer.testing import make_client, offline_resolver
@@ -177,3 +179,24 @@ def test_finds_no_arrival_when_no_reaction_has_a_first_commit(client, monkeypatc
     )
     monkeypatch.setattr(execute.Corpus, "search", lambda self, request: unmatched)
     assert newest_arrival(_corpus(client)) is None
+
+
+def test_passes_over_a_source_with_no_dataset_id(monkeypatch, tmp_path):
+    # The unnamed source's reaction arrives last, but no route can address its dataset.
+    unnamed = dataset_pb2.Dataset(
+        name="unnamed",
+        description="A source that records no dataset ID",
+        reactions=[reaction_pb2.Reaction(reaction_id="ord-unnamed01")],
+    )
+    monkeypatch.setattr(testing, "DATASETS", (*testing.DATASETS, unnamed))
+    monkeypatch.setattr(testing, "ARRIVALS", {**testing.ARRIVALS, "": 2})
+    testing.derive_corpus(tmp_path)
+    corpus = open_corpus(Settings(corpus_dir=tmp_path), resolver=offline_resolver)
+    try:
+        assert None in corpus.datasets().column("dataset_id").to_pylist()
+        assert newest_arrival(corpus) == Arrival(
+            dataset_id="ord_dataset-viewer02",
+            arrived=datetime.date(2023, 3, 2),
+        )
+    finally:
+        corpus.close()

@@ -50,7 +50,7 @@
     "/api/datasets/newest": {
       "get": {
         "summary": "Newest Dataset",
-        "description": "Return the dataset that most recently reached ord-data.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with the day it arrived, or None when no reaction in the corpus\n    has a first commit.",
+        "description": "Return the dataset that most recently reached ord-data.\n\nArgs:\n    state: The settings and open corpus.\n\nReturns:\n    The dataset, with the day it arrived, or None when no reaction of a dataset\n    with an ID has a first commit.",
         "operationId": "newest_dataset_api_datasets_newest_get",
         "responses": {
           "200": {

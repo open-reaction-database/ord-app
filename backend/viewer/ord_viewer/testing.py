@@ -223,8 +223,11 @@ def derive_corpus(root: pathlib.Path) -> None:
     Args:
         root: The directory to build the corpus in.
     """
-    for dataset in DATASETS:
-        source = root / "sources" / "aa" / f"{dataset.dataset_id}.parquet"
+    for index, dataset in enumerate(DATASETS):
+        # A source that records no dataset ID is named by its place, since ".parquet"
+        # would be hidden from the corpus's globs.
+        name = dataset.dataset_id or f"unnamed{index}"
+        source = root / "sources" / "aa" / f"{name}.parquet"
         source.parent.mkdir(parents=True, exist_ok=True)
         parquet.save_dataset(dataset, source)
     # The input patterns are globs, so a metacharacter in root's own name is escaped.

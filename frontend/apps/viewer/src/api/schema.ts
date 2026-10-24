@@ -85,8 +85,8 @@ export interface paths {
      *         state: The settings and open corpus.
      *
      *     Returns:
-     *         The dataset, with the day it arrived, or None when no reaction in the corpus
-     *         has a first commit.
+     *         The dataset, with the day it arrived, or None when no reaction of a dataset
+     *         with an ID has a first commit.
      */
     get: operations['newest_dataset_api_datasets_newest_get'];
     put?: never;

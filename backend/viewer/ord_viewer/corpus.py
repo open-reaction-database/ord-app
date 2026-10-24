@@ -270,18 +270,25 @@ def newest_arrival(corpus: execute.Corpus) -> Arrival | None:
 
     A dataset arrived on the day of the earliest first commit among its reactions, so a
     reaction added to it later does not move it. Search measures a timestamp by its day,
-    so two datasets that arrived on one day tie, and the first dataset ID wins.
+    so two datasets that arrived on one day tie, and the first dataset ID wins. A source
+    that records no dataset ID is passed over, since no route can address it.
 
     Args:
         corpus: The open corpus.
 
     Returns:
-        The dataset and the day it arrived, or None when no reaction in the corpus has a
-        first commit.
+        The dataset and the day it arrived, or None when no reaction of a dataset with an
+        ID has a first commit.
     """
     request = Query.model_validate(
         {
-            "where": {"op": "not_null", "path": _FIRST_COMMIT},
+            "where": {
+                "op": "and",
+                "clauses": [
+                    {"op": "not_null", "path": "dataset_id"},
+                    {"op": "not_null", "path": _FIRST_COMMIT},
+                ],
+            },
             "aggregate": {
                 "group_by": ["dataset_id"],
                 "measures": [{"fn": "min", "path": _FIRST_COMMIT, "name": "arrived"}],
