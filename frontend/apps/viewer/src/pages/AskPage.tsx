@@ -17,6 +17,7 @@ import { Accordion, Code, Flex, Loader, Stack, Text, Title } from '@mantine/core
 import { useLocation, useSearchParams } from 'wouter';
 import { useAsk } from '#api/hooks.ts';
 import type { AskResponse } from '#api/types.ts';
+import { BetaNote } from '#ask/BetaNote.tsx';
 import { QuestionForm } from '#ask/QuestionForm.tsx';
 import { askPath, readStructures, type Structures } from '#ask/questions.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
@@ -92,6 +93,7 @@ export function AskPage() {
   return (
     <ViewerPage breadcrumbs={[{ title: 'Ask', path: '/ask' }]}>
       <Stack gap="md">
+        <BetaNote />
         <Title order={2}>Ask about reactions</Title>
         <QuestionForm
           key={asked}

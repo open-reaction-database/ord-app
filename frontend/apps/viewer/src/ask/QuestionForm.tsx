@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Group, Stack, TextInput } from '@mantine/core';
+import { Anchor, Button, Group, Stack, TextInput } from '@mantine/core';
 import { useState } from 'react';
+import { Link } from 'wouter';
 import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
 import {
   askPath,
@@ -35,7 +36,8 @@ interface QuestionFormProps {
 }
 
 /**
- * The question box, with the structures it names and the example questions.
+ * The question box, with the structures it names, the example questions, and a link to
+ * the structured search.
  *
  * It starts from `question` and `structures` and keeps its own draft after; its host
  * keys it by them to start again.
@@ -117,6 +119,13 @@ export function QuestionForm({
             onAsk(example, {});
           }}
         />
+        <Anchor
+          component={Link}
+          href="/search"
+          size="sm"
+        >
+          Or search by structure and conditions →
+        </Anchor>
       </Stack>
     </form>
   );

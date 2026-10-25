@@ -37,6 +37,11 @@ afterEach(() => {
 });
 
 describe('AskPage', () => {
+  it('says the feature is in beta', () => {
+    const { getByText } = renderAt('/ask', <AskPage />);
+    expect(getByText(/in beta/)).toBeInTheDocument();
+  });
+
   it("asks the URL's question and shows the answer", async () => {
     const fetch = mockApi({
       'POST /api/ask': ANSWER,

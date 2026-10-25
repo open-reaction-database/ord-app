@@ -46,6 +46,16 @@ test('asks a question from the front page', async ({ page }) => {
   await expect(page.getByText('Three reactions use acetyl chloride.')).toBeVisible();
 });
 
+test('searches by structure and conditions from the front page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('Beta', { exact: true })).toBeVisible();
+  await page
+    .getByRole('link', { name: 'Or search by structure and conditions →' })
+    .click();
+  await expect(page).toHaveURL('/search');
+  await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
+});
+
 test('browses from the front page, and comes back by the logo', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('datasets', { exact: true })).toBeVisible();
