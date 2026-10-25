@@ -37,9 +37,9 @@ afterEach(() => {
 });
 
 describe('AskPage', () => {
-  it('says the feature is in development', () => {
+  it('says the feature is in beta', () => {
     const { getByText } = renderAt('/ask', <AskPage />);
-    expect(getByText(/in development/)).toBeInTheDocument();
+    expect(getByText(/in beta/)).toBeInTheDocument();
   });
 
   it("asks the URL's question and shows the answer", async () => {

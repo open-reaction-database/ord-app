@@ -59,16 +59,16 @@ async function contrast(text: Locator): Promise<number> {
   });
 }
 
-test("the front page's development badge is legible", async ({ page }) => {
+test("the front page's beta badge is legible", async ({ page }) => {
   await page.goto('/');
-  const badge = page.getByText('In development', { exact: true });
+  const badge = page.getByText('Beta', { exact: true });
   await expect(badge).toBeVisible();
   expect(await contrast(badge)).toBeGreaterThanOrEqual(LEAST_CONTRAST);
 });
 
-test("the ask page's development note is legible", async ({ page }) => {
+test("the ask page's beta note is legible", async ({ page }) => {
   await page.goto('/ask');
-  const note = page.getByText(/This feature is in development/);
+  const note = page.getByText(/This feature is in beta/);
   await expect(note).toBeVisible();
   expect(await contrast(note)).toBeGreaterThanOrEqual(LEAST_CONTRAST);
 });

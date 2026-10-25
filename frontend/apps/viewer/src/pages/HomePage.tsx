@@ -27,7 +27,7 @@ import {
 import { Link, useLocation } from 'wouter';
 import { useDatasets, useNewestDataset } from '#api/hooks.ts';
 import type { NewestDataset } from '#api/types.ts';
-import { DevelopmentBadge } from '#ask/DevelopmentNote.tsx';
+import { BetaBadge } from '#ask/BetaNote.tsx';
 import { QuestionForm } from '#ask/QuestionForm.tsx';
 import { askPath } from '#ask/questions.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
@@ -174,7 +174,7 @@ function AskBox() {
       <Stack gap="sm">
         <Group gap="sm">
           <Title order={3}>Ask about reactions</Title>
-          <DevelopmentBadge />
+          <BetaBadge />
         </Group>
         <QuestionForm
           question=""

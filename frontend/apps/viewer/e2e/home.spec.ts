@@ -48,7 +48,7 @@ test('asks a question from the front page', async ({ page }) => {
 
 test('searches by structure and conditions from the front page', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('In development')).toBeVisible();
+  await expect(page.getByText('Beta', { exact: true })).toBeVisible();
   await page
     .getByRole('link', { name: 'Or search by structure and conditions →' })
     .click();

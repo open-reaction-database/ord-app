@@ -16,7 +16,7 @@
 import { Badge, Paper, Text } from '@mantine/core';
 
 /** A standing note, not an alert, so it is not announced when the page loads. */
-export function DevelopmentNote() {
+export function BetaNote() {
   return (
     <Paper
       p="sm"
@@ -25,20 +25,20 @@ export function DevelopmentNote() {
     >
       {/* Mantine's light yellow text is too faint to read on the light tint. */}
       <Text size="sm">
-        This feature is in development — results may be incomplete or change.
+        This feature is in beta — results may be incomplete or change.
       </Text>
     </Paper>
   );
 }
 
 /** The note's mark, for beside a heading where the whole note would crowd the page. */
-export function DevelopmentBadge() {
+export function BetaBadge() {
   return (
     <Badge
       color="yellow"
       autoContrast
     >
-      In development
+      Beta
     </Badge>
   );
 }

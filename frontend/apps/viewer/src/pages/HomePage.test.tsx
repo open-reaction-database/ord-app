@@ -73,9 +73,9 @@ describe('HomePage', () => {
     expect(await findByText(/the corpus is closed/)).toBeInTheDocument();
   });
 
-  it('marks the question box as in development', () => {
+  it('marks the question box as beta', () => {
     const { getByText } = show();
-    expect(getByText('In development')).toBeInTheDocument();
+    expect(getByText('Beta')).toBeInTheDocument();
   });
 
   it('links to the datasets and to the About page', () => {
