@@ -155,4 +155,11 @@ describe('QuestionForm', () => {
     expect(onAsk).toHaveBeenCalledWith(ASK_EXAMPLES[2], {});
     expect(queryByRole('textbox', { name: 'Structure @A' })).not.toBeInTheDocument();
   });
+
+  it('links to the structured search', () => {
+    const { getByRole } = show();
+    expect(
+      getByRole('link', { name: 'Or search by structure and conditions →' }),
+    ).toHaveAttribute('href', '/search');
+  });
 });

@@ -28,7 +28,7 @@ interface ViewerPageProps extends PropsWithChildren {
 /** The header's links: the viewer's own pages route in the app, the rest leave it. */
 const LINKS: ReadonlyArray<{ label: string; href: string; external?: boolean }> = [
   { label: 'Browse', href: '/datasets' },
-  { label: 'Search', href: '/ask' },
+  { label: 'Search', href: '/search' },
   { label: 'Contribute', href: EDITOR_URL, external: true },
   { label: 'Docs', href: DOCS_URL, external: true },
   { label: 'About', href: '/about' },
