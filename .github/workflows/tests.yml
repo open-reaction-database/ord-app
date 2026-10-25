@@ -29,7 +29,8 @@ jobs:
   test_python_editor:
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        # action-setup-postgres v8 adds its apt key with apt-key, which Ubuntu 26.04 lacks.
+        os: ["ubuntu-24.04", "macos-latest"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -72,7 +73,7 @@ jobs:
           PG_TEST_DSN: "postgresql+psycopg://ord:password@localhost:5432/test"
 
       - name: Coverage summary
-        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        if: ${{ always() && runner.os == 'Linux' }}
         run: |
           {
             echo "### Python test coverage"
@@ -81,7 +82,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Python coverage report
-        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        if: ${{ always() && runner.os == 'Linux' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: python-coverage
@@ -226,7 +227,10 @@ jobs:
           retention-days: 7
 
   test_e2e_editor:
-    runs-on: ubuntu-latest
+    # action-setup-postgres v8 adds its apt key with apt-key, which Ubuntu 26.04 lacks;
+    # Playwright 1.60 has no Chromium build for 26.04; and the screenshot baselines are
+    # rendered on 24.04.
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -324,7 +328,9 @@ jobs:
           retention-days: 7
 
   test_e2e_viewer:
-    runs-on: ubuntu-latest
+    # Playwright 1.60 has no Chromium build for Ubuntu 26.04, and the screenshot baselines are
+    # rendered on 24.04.
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
