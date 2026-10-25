@@ -144,6 +144,9 @@ test('shows the front page on a phone, with the question box before the card', a
   for (const example of await examples.all()) {
     await expectWhole(example);
   }
+  await expectWhole(
+    page.getByRole('link', { name: 'Or search by structure and conditions →' }),
+  );
   await expectWhole(view);
   await expectNoSidewaysScroll(page);
 });
