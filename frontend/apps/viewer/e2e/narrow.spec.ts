@@ -392,7 +392,7 @@ test('shows a wide table on a phone, scrolling inside it', async ({ page }) => {
 test('asks a question on a phone', async ({ page }) => {
   await withLongIds(page);
   await page.goto(
-    `/ask?${new URLSearchParams({ q: 'reactions that use acetyl chloride' })}`,
+    `/ask#${new URLSearchParams({ q: 'reactions that use acetyl chloride' })}`,
   );
   await expect(page.getByRole('link', { name: REACTION_ID }).first()).toBeVisible();
   await page.getByRole('button', { name: 'The query it ran' }).click();

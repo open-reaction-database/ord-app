@@ -42,7 +42,7 @@ test('asks a question from the front page', async ({ page }) => {
     .getByRole('textbox', { name: 'Question' })
     .fill('reactions that use acetyl chloride');
   await page.getByRole('button', { name: 'Ask', exact: true }).click();
-  await expect(page).toHaveURL(/\/ask\?q=reactions\+that\+use\+acetyl\+chloride$/);
+  await expect(page).toHaveURL(/\/ask#q=reactions\+that\+use\+acetyl\+chloride$/);
   await expect(page.getByText('Three reactions use acetyl chloride.')).toBeVisible();
 });
 

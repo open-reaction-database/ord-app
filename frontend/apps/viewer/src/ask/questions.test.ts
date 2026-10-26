@@ -42,9 +42,9 @@ describe('questions', () => {
       '@B': 'C(=O)O',
     });
     expect(path).toBe(
-      '/ask?q=reactions+that+make+%40A+from+%40B&%40A=c1ccccc1&%40B=C%28%3DO%29O',
+      '/ask#q=reactions+that+make+%40A+from+%40B&%40A=c1ccccc1&%40B=C%28%3DO%29O',
     );
-    const params = new URLSearchParams(path.split('?')[1]);
+    const params = new URLSearchParams(path.split('#')[1]);
     params.append('page', '2');
     params.append('@lower', 'C');
     expect(readStructures(params)).toEqual({ '@A': 'c1ccccc1', '@B': 'C(=O)O' });

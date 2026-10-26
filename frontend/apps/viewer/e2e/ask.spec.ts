@@ -35,15 +35,23 @@ test('answers a question with its reactions', async ({ page }) => {
 
 test('answers a question with a table', async ({ page }) => {
   await page.goto(
-    `/ask?${new URLSearchParams({ q: 'how many reactions are in each dataset' })}`,
+    `/ask#${new URLSearchParams({ q: 'how many reactions are in each dataset' })}`,
   );
   const table = page.getByRole('table');
   await expect(table).toContainText('ord_dataset-viewer01');
   await expect(table).toContainText('3');
 });
 
+test('answers an /ask?q=… address at /ask#q=…', async ({ page }) => {
+  await page.goto(
+    `/ask?${new URLSearchParams({ q: 'reactions that use acetyl chloride' })}`,
+  );
+  await expect(page).toHaveURL(/\/ask#q=reactions\+that\+use\+acetyl\+chloride$/);
+  await expect(page.getByText('Three reactions use acetyl chloride.')).toBeVisible();
+});
+
 test('says why it cannot answer a question', async ({ page }) => {
-  await page.goto(`/ask?${new URLSearchParams({ q: 'what does pyridine cost' })}`);
+  await page.goto(`/ask#${new URLSearchParams({ q: 'what does pyridine cost' })}`);
   await expect(page.getByRole('alert')).toContainText('no script');
 });
 
@@ -67,6 +75,30 @@ test('answers a question about a structure pasted beside it', async ({ page }) =
   // The query that ran names the structure itself, not its placeholder.
   await page.getByRole('button', { name: 'The query it ran' }).click();
   await expect(page.getByText('"CC(=O)Cl"', { exact: false })).toBeVisible();
+});
+
+test('puts a question and its structures in no address the browser sends', async ({
+  page,
+}) => {
+  // Each request's address and Referer, which a server's access log records.
+  const sent: Array<string> = [];
+  page.on('request', request => {
+    sent.push(`${request.url()} ${request.headers().referer ?? ''}`);
+  });
+  await page.goto('/');
+  await page.getByRole('textbox', { name: 'Question' }).fill('reactions that use');
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  await page.getByRole('textbox', { name: 'Structure @A' }).fill('CC(=O)Cl');
+  await page.getByRole('button', { name: 'Ask' }).click();
+  const answer = page.getByText('Three reactions use the structure you drew.');
+  await expect(answer).toBeVisible();
+  // The Google tag reports the page's address without its fragment.
+  expect(new URL(page.url()).search).toBe('');
+  // A reload requests the ask page's own address.
+  await page.reload();
+  await expect(answer).toBeVisible();
+  expect(sent.some(address => address.includes('/ask'))).toBe(true);
+  expect(sent.filter(address => /reactions\+that|CC%28/.test(address))).toEqual([]);
 });
 
 // Ketcher sets this global to each instance it initializes.

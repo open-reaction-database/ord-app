@@ -16,13 +16,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderAt } from '#test/render.tsx';
-import {
-  ASK_EXAMPLES,
-  askPath,
-  MAX_ADDRESS,
-  MOST_STRUCTURES,
-  type Structures,
-} from '#ask/questions.ts';
+import { ASK_EXAMPLES, MOST_STRUCTURES, type Structures } from '#ask/questions.ts';
 import { QuestionForm } from '#ask/QuestionForm.tsx';
 
 // Ketcher needs a canvas; this dialog saves benzene as soon as it opens, from what it
@@ -114,25 +108,6 @@ describe('QuestionForm', () => {
     expect(getByRole('textbox', { name: 'Question' })).toHaveValue(
       'reactions with and @B @A',
     );
-  });
-
-  it('refuses a question whose address would be too long to reload', async () => {
-    const user = userEvent.setup();
-    const { getByRole, getByText, onAsk } = show('reactions that make @A', {
-      '@A': 'C'.repeat(
-        MAX_ADDRESS - askPath('reactions that make @A', { '@A': '' }).length,
-      ),
-    });
-    expect(getByRole('button', { name: 'Ask' })).toBeEnabled();
-    await user.type(getByRole('textbox', { name: 'Structure @A' }), 'C');
-    expect(
-      getByText(
-        'Too long to ask with its structures; shorten the question or a structure.',
-      ),
-    ).toBeInTheDocument();
-    expect(getByRole('button', { name: 'Ask' })).toBeDisabled();
-    await user.type(getByRole('textbox', { name: 'Question' }), '{Enter}');
-    expect(onAsk).not.toHaveBeenCalled();
   });
 
   it('adds no more structures than the backend takes', () => {

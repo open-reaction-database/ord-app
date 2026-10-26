@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { askPath } from '#ask/questions.ts';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0101 } from '#test/fixtures/records.ts';
@@ -76,6 +77,18 @@ describe('ViewerRoutes', () => {
   it('shows /ask', () => {
     const { getByRole } = renderAt('/ask', <ViewerRoutes />);
     expect(getByRole('heading', { name: 'Ask about reactions' })).toBeInTheDocument();
+  });
+
+  it("moves an /ask?q=… address's question and structures into its fragment", () => {
+    const { getByRole, history } = renderAt(
+      '/ask?q=reactions+that+use+%40A&%40A=CCN',
+      <ViewerRoutes />,
+    );
+    expect(history).toEqual([askPath('reactions that use @A', { '@A': 'CCN' })]);
+    expect(getByRole('textbox', { name: 'Question' })).toHaveValue(
+      'reactions that use @A',
+    );
+    expect(getByRole('textbox', { name: 'Structure @A' })).toHaveValue('CCN');
   });
 
   it('shows About', () => {
