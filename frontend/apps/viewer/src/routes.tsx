@@ -29,12 +29,13 @@ import { routeParam } from '#routeParams.ts';
 /** The ask page, and an /ask?q=… address as /ask#q=…, where the page reads it. */
 function AskRoute() {
   const [searchParams] = useSearchParams();
-  if (!searchParams.has('q')) {
+  const question = searchParams.get('q');
+  if (question === null) {
     return <AskPage />;
   }
   return (
     <Redirect
-      to={askPath(searchParams.get('q') ?? '', readStructures(searchParams))}
+      to={askPath(question, readStructures(searchParams))}
       replace
     />
   );
