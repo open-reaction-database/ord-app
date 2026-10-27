@@ -16,7 +16,6 @@
 import { createRoot } from 'react-dom/client';
 import './index.scss';
 import '@open-reaction-database/ui/theme/global.scss';
-import { loadAnalytics } from '@open-reaction-database/ui/shell';
 import { AppRoot } from './core/AppRoot.tsx';
 import { Buffer } from 'buffer'; // NOSONAR: the npm polyfill, for browser code; node:buffer is a Node builtin
 
@@ -24,7 +23,5 @@ import { Buffer } from 'buffer'; // NOSONAR: the npm polyfill, for browser code;
 // among them. Set here, before the lazily loaded routes import those dependencies.
 globalThis.global ||= globalThis;
 globalThis.Buffer = Buffer;
-
-loadAnalytics('G-R9MFY2X2C7');
 
 createRoot(document.getElementById('root')!).render(<AppRoot />);

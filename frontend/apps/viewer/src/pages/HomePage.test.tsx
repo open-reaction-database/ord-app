@@ -78,6 +78,11 @@ describe('HomePage', () => {
     expect(getByText('Beta')).toBeInTheDocument();
   });
 
+  it('says where a question is sent', () => {
+    const { getByText } = show();
+    expect(getByText(/sent to Anthropic/)).toBeInTheDocument();
+  });
+
   it('links to the datasets and to the About page', () => {
     const { getByRole } = show();
     expect(getByRole('link', { name: 'Browse datasets' })).toHaveAttribute(

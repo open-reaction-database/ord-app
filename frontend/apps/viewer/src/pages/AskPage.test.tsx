@@ -42,6 +42,11 @@ describe('AskPage', () => {
     expect(getByText(/in beta/)).toBeInTheDocument();
   });
 
+  it('says where a question is sent', () => {
+    const { getByText } = renderAt('/ask', <AskPage />);
+    expect(getByText(/sent to Anthropic/)).toBeInTheDocument();
+  });
+
   it("asks the URL's question and shows the answer", async () => {
     const fetch = mockApi({
       'POST /api/ask': ANSWER,

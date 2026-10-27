@@ -13,7 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Badge, Paper, Text } from '@mantine/core';
+import { Badge, Paper, Stack, Text } from '@mantine/core';
+
+/** Where a question goes once it is asked, for beside any box that asks one. */
+export function AskDisclosure() {
+  return (
+    <Text size="sm">
+      Your question is sent to Anthropic to turn it into a search, and compound names in
+      it may be looked up with PubChem, NCI/CADD, and EBI. Please do not enter anything
+      confidential.
+    </Text>
+  );
+}
 
 /** A standing note, not an alert, so it is not announced when the page loads. */
 export function BetaNote() {
@@ -24,9 +35,12 @@ export function BetaNote() {
       bg="var(--mantine-color-yellow-light)"
     >
       {/* Mantine's light yellow text is too faint to read on the light tint. */}
-      <Text size="sm">
-        This feature is in beta — results may be incomplete or change.
-      </Text>
+      <Stack gap="xs">
+        <Text size="sm">
+          This feature is in beta — results may be incomplete or change.
+        </Text>
+        <AskDisclosure />
+      </Stack>
     </Paper>
   );
 }
