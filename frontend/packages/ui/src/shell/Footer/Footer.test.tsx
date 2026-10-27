@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { afterEach, describe, it, expect } from 'vitest';
-import { screen } from '@testing-library/react';
+import { afterEach, describe, it, expect, vi } from 'vitest';
+import { renderHook, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import { Footer } from './Footer.tsx';
@@ -66,6 +67,31 @@ describe('Footer', () => {
     renderWithMantine(<Footer />);
     const link = screen.getByRole('link', { name: 'help@open-reaction-database.org' });
     expect(link).toHaveAttribute('href', 'mailto:help@open-reaction-database.org');
+  });
+
+  it('offers no analytics settings on a page with no Google tag to load', () => {
+    renderWithMantine(<Footer />);
+    expect(screen.queryByRole('button', { name: 'Analytics settings' })).toBeNull();
+  });
+
+  describe('on a page with a Google tag to load', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('reopens the analytics banner from its settings button', async () => {
+      // Fresh copies, since the analytics module keeps the page's state.
+      vi.resetModules();
+      const analytics = await import('#shell/analytics.ts');
+      const fresh = await import('./Footer.tsx');
+      localStorage.setItem(analytics.ANALYTICS_CHOICE_KEY, 'denied');
+      analytics.loadAnalytics('G-TEST', 'open-reaction-database.org');
+      const { result } = renderHook(() => analytics.useAnalytics());
+      expect(result.current.asking).toBe(false);
+      renderWithMantine(<fresh.Footer />);
+      await userEvent.click(screen.getByRole('button', { name: 'Analytics settings' }));
+      expect(result.current.asking).toBe(true);
+    });
   });
 
   describe('at different widths', () => {

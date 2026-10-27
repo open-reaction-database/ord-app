@@ -34,6 +34,15 @@ vi.mock('#shell/Footer/Footer.tsx', () => ({
   ),
 }));
 
+vi.mock('#shell/AnalyticsBanner/AnalyticsBanner.tsx', () => ({
+  AnalyticsBanner: ({ className }: Readonly<{ className?: string }>) => (
+    <div
+      data-testid="analytics-banner"
+      className={className}
+    />
+  ),
+}));
+
 describe('PageContainer', () => {
   it('renders the logo, header controls, chrome, optional badge, and its children', () => {
     const { getByText, getByAltText, getByTestId, getByRole } = renderWithMantine(
@@ -121,6 +130,35 @@ describe('PageContainer', () => {
     expect(queryByRole('contentinfo')).toBeNull();
     expect(queryByTestId('footer')).toBeNull();
     expect(getByRole('main').className).toMatch(/mainWithoutFooter/);
+  });
+});
+
+describe('PageContainer’s analytics banner', () => {
+  it('rests the banner on the footer’s top edge', () => {
+    const { getByRole, getByTestId } = renderWithMantine(
+      <PageContainer breadcrumbs={[]} />,
+    );
+    const banner = getByTestId('analytics-banner');
+    expect(getByRole('contentinfo')).toContainElement(banner);
+    expect(banner.className).toMatch(/banner/);
+    expect(banner.className).not.toMatch(/bannerWithoutFooter/);
+    const style = getComputedStyle(banner);
+    expect(style.position).toBe('absolute');
+    expect(style.bottom).toBe('100%');
+  });
+
+  it('rests the banner on the window’s bottom edge on a page with no footer', () => {
+    const { getByTestId } = renderWithMantine(
+      <PageContainer
+        breadcrumbs={[]}
+        footer={null}
+      />,
+    );
+    const banner = getByTestId('analytics-banner');
+    expect(banner.className).toMatch(/bannerWithoutFooter/);
+    const style = getComputedStyle(banner);
+    expect(style.position).toBe('fixed');
+    expect(style.bottom).toBe('0px');
   });
 });
 

@@ -21,10 +21,10 @@ import classes from './AnalyticsBanner.module.scss';
 export const PRIVACY_NOTICE_URL =
   'https://docs.open-reaction-database.org/en/latest/site_privacy.html';
 
-/** Asks the visitor whether the page may load Google Analytics, while they have not said. */
+/** Asks whether the page may load Google Analytics, until the visitor chooses or reopens it. */
 export function AnalyticsBanner({ className }: Readonly<{ className?: string }>) {
-  const { available, asking } = useAnalytics();
-  if (!available || !asking) {
+  const { asking } = useAnalytics();
+  if (!asking) {
     return null;
   }
   return (

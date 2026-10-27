@@ -81,8 +81,9 @@ function writeChoice(choice: AnalyticsChoice) {
 // gtag.js reads a command only as an Arguments object, and ignores one pushed as an array.
 function gtag(..._command: Array<unknown>) {
   const page = globalThis as unknown as { dataLayer?: Array<unknown> };
+  page.dataLayer ??= [];
   // eslint-disable-next-line prefer-rest-params -- gtag.js needs the Arguments object
-  (page.dataLayer ??= []).push(arguments); // NOSONAR: gtag.js needs the Arguments object
+  page.dataLayer.push(arguments); // NOSONAR: gtag.js needs the Arguments object
 }
 
 /** Sets Google's opt-out flag for a measurement ID, which gtag.js reads before each hit. */

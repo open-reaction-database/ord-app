@@ -24,9 +24,9 @@ vi.mock('@open-reaction-database/ui/shell', () => ({ loadAnalytics }));
 vi.mock('react-dom/client', () => ({ createRoot: () => ({ render }) }));
 vi.mock('./core/AppRoot.tsx', () => ({ AppRoot: () => null }));
 
-it('renders the app, loading no Google tag', async () => {
+it('names the editor’s Google tag, then renders the app', async () => {
   document.body.innerHTML = '<div id="root"></div>';
   await import('./main.tsx');
-  expect(loadAnalytics).not.toHaveBeenCalled();
+  expect(loadAnalytics).toHaveBeenCalledWith('G-R9MFY2X2C7');
   expect(render).toHaveBeenCalledTimes(1);
 });
