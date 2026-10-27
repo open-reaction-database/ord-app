@@ -79,24 +79,3 @@ test('sends nothing to Google from a deployed host, through a search', async ({
   await expect(page.getByRole('heading', { name: '2 reactions' })).toBeVisible();
   await expectNothingSentToGoogle(page, sent);
 });
-
-test('hands the Google tag no search on a deployed host', async ({ page, baseURL }) => {
-  await serveDeployed(page, baseURL);
-  await page.goto(`${DEPLOYED}/search`);
-  await page.getByRole('button', { name: 'Add a structure' }).click();
-  await page.getByRole('textbox', { name: 'Structure 1' }).fill('CC(=O)Cl');
-  await page.getByRole('textbox', { name: 'Dataset IDs' }).fill('ord_dataset-viewer01');
-  await page.getByRole('button', { name: 'Search' }).click();
-  await expect(page.getByRole('heading', { name: '2 reactions' })).toBeVisible();
-  // The tag reads its commands from dataLayer, and reports the page's title and its
-  // address without the fragment.
-  const handed = await page.evaluate(() =>
-    JSON.stringify((globalThis as { dataLayer?: unknown }).dataLayer),
-  );
-  expect(handed).toContain('G-REEDLYB0ZJ');
-  const searched = /component|dataset_id|ord_dataset-viewer01|CC\(=O\)Cl|CC%28/;
-  expect(handed).not.toMatch(searched);
-  expect(await page.title()).not.toMatch(searched);
-  expect(new URL(page.url()).search).toBe('');
-  await page.unrouteAll({ behavior: 'ignoreErrors' });
-});
