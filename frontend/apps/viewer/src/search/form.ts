@@ -208,10 +208,11 @@ export function paramsFromForm(form: SearchForm): URLSearchParams {
 }
 
 /**
- * The search page's address with a form's parameters, which it searches on arrival.
+ * The search page's address with a form's parameters, or the bare page for none.
  *
- * They are carried in the fragment. A browser sends no fragment to a server, in a request
- * line or a Referer header, and the Google tag reports a page's address without one.
+ * They are carried in the fragment, where the page reads them on arrival. A browser
+ * sends no fragment to a server, in a request line or a Referer header, and the Google
+ * tag reports a page's address without one.
  */
 export function searchPath(params: string): string {
   return params ? `/search#${params}` : '/search';
