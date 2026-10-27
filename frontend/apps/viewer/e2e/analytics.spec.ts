@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /** Every host the Google tag loads from or reports to. */
 const GOOGLE = /googletagmanager\.com|google-analytics\.com|analytics\.google\.com/;
@@ -21,11 +21,12 @@ const GOOGLE = /googletagmanager\.com|google-analytics\.com|analytics\.google\.c
 /** A host that is not local, as the viewer is deployed. */
 const DEPLOYED = 'https://viewer.example';
 
-test('sends nothing to Google from a deployed host, through an ask', async ({
-  page,
-  baseURL,
-}) => {
-  // The page is fetched from the local server but addressed by a host that is not local.
+/**
+ * Serves the local build at DEPLOYED, and returns every request made to Google, each
+ * recorded and answered here so a page that sends one fails its test without reaching
+ * Google.
+ */
+async function serveDeployed(page: Page, baseURL: string | undefined) {
   await page.route(`${DEPLOYED}/**`, async route => {
     const url = route
       .request()
@@ -34,11 +35,26 @@ test('sends nothing to Google from a deployed host, through an ask', async ({
     await route.fulfill({ response: await route.fetch({ url }) });
   });
   const sent: Array<string> = [];
-  // Recorded and answered here, so a page that asks fails the test without reaching Google.
   await page.route(GOOGLE, route => {
     sent.push(route.request().url());
     return route.fulfill({ status: 204 });
   });
+  return sent;
+}
+
+/** Checks the page sent nothing to Google and holds no Google tag's dataLayer. */
+async function expectNothingSentToGoogle(page: Page, sent: Array<string>) {
+  expect(sent).toEqual([]);
+  expect(await page.evaluate(() => 'dataLayer' in globalThis)).toBe(false);
+  // The app's own requests may still be on their way through the routes above.
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+}
+
+test('sends nothing to Google from a deployed host, through an ask', async ({
+  page,
+  baseURL,
+}) => {
+  const sent = await serveDeployed(page, baseURL);
   await page.goto(`${DEPLOYED}/`);
   await page.getByRole('textbox', { name: 'Question' }).fill('reactions that use');
   await page.getByRole('button', { name: 'Add a structure' }).click();
@@ -47,8 +63,19 @@ test('sends nothing to Google from a deployed host, through an ask', async ({
   await expect(
     page.getByText('Three reactions use the structure you drew.'),
   ).toBeVisible();
-  expect(sent).toEqual([]);
-  expect(await page.evaluate(() => 'dataLayer' in globalThis)).toBe(false);
-  // The app's own requests may still be on their way through the routes above.
-  await page.unrouteAll({ behavior: 'ignoreErrors' });
+  await expectNothingSentToGoogle(page, sent);
+});
+
+test('sends nothing to Google from a deployed host, through a search', async ({
+  page,
+  baseURL,
+}) => {
+  const sent = await serveDeployed(page, baseURL);
+  await page.goto(`${DEPLOYED}/search`);
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  await page.getByRole('textbox', { name: 'Structure 1' }).fill('CC(=O)Cl');
+  await page.getByRole('textbox', { name: 'Dataset IDs' }).fill('ord_dataset-viewer01');
+  await page.getByRole('button', { name: 'Search' }).click();
+  await expect(page.getByRole('heading', { name: '2 reactions' })).toBeVisible();
+  await expectNothingSentToGoogle(page, sent);
 });
