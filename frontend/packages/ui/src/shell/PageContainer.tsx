@@ -21,6 +21,7 @@ import ORDLogo from './ORDLogo.png';
 import { Breadcrumbs } from '#shell/Breadcrumbs/Breadcrumbs.tsx';
 import type { Breadcrumbs as BreadcrumbItems } from './breadcrumbs.ts';
 import { Footer } from '#shell/Footer/Footer.tsx';
+import { AnalyticsBanner } from '#shell/AnalyticsBanner/AnalyticsBanner.tsx';
 
 export interface PageContainerProps extends PropsWithChildren {
   breadcrumbs: BreadcrumbItems;
@@ -94,7 +95,14 @@ export function PageContainer({
         </Flex>
       </AppShell.Main>
 
-      {hasFooter && <AppShell.Footer withBorder={true}>{footer}</AppShell.Footer>}
+      {hasFooter ? (
+        <AppShell.Footer withBorder={true}>
+          <AnalyticsBanner className={classes.banner} />
+          {footer}
+        </AppShell.Footer>
+      ) : (
+        <AnalyticsBanner className={classes.bannerWithoutFooter} />
+      )}
     </AppShell>
   );
 }

@@ -15,6 +15,7 @@
  */
 import { Flex } from '@mantine/core';
 import { Github, Linkedin } from '#theme/icons/index.ts';
+import { askAnalytics, useAnalytics } from '#shell/analytics.ts';
 import classes from './footer.module.scss';
 
 const REPOSITORY = 'https://github.com/open-reaction-database/ord-app';
@@ -55,6 +56,25 @@ function BuiltCommit({ commit }: Readonly<{ commit: string }>) {
   );
 }
 
+/** Reopens the analytics banner, on a page that has a Google tag to load. */
+function AnalyticsSettings() {
+  const { available } = useAnalytics();
+  if (!available) {
+    return null;
+  }
+  return (
+    <div>
+      <button
+        type="button"
+        className={classes.settings}
+        onClick={askAnalytics}
+      >
+        Analytics settings
+      </button>
+    </div>
+  );
+}
+
 export function Footer({ commit = '' }: Readonly<FooterProps>) {
   const year = new Date().getFullYear();
 
@@ -67,6 +87,7 @@ export function Footer({ commit = '' }: Readonly<FooterProps>) {
         </a>
       </div>
       <BuiltCommit commit={commit} />
+      <AnalyticsSettings />
       <div className={classes.footerLinks}>
         <a
           href="https://github.com/open-reaction-database/"
