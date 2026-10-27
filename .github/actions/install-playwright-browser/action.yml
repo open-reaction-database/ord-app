@@ -1,0 +1,56 @@
+# Copyright 2026 Open Reaction Database Project Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The runners' Ubuntu mirror sometimes serves the system packages Chromium needs slowly
+# enough to stall a job for minutes, so apt keeps them in a cache that later runs restore.
+# The screenshot baselines are rendered with these packages installed, so the install
+# keeps them. The browsers come from Playwright's own CDN, which hasn't stalled, and
+# aren't cached.
+name: Install Playwright's browser
+description: Install Playwright's Chromium and its system packages from frontend/, caching the packages.
+
+runs:
+  using: composite
+  steps:
+    - name: Name the package cache
+      id: cache-key
+      shell: bash
+      working-directory: frontend
+      run: |
+        version=$(node_modules/.bin/playwright --version)
+        prefix="playwright-packages-$ImageOS-$RUNNER_ARCH-"
+        echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+        echo "key=$prefix$ImageVersion-${version#Version }" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the package cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: /tmp/playwright-packages
+        key: ${{ steps.cache-key.outputs.key }}
+        restore-keys: ${{ steps.cache-key.outputs.prefix }}
+
+    - name: Install Chromium and its packages
+      shell: bash
+      working-directory: frontend
+      run: |
+        archives=/tmp/playwright-packages
+        mkdir -p "$archives/partial"
+        echo "Dir::Cache::archives \"$archives\";" | sudo tee /etc/apt/apt.conf.d/90playwright-packages
+        node_modules/.bin/playwright install --with-deps chromium
+        # Drops the packages a newer version has replaced, so a cache restored from an
+        # older runner image doesn't grow.
+        sudo apt-get autoclean
+        # apt leaves its lock and partial download directory readable only by root and
+        # _apt, and the cache is saved as the runner's user.
+        sudo chown -R "$(id -u):$(id -g)" "$archives"
