@@ -15,6 +15,10 @@
  */
 @use 'palette';
 
+/* Roboto, roman and italic at every weight, served from the app's own build. */
+@use '@fontsource-variable/roboto/wght';
+@use '@fontsource-variable/roboto/wght-italic';
+
 :root {
   --color-primary: #3c78d8;
   --color-background-main: #f8f8f8;
