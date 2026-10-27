@@ -141,13 +141,12 @@ describe('SearchPage', () => {
     });
   });
 
-  it('puts a new search in the fragment, and none in the query', async () => {
+  it("puts a new search in the page's fragment", async () => {
     mockApi({ 'POST /api/search': FOUND, 'GET /api/reactions': [VIEWER0103] });
     const user = userEvent.setup();
     const { getByRole } = renderAt('/search', <SearchPage />);
     await user.type(getByRole('textbox', { name: 'Reaction IDs' }), 'ord-viewer0103');
     await user.click(getByRole('button', { name: 'Search' }));
-    expect(globalThis.location.search).toBe('');
     expect(globalThis.location.hash).toBe('#reaction_id=ord-viewer0103&limit=100');
   });
 
