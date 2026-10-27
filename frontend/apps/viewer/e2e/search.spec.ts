@@ -26,7 +26,7 @@ async function expectResults(
   params: Array<[string, string]>,
   ids: Array<string>,
 ) {
-  await page.goto(`/search?${new URLSearchParams([...params, ['limit', '100']])}`);
+  await page.goto(`/search#${new URLSearchParams([...params, ['limit', '100']])}`);
   if (ids.length === 0) {
     await expect(page.getByText('No reactions.')).toBeVisible();
   } else {
@@ -149,6 +149,30 @@ test('searches from the form, and keeps a selection across Back', async ({ page 
   await expect(
     page.getByRole('checkbox', { name: 'Select ord-viewer0103' }),
   ).toBeChecked();
+});
+
+test('puts a search in no address the browser sends', async ({ page }) => {
+  // Each request's address and Referer, which a server's access log records.
+  const sent: Array<string> = [];
+  page.on('request', request => {
+    sent.push(`${request.url()} ${request.headers().referer ?? ''}`);
+  });
+  await page.goto('/search');
+  await page.getByRole('button', { name: 'Add a structure' }).click();
+  await page.getByRole('textbox', { name: 'Structure 1' }).fill('CC(=O)Cl');
+  await page.getByRole('textbox', { name: 'Dataset IDs' }).fill('ord_dataset-viewer01');
+  await page.getByRole('button', { name: 'Search' }).click();
+  const found = page.getByRole('link', { name: REACTION_LINK });
+  await expect(found).toHaveText(['ord-viewer0102', 'ord-viewer0103']);
+  // The Google tag reports the page's address without its fragment.
+  expect(new URL(page.url()).search).toBe('');
+  // A reload requests the search page's own address.
+  await page.reload();
+  await expect(found).toHaveText(['ord-viewer0102', 'ord-viewer0103']);
+  expect(sent.some(address => address.includes('/search'))).toBe(true);
+  expect(
+    sent.filter(address => /[?&](component|dataset_id)=|CC%28/.test(address)),
+  ).toEqual([]);
 });
 
 test('opens the drawing dialog', async ({ page }) => {

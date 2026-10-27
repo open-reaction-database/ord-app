@@ -16,6 +16,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/react';
+import { Link } from 'wouter';
 import { renderAt } from '#test/render.tsx';
 import { mockApi } from '#test/fetch.ts';
 import { VIEWER0103 } from '#test/fixtures/records.ts';
@@ -28,7 +29,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const SEARCH_URL = '/search?reaction_id=ord-viewer0103&limit=100';
+const SEARCH_URL = '/search#reaction_id=ord-viewer0103&limit=100';
 
 /** What the search at SEARCH_URL finds. */
 const FOUND = { kind: 'reactions', reaction_ids: ['ord-viewer0103'], truncated: false };
@@ -66,7 +67,7 @@ describe('SearchPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByRole } = renderAt(
-      '/search?reaction_id=ord-viewer0103&limit=100',
+      '/search#reaction_id=ord-viewer0103&limit=100',
       <SearchPage />,
     );
     expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
@@ -84,7 +85,7 @@ describe('SearchPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByText } = renderAt(
-      '/search?reaction_id=ord-viewer0103&limit=1',
+      '/search#reaction_id=ord-viewer0103&limit=1',
       <SearchPage />,
     );
     expect(await findByText(/stopped at its limit of 1;/)).toBeInTheDocument();
@@ -100,7 +101,7 @@ describe('SearchPage', () => {
       },
     });
     const { findByRole } = renderAt(
-      '/search?reaction_id=ord-viewer0103&limit=100',
+      '/search#reaction_id=ord-viewer0103&limit=100',
       <SearchPage />,
     );
     expect(await findByRole('columnheader', { name: 'n' })).toBeInTheDocument();
@@ -132,12 +133,50 @@ describe('SearchPage', () => {
     await user.click(getByRole('button', { name: 'Add a structure' }));
     await user.type(getByRole('textbox', { name: 'Structure 1' }), 'CCN');
     await user.click(getByRole('button', { name: 'Search' }));
-    const params = new URLSearchParams(history.at(-1)!.split('?')[1]);
+    const params = new URLSearchParams(history.at(-1)!.split('#')[1]);
     expect(JSON.parse(params.get('component')!)).toEqual({
       pattern: 'CCN',
       target: 'input',
       mode: 'exact',
     });
+  });
+
+  it("puts a new search in the page's fragment", async () => {
+    mockApi({ 'POST /api/search': FOUND, 'GET /api/reactions': [VIEWER0103] });
+    const user = userEvent.setup();
+    const { getByRole } = renderAt('/search', <SearchPage />);
+    await user.type(getByRole('textbox', { name: 'Reaction IDs' }), 'ord-viewer0103');
+    await user.click(getByRole('button', { name: 'Search' }));
+    expect(globalThis.location.hash).toBe('#reaction_id=ord-viewer0103&limit=100');
+  });
+
+  it('runs no search a query names', () => {
+    const fetch = mockApi({});
+    const { getByText } = renderAt(
+      '/search?reaction_id=ord-viewer0103&limit=100',
+      <SearchPage />,
+    );
+    expect(
+      getByText('Set a structure, a reaction SMARTS, a range, or an ID, then search.'),
+    ).toBeInTheDocument();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('runs the search a new fragment names', async () => {
+    mockApi({
+      'POST /api/search': FOUND,
+      'GET /api/reactions': [VIEWER0103],
+    });
+    const user = userEvent.setup();
+    const { findByRole, getByRole } = renderAt(
+      '/search',
+      <>
+        <SearchPage />
+        <Link href={SEARCH_URL}>elsewhere</Link>
+      </>,
+    );
+    await user.click(getByRole('link', { name: 'elsewhere' }));
+    expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
   });
 
   it('searches when Enter is pressed in a field', async () => {
@@ -179,7 +218,7 @@ describe('SearchPage', () => {
       'POST /api/search': () => answers.shift()!(),
       'GET /api/reactions': [VIEWER0103],
     });
-    const { findByRole, getByRole } = renderAt(`/search?${search}`, <SearchPage />);
+    const { findByRole, getByRole } = renderAt(`/search#${search}`, <SearchPage />);
     expect(await findByRole('alert')).toHaveTextContent('try again shortly');
     await user.click(getByRole('button', { name: 'Search' }));
     expect(await findByRole('link', { name: 'ord-viewer0103' })).toBeInTheDocument();
@@ -232,7 +271,7 @@ describe('SearchPage', () => {
         }),
     });
     const { findByRole } = renderAt(
-      `/search?component=${encodeURIComponent('C((;input;smarts')}&limit=100`,
+      `/search#component=${encodeURIComponent('C((;input;smarts')}&limit=100`,
       <SearchPage />,
     );
     expect(await findByRole('alert')).toHaveTextContent('cannot parse SMARTS');
