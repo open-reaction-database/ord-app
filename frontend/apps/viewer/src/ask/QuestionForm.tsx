@@ -18,9 +18,7 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { ExampleQuestions } from '#ask/ExampleQuestions.tsx';
 import {
-  askPath,
   isTooLong,
-  MAX_ADDRESS,
   MAX_QUESTION,
   nextPlaceholder,
   type Structures,
@@ -55,13 +53,7 @@ export function QuestionForm({
     Object.entries(structures).map(([name, structure]) => [name, structure.trim()]),
   );
   const unfinished = Object.values(drawn).includes('');
-  const unaddressable = askPath(trimmed, drawn).length > MAX_ADDRESS;
-  let error = null;
-  if (tooLong) {
-    error = `At most ${MAX_QUESTION} characters.`;
-  } else if (unaddressable) {
-    error = 'Too long to ask with its structures; shorten the question or a structure.';
-  }
+  const error = tooLong ? `At most ${MAX_QUESTION} characters.` : null;
   const next = nextPlaceholder(structures);
   const add = (name: string) => {
     setStructures({ ...structures, [name]: '' });

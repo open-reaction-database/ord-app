@@ -92,6 +92,24 @@ jobs:
       - name: Check the image through nginx
         run: deploy/viewer/smoke_test.sh http://127.0.0.1:8080 ord-viewer0101
 
+      - name: The access log leaves out an ask address's query
+        run: |
+          curl -sf -o /dev/null 'http://127.0.0.1:8080/ask?q=logged-question&%40A=logged-structure'
+          curl -sf -o /dev/null -H 'Referer: http://127.0.0.1:8080/ask?q=logged-referer' \
+            http://127.0.0.1:8080/
+          # nginx writes a request's line once it has answered; wait up to 5 s for both.
+          for _ in 1 2 3 4 5; do
+            logs=$(docker logs viewer 2>/dev/null)
+            grep -qF '"http://127.0.0.1:8080/ask"' <<<"$logs" && break
+            sleep 1
+          done
+          grep -qF '"GET /ask HTTP/1.1"' <<<"$logs"
+          grep -qF '"http://127.0.0.1:8080/ask"' <<<"$logs"
+          if grep -qF logged- <<<"$logs"; then
+            echo "the access log holds an ask address's query" >&2
+            exit 1
+          fi
+
       - name: A requested stop exits 0
         run: |
           docker stop viewer

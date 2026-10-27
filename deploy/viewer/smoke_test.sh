@@ -77,9 +77,12 @@ until [[ $(status "$base/api/health") == 200 ]] || ((SECONDS >= deadline)); do
 done
 expect_status 200 "$base/api/health"
 
+# index.html's mount point, which marks a response as the SPA.
+spa='<div id="root">'
+
 # The SPA, at its root and at a deep link, which falls back to index.html.
-expect_body "$base/" '<div id="root">'
-expect_body "$base/reactions/$reaction" '<div id="root">'
+expect_body "$base/" "$spa"
+expect_body "$base/reactions/$reaction" "$spa"
 expect_header "$base/" '^cache-control: no-cache'
 index=$(request -sf "$base/")
 asset=$(grep -m1 -oE '/assets/[^"]+\.js' <<<"$index") || {
@@ -87,6 +90,13 @@ asset=$(grep -m1 -oE '/assets/[^"]+\.js' <<<"$index") || {
   exit 1
 }
 expect_header "$base$asset" '^cache-control: public, max-age=31536000, immutable'
+
+# The ask page; an ask address with its question in the query goes to the same address
+# with the query as its fragment, relative to the host it was asked of.
+legacy="$base/ask?q=reactions+that+use+%40A&%40A=CCN"
+expect_body "$base/ask" "$spa"
+expect_status 302 "$legacy"
+expect_header "$legacy" '^location: /ask#q=reactions\+that\+use\+%40A&%40A=CCN[[:space:]]*$'
 
 # The API, ahead of the static rules.
 expect_body "$base/api/openapi.json" '"/api/search"'
@@ -105,10 +115,10 @@ if ((limited == 0)); then
   exit 1
 fi
 
-# An ask address as long as the viewer makes one (MAX_ADDRESS, 16,000 characters) is
-# served, and one twice that is past nginx's request line.
-long="/ask?q=$(head -c 15993 /dev/zero | tr '\0' 'a')"
-expect_body "$base$long" '<div id="root">'
+# An address of 16,000 characters, within the 16 KiB request line the load balancer
+# passes, is served, and one twice that is past nginx's.
+long="/datasets?q=$(head -c 15988 /dev/zero | tr '\0' 'a')"
+expect_body "$base$long" "$spa"
 expect_status 414 "$base$long$long"
 
 # A body past 128 KiB never reaches the backend.

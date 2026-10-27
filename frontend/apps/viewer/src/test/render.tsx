@@ -24,16 +24,39 @@ import { memoryLocation } from 'wouter/memory-location';
 import { createQueryClient } from '#api/queryClient.ts';
 
 /**
- * Renders ui inside the viewer's providers, at path (which may carry a query string).
+ * Writes a path's fragment into the page's own address, where `useFragmentParams` reads
+ * it, or clears the address's fragment for a path without one.
+ */
+function showFragment(path: string) {
+  const at = path.indexOf('#');
+  const fragment = at === -1 ? '' : path.slice(at);
+  const { pathname, search } = globalThis.location;
+  globalThis.history.replaceState(null, '', `${pathname}${search}${fragment}`);
+}
+
+/**
+ * Renders ui inside the viewer's providers, at path (which may carry a query string or a
+ * fragment).
  *
  * Each call gets its own cache, so no test sees another's responses; a rerender keeps
- * the providers, the cache, and the location.
+ * the providers, the cache, and the location. wouter's memory location keeps a path
+ * whole, so routes are matched against the path without its fragment, as a browser's
+ * location gives it, and the fragment is written into the page's own address.
  *
  * Returns Testing Library's result and `history`, every path the router has been at,
  * oldest first; a redirect with `replace` overwrites the last.
  */
 export function renderAt(path: string, ui: ReactElement) {
   const location = memoryLocation({ path, record: true });
+  showFragment(path);
+  const navigate = (to: string, options?: { replace?: boolean }) => {
+    location.navigate(to, options);
+    showFragment(to);
+  };
+  function useLocation(): [string, typeof navigate] {
+    const [current] = location.hook();
+    return [current.split('#')[0], navigate];
+  }
   const client = createQueryClient();
   function Providers({ children }: Readonly<{ children: ReactNode }>) {
     return (
@@ -41,7 +64,7 @@ export function renderAt(path: string, ui: ReactElement) {
         <Notifications />
         <QueryClientProvider client={client}>
           <Router
-            hook={location.hook}
+            hook={useLocation}
             searchHook={location.searchHook}
           >
             {children}

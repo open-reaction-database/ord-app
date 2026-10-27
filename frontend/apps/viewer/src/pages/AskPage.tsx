@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Accordion, Code, Flex, Loader, Stack, Text, Title } from '@mantine/core';
-import { useLocation, useSearchParams } from 'wouter';
+import { useLocation } from 'wouter';
 import { useAsk } from '#api/hooks.ts';
 import type { AskResponse } from '#api/types.ts';
 import { BetaNote } from '#ask/BetaNote.tsx';
@@ -24,6 +24,7 @@ import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
+import { useFragmentParams } from '#fragment.ts';
 
 function Answer({
   answer,
@@ -56,10 +57,10 @@ function Answer({
 
 /** Ask a question in English; the backend compiles it to a query and answers it. */
 export function AskPage() {
-  const [searchParams] = useSearchParams();
+  const params = useFragmentParams();
   const [, navigate] = useLocation();
-  const question = (searchParams.get('q') ?? '').trim();
-  const structures = readStructures(searchParams);
+  const question = (params.get('q') ?? '').trim();
+  const structures = readStructures(params);
   const asked = askPath(question, structures);
   const answer = useAsk(question === '' ? null : question, structures);
   // The question already asked is asked again only after a failure; an answer is kept.

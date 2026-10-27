@@ -48,7 +48,7 @@ describe('AskPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByText, findByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     expect(await findByText('One reaction uses ethylamine.')).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('AskPage', () => {
     const user = userEvent.setup();
     mockApi({ 'POST /api/ask': ANSWER, 'GET /api/reactions': [VIEWER0103] });
     const { findByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     const toggle = await findByRole('button', { name: 'The query it ran' });
@@ -99,7 +99,7 @@ describe('AskPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByText } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     expect(
@@ -117,7 +117,7 @@ describe('AskPage', () => {
       },
     });
     const { findByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     expect(await findByRole('table')).toHaveTextContent('5');
@@ -129,7 +129,7 @@ describe('AskPage', () => {
     const { getByRole, history } = renderAt('/ask', <AskPage />);
     await user.type(getByRole('textbox', { name: 'Question' }), QUESTION);
     await user.click(getByRole('button', { name: 'Ask' }));
-    expect(new URLSearchParams(history.at(-1)!.split('?')[1]).get('q')).toBe(QUESTION);
+    expect(new URLSearchParams(history.at(-1)!.split('#')[1]).get('q')).toBe(QUESTION);
   });
 
   it('asks an example', async () => {
@@ -137,7 +137,7 @@ describe('AskPage', () => {
     const user = userEvent.setup();
     const { getByRole, history } = renderAt('/ask', <AskPage />);
     await user.click(getByRole('button', { name: ASK_EXAMPLES[0] }));
-    expect(new URLSearchParams(history.at(-1)!.split('?')[1]).get('q')).toBe(
+    expect(new URLSearchParams(history.at(-1)!.split('#')[1]).get('q')).toBe(
       ASK_EXAMPLES[0],
     );
   });
@@ -146,10 +146,10 @@ describe('AskPage', () => {
     mockApi({});
     const user = userEvent.setup();
     const { getByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <>
         <AskPage />
-        <Link href={`/ask?${new URLSearchParams({ q: ASK_EXAMPLES[1] })}`}>
+        <Link href={`/ask#${new URLSearchParams({ q: ASK_EXAMPLES[1] })}`}>
           elsewhere
         </Link>
       </>,
@@ -173,7 +173,7 @@ describe('AskPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByRole, findByText, getByRole, queryByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     expect(await findByRole('alert')).toHaveTextContent('try again shortly');
@@ -190,7 +190,7 @@ describe('AskPage', () => {
       'GET /api/reactions': [VIEWER0103],
     });
     const { findByText, getByRole } = renderAt(
-      `/ask?q=${encodeURIComponent(QUESTION)}`,
+      `/ask#q=${encodeURIComponent(QUESTION)}`,
       <AskPage />,
     );
     await findByText('One reaction uses ethylamine.');
@@ -230,7 +230,7 @@ describe('AskPage', () => {
 
   it('asks nothing for a blank question in the URL', () => {
     const fetch = mockApi({});
-    renderAt('/ask?q=%20%20', <AskPage />);
+    renderAt('/ask#q=%20%20', <AskPage />);
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -241,7 +241,7 @@ describe('AskPage', () => {
           status: 422,
         }),
     });
-    const { findByRole } = renderAt('/ask?q=what%20does%20it%20cost', <AskPage />);
+    const { findByRole } = renderAt('/ask#q=what%20does%20it%20cost', <AskPage />);
     expect(await findByRole('alert')).toHaveTextContent('the corpus records no prices');
   });
 });

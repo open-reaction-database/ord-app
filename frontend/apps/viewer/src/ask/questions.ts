@@ -19,14 +19,6 @@ export const MAX_QUESTION = 2000;
 /** The backend's bound on how many structures one question names. */
 export const MOST_STRUCTURES = 10;
 
-/**
- * The longest ask address, which carries a question and its structures.
- *
- * The viewer's load balancer and nginx each take a request line of at most 16 KiB, so a
- * reload or a shared link of a longer address would be refused.
- */
-export const MAX_ADDRESS = 16_000;
-
 /** ord-interface's examples. */
 export const ASK_EXAMPLES = [
   'reactions for synthesizing ibuprofen',
@@ -57,13 +49,18 @@ export function nextPlaceholder(structures: Structures): string | undefined {
   return PLACEHOLDERS.find(name => !(name in structures));
 }
 
-/** The ask page's address with a question and its structures, which it asks on arrival. */
+/**
+ * The ask page's address with a question and its structures, which it asks on arrival.
+ *
+ * They are carried in the fragment. A browser sends no fragment to a server, in a request
+ * line or a Referer header, and the Google tag reports a page's address without one.
+ */
 export function askPath(question: string, structures: Structures = {}): string {
   const params = new URLSearchParams({ q: question });
   for (const [name, structure] of Object.entries(structures)) {
     params.append(name, structure);
   }
-  return `/ask?${params}`;
+  return `/ask#${params}`;
 }
 
 /** The structures an address names, each under its placeholder's own parameter. */
