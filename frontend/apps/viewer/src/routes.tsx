@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { Redirect, Route, Switch, useSearchParams } from 'wouter';
-import { askPath, readStructures } from '#ask/questions.ts';
 import { AboutPage } from '#pages/AboutPage.tsx';
 import { AskPage } from '#pages/AskPage.tsx';
 import { DatasetPage } from '#pages/DatasetPage.tsx';
@@ -25,21 +24,6 @@ import { ReactionPage } from '#pages/ReactionPage.tsx';
 import { ReactionSetPage } from '#pages/ReactionSetPage.tsx';
 import { SearchPage } from '#pages/SearchPage.tsx';
 import { routeParam } from '#routeParams.ts';
-
-/** The ask page, and an /ask?q=… address as /ask#q=…, where the page reads it. */
-function AskRoute() {
-  const [searchParams] = useSearchParams();
-  const question = searchParams.get('q');
-  if (question === null) {
-    return <AskPage />;
-  }
-  return (
-    <Redirect
-      to={askPath(question, readStructures(searchParams))}
-      replace
-    />
-  );
-}
 
 /** ord-interface's /selected-set?reaction_id=…, as the viewer's /reactions?id=…. */
 function SelectedSetRedirect() {
@@ -83,7 +67,7 @@ export function ViewerRoutes() {
       />
       <Route
         path="/ask"
-        component={AskRoute}
+        component={AskPage}
       />
       <Route
         path="/about"

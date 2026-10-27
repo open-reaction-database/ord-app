@@ -42,14 +42,6 @@ test('answers a question with a table', async ({ page }) => {
   await expect(table).toContainText('3');
 });
 
-test('answers an /ask?q=… address at /ask#q=…', async ({ page }) => {
-  await page.goto(
-    `/ask?${new URLSearchParams({ q: 'reactions that use acetyl chloride' })}`,
-  );
-  await expect(page).toHaveURL(/\/ask#q=reactions\+that\+use\+acetyl\+chloride$/);
-  await expect(page.getByText('Three reactions use acetyl chloride.')).toBeVisible();
-});
-
 test('says why it cannot answer a question', async ({ page }) => {
   await page.goto(`/ask#${new URLSearchParams({ q: 'what does pyridine cost' })}`);
   await expect(page.getByRole('alert')).toContainText('no script');
