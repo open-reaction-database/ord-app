@@ -18,10 +18,10 @@ import { expect, test } from '@playwright/test';
 test('loads Roboto from its own build, and nothing from Google Fonts', async ({
   page,
 }) => {
-  const fonts: Array<string> = [];
+  const fonts: Array<URL> = [];
   page.on('request', request => {
     if (request.resourceType() === 'font') {
-      fonts.push(new URL(request.url()).pathname);
+      fonts.push(new URL(request.url()));
     }
   });
   // Recorded and answered here, so a page that asks fails the test without reaching Google.
@@ -40,8 +40,10 @@ test('loads Roboto from its own build, and nothing from Google Fonts', async ({
   });
   expect(loaded).toContain('Roboto Variable normal');
   expect(fonts.length).toBeGreaterThan(0);
+  const origin = new URL(page.url()).origin;
   for (const font of fonts) {
-    expect(font).toMatch(
+    expect(font.origin).toBe(origin);
+    expect(font.pathname).toMatch(
       /^\/assets\/roboto-[a-z-]+-wght-(normal|italic)-[\w-]+\.woff2$/,
     );
   }
