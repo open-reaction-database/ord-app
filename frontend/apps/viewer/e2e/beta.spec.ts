@@ -72,3 +72,19 @@ test("the ask page's beta note is legible", async ({ page }) => {
   await expect(note).toBeVisible();
   expect(await contrast(note)).toBeGreaterThanOrEqual(LEAST_CONTRAST);
 });
+
+// The sentence sits on the beta note's yellow tint on the ask page, and on the question
+// box's primary tint on the front page.
+for (const [where, path] of [
+  ['front page', '/'],
+  ['ask page', '/ask'],
+]) {
+  test(`the ${where}'s sentence on where a question is sent is legible`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    const disclosure = page.getByText(/sent to Anthropic/);
+    await expect(disclosure).toBeVisible();
+    expect(await contrast(disclosure)).toBeGreaterThanOrEqual(LEAST_CONTRAST);
+  });
+}
