@@ -17,9 +17,9 @@
 # the API fetches into at startup, such as /app/corpus. Built from the repository's root:
 #   docker build -f deploy/viewer/Dockerfile .
 
-FROM ghcr.io/astral-sh/uv:0.13.0@sha256:cdc6093146eb3ff6a40107b38f008b789e050e77ad87865e381d9917da55a168 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.6@sha256:af22a52f5eafef3d78e551599d405c02df61919d18028f0cea8eda93bc9986d0 AS uv
 
-FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS spa
+FROM node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS spa
 WORKDIR /app
 # The manifests first, so npm ci's layer stays cached until one of them changes. Every
 # workspace the lockfile names is listed; npm ci fails if one is missing.
