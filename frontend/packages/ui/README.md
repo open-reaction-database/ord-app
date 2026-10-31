@@ -2,7 +2,7 @@
 
 The theme and components that the Open Reaction Database web apps share: the Mantine theme, the global
 stylesheet, icons, display primitives and form controls, the reaction model, the reaction view with its
-drawer, the page shell and its Google Analytics loader, and a Ketcher structure dialog. Apps import it only through the subpaths in its `package.json` `exports`
+drawer, the page shell with its Google Analytics loader and consent banner, and a Ketcher structure dialog. Apps import it only through the subpaths in its `package.json` `exports`
 (`@open-reaction-database/ui/theme`, `…/display`, `…/reaction`, `…/reaction/model`, `…/reaction/previews`,
 `…/shell`, `…/ketcher`, `…/testing`), never by a path into `src/`. Each app's Vite build compiles it from TypeScript
 source; it has no build step of its own and is not published.

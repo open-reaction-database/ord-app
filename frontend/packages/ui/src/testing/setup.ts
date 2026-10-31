@@ -16,3 +16,12 @@
 
 // Registers jest-dom matchers (toBeInTheDocument, etc.).
 import '@testing-library/jest-dom/vitest';
+
+// Node 25 and later define a localStorage global of their own, which is undefined without
+// --localstorage-file and hides happy-dom's; the tests get a storage of happy-dom's kind.
+if (globalThis.localStorage === undefined) {
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: new Storage(),
+    configurable: true,
+  });
+}

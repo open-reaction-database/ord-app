@@ -54,6 +54,21 @@
   margin: 0 20px;
 }
 
+/* The analytics banner rests on the footer's top edge, over the bottom of the page. */
+.banner {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+}
+
+/* With no footer, it rests on the window's bottom edge. */
+.bannerWithoutFooter {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--mantine-z-index-app);
+}
+
 .logo {
   width: 54px;
   height: 24px;
