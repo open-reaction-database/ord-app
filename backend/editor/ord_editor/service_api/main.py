@@ -26,12 +26,14 @@ from sqlalchemy.exc import DBAPIError
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
+from ord_editor.service_api.access_log import skip_access_log
 from ord_editor.service_api.constants import AppEnvs
 from ord_editor.service_api.domain.reactions import validate_dataset_reactions
 from ord_editor.service_api.resources.v1 import (
     auth,
     datasets,
     group,
+    health,
     reactions,
     templates,
     users,
@@ -114,6 +116,7 @@ app.add_middleware(
 editor = APIRouter(prefix="/api/v1")
 editor.include_router(auth.router)
 
+editor.include_router(health.router)
 editor.include_router(users.router)
 editor.include_router(templates.router)
 editor.include_router(datasets.router)
@@ -125,7 +128,5 @@ app.include_router(editor)
 
 add_pagination(app)
 
-
-@app.get("/healthcheck")
-async def health_check() -> bool:
-    return True
+# The load balancer requests the health check every few seconds.
+skip_access_log(app.url_path_for("health"))

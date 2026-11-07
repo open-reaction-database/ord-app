@@ -101,7 +101,7 @@ jobs:
             'http://127.0.0.1:8080/search?component=logged-component&reaction_smarts=logged-smarts'
           curl -sf -o /dev/null \
             -H 'Referer: http://127.0.0.1:8080/search?component=logged-search-referer' \
-            http://127.0.0.1:8080/api/health
+            http://127.0.0.1:8080/datasets
           # nginx writes a request's line once it has answered; wait up to 5 s for them all.
           for _ in 1 2 3 4 5; do
             logs=$(docker logs viewer 2>/dev/null)
@@ -124,6 +124,20 @@ jobs:
           code=$(docker inspect -f '{{.State.ExitCode}}' viewer)
           if [[ $code != 0 ]]; then
             echo "expected a requested stop to exit 0, got $code" >&2
+            exit 1
+          fi
+
+      # The smoke test requested the health check, and the stopped container's output is
+      # all written. nginx logs curl's HTTP/1.1, and uvicorn the 1.0 that nginx proxies.
+      # An access line has the status after the quoted request; nginx's error log, which
+      # records a check made before the backend listens, has none.
+      - name: The access log leaves out the health check
+        run: |
+          logs=$(docker logs viewer 2>&1)
+          grep -qF '"GET /api/openapi.json HTTP/1.1" 200' <<<"$logs"
+          grep -qF '"GET /api/openapi.json HTTP/1.0" 200' <<<"$logs"
+          if grep -qE '"GET /api/health[^"]*" [0-9]{3}' <<<"$logs"; then
+            echo "the access log holds a health check" >&2
             exit 1
           fi
 

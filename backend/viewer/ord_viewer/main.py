@@ -24,6 +24,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from ord_viewer.access_log import skip_access_log
 from ord_viewer.corpus import newest_arrival, open_corpus
 from ord_viewer.routes import ask, datasets, download, health, reactions, search
 from ord_viewer.settings import Settings
@@ -138,3 +139,6 @@ def create_app(
 
 
 app = create_app()
+
+# The load balancer requests the health check every few seconds.
+skip_access_log(app.url_path_for("health"))
