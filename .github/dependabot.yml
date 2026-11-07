@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Actions in .github/workflows are pinned to commit SHAs, and the Dockerfiles'
-# images to digests. Dependabot rewrites the SHA or digest along with its version,
-# which is what keeps a pinned workflow or image from freezing on whatever was
+# Actions in .github/workflows and .github/actions are pinned to commit SHAs, and the
+# Dockerfiles' images to digests. Dependabot rewrites the SHA or digest along with its
+# version, which is what keeps a pinned workflow or image from freezing on whatever was
 # current the day it was written (a base image's tag is rebuilt for OS fixes).
 # backend/editor/docker-compose.yml's images are tracked by tag.
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    # / covers .github/workflows; each local composite action has a directory of its own.
+    directories:
+      - /
+      - /.github/actions/*
     schedule:
       interval: monthly
     groups:

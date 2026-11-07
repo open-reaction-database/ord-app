@@ -271,8 +271,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Install Playwright browsers
-        working-directory: frontend
-        run: node_modules/.bin/playwright install --with-deps chromium
+        uses: ./.github/actions/install-playwright-browser
 
       # The UI is served via the dev server (vite dev), not a production build: the no-auth
       # bypass is hard-gated off in production builds (import.meta.env.PROD), so e2e must use
@@ -358,8 +357,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Install Playwright's browser
-        working-directory: frontend
-        run: node_modules/.bin/playwright install --with-deps chromium
+        uses: ./.github/actions/install-playwright-browser
 
       - name: Build the viewer
         working-directory: frontend

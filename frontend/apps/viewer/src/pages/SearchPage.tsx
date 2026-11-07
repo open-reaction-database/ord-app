@@ -16,14 +16,20 @@
 import { Button, Flex, Loader, Paper, Stack, Text, Title } from '@mantine/core';
 import { hashKey, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { useLocation, useSearchParams } from 'wouter';
+import { useLocation } from 'wouter';
 import { useSearch } from '#api/hooks.ts';
 import { ErrorNotice } from '#components/ErrorNotice.tsx';
 import { ReactionResults } from '#components/ReactionResults.tsx';
 import { ResultTable } from '#components/ResultTable.tsx';
 import { ViewerPage } from '#components/ViewerPage.tsx';
+import { useFragmentParams } from '#fragment.ts';
 import { compileQuery } from '#search/compile.ts';
-import { formFromParams, paramsFromForm, type SearchForm } from '#search/form.ts';
+import {
+  formFromParams,
+  paramsFromForm,
+  searchPath,
+  type SearchForm,
+} from '#search/form.ts';
 import { SearchFormPanel } from '#search/SearchFormPanel.tsx';
 
 function HelpNote() {
@@ -49,9 +55,8 @@ function HelpNote() {
 
 /** The search form beside its results; the URL holds the form, so a search can be linked. */
 export function SearchPage() {
-  const [searchParams] = useSearchParams();
   const [, navigate] = useLocation();
-  const search = searchParams.toString();
+  const search = useFragmentParams().toString();
   const form = useMemo(() => formFromParams(new URLSearchParams(search)), [search]);
   const query = useMemo(() => compileQuery(form), [form]);
   const results = useSearch(query);
@@ -62,7 +67,7 @@ export function SearchPage() {
   const runSearch = (next: SearchForm) => {
     const params = paramsFromForm(next).toString();
     if (params !== search) {
-      navigate(`/search?${params}`);
+      navigate(searchPath(params));
     }
     if (hashKey([compileQuery(next)]) === hashKey([query])) {
       void queryClient.refetchQueries({
@@ -97,11 +102,7 @@ export function SearchPage() {
     body = <ResultTable result={results.data} />;
   }
   return (
-    <ViewerPage
-      breadcrumbs={[
-        { title: 'Search', path: search ? `/search?${search}` : '/search' },
-      ]}
-    >
+    <ViewerPage breadcrumbs={[{ title: 'Search', path: searchPath(search) }]}>
       <Stack gap="md">
         <Flex
           justify="space-between"

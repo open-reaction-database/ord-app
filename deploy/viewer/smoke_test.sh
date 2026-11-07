@@ -98,6 +98,12 @@ expect_body "$base/ask" "$spa"
 expect_status 302 "$legacy"
 expect_header "$legacy" '^location: /ask#q=reactions\+that\+use\+%40A&%40A=CCN[[:space:]]*$'
 
+# The search page; a search address with its form in the query goes the same way.
+legacy="$base/search?reaction_id=$reaction&limit=100"
+expect_body "$base/search" "$spa"
+expect_status 302 "$legacy"
+expect_header "$legacy" "^location: /search#reaction_id=$reaction&limit=100[[:space:]]*\$"
+
 # The API, ahead of the static rules.
 expect_body "$base/api/openapi.json" '"/api/search"'
 expect_status 200 "$base/api/reactions/$reaction"

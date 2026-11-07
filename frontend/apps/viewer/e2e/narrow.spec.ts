@@ -358,7 +358,7 @@ for (const { name, open } of DRAWERS) {
 
 test('shows search results with long IDs on a phone', async ({ page }) => {
   await withLongIds(page);
-  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  await page.goto('/search#reaction_id=ord-viewer0101&limit=100');
   // On a phone the form comes first and the results below it.
   const link = page.getByRole('link', { name: REACTION_ID });
   await link.scrollIntoViewIfNeeded();
@@ -380,7 +380,7 @@ test('shows a wide table on a phone, scrolling inside it', async ({ page }) => {
       },
     }),
   );
-  await page.goto('/search?reaction_id=ord-viewer0101&limit=100');
+  await page.goto('/search#reaction_id=ord-viewer0101&limit=100');
   const table = page.getByRole('table');
   await table.scrollIntoViewIfNeeded();
   await expect(

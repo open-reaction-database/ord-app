@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@fastify/deepmerge": "^2.0.2",
+    "@fontsource-variable/roboto": "5.3.0",
     "buffer": "^6.0.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",

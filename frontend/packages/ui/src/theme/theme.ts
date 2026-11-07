@@ -25,7 +25,8 @@ primaryColors[9] = '#001926';
 const secondaryColors = colorsTuple(['#aab9c5', '#637d92', '#4a5e6d']);
 
 export const theme = createTheme({
-  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  // The family global.scss loads.
+  fontFamily: '"Roboto Variable", "Helvetica", "Arial", sans-serif',
   fontSizes: {
     sm: '0.875rem',
     md: '0.875rem',

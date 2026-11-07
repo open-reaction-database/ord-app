@@ -18,6 +18,7 @@ import {
   EMPTY_FORM,
   formFromParams,
   paramsFromForm,
+  searchPath,
   type SearchForm,
 } from '#search/form.ts';
 
@@ -161,5 +162,20 @@ describe('paramsFromForm', () => {
       limit: 300,
     };
     expect(formFromParams(paramsFromForm(form))).toEqual(form);
+  });
+});
+
+describe('searchPath', () => {
+  it('carries the parameters in the fragment', () => {
+    const params = paramsFromForm({
+      ...EMPTY_FORM,
+      structures: [{ pattern: 'C(=O)Cl', target: 'input', mode: 'exact' }],
+    }).toString();
+    expect(searchPath(params)).toBe(`/search#${params}`);
+    expect(new URL(searchPath(params), 'https://viewer.example').search).toBe('');
+  });
+
+  it('is the bare page for no parameters', () => {
+    expect(searchPath('')).toBe('/search');
   });
 });
