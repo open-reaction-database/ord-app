@@ -54,18 +54,18 @@
   margin: 0 20px;
 }
 
-/* The analytics banner rests on the footer's top edge, over the bottom of the page. */
-.banner {
+/* The analytics card sits above the footer at its right end, over the bottom of the page. */
+.analytics {
   position: absolute;
-  inset-inline: 0;
-  bottom: 100%;
+  right: 0;
+  bottom: calc(100% + 12px);
 }
 
-/* With no footer, it rests on the window's bottom edge. */
-.bannerWithoutFooter {
+/* With no footer, it sits at the window's bottom right. */
+.analyticsWithoutFooter {
   position: fixed;
-  inset-inline: 0;
-  bottom: 0;
+  right: 16px;
+  bottom: 16px;
   z-index: var(--mantine-z-index-app);
 }
 
@@ -101,5 +101,9 @@
     height: auto;
     margin: 0;
     padding: 8px 20px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .analytics {
+    right: 16px;
   }
 }

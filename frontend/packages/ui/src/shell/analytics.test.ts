@@ -166,7 +166,7 @@ describe('analytics', () => {
     expect(appWindow.dataLayer).toBeUndefined();
   });
 
-  it('asks until the visitor chooses, and again when they reopen the banner', () => {
+  it('asks until the visitor chooses, and again when they reopen the card', () => {
     const { result } = renderHook(() => analytics.useAnalytics());
     expect(result.current).toEqual({ available: false, asking: false });
     act(() => analytics.loadAnalytics('G-TEST', DEPLOYED));
@@ -185,7 +185,7 @@ describe('analytics', () => {
     expect(result.current).toEqual({ available: true, choice: 'denied', asking: true });
   });
 
-  it('shows no banner to a visitor who chose before', () => {
+  it('shows no card to a visitor who chose before', () => {
     localStorage.setItem(analytics.ANALYTICS_CHOICE_KEY, 'denied');
     analytics.loadAnalytics('G-TEST', DEPLOYED);
     const { result } = renderHook(() => analytics.useAnalytics());

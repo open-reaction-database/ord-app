@@ -58,7 +58,7 @@ async function expectNothingSentToGoogle(page: Page, sent: Array<string>) {
   expect(await page.evaluate(() => 'dataLayer' in globalThis)).toBe(false);
 }
 
-function banner(page: Page) {
+function card(page: Page) {
   return page.getByRole('region', { name: 'Analytics' });
 }
 
@@ -77,7 +77,7 @@ test('asks nothing and sends nothing to Google from a page served locally', asyn
   });
   await page.goto('/');
   await expect(page.getByRole('link', { name: 'Search', exact: true })).toBeVisible();
-  await expect(banner(page)).toHaveCount(0);
+  await expect(card(page)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Analytics settings' })).toHaveCount(0);
   await expectNothingSentToGoogle(page, sent);
 });
@@ -88,9 +88,9 @@ test('asks before loading the Google tag on a deployed host', async ({
 }) => {
   const sent = await serveDeployed(page, baseURL);
   await page.goto(`${DEPLOYED}/`);
-  await expect(banner(page)).toContainText('May we use Google Analytics?');
+  await expect(card(page)).toContainText('May we use Google Analytics?');
   await expect(
-    banner(page).getByRole('link', { name: 'Privacy notice' }),
+    card(page).getByRole('link', { name: 'Privacy notice' }),
   ).toHaveAttribute(
     'href',
     'https://docs.open-reaction-database.org/en/latest/site_privacy.html',
@@ -105,9 +105,9 @@ test('loads the Google tag once a visitor accepts, and on their next visit', asy
   await serveDeployed(page, baseURL);
   await page.goto(`${DEPLOYED}/`);
   const tag = page.waitForRequest(GOOGLE);
-  await banner(page).getByRole('button', { name: 'Accept' }).click();
+  await card(page).getByRole('button', { name: 'Accept' }).click();
   expect((await tag).url()).toBe(GOOGLE_TAG);
-  await expect(banner(page)).toHaveCount(0);
+  await expect(card(page)).toHaveCount(0);
   expect((await handed(page)).slice(0, 2)).toEqual([
     [
       'consent',
@@ -125,7 +125,7 @@ test('loads the Google tag once a visitor accepts, and on their next visit', asy
   await page.reload();
   expect((await again).url()).toBe(GOOGLE_TAG);
   await expect(page.getByRole('button', { name: 'Analytics settings' })).toBeVisible();
-  await expect(banner(page)).toHaveCount(0);
+  await expect(card(page)).toHaveCount(0);
 });
 
 test('loads nothing once a visitor declines, or on their next visit', async ({
@@ -134,11 +134,11 @@ test('loads nothing once a visitor declines, or on their next visit', async ({
 }) => {
   const sent = await serveDeployed(page, baseURL);
   await page.goto(`${DEPLOYED}/`);
-  await banner(page).getByRole('button', { name: 'Decline' }).click();
-  await expect(banner(page)).toHaveCount(0);
+  await card(page).getByRole('button', { name: 'Decline' }).click();
+  await expect(card(page)).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole('button', { name: 'Analytics settings' })).toBeVisible();
-  await expect(banner(page)).toHaveCount(0);
+  await expect(card(page)).toHaveCount(0);
   await expectNothingSentToGoogle(page, sent);
 });
 
@@ -154,11 +154,11 @@ test('stops the Google tag and deletes its cookies when a visitor changes their 
   ]);
   await page.goto(`${DEPLOYED}/`);
   const tag = page.waitForRequest(GOOGLE);
-  await banner(page).getByRole('button', { name: 'Accept' }).click();
+  await card(page).getByRole('button', { name: 'Accept' }).click();
   await tag;
   await page.getByRole('button', { name: 'Analytics settings' }).click();
-  await banner(page).getByRole('button', { name: 'Decline' }).click();
-  await expect(banner(page)).toHaveCount(0);
+  await card(page).getByRole('button', { name: 'Decline' }).click();
+  await expect(card(page)).toHaveCount(0);
   expect(
     await page.evaluate(
       () => (globalThis as Record<string, unknown>)['ga-disable-G-REEDLYB0ZJ'],
@@ -176,7 +176,7 @@ test('stops the Google tag and deletes its cookies when a visitor changes their 
 test('hands the Google tag no question or structure', async ({ page, baseURL }) => {
   await serveDeployed(page, baseURL);
   await page.goto(`${DEPLOYED}/`);
-  await banner(page).getByRole('button', { name: 'Accept' }).click();
+  await card(page).getByRole('button', { name: 'Accept' }).click();
   await page.getByRole('textbox', { name: 'Question' }).fill('reactions that use');
   await page.getByRole('button', { name: 'Add a structure' }).click();
   await page.getByRole('textbox', { name: 'Structure @A' }).fill('CC(=O)Cl');

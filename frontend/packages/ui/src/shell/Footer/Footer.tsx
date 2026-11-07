@@ -56,7 +56,7 @@ function BuiltCommit({ commit }: Readonly<{ commit: string }>) {
   );
 }
 
-/** Reopens the analytics banner, on a page that has a Google tag to load. */
+/** Reopens the analytics card, on a page that has a Google tag to load. */
 function AnalyticsSettings() {
   const { available } = useAnalytics();
   if (!available) {

@@ -13,29 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Group, Text } from '@mantine/core';
+import { Button, Group, Paper, Text } from '@mantine/core';
 import clsx from 'clsx';
 import { chooseAnalytics, useAnalytics } from '#shell/analytics.ts';
-import classes from './AnalyticsBanner.module.scss';
+import classes from './AnalyticsCard.module.scss';
 
 export const PRIVACY_NOTICE_URL =
   'https://docs.open-reaction-database.org/en/latest/site_privacy.html';
 
 /** Asks whether the page may load Google Analytics, until the visitor chooses or reopens it. */
-export function AnalyticsBanner({ className }: Readonly<{ className?: string }>) {
+export function AnalyticsCard({ className }: Readonly<{ className?: string }>) {
   const { asking } = useAnalytics();
   if (!asking) {
     return null;
   }
   return (
-    <section
+    <Paper
+      component="section"
       aria-label="Analytics"
       className={clsx(classes.root, className)}
+      withBorder={true}
+      shadow="md"
+      radius="md"
+      p="md"
     >
-      <Text
-        size="sm"
-        className={classes.text}
-      >
+      <Text size="sm">
         May we use Google Analytics? It sets cookies and tells Google which pages you
         visit, so we can see how the site is used.{' '}
         <a
@@ -48,11 +50,12 @@ export function AnalyticsBanner({ className }: Readonly<{ className?: string }>)
       </Text>
       <Group
         gap="xs"
+        justify="flex-end"
         wrap="nowrap"
       >
         <Button onClick={() => chooseAnalytics('denied')}>Decline</Button>
         <Button onClick={() => chooseAnalytics('granted')}>Accept</Button>
       </Group>
-    </section>
+    </Paper>
   );
 }

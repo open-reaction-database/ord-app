@@ -79,7 +79,7 @@ describe('Footer', () => {
       localStorage.clear();
     });
 
-    it('reopens the analytics banner from its settings button', async () => {
+    it('reopens the analytics card from its settings button', async () => {
       // Fresh copies, since the analytics module keeps the page's state.
       vi.resetModules();
       const analytics = await import('#shell/analytics.ts');

@@ -27,22 +27,22 @@ import userEvent from '@testing-library/user-event';
 import { renderWithMantine } from '#testing/renderWithMantine.tsx';
 import { DEFAULT_VIEWPORT_WIDTH, setViewportWidth } from '#testing/setViewportWidth.ts';
 import type * as AnalyticsModule from '#shell/analytics.ts';
-import type * as BannerModule from './AnalyticsBanner.tsx';
+import type * as CardModule from './AnalyticsCard.tsx';
 
 const DEPLOYED = 'open-reaction-database.org';
 
-describe('AnalyticsBanner', () => {
+describe('AnalyticsCard', () => {
   // What the loader puts in the head, kept out of it so happy-dom does not try to load it.
   let append: MockInstance<(...nodes: Array<Node | string>) => void>;
   // Fresh copies for each test, since the analytics module keeps the page's state.
   let analytics: typeof AnalyticsModule;
-  let banner: typeof BannerModule;
+  let card: typeof CardModule;
 
   beforeEach(async () => {
     append = vi.spyOn(document.head, 'append').mockImplementation(() => undefined);
     vi.resetModules();
     analytics = await import('#shell/analytics.ts');
-    banner = await import('./AnalyticsBanner.tsx');
+    card = await import('./AnalyticsCard.tsx');
   });
 
   afterEach(() => {
@@ -52,19 +52,19 @@ describe('AnalyticsBanner', () => {
     setViewportWidth(DEFAULT_VIEWPORT_WIDTH);
   });
 
-  function renderBanner() {
-    return renderWithMantine(<banner.AnalyticsBanner className="placed" />);
+  function renderCard() {
+    return renderWithMantine(<card.AnalyticsCard className="placed" />);
   }
 
   it('shows nothing on a page with no Google tag to load', () => {
     analytics.loadAnalytics('G-TEST', 'localhost');
-    renderBanner();
+    renderCard();
     expect(screen.queryByRole('region', { name: 'Analytics' })).toBeNull();
   });
 
   it('asks a visitor who has not chosen, and links the privacy notice', () => {
     analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
+    renderCard();
     const region = screen.getByRole('region', { name: 'Analytics' });
     expect(region).toHaveClass('placed');
     expect(region).toHaveTextContent(
@@ -73,7 +73,7 @@ describe('AnalyticsBanner', () => {
     );
     expect(screen.getByRole('link', { name: 'Privacy notice' })).toHaveAttribute(
       'href',
-      banner.PRIVACY_NOTICE_URL,
+      card.PRIVACY_NOTICE_URL,
     );
     expect(screen.getByRole('button', { name: 'Decline' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('AnalyticsBanner', () => {
 
   it('loads the tag and closes on Accept', async () => {
     analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
+    renderCard();
     await userEvent.click(screen.getByRole('button', { name: 'Accept' }));
     expect(screen.queryByRole('region', { name: 'Analytics' })).toBeNull();
     expect(append).toHaveBeenCalledTimes(1);
@@ -90,7 +90,7 @@ describe('AnalyticsBanner', () => {
 
   it('loads nothing and closes on Decline', async () => {
     analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
+    renderCard();
     await userEvent.click(screen.getByRole('button', { name: 'Decline' }));
     expect(screen.queryByRole('region', { name: 'Analytics' })).toBeNull();
     expect(append).not.toHaveBeenCalled();
@@ -100,25 +100,19 @@ describe('AnalyticsBanner', () => {
   it('stays closed for a visitor who chose before, until they reopen it', () => {
     localStorage.setItem(analytics.ANALYTICS_CHOICE_KEY, 'denied');
     analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
+    renderCard();
     expect(screen.queryByRole('region', { name: 'Analytics' })).toBeNull();
     act(() => analytics.askAnalytics());
     expect(screen.getByRole('region', { name: 'Analytics' })).toBeInTheDocument();
   });
 
-  it('keeps its buttons beside the text from the sm breakpoint up', () => {
-    setViewportWidth(768);
+  it('puts its buttons under the text, in a card that leaves a phone’s edges clear', () => {
+    setViewportWidth(390);
     analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
-    const region = screen.getByRole('region', { name: 'Analytics' });
-    expect(getComputedStyle(region).flexDirection).not.toBe('column');
-  });
-
-  it('puts its buttons under the text below the sm breakpoint', () => {
-    setViewportWidth(767);
-    analytics.loadAnalytics('G-TEST', DEPLOYED);
-    renderBanner();
-    const region = screen.getByRole('region', { name: 'Analytics' });
-    expect(getComputedStyle(region).flexDirection).toBe('column');
+    renderCard();
+    const style = getComputedStyle(screen.getByRole('region', { name: 'Analytics' }));
+    expect(style.flexDirection).toBe('column');
+    expect(style.width).toBe('360px');
+    expect(style.maxWidth).toBe('calc(390px - 32px)');
   });
 });

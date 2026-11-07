@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* The text above the buttons, in a card no wider than a phone's screen leaves room for. */
 .root {
   display: flex;
-  align-items: center;
-  gap: 12px 24px;
-  padding: 12px 20px;
+  flex-direction: column;
+  gap: 12px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
   color: var(--color-text-primary);
-  background-color: var(--color-background-white);
-  border-top: 1px solid var(--color-border-2);
-  box-shadow: 0 -2px 8px rgb(0 0 0 / 8%);
-}
-
-.text {
-  flex: 1 1 auto;
-}
-
-/* Below Mantine's sm breakpoint the buttons go under the text, where it has the width it needs. */
-@media (width < 48em) {
-  .root {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }

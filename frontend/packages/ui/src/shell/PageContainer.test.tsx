@@ -34,10 +34,10 @@ vi.mock('#shell/Footer/Footer.tsx', () => ({
   ),
 }));
 
-vi.mock('#shell/AnalyticsBanner/AnalyticsBanner.tsx', () => ({
-  AnalyticsBanner: ({ className }: Readonly<{ className?: string }>) => (
+vi.mock('#shell/AnalyticsCard/AnalyticsCard.tsx', () => ({
+  AnalyticsCard: ({ className }: Readonly<{ className?: string }>) => (
     <div
-      data-testid="analytics-banner"
+      data-testid="analytics-card"
       className={className}
     />
   ),
@@ -133,32 +133,50 @@ describe('PageContainer', () => {
   });
 });
 
-describe('PageContainer’s analytics banner', () => {
-  it('rests the banner on the footer’s top edge', () => {
+describe('PageContainer’s analytics card', () => {
+  afterEach(() => {
+    setViewportWidth(DEFAULT_VIEWPORT_WIDTH);
+  });
+
+  function renderCard() {
     const { getByRole, getByTestId } = renderWithMantine(
       <PageContainer breadcrumbs={[]} />,
     );
-    const banner = getByTestId('analytics-banner');
-    expect(getByRole('contentinfo')).toContainElement(banner);
-    expect(banner.className).toMatch(/banner/);
-    expect(banner.className).not.toMatch(/bannerWithoutFooter/);
-    const style = getComputedStyle(banner);
+    const card = getByTestId('analytics-card');
+    expect(getByRole('contentinfo')).toContainElement(card);
+    expect(card.className).toMatch(/analytics/);
+    expect(card.className).not.toMatch(/analyticsWithoutFooter/);
+    return getComputedStyle(card);
+  }
+
+  it('sets the card above the footer at its right end, from the sm breakpoint up', () => {
+    setViewportWidth(768);
+    const style = renderCard();
     expect(style.position).toBe('absolute');
-    expect(style.bottom).toBe('100%');
+    expect(style.right).toBe('0px');
+    expect(style.bottom).toBe('calc(100% + 12px)');
   });
 
-  it('rests the banner on the window’s bottom edge on a page with no footer', () => {
+  it('keeps the card off the screen’s right edge below the sm breakpoint', () => {
+    setViewportWidth(767);
+    const style = renderCard();
+    expect(style.position).toBe('absolute');
+    expect(style.right).toBe('16px');
+  });
+
+  it('sets the card at the window’s bottom right on a page with no footer', () => {
     const { getByTestId } = renderWithMantine(
       <PageContainer
         breadcrumbs={[]}
         footer={null}
       />,
     );
-    const banner = getByTestId('analytics-banner');
-    expect(banner.className).toMatch(/bannerWithoutFooter/);
-    const style = getComputedStyle(banner);
+    const card = getByTestId('analytics-card');
+    expect(card.className).toMatch(/analyticsWithoutFooter/);
+    const style = getComputedStyle(card);
     expect(style.position).toBe('fixed');
-    expect(style.bottom).toBe('0px');
+    expect(style.right).toBe('16px');
+    expect(style.bottom).toBe('16px');
   });
 });
 

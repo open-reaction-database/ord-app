@@ -30,7 +30,7 @@ const LOCAL_HOSTS = [
 /** The local storage key that holds the visitor's choice. */
 export const ANALYTICS_CHOICE_KEY = 'ord-analytics';
 
-/** The visitor's answer to the banner, in Google consent mode's terms. */
+/** The visitor's answer to the card, in Google consent mode's terms. */
 export type AnalyticsChoice = 'granted' | 'denied';
 
 export interface AnalyticsState {
@@ -38,7 +38,7 @@ export interface AnalyticsState {
   available: boolean;
   /** The visitor's choice, or none before they make one. */
   choice?: AnalyticsChoice;
-  /** Whether the banner is showing, asking for a choice. */
+  /** Whether the card is showing, asking for a choice. */
   asking: boolean;
 }
 
@@ -65,7 +65,7 @@ function readChoice(): AnalyticsChoice | undefined {
     const value = globalThis.localStorage.getItem(ANALYTICS_CHOICE_KEY);
     return value === 'granted' || value === 'denied' ? value : undefined;
   } catch {
-    // Storage the browser blocks holds no choice, so the banner asks.
+    // Storage the browser blocks holds no choice, so the card asks.
     return undefined;
   }
 }
@@ -149,7 +149,7 @@ function deny(current: Tag) {
 
 /**
  * Names the page's Google tag, such as `G-REEDLYB0ZJ`, and loads it if the visitor has
- * accepted analytics; until they choose, the banner asks. A page served locally, from
+ * accepted analytics; until they choose, the card asks. A page served locally, from
  * `hostname` (the page's own host unless a caller names another), loads nothing and asks
  * nothing.
  */
@@ -168,7 +168,7 @@ export function loadAnalytics(
   }
 }
 
-/** Records the visitor's choice, closes the banner, and loads or stops the Google tag. */
+/** Records the visitor's choice, closes the card, and loads or stops the Google tag. */
 export function chooseAnalytics(choice: AnalyticsChoice): void {
   if (tag === undefined) {
     return;
@@ -182,7 +182,7 @@ export function chooseAnalytics(choice: AnalyticsChoice): void {
   setState({ ...state, choice, asking: false });
 }
 
-/** Shows the banner again, so the visitor can change their choice. */
+/** Shows the card again, so the visitor can change their choice. */
 export function askAnalytics(): void {
   if (tag !== undefined) {
     setState({ ...state, asking: true });
@@ -196,7 +196,7 @@ function subscribe(listener: () => void) {
   };
 }
 
-/** The page's analytics: whether there is a tag to load, the choice, and the banner. */
+/** The page's analytics: whether there is a tag to load, the choice, and the card. */
 export function useAnalytics(): AnalyticsState {
   return useSyncExternalStore(subscribe, () => state);
 }
