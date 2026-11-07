@@ -108,6 +108,7 @@ expect_header "$legacy" "^location: /search#reaction_id=$reaction&limit=100[[:sp
 expect_body "$base/api/openapi.json" '"/api/search"'
 expect_status 200 "$base/api/reactions/$reaction"
 expect_status 301 "$base/editor"
+expect_header "$base/editor" '^location: https://editor\.open-reaction-database\.org/[[:space:]]*$'
 
 # With no key set, an ask is refused by the backend, then by nginx past its burst.
 ask=(-X POST -H 'Content-Type: application/json' -d '{"question": "pyridine"}' "$base/api/ask")

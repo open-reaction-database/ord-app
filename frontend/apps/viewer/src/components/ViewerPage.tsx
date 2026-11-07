@@ -18,7 +18,7 @@ import { PageContainer, type Breadcrumbs } from '@open-reaction-database/ui/shel
 import { useState, type PropsWithChildren } from 'react';
 import { Link } from 'wouter';
 
-export const EDITOR_URL = 'https://app.open-reaction-database.org';
+export const EDITOR_URL = 'https://editor.open-reaction-database.org';
 export const DOCS_URL = 'https://docs.open-reaction-database.org';
 
 interface ViewerPageProps extends PropsWithChildren {
